@@ -31,7 +31,7 @@ abstract class GagakuRoute {
   static const extensionSaved = 'saved';
   static const extensionHistory = 'history';
   static const extensionHomePage = '/extensions/:sourceId/home';
-  static const extensionSearch = '/extensions/:sourceId/search';
+  static const extensionSearch = '/extensions/search';
   static const web = '/read';
   static const webManga = '/read/:sourceId/:mangaId';
   static const proxyChapter = '/read/:proxy/:code/:chapter/:page';

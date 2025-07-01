@@ -98,7 +98,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final parser = ref.watch(
+    final source = ref.watch(
       getExtensionFromIdProvider(handle.sourceId).select(
         (value) => switch (value) {
           AsyncValue(value: final data?) => data,
@@ -193,8 +193,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            if (parser != null && parser.icon.isNotEmpty)
-                              Image.network(parser.icon, width: 24, height: 24),
+                            if (source != null && source.icon.isNotEmpty)
+                              Image.network(source.icon, width: 24, height: 24),
                           ],
                         ),
                       ),
@@ -277,8 +277,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                       onPressed:
                           () => context.router.push(
                             ExtensionSearchRoute(
-                              sourceId: handle.sourceId,
-                              source: parser,
+                              initialSource: source,
                               query: SearchQuery(title: manga.title),
                             ),
                           ),
@@ -332,8 +331,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                               onPressed:
                                   () => context.router.push(
                                     ExtensionSearchRoute(
-                                      sourceId: handle.sourceId,
-                                      source: parser,
+                                      initialSource: source,
                                       query: SearchQuery(title: alttitle),
                                     ),
                                   ),
@@ -389,8 +387,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                       onPressed:
                                           () => context.router.push(
                                             ExtensionSearchRoute(
-                                              sourceId: handle.sourceId,
-                                              source: parser,
+                                              initialSource: source,
                                               query: SearchQuery(
                                                 title: '',
                                                 filters: [

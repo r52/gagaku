@@ -67,10 +67,7 @@ class _ExtensionHomeCard extends ConsumerWidget {
                     icon: const Icon(Icons.search),
                     onPressed:
                         () => context.router.push(
-                          ExtensionSearchRoute(
-                            sourceId: source.id,
-                            source: source,
-                          ),
+                          ExtensionSearchRoute(initialSource: source),
                         ),
                     tooltip: tr.search.arg(arg: source.name),
                   ),
@@ -391,8 +388,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
 
                       context.router.push(
                         ExtensionSearchRoute(
-                          sourceId: source.id,
-                          source: source,
+                          initialSource: source,
                           query: element.searchQuery,
                         ),
                       );
@@ -465,10 +461,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
                   icon: const Icon(Icons.search),
                   onPressed:
                       () => context.router.push(
-                        ExtensionSearchRoute(
-                          sourceId: source.id,
-                          source: source,
-                        ),
+                        ExtensionSearchRoute(initialSource: source),
                       ),
                   tooltip: tr.search.arg(arg: source.name),
                 ),

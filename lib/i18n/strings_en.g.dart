@@ -232,14 +232,15 @@ class TranslationsWebSourcesEn {
 	late final TranslationsWebSourcesRepoEn repo = TranslationsWebSourcesRepoEn.internal(_root);
 	late final TranslationsWebSourcesSourceEn source = TranslationsWebSourcesSourceEn.internal(_root);
 	String get noSourcesWarning => 'No extensions installed!';
-	String get sourceSearch => 'Source Search';
+	String get noSearchableSourcesWarning => 'No searchable extensions installed!';
+	String get sourceSearch => 'Extension Search';
 	String get resetRead => 'Reset Read Markers';
 	String get resetReadWarning => 'Are you sure you want to reset all read markers for this manga?';
 	String get resetAllRead => 'Reset all Read Markers';
 	String get resetAllReadWarning => 'Are you sure you want to reset all read markers?';
 	String get favorites => 'Favorites';
 	String get loadInstalledSourcesError => 'Error loading installed sources';
-	String get searchThisName => 'Search this Manga name';
+	String get searchThisName => 'Search this Manga name using extensions';
 }
 
 // Path: search
@@ -986,14 +987,15 @@ extension on Translations {
 			case 'webSources.source.installedVersion': return ({required Object version}) => ' (installed: v${version})';
 			case 'webSources.source.noTagsWarning': return 'This extension provides no filter options';
 			case 'webSources.noSourcesWarning': return 'No extensions installed!';
-			case 'webSources.sourceSearch': return 'Source Search';
+			case 'webSources.noSearchableSourcesWarning': return 'No searchable extensions installed!';
+			case 'webSources.sourceSearch': return 'Extension Search';
 			case 'webSources.resetRead': return 'Reset Read Markers';
 			case 'webSources.resetReadWarning': return 'Are you sure you want to reset all read markers for this manga?';
 			case 'webSources.resetAllRead': return 'Reset all Read Markers';
 			case 'webSources.resetAllReadWarning': return 'Are you sure you want to reset all read markers?';
 			case 'webSources.favorites': return 'Favorites';
 			case 'webSources.loadInstalledSourcesError': return 'Error loading installed sources';
-			case 'webSources.searchThisName': return 'Search this Manga name';
+			case 'webSources.searchThisName': return 'Search this Manga name using extensions';
 			case 'search.text': return 'Search';
 			case 'search.arg': return ({required Object arg}) => 'Search ${arg}';
 			case 'search.filters': return 'Search Filters';

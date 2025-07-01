@@ -230,19 +230,16 @@ class ExtensionSearchRoute
     extends _i29.PageRouteInfo<ExtensionSearchRouteArgs> {
   ExtensionSearchRoute({
     _i30.Key? key,
-    required String sourceId,
-    _i31.WebSourceInfo? source,
+    _i31.WebSourceInfo? initialSource,
     _i31.SearchQuery? query,
     List<_i29.PageRouteInfo>? children,
   }) : super(
          ExtensionSearchRoute.name,
          args: ExtensionSearchRouteArgs(
            key: key,
-           sourceId: sourceId,
-           source: source,
+           initialSource: initialSource,
            query: query,
          ),
-         rawPathParams: {'sourceId': sourceId},
          initialChildren: children,
        );
 
@@ -251,17 +248,12 @@ class ExtensionSearchRoute
   static _i29.PageInfo page = _i29.PageInfo(
     name,
     builder: (data) {
-      final pathParams = data.inheritedPathParams;
       final args = data.argsAs<ExtensionSearchRouteArgs>(
-        orElse:
-            () => ExtensionSearchRouteArgs(
-              sourceId: pathParams.getString('sourceId'),
-            ),
+        orElse: () => const ExtensionSearchRouteArgs(),
       );
       return _i4.ExtensionSearchPage(
         key: args.key,
-        sourceId: args.sourceId,
-        source: args.source,
+        initialSource: args.initialSource,
         query: args.query,
       );
     },
@@ -269,24 +261,17 @@ class ExtensionSearchRoute
 }
 
 class ExtensionSearchRouteArgs {
-  const ExtensionSearchRouteArgs({
-    this.key,
-    required this.sourceId,
-    this.source,
-    this.query,
-  });
+  const ExtensionSearchRouteArgs({this.key, this.initialSource, this.query});
 
   final _i30.Key? key;
 
-  final String sourceId;
-
-  final _i31.WebSourceInfo? source;
+  final _i31.WebSourceInfo? initialSource;
 
   final _i31.SearchQuery? query;
 
   @override
   String toString() {
-    return 'ExtensionSearchRouteArgs{key: $key, sourceId: $sourceId, source: $source, query: $query}';
+    return 'ExtensionSearchRouteArgs{key: $key, initialSource: $initialSource, query: $query}';
   }
 
   @override
@@ -294,14 +279,12 @@ class ExtensionSearchRouteArgs {
     if (identical(this, other)) return true;
     if (other is! ExtensionSearchRouteArgs) return false;
     return key == other.key &&
-        sourceId == other.sourceId &&
-        source == other.source &&
+        initialSource == other.initialSource &&
         query == other.query;
   }
 
   @override
-  int get hashCode =>
-      key.hashCode ^ sourceId.hashCode ^ source.hashCode ^ query.hashCode;
+  int get hashCode => key.hashCode ^ initialSource.hashCode ^ query.hashCode;
 }
 
 /// generated route for
