@@ -14,6 +14,160 @@ part of 'types.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
+mixin _$ChapterEntry {
+
+ String get name; WebChapter get chapter;
+/// Create a copy of ChapterEntry
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChapterEntryCopyWith<ChapterEntry> get copyWith => _$ChapterEntryCopyWithImpl<ChapterEntry>(this as ChapterEntry, _$identity);
+
+  /// Serializes this ChapterEntry to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterEntry&&(identical(other.name, name) || other.name == name)&&(identical(other.chapter, chapter) || other.chapter == chapter));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,name,chapter);
+
+@override
+String toString() {
+  return 'ChapterEntry(name: $name, chapter: $chapter)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ChapterEntryCopyWith<$Res>  {
+  factory $ChapterEntryCopyWith(ChapterEntry value, $Res Function(ChapterEntry) _then) = _$ChapterEntryCopyWithImpl;
+@useResult
+$Res call({
+ String name, WebChapter chapter
+});
+
+
+$WebChapterCopyWith<$Res> get chapter;
+
+}
+/// @nodoc
+class _$ChapterEntryCopyWithImpl<$Res>
+    implements $ChapterEntryCopyWith<$Res> {
+  _$ChapterEntryCopyWithImpl(this._self, this._then);
+
+  final ChapterEntry _self;
+  final $Res Function(ChapterEntry) _then;
+
+/// Create a copy of ChapterEntry
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? chapter = null,}) {
+  return _then(_self.copyWith(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,chapter: null == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
+as WebChapter,
+  ));
+}
+/// Create a copy of ChapterEntry
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebChapterCopyWith<$Res> get chapter {
+  
+  return $WebChapterCopyWith<$Res>(_self.chapter, (value) {
+    return _then(_self.copyWith(chapter: value));
+  });
+}
+}
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _ChapterEntry extends ChapterEntry {
+  const _ChapterEntry({required this.name, required this.chapter}): super._();
+  factory _ChapterEntry.fromJson(Map<String, dynamic> json) => _$ChapterEntryFromJson(json);
+
+@override final  String name;
+@override final  WebChapter chapter;
+
+/// Create a copy of ChapterEntry
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ChapterEntryCopyWith<_ChapterEntry> get copyWith => __$ChapterEntryCopyWithImpl<_ChapterEntry>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ChapterEntryToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterEntry&&(identical(other.name, name) || other.name == name)&&(identical(other.chapter, chapter) || other.chapter == chapter));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,name,chapter);
+
+@override
+String toString() {
+  return 'ChapterEntry(name: $name, chapter: $chapter)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ChapterEntryCopyWith<$Res> implements $ChapterEntryCopyWith<$Res> {
+  factory _$ChapterEntryCopyWith(_ChapterEntry value, $Res Function(_ChapterEntry) _then) = __$ChapterEntryCopyWithImpl;
+@override @useResult
+$Res call({
+ String name, WebChapter chapter
+});
+
+
+@override $WebChapterCopyWith<$Res> get chapter;
+
+}
+/// @nodoc
+class __$ChapterEntryCopyWithImpl<$Res>
+    implements _$ChapterEntryCopyWith<$Res> {
+  __$ChapterEntryCopyWithImpl(this._self, this._then);
+
+  final _ChapterEntry _self;
+  final $Res Function(_ChapterEntry) _then;
+
+/// Create a copy of ChapterEntry
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? chapter = null,}) {
+  return _then(_ChapterEntry(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,chapter: null == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
+as WebChapter,
+  ));
+}
+
+/// Create a copy of ChapterEntry
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebChapterCopyWith<$Res> get chapter {
+  
+  return $WebChapterCopyWith<$Res>(_self.chapter, (value) {
+    return _then(_self.copyWith(chapter: value));
+  });
+}
+}
+
+
+/// @nodoc
 mixin _$SourceHandler {
 
  SourceType get type; set type(SourceType value); String get sourceId; set sourceId(String value); String get location; set location(String value); String? get chapter; set chapter(String? value);

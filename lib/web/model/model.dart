@@ -1109,9 +1109,9 @@ return p;
     final chapmap =
         chapters
             .map(
-              (e) => ChapterEntry.entry(
-                e.chapNum.toString(),
-                WebChapter(
+              (e) => ChapterEntry(
+                name: e.chapNum.toString(),
+                chapter: WebChapter(
                   title: e.title,
                   volume: e.volume?.toString(),
                   groups: {e.version ?? sourceId: e},
