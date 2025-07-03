@@ -1,6 +1,5 @@
-// dart format width=80
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -86,6 +85,7 @@ as FilterOrder,
 }
 
 }
+
 
 
 /// @nodoc
@@ -295,6 +295,7 @@ $MangaFiltersCopyWith<$Res> get filter {
   });
 }
 }
+
 
 
 /// @nodoc
@@ -507,6 +508,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -1594,6 +1596,7 @@ as List<String>,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -1765,6 +1768,7 @@ $ChapterAPIDataCopyWith<$Res> get chapter {
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -1924,6 +1928,7 @@ as int,
 }
 
 }
+
 
 
 /// @nodoc
@@ -2088,6 +2093,7 @@ as String?,
 }
 
 }
+
 
 
 /// @nodoc
@@ -2265,6 +2271,7 @@ $MangaLinksCopyWith<$Res>? get links {
   });
 }
 }
+
 
 
 /// @nodoc
@@ -2485,6 +2492,7 @@ as DateTime,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -2651,6 +2659,7 @@ as String?,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -2805,6 +2814,7 @@ as String?,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -2954,6 +2964,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -3107,6 +3118,7 @@ as DateTime,
 }
 
 }
+
 
 
 /// @nodoc
@@ -3278,6 +3290,7 @@ as TagGroup,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -3439,6 +3452,7 @@ as Map<String, MangaStatistics>,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -3588,6 +3602,7 @@ as Map<String, ChapterStatistics>,
 }
 
 }
+
 
 
 /// @nodoc
@@ -3762,6 +3777,7 @@ $StatisticsDetailsRatingCopyWith<$Res> get rating {
   });
 }
 }
+
 
 
 /// @nodoc
@@ -3946,6 +3962,7 @@ $StatisticsDetailsCommentsCopyWith<$Res>? get comments {
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -4104,6 +4121,7 @@ as int,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -4252,6 +4270,7 @@ as double,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -4397,6 +4416,7 @@ as Map<String, SelfRating>,
 }
 
 }
+
 
 
 /// @nodoc
@@ -4551,6 +4571,7 @@ as DateTime,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -4698,6 +4719,7 @@ as int,
 }
 
 }
+
 
 
 /// @nodoc
@@ -4848,6 +4870,7 @@ as List<MDError>,
 }
 
 }
+
 
 
 /// @nodoc
@@ -5004,6 +5027,7 @@ as String,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -5151,6 +5175,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -5303,6 +5328,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc

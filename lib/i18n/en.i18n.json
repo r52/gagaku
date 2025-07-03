@@ -170,7 +170,7 @@
     "resetAllReadWarning": "Are you sure you want to reset all read markers?",
     "favorites": "Favorites",
     "loadInstalledSourcesError": "Error loading installed sources",
-    "searchThisName": "Search this Manga name using extensions"
+    "searchWithExt": "Search with extensions"
   },
   "search": {
     "text": "Search",
@@ -347,7 +347,8 @@
     "unread": "unread",
     "markAllWarning": "Are you sure you want to mark all visible chapters as ${arg}?",
     "noChaptersMsg": "No Chapters",
-    "markAs": "Mark as $arg"
+    "markAs": "Mark as $arg",
+    "copyLink": "Copy gagaku link"
   },
   "readingStatus": {
     "remove": "Remove",

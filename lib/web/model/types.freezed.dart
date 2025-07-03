@@ -1,6 +1,5 @@
-// dart format width=80
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -84,6 +83,7 @@ $WebChapterCopyWith<$Res> get chapter {
   });
 }
 }
+
 
 
 /// @nodoc
@@ -224,6 +224,7 @@ as String?,
 }
 
 }
+
 
 
 /// @nodoc
@@ -375,6 +376,7 @@ $WebMangaCopyWith<$Res> get manga {
   });
 }
 }
+
 
 
 /// @nodoc
@@ -538,6 +540,7 @@ $SourceHandlerCopyWith<$Res>? get handle {
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -692,6 +695,7 @@ $SourceMangaCopyWith<$Res>? get data {
   });
 }
 }
+
 
 
 /// @nodoc
@@ -850,6 +854,7 @@ as Map<String, dynamic>,
 }
 
 
+
 /// @nodoc
 
 @JsonSerializable(fieldRename: FieldRename.snake)
@@ -992,6 +997,7 @@ as String,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -1131,6 +1137,7 @@ as List<SourceIntents>,
 }
 
 }
+
 
 
 /// @nodoc
@@ -1285,6 +1292,7 @@ as BadgeColor,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -1420,6 +1428,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -1559,6 +1568,7 @@ as String?,
 }
 
 }
+
 
 
 /// @nodoc
@@ -1723,6 +1733,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -2000,6 +2011,7 @@ as String,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -2144,6 +2156,7 @@ $BuiltWithCopyWith<$Res> get builtWith {
   });
 }
 }
+
 
 
 /// @nodoc
@@ -2298,6 +2311,7 @@ as String,
 
 
 
+
 /// @nodoc
 mixin _$RepoData {
 
@@ -2361,6 +2375,7 @@ as SupportedVersion,
 }
 
 
+
 OAuthResponseType _$OAuthResponseTypeFromJson(
   Map<String, dynamic> json
 ) {
@@ -2419,6 +2434,7 @@ String toString() {
 class $OAuthResponseTypeCopyWith<$Res>  {
 $OAuthResponseTypeCopyWith(OAuthResponseType _, $Res Function(OAuthResponseType) __);
 }
+
 
 
 /// @nodoc
@@ -2677,6 +2693,7 @@ as List<SearchFilterValue>,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -2822,6 +2839,7 @@ as dynamic,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -2962,6 +2980,7 @@ as dynamic,
 }
 
 }
+
 
 
 /// @nodoc
@@ -3113,6 +3132,7 @@ $MangaInfoCopyWith<$Res> get mangaInfo {
   });
 }
 }
+
 
 
 /// @nodoc
@@ -3270,6 +3290,7 @@ as String?,
 }
 
 }
+
 
 
 /// @nodoc
@@ -3463,6 +3484,7 @@ as List<Tag>,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -3605,6 +3627,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -3759,6 +3782,7 @@ $SourceMangaCopyWith<$Res> get sourceManga {
   });
 }
 }
+
 
 
 /// @nodoc
@@ -3933,6 +3957,7 @@ as List<String>,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -4077,6 +4102,7 @@ as DiscoverSectionType,
 }
 
 }
+
 
 
 /// @nodoc
@@ -4252,6 +4278,7 @@ as ContentRating?,
 }
 
 }
+
 
 
 /// @nodoc
@@ -4743,6 +4770,7 @@ as String,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -4929,6 +4957,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -5781,6 +5810,7 @@ as List<FormItemElement>,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -5925,6 +5955,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -6092,6 +6123,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -6514,6 +6546,7 @@ as String,value: null == value ? _self.value : value ,
 }
 
 }
+
 
 
 /// @nodoc

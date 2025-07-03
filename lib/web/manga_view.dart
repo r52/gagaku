@@ -204,7 +204,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
               ),
               actions: [
                 OverflowBar(
-                  spacing: 8.0,
+                  spacing: 6.0,
                   children: [
                     FavoritesButton(
                       link: link,
@@ -212,17 +212,43 @@ class WebMangaViewWidget extends HookConsumerWidget {
                         Radius.circular(6.0),
                       ),
                     ),
-                    Consumer(
-                      builder: (context, ref, child) {
-                        final key = handle.getKey();
-
-                        return IconButton(
-                          tooltip: tr.webSources.resetRead,
-                          style: Styles.squareIconButtonStyle(
-                            backgroundColor: theme.colorScheme.surface
-                                .withAlpha(200),
+                    IconButton(
+                      tooltip: tr.webSources.searchWithExt,
+                      style: Styles.squareIconButtonStyle(
+                        backgroundColor: theme.colorScheme.surface.withAlpha(
+                          200,
+                        ),
+                      ),
+                      onPressed:
+                          () => context.router.push(
+                            ExtensionSearchRoute(
+                              initialSource: source,
+                              query: SearchQuery(title: manga.title),
+                            ),
                           ),
+                      icon: const Icon(Icons.search),
+                    ),
+                    MenuAnchor(
+                      builder:
+                          (context, controller, child) => IconButton(
+                            color: theme.colorScheme.onPrimaryContainer,
+                            style: Styles.squareIconButtonStyle(
+                              backgroundColor: theme.colorScheme.surface
+                                  .withAlpha(200),
+                            ),
+                            onPressed: () {
+                              if (controller.isOpen) {
+                                controller.close();
+                              } else {
+                                controller.open();
+                              }
+                            },
+                            icon: const Icon(Icons.more_vert),
+                          ),
+                      menuChildren: [
+                        MenuItemButton(
                           onPressed: () async {
+                            final key = handle.getKey();
                             final result = await showDialog<bool>(
                               context: context,
                               builder: (BuildContext context) {
@@ -263,25 +289,32 @@ class WebMangaViewWidget extends HookConsumerWidget {
                               });
                             }
                           },
-                          icon: const Icon(Icons.restore),
-                        );
-                      },
-                    ),
-                    IconButton(
-                      tooltip: tr.webSources.searchThisName,
-                      style: Styles.squareIconButtonStyle(
-                        backgroundColor: theme.colorScheme.surface.withAlpha(
-                          200,
+                          leadingIcon: const Icon(Icons.restore),
+                          child: Text(tr.webSources.resetRead),
                         ),
-                      ),
-                      onPressed:
-                          () => context.router.push(
-                            ExtensionSearchRoute(
-                              initialSource: source,
-                              query: SearchQuery(title: manga.title),
-                            ),
-                          ),
-                      icon: const Icon(Icons.search),
+                        MenuItemButton(
+                          onPressed:
+                              () => Clipboard.setData(
+                                ClipboardData(
+                                  text:
+                                      'gagaku://open${context.router.currentUrl}',
+                                ),
+                              ).then((_) {
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    showCloseIcon: true,
+                                    duration: const Duration(
+                                      milliseconds: 1000,
+                                    ),
+                                    content: Text(tr.ui.copyClipboard),
+                                  ),
+                                );
+                              }),
+                          leadingIcon: const Icon(Icons.copy),
+                          child: Text(tr.mangaView.copyLink),
+                        ),
+                      ],
                     ),
                     const SizedBox(width: 2),
                   ],
@@ -323,7 +356,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                   );
                                 }),
                             trailing: IconButton(
-                              tooltip: tr.webSources.searchThisName,
+                              tooltip: tr.webSources.searchWithExt,
                               style: Styles.squareIconButtonStyle(
                                 backgroundColor: theme.colorScheme.surface
                                     .withAlpha(200),
@@ -601,11 +634,11 @@ class ContentChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = content.name.capitalize();
+    final label = content.name.toLowerCase().capitalize();
     return IconTextChip(
       color: switch (content) {
         ContentRating.ADULT => Colors.red,
-        ContentRating.MATURE => Colors.red,
+        ContentRating.MATURE => Colors.orange,
         _ => Colors.green,
       },
       text: label,

@@ -240,7 +240,7 @@ class TranslationsWebSourcesEn {
 	String get resetAllReadWarning => 'Are you sure you want to reset all read markers?';
 	String get favorites => 'Favorites';
 	String get loadInstalledSourcesError => 'Error loading installed sources';
-	String get searchThisName => 'Search this Manga name using extensions';
+	String get searchWithExt => 'Search with extensions';
 }
 
 // Path: search
@@ -398,6 +398,7 @@ class TranslationsMangaViewEn {
 	String markAllWarning({required Object arg}) => 'Are you sure you want to mark all visible chapters as ${arg}?';
 	String get noChaptersMsg => 'No Chapters';
 	String markAs({required Object arg}) => 'Mark as ${arg}';
+	String get copyLink => 'Copy gagaku link';
 }
 
 // Path: readingStatus
@@ -995,7 +996,7 @@ extension on Translations {
 			case 'webSources.resetAllReadWarning': return 'Are you sure you want to reset all read markers?';
 			case 'webSources.favorites': return 'Favorites';
 			case 'webSources.loadInstalledSourcesError': return 'Error loading installed sources';
-			case 'webSources.searchThisName': return 'Search this Manga name using extensions';
+			case 'webSources.searchWithExt': return 'Search with extensions';
 			case 'search.text': return 'Search';
 			case 'search.arg': return ({required Object arg}) => 'Search ${arg}';
 			case 'search.filters': return 'Search Filters';
@@ -1149,6 +1150,7 @@ extension on Translations {
 			case 'mangaView.markAllWarning': return ({required Object arg}) => 'Are you sure you want to mark all visible chapters as ${arg}?';
 			case 'mangaView.noChaptersMsg': return 'No Chapters';
 			case 'mangaView.markAs': return ({required Object arg}) => 'Mark as ${arg}';
+			case 'mangaView.copyLink': return 'Copy gagaku link';
 			case 'readingStatus.remove': return 'Remove';
 			case 'readingStatus.reading': return 'Reading';
 			case 'readingStatus.on_hold': return 'On Hold';

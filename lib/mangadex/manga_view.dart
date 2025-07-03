@@ -309,6 +309,59 @@ class _MangaDexMangaViewWidgetState
       );
     }
 
+    final moreMenu = MenuAnchor(
+      builder:
+          (context, controller, child) => IconButton(
+            color: theme.colorScheme.onPrimaryContainer,
+            style: Styles.squareIconButtonStyle(
+              backgroundColor: theme.colorScheme.surface.withAlpha(200),
+            ),
+            onPressed: () {
+              if (controller.isOpen) {
+                controller.close();
+              } else {
+                controller.open();
+              }
+            },
+            icon: const Icon(Icons.more_vert),
+          ),
+      menuChildren: [
+        MenuItemButton(
+          onPressed:
+              () => context.router.push(
+                ExtensionSearchRoute(
+                  query: SearchQuery(
+                    title: widget.manga.attributes!.title.get(
+                      tr.$meta.locale.languageCode,
+                    ),
+                  ),
+                ),
+              ),
+          leadingIcon: const Icon(Icons.search),
+          child: Text(tr.webSources.searchWithExt),
+        ),
+        MenuItemButton(
+          onPressed:
+              () => Clipboard.setData(
+                ClipboardData(
+                  text: 'gagaku://open${context.router.currentUrl}',
+                ),
+              ).then((_) {
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    showCloseIcon: true,
+                    duration: const Duration(milliseconds: 1000),
+                    content: Text(tr.ui.copyClipboard),
+                  ),
+                );
+              }),
+          leadingIcon: const Icon(Icons.copy),
+          child: Text(tr.mangaView.copyLink),
+        ),
+      ],
+    );
+
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
@@ -398,187 +451,160 @@ class _MangaDexMangaViewWidgetState
                           ),
                         ),
                       ),
-                      Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 20.0, bottom: 50.0),
-                          child: IconButton(
-                            tooltip: tr.webSources.searchThisName,
-                            style: Styles.squareIconButtonStyle(
-                              backgroundColor: theme.colorScheme.surface
-                                  .withAlpha(200),
-                            ),
-                            onPressed:
-                                () => context.router.push(
-                                  ExtensionSearchRoute(
-                                    query: SearchQuery(
-                                      title: widget.manga.attributes!.title.get(
-                                        tr.$meta.locale.languageCode,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            icon: const Icon(Icons.search),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
-                actions:
-                    me == null
-                        ? null
-                        : [
-                          OverflowBar(
-                            spacing: 8.0,
-                            children: [
-                              Consumer(
-                                builder: (context, ref, child) {
-                                  final followProvider = ref.watch(
-                                    followingStatusProvider(widget.manga),
+                actions: [
+                  OverflowBar(
+                    spacing: 6.0,
+                    children: [
+                      if (me != null)
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final followProvider = ref.watch(
+                              followingStatusProvider(widget.manga),
+                            );
+                            final following = followProvider.value;
+                            final setFollowing = ref.watch(
+                              followStatusMutation(widget.manga),
+                            );
+                            final statusProvider = ref.watch(
+                              readingStatusProvider(widget.manga),
+                            );
+                            final reading = statusProvider.value;
+
+                            if (following == null ||
+                                statusProvider.isLoading ||
+                                setFollowing is MutationPending) {
+                              return _loadingAction;
+                            }
+
+                            if (following == false && reading == null) {
+                              return ElevatedButton(
+                                style: Styles.buttonStyle(),
+                                onPressed: () async {
+                                  final result = await showDialog<
+                                    (MangaReadingStatus, bool)
+                                  >(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return _AddToLibraryDialog();
+                                    },
                                   );
-                                  final following = followProvider.value;
-                                  final setFollowing = ref.watch(
-                                    followStatusMutation(widget.manga),
-                                  );
-                                  final statusProvider = ref.watch(
-                                    readingStatusProvider(widget.manga),
-                                  );
-                                  final reading = statusProvider.value;
 
-                                  if (following == null ||
-                                      statusProvider.isLoading ||
-                                      setFollowing is MutationPending) {
-                                    return _loadingAction;
-                                  }
-
-                                  if (following == false && reading == null) {
-                                    return ElevatedButton(
-                                      style: Styles.buttonStyle(),
-                                      onPressed: () async {
-                                        final result = await showDialog<
-                                          (MangaReadingStatus, bool)
-                                        >(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return _AddToLibraryDialog();
-                                          },
-                                        );
-
-                                        if (result != null) {
-                                          readingStatusMutation(
-                                            widget.manga,
-                                          ).run(ref, (ref) async {
-                                            return await ref
-                                                .get(
-                                                  readingStatusProvider(
-                                                    widget.manga,
-                                                  ).notifier,
-                                                )
-                                                .set(result.$1);
-                                          });
-
-                                          followStatusMutation(
-                                            widget.manga,
-                                          ).run(ref, (ref) async {
-                                            return await ref
-                                                .get(
-                                                  followingStatusProvider(
-                                                    widget.manga,
-                                                  ).notifier,
-                                                )
-                                                .set(result.$2);
-                                          });
-                                        }
+                                  if (result != null) {
+                                    readingStatusMutation(widget.manga).run(
+                                      ref,
+                                      (ref) async {
+                                        return await ref
+                                            .get(
+                                              readingStatusProvider(
+                                                widget.manga,
+                                              ).notifier,
+                                            )
+                                            .set(result.$1);
                                       },
-                                      child: Text(tr.mangaActions.addToLibrary),
                                     );
-                                  }
 
-                                  if (reading != null) {
-                                    return IconButton(
-                                      padding: EdgeInsets.zero,
-                                      tooltip:
-                                          following
-                                              ? tr.mangaActions.unfollow
-                                              : tr.mangaActions.follow,
-                                      style: Styles.squareIconButtonStyle(
-                                        backgroundColor: theme
-                                            .colorScheme
-                                            .surface
-                                            .withAlpha(200),
-                                      ),
-                                      color: theme.colorScheme.primary,
-                                      onPressed: () async {
-                                        bool set = !following;
-                                        followStatusMutation(widget.manga).run(
-                                          ref,
-                                          (ref) async {
-                                            return await ref
-                                                .get(
-                                                  followingStatusProvider(
-                                                    widget.manga,
-                                                  ).notifier,
-                                                )
-                                                .set(set);
-                                          },
-                                        );
+                                    followStatusMutation(widget.manga).run(
+                                      ref,
+                                      (ref) async {
+                                        return await ref
+                                            .get(
+                                              followingStatusProvider(
+                                                widget.manga,
+                                              ).notifier,
+                                            )
+                                            .set(result.$2);
                                       },
-                                      icon: Icon(
-                                        following
-                                            ? Icons.notifications_active
-                                            : Icons.notifications_off_outlined,
-                                      ),
                                     );
                                   }
-
-                                  return const SizedBox.shrink();
                                 },
-                              ),
-                              Consumer(
-                                builder: (context, ref, child) {
-                                  final readProvider = ref.watch(
-                                    readingStatusProvider(widget.manga),
-                                  );
-                                  final reading = readProvider.value;
-                                  final setReadingStatus = ref.watch(
-                                    readingStatusMutation(widget.manga),
-                                  );
+                                child: Text(tr.mangaActions.addToLibrary),
+                              );
+                            }
 
-                                  if (readProvider.isLoading ||
-                                      setReadingStatus is MutationPending) {
-                                    return _loadingAction;
-                                  }
-
-                                  if (reading != null) {
-                                    return _ReadingStatusDropdown(
-                                      key: ValueKey(
-                                        '_ReadingStatusDropdown(${widget.manga.id})',
-                                      ),
-                                      initial: reading,
-                                      manga: widget.manga,
-                                    );
-                                  }
-
-                                  return const SizedBox.shrink();
+                            if (reading != null) {
+                              return IconButton(
+                                padding: EdgeInsets.zero,
+                                tooltip:
+                                    following
+                                        ? tr.mangaActions.unfollow
+                                        : tr.mangaActions.follow,
+                                style: Styles.squareIconButtonStyle(
+                                  backgroundColor: theme.colorScheme.surface
+                                      .withAlpha(200),
+                                ),
+                                color: theme.colorScheme.primary,
+                                onPressed: () async {
+                                  bool set = !following;
+                                  followStatusMutation(widget.manga).run(ref, (
+                                    ref,
+                                  ) async {
+                                    return await ref
+                                        .get(
+                                          followingStatusProvider(
+                                            widget.manga,
+                                          ).notifier,
+                                        )
+                                        .set(set);
+                                  });
                                 },
-                              ),
-                              _RatingMenu(
-                                key: ValueKey(
-                                  '_RatingMenu(${widget.manga.id})',
+                                icon: Icon(
+                                  following
+                                      ? Icons.notifications_active
+                                      : Icons.notifications_off_outlined,
                                 ),
-                                manga: widget.manga,
-                              ),
-                              _UserListsMenu(
+                              );
+                            }
+
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      if (me != null)
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final readProvider = ref.watch(
+                              readingStatusProvider(widget.manga),
+                            );
+                            final reading = readProvider.value;
+                            final setReadingStatus = ref.watch(
+                              readingStatusMutation(widget.manga),
+                            );
+
+                            if (readProvider.isLoading ||
+                                setReadingStatus is MutationPending) {
+                              return _loadingAction;
+                            }
+
+                            if (reading != null) {
+                              return _ReadingStatusDropdown(
                                 key: ValueKey(
-                                  '_UserListsMenu(${widget.manga.id})',
+                                  '_ReadingStatusDropdown(${widget.manga.id})',
                                 ),
+                                initial: reading,
                                 manga: widget.manga,
-                              ),
-                              const SizedBox(width: 2),
-                            ],
-                          ),
-                        ],
+                              );
+                            }
+
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      if (me != null)
+                        _RatingMenu(
+                          key: ValueKey('_RatingMenu(${widget.manga.id})'),
+                          manga: widget.manga,
+                        ),
+                      if (me != null)
+                        _UserListsMenu(
+                          key: ValueKey('_UserListsMenu(${widget.manga.id})'),
+                          manga: widget.manga,
+                        ),
+                      moreMenu,
+                      const SizedBox(width: 2),
+                    ],
+                  ),
+                ],
               ),
               SliverList.list(
                 children: [
@@ -632,7 +658,7 @@ class _MangaDexMangaViewWidgetState
                                         );
                                       }),
                                   trailing: IconButton(
-                                    tooltip: tr.webSources.searchThisName,
+                                    tooltip: tr.webSources.searchWithExt,
                                     style: Styles.squareIconButtonStyle(
                                       backgroundColor: theme.colorScheme.surface
                                           .withAlpha(200),

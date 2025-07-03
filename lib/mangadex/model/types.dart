@@ -486,7 +486,7 @@ abstract class MDEntityList with _$MDEntityList {
       _$MDEntityListFromJson(json);
 }
 
-mixin ChapterOps on MangaDexEntity {
+mixin ChapterOps implements MangaDexUUID {
   ChapterAttributes get attributes;
   List<MangaDexEntity> get relationships;
 
@@ -544,7 +544,7 @@ mixin ChapterOps on MangaDexEntity {
   }
 }
 
-mixin MangaOps on MangaDexEntity {
+mixin MangaOps implements MangaDexUUID {
   MangaAttributes? get attributes;
   List<MangaDexEntity>? get relationships;
   MangaRelations? get related;
@@ -654,7 +654,7 @@ mixin MangaOps on MangaDexEntity {
   }
 }
 
-mixin CustomListOps on MangaDexEntity {
+mixin CustomListOps implements MangaDexUUID {
   CustomListAttributes get attributes;
   List<MangaDexEntity> get relationships;
 

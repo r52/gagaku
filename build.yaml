@@ -10,6 +10,10 @@ targets:
       json_serializable:
         options:
           explicit_to_json: true
+      freezed:
+        options:
+          map: false
+          when: false
 
 builders:
   version_builder:
