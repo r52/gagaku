@@ -102,6 +102,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
               closedElevation: 0.0,
               closedBuilder: (context, openContainer) {
                 return IconButton(
+                  color: theme.colorScheme.onPrimaryContainer,
                   icon: const Icon(Icons.settings),
                   onPressed: () {
                     openContainer();
@@ -122,7 +123,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
                   // XXX: This changes when OAuth is released
                   me == null
                       ? IconButton(
-                        color: theme.colorScheme.primary,
+                        color: theme.colorScheme.onPrimaryContainer,
                         tooltip: tr.auth.login,
                         icon: const Icon(Icons.login),
                         onPressed:
@@ -131,7 +132,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
                       : MenuAnchor(
                         builder:
                             (context, controller, child) => IconButton(
-                              color: theme.colorScheme.primary,
+                              color: theme.colorScheme.onPrimaryContainer,
                               onPressed: () {
                                 if (controller.isOpen) {
                                   controller.close();

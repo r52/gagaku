@@ -312,7 +312,6 @@ class _MangaDexMangaViewWidgetState
     final moreMenu = MenuAnchor(
       builder:
           (context, controller, child) => IconButton(
-            color: theme.colorScheme.onPrimaryContainer,
             style: Styles.squareIconButtonStyle(
               backgroundColor: theme.colorScheme.surface.withAlpha(200),
             ),
@@ -1608,7 +1607,7 @@ class _RatingMenu extends HookConsumerWidget {
           color:
               hasRating
                   ? theme.colorScheme.primaryContainer
-                  : theme.colorScheme.surfaceContainerHighest,
+                  : theme.colorScheme.surface.withAlpha(200),
           borderRadius: const BorderRadius.all(Radius.circular(6.0)),
           child:
               (isLoading || ratings == null)
@@ -1650,7 +1649,7 @@ class _RatingMenu extends HookConsumerWidget {
           ),
       ],
       child: Padding(
-        padding: const EdgeInsets.all(6.0),
+        padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           spacing: 4.0,
@@ -1692,7 +1691,7 @@ class _UserListsMenu extends ConsumerWidget {
     return MenuAnchor(
       builder: (context, controller, child) {
         return Material(
-          color: theme.colorScheme.surfaceContainerHighest,
+          color: theme.colorScheme.surface.withAlpha(200),
           borderRadius: const BorderRadius.all(Radius.circular(6.0)),
           child:
               isLoading
@@ -1829,7 +1828,7 @@ class _UserListsMenu extends ConsumerWidget {
         ),
       ],
       child: const Padding(
-        padding: EdgeInsets.all(6.0),
+        padding: EdgeInsets.all(8.0),
         child: Icon(Icons.playlist_add),
       ),
     );

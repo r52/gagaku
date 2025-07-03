@@ -22,7 +22,6 @@ class _ExtensionHomeCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nav = Navigator.of(context);
-    final theme = Theme.of(context);
     final tr = context.t;
 
     return DataProviderWhenWidget(
@@ -49,7 +48,6 @@ class _ExtensionHomeCard extends ConsumerWidget {
               children: [
                 if (source.hasCapability(SourceIntents.settingsUI))
                   IconButton(
-                    color: theme.colorScheme.onPrimaryContainer,
                     icon: const Icon(Icons.settings),
                     onPressed:
                         () => nav.push(
@@ -63,7 +61,6 @@ class _ExtensionHomeCard extends ConsumerWidget {
                   ),
                 if (source.hasCapability(SourceIntents.mangaSearch))
                   IconButton(
-                    color: theme.colorScheme.onPrimaryContainer,
                     icon: const Icon(Icons.search),
                     onPressed:
                         () => context.router.push(

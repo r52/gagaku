@@ -231,7 +231,6 @@ class WebMangaViewWidget extends HookConsumerWidget {
                     MenuAnchor(
                       builder:
                           (context, controller, child) => IconButton(
-                            color: theme.colorScheme.onPrimaryContainer,
                             style: Styles.squareIconButtonStyle(
                               backgroundColor: theme.colorScheme.surface
                                   .withAlpha(200),

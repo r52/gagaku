@@ -577,14 +577,14 @@ class FavoritesButton extends HookConsumerWidget {
         return Tooltip(
           message: tr.mangaActions.favorite,
           child: Material(
-            color: theme.colorScheme.surfaceContainerHighest,
+            color: theme.colorScheme.surface.withAlpha(200),
             shape: borderRadius == null ? const CircleBorder() : null,
             borderRadius: borderRadius,
             child:
                 favorites == null
                     ? const SizedBox(
-                      width: 36,
-                      height: 36,
+                      width: 40,
+                      height: 40,
                       child: Padding(
                         padding: EdgeInsets.all(8.0),
                         child: CircularProgressIndicator(),
@@ -646,7 +646,7 @@ class FavoritesButton extends HookConsumerWidget {
               ]
               : [],
       child: Padding(
-        padding: const EdgeInsets.all(6.0),
+        padding: const EdgeInsets.all(8.0),
         child: Icon(
           favorited ? Icons.favorite : Icons.favorite_border,
           color: favorited ? theme.colorScheme.primary : null,

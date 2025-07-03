@@ -249,6 +249,7 @@ class CategoryManager extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
+    final theme = Theme.of(context);
     final nav = Navigator.of(context);
     final list = useState(categories);
     final defaultCat = useState(defaultCategory);
@@ -258,6 +259,7 @@ class CategoryManager extends HookConsumerWidget {
         flexibleSpace: TitleFlexBar(title: tr.webSources.settings.categories),
         actions: [
           IconButton(
+            color: theme.colorScheme.onPrimaryContainer,
             tooltip: tr.webSources.settings.newCategory,
             onPressed: () async {
               final result = await showDialog<String>(
@@ -276,6 +278,7 @@ class CategoryManager extends HookConsumerWidget {
             icon: const Icon(Icons.add),
           ),
           IconButton(
+            color: theme.colorScheme.onPrimaryContainer,
             tooltip: tr.ui.save,
             onPressed: () {
               nav.pop((list.value, defaultCat.value));
