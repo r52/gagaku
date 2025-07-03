@@ -1292,7 +1292,7 @@ class MangaDexModel {
 
         final resp = SelfRatingResponse.fromJson(body);
 
-        Map<String, SelfRating> map = resp.ratings;
+        Map<String, SelfRating> map = {...resp.ratings};
 
         for (final m in mangas) {
           if (!map.containsKey(m.id)) {
