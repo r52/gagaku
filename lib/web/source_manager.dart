@@ -70,6 +70,7 @@ class SourceManager extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
+    final theme = Theme.of(context);
     final nav = Navigator.of(context);
     final forceRefresh = useState(0);
     final cfg = ref.watch(webConfigProvider);
@@ -149,23 +150,32 @@ class SourceManager extends HookConsumerWidget {
                                                 ScaffoldMessenger.of(context);
 
                                             if (value) {
-                                              ref.read(
-                                                webConfigProvider.saveWith,
-                                              )(
-                                                installedSources: [
-                                                  ...cfg.installedSources,
-                                                  WebSourceInfo(
-                                                    id: source.id,
-                                                    name: source.name,
-                                                    repo: repo.url,
-                                                    baseUrl:
-                                                        source.getBaseUrl(),
-                                                    version: repo.version,
-                                                    icon: icon,
-                                                    capabilities: capabilities,
-                                                  ),
-                                                ],
-                                              );
+                                              webConfigSaveMutation.run(ref, (
+                                                ref,
+                                              ) async {
+                                                return ref
+                                                    .get(
+                                                      webConfigProvider
+                                                          .notifier,
+                                                    )
+                                                    .saveWith(
+                                                      installedSources: [
+                                                        ...cfg.installedSources,
+                                                        WebSourceInfo(
+                                                          id: source.id,
+                                                          name: source.name,
+                                                          repo: repo.url,
+                                                          baseUrl:
+                                                              source
+                                                                  .getBaseUrl(),
+                                                          version: repo.version,
+                                                          icon: icon,
+                                                          capabilities:
+                                                              capabilities,
+                                                        ),
+                                                      ],
+                                                    );
+                                              });
 
                                               messenger
                                                 ..removeCurrentSnackBar()
@@ -187,17 +197,25 @@ class SourceManager extends HookConsumerWidget {
                                                   source.id,
                                                 ),
                                               );
-                                              ref.read(
-                                                webConfigProvider.saveWith,
-                                              )(
-                                                installedSources: [
-                                                  ...cfg.installedSources,
-                                                ]..removeWhere(
-                                                  (e) =>
-                                                      e.id == source.id &&
-                                                      e.repo == repo.url,
-                                                ),
-                                              );
+
+                                              webConfigSaveMutation.run(ref, (
+                                                ref,
+                                              ) async {
+                                                return ref
+                                                    .get(
+                                                      webConfigProvider
+                                                          .notifier,
+                                                    )
+                                                    .saveWith(
+                                                      installedSources: [
+                                                        ...cfg.installedSources,
+                                                      ]..removeWhere(
+                                                        (e) =>
+                                                            e.id == source.id &&
+                                                            e.repo == repo.url,
+                                                      ),
+                                                    );
+                                              });
 
                                               messenger
                                                 ..removeCurrentSnackBar()
@@ -245,14 +263,19 @@ class SourceManager extends HookConsumerWidget {
                                   ref.invalidate(
                                     extensionSourceProvider(item.id),
                                   );
-                                  ref.read(webConfigProvider.saveWith)(
-                                    installedSources: [...cfg.installedSources]
-                                      ..removeWhere(
-                                        (e) =>
-                                            e.id == item.id &&
-                                            e.repo == item.repo,
-                                      ),
-                                  );
+                                  webConfigSaveMutation.run(ref, (ref) async {
+                                    return ref
+                                        .get(webConfigProvider.notifier)
+                                        .saveWith(
+                                          installedSources: [
+                                            ...cfg.installedSources,
+                                          ]..removeWhere(
+                                            (e) =>
+                                                e.id == item.id &&
+                                                e.repo == item.repo,
+                                          ),
+                                        );
+                                  });
 
                                   messenger
                                     ..removeCurrentSnackBar()
@@ -299,6 +322,7 @@ class SourceManager extends HookConsumerWidget {
         flexibleSpace: TitleFlexBar(title: tr.webSources.source.manager),
         actions: [
           IconButton(
+            color: theme.colorScheme.onPrimaryContainer,
             onPressed: () {
               forceRefresh.value += 1;
             },
@@ -306,6 +330,7 @@ class SourceManager extends HookConsumerWidget {
             tooltip: tr.webSources.source.refresh,
           ),
           IconButton(
+            color: theme.colorScheme.onPrimaryContainer,
             onPressed: () => nav.push(WebSourceSettingsRouteBuilder()),
             icon: const Icon(Icons.settings),
             tooltip: tr.arg_settings(arg: tr.webSources.text),

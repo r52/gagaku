@@ -12,7 +12,7 @@ import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod_annotation/experimental/mutation.dart';
+import 'package:riverpod/experimental/mutation.dart';
 
 enum _ListViewType { self, followed }
 
@@ -38,6 +38,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.t;
+    final messenger = ScaffoldMessenger.of(context);
     final router = AutoRouter.of(context);
     final theme = Theme.of(context);
     final scrollController =
@@ -46,40 +47,25 @@ class MangaDexListsWidget extends HookConsumerWidget {
         useScrollController();
     final view = useState(_ListViewType.self);
     final me = ref.watch(loggedUserProvider).value;
-    final deleteList = ref.watch(userListsProvider(me?.id).deleteList);
-    final followList = ref.watch(followedListsProvider(me?.id).setFollow);
-    final userGetNextPage = ref.watch(userListsProvider(me?.id).getNextPage);
-    final followGetNextPage = ref.watch(
-      followedListsProvider(me?.id).getNextPage,
-    );
+    final deleteList = ref.watch(userListDeleteMutation(me?.id));
+    final userGetNextPage = ref.watch(userListNextPageMutation(me?.id));
 
-    ref.listen(userListsProvider(me?.id).deleteList, (_, state) {
-      if (state.state is ErrorMutation) {
-        ScaffoldMessenger.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(
-                t.mangadex.deleteListError(
-                  error: (state.state as ErrorMutation).error.toString(),
-                ),
-              ),
-              backgroundColor: Colors.red,
-            ),
-          );
-      } else if (state.state is SuccessMutation) {
-        ScaffoldMessenger.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(t.mangadex.deleteListOk),
-              backgroundColor: Colors.green,
-            ),
-          );
-      }
+    final followGetNextPage = ref.watch(followedListNextPageMutation(me?.id));
 
-      return;
-    });
+    if (deleteList is MutationError) {
+      Styles.showSnackBar(
+        messenger,
+        content: t.mangadex.deleteListError(
+          error: (deleteList as MutationError).error.toString(),
+        ),
+      );
+    } else if (deleteList is MutationSuccess) {
+      Styles.showSnackBar(
+        messenger,
+        content: t.mangadex.deleteListOk,
+        color: Colors.green,
+      );
+    }
 
     useEffect(() {
       void controllerAtEdge() {
@@ -88,13 +74,21 @@ class MangaDexListsWidget extends HookConsumerWidget {
                 scrollController.position.maxScrollExtent) {
           switch (view.value) {
             case _ListViewType.self:
-              if (userGetNextPage.state is! PendingMutation) {
-                userGetNextPage();
+              if (userGetNextPage is! MutationPending) {
+                userListNextPageMutation(me?.id).run(ref, (ref) async {
+                  return await ref
+                      .get(userListsProvider(me?.id).notifier)
+                      .getMore();
+                });
               }
               break;
             case _ListViewType.followed:
-              if (followGetNextPage.state is! PendingMutation) {
-                followGetNextPage();
+              if (followGetNextPage is! MutationPending) {
+                followedListNextPageMutation(me?.id).run(ref, (ref) async {
+                  return await ref
+                      .get(followedListsProvider(me?.id).notifier)
+                      .getMore();
+                });
               }
               break;
           }
@@ -249,7 +243,17 @@ class MangaDexListsWidget extends HookConsumerWidget {
 
                                         return MenuItemButton(
                                           onPressed:
-                                              () => followList(item, idx == -1),
+                                              () => followedListMutation(
+                                                me?.id,
+                                              ).run(ref, (ref) async {
+                                                return await ref
+                                                    .get(
+                                                      followedListsProvider(
+                                                        me?.id,
+                                                      ).notifier,
+                                                    )
+                                                    .setFollow(item, idx == -1);
+                                              }),
                                           child: Text(
                                             idx == -1
                                                 ? t.ui.follow
@@ -266,7 +270,18 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                               item.attributes.name,
                                             );
                                         if (result == true) {
-                                          deleteList(item);
+                                          userListDeleteMutation(me?.id).run(
+                                            ref,
+                                            (ref) async {
+                                              return await ref
+                                                  .get(
+                                                    userListsProvider(
+                                                      me?.id,
+                                                    ).notifier,
+                                                  )
+                                                  .deleteList(item);
+                                            },
+                                          );
                                         }
                                       },
                                       child: Text(t.ui.delete),
@@ -289,7 +304,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                           },
                         ),
                         SliverVisibility.maintain(
-                          visible: userGetNextPage.state is PendingMutation,
+                          visible: userGetNextPage is MutationPending,
                           sliver: const SliverToBoxAdapter(
                             child: ListSpinner(),
                           ),
@@ -374,7 +389,17 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                   menuChildren: [
                                     MenuItemButton(
                                       onPressed: () async {
-                                        followList(item, false);
+                                        followedListMutation(me?.id).run(ref, (
+                                          ref,
+                                        ) async {
+                                          return await ref
+                                              .get(
+                                                followedListsProvider(
+                                                  me?.id,
+                                                ).notifier,
+                                              )
+                                              .setFollow(item, false);
+                                        });
                                       },
                                       child: Text(t.ui.unfollow),
                                     ),
@@ -389,7 +414,18 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                                 item.attributes.name,
                                               );
                                           if (result == true) {
-                                            deleteList(item);
+                                            userListDeleteMutation(me.id).run(
+                                              ref,
+                                              (ref) async {
+                                                return await ref
+                                                    .get(
+                                                      userListsProvider(
+                                                        me.id,
+                                                      ).notifier,
+                                                    )
+                                                    .deleteList(item);
+                                              },
+                                            );
                                           }
                                         },
                                         child: Text(t.ui.delete),
@@ -415,7 +451,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                           },
                         ),
                         SliverVisibility.maintain(
-                          visible: followGetNextPage.state is PendingMutation,
+                          visible: followGetNextPage is MutationPending,
                           sliver: const SliverToBoxAdapter(
                             child: ListSpinner(),
                           ),

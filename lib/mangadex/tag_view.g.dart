@@ -10,7 +10,7 @@ part of 'tag_view.dart';
 const _fetchTagFromIdProvider = _FetchTagFromIdFamily._();
 
 final class _FetchTagFromIdProvider
-    extends $FunctionalProvider<AsyncValue<Tag>, FutureOr<Tag>>
+    extends $FunctionalProvider<AsyncValue<Tag>, Tag, FutureOr<Tag>>
     with $FutureModifier<Tag>, $FutureProvider<Tag> {
   const _FetchTagFromIdProvider._({
     required _FetchTagFromIdFamily super.from,
@@ -79,7 +79,12 @@ final class _FetchTagFromIdFamily extends $Family
 const _trendingThisYearProvider = _TrendingThisYearFamily._();
 
 final class _TrendingThisYearProvider
-    extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Manga>>,
+          List<Manga>,
+          FutureOr<List<Manga>>
+        >
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const _TrendingThisYearProvider._({
     required _TrendingThisYearFamily super.from,
@@ -149,7 +154,12 @@ final class _TrendingThisYearFamily extends $Family
 const _recentlyAddedProvider = _RecentlyAddedFamily._();
 
 final class _RecentlyAddedProvider
-    extends $FunctionalProvider<AsyncValue<List<Manga>>, FutureOr<List<Manga>>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Manga>>,
+          List<Manga>,
+          FutureOr<List<Manga>>
+        >
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
   const _RecentlyAddedProvider._({
     required _RecentlyAddedFamily super.from,

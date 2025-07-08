@@ -28,11 +28,20 @@ class WebReaderData {
   final CtxCallback? onLinkPressed;
 }
 
-extension type ChapterEntry(MapEntry<String, WebChapter> e) {
-  ChapterEntry.entry(String key, WebChapter value) : e = MapEntry(key, value);
+@freezed
+abstract class ChapterEntry with _$ChapterEntry {
+  const ChapterEntry._();
 
-  String get name => e.key;
-  WebChapter get chapter => e.value;
+  const factory ChapterEntry({
+    required String name,
+    required WebChapter chapter,
+  }) = _ChapterEntry;
+
+  factory ChapterEntry.fromJson(Map<String, dynamic> json) =>
+      _$ChapterEntryFromJson(json);
+
+  factory ChapterEntry.fromEntry(MapEntry<String, WebChapter> entry) =>
+      ChapterEntry(name: entry.key, chapter: entry.value);
 }
 
 enum SourceType { proxy, source }
@@ -46,8 +55,6 @@ abstract class SourceHandler with _$SourceHandler {
     required String sourceId,
     required String location,
     String? chapter,
-    @JsonKey(includeFromJson: false, includeToJson: false)
-    WebSourceInfo? parser,
   }) = _SourceHandler;
 
   String getURL() =>
@@ -75,7 +82,7 @@ abstract class SourceHandler with _$SourceHandler {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, type, sourceId, location, chapter, parser);
+      Object.hash(runtimeType, type, sourceId, location, chapter);
 }
 
 @freezed
@@ -103,20 +110,6 @@ abstract class HistoryLink with _$HistoryLink {
   factory HistoryLink.fromJson(Map<String, dynamic> json) =>
       _$HistoryLinkFromJson(json);
 
-  // factory HistoryLink.fromPartialSourceManga(
-  //   WebSourceInfo source,
-  //   PartialSourceManga manga,
-  // ) => HistoryLink(
-  //   title: manga.title,
-  //   url: '${source.id}/${manga.mangaId}',
-  //   cover: manga.image,
-  //   handle: SourceHandler(
-  //     type: SourceType.source,
-  //     sourceId: source.id,
-  //     location: manga.mangaId,
-  //     parser: source,
-  //   ),
-
   factory HistoryLink.fromSearchReultItem(
     WebSourceInfo source,
     SearchResultItem item,
@@ -128,7 +121,6 @@ abstract class HistoryLink with _$HistoryLink {
       type: SourceType.source,
       sourceId: source.id,
       location: item.mangaId,
-      parser: source,
     ),
   );
 
@@ -137,7 +129,8 @@ abstract class HistoryLink with _$HistoryLink {
     DiscoverSectionItem item,
   ) {
     return switch (item) {
-      GenresCarouselItem() => throw UnsupportedError('Unsupported type'),
+      GenresCarouselItem() =>
+        throw UnsupportedError('Unsupported section type'),
       ChapterUpdatesCarouselItem() => HistoryLink(
         title: item.title,
         url: '$sourceId/${item.mangaId}',
@@ -161,6 +154,13 @@ abstract class HistoryLink with _$HistoryLink {
     };
   }
 
+  bool isExact(HistoryLink other) {
+    return this == other &&
+        title == other.title &&
+        cover == other.cover &&
+        handle == other.handle;
+  }
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
@@ -179,21 +179,32 @@ class WebChapterSerializer
 
   @override
   List<ChapterEntry> fromJson(dynamic chapters) {
-    final map = (chapters as Map<String, dynamic>).map(
-      (k, e) => MapEntry(k, WebChapter.fromJson(e as Map<String, dynamic>)),
-    );
+    if (chapters is Map) {
+      final map = (chapters as Map<String, dynamic>).map(
+        (k, e) => MapEntry(k, WebChapter.fromJson(e as Map<String, dynamic>)),
+      );
 
-    final chapterlist = map.entries.map((e) => ChapterEntry(e)).toList();
-    chapterlist.sort((a, b) => compareNatural(b.name, a.name));
+      final chapterlist =
+          map.entries.map((e) => ChapterEntry.fromEntry(e)).toList();
+      chapterlist.sort((a, b) => compareNatural(b.name, a.name));
 
-    return chapterlist;
+      return chapterlist;
+    }
+
+    if (chapters is List) {
+      final chapterlist =
+          (chapters).map((c) => ChapterEntry.fromJson(c)).toList();
+
+      chapterlist.sort((a, b) => compareNatural(b.name, a.name));
+      return chapterlist;
+    }
+
+    throw UnsupportedError("Unknown web chapter format");
   }
 
   @override
   dynamic toJson(List<ChapterEntry> chapters) {
-    return Map.fromEntries(
-      chapters.cast<MapEntry<String, WebChapter>>(),
-    ).map((k, e) => MapEntry(k, e.toJson()));
+    return chapters.map((c) => c.toJson()).toList();
   }
 }
 

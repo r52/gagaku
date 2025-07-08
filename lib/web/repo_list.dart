@@ -16,6 +16,7 @@ class RepoListManager extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
+    final theme = Theme.of(context);
     final nav = Navigator.of(context);
     final list = useState(
       ref.watch(webConfigProvider.select((c) => c.repoList)),
@@ -26,6 +27,7 @@ class RepoListManager extends HookConsumerWidget {
         flexibleSpace: const TitleFlexBar(title: 'Repo List'),
         actions: [
           IconButton(
+            color: theme.colorScheme.onPrimaryContainer,
             tooltip: tr.webSources.repo.newRepo,
             onPressed: () async {
               final result = await showDialog<RepoInfo>(
@@ -42,9 +44,14 @@ class RepoListManager extends HookConsumerWidget {
             icon: const Icon(Icons.add),
           ),
           IconButton(
+            color: theme.colorScheme.onPrimaryContainer,
             tooltip: tr.ui.save,
             onPressed: () {
-              ref.read(webConfigProvider.saveWith)(repoList: list.value);
+              webConfigSaveMutation.run(ref, (ref) async {
+                return ref
+                    .get(webConfigProvider.notifier)
+                    .saveWith(repoList: list.value);
+              });
               nav.pop();
             },
             icon: const Icon(Icons.save),

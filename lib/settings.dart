@@ -197,7 +197,11 @@ class AppSettingsPage extends HookConsumerWidget {
                     onSelected: (ThemeMode? value) {
                       if (value != null) {
                         final c = cfg.copyWith(themeMode: value);
-                        ref.read(gagakuSettingsProvider.save)(c);
+                        gagakuConfigSaveMutation.run(ref, (ref) async {
+                          return ref
+                              .get(gagakuSettingsProvider.notifier)
+                              .save(c);
+                        });
                       }
                     },
                   ),
@@ -236,7 +240,11 @@ class AppSettingsPage extends HookConsumerWidget {
                     onSelected: (GagakuTheme? value) {
                       if (value != null) {
                         final c = cfg.copyWith(theme: value);
-                        ref.read(gagakuSettingsProvider.save)(c);
+                        gagakuConfigSaveMutation.run(ref, (ref) async {
+                          return ref
+                              .get(gagakuSettingsProvider.notifier)
+                              .save(c);
+                        });
                       }
                     },
                   ),

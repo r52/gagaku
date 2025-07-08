@@ -43,7 +43,12 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
                   icon: const Icon(Icons.save),
                   label: Text(saveSettings),
                   onPressed: () {
-                    ref.read(localConfigProvider.save)(config.value);
+                    localConfigSaveMutation.run(ref, (ref) async {
+                      return ref
+                          .get(localConfigProvider.notifier)
+                          .save(config.value);
+                    });
+
                     nav.pop();
                   },
                 ),

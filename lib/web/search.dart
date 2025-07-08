@@ -27,37 +27,53 @@ class _SearchHistory extends _$SearchHistory {
 
 @RoutePage()
 class ExtensionSearchPage extends StatelessWidget {
-  const ExtensionSearchPage({
-    super.key,
-    @PathParam() required this.sourceId,
-    this.source,
-    this.query,
-  });
+  const ExtensionSearchPage({super.key, this.initialSource, this.query});
 
-  final String sourceId;
-  final WebSourceInfo? source;
+  final WebSourceInfo? initialSource;
   final SearchQuery? query;
 
   @override
   Widget build(BuildContext context) {
-    if (source != null) {
-      return ExtensionSearchWidget(source: source!, query: query);
+    if (initialSource != null &&
+        initialSource!.hasCapability(SourceIntents.mangaSearch)) {
+      return ExtensionSearchWidget(initialSource: initialSource!, query: query);
     }
 
     return DataProviderWhenWidget(
-      provider: getExtensionFromIdProvider(sourceId),
+      provider: extensionInfoListProvider,
       errorBuilder: (context, child, _, _) => Scaffold(body: child),
-      builder: (context, data) {
-        return ExtensionSearchWidget(source: data, query: query);
+      builder: (context, extensions) {
+        final firstSearchable = extensions.values.firstWhereOrNull(
+          (ext) => ext.hasCapability(SourceIntents.mangaSearch),
+        );
+
+        if (firstSearchable == null) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(t.webSources.sourceSearch),
+              leading: AutoLeadingButton(),
+            ),
+            body: Center(child: Text(t.webSources.noSearchableSourcesWarning)),
+          );
+        }
+
+        return ExtensionSearchWidget(
+          initialSource: firstSearchable,
+          query: query,
+        );
       },
     );
   }
 }
 
 class ExtensionSearchWidget extends StatefulHookConsumerWidget {
-  const ExtensionSearchWidget({super.key, required this.source, this.query});
+  const ExtensionSearchWidget({
+    super.key,
+    required this.initialSource,
+    this.query,
+  });
 
-  final WebSourceInfo source;
+  final WebSourceInfo initialSource;
   final SearchQuery? query;
 
   @override
@@ -98,7 +114,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
 
   @override
   void initState() {
-    source = widget.source;
+    source = widget.initialSource;
     query = widget.query;
     super.initState();
   }
@@ -116,6 +132,13 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
     final theme = Theme.of(context);
     final controller = useSearchController();
 
+    useEffect(() {
+      if (widget.query != null && widget.query!.title.isNotEmpty) {
+        controller.text = widget.query!.title;
+      }
+      return null;
+    }, [widget.query]);
+
     return Scaffold(
       body: WebMangaListWidget(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -131,25 +154,22 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
               (context, extensions) => HookBuilder(
                 builder: (context) {
                   final searchExtensions = useMemoized(
-                    () =>
-                        extensions
-                            .where(
-                              (e) => e.hasCapability(SourceIntents.mangaSearch),
-                            )
-                            .toList(),
+                    () => Map.fromEntries(
+                      extensions.entries.where(
+                        (e) => e.value.hasCapability(SourceIntents.mangaSearch),
+                      ),
+                    ),
                     [extensions],
                   );
 
                   return DropdownMenu<WebSourceInfo>(
-                    initialSelection: searchExtensions.firstWhereOrNull(
-                      (f) => f.id == source.id,
-                    ),
+                    initialSelection: searchExtensions[source.id],
                     width: 200,
                     requestFocusOnTap: false,
                     enableSearch: false,
                     enableFilter: false,
                     dropdownMenuEntries:
-                        searchExtensions
+                        searchExtensions.values
                             .map(
                               (opt) => DropdownMenuEntry(
                                 value: opt,
@@ -172,7 +192,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
         ),
         leading: [
           SliverAppBar(
-            leading: const BackButton(),
+            leading: AutoLeadingButton(),
             pinned: true,
             snap: false,
             floating: false,

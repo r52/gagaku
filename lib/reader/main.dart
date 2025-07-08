@@ -594,9 +594,13 @@ class ReaderWidget extends HookConsumerWidget {
                                 ? null
                                 : (value) {
                                   if (value) {
-                                    ref.read(readerSettingsProvider.save)(
-                                      settings.copyWith(format: f),
-                                    );
+                                    readerConfigSaveMutation.run(ref, (
+                                      ref,
+                                    ) async {
+                                      return ref
+                                          .get(readerSettingsProvider.notifier)
+                                          .save(settings.copyWith(format: f));
+                                    });
                                   }
                                 },
                       ),
@@ -633,9 +637,15 @@ class ReaderWidget extends HookConsumerWidget {
                                 ? null
                                 : (value) {
                                   if (value) {
-                                    ref.read(readerSettingsProvider.save)(
-                                      settings.copyWith(direction: dir),
-                                    );
+                                    readerConfigSaveMutation.run(ref, (
+                                      ref,
+                                    ) async {
+                                      return ref
+                                          .get(readerSettingsProvider.notifier)
+                                          .save(
+                                            settings.copyWith(direction: dir),
+                                          );
+                                    });
                                   }
                                 },
                       ),
@@ -650,11 +660,15 @@ class ReaderWidget extends HookConsumerWidget {
                   ),
                   label: Text(tr.reader.progressBar),
                   onPressed: () {
-                    ref.read(readerSettingsProvider.save)(
-                      settings.copyWith(
-                        showProgressBar: !settings.showProgressBar,
-                      ),
-                    );
+                    readerConfigSaveMutation.run(ref, (ref) async {
+                      return ref
+                          .get(readerSettingsProvider.notifier)
+                          .save(
+                            settings.copyWith(
+                              showProgressBar: !settings.showProgressBar,
+                            ),
+                          );
+                    });
                   },
                 ),
                 ActionChip(
@@ -670,11 +684,15 @@ class ReaderWidget extends HookConsumerWidget {
                       (format == ReaderFormat.longstrip)
                           ? null
                           : () {
-                            ref.read(readerSettingsProvider.save)(
-                              settings.copyWith(
-                                swipeGestures: !settings.swipeGestures,
-                              ),
-                            );
+                            readerConfigSaveMutation.run(ref, (ref) async {
+                              return ref
+                                  .get(readerSettingsProvider.notifier)
+                                  .save(
+                                    settings.copyWith(
+                                      swipeGestures: !settings.swipeGestures,
+                                    ),
+                                  );
+                            });
                           },
                 ),
                 ActionChip(
@@ -690,11 +708,15 @@ class ReaderWidget extends HookConsumerWidget {
                       (format == ReaderFormat.longstrip)
                           ? null
                           : () {
-                            ref.read(readerSettingsProvider.save)(
-                              settings.copyWith(
-                                clickToTurn: !settings.clickToTurn,
-                              ),
-                            );
+                            readerConfigSaveMutation.run(ref, (ref) async {
+                              return ref
+                                  .get(readerSettingsProvider.notifier)
+                                  .save(
+                                    settings.copyWith(
+                                      clickToTurn: !settings.clickToTurn,
+                                    ),
+                                  );
+                            });
                           },
                 ),
                 Row(
@@ -718,9 +740,11 @@ class ReaderWidget extends HookConsumerWidget {
                       ),
                       onSelected: (int? value) {
                         if (value != null) {
-                          ref.read(readerSettingsProvider.save)(
-                            settings.copyWith(precacheCount: value),
-                          );
+                          readerConfigSaveMutation.run(ref, (ref) async {
+                            return ref
+                                .get(readerSettingsProvider.notifier)
+                                .save(settings.copyWith(precacheCount: value));
+                          });
                         }
                       },
                       dropdownMenuEntries:

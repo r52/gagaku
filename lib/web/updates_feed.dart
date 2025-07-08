@@ -89,7 +89,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
 
     if (isMobile) {
       var hasPermissions = await FlutterBackground.hasPermissions;
-      if (!hasPermissions && context.mounted) {
+      if (!hasPermissions && mounted) {
         await showDialog(
           context: context,
           builder: (context) {
@@ -269,7 +269,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
       final stackTrace = future.stackTrace!;
       final msg = "_WebSourceUpdatesPageState._getFeedUpdates() failed";
 
-      Styles.showErrorSnackBar(messenger, '$error');
+      Styles.showSnackBar(messenger, content: '$error');
       logger.e(msg, error: error, stackTrace: stackTrace);
 
       slivers.add(

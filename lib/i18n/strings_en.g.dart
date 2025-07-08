@@ -232,13 +232,15 @@ class TranslationsWebSourcesEn {
 	late final TranslationsWebSourcesRepoEn repo = TranslationsWebSourcesRepoEn.internal(_root);
 	late final TranslationsWebSourcesSourceEn source = TranslationsWebSourcesSourceEn.internal(_root);
 	String get noSourcesWarning => 'No extensions installed!';
-	String get sourceSearch => 'Source Search';
+	String get noSearchableSourcesWarning => 'No searchable extensions installed!';
+	String get sourceSearch => 'Extension Search';
 	String get resetRead => 'Reset Read Markers';
 	String get resetReadWarning => 'Are you sure you want to reset all read markers for this manga?';
 	String get resetAllRead => 'Reset all Read Markers';
 	String get resetAllReadWarning => 'Are you sure you want to reset all read markers?';
 	String get favorites => 'Favorites';
 	String get loadInstalledSourcesError => 'Error loading installed sources';
+	String get searchWithExt => 'Search with extensions';
 }
 
 // Path: search
@@ -396,6 +398,7 @@ class TranslationsMangaViewEn {
 	String markAllWarning({required Object arg}) => 'Are you sure you want to mark all visible chapters as ${arg}?';
 	String get noChaptersMsg => 'No Chapters';
 	String markAs({required Object arg}) => 'Mark as ${arg}';
+	String get copyLink => 'Copy gagaku link';
 }
 
 // Path: readingStatus
@@ -985,13 +988,15 @@ extension on Translations {
 			case 'webSources.source.installedVersion': return ({required Object version}) => ' (installed: v${version})';
 			case 'webSources.source.noTagsWarning': return 'This extension provides no filter options';
 			case 'webSources.noSourcesWarning': return 'No extensions installed!';
-			case 'webSources.sourceSearch': return 'Source Search';
+			case 'webSources.noSearchableSourcesWarning': return 'No searchable extensions installed!';
+			case 'webSources.sourceSearch': return 'Extension Search';
 			case 'webSources.resetRead': return 'Reset Read Markers';
 			case 'webSources.resetReadWarning': return 'Are you sure you want to reset all read markers for this manga?';
 			case 'webSources.resetAllRead': return 'Reset all Read Markers';
 			case 'webSources.resetAllReadWarning': return 'Are you sure you want to reset all read markers?';
 			case 'webSources.favorites': return 'Favorites';
 			case 'webSources.loadInstalledSourcesError': return 'Error loading installed sources';
+			case 'webSources.searchWithExt': return 'Search with extensions';
 			case 'search.text': return 'Search';
 			case 'search.arg': return ({required Object arg}) => 'Search ${arg}';
 			case 'search.filters': return 'Search Filters';
@@ -1145,6 +1150,7 @@ extension on Translations {
 			case 'mangaView.markAllWarning': return ({required Object arg}) => 'Are you sure you want to mark all visible chapters as ${arg}?';
 			case 'mangaView.noChaptersMsg': return 'No Chapters';
 			case 'mangaView.markAs': return ({required Object arg}) => 'Mark as ${arg}';
+			case 'mangaView.copyLink': return 'Copy gagaku link';
 			case 'readingStatus.remove': return 'Remove';
 			case 'readingStatus.reading': return 'Reading';
 			case 'readingStatus.on_hold': return 'On Hold';

@@ -98,6 +98,14 @@ class WebMangaViewWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
+    final source = ref.watch(
+      getExtensionFromIdProvider(handle.sourceId).select(
+        (value) => switch (value) {
+          AsyncValue(value: final data?) => data,
+          _ => null,
+        },
+      ),
+    );
     final api = ref.watch(proxyProvider);
     final theme = Theme.of(context);
     final link = HistoryLink(
@@ -111,8 +119,14 @@ class WebMangaViewWidget extends HookConsumerWidget {
 
     useEffect(() {
       Future.delayed(Duration.zero, () {
-        ref.read(webSourceHistoryProvider.add)(link);
-        ref.read(webSourceFavoritesProvider.updateAll)(link);
+        webSourceHistoryMutation.run(ref, (ref) async {
+          return await ref.get(webSourceHistoryProvider.notifier).add(link);
+        });
+        webSourceFavoritesMutation.run(ref, (ref) async {
+          return await ref
+              .get(webSourceFavoritesProvider.notifier)
+              .updateAll(link);
+        });
       });
       return null;
     }, []);
@@ -154,6 +168,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
                     CachedNetworkImage(
                       imageUrl: manga.cover,
                       cacheManager: gagakuImageCache,
+                      memCacheWidth: 512,
+                      maxWidthDiskCache: 512,
                       colorBlendMode: BlendMode.modulate,
                       color: Colors.grey,
                       fit: BoxFit.cover,
@@ -177,13 +193,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            if (handle.parser != null &&
-                                handle.parser!.icon.isNotEmpty)
-                              Image.network(
-                                handle.parser!.icon,
-                                width: 24,
-                                height: 24,
-                              ),
+                            if (source != null && source.icon.isNotEmpty)
+                              Image.network(source.icon, width: 24, height: 24),
                           ],
                         ),
                       ),
@@ -193,7 +204,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
               ),
               actions: [
                 OverflowBar(
-                  spacing: 8.0,
+                  spacing: 6.0,
                   children: [
                     FavoritesButton(
                       link: link,
@@ -201,17 +212,42 @@ class WebMangaViewWidget extends HookConsumerWidget {
                         Radius.circular(6.0),
                       ),
                     ),
-                    Consumer(
-                      builder: (context, ref, child) {
-                        final key = handle.getKey();
-
-                        return IconButton(
-                          tooltip: tr.webSources.resetRead,
-                          style: Styles.squareIconButtonStyle(
-                            backgroundColor: theme.colorScheme.surface
-                                .withAlpha(200),
+                    IconButton(
+                      tooltip: tr.webSources.searchWithExt,
+                      style: Styles.squareIconButtonStyle(
+                        backgroundColor: theme.colorScheme.surface.withAlpha(
+                          200,
+                        ),
+                      ),
+                      onPressed:
+                          () => context.router.push(
+                            ExtensionSearchRoute(
+                              initialSource: source,
+                              query: SearchQuery(title: manga.title),
+                            ),
                           ),
+                      icon: const Icon(Icons.search),
+                    ),
+                    MenuAnchor(
+                      builder:
+                          (context, controller, child) => IconButton(
+                            style: Styles.squareIconButtonStyle(
+                              backgroundColor: theme.colorScheme.surface
+                                  .withAlpha(200),
+                            ),
+                            onPressed: () {
+                              if (controller.isOpen) {
+                                controller.close();
+                              } else {
+                                controller.open();
+                              }
+                            },
+                            icon: const Icon(Icons.more_vert),
+                          ),
+                      menuChildren: [
+                        MenuItemButton(
                           onPressed: () async {
+                            final key = handle.getKey();
                             final result = await showDialog<bool>(
                               context: context,
                               builder: (BuildContext context) {
@@ -245,12 +281,39 @@ class WebMangaViewWidget extends HookConsumerWidget {
                             );
 
                             if (result == true) {
-                              ref.read(webReadMarkersProvider.deleteKey)(key);
+                              webReadMarkerMutation.run(ref, (ref) async {
+                                return await ref
+                                    .get(webReadMarkersProvider.notifier)
+                                    .deleteKey(key);
+                              });
                             }
                           },
-                          icon: const Icon(Icons.restore),
-                        );
-                      },
+                          leadingIcon: const Icon(Icons.restore),
+                          child: Text(tr.webSources.resetRead),
+                        ),
+                        MenuItemButton(
+                          onPressed:
+                              () => Clipboard.setData(
+                                ClipboardData(
+                                  text:
+                                      'gagaku://open${context.router.currentUrl}',
+                                ),
+                              ).then((_) {
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    showCloseIcon: true,
+                                    duration: const Duration(
+                                      milliseconds: 1000,
+                                    ),
+                                    content: Text(tr.ui.copyClipboard),
+                                  ),
+                                );
+                              }),
+                          leadingIcon: const Icon(Icons.copy),
+                          child: Text(tr.mangaView.copyLink),
+                        ),
+                      ],
                     ),
                     const SizedBox(width: 2),
                   ],
@@ -259,6 +322,11 @@ class WebMangaViewWidget extends HookConsumerWidget {
             ),
             SliverList.list(
               children: [
+                if (extdata != null)
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: MangaStatisticsRow(manga: extdata),
+                  ),
                 if (extdata != null &&
                     extdata.mangaInfo.secondaryTitles.isNotEmpty)
                   ExpansionTile(
@@ -267,28 +335,39 @@ class WebMangaViewWidget extends HookConsumerWidget {
                       for (final alttitle in extdata.mangaInfo.secondaryTitles)
                         SizedBox(
                           width: double.infinity,
-                          child: Material(
-                            color: theme.colorScheme.surfaceContainerHighest,
-                            child: InkWell(
-                              onTap:
-                                  () => Clipboard.setData(
-                                    ClipboardData(text: alttitle),
-                                  ).then((_) {
-                                    if (!context.mounted) return;
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        showCloseIcon: true,
-                                        duration: const Duration(
-                                          milliseconds: 1000,
-                                        ),
-                                        content: Text(tr.ui.copyClipboard),
+                          child: ListTile(
+                            tileColor:
+                                theme.colorScheme.surfaceContainerHighest,
+                            title: Text(alttitle),
+                            onTap:
+                                () => Clipboard.setData(
+                                  ClipboardData(text: alttitle),
+                                ).then((_) {
+                                  if (!context.mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      showCloseIcon: true,
+                                      duration: const Duration(
+                                        milliseconds: 1000,
                                       ),
-                                    );
-                                  }),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(alttitle),
+                                      content: Text(tr.ui.copyClipboard),
+                                    ),
+                                  );
+                                }),
+                            trailing: IconButton(
+                              tooltip: tr.webSources.searchWithExt,
+                              style: Styles.squareIconButtonStyle(
+                                backgroundColor: theme.colorScheme.surface
+                                    .withAlpha(200),
                               ),
+                              onPressed:
+                                  () => context.router.push(
+                                    ExtensionSearchRoute(
+                                      initialSource: source,
+                                      query: SearchQuery(title: alttitle),
+                                    ),
+                                  ),
+                              icon: const Icon(Icons.search),
                             ),
                           ),
                         ),
@@ -340,8 +419,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                       onPressed:
                                           () => context.router.push(
                                             ExtensionSearchRoute(
-                                              sourceId: handle.sourceId,
-                                              source: handle.parser,
+                                              initialSource: source,
                                               query: SearchQuery(
                                                 title: '',
                                                 filters: [
@@ -466,11 +544,15 @@ class WebMangaViewWidget extends HookConsumerWidget {
                               );
 
                               if (result == true) {
-                                ref.read(webReadMarkersProvider.setBulk)(
-                                  mangakey,
-                                  read: !allRead ? chapterkeys : null,
-                                  unread: allRead ? chapterkeys : null,
-                                );
+                                webReadMarkerMutation.run(ref, (ref) async {
+                                  return await ref
+                                      .get(webReadMarkersProvider.notifier)
+                                      .setBulk(
+                                        mangakey,
+                                        read: !allRead ? chapterkeys : null,
+                                        unread: allRead ? chapterkeys : null,
+                                      );
+                                });
                               }
                             },
                             child: Text(tr.mangaView.markAllAs(arg: opt)),
@@ -506,6 +588,59 @@ class WebMangaViewWidget extends HookConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class MangaStatisticsRow extends StatelessWidget {
+  const MangaStatisticsRow({super.key, required this.manga});
+
+  final SourceManga manga;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      runSpacing: 4.0,
+      spacing: 5.0,
+      children: [
+        ContentChip(content: manga.mangaInfo.contentRating),
+        if (manga.mangaInfo.rating != null)
+          IconTextChip(
+            icon: const Icon(
+              Icons.star_border,
+              color: Colors.amber,
+              size: 18,
+              shadows: [Shadow(offset: Offset(1.0, 1.0))],
+            ),
+            text: (manga.mangaInfo.rating! * 10).toStringAsFixed(2),
+            style: const TextStyle(
+              color: Colors.amber,
+              shadows: [Shadow(offset: Offset(1.0, 1.0))],
+            ),
+          ),
+        const SizedBox.shrink(),
+        if (manga.mangaInfo.status != null)
+          IconTextChip(text: manga.mangaInfo.status!),
+      ],
+    );
+  }
+}
+
+class ContentChip extends StatelessWidget {
+  const ContentChip({super.key, required this.content});
+
+  final ContentRating content;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = content.name.toLowerCase().capitalize();
+    return IconTextChip(
+      color: switch (content) {
+        ContentRating.ADULT => Colors.red,
+        ContentRating.MATURE => Colors.orange,
+        _ => Colors.green,
+      },
+      text: label,
     );
   }
 }

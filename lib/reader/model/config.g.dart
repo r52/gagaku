@@ -67,28 +67,16 @@ final class ReaderSettingsProvider
   @override
   ReaderSettings create() => ReaderSettings();
 
-  @$internal
-  @override
-  _$ReaderSettingsElement $createElement($ProviderPointer pointer) =>
-      _$ReaderSettingsElement(pointer);
-
-  ProviderListenable<ReaderSettings$Save> get save =>
-      $LazyProxyListenable<ReaderSettings$Save, ReaderConfig>(this, (element) {
-        element as _$ReaderSettingsElement;
-
-        return element._$save;
-      });
-
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(ReaderConfig value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $ValueProvider<ReaderConfig>(value),
+      providerOverride: $SyncValueProvider<ReaderConfig>(value),
     );
   }
 }
 
-String _$readerSettingsHash() => r'3a6d6cfe488873955a1dc0fbab82f33d87eab125';
+String _$readerSettingsHash() => r'16becbc29d65077e2590bf708801a795db9c27e3';
 
 abstract class _$ReaderSettings extends $Notifier<ReaderConfig> {
   ReaderConfig build();
@@ -96,84 +84,17 @@ abstract class _$ReaderSettings extends $Notifier<ReaderConfig> {
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<ReaderConfig>;
+    final ref = this.ref as $Ref<ReaderConfig, ReaderConfig>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<ReaderConfig>,
+              AnyNotifier<ReaderConfig, ReaderConfig>,
               ReaderConfig,
               Object?,
               Object?
             >;
     element.handleValue(ref, created);
   }
-}
-
-class _$ReaderSettingsElement
-    extends $NotifierProviderElement<ReaderSettings, ReaderConfig> {
-  _$ReaderSettingsElement(super.pointer) {
-    _$save.result = $Result.data(_$ReaderSettings$Save(this));
-  }
-  final _$save = $ElementLense<_$ReaderSettings$Save>();
-  @override
-  void mount() {
-    super.mount();
-    _$save.result!.value!.reset();
-  }
-
-  @override
-  void visitListenables(
-    void Function($ElementLense element) listenableVisitor,
-  ) {
-    super.visitListenables(listenableVisitor);
-
-    listenableVisitor(_$save);
-  }
-}
-
-sealed class ReaderSettings$Save extends MutationBase<ReaderConfig> {
-  /// Starts the mutation.
-  ///
-  /// This will first set the state to [PendingMutation], then
-  /// will call [ReaderSettings.save] with the provided parameters.
-  ///
-  /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutation] or [ErrorMutation] based on if the method
-  /// threw or not.
-  ///
-  /// **Note**:
-  /// If the notifier threw in its constructor, the mutation won't start
-  /// and [call] will throw.
-  /// This should generally never happen though, as Notifiers are not supposed
-  /// to have logic in their constructors.
-  ReaderConfig call(ReaderConfig update);
-}
-
-final class _$ReaderSettings$Save
-    extends
-        $SyncMutationBase<ReaderConfig, _$ReaderSettings$Save, ReaderSettings>
-    implements ReaderSettings$Save {
-  _$ReaderSettings$Save(this.element, {super.state, super.key});
-
-  @override
-  final _$ReaderSettingsElement element;
-
-  @override
-  $ElementLense<_$ReaderSettings$Save> get listenable => element._$save;
-
-  @override
-  ReaderConfig call(ReaderConfig update) {
-    return mutate(
-      Invocation.method(#save, [update]),
-      ($notifier) => $notifier.save(update),
-    );
-  }
-
-  @override
-  _$ReaderSettings$Save copyWith(
-    MutationState<ReaderConfig> state, {
-    Object? key,
-  }) => _$ReaderSettings$Save(element, state: state, key: key);
 }
 
 // ignore_for_file: type=lint

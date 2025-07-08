@@ -22,7 +22,6 @@ class _ExtensionHomeCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nav = Navigator.of(context);
-    final theme = Theme.of(context);
     final tr = context.t;
 
     return DataProviderWhenWidget(
@@ -49,7 +48,6 @@ class _ExtensionHomeCard extends ConsumerWidget {
               children: [
                 if (source.hasCapability(SourceIntents.settingsUI))
                   IconButton(
-                    color: theme.colorScheme.onPrimaryContainer,
                     icon: const Icon(Icons.settings),
                     onPressed:
                         () => nav.push(
@@ -63,14 +61,10 @@ class _ExtensionHomeCard extends ConsumerWidget {
                   ),
                 if (source.hasCapability(SourceIntents.mangaSearch))
                   IconButton(
-                    color: theme.colorScheme.onPrimaryContainer,
                     icon: const Icon(Icons.search),
                     onPressed:
                         () => context.router.push(
-                          ExtensionSearchRoute(
-                            sourceId: source.id,
-                            source: source,
-                          ),
+                          ExtensionSearchRoute(initialSource: source),
                         ),
                     tooltip: tr.search.arg(arg: source.name),
                   ),
@@ -158,9 +152,14 @@ class WebSourceFrontPage extends HookConsumerWidget {
                     ),
                   );
               } else {
-                ref.read(webConfigProvider.saveWith)(
-                  repoList: [...list, RepoInfo(name: name, url: url)],
-                );
+                webConfigSaveMutation.run(ref, (ref) async {
+                  return ref
+                      .get(webConfigProvider.notifier)
+                      .saveWith(
+                        repoList: [...list, RepoInfo(name: name, url: url)],
+                      );
+                });
+
                 messenger
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
@@ -274,7 +273,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
       final stackTrace = sectionsSnapshot.stackTrace!;
       final msg = "ExtensionSource(${source.id}).getDiscoverSections() failed";
 
-      Styles.showErrorSnackBar(messenger, '$error');
+      Styles.showSnackBar(messenger, content: '$error');
       logger.e(msg, error: error, stackTrace: stackTrace);
 
       slivers.add(
@@ -314,7 +313,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
         final msg =
             "ExtensionSource(${source.id}).getDiscoverSectionItems() failed";
 
-        Styles.showErrorSnackBar(messenger, '$error');
+        Styles.showSnackBar(messenger, content: '$error');
         logger.e(msg, error: error, stackTrace: stackTrace);
 
         slivers.add(
@@ -386,8 +385,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
 
                       context.router.push(
                         ExtensionSearchRoute(
-                          sourceId: source.id,
-                          source: source,
+                          initialSource: source,
                           query: element.searchQuery,
                         ),
                       );
@@ -460,10 +458,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
                   icon: const Icon(Icons.search),
                   onPressed:
                       () => context.router.push(
-                        ExtensionSearchRoute(
-                          sourceId: source.id,
-                          source: source,
-                        ),
+                        ExtensionSearchRoute(initialSource: source),
                       ),
                   tooltip: tr.search.arg(arg: source.name),
                 ),

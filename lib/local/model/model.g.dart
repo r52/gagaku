@@ -29,17 +29,11 @@ final class LibrarySortTypeProvider
   @override
   LibrarySortType create() => LibrarySortType();
 
-  @$internal
-  @override
-  $NotifierProviderElement<LibrarySortType, LibrarySort> $createElement(
-    $ProviderPointer pointer,
-  ) => $NotifierProviderElement(pointer);
-
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(LibrarySort value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $ValueProvider<LibrarySort>(value),
+      providerOverride: $SyncValueProvider<LibrarySort>(value),
     );
   }
 }
@@ -52,11 +46,11 @@ abstract class _$LibrarySortType extends $Notifier<LibrarySort> {
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<LibrarySort>;
+    final ref = this.ref as $Ref<LibrarySort, LibrarySort>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<LibrarySort>,
+              AnyNotifier<LibrarySort, LibrarySort>,
               LibrarySort,
               Object?,
               Object?
@@ -87,12 +81,6 @@ final class LocalLibraryProvider
   @$internal
   @override
   LocalLibrary create() => LocalLibrary();
-
-  @$internal
-  @override
-  $AsyncNotifierProviderElement<LocalLibrary, LocalLibraryItem> $createElement(
-    $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(pointer);
 }
 
 String _$localLibraryHash() => r'e5304b940c79acd9ee306bed67941dd1f590840b';
@@ -103,11 +91,12 @@ abstract class _$LocalLibrary extends $AsyncNotifier<LocalLibraryItem> {
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<LocalLibraryItem>>;
+    final ref =
+        this.ref as $Ref<AsyncValue<LocalLibraryItem>, LocalLibraryItem>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<LocalLibraryItem>>,
+              AnyNotifier<AsyncValue<LocalLibraryItem>, LocalLibraryItem>,
               AsyncValue<LocalLibraryItem>,
               Object?,
               Object?
@@ -138,12 +127,6 @@ final class SupportedFormatsProvider
   @$internal
   @override
   SupportedFormats create() => SupportedFormats();
-
-  @$internal
-  @override
-  $AsyncNotifierProviderElement<SupportedFormats, FormatInfo> $createElement(
-    $ProviderPointer pointer,
-  ) => $AsyncNotifierProviderElement(pointer);
 }
 
 String _$supportedFormatsHash() => r'3840c7ebd8357ef2b7163a74cb1335481d03be80';
@@ -154,11 +137,11 @@ abstract class _$SupportedFormats extends $AsyncNotifier<FormatInfo> {
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<FormatInfo>>;
+    final ref = this.ref as $Ref<AsyncValue<FormatInfo>, FormatInfo>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<FormatInfo>>,
+              AnyNotifier<AsyncValue<FormatInfo>, FormatInfo>,
               AsyncValue<FormatInfo>,
               Object?,
               Object?

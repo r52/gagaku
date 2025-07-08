@@ -11,7 +11,11 @@ const _fetchWebChapterInfoProvider = _FetchWebChapterInfoFamily._();
 
 final class _FetchWebChapterInfoProvider
     extends
-        $FunctionalProvider<AsyncValue<WebReaderData>, FutureOr<WebReaderData>>
+        $FunctionalProvider<
+          AsyncValue<WebReaderData>,
+          WebReaderData,
+          FutureOr<WebReaderData>
+        >
     with $FutureModifier<WebReaderData>, $FutureProvider<WebReaderData> {
   const _FetchWebChapterInfoProvider._({
     required _FetchWebChapterInfoFamily super.from,
@@ -58,7 +62,7 @@ final class _FetchWebChapterInfoProvider
 }
 
 String _$fetchWebChapterInfoHash() =>
-    r'0be7e7c01f95b05989714a430f97f0b311afe020';
+    r'0ae89d758f7deeab8aefa6a41104968b4f65d4dd';
 
 final class _FetchWebChapterInfoFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<WebReaderData>, SourceHandler> {
@@ -85,6 +89,7 @@ final class _GetPagesProvider
     extends
         $FunctionalProvider<
           AsyncValue<List<ReaderPage>>,
+          List<ReaderPage>,
           FutureOr<List<ReaderPage>>
         >
     with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {
@@ -159,6 +164,7 @@ final class _GetSourcePagesProvider
     extends
         $FunctionalProvider<
           AsyncValue<List<ReaderPage>>,
+          List<ReaderPage>,
           FutureOr<List<ReaderPage>>
         >
     with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {
@@ -206,7 +212,7 @@ final class _GetSourcePagesProvider
   }
 }
 
-String _$getSourcePagesHash() => r'a374a9fb20c0b66491de2b06b93beaea0133da5c';
+String _$getSourcePagesHash() => r'e76f59888cefdfb3b6b5800a243fbf4eec05c088';
 
 final class _GetSourcePagesFamily extends $Family
     with

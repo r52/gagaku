@@ -10,7 +10,7 @@ part of 'cache.dart';
 const cacheProvider = CacheProvider._();
 
 final class CacheProvider
-    extends $FunctionalProvider<CacheManager, CacheManager>
+    extends $FunctionalProvider<CacheManager, CacheManager, CacheManager>
     with $Provider<CacheManager> {
   const CacheProvider._()
     : super(
@@ -40,7 +40,7 @@ final class CacheProvider
   Override overrideWithValue(CacheManager value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $ValueProvider<CacheManager>(value),
+      providerOverride: $SyncValueProvider<CacheManager>(value),
     );
   }
 }

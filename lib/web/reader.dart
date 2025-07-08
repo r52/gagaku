@@ -23,14 +23,18 @@ Future<WebReaderData> _fetchWebChapterInfo(
   final manga = await api.getMangaFromSource(handle);
 
   if (manga != null) {
-    ref.read(webSourceHistoryProvider.add)(
-      HistoryLink(
-        title: manga.title,
-        url: handle.getURL(),
-        cover: manga.cover,
-        handle: handle,
-      ),
-    );
+    webSourceHistoryMutation.run(ref, (ref) async {
+      return await ref
+          .get(webSourceHistoryProvider.notifier)
+          .add(
+            HistoryLink(
+              title: manga.title,
+              url: handle.getURL(),
+              cover: manga.cover,
+              handle: handle,
+            ),
+          );
+    });
 
     final chapter = manga.getChapter(handle.chapter!);
 
@@ -87,24 +91,7 @@ Future<List<ReaderPage>> _getSourcePages(
   String referer = '';
   List<String>? links = [];
 
-  String? sourceId;
-  if (handle.parser != null) {
-    sourceId = handle.parser!.id;
-  } else {
-    final installed = await ref.watch(extensionInfoListProvider.future);
-    for (final src in installed) {
-      if (handle.sourceId == src.id) {
-        sourceId = handle.sourceId;
-        break;
-      }
-    }
-  }
-
-  if (sourceId == null) {
-    throw Exception(
-      'Failed to allocate extension. Parser: ${handle.parser}, sourceId: ${handle.sourceId}',
-    );
-  }
+  final sourceId = handle.sourceId;
 
   final ext = await ref.watch(extensionSourceProvider(sourceId).future);
   links = await ref
@@ -286,7 +273,11 @@ class WebSourceReaderWidget extends HookConsumerWidget {
 
       timer.value = Timer(const Duration(milliseconds: 2000), () async {
         if (readKey != null) {
-          ref.read(webReadMarkersProvider.set)(handle.getKey(), readKey!, true);
+          webReadMarkerMutation.run(ref, (ref) async {
+            return await ref
+                .get(webReadMarkersProvider.notifier)
+                .set(handle.getKey(), readKey!, true);
+          });
         }
       });
 

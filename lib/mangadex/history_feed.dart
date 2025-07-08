@@ -36,9 +36,17 @@ class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
       );
 
       await (
-        ref.read(statisticsProvider.get)(mangas),
-        ref.read(readChaptersProvider(me?.id).get)(mangas),
-        ref.read(chapterStatsProvider.get)(chapters),
+        statisticsMutation.run(ref, (ref) async {
+          return await ref.get(statisticsProvider.notifier).get(mangas);
+        }),
+        readChaptersMutation(me?.id).run(ref, (ref) async {
+          return await ref
+              .get(readChaptersProvider(me?.id).notifier)
+              .get(mangas);
+        }),
+        chapterStatsMutation.run(ref, (ref) async {
+          return await ref.get(chapterStatsProvider.notifier).get(chapters);
+        }),
       ).wait;
 
       return PageResultsMetaData(chapters.toList());

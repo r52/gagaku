@@ -31,6 +31,18 @@ const _$SupportedVersionEnumMap = {
   SupportedVersion.v0_9: 'v0_9',
 };
 
+_ChapterEntry _$ChapterEntryFromJson(Map<String, dynamic> json) =>
+    _ChapterEntry(
+      name: json['name'] as String,
+      chapter: WebChapter.fromJson(json['chapter'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$ChapterEntryToJson(_ChapterEntry instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'chapter': instance.chapter.toJson(),
+    };
+
 _SourceHandler _$SourceHandlerFromJson(Map<String, dynamic> json) =>
     _SourceHandler(
       type: $enumDecode(_$SourceTypeEnumMap, json['type']),

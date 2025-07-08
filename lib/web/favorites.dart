@@ -85,16 +85,20 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
                       AsyncValue(value: final data?) =>
                         data.containsKey(cat.id)
                             ? data[cat.id]!
-                            : <HistoryLink>[],
-                      _ => <HistoryLink>[],
+                            : const <HistoryLink>[],
+                      _ => const <HistoryLink>[],
                     },
                   ),
                 );
                 final fileredItems = useMemoized(
-                  () => items.where(
-                    (i) => i.title.toLowerCase().contains(filterText.text),
-                  ),
-                  [filterText, items],
+                  () =>
+                      items
+                          .where(
+                            (i) =>
+                                i.title.toLowerCase().contains(filterText.text),
+                          )
+                          .toList(),
+                  [filterText.text, items],
                 );
 
                 return WebMangaListWidget(
@@ -117,7 +121,7 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
                         child: Center(child: Text(tr.errors.noitems)),
                       ),
                     WebMangaListViewSliver(
-                      items: fileredItems.toList(),
+                      items: fileredItems,
                       favoritesKey: cat.id,
                       reorderable: true,
                       showRemoveButton: false,

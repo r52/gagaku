@@ -29,17 +29,11 @@ final class _MangaListViewProvider
   @override
   _MangaListView create() => _MangaListView();
 
-  @$internal
-  @override
-  $NotifierProviderElement<_MangaListView, MangaListView> $createElement(
-    $ProviderPointer pointer,
-  ) => $NotifierProviderElement(pointer);
-
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(MangaListView value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $ValueProvider<MangaListView>(value),
+      providerOverride: $SyncValueProvider<MangaListView>(value),
     );
   }
 }
@@ -52,11 +46,11 @@ abstract class _$MangaListView extends $Notifier<MangaListView> {
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<MangaListView>;
+    final ref = this.ref as $Ref<MangaListView, MangaListView>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<MangaListView>,
+              AnyNotifier<MangaListView, MangaListView>,
               MangaListView,
               Object?,
               Object?

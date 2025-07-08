@@ -113,7 +113,11 @@ class WebSourceHomePage extends HookConsumerWidget {
                           );
 
                           if (result == true) {
-                            ref.read(webReadMarkersProvider.clear)();
+                            webReadMarkerMutation.run(ref, (ref) async {
+                              return await ref
+                                  .get(webReadMarkersProvider.notifier)
+                                  .clear();
+                            });
                           }
                         },
                         leadingIcon: const Icon(Icons.restore),

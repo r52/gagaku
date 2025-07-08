@@ -54,7 +54,9 @@ class _MangaDexRecentFeedPageState
 
       final newItems = list.data.cast<Manga>();
 
-      await ref.read(statisticsProvider.get)(newItems);
+      statisticsMutation.run(ref, (ref) async {
+        return await ref.get(statisticsProvider.notifier).get(newItems);
+      });
 
       return PageResultsMetaData(newItems, list.total);
     },

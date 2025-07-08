@@ -76,37 +76,16 @@ final class WebConfigProvider
   @override
   WebConfig create() => WebConfig();
 
-  @$internal
-  @override
-  _$WebConfigElement $createElement($ProviderPointer pointer) =>
-      _$WebConfigElement(pointer);
-
-  ProviderListenable<WebConfig$SaveWith> get saveWith =>
-      $LazyProxyListenable<WebConfig$SaveWith, WebSourceConfig>(this, (
-        element,
-      ) {
-        element as _$WebConfigElement;
-
-        return element._$saveWith;
-      });
-
-  ProviderListenable<WebConfig$Save> get save =>
-      $LazyProxyListenable<WebConfig$Save, WebSourceConfig>(this, (element) {
-        element as _$WebConfigElement;
-
-        return element._$save;
-      });
-
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(WebSourceConfig value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $ValueProvider<WebSourceConfig>(value),
+      providerOverride: $SyncValueProvider<WebSourceConfig>(value),
     );
   }
 }
 
-String _$webConfigHash() => r'02fd3ba9bd9a4f62fac7c2c4bf1ebbdd044f85d1';
+String _$webConfigHash() => r'4bccb93a95d460642c1c8e845848bf3091caac30';
 
 abstract class _$WebConfig extends $Notifier<WebSourceConfig> {
   WebSourceConfig build();
@@ -114,155 +93,17 @@ abstract class _$WebConfig extends $Notifier<WebSourceConfig> {
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<WebSourceConfig>;
+    final ref = this.ref as $Ref<WebSourceConfig, WebSourceConfig>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<WebSourceConfig>,
+              AnyNotifier<WebSourceConfig, WebSourceConfig>,
               WebSourceConfig,
               Object?,
               Object?
             >;
     element.handleValue(ref, created);
   }
-}
-
-class _$WebConfigElement
-    extends $NotifierProviderElement<WebConfig, WebSourceConfig> {
-  _$WebConfigElement(super.pointer) {
-    _$saveWith.result = $Result.data(_$WebConfig$SaveWith(this));
-    _$save.result = $Result.data(_$WebConfig$Save(this));
-  }
-  final _$saveWith = $ElementLense<_$WebConfig$SaveWith>();
-  final _$save = $ElementLense<_$WebConfig$Save>();
-  @override
-  void mount() {
-    super.mount();
-    _$saveWith.result!.value!.reset();
-    _$save.result!.value!.reset();
-  }
-
-  @override
-  void visitListenables(
-    void Function($ElementLense element) listenableVisitor,
-  ) {
-    super.visitListenables(listenableVisitor);
-
-    listenableVisitor(_$saveWith);
-    listenableVisitor(_$save);
-  }
-}
-
-sealed class WebConfig$SaveWith extends MutationBase<WebSourceConfig> {
-  /// Starts the mutation.
-  ///
-  /// This will first set the state to [PendingMutation], then
-  /// will call [WebConfig.saveWith] with the provided parameters.
-  ///
-  /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutation] or [ErrorMutation] based on if the method
-  /// threw or not.
-  ///
-  /// **Note**:
-  /// If the notifier threw in its constructor, the mutation won't start
-  /// and [call] will throw.
-  /// This should generally never happen though, as Notifiers are not supposed
-  /// to have logic in their constructors.
-  WebSourceConfig call({
-    List<WebSourceInfo>? installedSources,
-    List<RepoInfo>? repoList,
-    List<WebSourceCategory>? categories,
-    String? defaultCategory,
-    List<String>? categoriesToUpdate,
-  });
-}
-
-final class _$WebConfig$SaveWith
-    extends $SyncMutationBase<WebSourceConfig, _$WebConfig$SaveWith, WebConfig>
-    implements WebConfig$SaveWith {
-  _$WebConfig$SaveWith(this.element, {super.state, super.key});
-
-  @override
-  final _$WebConfigElement element;
-
-  @override
-  $ElementLense<_$WebConfig$SaveWith> get listenable => element._$saveWith;
-
-  @override
-  WebSourceConfig call({
-    List<WebSourceInfo>? installedSources,
-    List<RepoInfo>? repoList,
-    List<WebSourceCategory>? categories,
-    String? defaultCategory,
-    List<String>? categoriesToUpdate,
-  }) {
-    return mutate(
-      Invocation.method(#saveWith, [], {
-        #installedSources: installedSources,
-        #repoList: repoList,
-        #categories: categories,
-        #defaultCategory: defaultCategory,
-        #categoriesToUpdate: categoriesToUpdate,
-      }),
-      ($notifier) => $notifier.saveWith(
-        installedSources: installedSources,
-        repoList: repoList,
-        categories: categories,
-        defaultCategory: defaultCategory,
-        categoriesToUpdate: categoriesToUpdate,
-      ),
-    );
-  }
-
-  @override
-  _$WebConfig$SaveWith copyWith(
-    MutationState<WebSourceConfig> state, {
-    Object? key,
-  }) => _$WebConfig$SaveWith(element, state: state, key: key);
-}
-
-sealed class WebConfig$Save extends MutationBase<WebSourceConfig> {
-  /// Starts the mutation.
-  ///
-  /// This will first set the state to [PendingMutation], then
-  /// will call [WebConfig.save] with the provided parameters.
-  ///
-  /// After the method completes, the mutation state will be updated to either
-  /// [SuccessMutation] or [ErrorMutation] based on if the method
-  /// threw or not.
-  ///
-  /// **Note**:
-  /// If the notifier threw in its constructor, the mutation won't start
-  /// and [call] will throw.
-  /// This should generally never happen though, as Notifiers are not supposed
-  /// to have logic in their constructors.
-  WebSourceConfig call(WebSourceConfig update);
-}
-
-final class _$WebConfig$Save
-    extends $SyncMutationBase<WebSourceConfig, _$WebConfig$Save, WebConfig>
-    implements WebConfig$Save {
-  _$WebConfig$Save(this.element, {super.state, super.key});
-
-  @override
-  final _$WebConfigElement element;
-
-  @override
-  $ElementLense<_$WebConfig$Save> get listenable => element._$save;
-
-  @override
-  WebSourceConfig call(WebSourceConfig update) {
-    return mutate(
-      Invocation.method(#save, [update]),
-      ($notifier) => $notifier.save(update),
-    );
-  }
-
-  @override
-  _$WebConfig$Save copyWith(
-    MutationState<WebSourceConfig> state, {
-    Object? key,
-  }) => _$WebConfig$Save(element, state: state, key: key);
 }
 
 @ProviderFor(ExtensionState)
@@ -288,17 +129,11 @@ final class ExtensionStateProvider
   @override
   ExtensionState create() => ExtensionState();
 
-  @$internal
-  @override
-  $NotifierProviderElement<ExtensionState, ExtensionStateMap> $createElement(
-    $ProviderPointer pointer,
-  ) => $NotifierProviderElement(pointer);
-
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(ExtensionStateMap value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $ValueProvider<ExtensionStateMap>(value),
+      providerOverride: $SyncValueProvider<ExtensionStateMap>(value),
     );
   }
 }
@@ -311,11 +146,11 @@ abstract class _$ExtensionState extends $Notifier<ExtensionStateMap> {
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<ExtensionStateMap>;
+    final ref = this.ref as $Ref<ExtensionStateMap, ExtensionStateMap>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<ExtensionStateMap>,
+              AnyNotifier<ExtensionStateMap, ExtensionStateMap>,
               ExtensionStateMap,
               Object?,
               Object?
@@ -347,16 +182,11 @@ final class ExtensionSecureStateProvider
   @override
   ExtensionSecureState create() => ExtensionSecureState();
 
-  @$internal
-  @override
-  $NotifierProviderElement<ExtensionSecureState, ExtensionStateMap>
-  $createElement($ProviderPointer pointer) => $NotifierProviderElement(pointer);
-
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(ExtensionStateMap value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $ValueProvider<ExtensionStateMap>(value),
+      providerOverride: $SyncValueProvider<ExtensionStateMap>(value),
     );
   }
 }
@@ -370,11 +200,11 @@ abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateMap> {
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<ExtensionStateMap>;
+    final ref = this.ref as $Ref<ExtensionStateMap, ExtensionStateMap>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<ExtensionStateMap>,
+              AnyNotifier<ExtensionStateMap, ExtensionStateMap>,
               ExtensionStateMap,
               Object?,
               Object?

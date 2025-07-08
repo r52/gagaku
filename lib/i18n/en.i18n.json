@@ -162,13 +162,15 @@
       "noTagsWarning": "This extension provides no filter options"
     },
     "noSourcesWarning": "No extensions installed!",
-    "sourceSearch": "Source Search",
+    "noSearchableSourcesWarning": "No searchable extensions installed!",
+    "sourceSearch": "Extension Search",
     "resetRead": "Reset Read Markers",
     "resetReadWarning": "Are you sure you want to reset all read markers for this manga?",
     "resetAllRead": "Reset all Read Markers",
     "resetAllReadWarning": "Are you sure you want to reset all read markers?",
     "favorites": "Favorites",
-    "loadInstalledSourcesError": "Error loading installed sources"
+    "loadInstalledSourcesError": "Error loading installed sources",
+    "searchWithExt": "Search with extensions"
   },
   "search": {
     "text": "Search",
@@ -345,7 +347,8 @@
     "unread": "unread",
     "markAllWarning": "Are you sure you want to mark all visible chapters as ${arg}?",
     "noChaptersMsg": "No Chapters",
-    "markAs": "Mark as $arg"
+    "markAs": "Mark as $arg",
+    "copyLink": "Copy gagaku link"
   },
   "readingStatus": {
     "remove": "Remove",

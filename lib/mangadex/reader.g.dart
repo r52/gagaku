@@ -10,7 +10,12 @@ part of 'reader.dart';
 const _fetchChapterDataProvider = _FetchChapterDataFamily._();
 
 final class _FetchChapterDataProvider
-    extends $FunctionalProvider<AsyncValue<ReaderData>, FutureOr<ReaderData>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<ReaderData>,
+          ReaderData,
+          FutureOr<ReaderData>
+        >
     with $FutureModifier<ReaderData>, $FutureProvider<ReaderData> {
   const _FetchChapterDataProvider._({
     required _FetchChapterDataFamily super.from,
@@ -82,6 +87,7 @@ final class _FetchChapterPagesProvider
     extends
         $FunctionalProvider<
           AsyncValue<List<ReaderPage>>,
+          List<ReaderPage>,
           FutureOr<List<ReaderPage>>
         >
     with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {

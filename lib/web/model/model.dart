@@ -17,9 +17,10 @@ import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:native_dio_adapter/native_dio_adapter.dart' hide URLRequest;
-import 'package:riverpod_annotation/experimental/mutation.dart';
+import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
@@ -33,7 +34,7 @@ void openWebSource(BuildContext context, SourceHandler handle) {
       readerData = WebReaderData(source: code, handle: handle);
     }
 
-    AutoRouter.of(context).push(
+    context.router.push(
       ProxyWebSourceReaderRoute(
         proxy: handle.sourceId,
         code: handle.location,
@@ -43,7 +44,7 @@ void openWebSource(BuildContext context, SourceHandler handle) {
       ),
     );
   } else {
-    AutoRouter.of(context).push(
+    context.router.push(
       WebMangaViewRoute(
         sourceId: handle.sourceId,
         mangaId: handle.location,
@@ -92,20 +93,6 @@ class ProxyHandler {
 
   Future<HistoryLink> handleLink(HistoryLink link) async {
     if (link.handle != null) {
-      final handle = link.handle!;
-
-      if (handle.type == SourceType.source && handle.parser == null) {
-        final installed = ref.watch(
-          webConfigProvider.select((cfg) => cfg.installedSources),
-        );
-
-        final src = installed.firstWhereOrNull(
-          (ext) => handle.sourceId == ext.id,
-        );
-
-        handle.parser = src;
-      }
-
       return link;
     }
 
@@ -118,8 +105,15 @@ class ProxyHandler {
 
     final updatedLink = link.copyWith(handle: handle);
 
-    ref.read(webSourceHistoryProvider.add)(updatedLink);
-    ref.read(webSourceFavoritesProvider.updateAll)(updatedLink);
+    webSourceHistoryMutation.run(ref, (ref) async {
+      return await ref.get(webSourceHistoryProvider.notifier).add(updatedLink);
+    });
+
+    webSourceFavoritesMutation.run(ref, (ref) async {
+      return await ref
+          .get(webSourceFavoritesProvider.notifier)
+          .updateAll(updatedLink);
+    });
 
     return updatedLink;
   }
@@ -134,9 +128,11 @@ class ProxyHandler {
         chapter: '1',
       );
 
-      ref.read(webSourceHistoryProvider.add)(
-        HistoryLink(title: url, url: url, handle: handle),
-      );
+      webSourceHistoryMutation.run(ref, (ref) async {
+        return await ref
+            .get(webSourceHistoryProvider.notifier)
+            .add(HistoryLink(title: url, url: url, handle: handle));
+      });
 
       return handle;
     }
@@ -146,22 +142,19 @@ class ProxyHandler {
       return handle;
     }
 
-    final installed = ref.watch(
-      webConfigProvider.select((cfg) => cfg.installedSources),
-    );
-
-    final src = installed.firstWhereOrNull(
-      (ext) => url.startsWith('${ext.id}/'),
-    );
-
-    if (src == null) {
-      logger.w('Extension not found. url: $url');
-      return null;
-    }
-
     final parts = url.split('/');
     if (parts.length != 2) {
       logger.w('Invalid extension url $url');
+      return null;
+    }
+
+    final srcId = parts[0];
+
+    final installed = await ref.watch(extensionInfoListProvider.future);
+    final src = installed[srcId];
+
+    if (src == null) {
+      logger.w('Extension not found. url: $url');
       return null;
     }
 
@@ -170,7 +163,6 @@ class ProxyHandler {
       type: SourceType.source,
       sourceId: src.id,
       location: loc,
-      parser: src,
     );
 
     return handle;
@@ -235,51 +227,33 @@ class ProxyHandler {
   Future<WebManga?> getMangaFromSource(SourceHandler handle) async {
     switch (handle.type) {
       case SourceType.source:
-        String? sourceId;
-        if (handle.parser != null) {
-          sourceId = handle.parser!.id;
-        } else {
-          final installed = await ref.watch(extensionInfoListProvider.future);
-          for (final src in installed) {
-            if (handle.sourceId == src.id) {
-              sourceId = handle.sourceId;
-              break;
-            }
-          }
-        }
+        final key = handle.getKey();
 
-        if (sourceId != null) {
-          final key = handle.getKey();
-
-          if (await _cache.exists(key)) {
-            logger.d('CacheManager: retrieving entry $key');
-            final manga = _cache.get<WebManga>(key, WebManga.fromJson);
-            return manga;
-          }
-
-          final manga = await ref
-              .read(extensionSourceProvider(sourceId).notifier)
-              .getManga(handle.location);
-
-          if (manga != null) {
-            const expiry = Duration(days: 1);
-
-            logger.d(
-              'CacheManager: caching entry $key for ${expiry.toString()}',
-            );
-            _cache.put(
-              key,
-              json.encode(manga.toJson()),
-              manga,
-              true,
-              expiry: expiry,
-            );
-          }
-
+        if (await _cache.exists(key)) {
+          logger.d('CacheManager: retrieving entry $key');
+          final manga = _cache.get<WebManga>(key, WebManga.fromJson);
           return manga;
         }
 
-        return null;
+        final manga = await ref
+            .read(extensionSourceProvider(handle.sourceId).notifier)
+            .getManga(handle.location);
+
+        if (manga != null) {
+          const expiry = Duration(days: 1);
+
+          logger.d('CacheManager: caching entry $key for ${expiry.toString()}');
+          _cache.put(
+            key,
+            json.encode(manga.toJson()),
+            manga,
+            true,
+            expiry: expiry,
+          );
+        }
+
+        return manga;
+
       case SourceType.proxy:
         return await _getMangaFromProxy(handle);
     }
@@ -373,8 +347,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     return _fetch();
   }
 
-  @mutation
-  Future<void> clear() async {
+  Future<Map<String, List<HistoryLink>>> clear() async {
     await future;
     final empty = <String, List<HistoryLink>>{};
 
@@ -382,9 +355,10 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     await box.put('web_favorites', json.encode(empty));
 
     state = AsyncData(empty);
+
+    return empty;
   }
 
-  @mutation
   Future<Map<String, List<HistoryLink>>> add(
     String category,
     HistoryLink link,
@@ -408,15 +382,21 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     return udp;
   }
 
-  @mutation
   Future<Map<String, List<HistoryLink>>> updateAll(HistoryLink link) async {
+    bool updated = false;
+
     final oldstate = await future;
     for (final cat in oldstate.keys) {
       final idx = oldstate[cat]!.indexOf(link);
 
-      if (idx != -1) {
+      if (idx != -1 && !link.isExact(oldstate[cat]![idx])) {
         oldstate[cat]![idx] = link;
+        updated = true;
       }
+    }
+
+    if (!updated) {
+      return oldstate;
     }
 
     final udp = {...oldstate};
@@ -429,7 +409,6 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     return udp;
   }
 
-  @mutation
   Future<Map<String, List<HistoryLink>>> remove(
     String category,
     HistoryLink link,
@@ -459,7 +438,6 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     return udp;
   }
 
-  @mutation
   Future<Map<String, List<HistoryLink>>> updateList(
     String category,
     int oldIndex,
@@ -486,7 +464,6 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     return udp;
   }
 
-  @mutation
   Future<Map<String, List<HistoryLink>>> reconfigureCategories(
     List<WebSourceCategory> categories,
     String defaultCategory,
@@ -513,6 +490,8 @@ class WebSourceFavorites extends _$WebSourceFavorites {
   }
 }
 
+final webSourceFavoritesMutation = Mutation<Map<String, List<HistoryLink>>>();
+
 @Riverpod(keepAlive: true)
 class WebSourceHistory extends _$WebSourceHistory {
   static const _numItems = 250;
@@ -536,7 +515,6 @@ class WebSourceHistory extends _$WebSourceHistory {
     return _fetch();
   }
 
-  @mutation
   Future<Queue<HistoryLink>> clear() async {
     await future;
 
@@ -551,7 +529,6 @@ class WebSourceHistory extends _$WebSourceHistory {
     return empty;
   }
 
-  @mutation
   Future<Queue<HistoryLink>> add(HistoryLink link) async {
     final oldstate = await future;
     final cpy = Queue.of(oldstate);
@@ -576,7 +553,6 @@ class WebSourceHistory extends _$WebSourceHistory {
     return cpy;
   }
 
-  @mutation
   Future<Queue<HistoryLink>> remove(HistoryLink link) async {
     final oldstate = await future;
     final cpy = Queue.of(oldstate);
@@ -600,6 +576,8 @@ class WebSourceHistory extends _$WebSourceHistory {
   }
 }
 
+final webSourceHistoryMutation = Mutation<Queue<HistoryLink>>();
+
 @Riverpod(keepAlive: true)
 class WebReadMarkers extends _$WebReadMarkers {
   Future<Map<String, Set<String>>> _fetch() async {
@@ -621,7 +599,6 @@ class WebReadMarkers extends _$WebReadMarkers {
     return _fetch();
   }
 
-  @mutation
   Future<Map<String, Set<String>>> clear() async {
     await future;
     final empty = <String, Set<String>>{};
@@ -634,7 +611,6 @@ class WebReadMarkers extends _$WebReadMarkers {
     return empty;
   }
 
-  @mutation
   Future<Map<String, Set<String>>> set(
     String manga,
     String chapter,
@@ -675,7 +651,6 @@ class WebReadMarkers extends _$WebReadMarkers {
     return oldstate;
   }
 
-  @mutation
   Future<Map<String, Set<String>>> setBulk(
     String manga, {
     Iterable<String>? read,
@@ -719,7 +694,6 @@ class WebReadMarkers extends _$WebReadMarkers {
     return oldstate;
   }
 
-  @mutation
   Future<Map<String, Set<String>>> deleteKey(String manga) async {
     final oldstate = await future;
     final keyExists = oldstate.containsKey(manga);
@@ -741,6 +715,8 @@ class WebReadMarkers extends _$WebReadMarkers {
     return oldstate;
   }
 }
+
+final webReadMarkerMutation = Mutation<Map<String, Set<String>>>();
 
 @Riverpod(keepAlive: true)
 class ExtensionSource extends _$ExtensionSource {
@@ -1133,9 +1109,9 @@ return p;
     final chapmap =
         chapters
             .map(
-              (e) => ChapterEntry.entry(
-                e.chapNum.toString(),
-                WebChapter(
+              (e) => ChapterEntry(
+                name: e.chapNum.toString(),
+                chapter: WebChapter(
                   title: e.title,
                   volume: e.volume?.toString(),
                   groups: {e.version ?? sourceId: e},
@@ -1202,14 +1178,18 @@ return p;
 @riverpod
 class ExtensionInfoList extends _$ExtensionInfoList {
   @override
-  Future<List<WebSourceInfo>> build() async {
+  Future<Map<String, WebSourceInfo>> build() async {
     final installed = ref.watch(
       webConfigProvider.select((cfg) => cfg.installedSources),
     );
 
-    return await Future.wait(
+    final list = await Future.wait(
       installed.map((i) => ref.watch(extensionSourceProvider(i.id).future)),
     );
+
+    final map = <String, WebSourceInfo>{for (var e in list) e.id: e};
+
+    return map;
   }
 }
 
@@ -1217,7 +1197,11 @@ class ExtensionInfoList extends _$ExtensionInfoList {
 Future<WebSourceInfo> getExtensionFromId(Ref ref, String sourceId) async {
   final sources = await ref.watch(extensionInfoListProvider.future);
 
-  return sources.firstWhere((e) => e.id == sourceId);
+  if (sources.containsKey(sourceId)) {
+    return sources[sourceId]!;
+  }
+
+  throw Exception("Invalid missing/source '$sourceId'");
 }
 
 class SettingsForm with ChangeNotifier {

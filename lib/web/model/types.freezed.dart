@@ -1,6 +1,5 @@
-// dart format width=80
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -14,9 +13,164 @@ part of 'types.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
+mixin _$ChapterEntry {
+
+ String get name; WebChapter get chapter;
+/// Create a copy of ChapterEntry
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChapterEntryCopyWith<ChapterEntry> get copyWith => _$ChapterEntryCopyWithImpl<ChapterEntry>(this as ChapterEntry, _$identity);
+
+  /// Serializes this ChapterEntry to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterEntry&&(identical(other.name, name) || other.name == name)&&(identical(other.chapter, chapter) || other.chapter == chapter));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,name,chapter);
+
+@override
+String toString() {
+  return 'ChapterEntry(name: $name, chapter: $chapter)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ChapterEntryCopyWith<$Res>  {
+  factory $ChapterEntryCopyWith(ChapterEntry value, $Res Function(ChapterEntry) _then) = _$ChapterEntryCopyWithImpl;
+@useResult
+$Res call({
+ String name, WebChapter chapter
+});
+
+
+$WebChapterCopyWith<$Res> get chapter;
+
+}
+/// @nodoc
+class _$ChapterEntryCopyWithImpl<$Res>
+    implements $ChapterEntryCopyWith<$Res> {
+  _$ChapterEntryCopyWithImpl(this._self, this._then);
+
+  final ChapterEntry _self;
+  final $Res Function(ChapterEntry) _then;
+
+/// Create a copy of ChapterEntry
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? chapter = null,}) {
+  return _then(_self.copyWith(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,chapter: null == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
+as WebChapter,
+  ));
+}
+/// Create a copy of ChapterEntry
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebChapterCopyWith<$Res> get chapter {
+  
+  return $WebChapterCopyWith<$Res>(_self.chapter, (value) {
+    return _then(_self.copyWith(chapter: value));
+  });
+}
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _ChapterEntry extends ChapterEntry {
+  const _ChapterEntry({required this.name, required this.chapter}): super._();
+  factory _ChapterEntry.fromJson(Map<String, dynamic> json) => _$ChapterEntryFromJson(json);
+
+@override final  String name;
+@override final  WebChapter chapter;
+
+/// Create a copy of ChapterEntry
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ChapterEntryCopyWith<_ChapterEntry> get copyWith => __$ChapterEntryCopyWithImpl<_ChapterEntry>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ChapterEntryToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterEntry&&(identical(other.name, name) || other.name == name)&&(identical(other.chapter, chapter) || other.chapter == chapter));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,name,chapter);
+
+@override
+String toString() {
+  return 'ChapterEntry(name: $name, chapter: $chapter)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ChapterEntryCopyWith<$Res> implements $ChapterEntryCopyWith<$Res> {
+  factory _$ChapterEntryCopyWith(_ChapterEntry value, $Res Function(_ChapterEntry) _then) = __$ChapterEntryCopyWithImpl;
+@override @useResult
+$Res call({
+ String name, WebChapter chapter
+});
+
+
+@override $WebChapterCopyWith<$Res> get chapter;
+
+}
+/// @nodoc
+class __$ChapterEntryCopyWithImpl<$Res>
+    implements _$ChapterEntryCopyWith<$Res> {
+  __$ChapterEntryCopyWithImpl(this._self, this._then);
+
+  final _ChapterEntry _self;
+  final $Res Function(_ChapterEntry) _then;
+
+/// Create a copy of ChapterEntry
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? chapter = null,}) {
+  return _then(_ChapterEntry(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,chapter: null == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
+as WebChapter,
+  ));
+}
+
+/// Create a copy of ChapterEntry
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebChapterCopyWith<$Res> get chapter {
+  
+  return $WebChapterCopyWith<$Res>(_self.chapter, (value) {
+    return _then(_self.copyWith(chapter: value));
+  });
+}
+}
+
+
+/// @nodoc
 mixin _$SourceHandler {
 
- SourceType get type; set type(SourceType value); String get sourceId; set sourceId(String value); String get location; set location(String value); String? get chapter; set chapter(String? value);@JsonKey(includeFromJson: false, includeToJson: false) WebSourceInfo? get parser;@JsonKey(includeFromJson: false, includeToJson: false) set parser(WebSourceInfo? value);
+ SourceType get type; set type(SourceType value); String get sourceId; set sourceId(String value); String get location; set location(String value); String? get chapter; set chapter(String? value);
 /// Create a copy of SourceHandler
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -31,7 +185,7 @@ $SourceHandlerCopyWith<SourceHandler> get copyWith => _$SourceHandlerCopyWithImp
 
 @override
 String toString() {
-  return 'SourceHandler(type: $type, sourceId: $sourceId, location: $location, chapter: $chapter, parser: $parser)';
+  return 'SourceHandler(type: $type, sourceId: $sourceId, location: $location, chapter: $chapter)';
 }
 
 
@@ -42,11 +196,11 @@ abstract mixin class $SourceHandlerCopyWith<$Res>  {
   factory $SourceHandlerCopyWith(SourceHandler value, $Res Function(SourceHandler) _then) = _$SourceHandlerCopyWithImpl;
 @useResult
 $Res call({
- SourceType type, String sourceId, String location, String? chapter,@JsonKey(includeFromJson: false, includeToJson: false) WebSourceInfo? parser
+ SourceType type, String sourceId, String location, String? chapter
 });
 
 
-$WebSourceInfoCopyWith<$Res>? get parser;
+
 
 }
 /// @nodoc
@@ -59,44 +213,31 @@ class _$SourceHandlerCopyWithImpl<$Res>
 
 /// Create a copy of SourceHandler
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? sourceId = null,Object? location = null,Object? chapter = freezed,Object? parser = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? sourceId = null,Object? location = null,Object? chapter = freezed,}) {
   return _then(_self.copyWith(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as SourceType,sourceId: null == sourceId ? _self.sourceId : sourceId // ignore: cast_nullable_to_non_nullable
 as String,location: null == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
 as String,chapter: freezed == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
-as String?,parser: freezed == parser ? _self.parser : parser // ignore: cast_nullable_to_non_nullable
-as WebSourceInfo?,
+as String?,
   ));
 }
-/// Create a copy of SourceHandler
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$WebSourceInfoCopyWith<$Res>? get parser {
-    if (_self.parser == null) {
-    return null;
-  }
 
-  return $WebSourceInfoCopyWith<$Res>(_self.parser!, (value) {
-    return _then(_self.copyWith(parser: value));
-  });
 }
-}
+
 
 
 /// @nodoc
 @JsonSerializable()
 
 class _SourceHandler extends SourceHandler {
-   _SourceHandler({required this.type, required this.sourceId, required this.location, this.chapter, @JsonKey(includeFromJson: false, includeToJson: false) this.parser}): super._();
+   _SourceHandler({required this.type, required this.sourceId, required this.location, this.chapter}): super._();
   factory _SourceHandler.fromJson(Map<String, dynamic> json) => _$SourceHandlerFromJson(json);
 
 @override  SourceType type;
 @override  String sourceId;
 @override  String location;
 @override  String? chapter;
-@override@JsonKey(includeFromJson: false, includeToJson: false)  WebSourceInfo? parser;
 
 /// Create a copy of SourceHandler
 /// with the given fields replaced by the non-null parameter values.
@@ -113,7 +254,7 @@ Map<String, dynamic> toJson() {
 
 @override
 String toString() {
-  return 'SourceHandler(type: $type, sourceId: $sourceId, location: $location, chapter: $chapter, parser: $parser)';
+  return 'SourceHandler(type: $type, sourceId: $sourceId, location: $location, chapter: $chapter)';
 }
 
 
@@ -124,11 +265,11 @@ abstract mixin class _$SourceHandlerCopyWith<$Res> implements $SourceHandlerCopy
   factory _$SourceHandlerCopyWith(_SourceHandler value, $Res Function(_SourceHandler) _then) = __$SourceHandlerCopyWithImpl;
 @override @useResult
 $Res call({
- SourceType type, String sourceId, String location, String? chapter,@JsonKey(includeFromJson: false, includeToJson: false) WebSourceInfo? parser
+ SourceType type, String sourceId, String location, String? chapter
 });
 
 
-@override $WebSourceInfoCopyWith<$Res>? get parser;
+
 
 }
 /// @nodoc
@@ -141,30 +282,17 @@ class __$SourceHandlerCopyWithImpl<$Res>
 
 /// Create a copy of SourceHandler
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? sourceId = null,Object? location = null,Object? chapter = freezed,Object? parser = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? sourceId = null,Object? location = null,Object? chapter = freezed,}) {
   return _then(_SourceHandler(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as SourceType,sourceId: null == sourceId ? _self.sourceId : sourceId // ignore: cast_nullable_to_non_nullable
 as String,location: null == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
 as String,chapter: freezed == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
-as String?,parser: freezed == parser ? _self.parser : parser // ignore: cast_nullable_to_non_nullable
-as WebSourceInfo?,
+as String?,
   ));
 }
 
-/// Create a copy of SourceHandler
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$WebSourceInfoCopyWith<$Res>? get parser {
-    if (_self.parser == null) {
-    return null;
-  }
 
-  return $WebSourceInfoCopyWith<$Res>(_self.parser!, (value) {
-    return _then(_self.copyWith(parser: value));
-  });
-}
 }
 
 
@@ -248,6 +376,7 @@ $WebMangaCopyWith<$Res> get manga {
   });
 }
 }
+
 
 
 /// @nodoc
@@ -411,6 +540,7 @@ $SourceHandlerCopyWith<$Res>? get handle {
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -565,6 +695,7 @@ $SourceMangaCopyWith<$Res>? get data {
   });
 }
 }
+
 
 
 /// @nodoc
@@ -723,6 +854,7 @@ as Map<String, dynamic>,
 }
 
 
+
 /// @nodoc
 
 @JsonSerializable(fieldRename: FieldRename.snake)
@@ -865,6 +997,7 @@ as String,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -1004,6 +1137,7 @@ as List<SourceIntents>,
 }
 
 }
+
 
 
 /// @nodoc
@@ -1158,6 +1292,7 @@ as BadgeColor,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -1293,6 +1428,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -1432,6 +1568,7 @@ as String?,
 }
 
 }
+
 
 
 /// @nodoc
@@ -1596,6 +1733,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -1873,6 +2011,7 @@ as String,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -2017,6 +2156,7 @@ $BuiltWithCopyWith<$Res> get builtWith {
   });
 }
 }
+
 
 
 /// @nodoc
@@ -2171,6 +2311,7 @@ as String,
 
 
 
+
 /// @nodoc
 mixin _$RepoData {
 
@@ -2234,6 +2375,7 @@ as SupportedVersion,
 }
 
 
+
 OAuthResponseType _$OAuthResponseTypeFromJson(
   Map<String, dynamic> json
 ) {
@@ -2292,6 +2434,7 @@ String toString() {
 class $OAuthResponseTypeCopyWith<$Res>  {
 $OAuthResponseTypeCopyWith(OAuthResponseType _, $Res Function(OAuthResponseType) __);
 }
+
 
 
 /// @nodoc
@@ -2550,6 +2693,7 @@ as List<SearchFilterValue>,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -2695,6 +2839,7 @@ as dynamic,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -2835,6 +2980,7 @@ as dynamic,
 }
 
 }
+
 
 
 /// @nodoc
@@ -2986,6 +3132,7 @@ $MangaInfoCopyWith<$Res> get mangaInfo {
   });
 }
 }
+
 
 
 /// @nodoc
@@ -3143,6 +3290,7 @@ as String?,
 }
 
 }
+
 
 
 /// @nodoc
@@ -3336,6 +3484,7 @@ as List<Tag>,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -3478,6 +3627,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -3632,6 +3782,7 @@ $SourceMangaCopyWith<$Res> get sourceManga {
   });
 }
 }
+
 
 
 /// @nodoc
@@ -3806,6 +3957,7 @@ as List<String>,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -3950,6 +4102,7 @@ as DiscoverSectionType,
 }
 
 }
+
 
 
 /// @nodoc
@@ -4125,6 +4278,7 @@ as ContentRating?,
 }
 
 }
+
 
 
 /// @nodoc
@@ -4616,6 +4770,7 @@ as String,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -4802,6 +4957,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -5654,6 +5810,7 @@ as List<FormItemElement>,
 }
 
 
+
 /// @nodoc
 @JsonSerializable()
 
@@ -5798,6 +5955,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -5965,6 +6123,7 @@ as String,
 }
 
 }
+
 
 
 /// @nodoc
@@ -6387,6 +6546,7 @@ as String,value: null == value ? _self.value : value ,
 }
 
 }
+
 
 
 /// @nodoc

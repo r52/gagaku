@@ -29,17 +29,11 @@ final class LibraryViewTypeProvider
   @override
   LibraryViewType create() => LibraryViewType();
 
-  @$internal
-  @override
-  $NotifierProviderElement<LibraryViewType, MangaReadingStatus> $createElement(
-    $ProviderPointer pointer,
-  ) => $NotifierProviderElement(pointer);
-
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(MangaReadingStatus value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $ValueProvider<MangaReadingStatus>(value),
+      providerOverride: $SyncValueProvider<MangaReadingStatus>(value),
     );
   }
 }
@@ -52,11 +46,11 @@ abstract class _$LibraryViewType extends $Notifier<MangaReadingStatus> {
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<MangaReadingStatus>;
+    final ref = this.ref as $Ref<MangaReadingStatus, MangaReadingStatus>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<MangaReadingStatus>,
+              AnyNotifier<MangaReadingStatus, MangaReadingStatus>,
               MangaReadingStatus,
               Object?,
               Object?
@@ -70,7 +64,11 @@ const _getLibraryListByTypeProvider = _GetLibraryListByTypeFamily._();
 
 final class _GetLibraryListByTypeProvider
     extends
-        $FunctionalProvider<AsyncValue<List<String>>, FutureOr<List<String>>>
+        $FunctionalProvider<
+          AsyncValue<List<String>>,
+          List<String>,
+          FutureOr<List<String>>
+        >
     with $FutureModifier<List<String>>, $FutureProvider<List<String>> {
   const _GetLibraryListByTypeProvider._({
     required _GetLibraryListByTypeFamily super.from,

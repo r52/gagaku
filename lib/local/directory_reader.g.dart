@@ -13,6 +13,7 @@ final class _GetDirectoryPagesProvider
     extends
         $FunctionalProvider<
           AsyncValue<List<ReaderPage>>,
+          List<ReaderPage>,
           FutureOr<List<ReaderPage>>
         >
     with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {

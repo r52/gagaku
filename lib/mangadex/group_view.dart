@@ -210,7 +210,9 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                 );
               }
 
-              ref.read(mdConfigProvider.save)(cfg.value);
+              mdConfigSaveMutation.run(ref, (ref) async {
+                return ref.get(mdConfigProvider.notifier).save(cfg.value);
+              });
             },
             icon: const Icon(Icons.block),
             label: Text(isBlacklisted ? t.ui.unblock : t.ui.block),
@@ -287,7 +289,9 @@ class __GroupTitlesTabState extends ConsumerState<_GroupTitlesTab> {
 
       final newItems = list.data.cast<Manga>();
 
-      await ref.read(statisticsProvider.get)(newItems);
+      statisticsMutation.run(ref, (ref) async {
+        return await ref.get(statisticsProvider.notifier).get(newItems);
+      });
 
       return PageResultsMetaData(newItems, list.total);
     },

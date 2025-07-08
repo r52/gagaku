@@ -68,7 +68,9 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
       final manga = results.data.cast<Manga>();
 
       if (manga.isNotEmpty) {
-        await ref.read(statisticsProvider.get)(manga);
+        statisticsMutation.run(ref, (ref) async {
+          return await ref.get(statisticsProvider.notifier).get(manga);
+        });
       }
 
       return PageResultsMetaData(manga, results.total);

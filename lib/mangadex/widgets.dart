@@ -102,6 +102,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
               closedElevation: 0.0,
               closedBuilder: (context, openContainer) {
                 return IconButton(
+                  color: theme.colorScheme.onPrimaryContainer,
                   icon: const Icon(Icons.settings),
                   onPressed: () {
                     openContainer();
@@ -122,7 +123,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
                   // XXX: This changes when OAuth is released
                   me == null
                       ? IconButton(
-                        color: theme.colorScheme.primary,
+                        color: theme.colorScheme.onPrimaryContainer,
                         tooltip: tr.auth.login,
                         icon: const Icon(Icons.login),
                         onPressed:
@@ -131,7 +132,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
                       : MenuAnchor(
                         builder:
                             (context, controller, child) => IconButton(
-                              color: theme.colorScheme.primary,
+                              color: theme.colorScheme.onPrimaryContainer,
                               onPressed: () {
                                 if (controller.isOpen) {
                                   controller.close();
@@ -256,11 +257,15 @@ class MarkReadButton extends ConsumerWidget {
       true || false => IconButton(
         onPressed: () async {
           bool set = !isRead;
-          ref.read(readChaptersProvider(me.id).set)(
-            manga,
-            read: set ? [chapter] : null,
-            unread: !set ? [chapter] : null,
-          );
+          readChaptersMutation(me.id).run(ref, (ref) async {
+            return await ref
+                .get(readChaptersProvider(me.id).notifier)
+                .set(
+                  manga,
+                  read: set ? [chapter] : null,
+                  unread: !set ? [chapter] : null,
+                );
+          });
         },
         padding: EdgeInsets.zero,
         splashRadius: 15,
@@ -470,9 +475,17 @@ class _InfiniteScrollFeedState
       );
 
       await (
-        ref.read(statisticsProvider.get)(mangas),
-        ref.read(readChaptersProvider(me?.id).get)(mangas),
-        ref.read(chapterStatsProvider.get)(chapters),
+        statisticsMutation.run(ref, (ref) async {
+          return await ref.get(statisticsProvider.notifier).get(mangas);
+        }),
+        readChaptersMutation(me?.id).run(ref, (ref) async {
+          return await ref
+              .get(readChaptersProvider(me?.id).notifier)
+              .get(mangas);
+        }),
+        chapterStatsMutation.run(ref, (ref) async {
+          return await ref.get(chapterStatsProvider.notifier).get(chapters);
+        }),
       ).wait;
 
       return PageResultsMetaData(chapters, chapterlist.total);
@@ -536,15 +549,22 @@ class _CoverButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.watch(loggedUserProvider).value;
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
-    final getRatings = ref.watch(ratingsProvider(me?.id).get);
-    final getStats = ref.watch(statisticsProvider.get);
 
     return TextButton(
       onPressed: () async {
-        getReadChapters([manga]);
-        getRatings([manga]);
-        getStats([manga]);
+        readChaptersMutation(me?.id).run(ref, (ref) async {
+          return await ref.get(readChaptersProvider(me?.id).notifier).get([
+            manga,
+          ]);
+        });
+
+        ratingsMutation(me?.id).run(ref, (ref) async {
+          await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
+        });
+
+        statisticsMutation.run(ref, (ref) async {
+          return await ref.get(statisticsProvider.notifier).get([manga]);
+        });
         context.router.push(
           MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
         );
@@ -583,9 +603,6 @@ class _MangaTitle extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.watch(loggedUserProvider).value;
     final theme = Theme.of(context);
-    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
-    final getRatings = ref.watch(ratingsProvider(me?.id).get);
-    final getStats = ref.watch(statisticsProvider.get);
 
     return TextButton.icon(
       style: TextButton.styleFrom(
@@ -597,9 +614,19 @@ class _MangaTitle extends ConsumerWidget {
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {
-        getReadChapters([manga]);
-        getRatings([manga]);
-        getStats([manga]);
+        readChaptersMutation(me?.id).run(ref, (ref) async {
+          return await ref.get(readChaptersProvider(me?.id).notifier).get([
+            manga,
+          ]);
+        });
+
+        ratingsMutation(me?.id).run(ref, (ref) async {
+          await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
+        });
+
+        statisticsMutation.run(ref, (ref) async {
+          return await ref.get(statisticsProvider.notifier).get([manga]);
+        });
         context.router.push(
           MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
         );
@@ -631,17 +658,24 @@ class _BackLinkedChapterButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.watch(loggedUserProvider).value;
-    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
-    final getRatings = ref.watch(ratingsProvider(me?.id).get);
-    final getStats = ref.watch(statisticsProvider.get);
 
     return ChapterButtonWidget(
       chapter: chapter,
       manga: manga,
       onLinkPressed: (context) async {
-        getReadChapters([manga]);
-        getRatings([manga]);
-        getStats([manga]);
+        readChaptersMutation(me?.id).run(ref, (ref) async {
+          return await ref.get(readChaptersProvider(me?.id).notifier).get([
+            manga,
+          ]);
+        });
+
+        ratingsMutation(me?.id).run(ref, (ref) async {
+          await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
+        });
+
+        statisticsMutation.run(ref, (ref) async {
+          return await ref.get(statisticsProvider.notifier).get([manga]);
+        });
         context.router.push(
           MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
         );
@@ -1292,9 +1326,6 @@ class GridMangaItem extends HookConsumerWidget {
     final gradient = useAnimation(
       aniController.drive(Styles.coverArtGradientTween),
     );
-    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
-    final getRatings = ref.watch(ratingsProvider(me?.id).get);
-    final getStats = ref.watch(statisticsProvider.get);
 
     final image = GridAlbumImage(
       gradient: gradient,
@@ -1312,9 +1343,19 @@ class GridMangaItem extends HookConsumerWidget {
 
     return InkWell(
       onTap: () async {
-        getReadChapters([manga]);
-        getRatings([manga]);
-        getStats([manga]);
+        readChaptersMutation(me?.id).run(ref, (ref) async {
+          return await ref.get(readChaptersProvider(me?.id).notifier).get([
+            manga,
+          ]);
+        });
+
+        ratingsMutation(me?.id).run(ref, (ref) async {
+          await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
+        });
+
+        statisticsMutation.run(ref, (ref) async {
+          return await ref.get(statisticsProvider.notifier).get([manga]);
+        });
         context.router.push(
           MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
         );
@@ -1372,9 +1413,6 @@ class GridMangaDetailedItem extends HookConsumerWidget {
     final me = ref.watch(loggedUserProvider).value;
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
-    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
-    final getRatings = ref.watch(ratingsProvider(me?.id).get);
-    final getStats = ref.watch(statisticsProvider.get);
 
     return Card(
       child: Padding(
@@ -1392,9 +1430,20 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                 ),
               ),
               onPressed: () async {
-                getReadChapters([manga]);
-                getRatings([manga]);
-                getStats([manga]);
+                readChaptersMutation(me?.id).run(ref, (ref) async {
+                  return await ref
+                      .get(readChaptersProvider(me?.id).notifier)
+                      .get([manga]);
+                });
+
+                ratingsMutation(me?.id).run(ref, (ref) async {
+                  await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
+                });
+                statisticsMutation.run(ref, (ref) async {
+                  return await ref.get(statisticsProvider.notifier).get([
+                    manga,
+                  ]);
+                });
                 context.router.push(
                   MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
                 );
@@ -1414,9 +1463,23 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                 children: [
                   TextButton(
                     onPressed: () async {
-                      getReadChapters([manga]);
-                      getRatings([manga]);
-                      getStats([manga]);
+                      readChaptersMutation(me?.id).run(ref, (ref) async {
+                        return await ref
+                            .get(readChaptersProvider(me?.id).notifier)
+                            .get([manga]);
+                      });
+
+                      ratingsMutation(me?.id).run(ref, (ref) async {
+                        await ref.get(ratingsProvider(me?.id).notifier).get([
+                          manga,
+                        ]);
+                      });
+
+                      statisticsMutation.run(ref, (ref) async {
+                        return await ref.get(statisticsProvider.notifier).get([
+                          manga,
+                        ]);
+                      });
                       context.router.push(
                         MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
                       );
@@ -1480,9 +1543,6 @@ class _ListMangaItem extends HookConsumerWidget {
     useAutomaticKeepAlive();
     final me = ref.watch(loggedUserProvider).value;
     final theme = Theme.of(context);
-    final getReadChapters = ref.watch(readChaptersProvider(me?.id).get);
-    final getRatings = ref.watch(ratingsProvider(me?.id).get);
-    final getStats = ref.watch(statisticsProvider.get);
 
     return Card(
       child: Padding(
@@ -1492,9 +1552,21 @@ class _ListMangaItem extends HookConsumerWidget {
           children: [
             TextButton(
               onPressed: () async {
-                getReadChapters([manga]);
-                getRatings([manga]);
-                getStats([manga]);
+                readChaptersMutation(me?.id).run(ref, (ref) async {
+                  return await ref
+                      .get(readChaptersProvider(me?.id).notifier)
+                      .get([manga]);
+                });
+
+                ratingsMutation(me?.id).run(ref, (ref) async {
+                  await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
+                });
+
+                statisticsMutation.run(ref, (ref) async {
+                  return await ref.get(statisticsProvider.notifier).get([
+                    manga,
+                  ]);
+                });
                 context.router.push(
                   MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
                 );
@@ -1526,9 +1598,23 @@ class _ListMangaItem extends HookConsumerWidget {
                       ),
                     ),
                     onPressed: () async {
-                      getReadChapters([manga]);
-                      getRatings([manga]);
-                      getStats([manga]);
+                      readChaptersMutation(me?.id).run(ref, (ref) async {
+                        return await ref
+                            .get(readChaptersProvider(me?.id).notifier)
+                            .get([manga]);
+                      });
+
+                      ratingsMutation(me?.id).run(ref, (ref) async {
+                        await ref.get(ratingsProvider(me?.id).notifier).get([
+                          manga,
+                        ]);
+                      });
+
+                      statisticsMutation.run(ref, (ref) async {
+                        return await ref.get(statisticsProvider.notifier).get([
+                          manga,
+                        ]);
+                      });
                       context.router.push(
                         MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
                       );
@@ -1668,7 +1754,9 @@ class MangaStatisticsRow extends HookConsumerWidget {
     // Redundancy
     useEffect(() {
       Future.delayed(Duration.zero, () async {
-        await ref.read(statisticsProvider.get)([manga]);
+        statisticsMutation.run(ref, (ref) async {
+          return await ref.get(statisticsProvider.notifier).get([manga]);
+        });
       });
       return null;
     }, []);

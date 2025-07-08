@@ -4,7 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/web/model/types.dart' show RepoInfo, WebSourceInfo;
 import 'package:hive_ce_flutter/hive_flutter.dart';
-import 'package:riverpod_annotation/experimental/mutation.dart';
+import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -79,7 +79,6 @@ class WebConfig extends _$WebConfig {
     return _fetch();
   }
 
-  @mutation
   WebSourceConfig saveWith({
     List<WebSourceInfo>? installedSources,
     List<RepoInfo>? repoList,
@@ -117,7 +116,6 @@ class WebConfig extends _$WebConfig {
     return update;
   }
 
-  @mutation
   WebSourceConfig save(WebSourceConfig update) {
     state = update;
     final box = Hive.box(gagakuDataBox);
@@ -126,6 +124,8 @@ class WebConfig extends _$WebConfig {
     return update;
   }
 }
+
+final webConfigSaveMutation = Mutation<WebSourceConfig>();
 
 @Riverpod(keepAlive: true)
 class ExtensionState extends _$ExtensionState {
