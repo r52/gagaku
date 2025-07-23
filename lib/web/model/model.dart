@@ -344,7 +344,8 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     }
 
     // Add/update link
-    final box = GagakuData().store.box<HistoryLink>();
+    final store = GagakuData().store;
+    final box = store.box<HistoryLink>();
     final query = box.query(HistoryLink_.url.equals(link.url)).build();
 
     final result = query.findUnique();
@@ -366,7 +367,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     }
 
     list.list.add(link);
-    list.list.applyToDb();
+    list.list.applyToDb(existingStore: store);
 
     final udp = {...oldstate};
 
@@ -393,7 +394,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
       final list = oldstate[c]!;
 
       list.list.remove(link);
-      list.list.applyToDb();
+      list.list.applyToDb(existingStore: GagakuData().store);
     }
 
     final udp = {...oldstate};
@@ -417,7 +418,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     if (oldstate.containsKey(category)) {
       final element = oldstate[category]!.list.removeAt(oldIndex);
       oldstate[category]!.list.insert(newIndex, element);
-      oldstate[category]!.list.applyToDb();
+      oldstate[category]!.list.applyToDb(existingStore: GagakuData().store);
     }
 
     final udp = {...oldstate};
@@ -464,7 +465,7 @@ class WebSourceHistory extends _$WebSourceHistory {
     final list = await future;
 
     list.list.clear();
-    list.list.applyToDb();
+    list.list.applyToDb(existingStore: GagakuData().store);
 
     state = AsyncData(list);
   }
@@ -473,7 +474,8 @@ class WebSourceHistory extends _$WebSourceHistory {
     final list = await future;
 
     // Add/update link
-    final box = GagakuData().store.box<HistoryLink>();
+    final store = GagakuData().store;
+    final box = store.box<HistoryLink>();
     final query = box.query(HistoryLink_.url.equals(link.url)).build();
 
     final result = query.findUnique();
@@ -504,7 +506,7 @@ class WebSourceHistory extends _$WebSourceHistory {
       }
     }
 
-    list.list.applyToDb();
+    list.list.applyToDb(existingStore: store);
 
     state = AsyncData(list);
   }
@@ -527,7 +529,7 @@ class WebSourceHistory extends _$WebSourceHistory {
       }
     }
 
-    list.list.applyToDb();
+    list.list.applyToDb(existingStore: GagakuData().store);
 
     state = AsyncData(list);
   }

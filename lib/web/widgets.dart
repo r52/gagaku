@@ -538,15 +538,15 @@ class FavoritesButton extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     final favorites = ref.watch(
-      favoritesListProvider.select(
+      webSourceFavoritesProvider.select(
         (value) => switch (value) {
           AsyncValue(value: final data?) => data,
-          _ => null,
+          _ => <String, WebFavoritesList>{},
         },
       ),
     );
 
-    final favlist = favorites?.map((l) => l.list.contains(link)).toList() ?? [];
+    final favlist = favorites.values.map((l) => l.list.contains(link)).toList();
     final favorited = favlist.any((e) => e);
 
     return MenuAnchor(
@@ -557,7 +557,7 @@ class FavoritesButton extends HookConsumerWidget {
             color: theme.colorScheme.surface.withAlpha(200),
             shape: borderRadius == null ? const CircleBorder() : null,
             borderRadius: borderRadius,
-            child: favorites == null
+            child: favorites.isEmpty
                 ? const SizedBox(
                     width: 40,
                     height: 40,
@@ -579,9 +579,9 @@ class FavoritesButton extends HookConsumerWidget {
           ),
         );
       },
-      menuChildren: favorites != null
+      menuChildren: favorites.isNotEmpty
           ? [
-              for (final (idx, cat) in favorites.indexed)
+              for (final (idx, cat) in favorites.values.indexed)
                 CheckboxListTile(
                   controlAffinity: ListTileControlAffinity.leading,
                   title: Text(cat.name),
