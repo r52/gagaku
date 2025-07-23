@@ -42,8 +42,6 @@ class WebSourceHistoryPage extends HookConsumerWidget {
     }, []);
     final stream = useStream(query);
 
-    // TODO pagination?
-
     // Pre-initialize sources
     final _ = ref.watch(extensionInfoListProvider);
 

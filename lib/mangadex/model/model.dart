@@ -2532,12 +2532,10 @@ class MangaDexHistory extends _$MangaDexHistory {
   @override
   Future<Queue<Chapter>> build() async {
     final box = GagakuData().store.box<MangaDexHistoryDB>();
-
     query = box.query().build();
 
     MangaDexHistoryDB? db;
-
-    db = await query.findUniqueAsync();
+    db = query.findUnique();
 
     if (db == null) {
       db = MangaDexHistoryDB();
@@ -2600,10 +2598,10 @@ class MangaDexHistory extends _$MangaDexHistory {
     final uuids = cpy.map((e) => e.id).toList();
 
     final box = GagakuData().store.box<MangaDexHistoryDB>();
-    final db = (await query.findUniqueAsync())!;
+    final db = query.findUnique()!;
     db.queue = uuids;
 
-    box.putAsync(db);
+    box.put(db);
 
     state = AsyncData(cpy);
 

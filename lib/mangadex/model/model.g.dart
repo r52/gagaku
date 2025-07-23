@@ -1020,7 +1020,7 @@ final class MangaDexHistoryProvider
   MangaDexHistory create() => MangaDexHistory();
 }
 
-String _$mangaDexHistoryHash() => r'ed768fbfe0e7debad33fe53764ee35d3a502bb94';
+String _$mangaDexHistoryHash() => r'9693891e2458bb4561ec4f30ee5e155fe450b69d';
 
 abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
   FutureOr<Queue<Chapter>> build();

@@ -347,7 +347,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     final box = GagakuData().store.box<HistoryLink>();
     final query = box.query(HistoryLink_.url.equals(link.url)).build();
 
-    final result = await query.findUniqueAsync();
+    final result = query.findUnique();
     query.close();
 
     if (result != null) {
@@ -355,7 +355,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
       link.lastAccessed = result.lastAccessed;
     }
 
-    box.putAsync(link);
+    box.put(link);
 
     // Add link to list
     final list = oldstate[category]!;
@@ -392,10 +392,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     for (final c in categoriesToEdit) {
       final list = oldstate[c]!;
 
-      while (list.list.contains(link)) {
-        list.list.remove(link);
-      }
-
+      list.list.remove(link);
       list.list.applyToDb();
     }
 
@@ -444,7 +441,7 @@ class WebSourceHistory extends _$WebSourceHistory {
         .build();
 
     WebFavoritesList? historyList;
-    historyList = await query.findUniqueAsync();
+    historyList = query.findUnique();
     query.close();
 
     if (historyList == null) {
@@ -479,14 +476,14 @@ class WebSourceHistory extends _$WebSourceHistory {
     final box = GagakuData().store.box<HistoryLink>();
     final query = box.query(HistoryLink_.url.equals(link.url)).build();
 
-    final result = await query.findUniqueAsync();
+    final result = query.findUnique();
     query.close();
 
     if (result != null) {
       link.dbid = result.dbid;
     }
 
-    box.putAsync(link);
+    box.put(link);
 
     // Add to list
     if (list.list.contains(link)) {
@@ -545,7 +542,7 @@ class WebReadMarkers extends _$WebReadMarkers {
     final query = box.query().build();
 
     ReadMarkersDB? db;
-    db = await query.findUniqueAsync();
+    db = query.findUnique();
     query.close();
 
     if (db == null) {
@@ -567,7 +564,7 @@ class WebReadMarkers extends _$WebReadMarkers {
 
     final box = GagakuData().store.box<ReadMarkersDB>();
     db = db.copyWith();
-    box.putAsync(db);
+    box.put(db);
 
     state = AsyncData(db);
 
@@ -600,7 +597,7 @@ class WebReadMarkers extends _$WebReadMarkers {
 
     final box = GagakuData().store.box<ReadMarkersDB>();
     db = db.copyWith();
-    box.putAsync(db);
+    box.put(db);
 
     state = AsyncData(db);
 
@@ -640,7 +637,7 @@ class WebReadMarkers extends _$WebReadMarkers {
 
     final box = GagakuData().store.box<ReadMarkersDB>();
     db = db.copyWith();
-    box.putAsync(db);
+    box.put(db);
 
     state = AsyncData(db);
 
@@ -658,7 +655,7 @@ class WebReadMarkers extends _$WebReadMarkers {
 
     final box = GagakuData().store.box<ReadMarkersDB>();
     db = db.copyWith();
-    box.putAsync(db);
+    box.put(db);
 
     state = AsyncData(db);
 

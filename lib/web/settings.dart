@@ -492,27 +492,23 @@ class UpdateCategoryDialog extends HookWidget {
     return AlertDialog(
       title: Text(tr.webSources.settings.categoriesToUpdate),
       content: Column(
-        children: List.generate(
-          categories.length,
-          (index) => Builder(
-            builder: (context) {
-              final cat = categories.elementAt(index);
-              return CheckboxListTile(
-                controlAffinity: ListTileControlAffinity.leading,
-                title: Text(cat.name),
-                value: selected.value.contains(cat.id),
-                onChanged: (bool? value) async {
-                  if (value == true) {
-                    selected.value = [...selected.value, cat.id];
-                  } else {
-                    selected.value.remove(cat.id);
-                    selected.value = [...selected.value];
-                  }
-                },
-              );
-            },
-          ),
-        ),
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final cat in categories)
+            CheckboxListTile(
+              controlAffinity: ListTileControlAffinity.leading,
+              title: Text(cat.name),
+              value: selected.value.contains(cat.id),
+              onChanged: (bool? value) async {
+                if (value == true) {
+                  selected.value = [...selected.value, cat.id];
+                } else {
+                  selected.value.remove(cat.id);
+                  selected.value = [...selected.value];
+                }
+              },
+            ),
+        ],
       ),
       actions: <Widget>[
         TextButton(

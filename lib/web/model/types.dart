@@ -86,7 +86,7 @@ class WebFavoritesList {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is WebFavoritesList &&
-            identical(other.id, id));
+            (identical(other.id, id) || other.id == id));
   }
 
   @override

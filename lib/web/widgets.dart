@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -535,26 +537,6 @@ class FavoritesButton extends HookConsumerWidget {
     final tr = context.t;
     final theme = Theme.of(context);
 
-    // final query = useMemoized(
-    //   () => GagakuData().store
-    //       .box<WebFavoritesList>()
-    //       .query(WebFavoritesList_.id.notEquals(historyListUUID))
-    //       .order(WebFavoritesList_.sortOrder)
-    //       .watch(triggerImmediately: true)
-    //       .map((query) => query.find()),
-    //   [],
-    // );
-    // final stream = useStream(query);
-
-    // if (stream.hasError) {
-    //   return Center(child: Icon(Icons.error));
-    // }
-
-    // final favorites = stream.data;
-    // final favorited = favorites?.any((l) => l.list.contains(link));
-
-    // TODO improve?
-
     final favorites = ref.watch(
       favoritesListProvider.select(
         (value) => switch (value) {
@@ -564,11 +546,8 @@ class FavoritesButton extends HookConsumerWidget {
       ),
     );
 
-    final favorited = favorites?.any((l) => l.list.contains(link));
-
-    if (favorited == null) {
-      return const CircularProgressIndicator();
-    }
+    final favlist = favorites?.map((l) => l.list.contains(link)).toList() ?? [];
+    final favorited = favlist.any((e) => e);
 
     return MenuAnchor(
       builder: (context, controller, child) {
@@ -602,34 +581,27 @@ class FavoritesButton extends HookConsumerWidget {
       },
       menuChildren: favorites != null
           ? [
-              ...List.generate(
-                favorites.length,
-                (index) => Builder(
-                  builder: (context) {
-                    final cat = favorites.elementAt(index);
-                    return CheckboxListTile(
-                      controlAffinity: ListTileControlAffinity.leading,
-                      title: Text(cat.name),
-                      value: cat.list.contains(link),
-                      onChanged: (bool? value) async {
-                        if (value == true) {
-                          webSourceFavoritesMutation.run(ref, (ref) async {
-                            return await ref
-                                .get(webSourceFavoritesProvider.notifier)
-                                .add(cat.id, link);
-                          });
-                        } else {
-                          webSourceFavoritesMutation.run(ref, (ref) async {
-                            return await ref
-                                .get(webSourceFavoritesProvider.notifier)
-                                .remove(cat.id, link);
-                          });
-                        }
-                      },
-                    );
+              for (final (idx, cat) in favorites.indexed)
+                CheckboxListTile(
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: Text(cat.name),
+                  value: favlist.elementAt(idx),
+                  onChanged: (bool? value) async {
+                    if (value == true) {
+                      webSourceFavoritesMutation.run(ref, (ref) async {
+                        return await ref
+                            .get(webSourceFavoritesProvider.notifier)
+                            .add(cat.id, link);
+                      });
+                    } else {
+                      webSourceFavoritesMutation.run(ref, (ref) async {
+                        return await ref
+                            .get(webSourceFavoritesProvider.notifier)
+                            .remove(cat.id, link);
+                      });
+                    }
                   },
                 ),
-              ),
               MenuItemButton(
                 onPressed: () =>
                     webSourceFavoritesMutation.run(ref, (ref) async {

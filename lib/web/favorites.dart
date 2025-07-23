@@ -23,25 +23,6 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
         DefaultScrollController.maybeOf(context, 'WebSourceFavoritesPage') ??
         controller ??
         useScrollController();
-    // final query = useMemoized(
-    //   () => GagakuData().store
-    //       .box<WebFavoritesList>()
-    //       .query(WebFavoritesList_.id.notEquals(historyListUUID))
-    //       .order(WebFavoritesList_.sortOrder)
-    //       .watch(triggerImmediately: true)
-    //       .map((query) => query.find()),
-    //   [],
-    // );
-    // final stream = useStream(query);
-
-    // if (stream.hasError) {
-    //   return ErrorList(error: stream.error!, stackTrace: stream.stackTrace!);
-    // } else if (stream.connectionState == ConnectionState.waiting ||
-    //     !stream.hasData) {
-    //   return Center(child: CircularProgressIndicator());
-    // }
-
-    // final categories = stream.data!;
 
     final categories = ref.watch(
       webSourceFavoritesProvider.select(

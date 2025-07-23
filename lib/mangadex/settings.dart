@@ -95,40 +95,35 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                         ),
                       ),
                     ),
-                    menuChildren: List.generate(
-                      Languages.languages.length,
-                      (index) => Builder(
-                        builder: (_) {
-                          final lang = Languages.languages.elementAt(index);
-                          return CheckboxListTile(
-                            controlAffinity: ListTileControlAffinity.leading,
-                            title: Text(tr[lang.label]),
-                            secondary: CountryFlag(flag: lang.flag, size: 15),
-                            value: config.value.translatedLanguages.contains(
-                              lang,
-                            ),
-                            onChanged: (bool? value) async {
-                              if (value == true) {
-                                config.value = config.value.copyWith(
-                                  translatedLanguages: {
-                                    ...config.value.translatedLanguages,
-                                    lang,
-                                  },
-                                );
-                              } else {
-                                config.value = config.value.copyWith(
-                                  translatedLanguages: config
-                                      .value
-                                      .translatedLanguages
-                                      .where((element) => element != lang)
-                                      .toSet(),
-                                );
-                              }
-                            },
-                          );
-                        },
-                      ),
-                    ),
+                    menuChildren: [
+                      for (final lang in Languages.languages)
+                        CheckboxListTile(
+                          controlAffinity: ListTileControlAffinity.leading,
+                          title: Text(tr[lang.label]),
+                          secondary: CountryFlag(flag: lang.flag, size: 15),
+                          value: config.value.translatedLanguages.contains(
+                            lang,
+                          ),
+                          onChanged: (bool? value) async {
+                            if (value == true) {
+                              config.value = config.value.copyWith(
+                                translatedLanguages: {
+                                  ...config.value.translatedLanguages,
+                                  lang,
+                                },
+                              );
+                            } else {
+                              config.value = config.value.copyWith(
+                                translatedLanguages: config
+                                    .value
+                                    .translatedLanguages
+                                    .where((element) => element != lang)
+                                    .toSet(),
+                              );
+                            }
+                          },
+                        ),
+                    ],
                     child: Column(
                       children: [
                         Wrap(
@@ -191,38 +186,31 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                         ),
                       ),
                     ),
-                    menuChildren: List.generate(
-                      Languages.languages.length,
-                      (index) => Builder(
-                        builder: (_) {
-                          final lang = Languages.languages.elementAt(index);
-                          return CheckboxListTile(
-                            controlAffinity: ListTileControlAffinity.leading,
-                            title: Text(tr[lang.label]),
-                            secondary: CountryFlag(flag: lang.flag, size: 15),
-                            value: config.value.originalLanguage.contains(lang),
-                            onChanged: (bool? value) async {
-                              if (value == true) {
-                                config.value = config.value.copyWith(
-                                  originalLanguage: {
-                                    ...config.value.originalLanguage,
-                                    lang,
-                                  },
-                                );
-                              } else {
-                                config.value = config.value.copyWith(
-                                  originalLanguage: config
-                                      .value
-                                      .originalLanguage
-                                      .where((element) => element != lang)
-                                      .toSet(),
-                                );
-                              }
-                            },
-                          );
-                        },
-                      ),
-                    ),
+                    menuChildren: [
+                      for (final lang in Languages.languages)
+                        CheckboxListTile(
+                          controlAffinity: ListTileControlAffinity.leading,
+                          title: Text(tr[lang.label]),
+                          secondary: CountryFlag(flag: lang.flag, size: 15),
+                          value: config.value.originalLanguage.contains(lang),
+                          onChanged: (bool? value) async {
+                            if (value == true) {
+                              config.value = config.value.copyWith(
+                                originalLanguage: {
+                                  ...config.value.originalLanguage,
+                                  lang,
+                                },
+                              );
+                            } else {
+                              config.value = config.value.copyWith(
+                                originalLanguage: config.value.originalLanguage
+                                    .where((element) => element != lang)
+                                    .toSet(),
+                              );
+                            }
+                          },
+                        ),
+                    ],
                     child: Column(
                       children: [
                         Wrap(
@@ -284,35 +272,30 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                         ),
                       ),
                     ),
-                    menuChildren: List.generate(
-                      ContentRating.values.length,
-                      (index) => Builder(
-                        builder: (_) {
-                          final content = ContentRating.values.elementAt(index);
-                          return CheckboxListTile(
-                            controlAffinity: ListTileControlAffinity.leading,
-                            title: Text(tr[content.label]),
-                            value: config.value.contentRating.contains(content),
-                            onChanged: (bool? value) async {
-                              if (value == true) {
-                                config.value = config.value.copyWith(
-                                  contentRating: {
-                                    ...config.value.contentRating,
-                                    content,
-                                  },
-                                );
-                              } else {
-                                config.value = config.value.copyWith(
-                                  contentRating: config.value.contentRating
-                                      .where((element) => element != content)
-                                      .toSet(),
-                                );
-                              }
-                            },
-                          );
-                        },
-                      ),
-                    ),
+                    menuChildren: [
+                      for (final content in ContentRating.values)
+                        CheckboxListTile(
+                          controlAffinity: ListTileControlAffinity.leading,
+                          title: Text(tr[content.label]),
+                          value: config.value.contentRating.contains(content),
+                          onChanged: (bool? value) async {
+                            if (value == true) {
+                              config.value = config.value.copyWith(
+                                contentRating: {
+                                  ...config.value.contentRating,
+                                  content,
+                                },
+                              );
+                            } else {
+                              config.value = config.value.copyWith(
+                                contentRating: config.value.contentRating
+                                    .where((element) => element != content)
+                                    .toSet(),
+                              );
+                            }
+                          },
+                        ),
+                    ],
                     child: Column(
                       children: [
                         Wrap(
