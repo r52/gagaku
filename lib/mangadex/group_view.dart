@@ -77,7 +77,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
 
     final settings = ref.watch(mdConfigProvider);
     final isBlacklisted = settings.groupBlacklist.contains(group.id);
-    final cfg = useRef(settings);
+    final cfg = useRef(settings.copyWith());
 
     const bottomNavigationBarItems = <Widget>[
       NavigationDestination(icon: Icon(Icons.info), label: 'Info'),
@@ -193,16 +193,16 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
         actions: [
           ElevatedButton.icon(
             style: Styles.buttonStyle(
-              backgroundColor:
-                  isBlacklisted ? Colors.green.shade900 : Colors.red.shade900,
+              backgroundColor: isBlacklisted
+                  ? Colors.green.shade900
+                  : Colors.red.shade900,
             ),
             onPressed: () {
               if (isBlacklisted) {
                 cfg.value = settings.copyWith(
-                  groupBlacklist:
-                      settings.groupBlacklist
-                          .where((element) => element != group.id)
-                          .toSet(),
+                  groupBlacklist: settings.groupBlacklist
+                      .where((element) => element != group.id)
+                      .toSet(),
                 );
               } else {
                 cfg.value = settings.copyWith(
@@ -276,8 +276,8 @@ class __GroupTitlesTabState extends ConsumerState<_GroupTitlesTab> {
   static const info = MangaDexFeeds.groupTitles;
 
   late final _pagingController = GagakuPagingController<int, Manga>(
-    getNextPageKey:
-        (state) => state.keys?.last != null ? state.keys!.last + info.limit : 0,
+    getNextPageKey: (state) =>
+        state.keys?.last != null ? state.keys!.last + info.limit : 0,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final list = await api.fetchMangaList(

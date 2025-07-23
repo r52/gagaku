@@ -1,104 +1,70 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'dart:convert';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
-import 'package:gagaku/web/model/types.dart' show RepoInfo, WebSourceInfo;
-import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:gagaku/objectbox.g.dart' show ExtensionStateDB_;
+import 'package:objectbox/objectbox.dart';
 import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:uuid/uuid.dart';
 
 part 'config.freezed.dart';
 part 'config.g.dart';
 
 typedef ExtensionStateMap = Map<String, Map<String, dynamic>>;
 
-const _defaultUUID = 'e9d5c6c4-a29c-4a74-aaf2-8f2f8d2c06c2';
-const _defaultCategory = WebSourceCategory(_defaultUUID, 'Default');
-
-@JsonSerializable()
-class WebSourceCategory {
-  const WebSourceCategory(this.id, this.name);
-  WebSourceCategory.name(this.name) : id = const Uuid().v4();
-
-  final String id;
-  final String name;
-
-  factory WebSourceCategory.fromJson(Map<String, dynamic> json) =>
-      _$WebSourceCategoryFromJson(json);
-  Map<String, dynamic> toJson() => _$WebSourceCategoryToJson(this);
-}
-
-class RepoConverter implements JsonConverter<RepoInfo, dynamic> {
-  const RepoConverter();
-
-  @override
-  RepoInfo fromJson(dynamic item) {
-    if (item is String) {
-      return RepoInfo(name: item, url: item);
-    }
-
-    return RepoInfo.fromJson(item);
-  }
-
-  @override
-  dynamic toJson(RepoInfo item) => item.toJson();
-}
-
-@freezed
-abstract class WebSourceConfig with _$WebSourceConfig {
-  factory WebSourceConfig({
-    @Default([]) List<WebSourceInfo> installedSources,
-    @RepoConverter() @Default([]) List<RepoInfo> repoList,
-    @Default([_defaultCategory]) List<WebSourceCategory> categories,
-    @Default(_defaultUUID) String defaultCategory,
+@unfreezed
+abstract class ExtensionConfig with _$ExtensionConfig {
+  @Entity(realClass: ExtensionConfig)
+  factory ExtensionConfig({
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    @Id()
+    @Default(0)
+    int dbid,
+    @Default('') String defaultCategory,
     @Default([]) List<String> categoriesToUpdate,
-  }) = _WebSourceConfig;
+  }) = _ExtensionConfig;
 
-  factory WebSourceConfig.fromJson(Map<String, dynamic> json) =>
-      _$WebSourceConfigFromJson(json);
+  factory ExtensionConfig.fromJson(Map<String, dynamic> json) =>
+      _$ExtensionConfigFromJson(json);
 }
 
 @Riverpod(keepAlive: true)
 class WebConfig extends _$WebConfig {
-  WebSourceConfig _fetch() {
-    final box = Hive.box(gagakuDataBox);
-    final str = box.get('websource');
+  late final Query<ExtensionConfig> query;
 
-    if (str == null) {
-      return WebSourceConfig();
+  ExtensionConfig _fetch() {
+    final box = GagakuData().store.box<ExtensionConfig>();
+
+    query = box.query().build();
+
+    ExtensionConfig? cfg;
+
+    cfg = query.findUnique();
+
+    if (cfg == null) {
+      cfg = ExtensionConfig();
+      box.put(cfg);
     }
 
-    final content = json.decode(str) as Map<String, dynamic>;
+    ref.onDispose(() {
+      query.close();
+    });
 
-    return WebSourceConfig.fromJson(content);
+    return cfg;
   }
 
   @override
-  WebSourceConfig build() {
+  ExtensionConfig build() {
     return _fetch();
   }
 
-  WebSourceConfig saveWith({
-    List<WebSourceInfo>? installedSources,
-    List<RepoInfo>? repoList,
-    List<WebSourceCategory>? categories,
+  ExtensionConfig saveWith({
     String? defaultCategory,
     List<String>? categoriesToUpdate,
   }) {
     var update = state;
-
-    if (installedSources != null) {
-      update = update.copyWith(installedSources: installedSources);
-    }
-
-    if (repoList != null) {
-      update = update.copyWith(repoList: repoList);
-    }
-
-    if (categories != null) {
-      update = update.copyWith(categories: categories);
-    }
 
     if (defaultCategory != null) {
       update = update.copyWith(defaultCategory: defaultCategory);
@@ -110,106 +76,144 @@ class WebConfig extends _$WebConfig {
 
     state = update;
 
-    final box = Hive.box(gagakuDataBox);
-    box.put('websource', json.encode(update.toJson()));
+    final box = GagakuData().store.box<ExtensionConfig>();
+    box.put(update);
 
     return update;
   }
 
-  WebSourceConfig save(WebSourceConfig update) {
+  ExtensionConfig save(ExtensionConfig update) {
+    if (update.dbid == 0) {
+      final cfg = query.findUnique();
+
+      if (cfg != null) {
+        update.dbid = cfg.dbid;
+      }
+    }
+
     state = update;
-    final box = Hive.box(gagakuDataBox);
-    box.put('websource', json.encode(update.toJson()));
+    final box = GagakuData().store.box<ExtensionConfig>();
+    box.put(update);
 
     return update;
   }
 }
 
-final webConfigSaveMutation = Mutation<WebSourceConfig>();
+final webConfigSaveMutation = Mutation<ExtensionConfig>();
+
+@Entity()
+class ExtensionStateDB {
+  @Id()
+  int dbid;
+
+  final bool secure;
+
+  @Transient()
+  ExtensionStateMap state;
+
+  ExtensionStateDB({this.dbid = 0, this.secure = false, this.state = const {}});
+
+  String get dbState => json.encode(state);
+
+  set dbState(String value) {
+    state = (json.decode(value) as Map<String, dynamic>)
+        .cast<String, Map<String, dynamic>>();
+  }
+}
 
 @Riverpod(keepAlive: true)
 class ExtensionState extends _$ExtensionState {
-  ExtensionStateMap _fetch() {
-    final box = Hive.box(gagakuDataBox);
-    final str = box.get('extension-state');
+  ExtensionStateDB _fetch() {
+    final box = GagakuData().store.box<ExtensionStateDB>();
 
-    if (str == null) {
-      return {};
+    final query = box.query(ExtensionStateDB_.secure.equals(false)).build();
+
+    ExtensionStateDB? db;
+
+    db = query.findUnique();
+    query.close();
+
+    if (db == null) {
+      db = ExtensionStateDB(secure: false);
+      box.put(db);
     }
 
-    final content = json.decode(str) as Map<String, dynamic>;
-
-    final result = content.cast<String, Map<String, dynamic>>();
-
-    return result;
+    return db;
   }
 
   @override
-  ExtensionStateMap build() {
+  ExtensionStateDB build() {
     return _fetch();
   }
 
   dynamic getExtensionState(String sourceId) {
-    final result = state[sourceId];
+    final result = state.state[sourceId];
     return result;
   }
 
   void setExtensionState(String sourceId, dynamic data) {
-    state[sourceId] = data;
+    state.state[sourceId] = data;
 
-    final box = Hive.box(gagakuDataBox);
-    box.put('extension-state', json.encode(state));
+    final box = GagakuData().store.box<ExtensionStateDB>();
+    box.put(state);
   }
 
   void resetAllState(String sourceId) {
-    state.remove(sourceId);
+    state.state.remove(sourceId);
 
-    final box = Hive.box(gagakuDataBox);
-    box.put('extension-state', json.encode(state));
+    final box = GagakuData().store.box<ExtensionStateDB>();
+    box.put(state);
   }
 
   void clearAll() {
-    final box = Hive.box(gagakuDataBox);
-    box.delete('extension-state');
+    state.state.clear();
+
+    final box = GagakuData().store.box<ExtensionStateDB>();
+    box.put(state);
   }
 }
 
 @Riverpod(keepAlive: true)
 class ExtensionSecureState extends _$ExtensionSecureState {
-  ExtensionStateMap _fetch() {
-    final box = Hive.box(gagakuDataBox);
-    final str = box.get('extension-secure-state');
+  ExtensionStateDB _fetch() {
+    final box = GagakuData().store.box<ExtensionStateDB>();
 
-    if (str == null) {
-      return {};
+    final query = box.query(ExtensionStateDB_.secure.equals(true)).build();
+
+    ExtensionStateDB? db;
+
+    db = query.findUnique();
+    query.close();
+
+    if (db == null) {
+      db = ExtensionStateDB(secure: true);
+      box.put(db);
     }
 
-    final content = json.decode(str) as Map<String, dynamic>;
-
-    final result = content.cast<String, Map<String, dynamic>>();
-
-    return result;
+    return db;
   }
 
   @override
-  ExtensionStateMap build() {
+  ExtensionStateDB build() {
     return _fetch();
   }
 
   dynamic getExtensionState(String sourceId) {
-    final result = state[sourceId];
+    final result = state.state[sourceId];
     return result;
   }
 
   void setExtensionState(String sourceId, dynamic data) {
-    state[sourceId] = data;
+    state.state[sourceId] = data;
 
-    final box = Hive.box(gagakuDataBox);
-    box.put('extension-secure-state', json.encode(state));
+    final box = GagakuData().store.box<ExtensionStateDB>();
+    box.put(state);
   }
 
   void clearAll() {
-    final box = Hive.box(gagakuDataBox);
-    box.delete('extension-secure-state');
+    state.state.clear();
+
+    final box = GagakuData().store.box<ExtensionStateDB>();
+    box.put(state);
   }
 }

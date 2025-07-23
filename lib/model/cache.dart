@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'package:flutter/painting.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/model.dart';
+import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:gagaku/web/model/types.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -93,7 +95,7 @@ class CacheManager {
   final Map<String, CacheEntry> _cache = <String, CacheEntry>{};
 
   CacheManager() : _box = Hive.lazyBox(gagakuCache) {
-    _pruneSchedule = Timer.periodic(const Duration(minutes: 1), (timer) async {
+    _pruneSchedule = Timer.periodic(const Duration(minutes: 15), (timer) async {
       await _checkForPrune();
     });
   }
@@ -111,6 +113,22 @@ class CacheManager {
     if (imageCache.currentSize >= imageCache.maximumSize) {
       imageCache.clear();
     }
+
+    // clean stale HistoryLinks
+    final store = GagakuData().store;
+    final box = store.box<HistoryLink>();
+
+    final builder = box.query();
+    builder.backlinkMany(WebFavoritesList_.list);
+    final inuseLinksQuery = builder.build();
+    final inuseLinks = await inuseLinksQuery.findIdsAsync();
+    inuseLinksQuery.close();
+
+    final notInuseQuery = box
+        .query(HistoryLink_.dbid.notOneOf(inuseLinks))
+        .build();
+    await notInuseQuery.removeAsync();
+    notInuseQuery.close();
   }
 
   /// Prunes all expired entries

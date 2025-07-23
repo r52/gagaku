@@ -5,7 +5,6 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
@@ -24,12 +23,37 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
         DefaultScrollController.maybeOf(context, 'WebSourceFavoritesPage') ??
         controller ??
         useScrollController();
+    // final query = useMemoized(
+    //   () => GagakuData().store
+    //       .box<WebFavoritesList>()
+    //       .query(WebFavoritesList_.id.notEquals(historyListUUID))
+    //       .order(WebFavoritesList_.sortOrder)
+    //       .watch(triggerImmediately: true)
+    //       .map((query) => query.find()),
+    //   [],
+    // );
+    // final stream = useStream(query);
+
+    // if (stream.hasError) {
+    //   return ErrorList(error: stream.error!, stackTrace: stream.stackTrace!);
+    // } else if (stream.connectionState == ConnectionState.waiting ||
+    //     !stream.hasData) {
+    //   return Center(child: CircularProgressIndicator());
+    // }
+
+    // final categories = stream.data!;
+
     final categories = ref.watch(
-      webConfigProvider.select((cfg) => cfg.categories),
+      webSourceFavoritesProvider.select(
+        (value) => switch (value) {
+          AsyncValue(value: final data?) => data,
+          _ => <String, WebFavoritesList>{},
+        },
+      ),
     );
     final tabController = useTabController(
       initialLength: categories.length,
-      keys: [categories],
+      keys: [categories.length],
     );
     final filterController = useTextEditingController();
 
@@ -65,7 +89,8 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
                 controller: tabController,
                 tabs: List<Tab>.generate(
                   categories.length,
-                  (int index) => Tab(text: categories.elementAt(index).name),
+                  (int index) =>
+                      Tab(text: categories.entries.elementAt(index).value.name),
                 ),
               ),
             ),
@@ -75,29 +100,17 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
       body: TabBarView(
         controller: tabController,
         children: [
-          for (final cat in categories)
+          for (final MapEntry(key: _, value: cat) in categories.entries)
             HookConsumer(
               builder: (context, ref, child) {
                 final filterText = useValueListenable(filterController);
-                final items = ref.watch(
-                  webSourceFavoritesProvider.select(
-                    (value) => switch (value) {
-                      AsyncValue(value: final data?) =>
-                        data.containsKey(cat.id)
-                            ? data[cat.id]!
-                            : const <HistoryLink>[],
-                      _ => const <HistoryLink>[],
-                    },
-                  ),
-                );
+                final items = cat.list.toList();
                 final fileredItems = useMemoized(
-                  () =>
-                      items
-                          .where(
-                            (i) =>
-                                i.title.toLowerCase().contains(filterText.text),
-                          )
-                          .toList(),
+                  () => items
+                      .where(
+                        (i) => i.title.toLowerCase().contains(filterText.text),
+                      )
+                      .toList(),
                   [filterText.text, items],
                 );
 

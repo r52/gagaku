@@ -6,6 +6,62 @@ part of 'types.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+HistoryLink _$HistoryLinkFromJson(Map<String, dynamic> json) => HistoryLink(
+  title: json['title'] as String,
+  url: json['url'] as String,
+  cover: json['cover'] as String?,
+  handle: json['handle'] == null
+      ? null
+      : SourceHandler.fromJson(json['handle'] as Map<String, dynamic>),
+  lastAccessed: json['lastAccessed'] == null
+      ? null
+      : DateTime.parse(json['lastAccessed'] as String),
+);
+
+Map<String, dynamic> _$HistoryLinkToJson(HistoryLink instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'url': instance.url,
+      'cover': instance.cover,
+      'handle': instance.handle?.toJson(),
+      'lastAccessed': instance.lastAccessed?.toIso8601String(),
+    };
+
+WebSourceInfo _$WebSourceInfoFromJson(Map<String, dynamic> json) =>
+    WebSourceInfo(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      repo: json['repo'] as String,
+      baseUrl: json['baseUrl'] as String?,
+      version:
+          $enumDecodeNullable(_$SupportedVersionEnumMap, json['version']) ??
+          SupportedVersion.v0_8,
+      icon: json['icon'] as String,
+      capabilities:
+          (json['capabilities'] as List<dynamic>?)
+              ?.map(const SourceIntentParser().fromJson)
+              .toList() ??
+          const [SourceIntents.mangaChapters],
+    );
+
+Map<String, dynamic> _$WebSourceInfoToJson(WebSourceInfo instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'repo': instance.repo,
+      'baseUrl': instance.baseUrl,
+      'version': _$SupportedVersionEnumMap[instance.version]!,
+      'icon': instance.icon,
+      'capabilities': instance.capabilities
+          .map(const SourceIntentParser().toJson)
+          .toList(),
+    };
+
+const _$SupportedVersionEnumMap = {
+  SupportedVersion.v0_8: 'v0_8',
+  SupportedVersion.v0_9: 'v0_9',
+};
+
 RepoInfo _$RepoInfoFromJson(Map<String, dynamic> json) =>
     RepoInfo(name: json['name'] as String, url: json['url'] as String);
 
@@ -24,11 +80,6 @@ Map<String, dynamic> _$RepoDataToJson(RepoData instance) => <String, dynamic>{
   'name': instance.name,
   'url': instance.url,
   'version': _$SupportedVersionEnumMap[instance.version]!,
-};
-
-const _$SupportedVersionEnumMap = {
-  SupportedVersion.v0_8: 'v0_8',
-  SupportedVersion.v0_9: 'v0_9',
 };
 
 _ChapterEntry _$ChapterEntryFromJson(Map<String, dynamic> json) =>
@@ -76,24 +127,6 @@ Map<String, dynamic> _$UpdateFeedItemToJson(_UpdateFeedItem instance) =>
       'manga': instance.manga.toJson(),
     };
 
-_HistoryLink _$HistoryLinkFromJson(Map<String, dynamic> json) => _HistoryLink(
-  title: json['title'] as String,
-  url: json['url'] as String,
-  cover: json['cover'] as String?,
-  handle:
-      json['handle'] == null
-          ? null
-          : SourceHandler.fromJson(json['handle'] as Map<String, dynamic>),
-);
-
-Map<String, dynamic> _$HistoryLinkToJson(_HistoryLink instance) =>
-    <String, dynamic>{
-      'title': instance.title,
-      'url': instance.url,
-      'cover': instance.cover,
-      'handle': instance.handle?.toJson(),
-    };
-
 _WebManga _$WebMangaFromJson(Map<String, dynamic> json) => _WebManga(
   title: json['title'] as String,
   description: json['description'] as String,
@@ -104,10 +137,9 @@ _WebManga _$WebMangaFromJson(Map<String, dynamic> json) => _WebManga(
     (k, e) => MapEntry(k, e as String),
   ),
   chapters: const WebChapterSerializer().fromJson(json['chapters']),
-  data:
-      json['data'] == null
-          ? null
-          : SourceManga.fromJson(json['data'] as Map<String, dynamic>),
+  data: json['data'] == null
+      ? null
+      : SourceManga.fromJson(json['data'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$WebMangaToJson(_WebManga instance) => <String, dynamic>{
@@ -150,35 +182,6 @@ _ImgurPage _$ImgurPageFromJson(Map<String, dynamic> json) => _ImgurPage(
 
 Map<String, dynamic> _$ImgurPageToJson(_ImgurPage instance) =>
     <String, dynamic>{'description': instance.description, 'src': instance.src};
-
-_WebSourceInfo _$WebSourceInfoFromJson(Map<String, dynamic> json) =>
-    _WebSourceInfo(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      repo: json['repo'] as String,
-      baseUrl: json['baseUrl'] as String?,
-      version:
-          $enumDecodeNullable(_$SupportedVersionEnumMap, json['version']) ??
-          SupportedVersion.v0_8,
-      icon: json['icon'] as String,
-      capabilities:
-          (json['capabilities'] as List<dynamic>?)
-              ?.map(const SourceIntentParser().fromJson)
-              .toList() ??
-          const [SourceIntents.mangaChapters],
-    );
-
-Map<String, dynamic> _$WebSourceInfoToJson(_WebSourceInfo instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'repo': instance.repo,
-      'baseUrl': instance.baseUrl,
-      'version': _$SupportedVersionEnumMap[instance.version]!,
-      'icon': instance.icon,
-      'capabilities':
-          instance.capabilities.map(const SourceIntentParser().toJson).toList(),
-    };
 
 _Badge08 _$Badge08FromJson(Map<String, dynamic> json) => _Badge08(
   text: json['text'] as String,
@@ -227,10 +230,9 @@ SourceVersion08 _$SourceVersion08FromJson(Map<String, dynamic> json) =>
       contentRating: $enumDecode(_$ContentRatingEnumMap, json['contentRating']),
       version: json['version'] as String,
       icon: json['icon'] as String,
-      tags:
-          (json['tags'] as List<dynamic>?)
-              ?.map((e) => Badge08.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      tags: (json['tags'] as List<dynamic>?)
+          ?.map((e) => Badge08.fromJson(e as Map<String, dynamic>))
+          .toList(),
       websiteBaseURL: json['websiteBaseURL'] as String,
       intents: (json['intents'] as num?)?.toInt(),
       $type: json['runtimeType'] as String?,
@@ -268,14 +270,12 @@ SourceVersion09 _$SourceVersion09FromJson(
   icon: json['icon'] as String,
   language: json['language'] as String?,
   contentRating: const ContentRatingParser().fromJson(json['contentRating']),
-  badges:
-      (json['badges'] as List<dynamic>)
-          .map((e) => SourceBadge.fromJson(e as Map<String, dynamic>))
-          .toList(),
-  developers:
-      (json['developers'] as List<dynamic>)
-          .map((e) => SourceDeveloper.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  badges: (json['badges'] as List<dynamic>)
+      .map((e) => SourceBadge.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  developers: (json['developers'] as List<dynamic>)
+      .map((e) => SourceDeveloper.fromJson(e as Map<String, dynamic>))
+      .toList(),
   capabilities: const SourceIntentOrListParser().fromJson(json['capabilities']),
   $type: json['runtimeType'] as String?,
 );
@@ -419,22 +419,21 @@ _MangaInfo _$MangaInfoFromJson(Map<String, dynamic> json) => _MangaInfo(
   thumbnailUrl: json['thumbnailUrl'] as String,
   synopsis: json['synopsis'] as String,
   primaryTitle: json['primaryTitle'] as String,
-  secondaryTitles:
-      (json['secondaryTitles'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
+  secondaryTitles: (json['secondaryTitles'] as List<dynamic>)
+      .map((e) => e as String)
+      .toList(),
   contentRating: const ContentRatingParser().fromJson(json['contentRating']),
   status: json['status'] as String?,
   artist: json['artist'] as String?,
   author: json['author'] as String?,
   bannerUrl: json['bannerUrl'] as String?,
   rating: json['rating'] as num?,
-  tagGroups:
-      (json['tagGroups'] as List<dynamic>?)
-          ?.map((e) => TagSection.fromJson(e as Map<String, dynamic>))
-          .toList(),
-  artworkUrls:
-      (json['artworkUrls'] as List<dynamic>?)?.map((e) => e as String).toList(),
+  tagGroups: (json['tagGroups'] as List<dynamic>?)
+      ?.map((e) => TagSection.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  artworkUrls: (json['artworkUrls'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
   additionalInfo: (json['additionalInfo'] as Map<String, dynamic>?)?.map(
     (k, e) => MapEntry(k, e as String),
   ),
@@ -463,10 +462,9 @@ Map<String, dynamic> _$MangaInfoToJson(
 _TagSection _$TagSectionFromJson(Map<String, dynamic> json) => _TagSection(
   id: json['id'] as String,
   title: json['title'] as String,
-  tags:
-      (json['tags'] as List<dynamic>)
-          .map((e) => Tag.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  tags: (json['tags'] as List<dynamic>)
+      .map((e) => Tag.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$TagSectionToJson(_TagSection instance) =>
@@ -771,10 +769,9 @@ SelectRowElement _$SelectRowElementFromJson(Map<String, dynamic> json) =>
       value: (json['value'] as List<dynamic>).map((e) => e as String).toList(),
       minItemCount: (json['minItemCount'] as num).toInt(),
       maxItemCount: (json['maxItemCount'] as num?)?.toInt(),
-      options:
-          (json['options'] as List<dynamic>)
-              .map((e) => SelectRowOption.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      options: (json['options'] as List<dynamic>)
+          .map((e) => SelectRowOption.fromJson(e as Map<String, dynamic>))
+          .toList(),
       onValueChange: json['onValueChange'] as String,
       $type: json['type'] as String?,
     );
@@ -920,10 +917,9 @@ _FormSectionElement _$FormSectionElementFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       header: json['header'] as String?,
       footer: json['footer'] as String?,
-      items:
-          (json['items'] as List<dynamic>)
-              .map((e) => FormItemElement.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      items: (json['items'] as List<dynamic>)
+          .map((e) => FormItemElement.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$FormSectionElementToJson(_FormSectionElement instance) =>
@@ -945,10 +941,9 @@ DropdownSearchFilter _$DropdownSearchFilterFromJson(
 ) => DropdownSearchFilter(
   id: json['id'] as String,
   title: json['title'] as String,
-  options:
-      (json['options'] as List<dynamic>)
-          .map((e) => FilterOption.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  options: (json['options'] as List<dynamic>)
+      .map((e) => FilterOption.fromJson(e as Map<String, dynamic>))
+      .toList(),
   value: json['value'] as String,
   $type: json['type'] as String?,
 );
@@ -967,10 +962,9 @@ SelectSearchFilter _$SelectSearchFilterFromJson(Map<String, dynamic> json) =>
     SelectSearchFilter(
       id: json['id'] as String,
       title: json['title'] as String,
-      options:
-          (json['options'] as List<dynamic>)
-              .map((e) => FilterOption.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      options: (json['options'] as List<dynamic>)
+          .map((e) => FilterOption.fromJson(e as Map<String, dynamic>))
+          .toList(),
       value: Map<String, String>.from(json['value'] as Map),
       allowExclusion: json['allowExclusion'] as bool,
       allowEmptySelection: json['allowEmptySelection'] as bool,
@@ -994,10 +988,9 @@ TagSearchFilter _$TagSearchFilterFromJson(Map<String, dynamic> json) =>
     TagSearchFilter(
       id: json['id'] as String,
       title: json['title'] as String,
-      sections:
-          (json['sections'] as List<dynamic>)
-              .map((e) => TagSection.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      sections: (json['sections'] as List<dynamic>)
+          .map((e) => TagSection.fromJson(e as Map<String, dynamic>))
+          .toList(),
       value: (json['value'] as Map<String, dynamic>).map(
         (k, e) => MapEntry(k, Map<String, String>.from(e as Map)),
       ),

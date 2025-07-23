@@ -9,7 +9,6 @@ import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -79,8 +78,9 @@ class WebMangaListWidget extends HookConsumerWidget {
     final tr = context.t;
     final scrollController =
         controller ?? (noController ? null : useScrollController());
-    final view =
-        showToggle ? ref.watch(_mangaListViewProvider) : WebMangaListView.grid;
+    final view = showToggle
+        ? ref.watch(_mangaListViewProvider)
+        : WebMangaListView.grid;
 
     return Stack(
       children: [
@@ -88,7 +88,7 @@ class WebMangaListWidget extends HookConsumerWidget {
           controller: scrollController,
           scrollBehavior: const MouseTouchScrollBehavior(),
           physics: physics,
-          cacheExtent: MediaQuery.sizeOf(context).height,
+          // cacheExtent: MediaQuery.sizeOf(context).height,
           slivers: [
             ...leading,
             SliverToBoxAdapter(
@@ -121,12 +121,11 @@ class WebMangaListWidget extends HookConsumerWidget {
                           ),
                         ],
                         selected: <WebMangaListView>{view},
-                        onSelectionChanged: (
-                          Set<WebMangaListView> newSelection,
-                        ) {
-                          ref.read(_mangaListViewProvider.notifier).state =
-                              newSelection.first;
-                        },
+                        onSelectionChanged:
+                            (Set<WebMangaListView> newSelection) {
+                              ref.read(_mangaListViewProvider.notifier).state =
+                                  newSelection.first;
+                            },
                       ),
                   ],
                 ),
@@ -178,10 +177,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
       ),
     );
     final api = ref.watch(proxyProvider);
-    WebMangaListView view =
-        items != null
-            ? ref.watch(_mangaListViewProvider)
-            : WebMangaListView.grid;
+    WebMangaListView view = items != null
+        ? ref.watch(_mangaListViewProvider)
+        : WebMangaListView.grid;
     final gridExtent = ref.watch(
       gagakuSettingsProvider.select((c) => c.gridAlbumExtent),
     );
@@ -192,28 +190,84 @@ class WebMangaListViewSliver extends ConsumerWidget {
         case WebMangaListView.list:
           return reorderable
               ? SliverReorderableList(
-                onReorder:
-                    (int oldIndex, int newIndex) =>
-                        webSourceFavoritesMutation.run(ref, (ref) async {
-                          return await ref
-                              .get(webSourceFavoritesProvider.notifier)
-                              .updateList(favoritesKey!, oldIndex, newIndex);
-                        }),
-                itemCount: items!.length,
-                // findChildIndexCallback: _findChildIndexCb,
-                itemBuilder: (context, index) {
-                  final item = items!.elementAt(index);
-                  Widget? sourceIcon = _getSourceIcon(item, sourcesMap);
+                  onReorder: (int oldIndex, int newIndex) =>
+                      webSourceFavoritesMutation.run(ref, (ref) async {
+                        return await ref
+                            .get(webSourceFavoritesProvider.notifier)
+                            .updateList(favoritesKey!, oldIndex, newIndex);
+                      }),
+                  itemCount: items!.length,
+                  // findChildIndexCallback: _findChildIndexCb,
+                  itemBuilder: (context, index) {
+                    final item = items!.elementAt(index);
+                    Widget? sourceIcon = _getSourceIcon(item, sourcesMap);
 
-                  return ReorderableDelayedDragStartListener(
-                    key: ValueKey(item.url),
-                    index: index,
-                    child: ListTile(
-                      tileColor:
-                          index.isOdd
-                              ? theme.colorScheme.surfaceContainer
-                              : theme.colorScheme.surfaceContainerHighest,
+                    return ReorderableDelayedDragStartListener(
+                      key: ValueKey(item.url),
+                      index: index,
+                      child: ListTile(
+                        tileColor: index.isOdd
+                            ? theme.colorScheme.surfaceContainer
+                            : theme.colorScheme.surfaceContainerHighest,
+                        leading: FavoritesButton(link: item),
+                        title: Text(item.title),
+                        textColor: theme.colorScheme.onSurface,
+                        onTap: () async {
+                          final tr = context.t;
+                          final messenger = ScaffoldMessenger.of(context);
+                          final result = await api.handleLink(item);
+
+                          if (!context.mounted) return;
+                          if (result.handle == null) {
+                            messenger
+                              ..removeCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(tr.errors.unsupportedUrl),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                          } else {
+                            openWebSource(context, result.handle!);
+                          }
+                        },
+                        trailing: sourceIcon,
+                      ),
+                    );
+                  },
+                )
+              : SliverList.separated(
+                  itemCount: items!.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 4.0),
+                  findChildIndexCallback: _findChildIndexCb,
+                  itemBuilder: (context, index) {
+                    final tr = context.t;
+                    final item = items!.elementAt(index);
+                    Widget? sourceIcon = _getSourceIcon(item, sourcesMap);
+
+                    return ListTile(
+                      key: ValueKey(item.url),
+                      tileColor: index.isOdd
+                          ? theme.colorScheme.surfaceContainer
+                          : theme.colorScheme.surfaceContainerHighest,
                       leading: FavoritesButton(link: item),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (sourceIcon != null) sourceIcon,
+                          IconButton(
+                            tooltip: tr.mangaActions.removeHistory,
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () async {
+                              webSourceHistoryMutation.run(ref, (ref) async {
+                                await ref
+                                    .get(webSourceHistoryProvider.notifier)
+                                    .remove(item);
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                       title: Text(item.title),
                       textColor: theme.colorScheme.onSurface,
                       onTap: () async {
@@ -235,68 +289,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
                           openWebSource(context, result.handle!);
                         }
                       },
-                      trailing: sourceIcon,
-                    ),
-                  );
-                },
-              )
-              : SliverList.separated(
-                itemCount: items!.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 4.0),
-                findChildIndexCallback: _findChildIndexCb,
-                itemBuilder: (context, index) {
-                  final tr = context.t;
-                  final item = items!.elementAt(index);
-                  Widget? sourceIcon = _getSourceIcon(item, sourcesMap);
-
-                  return ListTile(
-                    key: ValueKey(item.url),
-                    tileColor:
-                        index.isOdd
-                            ? theme.colorScheme.surfaceContainer
-                            : theme.colorScheme.surfaceContainerHighest,
-                    leading: FavoritesButton(link: item),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (sourceIcon != null) sourceIcon,
-                        IconButton(
-                          tooltip: tr.mangaActions.removeHistory,
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () async {
-                            webSourceHistoryMutation.run(ref, (ref) async {
-                              return await ref
-                                  .get(webSourceHistoryProvider.notifier)
-                                  .remove(item);
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    title: Text(item.title),
-                    textColor: theme.colorScheme.onSurface,
-                    onTap: () async {
-                      final tr = context.t;
-                      final messenger = ScaffoldMessenger.of(context);
-                      final result = await api.handleLink(item);
-
-                      if (!context.mounted) return;
-                      if (result.handle == null) {
-                        messenger
-                          ..removeCurrentSnackBar()
-                          ..showSnackBar(
-                            SnackBar(
-                              content: Text(tr.errors.unsupportedUrl),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                      } else {
-                        openWebSource(context, result.handle!);
-                      }
-                    },
-                  );
-                },
-              );
+                    );
+                  },
+                );
 
         case WebMangaListView.grid:
           return SliverGrid.builder(
@@ -335,25 +330,23 @@ class WebMangaListViewSliver extends ConsumerWidget {
                   final tr = context.t;
                   return ListTile(
                     key: ValueKey(item.url),
-                    tileColor:
-                        index.isOdd
-                            ? theme.colorScheme.surfaceContainer
-                            : theme.colorScheme.surfaceContainerHighest,
+                    tileColor: index.isOdd
+                        ? theme.colorScheme.surfaceContainer
+                        : theme.colorScheme.surfaceContainerHighest,
                     leading: FavoritesButton(link: item),
-                    trailing:
-                        showRemoveButton
-                            ? IconButton(
-                              tooltip: tr.mangaActions.removeHistory,
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () async {
-                                webSourceHistoryMutation.run(ref, (ref) async {
-                                  return await ref
-                                      .get(webSourceHistoryProvider.notifier)
-                                      .remove(item);
-                                });
-                              },
-                            )
-                            : null,
+                    trailing: showRemoveButton
+                        ? IconButton(
+                            tooltip: tr.mangaActions.removeHistory,
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () async {
+                              webSourceHistoryMutation.run(ref, (ref) async {
+                                await ref
+                                    .get(webSourceHistoryProvider.notifier)
+                                    .remove(item);
+                              });
+                            },
+                          )
+                        : null,
                     title: Text(item.title),
                     textColor: theme.colorScheme.onSurface,
                     onTap: () async {
@@ -439,21 +432,19 @@ class GridMangaItem extends HookConsumerWidget {
     );
     final theme = Theme.of(context);
 
-    final Widget cover =
-        link.cover != null
-            ? CachedNetworkImage(
-              imageUrl: link.cover!,
-              cacheManager: gagakuImageCache,
-              memCacheWidth: 512,
-              maxWidthDiskCache: 512,
-              width: 128.0,
-              progressIndicatorBuilder:
-                  (context, url, downloadProgress) =>
-                      const Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-              fit: BoxFit.cover,
-            )
-            : const Icon(Icons.menu_book, size: 128.0);
+    final Widget cover = link.cover != null
+        ? CachedNetworkImage(
+            imageUrl: link.cover!,
+            cacheManager: gagakuImageCache,
+            memCacheWidth: 512,
+            maxWidthDiskCache: 512,
+            width: 128.0,
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                const Center(child: CircularProgressIndicator()),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+            fit: BoxFit.cover,
+          )
+        : const Icon(Icons.menu_book, size: 128.0);
 
     Widget? sourceIcon = _getSourceIcon(link, sourcesMap);
 
@@ -515,7 +506,7 @@ class GridMangaItem extends HookConsumerWidget {
                 tooltip: tr.mangaActions.removeHistory,
                 onPressed: () async {
                   webSourceHistoryMutation.run(ref, (ref) async {
-                    return await ref
+                    await ref
                         .get(webSourceHistoryProvider.notifier)
                         .remove(link);
                   });
@@ -544,12 +535,28 @@ class FavoritesButton extends HookConsumerWidget {
     final tr = context.t;
     final theme = Theme.of(context);
 
-    final categories = ref.watch(
-      webConfigProvider.select((cfg) => cfg.categories),
-    );
+    // final query = useMemoized(
+    //   () => GagakuData().store
+    //       .box<WebFavoritesList>()
+    //       .query(WebFavoritesList_.id.notEquals(historyListUUID))
+    //       .order(WebFavoritesList_.sortOrder)
+    //       .watch(triggerImmediately: true)
+    //       .map((query) => query.find()),
+    //   [],
+    // );
+    // final stream = useStream(query);
+
+    // if (stream.hasError) {
+    //   return Center(child: Icon(Icons.error));
+    // }
+
+    // final favorites = stream.data;
+    // final favorited = favorites?.any((l) => l.list.contains(link));
+
+    // TODO improve?
 
     final favorites = ref.watch(
-      webSourceFavoritesProvider.select(
+      favoritesListProvider.select(
         (value) => switch (value) {
           AsyncValue(value: final data?) => data,
           _ => null,
@@ -557,16 +564,7 @@ class FavoritesButton extends HookConsumerWidget {
       ),
     );
 
-    final favorited = ref.watch(
-      webSourceFavoritesProvider.select(
-        (value) => switch (value) {
-          AsyncValue(value: final data?) => data.values.any(
-            (l) => l.contains(link),
-          ),
-          _ => null,
-        },
-      ),
-    );
+    final favorited = favorites?.any((l) => l.list.contains(link));
 
     if (favorited == null) {
       return const CircularProgressIndicator();
@@ -580,71 +578,69 @@ class FavoritesButton extends HookConsumerWidget {
             color: theme.colorScheme.surface.withAlpha(200),
             shape: borderRadius == null ? const CircleBorder() : null,
             borderRadius: borderRadius,
-            child:
-                favorites == null
-                    ? const SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(),
-                      ),
-                    )
-                    : InkWell(
-                      onTap: () {
-                        if (controller.isOpen) {
-                          controller.close();
-                        } else {
-                          controller.open();
-                        }
-                      },
-                      child: child,
+            child: favorites == null
+                ? const SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(),
                     ),
+                  )
+                : InkWell(
+                    onTap: () {
+                      if (controller.isOpen) {
+                        controller.close();
+                      } else {
+                        controller.open();
+                      }
+                    },
+                    child: child,
+                  ),
           ),
         );
       },
-      menuChildren:
-          favorites != null
-              ? [
-                ...List.generate(
-                  categories.length,
-                  (index) => Builder(
-                    builder: (context) {
-                      final cat = categories.elementAt(index);
-                      return CheckboxListTile(
-                        controlAffinity: ListTileControlAffinity.leading,
-                        title: Text(cat.name),
-                        value: favorites[cat.id]?.contains(link) ?? false,
-                        onChanged: (bool? value) async {
-                          if (value == true) {
-                            webSourceFavoritesMutation.run(ref, (ref) async {
-                              return await ref
-                                  .get(webSourceFavoritesProvider.notifier)
-                                  .add(cat.id, link);
-                            });
-                          } else {
-                            webSourceFavoritesMutation.run(ref, (ref) async {
-                              return await ref
-                                  .get(webSourceFavoritesProvider.notifier)
-                                  .remove(cat.id, link);
-                            });
-                          }
-                        },
-                      );
-                    },
-                  ),
+      menuChildren: favorites != null
+          ? [
+              ...List.generate(
+                favorites.length,
+                (index) => Builder(
+                  builder: (context) {
+                    final cat = favorites.elementAt(index);
+                    return CheckboxListTile(
+                      controlAffinity: ListTileControlAffinity.leading,
+                      title: Text(cat.name),
+                      value: cat.list.contains(link),
+                      onChanged: (bool? value) async {
+                        if (value == true) {
+                          webSourceFavoritesMutation.run(ref, (ref) async {
+                            return await ref
+                                .get(webSourceFavoritesProvider.notifier)
+                                .add(cat.id, link);
+                          });
+                        } else {
+                          webSourceFavoritesMutation.run(ref, (ref) async {
+                            return await ref
+                                .get(webSourceFavoritesProvider.notifier)
+                                .remove(cat.id, link);
+                          });
+                        }
+                      },
+                    );
+                  },
                 ),
-                MenuItemButton(
-                  onPressed:
-                      () => webSourceFavoritesMutation.run(ref, (ref) async {
-                        return await ref
-                            .get(webSourceFavoritesProvider.notifier)
-                            .remove('all', link);
-                      }),
-                  child: Text(tr.ui.clear),
-                ),
-              ]
-              : [],
+              ),
+              MenuItemButton(
+                onPressed: () =>
+                    webSourceFavoritesMutation.run(ref, (ref) async {
+                      return await ref
+                          .get(webSourceFavoritesProvider.notifier)
+                          .remove('all', link);
+                    }),
+                child: Text(tr.ui.clear),
+              ),
+            ]
+          : [],
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Icon(
@@ -681,8 +677,8 @@ class ChapterButtonWidget extends HookConsumerWidget {
     final isRead = ref.watch(
       webReadMarkersProvider.select(
         (value) => switch (value) {
-          AsyncValue(value: final map?) =>
-            map[mangakey]?.contains(chapterkey) ?? false,
+          AsyncValue(value: final db?) =>
+            db.markers[mangakey]?.contains(chapterkey) ?? false,
           _ => false,
         },
       ),
@@ -693,8 +689,8 @@ class ChapterButtonWidget extends HookConsumerWidget {
     final groupKey = data.chapter.groups.entries.first.key;
     final groupText =
         manga.groups != null && manga.groups?.containsKey(groupKey) == true
-            ? manga.groups![groupKey]!
-            : groupKey;
+        ? manga.groups![groupKey]!
+        : groupKey;
 
     final lang = tr.$meta.locale.languageCode;
     //final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
@@ -707,10 +703,9 @@ class ChapterButtonWidget extends HookConsumerWidget {
       timestamp = timeago.format(data.chapter.releaseDate!, locale: lang);
     }
 
-    final language =
-        sourceValue is Chapter
-            ? CountryFlag(flag: sourceValue.langCode, size: 12)
-            : null;
+    final language = sourceValue is Chapter
+        ? CountryFlag(flag: sourceValue.langCode, size: 12)
+        : null;
 
     final textstyle = TextStyle(
       color: (isRead == true ? theme.disabledColor : theme.colorScheme.primary),
@@ -734,10 +729,9 @@ class ChapterButtonWidget extends HookConsumerWidget {
       ),
       icon: Icon(
         isRead == true ? Icons.visibility_off : Icons.visibility,
-        color:
-            (isRead == true
-                ? theme.disabledColor
-                : theme.primaryIconTheme.color),
+        color: (isRead == true
+            ? theme.disabledColor
+            : theme.primaryIconTheme.color),
       ),
       constraints: const BoxConstraints(
         minWidth: 20.0,
@@ -847,8 +841,8 @@ class _ChapterButtonCard extends ConsumerWidget {
     final isRead = ref.watch(
       webReadMarkersProvider.select(
         (value) => switch (value) {
-          AsyncValue(value: final map?) =>
-            map[mangaKey]?.contains(chapterKey) ?? false,
+          AsyncValue(value: final db?) =>
+            db.markers[mangaKey]?.contains(chapterKey) ?? false,
           _ => false,
         },
       ),
@@ -897,50 +891,21 @@ class ChapterFeedItem extends HookWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child:
-            screenSizeSmall
-                ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    titleBtn,
-                    const Divider(height: 4.0),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        coverBtn,
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 4.0,
-                            children:
-                                state.manga.chapters
-                                    .take(3)
-                                    .map(
-                                      (e) => ChapterButtonWidget(
-                                        data: e,
-                                        manga: state.manga,
-                                        handle: state.link.handle!,
-                                      ),
-                                    )
-                                    .toList(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-                : Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    coverBtn,
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 4.0,
-                        children: [
-                          titleBtn,
-                          const Divider(height: 10.0),
-                          ...state.manga.chapters
+        child: screenSizeSmall
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  titleBtn,
+                  const Divider(height: 4.0),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      coverBtn,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 4.0,
+                          children: state.manga.chapters
                               .take(3)
                               .map(
                                 (e) => ChapterButtonWidget(
@@ -948,12 +913,39 @@ class ChapterFeedItem extends HookWidget {
                                   manga: state.manga,
                                   handle: state.link.handle!,
                                 ),
-                              ),
-                        ],
+                              )
+                              .toList(),
+                        ),
                       ),
+                    ],
+                  ),
+                ],
+              )
+            : Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  coverBtn,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 4.0,
+                      children: [
+                        titleBtn,
+                        const Divider(height: 10.0),
+                        ...state.manga.chapters
+                            .take(3)
+                            .map(
+                              (e) => ChapterButtonWidget(
+                                data: e,
+                                manga: state.manga,
+                                handle: state.link.handle!,
+                              ),
+                            ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -997,18 +989,16 @@ class _CoverButton extends ConsumerWidget {
         cacheManager: gagakuImageCache,
         memCacheWidth: 512,
         maxWidthDiskCache: 512,
-        imageBuilder:
-            (context, imageProvider) => DecoratedBox(
-              decoration: BoxDecoration(
-                image: DecorationImage(image: imageProvider),
-                borderRadius: const BorderRadius.all(Radius.circular(4.0)),
-              ),
-            ),
+        imageBuilder: (context, imageProvider) => DecoratedBox(
+          decoration: BoxDecoration(
+            image: DecorationImage(image: imageProvider),
+            borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+          ),
+        ),
         width: screenSizeSmall ? 64.0 : 128.0,
         height: screenSizeSmall ? 91.0 : 182.0,
-        progressIndicatorBuilder:
-            (context, url, downloadProgress) =>
-                const Center(child: CircularProgressIndicator()),
+        progressIndicatorBuilder: (context, url, downloadProgress) =>
+            const Center(child: CircularProgressIndicator()),
         errorWidget: (context, url, error) => const Icon(Icons.error),
         fit: BoxFit.cover,
       ),

@@ -19,6 +19,7 @@ import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:meta/meta.dart';
 import 'package:native_dio_adapter/native_dio_adapter.dart';
+import 'package:objectbox/objectbox.dart';
 import 'package:openid_client/openid_client.dart';
 import 'package:openid_client/openid_client_io.dart';
 import 'package:riverpod/experimental/mutation.dart';
@@ -218,10 +219,9 @@ class MangaDexTokenStorage implements TokenStorage<OIDAuthToken> {
     final storage = Hive.box(gagakuLocalBox);
 
     final tokenstr = storage.get('mangadex_tokens');
-    final token =
-        tokenstr != null
-            ? MangaDexTokens.fromJson(json.decode(tokenstr))
-            : null;
+    final token = tokenstr != null
+        ? MangaDexTokens.fromJson(json.decode(tokenstr))
+        : null;
 
     if (token != null && token.accessToken != null) {
       return OIDAuthToken(
@@ -271,16 +271,17 @@ class MangaDexModel {
   OIDAuthToken? _token;
   Credential? _credential;
 
-  final _dio = Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 5),
-        validateStatus: (status) => true,
-      ),
-    )
-    ..httpClientAdapter = NativeAdapter(
-      createCronetEngine: () => createCronetEngine(getUserAgent(true)),
-    );
+  final _dio =
+      Dio(
+          BaseOptions(
+            connectTimeout: const Duration(seconds: 5),
+            receiveTimeout: const Duration(seconds: 5),
+            validateStatus: (status) => true,
+          ),
+        )
+        ..httpClientAdapter = NativeAdapter(
+          createCronetEngine: () => createCronetEngine(getUserAgent(true)),
+        );
   late final Fresh<OIDAuthToken> _fresh;
 
   late final CacheManager _cache;
@@ -531,15 +532,13 @@ class MangaDexModel {
     final queryParams = {
       'limit': limit.toString(),
       'offset': offset.toString(),
-      'translatedLanguage[]':
-          settings.translatedLanguages
-              .map(const LanguageConverter().toJson)
-              .toList(),
+      'translatedLanguage[]': settings.translatedLanguages
+          .map(const LanguageConverter().toJson)
+          .toList(),
       if (!ignoreOriginalLanguage)
-        'originalLanguage[]':
-            settings.originalLanguage
-                .map(const LanguageConverter().toJson)
-                .toList(),
+        'originalLanguage[]': settings.originalLanguage
+            .map(const LanguageConverter().toJson)
+            .toList(),
       'includeFutureUpdates': '0',
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'order[$orderKey]': order,
@@ -578,10 +577,9 @@ class MangaDexModel {
 
     final list = <Chapter>[];
 
-    final fetch =
-        (await uuids.whereAsync(
-          (id) async => !await _cache.exists(id),
-        )).toList();
+    final fetch = (await uuids.whereAsync(
+      (id) async => !await _cache.exists(id),
+    )).toList();
 
     if (fetch.isNotEmpty) {
       int start = 0, end = 0;
@@ -642,8 +640,9 @@ class MangaDexModel {
     };
 
     final list = <Manga>[];
-    final fetch =
-        (await ids.whereAsync((id) async => !await _cache.exists(id))).toList();
+    final fetch = (await ids.whereAsync(
+      (id) async => !await _cache.exists(id),
+    )).toList();
 
     if (fetch.isNotEmpty) {
       int start = 0, end = 0;
@@ -771,14 +770,12 @@ class MangaDexModel {
     Map<String, dynamic> queryParams = {
       'limit': limit.toString(),
       'offset': offset.toString(),
-      'availableTranslatedLanguage[]':
-          settings.translatedLanguages
-              .map(const LanguageConverter().toJson)
-              .toList(),
-      'originalLanguage[]':
-          settings.originalLanguage
-              .map(const LanguageConverter().toJson)
-              .toList(),
+      'availableTranslatedLanguage[]': settings.translatedLanguages
+          .map(const LanguageConverter().toJson)
+          .toList(),
+      'originalLanguage[]': settings.originalLanguage
+          .map(const LanguageConverter().toJson)
+          .toList(),
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'includes[]': ['cover_art', 'author', 'artist'],
     };
@@ -918,10 +915,9 @@ class MangaDexModel {
     }
 
     final params = {
-      'status':
-          (status != null && status != MangaReadingStatus.remove)
-              ? status.name
-              : null,
+      'status': (status != null && status != MangaReadingStatus.remove)
+          ? status.name
+          : null,
     };
 
     final uri = MangaDexEndpoints.api.replace(
@@ -1353,10 +1349,9 @@ class MangaDexModel {
   Future<List<Group>> fetchGroups(Iterable<String> uuids) async {
     final list = <Group>[];
 
-    final fetch =
-        (await uuids.whereAsync(
-          (id) async => !await _cache.exists(id),
-        )).toList();
+    final fetch = (await uuids.whereAsync(
+      (id) async => !await _cache.exists(id),
+    )).toList();
 
     if (fetch.isNotEmpty) {
       int start = 0, end = 0;
@@ -1410,10 +1405,9 @@ class MangaDexModel {
     final list = <CreatorType>[];
 
     if (uuids != null) {
-      final fetch =
-          (await uuids.whereAsync(
-            (id) async => !await _cache.exists(id),
-          )).toList();
+      final fetch = (await uuids.whereAsync(
+        (id) async => !await _cache.exists(id),
+      )).toList();
 
       if (fetch.isNotEmpty) {
         int start = 0, end = 0;
@@ -2459,8 +2453,9 @@ class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
 
     final api = ref.watch(mangadexProvider);
 
-    MangaReadingStatus? resolved =
-        status == MangaReadingStatus.remove ? null : status;
+    MangaReadingStatus? resolved = status == MangaReadingStatus.remove
+        ? null
+        : status;
     bool success = await api.setMangaReadingStatus(manga, resolved);
     if (success) {
       if (ref.exists(userLibraryProvider(me.id))) {
@@ -2518,22 +2513,47 @@ class FollowingStatus extends _$FollowingStatus with AutoDisposeExpiryMix {
 
 final followStatusMutation = Mutation<bool>();
 
+@Entity()
+class MangaDexHistoryDB {
+  @Id()
+  int dbid;
+
+  List<String> queue;
+
+  MangaDexHistoryDB({this.dbid = 0, this.queue = const []});
+}
+
 @Riverpod(keepAlive: true)
 class MangaDexHistory extends _$MangaDexHistory {
   static const _numItems = 50;
 
+  late final Query<MangaDexHistoryDB> query;
+
   @override
   Future<Queue<Chapter>> build() async {
-    final box = Hive.box(gagakuDataBox);
-    final str = box.get('mangadex_history');
+    final box = GagakuData().store.box<MangaDexHistoryDB>();
 
-    if (str == null || (str as String).isEmpty) {
+    query = box.query().build();
+
+    MangaDexHistoryDB? db;
+
+    db = await query.findUniqueAsync();
+
+    if (db == null) {
+      db = MangaDexHistoryDB();
+      box.put(db);
+    }
+
+    ref.onDispose(() {
+      query.close();
+    });
+
+    if (db.queue.isEmpty) {
       return Queue<Chapter>();
     }
 
     final api = ref.watch(mangadexProvider);
-    final content = json.decode(str) as List<dynamic>;
-    final uuids = List<String>.from(content);
+    final uuids = db.queue.toList();
 
     final chapters = await api.fetchChapters(uuids);
 
@@ -2542,6 +2562,25 @@ class MangaDexHistory extends _$MangaDexHistory {
     });
 
     return Queue.of(chapters);
+
+    // final box = Hive.box(gagakuDataBox);
+    // final str = box.get('mangadex_history');
+
+    // if (str == null || (str as String).isEmpty) {
+    //   return Queue<Chapter>();
+    // }
+
+    // final api = ref.watch(mangadexProvider);
+    // final content = json.decode(str) as List<dynamic>;
+    // final uuids = List<String>.from(content);
+
+    // final chapters = await api.fetchChapters(uuids);
+
+    // chapterStatsMutation.run(ref, (ref) async {
+    //   return await ref.get(chapterStatsProvider.notifier).get(chapters);
+    // });
+
+    // return Queue.of(chapters);
   }
 
   Future<Chapter> add(Chapter chapter) async {
@@ -2560,8 +2599,11 @@ class MangaDexHistory extends _$MangaDexHistory {
 
     final uuids = cpy.map((e) => e.id).toList();
 
-    final box = Hive.box(gagakuDataBox);
-    await box.put('mangadex_history', json.encode(uuids));
+    final box = GagakuData().store.box<MangaDexHistoryDB>();
+    final db = (await query.findUniqueAsync())!;
+    db.queue = uuids;
+
+    box.putAsync(db);
 
     state = AsyncData(cpy);
 

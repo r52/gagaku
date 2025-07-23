@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
@@ -8,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/util/http.dart';
@@ -16,14 +16,14 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/types.dart';
-import 'package:hive_ce_flutter/hive_flutter.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:native_dio_adapter/native_dio_adapter.dart' hide URLRequest;
 import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
+
+const historyListUUID = 'd6f79229-6f8e-4872-9610-5200a54aef8f';
 
 void openWebSource(BuildContext context, SourceHandler handle) {
   if (handle.chapter != null) {
@@ -68,16 +68,17 @@ class ProxyHandler {
 
   final Ref ref;
 
-  final _dio = Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 5),
-        validateStatus: (status) => true,
-      ),
-    )
-    ..httpClientAdapter = NativeAdapter(
-      createCronetEngine: () => createCronetEngine(getUserAgent(false)),
-    );
+  final _dio =
+      Dio(
+          BaseOptions(
+            connectTimeout: const Duration(seconds: 5),
+            receiveTimeout: const Duration(seconds: 5),
+            validateStatus: (status) => true,
+          ),
+        )
+        ..httpClientAdapter = NativeAdapter(
+          createCronetEngine: () => createCronetEngine(getUserAgent(false)),
+        );
 
   late final CacheManager _cache;
 
@@ -106,13 +107,7 @@ class ProxyHandler {
     final updatedLink = link.copyWith(handle: handle);
 
     webSourceHistoryMutation.run(ref, (ref) async {
-      return await ref.get(webSourceHistoryProvider.notifier).add(updatedLink);
-    });
-
-    webSourceFavoritesMutation.run(ref, (ref) async {
-      return await ref
-          .get(webSourceFavoritesProvider.notifier)
-          .updateAll(updatedLink);
+      await ref.get(webSourceHistoryProvider.notifier).add(updatedLink);
     });
 
     return updatedLink;
@@ -129,9 +124,16 @@ class ProxyHandler {
       );
 
       webSourceHistoryMutation.run(ref, (ref) async {
-        return await ref
+        await ref
             .get(webSourceHistoryProvider.notifier)
-            .add(HistoryLink(title: url, url: url, handle: handle));
+            .add(
+              HistoryLink(
+                title: url,
+                url: url,
+                handle: handle,
+                lastAccessed: DateTime.now(),
+              ),
+            );
       });
 
       return handle;
@@ -302,143 +304,109 @@ class ProxyHandler {
   }
 }
 
+@riverpod
+Stream<List<WebFavoritesList>> favoritesList(Ref ref) async* {
+  final box = GagakuData().store.box<WebFavoritesList>();
+  final stream = box
+      .query(WebFavoritesList_.id.notEquals(historyListUUID))
+      .order(WebFavoritesList_.sortOrder)
+      .watch(triggerImmediately: true)
+      .map((query) => query.find());
+
+  await for (final items in stream) {
+    yield items;
+  }
+}
+
 @Riverpod(keepAlive: true)
 class WebSourceFavorites extends _$WebSourceFavorites {
-  Future<Map<String, List<HistoryLink>>> _fetch() async {
-    final cfg = ref.read(webConfigProvider);
-    final box = Hive.box(gagakuDataBox);
-    final str = box.get('web_favorites');
+  Future<Map<String, WebFavoritesList>> _fetch() async {
+    final data = await ref.watch(favoritesListProvider.future);
+    final map = {for (var item in data) item.id: item};
 
-    if (str == null || (str as String).isEmpty) {
-      return {};
-    }
-
-    final content = json.decode(str);
-
-    if (content is List) {
-      final links = content.map((e) => HistoryLink.fromJson(e)).toList();
-      return {cfg.defaultCategory: links};
-    } else if (content is Map) {
-      final map = (content as Map<String, dynamic>).map(
-        (key, value) => MapEntry(
-          key,
-          (value as List).map((e) => HistoryLink.fromJson(e)).toList(),
-        ),
-      );
-
-      final keys = map.keys.toList();
-      for (final key in keys) {
-        // If key doesnt exist in current categories, convert the
-        // list to default
-        if (cfg.categories.indexWhere((e) => e.id == key) == -1) {
-          final list = map.remove(key);
-          map[cfg.defaultCategory] = [...?map[cfg.defaultCategory], ...?list];
-        }
-      }
-
-      return map;
-    }
-
-    return {};
+    return map;
   }
 
   @override
-  FutureOr<Map<String, List<HistoryLink>>> build() async {
+  FutureOr<Map<String, WebFavoritesList>> build() async {
     return _fetch();
   }
 
-  Future<Map<String, List<HistoryLink>>> clear() async {
-    await future;
-    final empty = <String, List<HistoryLink>>{};
-
-    final box = Hive.box(gagakuDataBox);
-    await box.put('web_favorites', json.encode(empty));
-
-    state = AsyncData(empty);
-
-    return empty;
-  }
-
-  Future<Map<String, List<HistoryLink>>> add(
+  Future<Map<String, WebFavoritesList>> add(
     String category,
     HistoryLink link,
   ) async {
     final oldstate = await future;
-    final list = oldstate[category];
 
-    while (list?.contains(link) ?? false) {
-      list?.remove(link);
-    }
-
-    oldstate[category] = [link, ...?list];
-
-    final udp = {...oldstate};
-
-    final box = Hive.box(gagakuDataBox);
-    await box.put('web_favorites', json.encode(udp));
-
-    state = AsyncData(udp);
-
-    return udp;
-  }
-
-  Future<Map<String, List<HistoryLink>>> updateAll(HistoryLink link) async {
-    bool updated = false;
-
-    final oldstate = await future;
-    for (final cat in oldstate.keys) {
-      final idx = oldstate[cat]!.indexOf(link);
-
-      if (idx != -1 && !link.isExact(oldstate[cat]![idx])) {
-        oldstate[cat]![idx] = link;
-        updated = true;
-      }
-    }
-
-    if (!updated) {
+    if (!oldstate.containsKey(category)) {
+      // noop if category doesn't exist
       return oldstate;
     }
 
-    final udp = {...oldstate};
+    // Add/update link
+    final box = GagakuData().store.box<HistoryLink>();
+    final query = box.query(HistoryLink_.url.equals(link.url)).build();
 
-    final box = Hive.box(gagakuDataBox);
-    await box.put('web_favorites', json.encode(udp));
+    final result = await query.findUniqueAsync();
+    query.close();
+
+    if (result != null) {
+      link.dbid = result.dbid;
+      link.lastAccessed = result.lastAccessed;
+    }
+
+    box.putAsync(link);
+
+    // Add link to list
+    final list = oldstate[category]!;
+
+    if (list.list.contains(link)) {
+      // noop if link already exists
+      return oldstate;
+    }
+
+    list.list.add(link);
+    list.list.applyToDb();
+
+    final udp = {...oldstate};
 
     state = AsyncData(udp);
 
     return udp;
   }
 
-  Future<Map<String, List<HistoryLink>>> remove(
+  Future<Map<String, WebFavoritesList>> remove(
     String category,
     HistoryLink link,
   ) async {
     final oldstate = await future;
 
-    final categoriesToEdit =
-        category == 'all' ? oldstate.keys.toList() : [category];
+    if (category != 'all' && !oldstate.containsKey(category)) {
+      return oldstate;
+    }
+
+    final categoriesToEdit = category == 'all'
+        ? oldstate.keys.toList()
+        : [category];
 
     for (final c in categoriesToEdit) {
-      final list = oldstate[c];
+      final list = oldstate[c]!;
 
-      while (list?.contains(link) ?? false) {
-        list?.remove(link);
+      while (list.list.contains(link)) {
+        list.list.remove(link);
       }
 
-      oldstate[c] = [...?list];
+      list.list.applyToDb();
     }
 
     final udp = {...oldstate};
-
-    final box = Hive.box(gagakuDataBox);
-    await box.put('web_favorites', json.encode(udp));
 
     state = AsyncData(udp);
 
     return udp;
   }
 
-  Future<Map<String, List<HistoryLink>>> updateList(
+  Future<Map<String, WebFavoritesList>> updateList(
     String category,
     int oldIndex,
     int newIndex,
@@ -450,39 +418,42 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     }
 
     if (oldstate.containsKey(category)) {
-      final element = oldstate[category]!.removeAt(oldIndex);
-      oldstate[category]!.insert(newIndex, element);
+      final element = oldstate[category]!.list.removeAt(oldIndex);
+      oldstate[category]!.list.insert(newIndex, element);
+      oldstate[category]!.list.applyToDb();
     }
 
     final udp = {...oldstate};
-
-    final box = Hive.box(gagakuDataBox);
-    await box.put('web_favorites', json.encode(udp));
 
     state = AsyncData(udp);
 
     return udp;
   }
 
-  Future<Map<String, List<HistoryLink>>> reconfigureCategories(
-    List<WebSourceCategory> categories,
+  Future<Map<String, WebFavoritesList>> reconfigureCategories(
+    List<WebFavoritesList> categories,
     String defaultCategory,
   ) async {
     final oldstate = await future;
+
+    final box = GagakuData().store.box<WebFavoritesList>();
 
     // Move all deleted category lists to default
     final oldkeys = oldstate.keys.toList();
     for (final oldcat in oldkeys) {
       if (categories.indexWhere((e) => e.id == oldcat) == -1) {
         final list = oldstate.remove(oldcat);
-        oldstate[defaultCategory] = [...?oldstate[defaultCategory], ...?list];
+        if (oldstate.containsKey(defaultCategory)) {
+          oldstate[defaultCategory]!.list.addAll(list!.list.toList());
+          oldstate[defaultCategory]!.list.applyToDb();
+        }
+        box.remove(list!.dbid);
       }
     }
 
-    final udp = {...oldstate};
+    final nlist = await box.putAndGetManyAsync(categories);
 
-    final box = Hive.box(gagakuDataBox);
-    await box.put('web_favorites', json.encode(udp));
+    final udp = {for (var item in nlist) item.id: item};
 
     state = AsyncData(udp);
 
@@ -490,233 +461,255 @@ class WebSourceFavorites extends _$WebSourceFavorites {
   }
 }
 
-final webSourceFavoritesMutation = Mutation<Map<String, List<HistoryLink>>>();
+final webSourceFavoritesMutation = Mutation<Map<String, WebFavoritesList>>();
 
 @Riverpod(keepAlive: true)
 class WebSourceHistory extends _$WebSourceHistory {
   static const _numItems = 250;
 
-  Future<Queue<HistoryLink>> _fetch() async {
-    final box = Hive.box(gagakuDataBox);
-    final str = box.get('web_history');
+  Future<WebFavoritesList> _fetch() async {
+    final box = GagakuData().store.box<WebFavoritesList>();
+    final query = box
+        .query(WebFavoritesList_.id.equals(historyListUUID))
+        .build();
 
-    if (str == null || (str as String).isEmpty) {
-      return Queue<HistoryLink>();
+    WebFavoritesList? historyList;
+    historyList = await query.findUniqueAsync();
+    query.close();
+
+    if (historyList == null) {
+      historyList = WebFavoritesList(
+        id: historyListUUID,
+        name: 'extension_history',
+      );
+      box.put(historyList);
     }
 
-    final content = json.decode(str) as List<dynamic>;
-    final links = content.map((e) => HistoryLink.fromJson(e));
-
-    return Queue.of(links);
+    return historyList;
   }
 
   @override
-  FutureOr<Queue<HistoryLink>> build() async {
+  FutureOr<WebFavoritesList> build() async {
     return _fetch();
   }
 
-  Future<Queue<HistoryLink>> clear() async {
-    await future;
+  Future<void> clear() async {
+    final list = await future;
 
-    final empty = Queue<HistoryLink>();
-    final links = empty.toList();
+    list.list.clear();
+    list.list.applyToDb();
 
-    final box = Hive.box(gagakuDataBox);
-    await box.put('web_history', json.encode(links));
-
-    state = AsyncData(empty);
-
-    return empty;
+    state = AsyncData(list);
   }
 
-  Future<Queue<HistoryLink>> add(HistoryLink link) async {
-    final oldstate = await future;
-    final cpy = Queue.of(oldstate);
+  Future<void> add(HistoryLink link) async {
+    final list = await future;
 
-    while (cpy.contains(link)) {
-      cpy.remove(link);
+    // Add/update link
+    final box = GagakuData().store.box<HistoryLink>();
+    final query = box.query(HistoryLink_.url.equals(link.url)).build();
+
+    final result = await query.findUniqueAsync();
+    query.close();
+
+    if (result != null) {
+      link.dbid = result.dbid;
     }
 
-    cpy.addFirst(link);
+    box.putAsync(link);
 
-    while (cpy.length > _numItems) {
-      cpy.removeLast();
+    // Add to list
+    if (list.list.contains(link)) {
+      // noop if link already exists
+      return;
     }
 
-    final links = cpy.map((e) => e.toJson()).toList();
+    list.list.add(link);
 
-    final box = Hive.box(gagakuDataBox);
-    await box.put('web_history', json.encode(links));
+    if (list.list.length > _numItems) {
+      final items = list.list.toList();
+      items.sort(HistoryLink.lastAccessCompare);
 
-    state = AsyncData(cpy);
+      final toRemove = items.sublist(250);
 
-    return cpy;
+      for (final i in toRemove) {
+        list.list.remove(i);
+      }
+    }
+
+    list.list.applyToDb();
+
+    state = AsyncData(list);
   }
 
-  Future<Queue<HistoryLink>> remove(HistoryLink link) async {
-    final oldstate = await future;
-    final cpy = Queue.of(oldstate);
+  Future<void> remove(HistoryLink link) async {
+    final list = await future;
 
-    while (cpy.contains(link)) {
-      cpy.remove(link);
+    if (list.list.contains(link)) {
+      list.list.remove(link);
     }
 
-    while (cpy.length > _numItems) {
-      cpy.removeLast();
+    if (list.list.length > _numItems) {
+      final items = list.list.toList();
+      items.sort(HistoryLink.lastAccessCompare);
+
+      final toRemove = items.sublist(250);
+
+      for (final i in toRemove) {
+        list.list.remove(i);
+      }
     }
 
-    final links = cpy.map((e) => e.toJson()).toList();
+    list.list.applyToDb();
 
-    final box = Hive.box(gagakuDataBox);
-    await box.put('web_history', json.encode(links));
-
-    state = AsyncData(cpy);
-
-    return cpy;
+    state = AsyncData(list);
   }
 }
 
-final webSourceHistoryMutation = Mutation<Queue<HistoryLink>>();
+final webSourceHistoryMutation = Mutation<void>();
 
 @Riverpod(keepAlive: true)
 class WebReadMarkers extends _$WebReadMarkers {
-  Future<Map<String, Set<String>>> _fetch() async {
-    final box = Hive.box(gagakuDataBox);
-    final str = box.get('web_read_history');
+  Future<ReadMarkersDB> _fetch() async {
+    final box = GagakuData().store.box<ReadMarkersDB>();
+    final query = box.query().build();
 
-    if (str == null || (str as String).isEmpty) {
-      return <String, Set<String>>{};
+    ReadMarkersDB? db;
+    db = await query.findUniqueAsync();
+    query.close();
+
+    if (db == null) {
+      db = ReadMarkersDB();
+      box.put(db);
     }
 
-    Map<String, dynamic> content = json.decode(str);
-    final markers = content.map((m, s) => MapEntry(m, Set<String>.from(s)));
-
-    return markers;
+    return db;
   }
 
   @override
-  FutureOr<Map<String, Set<String>>> build() async {
+  FutureOr<ReadMarkersDB> build() async {
     return _fetch();
   }
 
-  Future<Map<String, Set<String>>> clear() async {
-    await future;
-    final empty = <String, Set<String>>{};
+  Future<ReadMarkersDB> clear() async {
+    ReadMarkersDB db = await future;
+    db.markers.clear();
 
-    final box = Hive.box(gagakuDataBox);
-    await box.put('web_read_history', json.encode({}));
+    final box = GagakuData().store.box<ReadMarkersDB>();
+    db = db.copyWith();
+    box.putAsync(db);
 
-    state = AsyncData(empty);
+    state = AsyncData(db);
 
-    return empty;
+    return db;
   }
 
-  Future<Map<String, Set<String>>> set(
-    String manga,
-    String chapter,
-    bool setRead,
-  ) async {
-    final oldstate = await future;
-    final keyExists = oldstate.containsKey(manga);
+  Future<ReadMarkersDB> set(String manga, String chapter, bool setRead) async {
+    ReadMarkersDB db = await future;
+    final keyExists = db.markers.containsKey(manga);
 
     // Refresh
     if (keyExists) {
       switch (setRead) {
         case true:
-          oldstate[manga]?.add(chapter);
+          db.markers[manga]?.add(chapter);
           break;
         case false:
-          oldstate[manga]?.remove(chapter);
+          db.markers[manga]?.remove(chapter);
           break;
       }
 
-      if (oldstate[manga]!.isEmpty) {
-        oldstate.remove(manga);
+      if (db.markers[manga]!.isEmpty) {
+        db.markers.remove(manga);
       }
     } else {
       if (setRead) {
-        oldstate[manga] = {chapter};
+        db.markers[manga] = {chapter};
       }
     }
 
-    final converted = oldstate.map(
-      (key, value) => MapEntry(key, value.toList()),
-    );
+    final box = GagakuData().store.box<ReadMarkersDB>();
+    db = db.copyWith();
+    box.putAsync(db);
 
-    final box = Hive.box(gagakuDataBox);
-    await box.put('web_read_history', json.encode(converted));
+    state = AsyncData(db);
 
-    state = AsyncData({...oldstate});
-
-    return oldstate;
+    return db;
   }
 
-  Future<Map<String, Set<String>>> setBulk(
+  Future<ReadMarkersDB> setBulk(
     String manga, {
     Iterable<String>? read,
     Iterable<String>? unread,
   }) async {
-    final oldstate = await future;
-    final keyExists = oldstate.containsKey(manga);
+    ReadMarkersDB db = await future;
+    final keyExists = db.markers.containsKey(manga);
 
     // Refresh
     if (keyExists) {
       if (read != null) {
-        oldstate[manga]?.addAll(read);
+        db.markers[manga]?.addAll(read);
       }
 
       if (unread != null) {
-        oldstate[manga]?.removeAll(unread);
+        db.markers[manga]?.removeAll(unread);
       }
 
-      if (oldstate[manga]!.isEmpty) {
-        oldstate.remove(manga);
+      if (db.markers[manga]!.isEmpty) {
+        db.markers.remove(manga);
       }
     } else {
       if (read != null) {
-        oldstate[manga] = {...read};
+        db.markers[manga] = {...read};
       }
 
       if (unread != null) {
-        oldstate[manga] = {};
+        db.markers[manga] = {};
       }
     }
 
-    final converted = oldstate.map(
-      (key, value) => MapEntry(key, value.toList()),
-    );
+    final box = GagakuData().store.box<ReadMarkersDB>();
+    db = db.copyWith();
+    box.putAsync(db);
 
-    final box = Hive.box(gagakuDataBox);
-    await box.put('web_read_history', json.encode(converted));
+    state = AsyncData(db);
 
-    state = AsyncData({...oldstate});
-
-    return oldstate;
+    return db;
   }
 
-  Future<Map<String, Set<String>>> deleteKey(String manga) async {
-    final oldstate = await future;
-    final keyExists = oldstate.containsKey(manga);
+  Future<ReadMarkersDB> deleteKey(String manga) async {
+    ReadMarkersDB db = await future;
+    final keyExists = db.markers.containsKey(manga);
 
     // Refresh
     if (keyExists) {
-      oldstate.remove(manga);
+      db.markers.remove(manga);
     }
 
-    final converted = oldstate.map(
-      (key, value) => MapEntry(key, value.toList()),
-    );
+    final box = GagakuData().store.box<ReadMarkersDB>();
+    db = db.copyWith();
+    box.putAsync(db);
 
-    final box = Hive.box(gagakuDataBox);
-    await box.put('web_read_history', json.encode(converted));
+    state = AsyncData(db);
 
-    state = AsyncData({...oldstate});
-
-    return oldstate;
+    return db;
   }
 }
 
-final webReadMarkerMutation = Mutation<Map<String, Set<String>>>();
+final webReadMarkerMutation = Mutation<ReadMarkersDB>();
+
+@riverpod
+Stream<List<WebSourceInfo>> installedSources(Ref ref) async* {
+  final box = GagakuData().store.box<WebSourceInfo>();
+  final stream = box
+      .query()
+      .watch(triggerImmediately: true)
+      .map((query) => query.find());
+
+  await for (final items in stream) {
+    yield items;
+  }
+}
 
 @Riverpod(keepAlive: true)
 class ExtensionSource extends _$ExtensionSource {
@@ -732,11 +725,13 @@ class ExtensionSource extends _$ExtensionSource {
     final completer = Completer<void>();
 
     // Let this throw here if not found
-    final source = ref.watch(
-      webConfigProvider.select(
-        (cfg) => cfg.installedSources.firstWhere((e) => e.id == sourceId),
-      ),
-    );
+    final box = GagakuData().store.box<WebSourceInfo>();
+    final query = box.query(WebSourceInfo_.id.equals(sourceId)).build();
+    final source = await query.findUniqueAsync();
+
+    if (source == null) {
+      throw Exception("Source $sourceId failed to initialize: not installed");
+    }
 
     try {
       _view = HeadlessInAppWebView(
@@ -914,7 +909,8 @@ class ExtensionSource extends _$ExtensionSource {
     }
 
     final result = await _controller?.callAsyncJavaScript(
-      functionBody: """
+      functionBody:
+          """
 var form = await ${source.id}.getSettingsForm();
 form.formWillAppear?.();
 var id = await window.initializeForm("main", form);
@@ -1018,7 +1014,8 @@ return formid;
 
     final result = await _controller?.callAsyncJavaScript(
       arguments: {'section': section.toJson(), 'metadata': metadata},
-      functionBody: """
+      functionBody:
+          """
 var p = await $sourceId.getDiscoverSectionItems(section, metadata);
 p.items.forEach((e) => {
   if ("publishDate" in e) {
@@ -1054,7 +1051,8 @@ return p;
     final params = query.toJson();
     final result = await _controller?.callAsyncJavaScript(
       arguments: {'query': params, 'metadata': metadata},
-      functionBody: """
+      functionBody:
+          """
 return await $sourceId.getSearchResults(query, metadata)
 """,
     );
@@ -1090,7 +1088,8 @@ return await $sourceId.getSearchResults(query, metadata)
 
     final chaps = await _controller?.callAsyncJavaScript(
       arguments: {'manga': smanga.toJson()},
-      functionBody: """
+      functionBody:
+          """
 var p = await $sourceId.getChapters(manga);
 p.forEach((e) => {
   e.publishDate = e.publishDate?.toISOString();
@@ -1106,20 +1105,19 @@ return p;
 
     final clist = chaps.value as List<dynamic>;
     final chapters = clist.map((e) => Chapter.fromJson(e)).toList();
-    final chapmap =
-        chapters
-            .map(
-              (e) => ChapterEntry(
-                name: e.chapNum.toString(),
-                chapter: WebChapter(
-                  title: e.title,
-                  volume: e.volume?.toString(),
-                  groups: {e.version ?? sourceId: e},
-                  releaseDate: e.publishDate,
-                ),
-              ),
-            )
-            .toList();
+    final chapmap = chapters
+        .map(
+          (e) => ChapterEntry(
+            name: e.chapNum.toString(),
+            chapter: WebChapter(
+              title: e.title,
+              volume: e.volume?.toString(),
+              groups: {e.version ?? sourceId: e},
+              releaseDate: e.publishDate,
+            ),
+          ),
+        )
+        .toList();
     chapmap.sort((a, b) => compareNatural(b.name, a.name));
 
     final manga = WebManga(
@@ -1179,9 +1177,7 @@ return p;
 class ExtensionInfoList extends _$ExtensionInfoList {
   @override
   Future<Map<String, WebSourceInfo>> build() async {
-    final installed = ref.watch(
-      webConfigProvider.select((cfg) => cfg.installedSources),
-    );
+    final installed = await ref.watch(installedSourcesProvider.future);
 
     final list = await Future.wait(
       installed.map((i) => ref.watch(extensionSourceProvider(i.id).future)),
@@ -1213,7 +1209,8 @@ class SettingsForm with ChangeNotifier {
 
   Future<List<FormSectionElement>> getSections() async {
     final result = await _controller.callAsyncJavaScript(
-      functionBody: """
+      functionBody:
+          """
 var form = window.getForm("$id");
 if (typeof form === "undefined") {
   return [];
@@ -1246,10 +1243,9 @@ return a;
       throw Exception('JavaScript error: ${result?.error}');
     }
 
-    final sections =
-        (result.value as List<dynamic>)
-            .map((e) => FormSectionElement.fromJson(e))
-            .toList();
+    final sections = (result.value as List<dynamic>)
+        .map((e) => FormSectionElement.fromJson(e))
+        .toList();
 
     return sections;
   }
@@ -1277,7 +1273,8 @@ return form.requiresExplicitSubmission();
   Future<void> call(String method) async {
     await _controller.callAsyncJavaScript(
       arguments: {'formid': id},
-      functionBody: """
+      functionBody:
+          """
 var form = window.getForm(formid);
 if (typeof form === "undefined") {
   return;

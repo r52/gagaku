@@ -6,8 +6,8 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_MangaDexConfig _$MangaDexConfigFromJson(Map<String, dynamic> json) =>
-    _MangaDexConfig(
+MangaDexConfig _$MangaDexConfigFromJson(Map<String, dynamic> json) =>
+    MangaDexConfig(
       translatedLanguages:
           (json['translatedLanguages'] as List<dynamic>?)
               ?.map(const LanguageConverter().fromJson)
@@ -35,20 +35,20 @@ _MangaDexConfig _$MangaDexConfigFromJson(Map<String, dynamic> json) =>
           const {},
     );
 
-Map<String, dynamic> _$MangaDexConfigToJson(
-  _MangaDexConfig instance,
-) => <String, dynamic>{
-  'translatedLanguages':
-      instance.translatedLanguages
+Map<String, dynamic> _$MangaDexConfigToJson(MangaDexConfig instance) =>
+    <String, dynamic>{
+      'translatedLanguages': instance.translatedLanguages
           .map(const LanguageConverter().toJson)
           .toList(),
-  'originalLanguage':
-      instance.originalLanguage.map(const LanguageConverter().toJson).toList(),
-  'contentRating':
-      instance.contentRating.map((e) => _$ContentRatingEnumMap[e]!).toList(),
-  'dataSaver': instance.dataSaver,
-  'groupBlacklist': instance.groupBlacklist.toList(),
-};
+      'originalLanguage': instance.originalLanguage
+          .map(const LanguageConverter().toJson)
+          .toList(),
+      'contentRating': instance.contentRating
+          .map((e) => _$ContentRatingEnumMap[e]!)
+          .toList(),
+      'dataSaver': instance.dataSaver,
+      'groupBlacklist': instance.groupBlacklist.toList(),
+    };
 
 const _$ContentRatingEnumMap = {
   ContentRating.safe: 'safe',
@@ -93,7 +93,7 @@ final class MdConfigProvider
   }
 }
 
-String _$mdConfigHash() => r'9405847c34050abb695ffe743e4d7de385d0e6cd';
+String _$mdConfigHash() => r'745b533741428ab1933c7be2ef08cffbd6df623c';
 
 abstract class _$MdConfig extends $Notifier<MangaDexConfig> {
   MangaDexConfig build();

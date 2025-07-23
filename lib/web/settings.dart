@@ -1,18 +1,21 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/model/model.dart';
+import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/repo_list.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class WebSourceSettingsRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
   WebSourceSettingsRouteBuilder()
     : super(
-        pageBuilder:
-            (context, animation, secondaryAnimation) =>
-                const WebSourceSettingsWidget(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const WebSourceSettingsWidget(),
       );
 }
 
@@ -25,6 +28,20 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
     final nav = Navigator.of(context);
     final cfg = ref.watch(webConfigProvider);
     final config = useState(cfg.copyWith());
+
+    final store = GagakuData().store;
+    final favbox = store.box<WebFavoritesList>();
+    final favitems = useMemoized(() {
+      final query = favbox
+          .query(WebFavoritesList_.id.notEquals(historyListUUID))
+          .order(WebFavoritesList_.sortOrder)
+          .build();
+      final items = query.find();
+      query.close();
+      return items;
+    }, []);
+
+    final favs = useState(favitems);
 
     return Scaffold(
       appBar: AppBar(
@@ -40,12 +57,20 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                   icon: const Icon(Icons.save),
                   label: Text(tr.saveSettings),
                   onPressed: () {
+                    // reconfigure sort
+                    favs.value.forEachIndexed((idx, e) => e.sortOrder = idx);
+
+                    final diff = favitems.toSet().difference(
+                      favs.value.toSet(),
+                    );
+
+                    favbox.putMany(favs.value);
+                    favbox.removeMany(diff.map((e) => e.dbid).toList());
+
                     webConfigSaveMutation.run(ref, (ref) async {
                       return ref
                           .get(webConfigProvider.notifier)
                           .saveWith(
-                            installedSources: config.value.installedSources,
-                            categories: config.value.categories,
                             defaultCategory: config.value.defaultCategory,
                             categoriesToUpdate: config.value.categoriesToUpdate,
                           );
@@ -54,7 +79,7 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                       return await ref
                           .get(webSourceFavoritesProvider.notifier)
                           .reconfigureCategories(
-                            config.value.categories,
+                            favs.value,
                             config.value.defaultCategory,
                           );
                     });
@@ -106,14 +131,12 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                   child: ElevatedButton.icon(
                     onPressed: () async {
                       final result = await nav
-                          .push<(List<WebSourceCategory>, String)>(
+                          .push<(List<WebFavoritesList>, String)>(
                             SlideTransitionRouteBuilder(
                               pageBuilder:
                                   (context, animation, secondaryAnimation) =>
                                       CategoryManager(
-                                        categories: [
-                                          ...config.value.categories,
-                                        ],
+                                        categories: [...favs.value],
                                         defaultCategory:
                                             config.value.defaultCategory,
                                       ),
@@ -121,8 +144,8 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                           );
 
                       if (result != null) {
+                        favs.value = result.$1;
                         config.value = config.value.copyWith(
-                          categories: result.$1,
                           defaultCategory: result.$2,
                         );
                       }
@@ -147,7 +170,7 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                         context: context,
                         builder: (BuildContext context) {
                           return UpdateCategoryDialog(
-                            categories: config.value.categories,
+                            categories: favs.value,
                             preselected: config.value.categoriesToUpdate,
                           );
                         },
@@ -243,7 +266,7 @@ class CategoryManager extends HookConsumerWidget {
     required this.defaultCategory,
   });
 
-  final List<WebSourceCategory> categories;
+  final List<WebFavoritesList> categories;
   final String defaultCategory;
 
   @override
@@ -270,7 +293,7 @@ class CategoryManager extends HookConsumerWidget {
               );
 
               if (result != null) {
-                final cat = WebSourceCategory.name(result);
+                final cat = WebFavoritesList.name(name: result);
 
                 list.value = [...list.value, cat];
               }
@@ -317,12 +340,11 @@ class CategoryManager extends HookConsumerWidget {
                       trailing: OverflowBar(
                         children: [
                           ElevatedButton(
-                            onPressed:
-                                item.id == defaultCat.value
-                                    ? null
-                                    : () {
-                                      defaultCat.value = item.id;
-                                    },
+                            onPressed: item.id == defaultCat.value
+                                ? null
+                                : () {
+                                    defaultCat.value = item.id;
+                                  },
                             child: Text(tr.ui.makeDefault),
                           ),
                           IconButton(
@@ -339,14 +361,7 @@ class CategoryManager extends HookConsumerWidget {
                               );
 
                               if (result != null) {
-                                final cat = WebSourceCategory(item.id, result);
-
-                                final idx = list.value.indexOf(item);
-                                if (idx != -1) {
-                                  list.value[idx] = cat;
-                                }
-
-                                list.value = [...list.value];
+                                item.name = result;
                               }
                             },
                             icon: const Icon(Icons.edit),
@@ -354,17 +369,16 @@ class CategoryManager extends HookConsumerWidget {
                           IconButton(
                             tooltip: tr.ui.delete,
                             color: Colors.red,
-                            onPressed:
-                                list.value.length != 1
-                                    ? () {
-                                      list.value.remove(item);
-                                      list.value = [...list.value];
+                            onPressed: list.value.length != 1
+                                ? () {
+                                    list.value.remove(item);
+                                    list.value = [...list.value];
 
-                                      if (item.id == defaultCat.value) {
-                                        defaultCat.value = list.value.first.id;
-                                      }
+                                    if (item.id == defaultCat.value) {
+                                      defaultCat.value = list.value.first.id;
                                     }
-                                    : null,
+                                  }
+                                : null,
                             icon: const Icon(Icons.delete),
                           ),
                         ],
@@ -384,7 +398,7 @@ class CategoryManager extends HookConsumerWidget {
 class NewCategoryDialog extends HookWidget {
   const NewCategoryDialog({super.key, required this.list, this.rename});
 
-  final List<WebSourceCategory> list;
+  final List<WebFavoritesList> list;
   final String? rename;
 
   @override
@@ -432,13 +446,12 @@ class NewCategoryDialog extends HookWidget {
                   list.indexWhere((e) => e.name == fieldController.text) == -1,
             );
             return ElevatedButton(
-              onPressed:
-                  nameIsValid
-                      ? () {
-                        Navigator.of(context).pop(fieldController.text);
-                        fieldController.clear();
-                      }
-                      : null,
+              onPressed: nameIsValid
+                  ? () {
+                      Navigator.of(context).pop(fieldController.text);
+                      fieldController.clear();
+                    }
+                  : null,
               child: Text(rename == null ? tr.ui.add : tr.ui.rename),
             );
           },
@@ -455,7 +468,7 @@ class UpdateCategoryDialog extends HookWidget {
     required this.preselected,
   });
 
-  final List<WebSourceCategory> categories;
+  final List<WebFavoritesList> categories;
   final List<String> preselected;
 
   @override

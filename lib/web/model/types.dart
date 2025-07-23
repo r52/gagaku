@@ -1,11 +1,15 @@
 // ignore_for_file: non_constant_identifier_names, invalid_annotation_target
 
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/reader/main.dart' show CtxCallback;
 import 'package:gagaku/util/freezed.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:objectbox/objectbox.dart';
+import 'package:uuid/uuid.dart';
 
 part 'types.freezed.dart';
 part 'types.g.dart';
@@ -26,6 +30,67 @@ class WebReaderData {
   final SourceHandler handle;
   final String? readKey;
   final CtxCallback? onLinkPressed;
+}
+
+@unfreezed
+@Entity()
+class ReadMarkersDB with _$ReadMarkersDB {
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @Id()
+  int dbid;
+
+  @override
+  @Transient()
+  Map<String, Set<String>> markers;
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  String get dbMarkers =>
+      json.encode(markers.map((key, value) => MapEntry(key, value.toList())));
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  set dbMarkers(String value) {
+    markers = (json.decode(value) as Map<String, dynamic>).map(
+      (m, s) => MapEntry(m, Set<String>.from(s)),
+    );
+  }
+
+  ReadMarkersDB({this.dbid = 0, this.markers = const {}});
+}
+
+@Entity()
+class WebFavoritesList {
+  @Id()
+  int dbid;
+
+  @Unique()
+  final String id;
+
+  String name;
+
+  int sortOrder;
+
+  final list = ToMany<HistoryLink>();
+
+  WebFavoritesList({
+    this.dbid = 0,
+    required this.id,
+    required this.name,
+    this.sortOrder = 0,
+  });
+  WebFavoritesList.name({this.dbid = 0, required this.name, this.sortOrder = 0})
+    : id = const Uuid().v4();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is WebFavoritesList &&
+            identical(other.id, id));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, id, name, list);
 }
 
 @freezed
@@ -57,10 +122,9 @@ abstract class SourceHandler with _$SourceHandler {
     String? chapter,
   }) = _SourceHandler;
 
-  String getURL() =>
-      type == SourceType.proxy
-          ? 'https://cubari.moe/read/$sourceId/$location/'
-          : '$sourceId/$location';
+  String getURL() => type == SourceType.proxy
+      ? 'https://cubari.moe/read/$sourceId/$location/'
+      : '$sourceId/$location';
   String getKey() => '$sourceId/$location';
 
   factory SourceHandler.fromJson(Map<String, dynamic> json) =>
@@ -96,19 +160,72 @@ abstract class UpdateFeedItem with _$UpdateFeedItem {
       _$UpdateFeedItemFromJson(json);
 }
 
-@freezed
-abstract class HistoryLink with _$HistoryLink {
-  const HistoryLink._();
+// class _SourceHandleToOneConverter
+//     implements JsonConverter<ToOne<SourceHandler>, Map<String, dynamic>?> {
+//   const _SourceHandleToOneConverter();
 
-  const factory HistoryLink({
-    required String title,
-    required String url,
-    String? cover,
-    SourceHandler? handle,
-  }) = _HistoryLink;
+//   @override
+//   ToOne<SourceHandler> fromJson(Map<String, dynamic>? json) =>
+//       ToOne<SourceHandler>(
+//         target: json == null ? null : SourceHandler.fromJson(json),
+//       );
+
+//   @override
+//   Map<String, dynamic>? toJson(ToOne<SourceHandler> rel) =>
+//       rel.target?.toJson();
+// }
+
+@unfreezed
+@JsonSerializable()
+@Entity()
+class HistoryLink with _$HistoryLink {
+  HistoryLink({
+    this.dbid = 0,
+    required this.title,
+    required this.url,
+    this.cover,
+    this.handle,
+    this.lastAccessed,
+  });
+
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @Id()
+  int dbid;
+
+  @override
+  String title;
+
+  @override
+  @Unique(onConflict: ConflictStrategy.fail)
+  String url;
+
+  @override
+  String? cover;
+
+  @override
+  @Transient()
+  SourceHandler? handle;
+
+  @override
+  @Property(type: PropertyType.date)
+  DateTime? lastAccessed;
+
+  @override
+  @Backlink('list')
+  final lists = ToMany<WebFavoritesList>();
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  String? get dbHandle => handle == null ? null : json.encode(handle?.toJson());
+
+  set dbHandle(String? value) {
+    handle = value == null ? null : SourceHandler.fromJson(json.decode(value));
+  }
 
   factory HistoryLink.fromJson(Map<String, dynamic> json) =>
       _$HistoryLinkFromJson(json);
+
+  Map<String, Object?> toJson() => _$HistoryLinkToJson(this);
 
   factory HistoryLink.fromSearchReultItem(
     WebSourceInfo source,
@@ -129,8 +246,9 @@ abstract class HistoryLink with _$HistoryLink {
     DiscoverSectionItem item,
   ) {
     return switch (item) {
-      GenresCarouselItem() =>
-        throw UnsupportedError('Unsupported section type'),
+      GenresCarouselItem() => throw UnsupportedError(
+        'Unsupported section type',
+      ),
       ChapterUpdatesCarouselItem() => HistoryLink(
         title: item.title,
         url: '$sourceId/${item.mangaId}',
@@ -169,8 +287,25 @@ abstract class HistoryLink with _$HistoryLink {
             (identical(other.url, url) || other.url == url));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, url);
+
+  static int lastAccessCompare(HistoryLink a, HistoryLink b) {
+    if (a.lastAccessed == null && b.lastAccessed == null) {
+      return 0;
+    }
+
+    if (a.lastAccessed == null) {
+      return -1;
+    }
+
+    if (b.lastAccessed == null) {
+      return 1;
+    }
+
+    return a.lastAccessed!.compareTo(b.lastAccessed!);
+  }
 }
 
 class WebChapterSerializer
@@ -184,16 +319,18 @@ class WebChapterSerializer
         (k, e) => MapEntry(k, WebChapter.fromJson(e as Map<String, dynamic>)),
       );
 
-      final chapterlist =
-          map.entries.map((e) => ChapterEntry.fromEntry(e)).toList();
+      final chapterlist = map.entries
+          .map((e) => ChapterEntry.fromEntry(e))
+          .toList();
       chapterlist.sort((a, b) => compareNatural(b.name, a.name));
 
       return chapterlist;
     }
 
     if (chapters is List) {
-      final chapterlist =
-          (chapters).map((c) => ChapterEntry.fromJson(c)).toList();
+      final chapterlist = (chapters)
+          .map((c) => ChapterEntry.fromJson(c))
+          .toList();
 
       chapterlist.sort((a, b) => compareNatural(b.name, a.name));
       return chapterlist;
@@ -314,28 +451,107 @@ abstract class ImgurPage with _$ImgurPage {
       _$ImgurPageFromJson(json);
 }
 
-@freezed
-abstract class WebSourceInfo with _$WebSourceInfo {
-  const WebSourceInfo._();
+@unfreezed
+@JsonSerializable()
+@Entity()
+class WebSourceInfo with _$WebSourceInfo {
+  WebSourceInfo({
+    this.dbid = 0,
+    required this.id,
+    required this.name,
+    required this.repo,
+    this.baseUrl,
+    this.version = SupportedVersion.v0_8,
+    required this.icon,
+    this.capabilities = const [SourceIntents.mangaChapters],
+  });
 
-  const factory WebSourceInfo({
-    required String id,
-    required String name,
-    required String repo,
-    String? baseUrl,
-    @Default(SupportedVersion.v0_8) SupportedVersion version,
-    required String icon,
-    @Default([SourceIntents.mangaChapters])
-    @SourceIntentParser()
-    List<SourceIntents> capabilities,
-  }) = _WebSourceInfo;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @Id()
+  int dbid;
+
+  @override
+  @Unique(onConflict: ConflictStrategy.replace)
+  final String id;
+
+  @override
+  final String name;
+
+  @override
+  final String repo;
+
+  @override
+  final String? baseUrl;
+
+  @override
+  @Transient()
+  SupportedVersion version;
+
+  @override
+  final String icon;
+
+  @override
+  @SourceIntentParser()
+  @Transient()
+  List<SourceIntents> capabilities;
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  String get dbVersion => version.name;
+
+  set dbVersion(String value) {
+    version = SupportedVersion.values.byName(value);
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  List<int> get dbCapabilities => capabilities.map((e) => e.flag).toList();
+
+  set dbCapabilities(List<int> value) {
+    capabilities = value
+        .map(
+          (intent) => SourceIntents.values.firstWhere((e) => e.flag == intent),
+        )
+        .toList();
+  }
 
   factory WebSourceInfo.fromJson(Map<String, dynamic> json) =>
       _$WebSourceInfoFromJson(json);
 
+  Map<String, Object?> toJson() => _$WebSourceInfoToJson(this);
+
   bool hasCapability(SourceIntents intent) {
     return capabilities.contains(intent);
   }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is WebSourceInfo &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.repo, repo) || other.repo == repo) &&
+            (identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl) &&
+            (identical(other.version, version) || other.version == version) &&
+            (identical(other.icon, icon) || other.icon == icon) &&
+            const DeepCollectionEquality().equals(
+              other.capabilities,
+              capabilities,
+            ));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    name,
+    repo,
+    baseUrl,
+    version,
+    icon,
+    const DeepCollectionEquality().hash(capabilities),
+  );
 }
 
 enum SupportedVersion {
@@ -528,11 +744,11 @@ sealed class SourceVersion with _$SourceVersion {
         intents == null
             ? []
             : SourceIntents.values.fold([], (list, intent) {
-              if ((intents & intent.flag) == intent.flag) {
-                list.add(intent);
-              }
-              return list;
-            }),
+                if ((intents & intent.flag) == intent.flag) {
+                  list.add(intent);
+                }
+                return list;
+              }),
       SourceVersion09(:final capabilities) => capabilities,
     };
   }
@@ -583,12 +799,20 @@ abstract class Versioning with _$Versioning {
 
 @freezed
 @JsonSerializable()
+@Entity()
 class RepoInfo with _$RepoInfo {
-  const RepoInfo({required this.name, required this.url});
+  RepoInfo({this.dbid = 0, required this.name, required this.url});
+
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @Id()
+  int dbid;
 
   @override
   final String name;
+
   @override
+  @Unique(onConflict: ConflictStrategy.replace)
   final String url;
 
   factory RepoInfo.fromJson(Map<String, dynamic> json) =>
@@ -600,12 +824,16 @@ class RepoInfo with _$RepoInfo {
 @freezed
 @JsonSerializable()
 class RepoData with _$RepoData implements RepoInfo {
-  const RepoData({
+  RepoData({
+    this.dbid = 0,
     required this.name,
     required this.url,
     required this.version,
   });
 
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  int dbid;
   @override
   final String name;
   @override
@@ -622,18 +850,6 @@ class RepoData with _$RepoData implements RepoInfo {
   @override
   Map<String, dynamic> toJson() => _$RepoDataToJson(this);
 }
-
-// abstract class DUIFormRow {
-//   String get id;
-// }
-
-// abstract class DUIInputType extends DUIFormRow {
-//   String get label;
-// }
-
-// abstract class DUILabelType extends DUIFormRow {
-//   String get label;
-// }
 
 @Freezed(unionKey: 'type')
 abstract class OAuthResponseType with _$OAuthResponseType {
@@ -653,114 +869,15 @@ abstract class OAuthResponseType with _$OAuthResponseType {
       _$OAuthResponseTypeFromJson(json);
 }
 
-// @Freezed(unionKey: 'type', unionValueCase: FreezedUnionCase.none)
-// sealed class DUIType with _$DUIType {
-//   @Implements<DUIFormRow>()
-//   const factory DUIType.DUISection({
-//     required String id,
-//     String? header,
-//     String? footer,
-//     required bool isHidden,
-//     required List<DUIType> rows,
-//   }) = DUISection;
-
-//   @Implements<DUIFormRow>()
-//   const factory DUIType.DUISelect({
-//     required String id,
-//     required String label,
-//     required List<String> options,
-//     required bool allowsMultiselect,
-//     required Map<String, String> labels,
-//   }) = DUISelect;
-
-//   @Implements<DUIInputType>()
-//   const factory DUIType.DUIInputField({
-//     required String id,
-//     required String label,
-//   }) = DUIInputField;
-
-//   @Implements<DUIInputType>()
-//   const factory DUIType.DUISecureInputField({
-//     required String id,
-//     required String label,
-//   }) = DUISecureInputField;
-
-//   @Implements<DUIFormRow>()
-//   const factory DUIType.DUIStepper({
-//     required String id,
-//     required String label,
-//     num? min,
-//     num? max,
-//     num? step,
-//   }) = DUIStepper;
-
-//   @Implements<DUILabelType>()
-//   const factory DUIType.DUILabel({
-//     required String id,
-//     required String label,
-//     String? value,
-//   }) = DUILabel;
-
-//   @Implements<DUILabelType>()
-//   const factory DUIType.DUIMultilineLabel({
-//     required String id,
-//     required String label,
-//     required String value,
-//   }) = DUIMultilineLabel;
-
-//   @Implements<DUIFormRow>()
-//   const factory DUIType.DUIHeader({
-//     required String id,
-//     required String imageUrl,
-//     required String title,
-//     String? subtitle,
-//   }) = DUIHeader;
-
-//   @Implements<DUIFormRow>()
-//   const factory DUIType.DUIButton({required String id, required String label}) =
-//       DUIButton;
-
-//   @Implements<DUIFormRow>()
-//   const factory DUIType.DUINavigationButton({
-//     required String id,
-//     required String label,
-//     required DUIForm form,
-//   }) = DUINavigationButton;
-
-//   @Implements<DUIFormRow>()
-//   const factory DUIType.DUISwitch({required String id, required String label}) =
-//       DUISwitch;
-
-//   @Implements<DUIFormRow>()
-//   const factory DUIType.DUIOAuthButton({
-//     required String id,
-//     required String label,
-//     required String authorizeEndpoint,
-//     required String clientId,
-//     required OAuthResponseType responseType,
-//     String? redirectUri,
-//     List<String>? scopes,
-//   }) = DUIOAuthButton;
-
-//   const factory DUIType.DUIForm({
-//     required List<DUISection> sections,
-//     required bool hasSubmit,
-//   }) = DUIForm;
-
-//   factory DUIType.fromJson(Map<String, dynamic> json) =>
-//       _$DUITypeFromJson(json);
-// }
-
 ////////////////////// 0.9
 
 class ContentRatingParser implements JsonConverter<ContentRating, dynamic> {
   const ContentRatingParser();
 
   @override
-  ContentRating fromJson(dynamic rating) =>
-      rating == 'SAFE'
-          ? ContentRating.EVERYONE
-          : ContentRating.values.byName(rating);
+  ContentRating fromJson(dynamic rating) => rating == 'SAFE'
+      ? ContentRating.EVERYONE
+      : ContentRating.values.byName(rating);
 
   @override
   dynamic toJson(ContentRating rating) =>

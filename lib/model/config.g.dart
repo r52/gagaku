@@ -6,27 +6,23 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_GagakuConfig _$GagakuConfigFromJson(Map<String, dynamic> json) =>
-    _GagakuConfig(
-      themeMode:
-          $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
-          ThemeMode.system,
-      theme:
-          $enumDecodeNullable(
-            _$GagakuThemeEnumMap,
-            json['theme'],
-            unknownValue: GagakuTheme.lime,
-          ) ??
-          GagakuTheme.lime,
-      gridAlbumExtent:
-          $enumDecodeNullable(
-            _$GridAlbumExtentEnumMap,
-            json['gridAlbumExtent'],
-          ) ??
-          GridAlbumExtent.medium,
-    );
+GagakuConfig _$GagakuConfigFromJson(Map<String, dynamic> json) => GagakuConfig(
+  themeMode:
+      $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
+      ThemeMode.system,
+  theme:
+      $enumDecodeNullable(
+        _$GagakuThemeEnumMap,
+        json['theme'],
+        unknownValue: GagakuTheme.lime,
+      ) ??
+      GagakuTheme.lime,
+  gridAlbumExtent:
+      $enumDecodeNullable(_$GridAlbumExtentEnumMap, json['gridAlbumExtent']) ??
+      GridAlbumExtent.medium,
+);
 
-Map<String, dynamic> _$GagakuConfigToJson(_GagakuConfig instance) =>
+Map<String, dynamic> _$GagakuConfigToJson(GagakuConfig instance) =>
     <String, dynamic>{
       'themeMode': _$ThemeModeEnumMap[instance.themeMode]!,
       'theme': _$GagakuThemeEnumMap[instance.theme]!,
@@ -96,7 +92,7 @@ final class GagakuSettingsProvider
   }
 }
 
-String _$gagakuSettingsHash() => r'fe542021bde33b2b0d97ab5ccd4354255d348e1c';
+String _$gagakuSettingsHash() => r'a04a76e0ff8b7a2a15c8f09de60c0e1a8c5d45e9';
 
 abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
   GagakuConfig build();

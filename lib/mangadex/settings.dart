@@ -27,7 +27,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
     final nav = Navigator.of(context);
     final theme = Theme.of(context);
     final cfg = ref.watch(mdConfigProvider);
-    final config = useState(cfg);
+    final config = useState(cfg.copyWith());
     final groupDataProvider = ref.watch(
       _fetchGroupDataProvider(config.value.groupBlacklist),
     );
@@ -73,29 +73,28 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
               builder: (context) {
                 return Center(
                   child: MenuAnchor(
-                    builder:
-                        (context, controller, child) => SizedBox(
-                          width: double.infinity,
-                          child: Material(
-                            color: theme.colorScheme.surfaceContainerHighest,
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(6.0),
-                            ),
-                            child: InkWell(
-                              onTap: () {
-                                if (controller.isOpen) {
-                                  controller.close();
-                                } else {
-                                  controller.open();
-                                }
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(6.0),
-                                child: child,
-                              ),
-                            ),
+                    builder: (context, controller, child) => SizedBox(
+                      width: double.infinity,
+                      child: Material(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(6.0),
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            if (controller.isOpen) {
+                              controller.close();
+                            } else {
+                              controller.open();
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child: child,
                           ),
                         ),
+                      ),
+                    ),
                     menuChildren: List.generate(
                       Languages.languages.length,
                       (index) => Builder(
@@ -118,10 +117,11 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                                 );
                               } else {
                                 config.value = config.value.copyWith(
-                                  translatedLanguages:
-                                      config.value.translatedLanguages
-                                          .where((element) => element != lang)
-                                          .toSet(),
+                                  translatedLanguages: config
+                                      .value
+                                      .translatedLanguages
+                                      .where((element) => element != lang)
+                                      .toSet(),
                                 );
                               }
                             },
@@ -141,10 +141,11 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                               ElevatedButton.icon(
                                 onPressed: () {
                                   config.value = config.value.copyWith(
-                                    translatedLanguages:
-                                        config.value.translatedLanguages
-                                            .where((element) => element != lang)
-                                            .toSet(),
+                                    translatedLanguages: config
+                                        .value
+                                        .translatedLanguages
+                                        .where((element) => element != lang)
+                                        .toSet(),
                                   );
                                 },
                                 icon: const Icon(Icons.close),
@@ -168,29 +169,28 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
               builder: (context) {
                 return Center(
                   child: MenuAnchor(
-                    builder:
-                        (context, controller, child) => SizedBox(
-                          width: double.infinity,
-                          child: Material(
-                            color: theme.colorScheme.surfaceContainerHighest,
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(6.0),
-                            ),
-                            child: InkWell(
-                              onTap: () {
-                                if (controller.isOpen) {
-                                  controller.close();
-                                } else {
-                                  controller.open();
-                                }
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(6.0),
-                                child: child,
-                              ),
-                            ),
+                    builder: (context, controller, child) => SizedBox(
+                      width: double.infinity,
+                      child: Material(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(6.0),
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            if (controller.isOpen) {
+                              controller.close();
+                            } else {
+                              controller.open();
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child: child,
                           ),
                         ),
+                      ),
+                    ),
                     menuChildren: List.generate(
                       Languages.languages.length,
                       (index) => Builder(
@@ -211,10 +211,11 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                                 );
                               } else {
                                 config.value = config.value.copyWith(
-                                  originalLanguage:
-                                      config.value.originalLanguage
-                                          .where((element) => element != lang)
-                                          .toSet(),
+                                  originalLanguage: config
+                                      .value
+                                      .originalLanguage
+                                      .where((element) => element != lang)
+                                      .toSet(),
                                 );
                               }
                             },
@@ -234,10 +235,11 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                               ElevatedButton.icon(
                                 onPressed: () {
                                   config.value = config.value.copyWith(
-                                    originalLanguage:
-                                        config.value.originalLanguage
-                                            .where((element) => element != lang)
-                                            .toSet(),
+                                    originalLanguage: config
+                                        .value
+                                        .originalLanguage
+                                        .where((element) => element != lang)
+                                        .toSet(),
                                   );
                                 },
                                 icon: const Icon(Icons.close),
@@ -260,29 +262,28 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
               builder: (context) {
                 return Center(
                   child: MenuAnchor(
-                    builder:
-                        (context, controller, child) => SizedBox(
-                          width: double.infinity,
-                          child: Material(
-                            color: theme.colorScheme.surfaceContainerHighest,
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(6.0),
-                            ),
-                            child: InkWell(
-                              onTap: () {
-                                if (controller.isOpen) {
-                                  controller.close();
-                                } else {
-                                  controller.open();
-                                }
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(6.0),
-                                child: child,
-                              ),
-                            ),
+                    builder: (context, controller, child) => SizedBox(
+                      width: double.infinity,
+                      child: Material(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(6.0),
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            if (controller.isOpen) {
+                              controller.close();
+                            } else {
+                              controller.open();
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child: child,
                           ),
                         ),
+                      ),
+                    ),
                     menuChildren: List.generate(
                       ContentRating.values.length,
                       (index) => Builder(
@@ -302,12 +303,9 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                                 );
                               } else {
                                 config.value = config.value.copyWith(
-                                  contentRating:
-                                      config.value.contentRating
-                                          .where(
-                                            (element) => element != content,
-                                          )
-                                          .toSet(),
+                                  contentRating: config.value.contentRating
+                                      .where((element) => element != content)
+                                      .toSet(),
                                 );
                               }
                             },
@@ -327,12 +325,9 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                               ElevatedButton.icon(
                                 onPressed: () {
                                   config.value = config.value.copyWith(
-                                    contentRating:
-                                        config.value.contentRating
-                                            .where(
-                                              (element) => element != content,
-                                            )
-                                            .toSet(),
+                                    contentRating: config.value.contentRating
+                                        .where((element) => element != content)
+                                        .toSet(),
                                   );
                                 },
                                 icon: const Icon(Icons.close),
@@ -397,10 +392,9 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                           label: Text(groupInfo.attributes.name),
                           onDeleted: () {
                             config.value = config.value.copyWith(
-                              groupBlacklist:
-                                  config.value.groupBlacklist
-                                      .where((element) => element != group)
-                                      .toSet(),
+                              groupBlacklist: config.value.groupBlacklist
+                                  .where((element) => element != group)
+                                  .toSet(),
                             );
                           },
                         ),
@@ -422,10 +416,9 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                           label: Text(group),
                           onDeleted: () {
                             config.value = config.value.copyWith(
-                              groupBlacklist:
-                                  config.value.groupBlacklist
-                                      .where((element) => element != group)
-                                      .toSet(),
+                              groupBlacklist: config.value.groupBlacklist
+                                  .where((element) => element != group)
+                                  .toSet(),
                             );
                           },
                         ),

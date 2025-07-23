@@ -147,7 +147,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
 
     for (final c in categoriesToUpdate) {
       if (favorites.containsKey(c)) {
-        linksToUpdate.addAll(favorites[c]!);
+        linksToUpdate.addAll(favorites[c]!.list.toList());
       }
     }
 

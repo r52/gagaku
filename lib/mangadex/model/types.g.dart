@@ -11,10 +11,9 @@ Chapter _$ChapterFromJson(Map<String, dynamic> json) => Chapter(
   attributes: ChapterAttributes.fromJson(
     json['attributes'] as Map<String, dynamic>,
   ),
-  relationships:
-      (json['relationships'] as List<dynamic>)
-          .map((e) => MangaDexEntity.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  relationships: (json['relationships'] as List<dynamic>)
+      .map((e) => MangaDexEntity.fromJson(e as Map<String, dynamic>))
+      .toList(),
   $type: json['type'] as String?,
 );
 
@@ -27,16 +26,12 @@ Map<String, dynamic> _$ChapterToJson(Chapter instance) => <String, dynamic>{
 
 Manga _$MangaFromJson(Map<String, dynamic> json) => Manga(
   id: json['id'] as String,
-  attributes:
-      json['attributes'] == null
-          ? null
-          : MangaAttributes.fromJson(
-            json['attributes'] as Map<String, dynamic>,
-          ),
-  relationships:
-      (json['relationships'] as List<dynamic>?)
-          ?.map((e) => MangaDexEntity.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  attributes: json['attributes'] == null
+      ? null
+      : MangaAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
+  relationships: (json['relationships'] as List<dynamic>?)
+      ?.map((e) => MangaDexEntity.fromJson(e as Map<String, dynamic>))
+      .toList(),
   related: $enumDecodeNullable(_$MangaRelationsEnumMap, json['related']),
   $type: json['type'] as String?,
 );
@@ -70,10 +65,9 @@ const _$MangaRelationsEnumMap = {
 
 User _$UserFromJson(Map<String, dynamic> json) => User(
   id: json['id'] as String,
-  attributes:
-      json['attributes'] == null
-          ? null
-          : UserAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
+  attributes: json['attributes'] == null
+      ? null
+      : UserAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
   $type: json['type'] as String?,
 );
 
@@ -121,12 +115,9 @@ Map<String, dynamic> _$CreatorIDToJson(CreatorID instance) => <String, dynamic>{
 
 CoverArt _$CoverArtFromJson(Map<String, dynamic> json) => CoverArt(
   id: json['id'] as String,
-  attributes:
-      json['attributes'] == null
-          ? null
-          : CoverArtAttributes.fromJson(
-            json['attributes'] as Map<String, dynamic>,
-          ),
+  attributes: json['attributes'] == null
+      ? null
+      : CoverArtAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
   $type: json['type'] as String?,
 );
 
@@ -155,10 +146,9 @@ CustomList _$CustomListFromJson(Map<String, dynamic> json) => CustomList(
   attributes: CustomListAttributes.fromJson(
     json['attributes'] as Map<String, dynamic>,
   ),
-  relationships:
-      (json['relationships'] as List<dynamic>)
-          .map((e) => MangaDexEntity.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  relationships: (json['relationships'] as List<dynamic>)
+      .map((e) => MangaDexEntity.fromJson(e as Map<String, dynamic>))
+      .toList(),
   $type: json['type'] as String?,
 );
 
@@ -206,8 +196,9 @@ _ChapterAPIData _$ChapterAPIDataFromJson(Map<String, dynamic> json) =>
     _ChapterAPIData(
       hash: json['hash'] as String,
       data: (json['data'] as List<dynamic>).map((e) => e as String).toList(),
-      dataSaver:
-          (json['dataSaver'] as List<dynamic>).map((e) => e as String).toList(),
+      dataSaver: (json['dataSaver'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
     );
 
 Map<String, dynamic> _$ChapterAPIDataToJson(_ChapterAPIData instance) =>
@@ -232,10 +223,9 @@ _MDEntityList _$MDEntityListFromJson(Map<String, dynamic> json) =>
     _MDEntityList(
       result: json['result'] as String,
       response: json['response'] as String,
-      data:
-          (json['data'] as List<dynamic>)
-              .map((e) => MangaDexEntity.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      data: (json['data'] as List<dynamic>)
+          .map((e) => MangaDexEntity.fromJson(e as Map<String, dynamic>))
+          .toList(),
       limit: (json['limit'] as num).toInt(),
       offset: (json['offset'] as num).toInt(),
       total: (json['total'] as num).toInt(),
@@ -269,15 +259,13 @@ Map<String, dynamic> _$MangaLinksToJson(_MangaLinks instance) =>
 _MangaAttributes _$MangaAttributesFromJson(Map<String, dynamic> json) =>
     _MangaAttributes(
       title: Map<String, String>.from(json['title'] as Map),
-      altTitles:
-          (json['altTitles'] as List<dynamic>)
-              .map((e) => Map<String, String>.from(e as Map))
-              .toList(),
+      altTitles: (json['altTitles'] as List<dynamic>)
+          .map((e) => Map<String, String>.from(e as Map))
+          .toList(),
       description: Map<String, String>.from(json['description'] as Map),
-      links:
-          json['links'] == null
-              ? null
-              : MangaLinks.fromJson(json['links'] as Map<String, dynamic>),
+      links: json['links'] == null
+          ? null
+          : MangaLinks.fromJson(json['links'] as Map<String, dynamic>),
       originalLanguage: const LanguageConverter().fromJson(
         json['originalLanguage'],
       ),
@@ -290,10 +278,9 @@ _MangaAttributes _$MangaAttributesFromJson(Map<String, dynamic> json) =>
       status: $enumDecode(_$MangaStatusEnumMap, json['status']),
       year: (json['year'] as num?)?.toInt(),
       contentRating: $enumDecode(_$ContentRatingEnumMap, json['contentRating']),
-      tags:
-          (json['tags'] as List<dynamic>)
-              .map((e) => Tag.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      tags: (json['tags'] as List<dynamic>)
+          .map((e) => Tag.fromJson(e as Map<String, dynamic>))
+          .toList(),
       version: (json['version'] as num).toInt(),
       createdAt: const TimestampSerializer().fromJson(json['createdAt']),
       updatedAt: const TimestampSerializer().fromJson(json['updatedAt']),
@@ -492,12 +479,11 @@ Map<String, dynamic> _$ChapterStatisticsResponseToJson(
 
 _MangaStatistics _$MangaStatisticsFromJson(Map<String, dynamic> json) =>
     _MangaStatistics(
-      comments:
-          json['comments'] == null
-              ? null
-              : StatisticsDetailsComments.fromJson(
-                json['comments'] as Map<String, dynamic>,
-              ),
+      comments: json['comments'] == null
+          ? null
+          : StatisticsDetailsComments.fromJson(
+              json['comments'] as Map<String, dynamic>,
+            ),
       rating: StatisticsDetailsRating.fromJson(
         json['rating'] as Map<String, dynamic>,
       ),
@@ -513,12 +499,11 @@ Map<String, dynamic> _$MangaStatisticsToJson(_MangaStatistics instance) =>
 
 _ChapterStatistics _$ChapterStatisticsFromJson(Map<String, dynamic> json) =>
     _ChapterStatistics(
-      comments:
-          json['comments'] == null
-              ? null
-              : StatisticsDetailsComments.fromJson(
-                json['comments'] as Map<String, dynamic>,
-              ),
+      comments: json['comments'] == null
+          ? null
+          : StatisticsDetailsComments.fromJson(
+              json['comments'] as Map<String, dynamic>,
+            ),
     );
 
 Map<String, dynamic> _$ChapterStatisticsToJson(_ChapterStatistics instance) =>

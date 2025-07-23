@@ -47,6 +47,47 @@ final class ProxyProvider
 
 String _$proxyHash() => r'8a4e90bb9775641c76f0be18ce9750786e3b2a4b';
 
+@ProviderFor(favoritesList)
+const favoritesListProvider = FavoritesListProvider._();
+
+final class FavoritesListProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<WebFavoritesList>>,
+          List<WebFavoritesList>,
+          Stream<List<WebFavoritesList>>
+        >
+    with
+        $FutureModifier<List<WebFavoritesList>>,
+        $StreamProvider<List<WebFavoritesList>> {
+  const FavoritesListProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'favoritesListProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$favoritesListHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<List<WebFavoritesList>> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<List<WebFavoritesList>> create(Ref ref) {
+    return favoritesList(ref);
+  }
+}
+
+String _$favoritesListHash() => r'65d7c97916f626d27f7c04ab2bee9594379b3c34';
+
 @ProviderFor(WebSourceFavorites)
 const webSourceFavoritesProvider = WebSourceFavoritesProvider._();
 
@@ -54,7 +95,7 @@ final class WebSourceFavoritesProvider
     extends
         $AsyncNotifierProvider<
           WebSourceFavorites,
-          Map<String, List<HistoryLink>>
+          Map<String, WebFavoritesList>
         > {
   const WebSourceFavoritesProvider._()
     : super(
@@ -76,11 +117,11 @@ final class WebSourceFavoritesProvider
 }
 
 String _$webSourceFavoritesHash() =>
-    r'c8183125f0ca25be2c0ab0b100dfd16a567f9b94';
+    r'd424dc459e14f11511915e5b328253ba7f8ab717';
 
 abstract class _$WebSourceFavorites
-    extends $AsyncNotifier<Map<String, List<HistoryLink>>> {
-  FutureOr<Map<String, List<HistoryLink>>> build();
+    extends $AsyncNotifier<Map<String, WebFavoritesList>> {
+  FutureOr<Map<String, WebFavoritesList>> build();
   @$mustCallSuper
   @override
   void runBuild() {
@@ -88,17 +129,17 @@ abstract class _$WebSourceFavorites
     final ref =
         this.ref
             as $Ref<
-              AsyncValue<Map<String, List<HistoryLink>>>,
-              Map<String, List<HistoryLink>>
+              AsyncValue<Map<String, WebFavoritesList>>,
+              Map<String, WebFavoritesList>
             >;
     final element =
         ref.element
             as $ClassProviderElement<
               AnyNotifier<
-                AsyncValue<Map<String, List<HistoryLink>>>,
-                Map<String, List<HistoryLink>>
+                AsyncValue<Map<String, WebFavoritesList>>,
+                Map<String, WebFavoritesList>
               >,
-              AsyncValue<Map<String, List<HistoryLink>>>,
+              AsyncValue<Map<String, WebFavoritesList>>,
               Object?,
               Object?
             >;
@@ -110,7 +151,7 @@ abstract class _$WebSourceFavorites
 const webSourceHistoryProvider = WebSourceHistoryProvider._();
 
 final class WebSourceHistoryProvider
-    extends $AsyncNotifierProvider<WebSourceHistory, Queue<HistoryLink>> {
+    extends $AsyncNotifierProvider<WebSourceHistory, WebFavoritesList> {
   const WebSourceHistoryProvider._()
     : super(
         from: null,
@@ -130,21 +171,21 @@ final class WebSourceHistoryProvider
   WebSourceHistory create() => WebSourceHistory();
 }
 
-String _$webSourceHistoryHash() => r'c628fef95497386236877f4b452293d66d7ad95f';
+String _$webSourceHistoryHash() => r'ff7d1a93c7930f218176d93f6a2a128201b15f57';
 
-abstract class _$WebSourceHistory extends $AsyncNotifier<Queue<HistoryLink>> {
-  FutureOr<Queue<HistoryLink>> build();
+abstract class _$WebSourceHistory extends $AsyncNotifier<WebFavoritesList> {
+  FutureOr<WebFavoritesList> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
     final ref =
-        this.ref as $Ref<AsyncValue<Queue<HistoryLink>>, Queue<HistoryLink>>;
+        this.ref as $Ref<AsyncValue<WebFavoritesList>, WebFavoritesList>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<Queue<HistoryLink>>, Queue<HistoryLink>>,
-              AsyncValue<Queue<HistoryLink>>,
+              AnyNotifier<AsyncValue<WebFavoritesList>, WebFavoritesList>,
+              AsyncValue<WebFavoritesList>,
               Object?,
               Object?
             >;
@@ -156,7 +197,7 @@ abstract class _$WebSourceHistory extends $AsyncNotifier<Queue<HistoryLink>> {
 const webReadMarkersProvider = WebReadMarkersProvider._();
 
 final class WebReadMarkersProvider
-    extends $AsyncNotifierProvider<WebReadMarkers, Map<String, Set<String>>> {
+    extends $AsyncNotifierProvider<WebReadMarkers, ReadMarkersDB> {
   const WebReadMarkersProvider._()
     : super(
         from: null,
@@ -176,35 +217,67 @@ final class WebReadMarkersProvider
   WebReadMarkers create() => WebReadMarkers();
 }
 
-String _$webReadMarkersHash() => r'85072d9873e221da4ec97977e70d020e81752f36';
+String _$webReadMarkersHash() => r'bb00ffe6be12a1c897dea6b5ec9aea47c2d9b61a';
 
-abstract class _$WebReadMarkers
-    extends $AsyncNotifier<Map<String, Set<String>>> {
-  FutureOr<Map<String, Set<String>>> build();
+abstract class _$WebReadMarkers extends $AsyncNotifier<ReadMarkersDB> {
+  FutureOr<ReadMarkersDB> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref =
-        this.ref
-            as $Ref<
-              AsyncValue<Map<String, Set<String>>>,
-              Map<String, Set<String>>
-            >;
+    final ref = this.ref as $Ref<AsyncValue<ReadMarkersDB>, ReadMarkersDB>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<
-                AsyncValue<Map<String, Set<String>>>,
-                Map<String, Set<String>>
-              >,
-              AsyncValue<Map<String, Set<String>>>,
+              AnyNotifier<AsyncValue<ReadMarkersDB>, ReadMarkersDB>,
+              AsyncValue<ReadMarkersDB>,
               Object?,
               Object?
             >;
     element.handleValue(ref, created);
   }
 }
+
+@ProviderFor(installedSources)
+const installedSourcesProvider = InstalledSourcesProvider._();
+
+final class InstalledSourcesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<WebSourceInfo>>,
+          List<WebSourceInfo>,
+          Stream<List<WebSourceInfo>>
+        >
+    with
+        $FutureModifier<List<WebSourceInfo>>,
+        $StreamProvider<List<WebSourceInfo>> {
+  const InstalledSourcesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'installedSourcesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$installedSourcesHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<List<WebSourceInfo>> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<List<WebSourceInfo>> create(Ref ref) {
+    return installedSources(ref);
+  }
+}
+
+String _$installedSourcesHash() => r'ec6937fd410c5666607ee8943bb59a91ffb42b23';
 
 @ProviderFor(ExtensionSource)
 const extensionSourceProvider = ExtensionSourceFamily._();
@@ -247,7 +320,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'770cb27b110b4686e715c0e8e2f29fd102be7190';
+String _$extensionSourceHash() => r'c10a451b242b41e6d0dab67be755008ed4e62f98';
 
 final class ExtensionSourceFamily extends $Family
     with
@@ -321,7 +394,7 @@ final class ExtensionInfoListProvider
   ExtensionInfoList create() => ExtensionInfoList();
 }
 
-String _$extensionInfoListHash() => r'05c7ab9b9fbd82c74fe15598b6cb718c4253a4a0';
+String _$extensionInfoListHash() => r'5450a457cad1e9211abd092e3a12fdea12901a9f';
 
 abstract class _$ExtensionInfoList
     extends $AsyncNotifier<Map<String, WebSourceInfo>> {

@@ -6,32 +6,9 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-WebSourceCategory _$WebSourceCategoryFromJson(Map<String, dynamic> json) =>
-    WebSourceCategory(json['id'] as String, json['name'] as String);
-
-Map<String, dynamic> _$WebSourceCategoryToJson(WebSourceCategory instance) =>
-    <String, dynamic>{'id': instance.id, 'name': instance.name};
-
-_WebSourceConfig _$WebSourceConfigFromJson(Map<String, dynamic> json) =>
-    _WebSourceConfig(
-      installedSources:
-          (json['installedSources'] as List<dynamic>?)
-              ?.map((e) => WebSourceInfo.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-      repoList:
-          (json['repoList'] as List<dynamic>?)
-              ?.map(const RepoConverter().fromJson)
-              .toList() ??
-          const [],
-      categories:
-          (json['categories'] as List<dynamic>?)
-              ?.map(
-                (e) => WebSourceCategory.fromJson(e as Map<String, dynamic>),
-              )
-              .toList() ??
-          const [_defaultCategory],
-      defaultCategory: json['defaultCategory'] as String? ?? _defaultUUID,
+_ExtensionConfig _$ExtensionConfigFromJson(Map<String, dynamic> json) =>
+    _ExtensionConfig(
+      defaultCategory: json['defaultCategory'] as String? ?? '',
       categoriesToUpdate:
           (json['categoriesToUpdate'] as List<dynamic>?)
               ?.map((e) => e as String)
@@ -39,15 +16,11 @@ _WebSourceConfig _$WebSourceConfigFromJson(Map<String, dynamic> json) =>
           const [],
     );
 
-Map<String, dynamic> _$WebSourceConfigToJson(
-  _WebSourceConfig instance,
-) => <String, dynamic>{
-  'installedSources': instance.installedSources.map((e) => e.toJson()).toList(),
-  'repoList': instance.repoList.map(const RepoConverter().toJson).toList(),
-  'categories': instance.categories.map((e) => e.toJson()).toList(),
-  'defaultCategory': instance.defaultCategory,
-  'categoriesToUpdate': instance.categoriesToUpdate,
-};
+Map<String, dynamic> _$ExtensionConfigToJson(_ExtensionConfig instance) =>
+    <String, dynamic>{
+      'defaultCategory': instance.defaultCategory,
+      'categoriesToUpdate': instance.categoriesToUpdate,
+    };
 
 // **************************************************************************
 // RiverpodGenerator
@@ -57,7 +30,7 @@ Map<String, dynamic> _$WebSourceConfigToJson(
 const webConfigProvider = WebConfigProvider._();
 
 final class WebConfigProvider
-    extends $NotifierProvider<WebConfig, WebSourceConfig> {
+    extends $NotifierProvider<WebConfig, ExtensionConfig> {
   const WebConfigProvider._()
     : super(
         from: null,
@@ -77,28 +50,28 @@ final class WebConfigProvider
   WebConfig create() => WebConfig();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(WebSourceConfig value) {
+  Override overrideWithValue(ExtensionConfig value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<WebSourceConfig>(value),
+      providerOverride: $SyncValueProvider<ExtensionConfig>(value),
     );
   }
 }
 
-String _$webConfigHash() => r'4bccb93a95d460642c1c8e845848bf3091caac30';
+String _$webConfigHash() => r'0108df5eecc30e803ef368fae85de1a09737f8c7';
 
-abstract class _$WebConfig extends $Notifier<WebSourceConfig> {
-  WebSourceConfig build();
+abstract class _$WebConfig extends $Notifier<ExtensionConfig> {
+  ExtensionConfig build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<WebSourceConfig, WebSourceConfig>;
+    final ref = this.ref as $Ref<ExtensionConfig, ExtensionConfig>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<WebSourceConfig, WebSourceConfig>,
-              WebSourceConfig,
+              AnyNotifier<ExtensionConfig, ExtensionConfig>,
+              ExtensionConfig,
               Object?,
               Object?
             >;
@@ -110,7 +83,7 @@ abstract class _$WebConfig extends $Notifier<WebSourceConfig> {
 const extensionStateProvider = ExtensionStateProvider._();
 
 final class ExtensionStateProvider
-    extends $NotifierProvider<ExtensionState, ExtensionStateMap> {
+    extends $NotifierProvider<ExtensionState, ExtensionStateDB> {
   const ExtensionStateProvider._()
     : super(
         from: null,
@@ -130,28 +103,28 @@ final class ExtensionStateProvider
   ExtensionState create() => ExtensionState();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(ExtensionStateMap value) {
+  Override overrideWithValue(ExtensionStateDB value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<ExtensionStateMap>(value),
+      providerOverride: $SyncValueProvider<ExtensionStateDB>(value),
     );
   }
 }
 
-String _$extensionStateHash() => r'8041816f19647b41f164799cc6063757a6997893';
+String _$extensionStateHash() => r'793a03042a21a1c60a0703659f419051266ffd10';
 
-abstract class _$ExtensionState extends $Notifier<ExtensionStateMap> {
-  ExtensionStateMap build();
+abstract class _$ExtensionState extends $Notifier<ExtensionStateDB> {
+  ExtensionStateDB build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<ExtensionStateMap, ExtensionStateMap>;
+    final ref = this.ref as $Ref<ExtensionStateDB, ExtensionStateDB>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<ExtensionStateMap, ExtensionStateMap>,
-              ExtensionStateMap,
+              AnyNotifier<ExtensionStateDB, ExtensionStateDB>,
+              ExtensionStateDB,
               Object?,
               Object?
             >;
@@ -163,7 +136,7 @@ abstract class _$ExtensionState extends $Notifier<ExtensionStateMap> {
 const extensionSecureStateProvider = ExtensionSecureStateProvider._();
 
 final class ExtensionSecureStateProvider
-    extends $NotifierProvider<ExtensionSecureState, ExtensionStateMap> {
+    extends $NotifierProvider<ExtensionSecureState, ExtensionStateDB> {
   const ExtensionSecureStateProvider._()
     : super(
         from: null,
@@ -183,29 +156,29 @@ final class ExtensionSecureStateProvider
   ExtensionSecureState create() => ExtensionSecureState();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(ExtensionStateMap value) {
+  Override overrideWithValue(ExtensionStateDB value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<ExtensionStateMap>(value),
+      providerOverride: $SyncValueProvider<ExtensionStateDB>(value),
     );
   }
 }
 
 String _$extensionSecureStateHash() =>
-    r'25399becce16ba4d5389b121f40921d5f46772ec';
+    r'fbce2ebe73d57cbaa9e7d959d0d66a78c36be5c0';
 
-abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateMap> {
-  ExtensionStateMap build();
+abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateDB> {
+  ExtensionStateDB build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<ExtensionStateMap, ExtensionStateMap>;
+    final ref = this.ref as $Ref<ExtensionStateDB, ExtensionStateDB>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<ExtensionStateMap, ExtensionStateMap>,
-              ExtensionStateMap,
+              AnyNotifier<ExtensionStateDB, ExtensionStateDB>,
+              ExtensionStateDB,
               Object?,
               Object?
             >;

@@ -6,21 +6,20 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_ReaderConfig _$ReaderConfigFromJson(Map<String, dynamic> json) =>
-    _ReaderConfig(
-      format:
-          $enumDecodeNullable(_$ReaderFormatEnumMap, json['format']) ??
-          ReaderFormat.single,
-      direction:
-          $enumDecodeNullable(_$ReaderDirectionEnumMap, json['direction']) ??
-          ReaderDirection.leftToRight,
-      showProgressBar: json['showProgressBar'] as bool? ?? false,
-      clickToTurn: json['clickToTurn'] as bool? ?? true,
-      swipeGestures: json['swipeGestures'] as bool? ?? true,
-      precacheCount: (json['precacheCount'] as num?)?.toInt() ?? 3,
-    );
+ReaderConfig _$ReaderConfigFromJson(Map<String, dynamic> json) => ReaderConfig(
+  format:
+      $enumDecodeNullable(_$ReaderFormatEnumMap, json['format']) ??
+      ReaderFormat.single,
+  direction:
+      $enumDecodeNullable(_$ReaderDirectionEnumMap, json['direction']) ??
+      ReaderDirection.leftToRight,
+  showProgressBar: json['showProgressBar'] as bool? ?? false,
+  clickToTurn: json['clickToTurn'] as bool? ?? true,
+  swipeGestures: json['swipeGestures'] as bool? ?? true,
+  precacheCount: (json['precacheCount'] as num?)?.toInt() ?? 3,
+);
 
-Map<String, dynamic> _$ReaderConfigToJson(_ReaderConfig instance) =>
+Map<String, dynamic> _$ReaderConfigToJson(ReaderConfig instance) =>
     <String, dynamic>{
       'format': _$ReaderFormatEnumMap[instance.format]!,
       'direction': _$ReaderDirectionEnumMap[instance.direction]!,
@@ -76,7 +75,7 @@ final class ReaderSettingsProvider
   }
 }
 
-String _$readerSettingsHash() => r'16becbc29d65077e2590bf708801a795db9c27e3';
+String _$readerSettingsHash() => r'6c5c1610d150145b37db8eb7cb281a6731f275bc';
 
 abstract class _$ReaderSettings extends $Notifier<ReaderConfig> {
   ReaderConfig build();

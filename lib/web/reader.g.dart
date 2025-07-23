@@ -62,7 +62,7 @@ final class _FetchWebChapterInfoProvider
 }
 
 String _$fetchWebChapterInfoHash() =>
-    r'0ae89d758f7deeab8aefa6a41104968b4f65d4dd';
+    r'170538e239c73c34dc399eabb2d6318bccd7e124';
 
 final class _FetchWebChapterInfoFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<WebReaderData>, SourceHandler> {

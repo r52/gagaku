@@ -41,9 +41,8 @@ class WebSourceHomePage extends HookConsumerWidget {
         WebSourceFavoritesRoute(),
         WebSourceHistoryRoute(),
       ],
-      transitionBuilder:
-          (context, child, animation) =>
-              FadeTransition(opacity: animation, child: child),
+      transitionBuilder: (context, child, animation) =>
+          FadeTransition(opacity: animation, child: child),
       builder: (context, child) {
         final tabsRouter = AutoTabsRouter.of(context);
 
@@ -71,18 +70,17 @@ class WebSourceHomePage extends HookConsumerWidget {
                     tooltip: tr.webSources.openLink,
                   ),
                   MenuAnchor(
-                    builder:
-                        (context, controller, child) => IconButton(
-                          color: theme.colorScheme.onPrimaryContainer,
-                          onPressed: () {
-                            if (controller.isOpen) {
-                              controller.close();
-                            } else {
-                              controller.open();
-                            }
-                          },
-                          icon: const Icon(Icons.more_vert),
-                        ),
+                    builder: (context, controller, child) => IconButton(
+                      color: theme.colorScheme.onPrimaryContainer,
+                      onPressed: () {
+                        if (controller.isOpen) {
+                          controller.close();
+                        } else {
+                          controller.open();
+                        }
+                      },
+                      icon: const Icon(Icons.more_vert),
+                    ),
                     menuChildren: [
                       MenuItemButton(
                         onPressed: () async {
@@ -124,20 +122,19 @@ class WebSourceHomePage extends HookConsumerWidget {
                         child: Text(tr.webSources.resetAllRead),
                       ),
                       MenuItemButton(
-                        onPressed:
-                            () => nav.push(
-                              SlideTransitionRouteBuilder(
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) =>
-                                        const SourceManager(),
-                              ),
-                            ),
+                        onPressed: () => nav.push(
+                          SlideTransitionRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    const SourceManager(),
+                          ),
+                        ),
                         leadingIcon: const Icon(Icons.collections_bookmark),
                         child: Text(tr.webSources.source.manager),
                       ),
                       MenuItemButton(
-                        onPressed:
-                            () => nav.push(WebSourceSettingsRouteBuilder()),
+                        onPressed: () =>
+                            nav.push(WebSourceSettingsRouteBuilder()),
                         leadingIcon: const Icon(Icons.settings),
                         child: Text(tr.arg_settings(arg: tr.webSources.text)),
                       ),

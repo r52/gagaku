@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/ui.dart';
-import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/types.dart' show RepoInfo;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,9 +18,9 @@ class RepoListManager extends HookConsumerWidget {
     final tr = context.t;
     final theme = Theme.of(context);
     final nav = Navigator.of(context);
-    final list = useState(
-      ref.watch(webConfigProvider.select((c) => c.repoList)),
-    );
+    final box = GagakuData().store.box<RepoInfo>();
+    final initial = useMemoized(() => box.getAll());
+    final list = useState(initial);
 
     return Scaffold(
       appBar: AppBar(
@@ -47,11 +47,11 @@ class RepoListManager extends HookConsumerWidget {
             color: theme.colorScheme.onPrimaryContainer,
             tooltip: tr.ui.save,
             onPressed: () {
-              webConfigSaveMutation.run(ref, (ref) async {
-                return ref
-                    .get(webConfigProvider.notifier)
-                    .saveWith(repoList: list.value);
-              });
+              final diff = initial.toSet().difference(list.value.toSet());
+
+              box.putMany(list.value);
+              box.removeMany(diff.map((e) => e.dbid).toList());
+
               nav.pop();
             },
             icon: const Icon(Icons.save),
@@ -59,44 +59,43 @@ class RepoListManager extends HookConsumerWidget {
         ],
       ),
       body: Center(
-        child:
-            list.value.isEmpty
-                ? Text(tr.errors.norepos)
-                : ListView.builder(
-                  itemCount: list.value.length,
-                  itemBuilder: (context, index) {
-                    final item = list.value.elementAt(index);
-                    return Card(
-                      child: ListTile(
-                        leading: const Icon(Icons.cloud_download),
-                        title: Text(item.name),
-                        subtitle: Text(item.url),
-                        trailing: OverflowBar(
-                          children: [
-                            IconButton(
-                              tooltip: tr.webSources.repo.browser,
-                              onPressed: () async {
-                                if (!await launchUrl(Uri.parse(item.url))) {
-                                  throw 'Could not launch $item';
-                                }
-                              },
-                              icon: const Icon(Icons.open_in_new),
-                            ),
-                            IconButton(
-                              tooltip: tr.ui.delete,
-                              onPressed: () {
-                                list.value = [
-                                  ...list.value.where((e) => e.url != item.url),
-                                ];
-                              },
-                              icon: const Icon(Icons.delete),
-                            ),
-                          ],
-                        ),
+        child: list.value.isEmpty
+            ? Text(tr.errors.norepos)
+            : ListView.builder(
+                itemCount: list.value.length,
+                itemBuilder: (context, index) {
+                  final item = list.value.elementAt(index);
+                  return Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.cloud_download),
+                      title: Text(item.name),
+                      subtitle: Text(item.url),
+                      trailing: OverflowBar(
+                        children: [
+                          IconButton(
+                            tooltip: tr.webSources.repo.browser,
+                            onPressed: () async {
+                              if (!await launchUrl(Uri.parse(item.url))) {
+                                throw 'Could not launch $item';
+                              }
+                            },
+                            icon: const Icon(Icons.open_in_new),
+                          ),
+                          IconButton(
+                            tooltip: tr.ui.delete,
+                            onPressed: () {
+                              list.value = [
+                                ...list.value.where((e) => e.url != item.url),
+                              ];
+                            },
+                            icon: const Icon(Icons.delete),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }
@@ -175,19 +174,18 @@ class NewRepoDialog extends HookWidget {
                   urlFieldController.text.startsWith(_urlStartValidation),
             );
             return ElevatedButton(
-              onPressed:
-                  urlIsValid && nameIsValid
-                      ? () {
-                        Navigator.of(context).pop(
-                          RepoInfo(
-                            name: nameFieldController.text,
-                            url: urlFieldController.text,
-                          ),
-                        );
-                        nameFieldController.clear();
-                        urlFieldController.clear();
-                      }
-                      : null,
+              onPressed: urlIsValid && nameIsValid
+                  ? () {
+                      Navigator.of(context).pop(
+                        RepoInfo(
+                          name: nameFieldController.text,
+                          url: urlFieldController.text,
+                        ),
+                      );
+                      nameFieldController.clear();
+                      urlFieldController.clear();
+                    }
+                  : null,
               child: Text(tr.ui.add),
             );
           },

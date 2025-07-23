@@ -1,0 +1,371 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:111371867039964082",
+      "lastPropertyId": "3:7984173099377989269",
+      "name": "ExtensionConfig",
+      "properties": [
+        {
+          "id": "1:702809558348999022",
+          "name": "dbid",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5985338773610867635",
+          "name": "defaultCategory",
+          "type": 9
+        },
+        {
+          "id": "3:7984173099377989269",
+          "name": "categoriesToUpdate",
+          "type": 30
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:1272000531801260819",
+      "lastPropertyId": "3:1246967688683176227",
+      "name": "ExtensionStateDB",
+      "properties": [
+        {
+          "id": "1:115932406367781731",
+          "name": "dbid",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1875153273166999490",
+          "name": "secure",
+          "type": 1
+        },
+        {
+          "id": "3:1246967688683176227",
+          "name": "dbState",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:8905727601441002465",
+      "lastPropertyId": "4:6453226003670022507",
+      "name": "GagakuConfig",
+      "properties": [
+        {
+          "id": "1:1559597783665220129",
+          "name": "dbid",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2110717126852364305",
+          "name": "dbThemeMode",
+          "type": 9
+        },
+        {
+          "id": "3:8212265773720154373",
+          "name": "dbTheme",
+          "type": 9
+        },
+        {
+          "id": "4:6453226003670022507",
+          "name": "dbGridAlbumExtent",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "4:1731686531402752321",
+      "lastPropertyId": "6:5672925307293041980",
+      "name": "HistoryLink",
+      "properties": [
+        {
+          "id": "1:6301968151465478333",
+          "name": "dbid",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8498260008821564787",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "3:5825434813974606690",
+          "name": "url",
+          "type": 9,
+          "flags": 2080,
+          "indexId": "1:2004028906787386225"
+        },
+        {
+          "id": "4:2744254492303125238",
+          "name": "cover",
+          "type": 9
+        },
+        {
+          "id": "5:1795425056450642708",
+          "name": "dbHandle",
+          "type": 9
+        },
+        {
+          "id": "6:5672925307293041980",
+          "name": "lastAccessed",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:328409103611464470",
+      "lastPropertyId": "6:7690923916094463004",
+      "name": "MangaDexConfig",
+      "properties": [
+        {
+          "id": "1:5078479494134166421",
+          "name": "dbid",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5552028329157906873",
+          "name": "dataSaver",
+          "type": 1
+        },
+        {
+          "id": "3:9047988088348082660",
+          "name": "dbTranslatedLanguages",
+          "type": 30
+        },
+        {
+          "id": "4:1319046327165113185",
+          "name": "dbOriginalLanguage",
+          "type": 30
+        },
+        {
+          "id": "5:632580891264039739",
+          "name": "dbContentRating",
+          "type": 30
+        },
+        {
+          "id": "6:7690923916094463004",
+          "name": "dbGroupBlacklist",
+          "type": 30
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "6:3370728645524358735",
+      "lastPropertyId": "2:434704016439297341",
+      "name": "MangaDexHistoryDB",
+      "properties": [
+        {
+          "id": "1:1440474707735404635",
+          "name": "dbid",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:434704016439297341",
+          "name": "queue",
+          "type": 30
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "7:498247088879987685",
+      "lastPropertyId": "2:6057485554336798550",
+      "name": "ReadMarkersDB",
+      "properties": [
+        {
+          "id": "1:5471831078013833691",
+          "name": "dbid",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6057485554336798550",
+          "name": "dbMarkers",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "8:7567026327644554216",
+      "lastPropertyId": "7:5687569147950667128",
+      "name": "ReaderConfig",
+      "properties": [
+        {
+          "id": "1:4967797488300071842",
+          "name": "dbid",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7222737130680534089",
+          "name": "showProgressBar",
+          "type": 1
+        },
+        {
+          "id": "3:5670763750426433158",
+          "name": "clickToTurn",
+          "type": 1
+        },
+        {
+          "id": "4:5346617553991309448",
+          "name": "swipeGestures",
+          "type": 1
+        },
+        {
+          "id": "5:1426230389998423643",
+          "name": "precacheCount",
+          "type": 6
+        },
+        {
+          "id": "6:7812811181229093298",
+          "name": "dbFormat",
+          "type": 9
+        },
+        {
+          "id": "7:5687569147950667128",
+          "name": "dbDirection",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "9:1939789569100104357",
+      "lastPropertyId": "3:3439045353928553187",
+      "name": "RepoInfo",
+      "properties": [
+        {
+          "id": "1:8342235021692432378",
+          "name": "dbid",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8648990468587137733",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:3439045353928553187",
+          "name": "url",
+          "type": 9,
+          "flags": 34848,
+          "indexId": "4:7797636678653461826"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "10:8266095565985557519",
+      "lastPropertyId": "4:5082996902578126382",
+      "name": "WebFavoritesList",
+      "properties": [
+        {
+          "id": "1:165971761666034467",
+          "name": "dbid",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3870597866393859547",
+          "name": "id",
+          "type": 9,
+          "flags": 2080,
+          "indexId": "2:2983538901360366658"
+        },
+        {
+          "id": "3:4918574492809522315",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:5082996902578126382",
+          "name": "sortOrder",
+          "type": 6
+        }
+      ],
+      "relations": [
+        {
+          "id": "1:5189061811819065121",
+          "name": "list",
+          "targetId": "4:1731686531402752321"
+        }
+      ]
+    },
+    {
+      "id": "11:1274503423913450017",
+      "lastPropertyId": "8:4028296935011566577",
+      "name": "WebSourceInfo",
+      "properties": [
+        {
+          "id": "1:3465719663841848016",
+          "name": "dbid",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4575450355582749360",
+          "name": "id",
+          "type": 9,
+          "flags": 34848,
+          "indexId": "3:973920413218894359"
+        },
+        {
+          "id": "3:1178427608296848149",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:2897245036507037625",
+          "name": "repo",
+          "type": 9
+        },
+        {
+          "id": "5:8000323717328380231",
+          "name": "baseUrl",
+          "type": 9
+        },
+        {
+          "id": "6:3514955494789857955",
+          "name": "icon",
+          "type": 9
+        },
+        {
+          "id": "7:4069525431648659974",
+          "name": "dbVersion",
+          "type": 9
+        },
+        {
+          "id": "8:4028296935011566577",
+          "name": "dbCapabilities",
+          "type": 27
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "11:1274503423913450017",
+  "lastIndexId": "4:7797636678653461826",
+  "lastRelationId": "1:5189061811819065121",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

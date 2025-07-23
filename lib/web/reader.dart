@@ -24,7 +24,7 @@ Future<WebReaderData> _fetchWebChapterInfo(
 
   if (manga != null) {
     webSourceHistoryMutation.run(ref, (ref) async {
-      return await ref
+      await ref
           .get(webSourceHistoryProvider.notifier)
           .add(
             HistoryLink(
@@ -32,6 +32,7 @@ Future<WebReaderData> _fetchWebChapterInfo(
               url: handle.getURL(),
               cover: manga.cover,
               handle: handle,
+              lastAccessed: DateTime.now(),
             ),
           );
     });
@@ -72,8 +73,9 @@ Future<List<ReaderPage>> _getPages(Ref ref, dynamic source) async {
     links = List<String>.from(source);
   }
 
-  final pages =
-      links.map((e) => ReaderPage(provider: NetworkImage(e))).toList();
+  final pages = links
+      .map((e) => ReaderPage(provider: NetworkImage(e)))
+      .toList();
 
   ref.onDispose(() {
     pages.clear();
@@ -110,14 +112,13 @@ Future<List<ReaderPage>> _getSourcePages(
     }
   }
 
-  final pages =
-      links
-          .map(
-            (e) => ReaderPage(
-              provider: NetworkImage(e, headers: {'referer': referer}),
-            ),
-          )
-          .toList();
+  final pages = links
+      .map(
+        (e) => ReaderPage(
+          provider: NetworkImage(e, headers: {'referer': referer}),
+        ),
+      )
+      .toList();
 
   ref.onDispose(() {
     pages.clear();
@@ -166,20 +167,18 @@ class ProxyWebSourceReaderPage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchWebChapterInfoProvider(handle),
-      errorBuilder:
-          (context, child, _, _) => Scaffold(
-            appBar: AppBar(leading: AutoLeadingButton()),
-            body: child,
-          ),
-      builder:
-          (context, data) => WebSourceReaderWidget(
-            source: data.source,
-            title: data.title,
-            link: data.link,
-            handle: data.handle,
-            readKey: data.readKey,
-            onLinkPressed: data.onLinkPressed,
-          ),
+      errorBuilder: (context, child, _, _) => Scaffold(
+        appBar: AppBar(leading: AutoLeadingButton()),
+        body: child,
+      ),
+      builder: (context, data) => WebSourceReaderWidget(
+        source: data.source,
+        title: data.title,
+        link: data.link,
+        handle: data.handle,
+        readKey: data.readKey,
+        onLinkPressed: data.onLinkPressed,
+      ),
     );
   }
 }
@@ -221,20 +220,18 @@ class ExtensionReaderPage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchWebChapterInfoProvider(handle),
-      errorBuilder:
-          (context, child, _, _) => Scaffold(
-            appBar: AppBar(leading: AutoLeadingButton()),
-            body: child,
-          ),
-      builder:
-          (context, data) => WebSourceReaderWidget(
-            source: data.source,
-            title: data.title,
-            link: data.link,
-            handle: data.handle,
-            readKey: data.readKey,
-            onLinkPressed: data.onLinkPressed,
-          ),
+      errorBuilder: (context, child, _, _) => Scaffold(
+        appBar: AppBar(leading: AutoLeadingButton()),
+        body: child,
+      ),
+      builder: (context, data) => WebSourceReaderWidget(
+        source: data.source,
+        title: data.title,
+        link: data.link,
+        handle: data.handle,
+        readKey: data.readKey,
+        onLinkPressed: data.onLinkPressed,
+      ),
     );
   }
 }
@@ -285,23 +282,20 @@ class WebSourceReaderWidget extends HookConsumerWidget {
     }, []);
 
     return DataProviderWhenWidget(
-      provider:
-          handle.type == SourceType.proxy
-              ? _getPagesProvider(source)
-              : _getSourcePagesProvider(source, handle),
-      errorBuilder:
-          (context, child, _, _) => Scaffold(
-            appBar: AppBar(leading: AutoLeadingButton()),
-            body: child,
-          ),
-      builder:
-          (context, pages) => ReaderWidget(
-            pages: pages,
-            title: name,
-            longstrip: false,
-            drawerHeader: link,
-            onHeaderPressed: onLinkPressed,
-          ),
+      provider: handle.type == SourceType.proxy
+          ? _getPagesProvider(source)
+          : _getSourcePagesProvider(source, handle),
+      errorBuilder: (context, child, _, _) => Scaffold(
+        appBar: AppBar(leading: AutoLeadingButton()),
+        body: child,
+      ),
+      builder: (context, pages) => ReaderWidget(
+        pages: pages,
+        title: name,
+        longstrip: false,
+        drawerHeader: link,
+        onHeaderPressed: onLinkPressed,
+      ),
     );
   }
 }
