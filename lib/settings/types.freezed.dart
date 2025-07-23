@@ -181,4 +181,153 @@ as List<String>,
 
 }
 
+
+/// @nodoc
+mixin _$FavoriteListExport {
+
+ String get id; String get name; int get sortOrder; List<String> get list;
+/// Create a copy of FavoriteListExport
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FavoriteListExportCopyWith<FavoriteListExport> get copyWith => _$FavoriteListExportCopyWithImpl<FavoriteListExport>(this as FavoriteListExport, _$identity);
+
+  /// Serializes this FavoriteListExport to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FavoriteListExport&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder)&&const DeepCollectionEquality().equals(other.list, list));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,name,sortOrder,const DeepCollectionEquality().hash(list));
+
+@override
+String toString() {
+  return 'FavoriteListExport(id: $id, name: $name, sortOrder: $sortOrder, list: $list)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FavoriteListExportCopyWith<$Res>  {
+  factory $FavoriteListExportCopyWith(FavoriteListExport value, $Res Function(FavoriteListExport) _then) = _$FavoriteListExportCopyWithImpl;
+@useResult
+$Res call({
+ String id, String name, int sortOrder, List<String> list
+});
+
+
+
+
+}
+/// @nodoc
+class _$FavoriteListExportCopyWithImpl<$Res>
+    implements $FavoriteListExportCopyWith<$Res> {
+  _$FavoriteListExportCopyWithImpl(this._self, this._then);
+
+  final FavoriteListExport _self;
+  final $Res Function(FavoriteListExport) _then;
+
+/// Create a copy of FavoriteListExport
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? sortOrder = null,Object? list = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,sortOrder: null == sortOrder ? _self.sortOrder : sortOrder // ignore: cast_nullable_to_non_nullable
+as int,list: null == list ? _self.list : list // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _FavoriteListExport implements FavoriteListExport {
+  const _FavoriteListExport({required this.id, required this.name, required this.sortOrder, required final  List<String> list}): _list = list;
+  factory _FavoriteListExport.fromJson(Map<String, dynamic> json) => _$FavoriteListExportFromJson(json);
+
+@override final  String id;
+@override final  String name;
+@override final  int sortOrder;
+ final  List<String> _list;
+@override List<String> get list {
+  if (_list is EqualUnmodifiableListView) return _list;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_list);
+}
+
+
+/// Create a copy of FavoriteListExport
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FavoriteListExportCopyWith<_FavoriteListExport> get copyWith => __$FavoriteListExportCopyWithImpl<_FavoriteListExport>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FavoriteListExportToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FavoriteListExport&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder)&&const DeepCollectionEquality().equals(other._list, _list));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,name,sortOrder,const DeepCollectionEquality().hash(_list));
+
+@override
+String toString() {
+  return 'FavoriteListExport(id: $id, name: $name, sortOrder: $sortOrder, list: $list)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FavoriteListExportCopyWith<$Res> implements $FavoriteListExportCopyWith<$Res> {
+  factory _$FavoriteListExportCopyWith(_FavoriteListExport value, $Res Function(_FavoriteListExport) _then) = __$FavoriteListExportCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String name, int sortOrder, List<String> list
+});
+
+
+
+
+}
+/// @nodoc
+class __$FavoriteListExportCopyWithImpl<$Res>
+    implements _$FavoriteListExportCopyWith<$Res> {
+  __$FavoriteListExportCopyWithImpl(this._self, this._then);
+
+  final _FavoriteListExport _self;
+  final $Res Function(_FavoriteListExport) _then;
+
+/// Create a copy of FavoriteListExport
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? sortOrder = null,Object? list = null,}) {
+  return _then(_FavoriteListExport(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,sortOrder: null == sortOrder ? _self.sortOrder : sortOrder // ignore: cast_nullable_to_non_nullable
+as int,list: null == list ? _self._list : list // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
+}
+
+
+}
+
 // dart format on

@@ -43,8 +43,7 @@ class AppSettingsPage extends HookConsumerWidget {
       output[key as String] = djson;
     }
 
-    // TODO exporter v2
-    final outputdata = await const GagakuBackupDataV1().write(output);
+    final outputdata = await const GagakuBackupDataV2().write(output);
 
     if (!context.mounted) return null;
     final result = await FilePicker.platform.saveFile(
@@ -121,6 +120,9 @@ class AppSettingsPage extends HookConsumerWidget {
     final jdata = json.decode(udata) as Map<String, dynamic>;
 
     switch (jdata["version"]) {
+      case 2:
+        await const GagakuBackupDataV2().read(jdata);
+        break;
       case 1:
       default:
         await const GagakuBackupDataV1().read(jdata);

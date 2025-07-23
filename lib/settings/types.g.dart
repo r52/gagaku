@@ -48,3 +48,19 @@ Map<String, dynamic> _$WebSourceConfigToJson(
   'defaultCategory': instance.defaultCategory,
   'categoriesToUpdate': instance.categoriesToUpdate,
 };
+
+_FavoriteListExport _$FavoriteListExportFromJson(Map<String, dynamic> json) =>
+    _FavoriteListExport(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      sortOrder: (json['sortOrder'] as num).toInt(),
+      list: (json['list'] as List<dynamic>).map((e) => e as String).toList(),
+    );
+
+Map<String, dynamic> _$FavoriteListExportToJson(_FavoriteListExport instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'sortOrder': instance.sortOrder,
+      'list': instance.list,
+    };

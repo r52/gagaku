@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:gagaku/log.dart';
@@ -11,52 +12,34 @@ import 'package:gagaku/settings/types.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart' show historyListUUID;
 import 'package:gagaku/web/model/types.dart';
-import 'package:meta/meta.dart';
 
 const _versionKey = "version";
 
 abstract interface class GagakuBackupDataConverter {
-  @mustBeOverridden
   Future<void> read(Map<String, dynamic> data);
-  @mustBeOverridden
   Future<String> write(Map<String, dynamic> data);
 
-  @mustBeOverridden
   Future<void> importExtensionState(Map<String, dynamic> json);
-  @mustBeOverridden
   Future<void> writeExtensionState(Map<String, dynamic> json);
-  @mustBeOverridden
   Future<void> importExtensionSecureState(Map<String, dynamic> json);
-  @mustBeOverridden
   Future<void> writeExtensionSecureState(Map<String, dynamic> json);
 
-  @mustBeOverridden
   Future<void> importGagakuConfig(Map<String, dynamic> json);
-  @mustBeOverridden
   Future<void> writeGagakuConfig(Map<String, dynamic> json);
 
-  @mustBeOverridden
   Future<void> importReaderConfig(Map<String, dynamic> json);
-  @mustBeOverridden
   Future<void> writeReaderConfig(Map<String, dynamic> json);
 
-  @mustBeOverridden
   Future<void> importMangadexConfig(Map<String, dynamic> json);
-  @mustBeOverridden
   Future<void> writeMangadexConfig(Map<String, dynamic> json);
-  @mustBeOverridden
+
   Future<void> importMangadexHistory(Map<String, dynamic> json);
-  @mustBeOverridden
   Future<void> writeMangadexHistory(Map<String, dynamic> json);
 
-  @mustBeOverridden
   Future<void> importWebReadHistory(Map<String, dynamic> json);
-  @mustBeOverridden
   Future<void> writeWebReadHistory(Map<String, dynamic> json);
 
-  @mustBeOverridden
   Future<void> importWebConfigFavoritesHistory(Map<String, dynamic> json);
-  @mustBeOverridden
   Future<void> writeWebConfigFavoritesHistory(Map<String, dynamic> json);
 }
 
@@ -547,6 +530,502 @@ class GagakuBackupDataV1 implements GagakuBackupDataConverter {
       for (var item in favlists)
         item.id: item.list.map((i) => i.toJson()).toList(),
     };
+  }
+
+  @override
+  Future<void> writeWebReadHistory(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<ReadMarkersDB>();
+    final query = box.query().build();
+
+    ReadMarkersDB? db;
+    db = await query.findUniqueAsync();
+    query.close();
+
+    if (db != null) {
+      data[_webReadMarkersKey] = db.markers.map(
+        (key, value) => MapEntry(key, value.toList()),
+      );
+    }
+  }
+}
+
+class GagakuBackupDataV2 implements GagakuBackupDataConverter {
+  const GagakuBackupDataV2();
+
+  static const _extenstionStateKey = "extension-state";
+  static const _extenstionSecureStateKey = "extension-secure-state";
+  static const _readerConfigKey = "reader";
+  static const _mangadexConfigKey = "mangadex";
+  static const _gagakuConfigKey = "gagaku";
+  static const _mangadexHistoryKey = "mangadex_history";
+  static const _webfavoritesKey = "web_favorites";
+  static const _webhistoryKey = "web_history";
+  static const _webReadMarkersKey = "web_read_markers";
+  static const _webConfigKey = "web_config";
+  static const _extRepoListKey = "ext-repo-list";
+  static const _extInstalledSourcesKey = "ext-installed-sources";
+  static const _linkCacheKey = "link-cache";
+
+  @override
+  Future<void> read(Map<String, dynamic> data) async {
+    await importExtensionState(data);
+    await importExtensionSecureState(data);
+    await importGagakuConfig(data);
+    await importReaderConfig(data);
+    await importMangadexConfig(data);
+    await importMangadexHistory(data);
+    await importWebReadHistory(data);
+    await importWebConfigFavoritesHistory(data);
+  }
+
+  @override
+  Future<String> write(Map<String, dynamic> data) async {
+    data[_versionKey] = 2;
+
+    await writeExtensionState(data);
+    await writeExtensionSecureState(data);
+    await writeGagakuConfig(data);
+    await writeReaderConfig(data);
+    await writeMangadexConfig(data);
+    await writeMangadexHistory(data);
+    await writeWebReadHistory(data);
+    await writeWebConfigFavoritesHistory(data);
+
+    final output = json.encode(data);
+    return output;
+  }
+
+  @override
+  Future<void> importExtensionSecureState(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<ExtensionStateDB>();
+    final query = box.query(ExtensionStateDB_.secure.equals(true)).build();
+
+    ExtensionStateDB? db;
+    db = await query.findUniqueAsync();
+    db ??= ExtensionStateDB(secure: true);
+    query.close();
+
+    final key = _extenstionSecureStateKey;
+    if (data.containsKey(key)) {
+      final state = data[key] as Map<String, dynamic>;
+      final content = state.cast<String, Map<String, dynamic>>();
+      db.state = content;
+
+      box.put(db);
+    }
+  }
+
+  @override
+  Future<void> importExtensionState(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<ExtensionStateDB>();
+    final query = box.query(ExtensionStateDB_.secure.equals(false)).build();
+
+    ExtensionStateDB? db;
+    db = await query.findUniqueAsync();
+    db ??= ExtensionStateDB(secure: false);
+    query.close();
+
+    final key = _extenstionStateKey;
+    if (data.containsKey(key)) {
+      final state = data[key] as Map<String, dynamic>;
+      final content = state.cast<String, Map<String, dynamic>>();
+      db.state = content;
+
+      box.put(db);
+    }
+  }
+
+  @override
+  Future<void> importGagakuConfig(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<GagakuConfig>();
+    final query = box.query().build();
+
+    GagakuConfig? cfg;
+    cfg = await query.findUniqueAsync();
+    query.close();
+
+    final key = _gagakuConfigKey;
+    if (data.containsKey(key)) {
+      final state = data[key];
+
+      final c = GagakuConfig.fromJson(state);
+      if (cfg != null) {
+        c.dbid = cfg.dbid;
+      }
+
+      box.put(c);
+    }
+  }
+
+  @override
+  Future<void> importMangadexConfig(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<MangaDexConfig>();
+    final query = box.query().build();
+
+    MangaDexConfig? cfg;
+    cfg = await query.findUniqueAsync();
+    query.close();
+
+    final key = _mangadexConfigKey;
+    if (data.containsKey(key)) {
+      final state = data[key];
+
+      final c = MangaDexConfig.fromJson(state);
+      if (cfg != null) {
+        c.dbid = cfg.dbid;
+      }
+
+      box.put(c);
+    }
+  }
+
+  @override
+  Future<void> importMangadexHistory(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<MangaDexHistoryDB>();
+    final query = box.query().build();
+
+    MangaDexHistoryDB? db;
+    db = await query.findUniqueAsync();
+    db ??= MangaDexHistoryDB();
+    query.close();
+
+    final key = _mangadexHistoryKey;
+    if (data.containsKey(key)) {
+      final state = data[key];
+
+      if (state is! List) {
+        // invalid type
+        logger.w('Data in $key not a List');
+        return;
+      }
+
+      final content = List<String>.from(state);
+      db.queue = content;
+
+      box.put(db);
+    }
+  }
+
+  @override
+  Future<void> importReaderConfig(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<ReaderConfig>();
+    final query = box.query().build();
+
+    ReaderConfig? cfg;
+    cfg = await query.findUniqueAsync();
+    query.close();
+
+    final key = _readerConfigKey;
+    if (data.containsKey(key)) {
+      final state = data[key];
+
+      final c = ReaderConfig.fromJson(state);
+      if (cfg != null) {
+        c.dbid = cfg.dbid;
+      }
+
+      box.put(c);
+    }
+  }
+
+  @override
+  Future<void> importWebReadHistory(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<ReadMarkersDB>();
+    final query = box.query().build();
+
+    ReadMarkersDB? db;
+    db = await query.findUniqueAsync();
+    db ??= ReadMarkersDB();
+    query.close();
+
+    final key = _webReadMarkersKey;
+    if (data.containsKey(key)) {
+      final content = data[key] as Map<String, dynamic>;
+
+      final markers = content.map((m, s) => MapEntry(m, Set<String>.from(s)));
+      db.markers = markers;
+
+      box.put(db);
+    }
+  }
+
+  Future<void> importExtensionConfig(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<ExtensionConfig>();
+    final query = box.query().build();
+
+    ExtensionConfig? cfg;
+    cfg = await query.findUniqueAsync();
+    query.close();
+
+    final key = _webConfigKey;
+    if (data.containsKey(key)) {
+      final state = data[key];
+
+      final c = ExtensionConfig.fromJson(state);
+      if (cfg != null) {
+        c.dbid = cfg.dbid;
+      }
+
+      box.put(c);
+    }
+  }
+
+  Future<void> importInstalledSources(Map<String, dynamic> data) async {
+    final sbox = GagakuData().store.box<WebSourceInfo>();
+    sbox.removeAll();
+
+    final key = _extInstalledSourcesKey;
+    if (data.containsKey(key) && data[key] is List) {
+      final list = data[key] as List<dynamic>;
+      final sources = list.map((e) => WebSourceInfo.fromJson(e)).toList();
+      sbox.putMany(sources);
+    }
+  }
+
+  Future<void> importRepoList(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<RepoInfo>();
+    box.removeAll();
+
+    final key = _extRepoListKey;
+    if (data.containsKey(key) && data[key] is List) {
+      final list = data[key] as List<dynamic>;
+      final repos = list.map((e) => RepoInfo.fromJson(e)).toList();
+      box.putMany(repos);
+    }
+  }
+
+  @override
+  Future<void> importWebConfigFavoritesHistory(
+    Map<String, dynamic> data,
+  ) async {
+    await importExtensionConfig(data);
+    await importInstalledSources(data);
+    await importRepoList(data);
+
+    // link cache
+    final linkbox = GagakuData().store.box<HistoryLink>();
+    await linkbox.removeAllAsync();
+    HashMap<String, HistoryLink> linkcache = HashMap();
+
+    if (data.containsKey(_linkCacheKey) && data[_linkCacheKey] is List) {
+      final list = data[_linkCacheKey] as List<dynamic>;
+      final links = list.map((e) => HistoryLink.fromJson(e)).toList();
+      final plinks = await linkbox.putAndGetManyAsync(links);
+      linkcache.addEntries(plinks.map((l) => MapEntry(l.url, l)));
+    }
+
+    // history
+    {
+      final hbox = GagakuData().store.box<WebFavoritesList>();
+      final hq = hbox
+          .query(WebFavoritesList_.id.equals(historyListUUID))
+          .build();
+
+      WebFavoritesList? hlist;
+      hlist = await hq.findUniqueAsync();
+      hq.close();
+
+      if (hlist == null) {
+        hlist = WebFavoritesList(
+          id: historyListUUID,
+          name: 'extension_history',
+        );
+        hbox.put(hlist);
+      }
+
+      if (data.containsKey(_webhistoryKey) && data[_webhistoryKey] is List) {
+        final content = List<String>.from(
+          data[_webhistoryKey] as List<dynamic>,
+        );
+
+        hlist.list.clear();
+        final linksToAdd = [
+          for (final url in content)
+            if (linkcache.containsKey(url)) linkcache[url]!,
+        ];
+
+        hlist.list.addAll(linksToAdd);
+        hbox.put(hlist);
+      }
+    }
+
+    // fav lists
+    {
+      final fbox = GagakuData().store.box<WebFavoritesList>();
+      final fq = fbox
+          .query(WebFavoritesList_.id.notEquals(historyListUUID))
+          .build();
+
+      // remove existing lists
+      fq.remove();
+      fq.close();
+
+      if (data.containsKey(_webfavoritesKey) &&
+          data[_webfavoritesKey] is List) {
+        final newfavlist = <WebFavoritesList>[];
+
+        final list = data[_webfavoritesKey] as List<dynamic>;
+        final imported = list
+            .map((e) => FavoriteListExport.fromJson(e))
+            .toList();
+
+        for (final cat in imported) {
+          final newlist = WebFavoritesList(
+            id: cat.id,
+            name: cat.name,
+            sortOrder: cat.sortOrder,
+          );
+
+          final linksToAdd = [
+            for (final url in cat.list)
+              if (linkcache.containsKey(url)) linkcache[url]!,
+          ];
+
+          newlist.list.addAll(linksToAdd);
+          newfavlist.add(newlist);
+        }
+
+        fbox.putMany(newfavlist);
+      }
+    }
+  }
+
+  @override
+  Future<void> writeExtensionSecureState(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<ExtensionStateDB>();
+    final query = box.query(ExtensionStateDB_.secure.equals(true)).build();
+
+    ExtensionStateDB? db;
+    db = await query.findUniqueAsync();
+    query.close();
+
+    if (db != null) {
+      data[_extenstionSecureStateKey] = db.state;
+    }
+  }
+
+  @override
+  Future<void> writeExtensionState(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<ExtensionStateDB>();
+    final query = box.query(ExtensionStateDB_.secure.equals(false)).build();
+
+    ExtensionStateDB? db;
+    db = await query.findUniqueAsync();
+    query.close();
+
+    if (db != null) {
+      data[_extenstionStateKey] = db.state;
+    }
+  }
+
+  @override
+  Future<void> writeGagakuConfig(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<GagakuConfig>();
+    final query = box.query().build();
+
+    GagakuConfig? cfg;
+    cfg = await query.findUniqueAsync();
+    query.close();
+
+    if (cfg != null) {
+      data[_gagakuConfigKey] = cfg.toJson();
+    }
+  }
+
+  @override
+  Future<void> writeMangadexConfig(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<MangaDexConfig>();
+    final query = box.query().build();
+
+    MangaDexConfig? cfg;
+    cfg = await query.findUniqueAsync();
+    query.close();
+
+    if (cfg != null) {
+      data[_mangadexConfigKey] = cfg.toJson();
+    }
+  }
+
+  @override
+  Future<void> writeMangadexHistory(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<MangaDexHistoryDB>();
+    final query = box.query().build();
+
+    MangaDexHistoryDB? db;
+    db = await query.findUniqueAsync();
+    query.close();
+
+    if (db != null) {
+      data[_mangadexHistoryKey] = db.queue;
+    }
+  }
+
+  @override
+  Future<void> writeReaderConfig(Map<String, dynamic> data) async {
+    final box = GagakuData().store.box<ReaderConfig>();
+    final query = box.query().build();
+
+    ReaderConfig? cfg;
+    cfg = await query.findUniqueAsync();
+    query.close();
+
+    if (cfg != null) {
+      data[_readerConfigKey] = cfg.toJson();
+    }
+  }
+
+  Future<void> writeExtensionConfig(Map<String, dynamic> data) async {
+    final ecfgbox = GagakuData().store.box<ExtensionConfig>();
+    final ecfgquery = ecfgbox.query().build();
+
+    ExtensionConfig? ecfg;
+    ecfg = await ecfgquery.findUniqueAsync();
+    ecfgquery.close();
+
+    if (ecfg != null) {
+      data[_webConfigKey] = ecfg.toJson();
+    }
+  }
+
+  Future<void> writeInstalledSources(Map<String, dynamic> data) async {
+    final sbox = GagakuData().store.box<WebSourceInfo>();
+    final sources = await sbox.getAllAsync();
+
+    data[_extInstalledSourcesKey] = sources.map((e) => e.toJson()).toList();
+  }
+
+  Future<void> writeRepoList(Map<String, dynamic> data) async {
+    final rbox = GagakuData().store.box<RepoInfo>();
+    final repos = await rbox.getAllAsync();
+
+    data[_extRepoListKey] = repos.map((e) => e.toJson()).toList();
+  }
+
+  @override
+  Future<void> writeWebConfigFavoritesHistory(Map<String, dynamic> data) async {
+    await writeExtensionConfig(data);
+    await writeInstalledSources(data);
+    await writeRepoList(data);
+
+    // link cache
+    final linkbox = GagakuData().store.box<HistoryLink>();
+    final links = await linkbox.getAllAsync();
+    data[_linkCacheKey] = links.map((e) => e.toJson()).toList();
+
+    // lists
+    final listbox = GagakuData().store.box<WebFavoritesList>();
+    final lists = await listbox.getAllAsync();
+
+    final favlists = lists.where((e) => e.id != historyListUUID).toList();
+    final historylist = lists.firstWhere((e) => e.id == historyListUUID);
+
+    // history
+    data[_webhistoryKey] = historylist.list.map((i) => i.url).toList();
+
+    // fav lists
+    data[_webfavoritesKey] = favlists
+        .map((e) => FavoriteListExport.fromList(e))
+        .toList();
   }
 
   @override

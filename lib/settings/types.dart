@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:gagaku/web/model/types.dart' show RepoInfo, WebSourceInfo;
+import 'package:gagaku/web/model/types.dart'
+    show RepoInfo, WebFavoritesList, WebSourceInfo;
 import 'package:uuid/uuid.dart';
 
 part 'types.g.dart';
@@ -49,4 +50,25 @@ abstract class WebSourceConfig with _$WebSourceConfig {
 
   factory WebSourceConfig.fromJson(Map<String, dynamic> json) =>
       _$WebSourceConfigFromJson(json);
+}
+
+@freezed
+abstract class FavoriteListExport with _$FavoriteListExport {
+  const factory FavoriteListExport({
+    required String id,
+    required String name,
+    required int sortOrder,
+    required List<String> list,
+  }) = _FavoriteListExport;
+
+  factory FavoriteListExport.fromJson(Map<String, dynamic> json) =>
+      _$FavoriteListExportFromJson(json);
+
+  factory FavoriteListExport.fromList(WebFavoritesList list) =>
+      FavoriteListExport(
+        id: list.id,
+        name: list.name,
+        sortOrder: list.sortOrder,
+        list: list.list.map((i) => i.url).toList(),
+      );
 }
