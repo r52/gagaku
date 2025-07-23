@@ -123,53 +123,52 @@ class MangaDexSliverAppBar extends StatelessWidget {
                   // XXX: This changes when OAuth is released
                   me == null
                       ? IconButton(
-                        color: theme.colorScheme.onPrimaryContainer,
-                        tooltip: tr.auth.login,
-                        icon: const Icon(Icons.login),
-                        onPressed:
-                            () => context.router.push(MangaDexLoginRoute()),
-                      )
+                          color: theme.colorScheme.onPrimaryContainer,
+                          tooltip: tr.auth.login,
+                          icon: const Icon(Icons.login),
+                          onPressed: () =>
+                              context.router.push(MangaDexLoginRoute()),
+                        )
                       : MenuAnchor(
-                        builder:
-                            (context, controller, child) => IconButton(
-                              color: theme.colorScheme.onPrimaryContainer,
-                              onPressed: () {
-                                if (controller.isOpen) {
-                                  controller.close();
-                                } else {
-                                  controller.open();
-                                }
-                              },
-                              icon: const Icon(Icons.person),
-                            ),
-                        menuChildren: [
-                          Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                spacing: 10.0,
-                                children: [
-                                  CircleAvatar(child: const Icon(Icons.person)),
-                                  Text(
-                                    tr.auth.loggedInAs(
-                                      user: me.attributes?.username ?? 'null',
+                          builder: (context, controller, child) => IconButton(
+                            color: theme.colorScheme.onPrimaryContainer,
+                            onPressed: () {
+                              if (controller.isOpen) {
+                                controller.close();
+                              } else {
+                                controller.open();
+                              }
+                            },
+                            icon: const Icon(Icons.person),
+                          ),
+                          menuChildren: [
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Column(
+                                  spacing: 10.0,
+                                  children: [
+                                    CircleAvatar(
+                                      child: const Icon(Icons.person),
                                     ),
-                                  ),
-                                ],
+                                    Text(
+                                      tr.auth.loggedInAs(
+                                        user: me.attributes?.username ?? 'null',
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          MenuItemButton(
-                            onPressed:
-                                () =>
-                                    ref
-                                        .read(authControlProvider.notifier)
-                                        .logout(),
-                            leadingIcon: const Icon(Icons.logout),
-                            child: Text(tr.auth.logout),
-                          ),
-                        ],
-                      ),
+                            MenuItemButton(
+                              onPressed: () => ref
+                                  .read(authControlProvider.notifier)
+                                  .logout(),
+                              leadingIcon: const Icon(Icons.logout),
+                              child: Text(tr.auth.logout),
+                            ),
+                          ],
+                        ),
                 // ignore: unused_local_variable
                 AsyncValue(:final error?, :final stackTrace?) => const Icon(
                   Icons.error,
@@ -196,21 +195,17 @@ class MangaProviderCarousel extends StatelessWidget {
     return Center(
       child: DataProviderWhenWidget(
         provider: provider,
-        builder:
-            (context, items) => ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 256),
-              child: CarouselView(
-                itemExtent: 180,
-                shrinkExtent: 180,
-                enableSplash: false,
-                children:
-                    items
-                        .map(
-                          (e) => GridMangaItem(key: ValueKey(e.id), manga: e),
-                        )
-                        .toList(),
-              ),
-            ),
+        builder: (context, items) => ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 256),
+          child: CarouselView(
+            itemExtent: 180,
+            shrinkExtent: 180,
+            enableSplash: false,
+            children: items
+                .map((e) => GridMangaItem(key: ValueKey(e.id), manga: e))
+                .toList(),
+          ),
+        ),
         errorBuilder: (context, defaultChild, error, stacktrace) {
           return Column(
             children: [Text('$error'), Text(stacktrace.toString())],
@@ -273,10 +268,9 @@ class MarkReadButton extends ConsumerWidget {
         tooltip: tr.mangaView.markAs(
           arg: isRead == true ? tr.mangaView.unread : tr.mangaView.read,
         ),
-        icon:
-            isRead == true
-                ? Icon(Icons.visibility_off, color: theme.disabledColor)
-                : Icon(Icons.visibility, color: theme.primaryIconTheme.color),
+        icon: isRead == true
+            ? Icon(Icons.visibility_off, color: theme.disabledColor)
+            : Icon(Icons.visibility, color: theme.primaryIconTheme.color),
         constraints: const BoxConstraints(
           minWidth: 20.0,
           minHeight: 20.0,
@@ -338,72 +332,66 @@ class ChapterFeedWidget extends HookWidget {
               ),
             PagingListener(
               controller: controller,
-              builder:
-                  (context, state, fetchNextPage) => HookConsumer(
-                    builder: (context, ref, child) {
-                      final api = ref.watch(mangadexProvider);
-                      final chapters = state.items;
+              builder: (context, state, fetchNextPage) => HookConsumer(
+                builder: (context, ref, child) {
+                  final api = ref.watch(mangadexProvider);
+                  final chapters = state.items;
 
-                      final builtItems = useMemoized(() async {
-                        if (chapters == null) {
-                          return null;
-                        }
+                  final builtItems = useMemoized(() async {
+                    if (chapters == null) {
+                      return null;
+                    }
 
-                        final mangaIds =
-                            chapters.map((e) => e.manga.id).toSet();
-                        final mangas = await api.fetchMangaById(
-                          ids: mangaIds,
-                          limit: MangaDexEndpoints.breakLimit,
-                        );
+                    final mangaIds = chapters.map((e) => e.manga.id).toSet();
+                    final mangas = await api.fetchMangaById(
+                      ids: mangaIds,
+                      limit: MangaDexEndpoints.breakLimit,
+                    );
 
-                        final items = ChapterFeedItemData.toData(
-                          chapters,
-                          mangas,
-                        );
+                    final items = ChapterFeedItemData.toData(chapters, mangas);
 
-                        return items;
-                      }, [state]);
+                    return items;
+                  }, [state]);
 
-                      final future = useFuture(builtItems);
+                  final future = useFuture(builtItems);
 
-                      final newState = PagingState<int, ChapterFeedItemData>(
-                        pages:
-                            state.keys == null || !future.hasData
-                                ? null
-                                : List.generate(
-                                  state.keys!.length,
-                                  (i) => i == 0 ? future.data! : [],
-                                ),
-                        keys: future.hasData ? state.keys : null,
-                        hasNextPage: state.hasNextPage,
-                        isLoading:
-                            future.connectionState == ConnectionState.waiting ||
-                            !future.hasData ||
-                            state.isLoading,
+                  final newState = PagingState<int, ChapterFeedItemData>(
+                    pages: state.keys == null || !future.hasData
+                        ? null
+                        : List.generate(
+                            state.keys!.length,
+                            (i) => i == 0 ? future.data! : [],
+                          ),
+                    keys: future.hasData ? state.keys : null,
+                    hasNextPage: state.hasNextPage,
+                    isLoading:
+                        future.connectionState == ConnectionState.waiting ||
+                        !future.hasData ||
+                        state.isLoading,
+                  );
+
+                  return PagedSuperSliverList(
+                    state: newState,
+                    fetchNextPage: fetchNextPage,
+                    findChildIndexCallback: (key) {
+                      final valueKey = key as ValueKey<int>;
+                      final val = newState.items!.indexWhere(
+                        (i) => i.id == valueKey.value,
                       );
-
-                      return PagedSuperSliverList(
-                        state: newState,
-                        fetchNextPage: fetchNextPage,
-                        findChildIndexCallback: (key) {
-                          final valueKey = key as ValueKey<int>;
-                          final val = newState.items!.indexWhere(
-                            (i) => i.id == valueKey.value,
-                          );
-                          return val >= 0 ? val : null;
-                        },
-                        builderDelegate:
-                            PagedChildBuilderDelegate<ChapterFeedItemData>(
-                              animateTransitions: true,
-                              itemBuilder:
-                                  (context, item, index) => ChapterFeedItem(
-                                    key: ValueKey(item.id),
-                                    state: item,
-                                  ),
-                            ),
-                      );
+                      return val >= 0 ? val : null;
                     },
-                  ),
+                    builderDelegate:
+                        PagedChildBuilderDelegate<ChapterFeedItemData>(
+                          animateTransitions: true,
+                          itemBuilder: (context, item, index) =>
+                              ChapterFeedItem(
+                                key: ValueKey(item.id),
+                                state: item,
+                              ),
+                        ),
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -449,9 +437,8 @@ class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
 class _InfiniteScrollFeedState
     extends ConsumerState<InfiniteScrollChapterFeedWidget> {
   late final _pagingController = GagakuPagingController<int, Chapter>(
-    getNextPageKey:
-        (state) =>
-            state.keys?.last != null ? state.keys!.last + widget.limit : 0,
+    getNextPageKey: (state) =>
+        state.keys?.last != null ? state.keys!.last + widget.limit : 0,
     fetchPage: (pageKey) async {
       final me = await ref.watch(loggedUserProvider.future);
       final api = ref.watch(mangadexProvider);
@@ -575,18 +562,16 @@ class _CoverButton extends ConsumerWidget {
       child: CachedNetworkImage(
         imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.small),
         cacheManager: gagakuImageCache,
-        imageBuilder:
-            (context, imageProvider) => DecoratedBox(
-              decoration: BoxDecoration(
-                image: DecorationImage(image: imageProvider),
-                borderRadius: const BorderRadius.all(Radius.circular(4.0)),
-              ),
-            ),
+        imageBuilder: (context, imageProvider) => DecoratedBox(
+          decoration: BoxDecoration(
+            image: DecorationImage(image: imageProvider),
+            borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+          ),
+        ),
         width: screenSizeSmall ? 64.0 : 128.0,
         height: screenSizeSmall ? 91.0 : 182.0,
-        progressIndicatorBuilder:
-            (context, url, downloadProgress) =>
-                const Center(child: CircularProgressIndicator()),
+        progressIndicatorBuilder: (context, url, downloadProgress) =>
+            const Center(child: CircularProgressIndicator()),
         errorWidget: (context, url, error) => const Icon(Icons.error),
         fit: BoxFit.cover,
       ),
@@ -707,60 +692,58 @@ class ChapterFeedItem extends HookWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child:
-            screenSizeSmall
-                ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    titleBtn,
-                    const Divider(height: 4.0),
-                    Row(
+        child: screenSizeSmall
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  titleBtn,
+                  const Divider(height: 4.0),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      coverBtn,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 4.0,
+                          children: state.chapters
+                              .map(
+                                (e) => _BackLinkedChapterButton(
+                                  key: ValueKey(e.id),
+                                  chapter: e,
+                                  manga: state.manga,
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            : Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  coverBtn,
+                  Expanded(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 4.0,
                       children: [
-                        coverBtn,
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 4.0,
-                            children:
-                                state.chapters
-                                    .map(
-                                      (e) => _BackLinkedChapterButton(
-                                        key: ValueKey(e.id),
-                                        chapter: e,
-                                        manga: state.manga,
-                                      ),
-                                    )
-                                    .toList(),
+                        titleBtn,
+                        const Divider(height: 10.0),
+                        ...state.chapters.map(
+                          (e) => _BackLinkedChapterButton(
+                            key: ValueKey(e.id),
+                            chapter: e,
+                            manga: state.manga,
                           ),
                         ),
                       ],
                     ),
-                  ],
-                )
-                : Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    coverBtn,
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 4.0,
-                        children: [
-                          titleBtn,
-                          const Divider(height: 10.0),
-                          ...state.chapters.map(
-                            (e) => _BackLinkedChapterButton(
-                              key: ValueKey(e.id),
-                              chapter: e,
-                              manga: state.manga,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -851,10 +834,9 @@ class ChapterButtonWidget extends HookWidget {
     final userChip = IconTextChip(
       key: ValueKey(user?.id),
       icon: isOfficialPub ? _checkIconB : null,
-      text:
-          !isOfficialPub
-              ? (user?.attributes?.username.crop() ?? '')
-              : tr.mangadex.officialPub,
+      text: !isOfficialPub
+          ? (user?.attributes?.username.crop() ?? '')
+          : tr.mangadex.officialPub,
     );
 
     final statsChip = Consumer(
@@ -930,74 +912,73 @@ class ChapterButtonWidget extends HookWidget {
       chapter: chapter,
     );
 
-    final tile =
-        screenSizeSmall
-            ? Table(
-              columnWidths: const <int, TableColumnWidth>{
-                0: FixedColumnWidth(24),
-                1: FlexColumnWidth(),
-              },
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              children: <TableRow>[
-                TableRow(children: <Widget>[markReadButton, title]),
-                TableRow(children: <Widget>[_groupIconB, groups]),
-                TableRow(
-                  children: [
-                    _personIconB,
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Expanded(
-                          child: Row(children: [Flexible(child: userChip)]),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
-                          spacing: 4.0,
-                          children: [_scheduleIconB, pubtime],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            )
-            : Table(
-              columnWidths: const <int, TableColumnWidth>{
-                0: FixedColumnWidth(24),
-                1: FlexColumnWidth(),
-                2: FixedColumnWidth(24),
-                3: FixedColumnWidth(145),
-                4: FixedColumnWidth(60),
-              },
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              children: <TableRow>[
-                TableRow(
-                  children: <Widget>[
-                    markReadButton,
-                    title,
-                    _scheduleIconB,
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [const SizedBox(width: 2.0), pubtime],
-                    ),
-                    const SizedBox.shrink(),
-                  ],
-                ),
-                TableRow(
-                  children: <Widget>[
-                    _groupIconB,
-                    groups,
-                    _personIconB,
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [Flexible(child: userChip)],
-                    ),
-                    statsChipRow,
-                  ],
-                ),
-              ],
-            );
+    final tile = screenSizeSmall
+        ? Table(
+            columnWidths: const <int, TableColumnWidth>{
+              0: FixedColumnWidth(24),
+              1: FlexColumnWidth(),
+            },
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            children: <TableRow>[
+              TableRow(children: <Widget>[markReadButton, title]),
+              TableRow(children: <Widget>[_groupIconB, groups]),
+              TableRow(
+                children: [
+                  _personIconB,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(
+                        child: Row(children: [Flexible(child: userChip)]),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: 4.0,
+                        children: [_scheduleIconB, pubtime],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          )
+        : Table(
+            columnWidths: const <int, TableColumnWidth>{
+              0: FixedColumnWidth(24),
+              1: FlexColumnWidth(),
+              2: FixedColumnWidth(24),
+              3: FixedColumnWidth(145),
+              4: FixedColumnWidth(60),
+            },
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            children: <TableRow>[
+              TableRow(
+                children: <Widget>[
+                  markReadButton,
+                  title,
+                  _scheduleIconB,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [const SizedBox(width: 2.0), pubtime],
+                  ),
+                  const SizedBox.shrink(),
+                ],
+              ),
+              TableRow(
+                children: <Widget>[
+                  _groupIconB,
+                  groups,
+                  _personIconB,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [Flexible(child: userChip)],
+                  ),
+                  statsChipRow,
+                ],
+              ),
+            ],
+          );
 
     return InkWell(
       onTap: () {
@@ -1032,6 +1013,7 @@ class MangaListWidget extends HookConsumerWidget {
     this.leading = const <Widget>[],
     this.physics,
     this.controller,
+    this.scrollBehavior = const MouseTouchScrollBehavior(),
     this.future,
     this.noController = false,
     this.showToggle = true,
@@ -1042,6 +1024,7 @@ class MangaListWidget extends HookConsumerWidget {
   final List<Widget> leading;
   final ScrollPhysics? physics;
   final ScrollController? controller;
+  final ScrollBehavior? scrollBehavior;
   final AsyncSnapshot? future;
   final bool noController;
   final bool showToggle;
@@ -1051,20 +1034,20 @@ class MangaListWidget extends HookConsumerWidget {
     final tr = context.t;
     final scrollController =
         controller ?? (noController ? null : useScrollController());
-    final view =
-        showToggle ? ref.watch(_mangaListViewProvider) : MangaListView.grid;
+    final view = showToggle
+        ? ref.watch(_mangaListViewProvider)
+        : MangaListView.grid;
 
-    final isLoading =
-        future != null
-            ? (future!.connectionState == ConnectionState.waiting ||
-                !future!.hasData)
-            : false;
+    final isLoading = future != null
+        ? (future!.connectionState == ConnectionState.waiting ||
+              !future!.hasData)
+        : false;
 
     return Stack(
       children: [
         CustomScrollView(
           controller: scrollController,
-          scrollBehavior: const MouseTouchScrollBehavior(),
+          scrollBehavior: scrollBehavior,
           physics: physics,
           cacheExtent: MediaQuery.sizeOf(context).height,
           slivers: [
@@ -1159,8 +1142,9 @@ class MangaListViewSliver extends ConsumerWidget {
     final gridExtent = ref.watch(
       gagakuSettingsProvider.select((c) => c.gridAlbumExtent),
     );
-    final view =
-        selectMode ? MangaListView.grid : ref.watch(_mangaListViewProvider);
+    final view = selectMode
+        ? MangaListView.grid
+        : ref.watch(_mangaListViewProvider);
 
     if (items != null) {
       switch (view) {
@@ -1183,8 +1167,9 @@ class MangaListViewSliver extends ConsumerWidget {
             maxCrossAxisExtent: gridExtent.detailed,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
-            childAspectRatio:
-                DeviceContext.screenWidthSmall(context) ? 1.0 : 2.0,
+            childAspectRatio: DeviceContext.screenWidthSmall(context)
+                ? 1.0
+                : 2.0,
           );
 
           return SliverGrid.builder(
@@ -1238,12 +1223,11 @@ class MangaListViewSliver extends ConsumerWidget {
               fetchNextPage: fetchNextPage,
               builderDelegate: PagedChildBuilderDelegate<Manga>(
                 animateTransitions: true,
-                itemBuilder:
-                    (context, item, index) => _ListMangaItem(
-                      key: ValueKey(item.id),
-                      manga: item,
-                      header: headers?[item.id],
-                    ),
+                itemBuilder: (context, item, index) => _ListMangaItem(
+                  key: ValueKey(item.id),
+                  manga: item,
+                  header: headers?[item.id],
+                ),
               ),
             );
           case MangaListView.detailed:
@@ -1251,8 +1235,9 @@ class MangaListViewSliver extends ConsumerWidget {
               maxCrossAxisExtent: gridExtent.detailed,
               mainAxisSpacing: 8,
               crossAxisSpacing: 8,
-              childAspectRatio:
-                  DeviceContext.screenWidthSmall(context) ? 1.0 : 2.0,
+              childAspectRatio: DeviceContext.screenWidthSmall(context)
+                  ? 1.0
+                  : 2.0,
             );
 
             return PagedSliverGrid(
@@ -1261,12 +1246,11 @@ class MangaListViewSliver extends ConsumerWidget {
               fetchNextPage: fetchNextPage,
               builderDelegate: PagedChildBuilderDelegate<Manga>(
                 animateTransitions: true,
-                itemBuilder:
-                    (context, item, index) => GridMangaDetailedItem(
-                      key: ValueKey(item.id),
-                      manga: item,
-                      header: headers?[item.id],
-                    ),
+                itemBuilder: (context, item, index) => GridMangaDetailedItem(
+                  key: ValueKey(item.id),
+                  manga: item,
+                  header: headers?[item.id],
+                ),
               ),
             );
           case MangaListView.grid:
@@ -1283,15 +1267,14 @@ class MangaListViewSliver extends ConsumerWidget {
               fetchNextPage: fetchNextPage,
               builderDelegate: PagedChildBuilderDelegate<Manga>(
                 animateTransitions: true,
-                itemBuilder:
-                    (context, item, index) => GridMangaItem(
-                      key: ValueKey(item.id),
-                      manga: item,
-                      selectMode: selectMode,
-                      selectButton: selectButton,
-                      onSelected: onSelected,
-                      header: headers?[item.id],
-                    ),
+                itemBuilder: (context, item, index) => GridMangaItem(
+                  key: ValueKey(item.id),
+                  manga: item,
+                  selectMode: selectMode,
+                  selectButton: selectButton,
+                  onSelected: onSelected,
+                  header: headers?[item.id],
+                ),
               ),
             );
         }
@@ -1334,9 +1317,8 @@ class GridMangaItem extends HookConsumerWidget {
         cacheManager: gagakuImageCache,
         width: 256.0,
         fit: BoxFit.cover,
-        progressIndicatorBuilder:
-            (context, url, downloadProgress) =>
-                const Center(child: CircularProgressIndicator()),
+        progressIndicatorBuilder: (context, url, downloadProgress) =>
+            const Center(child: CircularProgressIndicator()),
         errorWidget: (context, url, error) => const Icon(Icons.error),
       ),
     );
@@ -1368,25 +1350,24 @@ class GridMangaItem extends HookConsumerWidget {
         }
       },
       child: GridTile(
-        header:
-            selectMode
-                ? Align(
-                  alignment: Alignment.topRight,
-                  child: FloatingActionButton(
-                    heroTag: manga.id,
-                    mini: true,
-                    shape: const CircleBorder(),
-                    onPressed: () => onSelected!(manga),
-                    child: selectButton!(manga),
-                  ),
-                )
-                : (header != null
-                    ? GridAlbumTextBar(
+        header: selectMode
+            ? Align(
+                alignment: Alignment.topRight,
+                child: FloatingActionButton(
+                  heroTag: manga.id,
+                  mini: true,
+                  shape: const CircleBorder(),
+                  onPressed: () => onSelected!(manga),
+                  child: selectButton!(manga),
+                ),
+              )
+            : (header != null
+                  ? GridAlbumTextBar(
                       height: 40,
                       backgroundColor: Colors.black87,
                       text: header!,
                     )
-                    : null),
+                  : null),
         footer: GridAlbumTextBar(
           height: 80,
           leading: CountryFlag(
@@ -1493,8 +1474,8 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                       progressIndicatorBuilder:
                           (context, url, downloadProgress) =>
                               const Center(child: CircularProgressIndicator()),
-                      errorWidget:
-                          (context, url, error) => const Icon(Icons.error),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -1577,9 +1558,8 @@ class _ListMangaItem extends HookConsumerWidget {
                 ),
                 cacheManager: gagakuImageCache,
                 width: 80.0,
-                progressIndicatorBuilder:
-                    (context, url, downloadProgress) =>
-                        const Center(child: CircularProgressIndicator()),
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    const Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
                 fit: BoxFit.cover,
               ),
@@ -1671,10 +1651,9 @@ class ChapterTitle extends ConsumerWidget {
       );
 
       textstyle = TextStyle(
-        color:
-            (isRead == true
-                ? theme.disabledColor
-                : theme.colorScheme.onPrimaryContainer),
+        color: (isRead == true
+            ? theme.disabledColor
+            : theme.colorScheme.onPrimaryContainer),
       );
     }
 
@@ -1707,10 +1686,9 @@ class MangaGenreRow extends HookWidget {
             (e) => IconTextChip(
               key: ValueKey(e.id),
               text: e.attributes.name.get(tr.$meta.locale.languageCode),
-              onPressed:
-                  () => context.router.push(
-                    MangaDexTagViewRoute(tagId: e.id, tag: e),
-                  ),
+              onPressed: () => context.router.push(
+                MangaDexTagViewRoute(tagId: e.id, tag: e),
+              ),
             ),
           );
     }, [manga]);
@@ -1890,21 +1868,19 @@ class CommentChip extends HookWidget {
 
     return IconTextChip(
       icon: const Icon(Icons.chat_bubble_outline, size: 18),
-      text:
-          (comments != null)
-              ? numFormatter.format(comments!.repliesCount)
-              : 'N/A',
-      onPressed:
-          (comments != null)
-              ? () async {
-                final url =
-                    'https://forums.mangadex.org/threads/${comments!.threadId}';
+      text: (comments != null)
+          ? numFormatter.format(comments!.repliesCount)
+          : 'N/A',
+      onPressed: (comments != null)
+          ? () async {
+              final url =
+                  'https://forums.mangadex.org/threads/${comments!.threadId}';
 
-                if (!await launchUrl(Uri.parse(url))) {
-                  throw 'Could not launch $url';
-                }
+              if (!await launchUrl(Uri.parse(url))) {
+                throw 'Could not launch $url';
               }
-              : null,
+            }
+          : null,
     );
   }
 }

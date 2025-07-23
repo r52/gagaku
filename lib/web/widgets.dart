@@ -61,6 +61,7 @@ class WebMangaListWidget extends HookConsumerWidget {
     this.leading = const <Widget>[],
     this.physics,
     this.controller,
+    this.scrollBehavior = const MouseTouchScrollBehavior(),
     this.noController = false,
     this.showToggle = true,
     this.isLoading = false,
@@ -71,6 +72,7 @@ class WebMangaListWidget extends HookConsumerWidget {
   final List<Widget> leading;
   final ScrollPhysics? physics;
   final ScrollController? controller;
+  final ScrollBehavior? scrollBehavior;
   final bool noController;
   final bool showToggle;
   final bool isLoading;
@@ -88,7 +90,7 @@ class WebMangaListWidget extends HookConsumerWidget {
       children: [
         CustomScrollView(
           controller: scrollController,
-          scrollBehavior: const MouseTouchScrollBehavior(),
+          scrollBehavior: scrollBehavior,
           physics: physics,
           // cacheExtent: MediaQuery.sizeOf(context).height,
           slivers: [

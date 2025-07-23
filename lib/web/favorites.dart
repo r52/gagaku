@@ -98,6 +98,9 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
                 return WebMangaListWidget(
                   noController: true,
                   physics: const AlwaysScrollableScrollPhysics(),
+                  scrollBehavior: MouseTouchScrollBehavior().copyWith(
+                    scrollbars: false,
+                  ),
                   title: Text(
                     tr.num_titles(n: fileredItems.length),
                     style: const TextStyle(fontSize: 24),
