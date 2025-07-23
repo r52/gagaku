@@ -429,36 +429,6 @@ class WebSourceFavorites extends _$WebSourceFavorites {
 
     return udp;
   }
-
-  Future<Map<String, WebFavoritesList>> reconfigureCategories(
-    List<WebFavoritesList> categories,
-    String defaultCategory,
-  ) async {
-    final oldstate = await future;
-
-    final box = GagakuData().store.box<WebFavoritesList>();
-
-    // Move all deleted category lists to default
-    final oldkeys = oldstate.keys.toList();
-    for (final oldcat in oldkeys) {
-      if (categories.indexWhere((e) => e.id == oldcat) == -1) {
-        final list = oldstate.remove(oldcat);
-        if (oldstate.containsKey(defaultCategory)) {
-          oldstate[defaultCategory]!.list.addAll(list!.list.toList());
-          oldstate[defaultCategory]!.list.applyToDb();
-        }
-        box.remove(list!.dbid);
-      }
-    }
-
-    final nlist = await box.putAndGetManyAsync(categories);
-
-    final udp = {for (var item in nlist) item.id: item};
-
-    state = AsyncData(udp);
-
-    return udp;
-  }
 }
 
 final webSourceFavoritesMutation = Mutation<Map<String, WebFavoritesList>>();

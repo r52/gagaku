@@ -22,7 +22,6 @@ abstract class ExtensionConfig with _$ExtensionConfig {
     @Id()
     @Default(0)
     int dbid,
-    @Default('') String defaultCategory,
     @Default([]) List<String> categoriesToUpdate,
   }) = _ExtensionConfig;
 
@@ -60,15 +59,8 @@ class WebConfig extends _$WebConfig {
     return _fetch();
   }
 
-  ExtensionConfig saveWith({
-    String? defaultCategory,
-    List<String>? categoriesToUpdate,
-  }) {
+  ExtensionConfig saveWith({List<String>? categoriesToUpdate}) {
     var update = state;
-
-    if (defaultCategory != null) {
-      update = update.copyWith(defaultCategory: defaultCategory);
-    }
 
     if (categoriesToUpdate != null) {
       update = update.copyWith(categoriesToUpdate: categoriesToUpdate);

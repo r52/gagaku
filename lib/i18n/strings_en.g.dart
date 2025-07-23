@@ -124,6 +124,7 @@ class TranslationsUiEn {
 	String get retry => 'Retry';
 	String get irreversibleWarning => 'NOTE: THIS ACTION IS IRREVERSIBLE';
 	String get filterItems => 'Filter Items';
+	String get sureContinue => 'Are you sure you want to continue?';
 }
 
 // Path: errors
@@ -710,6 +711,8 @@ class TranslationsWebSourcesSettingsEn {
 	String get usedCategoryWarning => 'Category name already used';
 	String get categoriesToUpdate => 'Categories to Update';
 	String get categoriesToUpdateDesc => 'Select categories which manga will be updated in Updates view';
+	String get categoryDelete => '${_root.ui.delete} Category';
+	String get categoryDeleteWarn => 'Deleting a category will remove all items in it';
 	String get clearAll => 'Clear All Extension Settings';
 	String get clearAllDesc => 'Clears all extension settings. Recommended when replacing or upgrading extensions.';
 	String get clearAllWarning => 'Are you sure you want to delete all extension settings?';
@@ -886,6 +889,7 @@ extension on Translations {
 			case 'ui.retry': return 'Retry';
 			case 'ui.irreversibleWarning': return 'NOTE: THIS ACTION IS IRREVERSIBLE';
 			case 'ui.filterItems': return 'Filter Items';
+			case 'ui.sureContinue': return 'Are you sure you want to continue?';
 			case 'errors.noresults': return 'No results';
 			case 'errors.notitles': return 'No titles';
 			case 'errors.nomanga': return 'No manga';
@@ -956,6 +960,8 @@ extension on Translations {
 			case 'webSources.settings.usedCategoryWarning': return 'Category name already used';
 			case 'webSources.settings.categoriesToUpdate': return 'Categories to Update';
 			case 'webSources.settings.categoriesToUpdateDesc': return 'Select categories which manga will be updated in Updates view';
+			case 'webSources.settings.categoryDelete': return '${_root.ui.delete} Category';
+			case 'webSources.settings.categoryDeleteWarn': return 'Deleting a category will remove all items in it';
 			case 'webSources.settings.clearAll': return 'Clear All Extension Settings';
 			case 'webSources.settings.clearAllDesc': return 'Clears all extension settings. Recommended when replacing or upgrading extensions.';
 			case 'webSources.settings.clearAllWarning': return 'Are you sure you want to delete all extension settings?';

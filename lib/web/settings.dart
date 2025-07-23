@@ -71,16 +71,7 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                       return ref
                           .get(webConfigProvider.notifier)
                           .saveWith(
-                            defaultCategory: config.value.defaultCategory,
                             categoriesToUpdate: config.value.categoriesToUpdate,
-                          );
-                    });
-                    webSourceFavoritesMutation.run(ref, (ref) async {
-                      return await ref
-                          .get(webSourceFavoritesProvider.notifier)
-                          .reconfigureCategories(
-                            favs.value,
-                            config.value.defaultCategory,
                           );
                     });
 
@@ -130,24 +121,16 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                 return Center(
                   child: ElevatedButton.icon(
                     onPressed: () async {
-                      final result = await nav
-                          .push<(List<WebFavoritesList>, String)>(
-                            SlideTransitionRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      CategoryManager(
-                                        categories: [...favs.value],
-                                        defaultCategory:
-                                            config.value.defaultCategory,
-                                      ),
-                            ),
-                          );
+                      final result = await nav.push<List<WebFavoritesList>>(
+                        SlideTransitionRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  CategoryManager(categories: [...favs.value]),
+                        ),
+                      );
 
                       if (result != null) {
-                        favs.value = result.$1;
-                        config.value = config.value.copyWith(
-                          defaultCategory: result.$2,
-                        );
+                        favs.value = result;
                       }
                     },
                     icon: const Icon(Icons.library_add),
@@ -260,14 +243,9 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
 }
 
 class CategoryManager extends HookConsumerWidget {
-  const CategoryManager({
-    super.key,
-    required this.categories,
-    required this.defaultCategory,
-  });
+  const CategoryManager({super.key, required this.categories});
 
   final List<WebFavoritesList> categories;
-  final String defaultCategory;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -275,7 +253,6 @@ class CategoryManager extends HookConsumerWidget {
     final theme = Theme.of(context);
     final nav = Navigator.of(context);
     final list = useState(categories);
-    final defaultCat = useState(defaultCategory);
 
     return Scaffold(
       appBar: AppBar(
@@ -304,7 +281,7 @@ class CategoryManager extends HookConsumerWidget {
             color: theme.colorScheme.onPrimaryContainer,
             tooltip: tr.ui.save,
             onPressed: () {
-              nav.pop((list.value, defaultCat.value));
+              nav.pop(list.value);
             },
             icon: const Icon(Icons.save),
           ),
@@ -339,14 +316,6 @@ class CategoryManager extends HookConsumerWidget {
                       title: Text(item.name),
                       trailing: OverflowBar(
                         children: [
-                          ElevatedButton(
-                            onPressed: item.id == defaultCat.value
-                                ? null
-                                : () {
-                                    defaultCat.value = item.id;
-                                  },
-                            child: Text(tr.ui.makeDefault),
-                          ),
                           IconButton(
                             tooltip: tr.ui.rename,
                             onPressed: () async {
@@ -370,12 +339,56 @@ class CategoryManager extends HookConsumerWidget {
                             tooltip: tr.ui.delete,
                             color: Colors.red,
                             onPressed: list.value.length != 1
-                                ? () {
-                                    list.value.remove(item);
-                                    list.value = [...list.value];
+                                ? () async {
+                                    final warnResult = await showDialog<bool>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        final nav = Navigator.of(context);
+                                        return AlertDialog(
+                                          title: Text(
+                                            t
+                                                .webSources
+                                                .settings
+                                                .categoryDelete,
+                                          ),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            spacing: 6.0,
+                                            children: [
+                                              Text(
+                                                t
+                                                    .webSources
+                                                    .settings
+                                                    .categoryDeleteWarn,
+                                              ),
+                                              Text(t.ui.sureContinue),
+                                              const SizedBox.shrink(),
+                                              Text(t.ui.irreversibleWarning),
+                                            ],
+                                          ),
+                                          actions: <Widget>[
+                                            ElevatedButton(
+                                              child: Text(t.ui.no),
+                                              onPressed: () {
+                                                nav.pop(false);
+                                              },
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                nav.pop(true);
+                                              },
+                                              child: Text(t.ui.yes),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
 
-                                    if (item.id == defaultCat.value) {
-                                      defaultCat.value = list.value.first.id;
+                                    if (warnResult == true) {
+                                      list.value.remove(item);
+                                      list.value = [...list.value];
                                     }
                                   }
                                 : null,

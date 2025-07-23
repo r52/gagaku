@@ -37,12 +37,6 @@ final _entities = <obx_int.ModelEntity>[
         flags: 1,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 5985338773610867635),
-        name: 'defaultCategory',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
         id: const obx_int.IdUid(3, 7984173099377989269),
         name: 'categoriesToUpdate',
         type: 30,
@@ -478,7 +472,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
     retiredIndexUids: const [],
-    retiredPropertyUids: const [],
+    retiredPropertyUids: const [5985338773610867635],
     retiredRelationUids: const [],
     modelVersion: 5,
     modelVersionParserMinimum: 5,
@@ -495,7 +489,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         object.dbid = id;
       },
       objectToFB: (ExtensionConfig object, fb.Builder fbb) {
-        final defaultCategoryOffset = fbb.writeString(object.defaultCategory);
         final categoriesToUpdateOffset = fbb.writeList(
           object.categoriesToUpdate
               .map(fbb.writeString)
@@ -503,7 +496,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         );
         fbb.startTable(4);
         fbb.addInt64(0, object.dbid);
-        fbb.addOffset(1, defaultCategoryOffset);
         fbb.addOffset(2, categoriesToUpdateOffset);
         fbb.finish(fbb.endTable());
         return object.dbid;
@@ -517,16 +509,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
           4,
           0,
         );
-        final defaultCategoryParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 6, '');
         final categoriesToUpdateParam = const fb.ListReader<String>(
           fb.StringReader(asciiOptimization: true),
           lazy: false,
         ).vTableGet(buffer, rootOffset, 8, []);
         final object = ExtensionConfig(
           dbid: dbidParam,
-          defaultCategory: defaultCategoryParam,
           categoriesToUpdate: categoriesToUpdateParam,
         );
 
@@ -1084,15 +1072,10 @@ class ExtensionConfig_ {
     _entities[0].properties[0],
   );
 
-  /// See [ExtensionConfig.defaultCategory].
-  static final defaultCategory = obx.QueryStringProperty<ExtensionConfig>(
-    _entities[0].properties[1],
-  );
-
   /// See [ExtensionConfig.categoriesToUpdate].
   static final categoriesToUpdate =
       obx.QueryStringVectorProperty<ExtensionConfig>(
-        _entities[0].properties[2],
+        _entities[0].properties[1],
       );
 }
 

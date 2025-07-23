@@ -335,7 +335,6 @@ class GagakuBackupDataV1 implements GagakuBackupDataConverter {
       ecfg ??= ExtensionConfig();
       ecfgquery.close();
 
-      ecfg.defaultCategory = cfg.defaultCategory;
       ecfg.categoriesToUpdate = cfg.categoriesToUpdate;
 
       ecfgbox.put(ecfg);
@@ -534,7 +533,6 @@ class GagakuBackupDataV1 implements GagakuBackupDataConverter {
     final cfg = WebSourceConfig(
       categories: favlists.map((e) => WebSourceCategory(e.id, e.name)).toList(),
       categoriesToUpdate: ecfg.categoriesToUpdate,
-      defaultCategory: ecfg.defaultCategory,
       repoList: repos,
       installedSources: sources,
     );

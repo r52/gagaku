@@ -117,7 +117,7 @@ final class WebSourceFavoritesProvider
 }
 
 String _$webSourceFavoritesHash() =>
-    r'd424dc459e14f11511915e5b328253ba7f8ab717';
+    r'e0e82cedd87b618b708acbd1982fad9c69a5ebbd';
 
 abstract class _$WebSourceFavorites
     extends $AsyncNotifier<Map<String, WebFavoritesList>> {
@@ -171,7 +171,7 @@ final class WebSourceHistoryProvider
   WebSourceHistory create() => WebSourceHistory();
 }
 
-String _$webSourceHistoryHash() => r'ff7d1a93c7930f218176d93f6a2a128201b15f57';
+String _$webSourceHistoryHash() => r'9331d84452d11c7e50f9502a0564a8c72b958e02';
 
 abstract class _$WebSourceHistory extends $AsyncNotifier<WebFavoritesList> {
   FutureOr<WebFavoritesList> build();
@@ -217,7 +217,7 @@ final class WebReadMarkersProvider
   WebReadMarkers create() => WebReadMarkers();
 }
 
-String _$webReadMarkersHash() => r'bb00ffe6be12a1c897dea6b5ec9aea47c2d9b61a';
+String _$webReadMarkersHash() => r'16a0b07241c873c8d3287e36b29e64221e179706';
 
 abstract class _$WebReadMarkers extends $AsyncNotifier<ReadMarkersDB> {
   FutureOr<ReadMarkersDB> build();
@@ -320,7 +320,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'c10a451b242b41e6d0dab67be755008ed4e62f98';
+String _$extensionSourceHash() => r'1b76e7a7757d7556b3423510a866f4b9aacf4ccf';
 
 final class ExtensionSourceFamily extends $Family
     with

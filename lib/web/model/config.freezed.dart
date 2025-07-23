@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ExtensionConfig {
 
-@JsonKey(includeFromJson: false, includeToJson: false)@Id() int get dbid;@JsonKey(includeFromJson: false, includeToJson: false)@Id() set dbid(int value); String get defaultCategory; set defaultCategory(String value); List<String> get categoriesToUpdate; set categoriesToUpdate(List<String> value);
+@JsonKey(includeFromJson: false, includeToJson: false)@Id() int get dbid;@JsonKey(includeFromJson: false, includeToJson: false)@Id() set dbid(int value); List<String> get categoriesToUpdate; set categoriesToUpdate(List<String> value);
 /// Create a copy of ExtensionConfig
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,7 +30,7 @@ $ExtensionConfigCopyWith<ExtensionConfig> get copyWith => _$ExtensionConfigCopyW
 
 @override
 String toString() {
-  return 'ExtensionConfig(dbid: $dbid, defaultCategory: $defaultCategory, categoriesToUpdate: $categoriesToUpdate)';
+  return 'ExtensionConfig(dbid: $dbid, categoriesToUpdate: $categoriesToUpdate)';
 }
 
 
@@ -41,7 +41,7 @@ abstract mixin class $ExtensionConfigCopyWith<$Res>  {
   factory $ExtensionConfigCopyWith(ExtensionConfig value, $Res Function(ExtensionConfig) _then) = _$ExtensionConfigCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(includeFromJson: false, includeToJson: false)@Id() int dbid, String defaultCategory, List<String> categoriesToUpdate
+@JsonKey(includeFromJson: false, includeToJson: false)@Id() int dbid, List<String> categoriesToUpdate
 });
 
 
@@ -58,11 +58,10 @@ class _$ExtensionConfigCopyWithImpl<$Res>
 
 /// Create a copy of ExtensionConfig
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? dbid = null,Object? defaultCategory = null,Object? categoriesToUpdate = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? dbid = null,Object? categoriesToUpdate = null,}) {
   return _then(_self.copyWith(
 dbid: null == dbid ? _self.dbid : dbid // ignore: cast_nullable_to_non_nullable
-as int,defaultCategory: null == defaultCategory ? _self.defaultCategory : defaultCategory // ignore: cast_nullable_to_non_nullable
-as String,categoriesToUpdate: null == categoriesToUpdate ? _self.categoriesToUpdate : categoriesToUpdate // ignore: cast_nullable_to_non_nullable
+as int,categoriesToUpdate: null == categoriesToUpdate ? _self.categoriesToUpdate : categoriesToUpdate // ignore: cast_nullable_to_non_nullable
 as List<String>,
   ));
 }
@@ -75,11 +74,10 @@ as List<String>,
 @JsonSerializable()
 @Entity(realClass: ExtensionConfig)
 class _ExtensionConfig implements ExtensionConfig {
-   _ExtensionConfig({@JsonKey(includeFromJson: false, includeToJson: false)@Id() this.dbid = 0, this.defaultCategory = '', this.categoriesToUpdate = const []});
+   _ExtensionConfig({@JsonKey(includeFromJson: false, includeToJson: false)@Id() this.dbid = 0, this.categoriesToUpdate = const []});
   factory _ExtensionConfig.fromJson(Map<String, dynamic> json) => _$ExtensionConfigFromJson(json);
 
 @override@JsonKey(includeFromJson: false, includeToJson: false)@Id()  int dbid;
-@override@JsonKey()  String defaultCategory;
 @override@JsonKey()  List<String> categoriesToUpdate;
 
 /// Create a copy of ExtensionConfig
@@ -97,7 +95,7 @@ Map<String, dynamic> toJson() {
 
 @override
 String toString() {
-  return 'ExtensionConfig(dbid: $dbid, defaultCategory: $defaultCategory, categoriesToUpdate: $categoriesToUpdate)';
+  return 'ExtensionConfig(dbid: $dbid, categoriesToUpdate: $categoriesToUpdate)';
 }
 
 
@@ -108,7 +106,7 @@ abstract mixin class _$ExtensionConfigCopyWith<$Res> implements $ExtensionConfig
   factory _$ExtensionConfigCopyWith(_ExtensionConfig value, $Res Function(_ExtensionConfig) _then) = __$ExtensionConfigCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(includeFromJson: false, includeToJson: false)@Id() int dbid, String defaultCategory, List<String> categoriesToUpdate
+@JsonKey(includeFromJson: false, includeToJson: false)@Id() int dbid, List<String> categoriesToUpdate
 });
 
 
@@ -125,11 +123,10 @@ class __$ExtensionConfigCopyWithImpl<$Res>
 
 /// Create a copy of ExtensionConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? dbid = null,Object? defaultCategory = null,Object? categoriesToUpdate = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? dbid = null,Object? categoriesToUpdate = null,}) {
   return _then(_ExtensionConfig(
 dbid: null == dbid ? _self.dbid : dbid // ignore: cast_nullable_to_non_nullable
-as int,defaultCategory: null == defaultCategory ? _self.defaultCategory : defaultCategory // ignore: cast_nullable_to_non_nullable
-as String,categoriesToUpdate: null == categoriesToUpdate ? _self.categoriesToUpdate : categoriesToUpdate // ignore: cast_nullable_to_non_nullable
+as int,categoriesToUpdate: null == categoriesToUpdate ? _self.categoriesToUpdate : categoriesToUpdate // ignore: cast_nullable_to_non_nullable
 as List<String>,
   ));
 }

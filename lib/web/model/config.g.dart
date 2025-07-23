@@ -8,7 +8,6 @@ part of 'config.dart';
 
 _ExtensionConfig _$ExtensionConfigFromJson(Map<String, dynamic> json) =>
     _ExtensionConfig(
-      defaultCategory: json['defaultCategory'] as String? ?? '',
       categoriesToUpdate:
           (json['categoriesToUpdate'] as List<dynamic>?)
               ?.map((e) => e as String)
@@ -17,10 +16,7 @@ _ExtensionConfig _$ExtensionConfigFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$ExtensionConfigToJson(_ExtensionConfig instance) =>
-    <String, dynamic>{
-      'defaultCategory': instance.defaultCategory,
-      'categoriesToUpdate': instance.categoriesToUpdate,
-    };
+    <String, dynamic>{'categoriesToUpdate': instance.categoriesToUpdate};
 
 // **************************************************************************
 // RiverpodGenerator
@@ -58,7 +54,7 @@ final class WebConfigProvider
   }
 }
 
-String _$webConfigHash() => r'0108df5eecc30e803ef368fae85de1a09737f8c7';
+String _$webConfigHash() => r'304737f51d3bb916941dedd481c8fa249c333813';
 
 abstract class _$WebConfig extends $Notifier<ExtensionConfig> {
   ExtensionConfig build();

@@ -15,11 +15,6 @@
           "flags": 1
         },
         {
-          "id": "2:5985338773610867635",
-          "name": "defaultCategory",
-          "type": 9
-        },
-        {
           "id": "3:7984173099377989269",
           "name": "categoriesToUpdate",
           "type": 30
@@ -365,7 +360,9 @@
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    5985338773610867635
+  ],
   "retiredRelationUids": [],
   "version": 1
 }
