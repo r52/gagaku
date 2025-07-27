@@ -841,7 +841,7 @@ class ExtensionSource extends _$ExtensionSource {
           .getExtensionState(sourceId);
       await controller.callAsyncJavaScript(
         arguments: {'extstate': extstate},
-        functionBody: "window.createExtensionState(extstate);",
+        functionBody: "window.Application.createExtensionState(extstate);",
       );
 
       final extsecstate = ref
@@ -849,7 +849,8 @@ class ExtensionSource extends _$ExtensionSource {
           .getExtensionState(sourceId);
       await controller.callAsyncJavaScript(
         arguments: {'extstate': extsecstate},
-        functionBody: "window.createExtensionSecureState(extstate);",
+        functionBody:
+            "window.Application.createExtensionSecureState(extstate);",
       );
 
       // Init
@@ -883,7 +884,8 @@ class ExtensionSource extends _$ExtensionSource {
 
     final arg = args.map((e) => json.encode(e)).toList().join(",");
     final result = await _controller?.callAsyncJavaScript(
-      functionBody: "return await window.callBinding('$bindingId', $arg)",
+      functionBody:
+          "return await window.Application.callBinding('$bindingId', $arg)",
     );
 
     return result?.value;
@@ -997,7 +999,7 @@ return formid;
     final source = await future;
 
     if (!source.hasCapability(SourceIntents.discoverSections)) {
-      throw Exception("Source does not support homepages");
+      throw Exception("Source does not support discover sections");
     }
 
     final result = await _controller?.callAsyncJavaScript(

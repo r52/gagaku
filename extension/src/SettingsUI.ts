@@ -1,15 +1,8 @@
 import { Form } from "@paperback/types";
-import { PaperbackPolyfills } from "./PaperbackPolyfills";
 
 const forms: Record<string, Form> = {};
 
-// @ts-expect-error
-PaperbackPolyfills.formDidChange = function (formId: string) {
-  if ("gagaku" in globalThis) {
-    globalThis.gagaku?.callHandler("formDidChange", formId);
-  }
-};
-
+// TODO refactor this
 globalThis.initializeForm = async function (id: string, form: Form) {
   Object.assign(form, { __underlying_formId: id });
   forms[id] = form;
