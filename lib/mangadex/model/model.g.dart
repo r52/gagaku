@@ -332,7 +332,7 @@ final class UserListsProvider
   }
 }
 
-String _$userListsHash() => r'6da44adb834cd3eed979da23b82ef732cc8bd5aa';
+String _$userListsHash() => r'd81822ac7862464faac52a965edaf4d105a7f082';
 
 final class UserListsFamily extends $Family
     with
@@ -423,7 +423,7 @@ final class FollowedListsProvider
   }
 }
 
-String _$followedListsHash() => r'4aaa9bc709e5363b1369b1d71e1f95fe1993a393';
+String _$followedListsHash() => r'54cee419f2a26ec151129216f934f9e248b90445';
 
 final class FollowedListsFamily extends $Family
     with
@@ -587,7 +587,7 @@ final class TagListProvider
   TagList create() => TagList();
 }
 
-String _$tagListHash() => r'7710550e802e80112d520dbd855732c41c68ab29';
+String _$tagListHash() => r'0196fc7cdaa7989fc6255d343c1c3b2e19c37d1f';
 
 abstract class _$TagList extends $AsyncNotifier<Iterable<Tag>> {
   FutureOr<Iterable<Tag>> build();
@@ -1110,7 +1110,7 @@ final class AuthControlProvider
   AuthControl create() => AuthControl();
 }
 
-String _$authControlHash() => r'6045bfaeadb331af63daec0d99a665da85753b1a';
+String _$authControlHash() => r'13720c5ff5dd59eee2b9627e9897aadff31a6983';
 
 abstract class _$AuthControl extends $StreamNotifier<AuthenticationStatus> {
   Stream<AuthenticationStatus> build();

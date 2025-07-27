@@ -126,11 +126,6 @@ abstract class MangaDexEndpoints {
   static const me = '/user/me';
 }
 
-abstract class CacheLists {
-  static const library = 'UserLibrary({id})';
-  static const tags = 'tags';
-}
-
 class FeedInfo {
   const FeedInfo(this.key, this.limit, this.path);
 
@@ -201,6 +196,8 @@ abstract class MangaDexFeeds {
     MangaDexEndpoints.searchLimit,
     MangaDexEndpoints.manga,
   );
+  static const library = FeedInfo('UserLibrary', -1, MangaDexEndpoints.library);
+  static const tags = FeedInfo('Tags', -1, MangaDexEndpoints.tag);
 }
 
 extension TokenHelper on TokenResponse {
@@ -472,7 +469,7 @@ class MangaDexModel {
 
   /// Fetches MangaDex frontpage data
   Future<FrontPageData> fetchFrontPageData() async {
-    final key = 'FrontPageData';
+    const key = 'FrontPageData';
 
     if (await _cache.exists(key)) {
       return _cache.get<FrontPageData>(key, FrontPageData.fromJson);
@@ -829,10 +826,7 @@ class MangaDexModel {
     }
 
     // Throw if failure
-    final msg =
-        "getMangaFollowing() failed. Response code: ${response.statusCode}";
-    logger.e(msg, error: response.data);
-    throw Exception(msg);
+    throw createException("getMangaFollowing() failed.", response);
   }
 
   /// Sets the manga's following status [setFollow] of the [manga]
@@ -1088,10 +1082,12 @@ class MangaDexModel {
       );
     }
 
+    const feed = MangaDexFeeds.library;
+
     decoder(String key, value) =>
         MapEntry(key, MangaReadingStatus.values.byName(value));
 
-    final cachekey = CacheLists.library.replaceFirst('{id}', userId);
+    final cachekey = '${feed.key}($userId)';
 
     if (await _cache.exists(cachekey)) {
       logger.d("Retrieving cached user library of user $userId");
@@ -1101,7 +1097,7 @@ class MangaDexModel {
       return libMap;
     }
 
-    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.library);
+    final uri = MangaDexEndpoints.api.replace(path: feed.path);
 
     final response = await _dio.getUri(uri);
 
@@ -1129,11 +1125,11 @@ class MangaDexModel {
 
   /// Retrieve all MangaDex tags
   Future<MDEntityList> getTagList() async {
-    if (await _cache.exists(CacheLists.tags)) {
-      return await _cache.getEntityList(CacheLists.tags);
+    if (await _cache.exists(MangaDexFeeds.tags.key)) {
+      return await _cache.getEntityList(MangaDexFeeds.tags.key);
     }
 
-    final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.tag);
+    final uri = MangaDexEndpoints.api.replace(path: MangaDexFeeds.tags.path);
 
     final response = await _dio.getUri(uri);
 
@@ -1142,7 +1138,7 @@ class MangaDexModel {
 
       // Cache the data and list
       await _cache.putEntityList(
-        CacheLists.tags,
+        MangaDexFeeds.tags.key,
         result,
         resolve: false,
         expiry: const Duration(days: 1),
@@ -1511,51 +1507,6 @@ class MangaDexModel {
     throw createException("fetchListById() failed.", response);
   }
 
-  /// Fetches logged user's followed [CustomList] list
-  ///
-  /// [offset] denotes the nth item to start fetching from.
-  ///
-  /// Do not use directly. Use [followedListsProvider] instead
-  Future<List<CustomList>> fetchFollowedList({int offset = 0}) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "fetchFollowedList() called on invalid token/login. Shouldn't ever get here",
-      );
-    }
-
-    final info = MangaDexFeeds.followedLists;
-
-    final queryParams = {
-      'limit': info.limit.toString(),
-      'offset': offset.toString(),
-    };
-
-    final uri = MangaDexEndpoints.api.replace(
-      path: info.path!,
-      queryParameters: queryParams,
-    );
-
-    final response = await _dio.getUri(uri);
-
-    if (response.statusCode == 200) {
-      final result = MDEntityList.fromJson(response.data);
-
-      // Cache entries
-      await _cache.putAllAPIResolved(result.data);
-
-      final list = <CustomList>[];
-
-      for (final e in result.data) {
-        list.add(_cache.get<CustomList>(e.id, CustomList.fromJson));
-      }
-
-      return list;
-    }
-
-    // Throw if failure
-    throw createException("fetchFollowedList() failed.", response);
-  }
-
   /// Adds/removes a [CustomList] from user followed list
   Future<bool> setFollowList(CustomList list, bool follow) async {
     if (!await loggedIn()) {
@@ -1597,25 +1548,27 @@ class MangaDexModel {
 
   /// Fetches logged user's [CustomList] list
   ///
-  /// [offset] denotes the nth item to start fetching from.
+  /// [feed]    feed to use
+  /// [offset]  the nth item to start fetching from
   ///
-  /// Do not use directly. Use [userListsProvider] instead
-  Future<List<CustomList>> fetchUserList({int offset = 0}) async {
+  /// Do not use directly. Use [userListsProvider] or [followedListsProvider] instead
+  Future<List<CustomList>> fetchUserList({
+    required FeedInfo feed,
+    int offset = 0,
+  }) async {
     if (!await loggedIn()) {
       throw StateError(
         "fetchUserList() called on invalid token/login. Shouldn't ever get here",
       );
     }
 
-    final info = MangaDexFeeds.userLists;
-
     final queryParams = {
-      'limit': info.limit.toString(),
+      'limit': feed.limit.toString(),
       'offset': offset.toString(),
     };
 
     final uri = MangaDexEndpoints.api.replace(
-      path: info.path!,
+      path: feed.path!,
       queryParameters: queryParams,
     );
 
@@ -2039,7 +1992,10 @@ class UserLists extends _$UserLists
   @override
   Future<List<CustomList>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
-    final lists = await api.fetchUserList(offset: offset);
+    final lists = await api.fetchUserList(
+      feed: MangaDexFeeds.userLists,
+      offset: offset,
+    );
 
     disposeAfter(const Duration(minutes: 5));
 
@@ -2155,7 +2111,10 @@ class FollowedLists extends _$FollowedLists
   @override
   Future<List<CustomList>> fetchData(int offset) async {
     final api = ref.watch(mangadexProvider);
-    final lists = await api.fetchFollowedList(offset: offset);
+    final lists = await api.fetchUserList(
+      feed: MangaDexFeeds.followedLists,
+      offset: offset,
+    );
 
     disposeAfter(const Duration(minutes: 5));
 
@@ -2263,7 +2222,7 @@ class TagList extends _$TagList with AutoDisposeExpiryMix {
 
     final list = await api.getTagList();
 
-    disposeAfter(const Duration(minutes: 5));
+    disposeAfter(const Duration(minutes: 60));
 
     return list.data.cast<Tag>();
   }
@@ -2560,25 +2519,6 @@ class MangaDexHistory extends _$MangaDexHistory {
     });
 
     return Queue.of(chapters);
-
-    // final box = Hive.box(gagakuDataBox);
-    // final str = box.get('mangadex_history');
-
-    // if (str == null || (str as String).isEmpty) {
-    //   return Queue<Chapter>();
-    // }
-
-    // final api = ref.watch(mangadexProvider);
-    // final content = json.decode(str) as List<dynamic>;
-    // final uuids = List<String>.from(content);
-
-    // final chapters = await api.fetchChapters(uuids);
-
-    // chapterStatsMutation.run(ref, (ref) async {
-    //   return await ref.get(chapterStatsProvider.notifier).get(chapters);
-    // });
-
-    // return Queue.of(chapters);
   }
 
   Future<Chapter> add(Chapter chapter) async {
@@ -2652,7 +2592,7 @@ class AuthControl extends _$AuthControl {
     final api = ref.watch(mangadexProvider);
 
     // Invalidate stuff
-    await api.invalidateCacheItem(CacheLists.library);
+    await api.invalidateAll(MangaDexFeeds.library.key);
     ref.invalidate(userLibraryProvider);
     ref.invalidate(readChaptersProvider);
     ref.invalidate(ratingsProvider);

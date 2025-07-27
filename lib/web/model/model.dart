@@ -691,16 +691,20 @@ class ExtensionSource extends _$ExtensionSource {
 
   @override
   Future<WebSourceInfo> build(String sourceId) async {
-    final completer = Completer<void>();
-
-    // Let this throw here if not found
-    final box = GagakuData().store.box<WebSourceInfo>();
-    final query = box.query(WebSourceInfo_.id.equals(sourceId)).build();
-    final source = await query.findUniqueAsync();
-
-    if (source == null) {
-      throw Exception("Source $sourceId failed to initialize: not installed");
+    WebSourceInfo? source;
+    try {
+      final box = GagakuData().store.box<WebSourceInfo>();
+      final query = box.query(WebSourceInfo_.id.equals(sourceId)).build();
+      source = await query.findUniqueAsync();
+      if (source == null) {
+        throw Exception("Source $sourceId failed to initialize: not installed");
+      }
+    } catch (e) {
+      logger.e('Error retrieving source info from database', error: e);
+      rethrow; // Re-throw to prevent further execution
     }
+
+    final completer = Completer<void>();
 
     try {
       _view = HeadlessInAppWebView(
@@ -709,137 +713,10 @@ class ExtensionSource extends _$ExtensionSource {
         ),
         initialSettings: InAppWebViewSettings(isInspectable: kDebugMode),
         onWebViewCreated: (controller) {
-          controller.addJavaScriptHandler(
-            handlerName: 'resetAllState',
-            callback: (JavaScriptHandlerFunctionData data) {
-              ref.read(extensionStateProvider.notifier).resetAllState(sourceId);
-            },
-          );
-
-          controller.addJavaScriptHandler(
-            handlerName: 'setExtensionState',
-            callback: (JavaScriptHandlerFunctionData data) {
-              ref
-                  .read(extensionStateProvider.notifier)
-                  .setExtensionState(sourceId, data.args[0]);
-            },
-          );
-
-          controller.addJavaScriptHandler(
-            handlerName: 'setExtensionSecureState',
-            callback: (JavaScriptHandlerFunctionData data) {
-              ref
-                  .read(extensionSecureStateProvider.notifier)
-                  .setExtensionState(sourceId, data.args[0]);
-            },
-          );
-
-          controller.addJavaScriptHandler(
-            handlerName: 'formDidChange',
-            callback: (JavaScriptHandlerFunctionData data) {
-              final formId = data.args[0] as String;
-
-              if (!_forms.containsKey(formId)) {
-                logger.w('Tried to refresh non-existent form $formId');
-                return;
-              }
-
-              _forms[formId]!.reloadForm();
-            },
-          );
-
-          controller.addJavaScriptHandler(
-            handlerName: 'initializeForm',
-            callback: (JavaScriptHandlerFunctionData data) {
-              final formId = data.args[0] as String;
-
-              _forms.putIfAbsent(
-                formId,
-                () => SettingsForm(id: formId, controller: controller),
-              );
-            },
-          );
-
-          controller.addJavaScriptHandler(
-            handlerName: 'uninitializeForms',
-            callback: (JavaScriptHandlerFunctionData data) {
-              _forms.clear();
-            },
-          );
+          _setupJavaScriptHandlers(controller, sourceId);
         },
-        // onConsoleMessage: (controller, consoleMessage) {
-        //   logger.d('Console Message: ${consoleMessage.message}');
-        // },
-        onLoadStop: (controller, url) async {
-          await controller.injectJavascriptFileFromAsset(
-            assetFilePath: "assets/extensionhost/bundle.js",
-          );
-
-          final sourceFile = switch (source.version) {
-            SupportedVersion.v0_8 => 'source.js',
-            SupportedVersion.v0_9 => 'index.js',
-          };
-
-          final scriptUrl = '${source.repo}/${source.id}/$sourceFile';
-          final response = await http.get(Uri.parse(scriptUrl));
-
-          if (response.statusCode != 200) {
-            final err = "Failed to load $scriptUrl";
-            logger.d(err);
-            completer.completeError(Exception(err));
-            return;
-          }
-
-          final script = response.body;
-          await controller.evaluateJavascript(source: script);
-
-          if (source.version == SupportedVersion.v0_8) {
-            await controller.evaluateJavascript(
-              source:
-                  "var ${source.id} = window.CompatWrapper({registerHomeSectionsInInitialise: true}, new window.Sources['${source.id}'](window.cheerio));",
-            );
-          } else {
-            // 0.9
-            await controller.evaluateJavascript(
-              source: "var ${source.id} = window.source.${source.id};",
-            );
-          }
-
-          // Set extension state
-          final extstate = ref
-              .read(extensionStateProvider.notifier)
-              .getExtensionState(sourceId);
-          await controller.callAsyncJavaScript(
-            arguments: {'extstate': extstate},
-            functionBody: "window.createExtensionState(extstate);",
-          );
-
-          final extsecstate = ref
-              .read(extensionStateProvider.notifier)
-              .getExtensionState(sourceId);
-          await controller.callAsyncJavaScript(
-            arguments: {'extstate': extsecstate},
-            functionBody: "window.createExtensionSecureState(extstate);",
-          );
-
-          // Init
-          await controller.callAsyncJavaScript(
-            functionBody: "return await ${source.id}.initialise();",
-          );
-
-          // Get tags
-          final result = await controller.callAsyncJavaScript(
-            functionBody: "return await ${source.id}?.getSearchFilters();",
-          );
-
-          if (result != null && result.value != null) {
-            final rsec = result.value as List<dynamic>;
-            _filters = rsec.map((e) => SearchFilter.fromJson(e)).toList();
-          }
-
-          logger.d("Extension ${source.name} ready");
-          completer.complete();
-        },
+        onLoadStop: (controller, url) =>
+            _onWebViewLoadStop(controller, url, source!, completer),
       );
     } catch (e) {
       logger.w('Error creating extension view', error: e);
@@ -854,6 +731,148 @@ class ExtensionSource extends _$ExtensionSource {
     });
 
     return source;
+  }
+
+  void _setupJavaScriptHandlers(
+    InAppWebViewController controller,
+    String sourceId,
+  ) {
+    controller.addJavaScriptHandler(
+      handlerName: 'resetAllState',
+      callback: (JavaScriptHandlerFunctionData data) {
+        ref.read(extensionStateProvider.notifier).resetAllState(sourceId);
+      },
+    );
+
+    controller.addJavaScriptHandler(
+      handlerName: 'setExtensionState',
+      callback: (JavaScriptHandlerFunctionData data) {
+        ref
+            .read(extensionStateProvider.notifier)
+            .setExtensionState(sourceId, data.args[0]);
+      },
+    );
+
+    controller.addJavaScriptHandler(
+      handlerName: 'setExtensionSecureState',
+      callback: (JavaScriptHandlerFunctionData data) {
+        ref
+            .read(extensionSecureStateProvider.notifier)
+            .setExtensionState(sourceId, data.args[0]);
+      },
+    );
+
+    controller.addJavaScriptHandler(
+      handlerName: 'formDidChange',
+      callback: (JavaScriptHandlerFunctionData data) {
+        final formId = data.args[0] as String;
+
+        if (!_forms.containsKey(formId)) {
+          logger.w('Tried to refresh non-existent form $formId');
+          return;
+        }
+
+        _forms[formId]!.reloadForm();
+      },
+    );
+
+    controller.addJavaScriptHandler(
+      handlerName: 'initializeForm',
+      callback: (JavaScriptHandlerFunctionData data) {
+        final formId = data.args[0] as String;
+
+        _forms.putIfAbsent(
+          formId,
+          () => SettingsForm(id: formId, controller: controller),
+        );
+      },
+    );
+
+    controller.addJavaScriptHandler(
+      handlerName: 'uninitializeForms',
+      callback: (JavaScriptHandlerFunctionData data) {
+        _forms.clear();
+      },
+    );
+  }
+
+  Future<void> _onWebViewLoadStop(
+    InAppWebViewController controller,
+    Uri? url,
+    WebSourceInfo source,
+    Completer<void> completer,
+  ) async {
+    try {
+      await controller.injectJavascriptFileFromAsset(
+        assetFilePath: "assets/extensionhost/bundle.js",
+      );
+
+      final sourceFile = switch (source.version) {
+        SupportedVersion.v0_8 => 'source.js',
+        SupportedVersion.v0_9 => 'index.js',
+      };
+
+      final scriptUrl = '${source.repo}/${source.id}/$sourceFile';
+      final response = await http.get(Uri.parse(scriptUrl));
+
+      if (response.statusCode != 200) {
+        final err = "Failed to load $scriptUrl";
+        logger.d(err);
+        completer.completeError(Exception(err));
+        return;
+      }
+
+      final script = response.body;
+      await controller.evaluateJavascript(source: script);
+
+      final sourceId = source.id;
+
+      final initScript = switch (source.version) {
+        SupportedVersion.v0_8 =>
+          "var ${source.id} = window.CompatWrapper({registerHomeSectionsInInitialise: true}, new window.Sources['${source.id}'](window.cheerio));",
+        SupportedVersion.v0_9 =>
+          "var ${source.id} = window.source.${source.id};",
+      };
+      await controller.evaluateJavascript(source: initScript);
+
+      // Set extension state
+      final extstate = ref
+          .read(extensionStateProvider.notifier)
+          .getExtensionState(sourceId);
+      await controller.callAsyncJavaScript(
+        arguments: {'extstate': extstate},
+        functionBody: "window.createExtensionState(extstate);",
+      );
+
+      final extsecstate = ref
+          .read(extensionStateProvider.notifier)
+          .getExtensionState(sourceId);
+      await controller.callAsyncJavaScript(
+        arguments: {'extstate': extsecstate},
+        functionBody: "window.createExtensionSecureState(extstate);",
+      );
+
+      // Init
+      await controller.callAsyncJavaScript(
+        functionBody: "return await ${source.id}.initialise();",
+      );
+
+      // Get tags
+      final result = await controller.callAsyncJavaScript(
+        functionBody: "return await ${source.id}?.getSearchFilters();",
+      );
+
+      if (result != null && result.value != null) {
+        final rsec = result.value as List<dynamic>;
+        _filters = rsec.map((e) => SearchFilter.fromJson(e)).toList();
+      }
+
+      logger.d("Extension ${source.name} ready");
+      completer.complete();
+    } catch (e) {
+      logger.e('Error during WebView load stop', error: e);
+      completer.completeError(e);
+    }
   }
 
   Future<dynamic> callBinding(
