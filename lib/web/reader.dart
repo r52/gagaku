@@ -23,19 +23,15 @@ Future<WebReaderData> _fetchWebChapterInfo(
   final manga = await api.getMangaFromSource(handle);
 
   if (manga != null) {
-    webSourceHistoryMutation.run(ref, (ref) async {
-      await ref
-          .get(webSourceHistoryProvider.notifier)
-          .add(
-            HistoryLink(
-              title: manga.title,
-              url: handle.getURL(),
-              cover: manga.cover,
-              handle: handle,
-              lastAccessed: DateTime.now(),
-            ),
-          );
-    });
+    WebHistoryManager().add(
+      HistoryLink(
+        title: manga.title,
+        url: handle.getURL(),
+        cover: manga.cover,
+        handle: handle,
+        lastAccessed: DateTime.now(),
+      ),
+    );
 
     final chapter = manga.getChapter(handle.chapter!);
 

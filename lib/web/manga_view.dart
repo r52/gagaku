@@ -115,10 +115,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
     final extdata = manga.data;
 
     useEffect(() {
-      Future.delayed(Duration.zero, () {
-        webSourceHistoryMutation.run(ref, (ref) async {
-          await ref.get(webSourceHistoryProvider.notifier).add(link);
-        });
+      Future.delayed(Duration.zero, () async {
+        WebHistoryManager().add(link);
       });
       return null;
     }, []);

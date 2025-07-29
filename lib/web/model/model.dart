@@ -106,9 +106,7 @@ class ProxyHandler {
 
     final updatedLink = link.copyWith(handle: handle);
 
-    webSourceHistoryMutation.run(ref, (ref) async {
-      await ref.get(webSourceHistoryProvider.notifier).add(updatedLink);
-    });
+    WebHistoryManager().add(updatedLink);
 
     return updatedLink;
   }
@@ -123,18 +121,14 @@ class ProxyHandler {
         chapter: '1',
       );
 
-      webSourceHistoryMutation.run(ref, (ref) async {
-        await ref
-            .get(webSourceHistoryProvider.notifier)
-            .add(
-              HistoryLink(
-                title: url,
-                url: url,
-                handle: handle,
-                lastAccessed: DateTime.now(),
-              ),
-            );
-      });
+      WebHistoryManager().add(
+        HistoryLink(
+          title: url,
+          url: url,
+          handle: handle,
+          lastAccessed: DateTime.now(),
+        ),
+      );
 
       return handle;
     }
@@ -442,22 +436,20 @@ class WebSourceFavorites extends _$WebSourceFavorites {
 
 final webSourceFavoritesMutation = Mutation<Map<String, WebFavoritesList>>();
 
-@Riverpod(keepAlive: true)
-class WebSourceHistory extends _$WebSourceHistory {
-  static const _numItems = 250;
+class WebHistoryManager {
+  static final WebHistoryManager _instance = WebHistoryManager._internal();
 
-  bool _initialized = false;
+  static const _numItems = 250;
   late final Store _store;
   late final Box<WebFavoritesList> _listBox;
   late final Box<HistoryLink> _linkBox;
 
-  Future<WebFavoritesList> _fetch() async {
-    if (!_initialized) {
-      _store = GagakuData().store;
-      _linkBox = _store.box<HistoryLink>();
-      _listBox = _store.box<WebFavoritesList>();
-      _initialized = true;
-    }
+  late final WebFavoritesList _state;
+
+  WebHistoryManager._internal() {
+    _store = GagakuData().store;
+    _linkBox = _store.box<HistoryLink>();
+    _listBox = _store.box<WebFavoritesList>();
 
     final query = _listBox
         .query(WebFavoritesList_.id.equals(historyListUUID))
@@ -475,25 +467,21 @@ class WebSourceHistory extends _$WebSourceHistory {
       _listBox.put(historyList);
     }
 
-    return historyList;
+    _state = historyList;
   }
 
-  @override
-  FutureOr<WebFavoritesList> build() async {
-    return _fetch();
+  factory WebHistoryManager() {
+    return _instance;
   }
 
   Future<void> clear() async {
-    final list = await future;
-
+    final list = _state;
     list.list.clear();
     _listBox.put(list);
-
-    state = AsyncData(list);
   }
 
   Future<void> add(HistoryLink link) async {
-    final list = await future;
+    final list = _state;
 
     // Add/update link
     final query = _linkBox.query(HistoryLink_.url.equals(link.url)).build();
@@ -526,12 +514,10 @@ class WebSourceHistory extends _$WebSourceHistory {
     }
 
     _listBox.put(list);
-
-    state = AsyncData(list);
   }
 
   Future<void> remove(HistoryLink link) async {
-    final list = await future;
+    final list = _state;
 
     if (list.list.contains(link)) {
       list.list.remove(link);
@@ -549,12 +535,8 @@ class WebSourceHistory extends _$WebSourceHistory {
     }
 
     _listBox.put(list);
-
-    state = AsyncData(list);
   }
 }
-
-final webSourceHistoryMutation = Mutation<void>();
 
 @Riverpod(keepAlive: true)
 class WebReadMarkers extends _$WebReadMarkers {

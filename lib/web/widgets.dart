@@ -263,11 +263,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                             tooltip: tr.mangaActions.removeHistory,
                             icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () async {
-                              webSourceHistoryMutation.run(ref, (ref) async {
-                                await ref
-                                    .get(webSourceHistoryProvider.notifier)
-                                    .remove(item);
-                              });
+                              WebHistoryManager().remove(item);
                             },
                           ),
                         ],
@@ -343,11 +339,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                             tooltip: tr.mangaActions.removeHistory,
                             icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () async {
-                              webSourceHistoryMutation.run(ref, (ref) async {
-                                await ref
-                                    .get(webSourceHistoryProvider.notifier)
-                                    .remove(item);
-                              });
+                              WebHistoryManager().remove(item);
                             },
                           )
                         : null,
@@ -509,11 +501,7 @@ class GridMangaItem extends HookConsumerWidget {
                 shape: const CircleBorder(),
                 tooltip: tr.mangaActions.removeHistory,
                 onPressed: () async {
-                  webSourceHistoryMutation.run(ref, (ref) async {
-                    await ref
-                        .get(webSourceHistoryProvider.notifier)
-                        .remove(link);
-                  });
+                  WebHistoryManager().remove(link);
                 },
                 backgroundColor: theme.colorScheme.errorContainer,
                 child: Icon(

@@ -147,52 +147,6 @@ abstract class _$WebSourceFavorites
   }
 }
 
-@ProviderFor(WebSourceHistory)
-const webSourceHistoryProvider = WebSourceHistoryProvider._();
-
-final class WebSourceHistoryProvider
-    extends $AsyncNotifierProvider<WebSourceHistory, WebFavoritesList> {
-  const WebSourceHistoryProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'webSourceHistoryProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$webSourceHistoryHash();
-
-  @$internal
-  @override
-  WebSourceHistory create() => WebSourceHistory();
-}
-
-String _$webSourceHistoryHash() => r'cf2e68acf8a28e2a2874c596b75ee502a829ccf7';
-
-abstract class _$WebSourceHistory extends $AsyncNotifier<WebFavoritesList> {
-  FutureOr<WebFavoritesList> build();
-  @$mustCallSuper
-  @override
-  void runBuild() {
-    final created = build();
-    final ref =
-        this.ref as $Ref<AsyncValue<WebFavoritesList>, WebFavoritesList>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<AsyncValue<WebFavoritesList>, WebFavoritesList>,
-              AsyncValue<WebFavoritesList>,
-              Object?,
-              Object?
-            >;
-    element.handleValue(ref, created);
-  }
-}
-
 @ProviderFor(WebReadMarkers)
 const webReadMarkersProvider = WebReadMarkersProvider._();
 

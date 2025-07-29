@@ -115,11 +115,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
                       );
 
                       if (result == true) {
-                        webSourceHistoryMutation.run(ref, (ref) async {
-                          await ref
-                              .get(webSourceHistoryProvider.notifier)
-                              .clear();
-                        });
+                        WebHistoryManager().clear();
                       }
                     },
                     icon: const Icon(Icons.clear_all),
