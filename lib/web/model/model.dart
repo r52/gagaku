@@ -298,7 +298,7 @@ class ProxyHandler {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 Stream<List<WebFavoritesList>> favoritesList(Ref ref) async* {
   final box = GagakuData().store.box<WebFavoritesList>();
   final stream = box
@@ -314,144 +314,80 @@ Stream<List<WebFavoritesList>> favoritesList(Ref ref) async* {
 
 @Riverpod(keepAlive: true)
 class WebSourceFavorites extends _$WebSourceFavorites {
-  bool _initialized = false;
-  late final Store _store;
-  late final Box<WebFavoritesList> _listBox;
-  late final Box<HistoryLink> _linkBox;
-
-  Future<Map<String, WebFavoritesList>> _fetch() async {
-    if (!_initialized) {
-      _store = GagakuData().store;
-      _linkBox = _store.box<HistoryLink>();
-      _listBox = _store.box<WebFavoritesList>();
-      _initialized = true;
-    }
-
-    final data = await ref.watch(favoritesListProvider.future);
-    final map = {for (var item in data) item.id: item};
-
-    return map;
-  }
-
   @override
-  FutureOr<Map<String, WebFavoritesList>> build() async {
-    return _fetch();
+  FutureOr<List<WebFavoritesList>> build() async {
+    final data = await ref.watch(favoritesListProvider.future);
+    return data;
   }
 
-  Future<Map<String, WebFavoritesList>> add(
-    String category,
-    HistoryLink link,
-  ) async {
-    final oldstate = await future;
+  Future<void> add(WebFavoritesList list, HistoryLink link) async {
+    await GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
+      final linkBox = store.box<HistoryLink>();
+      final listBox = store.box<WebFavoritesList>();
 
-    if (!oldstate.containsKey(category)) {
-      // noop if category doesn't exist
-      return oldstate;
-    }
+      // Add/update link
+      final query = linkBox.query(HistoryLink_.url.equals(link.url)).build();
+      final result = query.findUnique();
+      query.close();
 
-    // Add/update link
-    final query = _linkBox.query(HistoryLink_.url.equals(link.url)).build();
-    final result = query.findUnique();
-    query.close();
+      if (result != null) {
+        link.dbid = result.dbid;
+        link.lastAccessed = result.lastAccessed;
+      }
 
-    if (result != null) {
-      link.dbid = result.dbid;
-      link.lastAccessed = result.lastAccessed;
-    }
+      linkBox.put(link);
 
-    _linkBox.put(link);
+      // Add link to list
+      if (list.list.contains(link)) {
+        // noop if link already exists
+        return;
+      }
 
-    // Add link to list
-    final list = oldstate[category]!;
-
-    if (list.list.contains(link)) {
-      // noop if link already exists
-      return oldstate;
-    }
-
-    list.list.add(link);
-    _listBox.put(list);
-
-    final udp = {...oldstate};
-
-    state = AsyncData(udp);
-
-    return udp;
+      list.list.add(link);
+      listBox.put(list);
+    }, null);
   }
 
-  Future<Map<String, WebFavoritesList>> remove(
-    String category,
-    HistoryLink link,
-  ) async {
-    final oldstate = await future;
-
-    if (category != 'all' && !oldstate.containsKey(category)) {
-      return oldstate;
-    }
-
-    final categoriesToEdit = category == 'all'
-        ? oldstate.keys.toList()
-        : [category];
-
-    for (final c in categoriesToEdit) {
-      final list = oldstate[c]!;
+  Future<void> remove(WebFavoritesList list, HistoryLink link) async {
+    await GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
+      final listBox = store.box<WebFavoritesList>();
 
       list.list.remove(link);
-    }
-
-    _listBox.putMany(oldstate.values.toList());
-
-    final udp = {...oldstate};
-
-    state = AsyncData(udp);
-
-    return udp;
+      listBox.put(list);
+    }, null);
   }
 
-  Future<Map<String, WebFavoritesList>> updateList(
-    String category,
-    int oldIndex,
-    int newIndex,
-  ) async {
-    final oldstate = await future;
-    if (oldIndex < newIndex) {
-      // removing the item at oldIndex will shorten the list by 1.
-      newIndex -= 1;
-    }
+  Future<void> removeFromAll(HistoryLink link) async {
+    await GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
+      final listBox = store.box<WebFavoritesList>();
 
-    if (oldstate.containsKey(category)) {
-      final element = oldstate[category]!.list.removeAt(oldIndex);
-      oldstate[category]!.list.insert(newIndex, element);
-    }
+      final listQuery = listBox
+          .query(WebFavoritesList_.id.notEquals(historyListUUID))
+          .order(WebFavoritesList_.sortOrder)
+          .build();
+      final lists = listQuery.find();
 
-    _listBox.putMany(oldstate.values.toList());
+      for (final l in lists) {
+        l.list.remove(link);
+      }
 
-    final udp = {...oldstate};
-
-    state = AsyncData(udp);
-
-    return udp;
+      listBox.putMany(lists);
+    }, null);
   }
 }
 
-final webSourceFavoritesMutation = Mutation<Map<String, WebFavoritesList>>();
+final webSourceFavoritesMutation = Mutation<void>();
 
 class WebHistoryManager {
   static final WebHistoryManager _instance = WebHistoryManager._internal();
 
   static const _numItems = 250;
-  late final Store _store;
-  late final Box<WebFavoritesList> _listBox;
-  late final Box<HistoryLink> _linkBox;
-
-  late final WebFavoritesList _state;
 
   WebHistoryManager._internal() {
-    _store = GagakuData().store;
-    _linkBox = _store.box<HistoryLink>();
-    _listBox = _store.box<WebFavoritesList>();
+    final store = GagakuData().store;
+    final listBox = store.box<WebFavoritesList>();
 
-    final query = _listBox
+    final query = listBox
         .query(WebFavoritesList_.id.equals(historyListUUID))
         .build();
 
@@ -464,10 +400,8 @@ class WebHistoryManager {
         id: historyListUUID,
         name: 'extension_history',
       );
-      _listBox.put(historyList);
+      listBox.put(historyList);
     }
-
-    _state = historyList;
   }
 
   factory WebHistoryManager() {
@@ -475,66 +409,94 @@ class WebHistoryManager {
   }
 
   Future<void> clear() async {
-    final list = _state;
-    list.list.clear();
-    _listBox.put(list);
+    await GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
+      final listBox = store.box<WebFavoritesList>();
+      final query = listBox
+          .query(WebFavoritesList_.id.equals(historyListUUID))
+          .build();
+
+      final list = query.findUnique()!;
+      query.close();
+
+      list.list.clear();
+      listBox.put(list);
+    }, null);
   }
 
   Future<void> add(HistoryLink link) async {
-    final list = _state;
+    await GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
+      final listBox = store.box<WebFavoritesList>();
+      final linkBox = store.box<HistoryLink>();
+      final listquery = listBox
+          .query(WebFavoritesList_.id.equals(historyListUUID))
+          .build();
 
-    // Add/update link
-    final query = _linkBox.query(HistoryLink_.url.equals(link.url)).build();
-    final result = query.findUnique();
-    query.close();
+      final list = listquery.findUnique()!;
+      listquery.close();
 
-    if (result != null) {
-      link.dbid = result.dbid;
-    }
+      // Add/update link
+      final linkquery = linkBox
+          .query(HistoryLink_.url.equals(link.url))
+          .build();
+      final result = linkquery.findUnique();
+      linkquery.close();
 
-    _linkBox.put(link);
-
-    // Add to list
-    if (list.list.contains(link)) {
-      // noop if link already exists
-      return;
-    }
-
-    list.list.add(link);
-
-    if (list.list.length > _numItems) {
-      final items = list.list.toList();
-      items.sort(HistoryLink.lastAccessCompare);
-
-      final toRemove = items.sublist(250);
-
-      for (final i in toRemove) {
-        list.list.remove(i);
+      if (result != null) {
+        link.dbid = result.dbid;
       }
-    }
 
-    _listBox.put(list);
+      linkBox.put(link);
+
+      // Add to list
+      if (list.list.contains(link)) {
+        // noop if link already exists
+        return;
+      }
+
+      list.list.add(link);
+
+      if (list.list.length > _numItems) {
+        final items = list.list.toList();
+        items.sort(HistoryLink.lastAccessCompare);
+
+        final toRemove = items.sublist(250);
+
+        for (final i in toRemove) {
+          list.list.remove(i);
+        }
+      }
+
+      listBox.put(list);
+    }, null);
   }
 
   Future<void> remove(HistoryLink link) async {
-    final list = _state;
+    await GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
+      final listBox = store.box<WebFavoritesList>();
+      final query = listBox
+          .query(WebFavoritesList_.id.equals(historyListUUID))
+          .build();
 
-    if (list.list.contains(link)) {
-      list.list.remove(link);
-    }
+      final list = query.findUnique()!;
+      query.close();
 
-    if (list.list.length > _numItems) {
-      final items = list.list.toList();
-      items.sort(HistoryLink.lastAccessCompare);
-
-      final toRemove = items.sublist(250);
-
-      for (final i in toRemove) {
-        list.list.remove(i);
+      if (list.list.contains(link)) {
+        list.list.remove(link);
       }
-    }
 
-    _listBox.put(list);
+      if (list.list.length > _numItems) {
+        final items = list.list.toList();
+        items.sort(HistoryLink.lastAccessCompare);
+
+        final toRemove = items.sublist(250);
+
+        for (final i in toRemove) {
+          list.list.remove(i);
+        }
+      }
+
+      listBox.put(list);
+    }, null);
   }
 }
 

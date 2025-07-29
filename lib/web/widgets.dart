@@ -15,6 +15,7 @@ import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -150,16 +151,11 @@ class WebMangaListViewSliver extends ConsumerWidget {
     this.items,
     this.controller,
     this.favoritesKey,
-    this.reorderable = false,
     this.showRemoveButton = true,
-  }) : assert(items != null || controller != null),
-       assert(
-         reorderable == false || (reorderable == true && favoritesKey != null),
-       );
+  }) : assert(items != null || controller != null);
 
   final String? favoritesKey;
   final List<HistoryLink>? items;
-  final bool reorderable;
   final bool showRemoveButton;
 
   final PagingController<dynamic, HistoryLink>? controller;
@@ -192,106 +188,105 @@ class WebMangaListViewSliver extends ConsumerWidget {
     if (items != null) {
       switch (view) {
         case WebMangaListView.list:
-          return reorderable
-              ? SliverReorderableList(
-                  onReorder: (int oldIndex, int newIndex) =>
-                      webSourceFavoritesMutation.run(ref, (ref) async {
-                        return await ref
-                            .get(webSourceFavoritesProvider.notifier)
-                            .updateList(favoritesKey!, oldIndex, newIndex);
-                      }),
-                  itemCount: items!.length,
-                  // findChildIndexCallback: _findChildIndexCb,
-                  itemBuilder: (context, index) {
-                    final item = items!.elementAt(index);
-                    Widget? sourceIcon = _getSourceIcon(item, sourcesMap);
+          return
+          // reorderable
+          //     ? SliverReorderableList(
+          //         onReorder: (int oldIndex, int newIndex) =>
+          //             webSourceFavoritesMutation.run(ref, (ref) async {
+          //               return await ref
+          //                   .get(webSourceFavoritesProvider.notifier)
+          //                   .updateList(favoritesKey!, oldIndex, newIndex);
+          //             }),
+          //         itemCount: items!.length,
+          //         // findChildIndexCallback: _findChildIndexCb,
+          //         itemBuilder: (context, index) {
+          //           final item = items!.elementAt(index);
+          //           Widget? sourceIcon = _getSourceIcon(item, sourcesMap);
+          //           return ReorderableDelayedDragStartListener(
+          //             key: ValueKey(item.url),
+          //             index: index,
+          //             child: ListTile(
+          //               tileColor: index.isOdd
+          //                   ? theme.colorScheme.surfaceContainer
+          //                   : theme.colorScheme.surfaceContainerHighest,
+          //               leading: FavoritesButton(link: item),
+          //               title: Text(item.title),
+          //               textColor: theme.colorScheme.onSurface,
+          //               onTap: () async {
+          //                 final tr = context.t;
+          //                 final messenger = ScaffoldMessenger.of(context);
+          //                 final result = await api.handleLink(item);
+          //                 if (!context.mounted) return;
+          //                 if (result.handle == null) {
+          //                   messenger
+          //                     ..removeCurrentSnackBar()
+          //                     ..showSnackBar(
+          //                       SnackBar(
+          //                         content: Text(tr.errors.unsupportedUrl),
+          //                         backgroundColor: Colors.red,
+          //                       ),
+          //                     );
+          //                 } else {
+          //                   openWebSource(context, result.handle!);
+          //                 }
+          //               },
+          //               trailing: sourceIcon,
+          //             ),
+          //           );
+          //         },
+          //       ) :
+          SliverList.separated(
+            itemCount: items!.length,
+            separatorBuilder: (_, _) => const SizedBox(height: 4.0),
+            findChildIndexCallback: _findChildIndexCb,
+            itemBuilder: (context, index) {
+              final tr = context.t;
+              final item = items!.elementAt(index);
+              Widget? sourceIcon = _getSourceIcon(item, sourcesMap);
 
-                    return ReorderableDelayedDragStartListener(
-                      key: ValueKey(item.url),
-                      index: index,
-                      child: ListTile(
-                        tileColor: index.isOdd
-                            ? theme.colorScheme.surfaceContainer
-                            : theme.colorScheme.surfaceContainerHighest,
-                        leading: FavoritesButton(link: item),
-                        title: Text(item.title),
-                        textColor: theme.colorScheme.onSurface,
-                        onTap: () async {
-                          final tr = context.t;
-                          final messenger = ScaffoldMessenger.of(context);
-                          final result = await api.handleLink(item);
-
-                          if (!context.mounted) return;
-                          if (result.handle == null) {
-                            messenger
-                              ..removeCurrentSnackBar()
-                              ..showSnackBar(
-                                SnackBar(
-                                  content: Text(tr.errors.unsupportedUrl),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                          } else {
-                            openWebSource(context, result.handle!);
-                          }
-                        },
-                        trailing: sourceIcon,
-                      ),
-                    );
-                  },
-                )
-              : SliverList.separated(
-                  itemCount: items!.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 4.0),
-                  findChildIndexCallback: _findChildIndexCb,
-                  itemBuilder: (context, index) {
-                    final tr = context.t;
-                    final item = items!.elementAt(index);
-                    Widget? sourceIcon = _getSourceIcon(item, sourcesMap);
-
-                    return ListTile(
-                      key: ValueKey(item.url),
-                      tileColor: index.isOdd
-                          ? theme.colorScheme.surfaceContainer
-                          : theme.colorScheme.surfaceContainerHighest,
-                      leading: FavoritesButton(link: item),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (sourceIcon != null) sourceIcon,
-                          IconButton(
-                            tooltip: tr.mangaActions.removeHistory,
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () async {
-                              WebHistoryManager().remove(item);
-                            },
-                          ),
-                        ],
-                      ),
-                      title: Text(item.title),
-                      textColor: theme.colorScheme.onSurface,
-                      onTap: () async {
-                        final tr = context.t;
-                        final messenger = ScaffoldMessenger.of(context);
-                        final result = await api.handleLink(item);
-
-                        if (!context.mounted) return;
-                        if (result.handle == null) {
-                          messenger
-                            ..removeCurrentSnackBar()
-                            ..showSnackBar(
-                              SnackBar(
-                                content: Text(tr.errors.unsupportedUrl),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                        } else {
-                          openWebSource(context, result.handle!);
-                        }
+              return ListTile(
+                key: ValueKey(item.url),
+                tileColor: index.isOdd
+                    ? theme.colorScheme.surfaceContainer
+                    : theme.colorScheme.surfaceContainerHighest,
+                leading: FavoritesButton(link: item),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (sourceIcon != null) sourceIcon,
+                    IconButton(
+                      tooltip: tr.mangaActions.removeHistory,
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        WebHistoryManager().remove(item);
                       },
-                    );
-                  },
-                );
+                    ),
+                  ],
+                ),
+                title: Text(item.title),
+                textColor: theme.colorScheme.onSurface,
+                onTap: () async {
+                  final tr = context.t;
+                  final messenger = ScaffoldMessenger.of(context);
+                  final result = await api.handleLink(item);
+
+                  if (!context.mounted) return;
+                  if (result.handle == null) {
+                    messenger
+                      ..removeCurrentSnackBar()
+                      ..showSnackBar(
+                        SnackBar(
+                          content: Text(tr.errors.unsupportedUrl),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                  } else {
+                    openWebSource(context, result.handle!);
+                  }
+                },
+              );
+            },
+          );
 
         case WebMangaListView.grid:
           return SliverGrid.builder(
@@ -526,9 +521,10 @@ class FavoritesButton extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final theme = Theme.of(context);
+    final mutFav = ref.watch(webSourceFavoritesMutation);
 
     final favorites = ref.watch(
-      favoritesListProvider.select(
+      webSourceFavoritesProvider.select(
         (value) => switch (value) {
           AsyncValue(value: final data?) => data,
           _ => <WebFavoritesList>[],
@@ -579,28 +575,30 @@ class FavoritesButton extends HookConsumerWidget {
                   controlAffinity: ListTileControlAffinity.leading,
                   title: Text(cat.name),
                   value: favlist.elementAt(idx),
-                  onChanged: (bool? value) async {
-                    if (value == true) {
-                      webSourceFavoritesMutation.run(ref, (ref) async {
-                        return await ref
-                            .get(webSourceFavoritesProvider.notifier)
-                            .add(cat.id, link);
-                      });
-                    } else {
-                      webSourceFavoritesMutation.run(ref, (ref) async {
-                        return await ref
-                            .get(webSourceFavoritesProvider.notifier)
-                            .remove(cat.id, link);
-                      });
-                    }
-                  },
+                  onChanged: mutFav is! MutationPending
+                      ? (bool? value) async {
+                          if (value == true) {
+                            webSourceFavoritesMutation.run(ref, (ref) async {
+                              await ref
+                                  .get(webSourceFavoritesProvider.notifier)
+                                  .add(cat, link);
+                            });
+                          } else {
+                            webSourceFavoritesMutation.run(ref, (ref) async {
+                              await ref
+                                  .get(webSourceFavoritesProvider.notifier)
+                                  .remove(cat, link);
+                            });
+                          }
+                        }
+                      : null,
                 ),
               MenuItemButton(
                 onPressed: () =>
                     webSourceFavoritesMutation.run(ref, (ref) async {
-                      return await ref
+                      await ref
                           .get(webSourceFavoritesProvider.notifier)
-                          .remove('all', link);
+                          .removeFromAll(link);
                     }),
                 child: Text(tr.ui.clear),
               ),

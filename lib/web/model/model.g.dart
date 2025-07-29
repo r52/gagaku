@@ -66,7 +66,7 @@ final class FavoritesListProvider
         argument: null,
         retry: null,
         name: r'favoritesListProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -86,17 +86,13 @@ final class FavoritesListProvider
   }
 }
 
-String _$favoritesListHash() => r'65d7c97916f626d27f7c04ab2bee9594379b3c34';
+String _$favoritesListHash() => r'f7a0e706c7eb0a7b01aad42eb5a06a119dffe6f8';
 
 @ProviderFor(WebSourceFavorites)
 const webSourceFavoritesProvider = WebSourceFavoritesProvider._();
 
 final class WebSourceFavoritesProvider
-    extends
-        $AsyncNotifierProvider<
-          WebSourceFavorites,
-          Map<String, WebFavoritesList>
-        > {
+    extends $AsyncNotifierProvider<WebSourceFavorites, List<WebFavoritesList>> {
   const WebSourceFavoritesProvider._()
     : super(
         from: null,
@@ -117,29 +113,26 @@ final class WebSourceFavoritesProvider
 }
 
 String _$webSourceFavoritesHash() =>
-    r'b73d44c375d9511243fb662f48cc73ab984d7091';
+    r'f59d16deeaf6e70ac5503bd7274831bfd1681287';
 
 abstract class _$WebSourceFavorites
-    extends $AsyncNotifier<Map<String, WebFavoritesList>> {
-  FutureOr<Map<String, WebFavoritesList>> build();
+    extends $AsyncNotifier<List<WebFavoritesList>> {
+  FutureOr<List<WebFavoritesList>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
     final ref =
         this.ref
-            as $Ref<
-              AsyncValue<Map<String, WebFavoritesList>>,
-              Map<String, WebFavoritesList>
-            >;
+            as $Ref<AsyncValue<List<WebFavoritesList>>, List<WebFavoritesList>>;
     final element =
         ref.element
             as $ClassProviderElement<
               AnyNotifier<
-                AsyncValue<Map<String, WebFavoritesList>>,
-                Map<String, WebFavoritesList>
+                AsyncValue<List<WebFavoritesList>>,
+                List<WebFavoritesList>
               >,
-              AsyncValue<Map<String, WebFavoritesList>>,
+              AsyncValue<List<WebFavoritesList>>,
               Object?,
               Object?
             >;

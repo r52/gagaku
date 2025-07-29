@@ -142,7 +142,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
       webConfigProvider.select((cfg) => cfg.categoriesToUpdate),
     );
 
-    final favorites = await ref.read(favoritesListProvider.future);
+    final favorites = await ref.read(webSourceFavoritesProvider.future);
 
     Set<HistoryLink> linksToUpdate = {};
 

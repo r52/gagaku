@@ -27,7 +27,7 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
         useScrollController();
 
     final categories = ref.watch(
-      favoritesListProvider.select(
+      webSourceFavoritesProvider.select(
         (value) => switch (value) {
           AsyncValue(value: final data?) => data,
           _ => <WebFavoritesList>[],
@@ -153,7 +153,6 @@ class WebSourceFavoriteTab extends HookWidget {
         WebMangaListViewSliver(
           items: fileredItems,
           favoritesKey: category.id,
-          reorderable: true,
           showRemoveButton: false,
         ),
       ],
