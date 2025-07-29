@@ -115,20 +115,21 @@ class CacheManager {
     }
 
     // clean stale HistoryLinks
-    final store = GagakuData().store;
-    final box = store.box<HistoryLink>();
+    GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
+      final box = store.box<HistoryLink>();
 
-    final builder = box.query();
-    builder.backlinkMany(WebFavoritesList_.list);
-    final inuseLinksQuery = builder.build();
-    final inuseLinks = await inuseLinksQuery.findIdsAsync();
-    inuseLinksQuery.close();
+      final builder = box.query();
+      builder.backlinkMany(WebFavoritesList_.list);
+      final inuseLinksQuery = builder.build();
+      final inuseLinks = inuseLinksQuery.findIds();
+      inuseLinksQuery.close();
 
-    final notInuseQuery = box
-        .query(HistoryLink_.dbid.notOneOf(inuseLinks))
-        .build();
-    await notInuseQuery.removeAsync();
-    notInuseQuery.close();
+      final notInuseQuery = box
+          .query(HistoryLink_.dbid.notOneOf(inuseLinks))
+          .build();
+      notInuseQuery.remove();
+      notInuseQuery.close();
+    }, null);
   }
 
   /// Prunes all expired entries
