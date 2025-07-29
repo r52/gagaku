@@ -540,16 +540,19 @@ class FavoritesButton extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     final favorites = ref.watch(
-      webSourceFavoritesProvider.select(
+      favoritesListProvider.select(
         (value) => switch (value) {
           AsyncValue(value: final data?) => data,
-          _ => <String, WebFavoritesList>{},
+          _ => <WebFavoritesList>[],
         },
       ),
     );
 
-    final favlist = favorites.values.map((l) => l.list.contains(link)).toList();
-    final favorited = favlist.any((e) => e);
+    final favlist = useMemoized(
+      () => favorites.map((l) => l.list.contains(link)).toList(),
+      [favorites],
+    );
+    final favorited = useMemoized(() => favlist.any((e) => e), [favlist]);
 
     return MenuAnchor(
       builder: (context, controller, child) {
@@ -583,7 +586,7 @@ class FavoritesButton extends HookConsumerWidget {
       },
       menuChildren: favorites.isNotEmpty
           ? [
-              for (final (idx, cat) in favorites.values.indexed)
+              for (final (idx, cat) in favorites.indexed)
                 CheckboxListTile(
                   controlAffinity: ListTileControlAffinity.leading,
                   title: Text(cat.name),

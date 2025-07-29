@@ -117,7 +117,7 @@ final class WebSourceFavoritesProvider
 }
 
 String _$webSourceFavoritesHash() =>
-    r'5b53079950bddaaf2fbc5f4c3442186c582e7444';
+    r'b73d44c375d9511243fb662f48cc73ab984d7091';
 
 abstract class _$WebSourceFavorites
     extends $AsyncNotifier<Map<String, WebFavoritesList>> {
@@ -171,7 +171,7 @@ final class WebSourceHistoryProvider
   WebSourceHistory create() => WebSourceHistory();
 }
 
-String _$webSourceHistoryHash() => r'1cd5749ec4f2fa1691bf394e27eb1e0b927800f1';
+String _$webSourceHistoryHash() => r'cf2e68acf8a28e2a2874c596b75ee502a829ccf7';
 
 abstract class _$WebSourceHistory extends $AsyncNotifier<WebFavoritesList> {
   FutureOr<WebFavoritesList> build();

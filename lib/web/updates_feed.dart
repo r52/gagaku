@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -141,13 +142,14 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
       webConfigProvider.select((cfg) => cfg.categoriesToUpdate),
     );
 
-    final favorites = await ref.read(webSourceFavoritesProvider.future);
+    final favorites = await ref.read(favoritesListProvider.future);
 
     Set<HistoryLink> linksToUpdate = {};
 
     for (final c in categoriesToUpdate) {
-      if (favorites.containsKey(c)) {
-        linksToUpdate.addAll(favorites[c]!.list.toList());
+      final fav = favorites.firstWhereOrNull((e) => e.id == c);
+      if (fav != null) {
+        linksToUpdate.addAll(fav.list.toList());
       }
     }
 

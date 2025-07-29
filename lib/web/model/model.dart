@@ -320,7 +320,19 @@ Stream<List<WebFavoritesList>> favoritesList(Ref ref) async* {
 
 @Riverpod(keepAlive: true)
 class WebSourceFavorites extends _$WebSourceFavorites {
+  bool _initialized = false;
+  late final Store _store;
+  late final Box<WebFavoritesList> _listBox;
+  late final Box<HistoryLink> _linkBox;
+
   Future<Map<String, WebFavoritesList>> _fetch() async {
+    if (!_initialized) {
+      _store = GagakuData().store;
+      _linkBox = _store.box<HistoryLink>();
+      _listBox = _store.box<WebFavoritesList>();
+      _initialized = true;
+    }
+
     final data = await ref.watch(favoritesListProvider.future);
     final map = {for (var item in data) item.id: item};
 
@@ -344,10 +356,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     }
 
     // Add/update link
-    final store = GagakuData().store;
-    final box = store.box<HistoryLink>();
-    final query = box.query(HistoryLink_.url.equals(link.url)).build();
-
+    final query = _linkBox.query(HistoryLink_.url.equals(link.url)).build();
     final result = query.findUnique();
     query.close();
 
@@ -356,7 +365,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
       link.lastAccessed = result.lastAccessed;
     }
 
-    box.put(link);
+    _linkBox.put(link);
 
     // Add link to list
     final list = oldstate[category]!;
@@ -367,7 +376,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     }
 
     list.list.add(link);
-    list.list.applyToDb(existingStore: store);
+    _listBox.put(list);
 
     final udp = {...oldstate};
 
@@ -394,8 +403,9 @@ class WebSourceFavorites extends _$WebSourceFavorites {
       final list = oldstate[c]!;
 
       list.list.remove(link);
-      list.list.applyToDb(existingStore: GagakuData().store);
     }
+
+    _listBox.putMany(oldstate.values.toList());
 
     final udp = {...oldstate};
 
@@ -418,8 +428,9 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     if (oldstate.containsKey(category)) {
       final element = oldstate[category]!.list.removeAt(oldIndex);
       oldstate[category]!.list.insert(newIndex, element);
-      oldstate[category]!.list.applyToDb(existingStore: GagakuData().store);
     }
+
+    _listBox.putMany(oldstate.values.toList());
 
     final udp = {...oldstate};
 
@@ -435,9 +446,20 @@ final webSourceFavoritesMutation = Mutation<Map<String, WebFavoritesList>>();
 class WebSourceHistory extends _$WebSourceHistory {
   static const _numItems = 250;
 
+  bool _initialized = false;
+  late final Store _store;
+  late final Box<WebFavoritesList> _listBox;
+  late final Box<HistoryLink> _linkBox;
+
   Future<WebFavoritesList> _fetch() async {
-    final box = GagakuData().store.box<WebFavoritesList>();
-    final query = box
+    if (!_initialized) {
+      _store = GagakuData().store;
+      _linkBox = _store.box<HistoryLink>();
+      _listBox = _store.box<WebFavoritesList>();
+      _initialized = true;
+    }
+
+    final query = _listBox
         .query(WebFavoritesList_.id.equals(historyListUUID))
         .build();
 
@@ -450,7 +472,7 @@ class WebSourceHistory extends _$WebSourceHistory {
         id: historyListUUID,
         name: 'extension_history',
       );
-      box.put(historyList);
+      _listBox.put(historyList);
     }
 
     return historyList;
@@ -465,7 +487,7 @@ class WebSourceHistory extends _$WebSourceHistory {
     final list = await future;
 
     list.list.clear();
-    list.list.applyToDb(existingStore: GagakuData().store);
+    _listBox.put(list);
 
     state = AsyncData(list);
   }
@@ -474,10 +496,7 @@ class WebSourceHistory extends _$WebSourceHistory {
     final list = await future;
 
     // Add/update link
-    final store = GagakuData().store;
-    final box = store.box<HistoryLink>();
-    final query = box.query(HistoryLink_.url.equals(link.url)).build();
-
+    final query = _linkBox.query(HistoryLink_.url.equals(link.url)).build();
     final result = query.findUnique();
     query.close();
 
@@ -485,7 +504,7 @@ class WebSourceHistory extends _$WebSourceHistory {
       link.dbid = result.dbid;
     }
 
-    box.put(link);
+    _linkBox.put(link);
 
     // Add to list
     if (list.list.contains(link)) {
@@ -506,7 +525,7 @@ class WebSourceHistory extends _$WebSourceHistory {
       }
     }
 
-    list.list.applyToDb(existingStore: store);
+    _listBox.put(list);
 
     state = AsyncData(list);
   }
@@ -529,7 +548,7 @@ class WebSourceHistory extends _$WebSourceHistory {
       }
     }
 
-    list.list.applyToDb(existingStore: GagakuData().store);
+    _listBox.put(list);
 
     state = AsyncData(list);
   }
