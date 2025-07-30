@@ -1,13 +1,14 @@
 import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/cache.dart';
+import 'package:gagaku/model/model.dart';
+import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/notification_service.dart';
 import 'package:gagaku/util/ui.dart';
@@ -142,16 +143,14 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
       webConfigProvider.select((cfg) => cfg.categoriesToUpdate),
     );
 
-    final favorites = await ref.read(webSourceFavoritesProvider.future);
-
-    Set<HistoryLink> linksToUpdate = {};
-
-    for (final c in categoriesToUpdate) {
-      final fav = favorites.firstWhereOrNull((e) => e.id == c);
-      if (fav != null) {
-        linksToUpdate.addAll(fav.list.toList());
-      }
-    }
+    final builder = GagakuData().store.box<HistoryLink>().query();
+    builder.backlinkMany(
+      WebFavoritesList_.list,
+      WebFavoritesList_.id.oneOf(categoriesToUpdate),
+    );
+    final query = builder.build();
+    final linksToUpdate = query.find();
+    query.close();
 
     logger.d('Links to update: ${linksToUpdate.length}');
 
@@ -202,6 +201,8 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
         await Future.delayed(const Duration(seconds: 5));
       } else if (processedCount % 5 == 0) {
         await Future.delayed(const Duration(seconds: 1));
+      } else {
+        await Future.delayed(const Duration(milliseconds: 500));
       }
 
       // Exit if stopped
