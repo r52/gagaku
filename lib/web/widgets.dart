@@ -253,7 +253,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (sourceIcon != null) sourceIcon,
+                    ?sourceIcon,
                     IconButton(
                       tooltip: tr.mangaActions.removeHistory,
                       icon: const Icon(Icons.delete, color: Colors.red),
@@ -747,7 +747,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.end,
-              children: [if (language != null) language],
+              children: [?language],
             ),
           ],
         ),
