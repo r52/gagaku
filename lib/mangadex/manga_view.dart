@@ -1331,6 +1331,7 @@ class _ChapterListSliver extends HookConsumerWidget {
     }, [state]);
 
     final newState = PagingState<int, _ChapterListElement>(
+      error: state.error,
       pages: state.keys == null
           ? null
           : List.generate(state.keys!.length, (i) => i == 0 ? builtItems! : []),

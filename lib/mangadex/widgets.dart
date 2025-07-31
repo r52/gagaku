@@ -356,6 +356,7 @@ class ChapterFeedWidget extends HookWidget {
                   final future = useFuture(builtItems);
 
                   final newState = PagingState<int, ChapterFeedItemData>(
+                    error: state.error,
                     pages: state.keys == null || !future.hasData
                         ? null
                         : List.generate(
@@ -500,11 +501,13 @@ class _InfiniteScrollFeedState
   }
 
   Future<void> _showError() async {
-    if (_pagingController.value.status == PagingStatus.subsequentPageError) {
+    if (_pagingController.value.status == PagingStatus.subsequentPageError ||
+        _pagingController.value.status == PagingStatus.firstPageError) {
       final tr = context.t;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(tr.errors.fetchFail),
+          duration: const Duration(seconds: 5),
           action: SnackBarAction(
             label: tr.ui.retry,
             onPressed: () => _pagingController.fetchNextPage(),
