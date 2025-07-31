@@ -110,38 +110,20 @@ class MangaDexConfig with _$MangaDexConfig {
 
 @riverpod
 class MdConfig extends _$MdConfig {
-  late final Query<MangaDexConfig> query;
-
   MangaDexConfig _fetch() {
     final box = GagakuData().store.box<MangaDexConfig>();
-
-    query = box.query().build();
+    final query = box.query().build();
 
     MangaDexConfig? cfg;
-
     cfg = query.findUnique();
+    query.close();
 
     if (cfg == null) {
       cfg = MangaDexConfig();
       box.put(cfg);
     }
 
-    ref.onDispose(() {
-      query.close();
-    });
-
     return cfg;
-
-    // final box = Hive.box(gagakuDataBox);
-    // final str = box.get('mangadex');
-
-    // if (str == null) {
-    //   return MangaDexConfig();
-    // }
-
-    // final content = json.decode(str) as Map<String, dynamic>;
-
-    // return MangaDexConfig.fromJson(content);
   }
 
   @override
@@ -150,8 +132,12 @@ class MdConfig extends _$MdConfig {
   }
 
   MangaDexConfig save(MangaDexConfig update) {
+    final box = GagakuData().store.box<MangaDexConfig>();
+
     if (update.dbid == 0) {
+      final query = box.query().build();
       final cfg = query.findUnique();
+      query.close();
 
       if (cfg != null) {
         update.dbid = cfg.dbid;
@@ -160,7 +146,6 @@ class MdConfig extends _$MdConfig {
 
     state = update;
 
-    final box = GagakuData().store.box<MangaDexConfig>();
     box.put(update);
 
     return update;

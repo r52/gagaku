@@ -103,38 +103,20 @@ class GagakuConfig with _$GagakuConfig {
 
 @riverpod
 class GagakuSettings extends _$GagakuSettings {
-  late final Query<GagakuConfig> query;
-
   GagakuConfig _fetch() {
     final box = GagakuData().store.box<GagakuConfig>();
-
-    query = box.query().build();
+    final query = box.query().build();
 
     GagakuConfig? cfg;
-
     cfg = query.findUnique();
+    query.close();
 
     if (cfg == null) {
       cfg = GagakuConfig();
       box.put(cfg);
     }
 
-    ref.onDispose(() {
-      query.close();
-    });
-
     return cfg;
-
-    // final box = Hive.box(gagakuDataBox);
-    // final str = box.get('gagaku');
-
-    // if (str == null) {
-    //   return const GagakuConfig();
-    // }
-
-    // final content = json.decode(str) as Map<String, dynamic>;
-
-    // return GagakuConfig.fromJson(content);
   }
 
   @override
@@ -143,8 +125,12 @@ class GagakuSettings extends _$GagakuSettings {
   }
 
   GagakuConfig save(GagakuConfig update) {
+    final box = GagakuData().store.box<GagakuConfig>();
+
     if (update.dbid == 0) {
+      final query = box.query().build();
       final cfg = query.findUnique();
+      query.close();
 
       if (cfg != null) {
         update.dbid = cfg.dbid;
@@ -153,7 +139,6 @@ class GagakuSettings extends _$GagakuSettings {
 
     state = update;
 
-    final box = GagakuData().store.box<GagakuConfig>();
     box.put(update);
 
     return update;

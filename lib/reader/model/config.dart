@@ -104,38 +104,20 @@ class ReaderConfig with _$ReaderConfig {
 
 @riverpod
 class ReaderSettings extends _$ReaderSettings {
-  late final Query<ReaderConfig> query;
-
   ReaderConfig _fetch() {
     final box = GagakuData().store.box<ReaderConfig>();
-
-    query = box.query().build();
+    final query = box.query().build();
 
     ReaderConfig? cfg;
-
     cfg = query.findUnique();
+    query.close();
 
     if (cfg == null) {
       cfg = ReaderConfig();
       box.put(cfg);
     }
 
-    ref.onDispose(() {
-      query.close();
-    });
-
     return cfg;
-
-    // final box = Hive.box(gagakuDataBox);
-    // final str = box.get('reader');
-
-    // if (str == null) {
-    //   return const ReaderConfig();
-    // }
-
-    // final content = json.decode(str) as Map<String, dynamic>;
-
-    // return ReaderConfig.fromJson(content);
   }
 
   @override
@@ -144,8 +126,12 @@ class ReaderSettings extends _$ReaderSettings {
   }
 
   ReaderConfig save(ReaderConfig update) {
+    final box = GagakuData().store.box<ReaderConfig>();
+
     if (update.dbid == 0) {
+      final query = box.query().build();
       final cfg = query.findUnique();
+      query.close();
 
       if (cfg != null) {
         update.dbid = cfg.dbid;
@@ -154,7 +140,6 @@ class ReaderSettings extends _$ReaderSettings {
 
     state = update;
 
-    final box = GagakuData().store.box<ReaderConfig>();
     box.put(update);
 
     return update;

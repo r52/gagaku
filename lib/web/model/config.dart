@@ -31,25 +31,18 @@ abstract class ExtensionConfig with _$ExtensionConfig {
 
 @Riverpod(keepAlive: true)
 class WebConfig extends _$WebConfig {
-  late final Query<ExtensionConfig> query;
-
   ExtensionConfig _fetch() {
     final box = GagakuData().store.box<ExtensionConfig>();
-
-    query = box.query().build();
+    final query = box.query().build();
 
     ExtensionConfig? cfg;
-
     cfg = query.findUnique();
+    query.close();
 
     if (cfg == null) {
       cfg = ExtensionConfig();
       box.put(cfg);
     }
-
-    ref.onDispose(() {
-      query.close();
-    });
 
     return cfg;
   }
@@ -75,8 +68,12 @@ class WebConfig extends _$WebConfig {
   }
 
   ExtensionConfig save(ExtensionConfig update) {
+    final box = GagakuData().store.box<ExtensionConfig>();
+
     if (update.dbid == 0) {
+      final query = box.query().build();
       final cfg = query.findUnique();
+      query.close();
 
       if (cfg != null) {
         update.dbid = cfg.dbid;
@@ -84,7 +81,7 @@ class WebConfig extends _$WebConfig {
     }
 
     state = update;
-    final box = GagakuData().store.box<ExtensionConfig>();
+
     box.put(update);
 
     return update;

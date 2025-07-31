@@ -54,7 +54,7 @@ final class WebConfigProvider
   }
 }
 
-String _$webConfigHash() => r'304737f51d3bb916941dedd481c8fa249c333813';
+String _$webConfigHash() => r'3946a046f37b982630c47c257cf1cb6ad37d53f4';
 
 abstract class _$WebConfig extends $Notifier<ExtensionConfig> {
   ExtensionConfig build();
