@@ -8,10 +8,6 @@ declare global {
   // WebView interface
   var gagaku: WebViewInterface | undefined;
 
-  // Form
-  function initializeForm(id: string, form: Form): Promise<String>;
-  function uninitializeForms(): void;
-  function getForm(id: string): Form | undefined;
 
   namespace Application {
     // binding
@@ -20,5 +16,10 @@ declare global {
     // State
     function createExtensionState(state: Record<string, any> | undefined): void;
     function createExtensionSecureState(state: Record<string, any> | undefined): void;
+
+    // Form
+    function initializeForm(id: string, form: Form): Promise<String>;
+    function uninitializeForms(): void;
+    function getForm(id: string): Form | undefined;
   }
 }

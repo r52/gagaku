@@ -1,13 +1,11 @@
-import "./SettingsUI";
-
 import { MockDiscoverSectionManager } from "./DiscoverSectionManager";
 import { MockSearchFilterManager } from "./SearchFilterManager";
 import { MockSelectorRegistry } from "./Selector";
 import { MockRequestManager } from "./RequestManager";
+import { FormManager } from "./FormManager";
 
 import { decodeHTMLStrict } from "entities";
 import { SelectorID } from "@paperback/types";
-
 
 export function ApplicationPolyfill(): typeof Application {
   let stateStorage: Record<string, unknown> = {}
@@ -23,6 +21,8 @@ export function ApplicationPolyfill(): typeof Application {
   )
   const searchFilterManager = new MockSearchFilterManager()
   // <!-- unused
+
+  const formManager = new FormManager();
 
   return {
     decodeHTMLEntities: decodeHTMLStrict,
@@ -196,6 +196,10 @@ export function ApplicationPolyfill(): typeof Application {
         globalThis.gagaku?.callHandler("formDidChange", formId);
       }
     },
+
+    initializeForm: formManager.initializeForm.bind(formManager),
+    uninitializeForms: formManager.uninitializeForms.bind(formManager),
+    getForm: formManager.getForm.bind(formManager),
 
     isResourceLimited: false,
 

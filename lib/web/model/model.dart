@@ -866,7 +866,7 @@ class ExtensionSource extends _$ExtensionSource {
           """
 var form = await ${source.id}.getSettingsForm();
 form.formWillAppear?.();
-var id = await window.initializeForm("main", form);
+var id = await window.Application.initializeForm("main", form);
 return id;
 """,
     );
@@ -894,7 +894,7 @@ return id;
     final result = await _controller?.callAsyncJavaScript(
       arguments: {'formid': id},
       functionBody: """
-var form = window.getForm(formid);
+var form = window.Application.getForm(formid);
 if (typeof form === "undefined") {
   return null;
 }
@@ -930,7 +930,7 @@ return formid;
     }
 
     await _controller?.evaluateJavascript(
-      source: "window.uninitializeForms();",
+      source: "window.Application.uninitializeForms();",
     );
   }
 
@@ -1164,7 +1164,7 @@ class SettingsForm with ChangeNotifier {
     final result = await _controller.callAsyncJavaScript(
       functionBody:
           """
-var form = window.getForm("$id");
+var form = window.Application.getForm("$id");
 if (typeof form === "undefined") {
   return [];
 }
@@ -1182,7 +1182,7 @@ var a = p.map((e) => {
 a.forEach((e) => {
   e.items.forEach((i) => {
     if ("form" in i) {
-      window.initializeForm(i.id, i.form);
+      window.Application.initializeForm(i.id, i.form);
       i.form = i.id;
     }
   });
@@ -1207,7 +1207,7 @@ return a;
     final result = await _controller.callAsyncJavaScript(
       arguments: {'formid': id},
       functionBody: """
-var form = window.getForm(formid);
+var form = window.Application.getForm(formid);
 if (typeof form === "undefined") {
   return false;
 }
@@ -1228,7 +1228,7 @@ return form.requiresExplicitSubmission();
       arguments: {'formid': id},
       functionBody:
           """
-var form = window.getForm(formid);
+var form = window.Application.getForm(formid);
 if (typeof form === "undefined") {
   return;
 }
@@ -1242,7 +1242,7 @@ return form.$method?.();
     _controller.callAsyncJavaScript(
       arguments: {'formid': id},
       functionBody: """
-var form = window.getForm(formid);
+var form = window.Application.getForm(formid);
 if (typeof form === "undefined") {
   return;
 }
@@ -1255,6 +1255,8 @@ form.formWillAppear?.();
   }
 
   void uninitialize() {
-    _controller.evaluateJavascript(source: "window.uninitializeForms();");
+    _controller.evaluateJavascript(
+      source: "window.Application.uninitializeForms();",
+    );
   }
 }
