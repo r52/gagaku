@@ -2486,24 +2486,19 @@ class MangaDexHistoryDB {
 class MangaDexHistory extends _$MangaDexHistory {
   static const _numItems = 50;
 
-  late final Query<MangaDexHistoryDB> query;
-
   @override
   Future<Queue<Chapter>> build() async {
     final box = GagakuData().store.box<MangaDexHistoryDB>();
-    query = box.query().build();
+    final query = box.query().build();
 
     MangaDexHistoryDB? db;
     db = query.findUnique();
+    query.close();
 
     if (db == null) {
       db = MangaDexHistoryDB();
       box.put(db);
     }
-
-    ref.onDispose(() {
-      query.close();
-    });
 
     if (db.queue.isEmpty) {
       return Queue<Chapter>();
@@ -2538,7 +2533,10 @@ class MangaDexHistory extends _$MangaDexHistory {
     final uuids = cpy.map((e) => e.id).toList();
 
     final box = GagakuData().store.box<MangaDexHistoryDB>();
+    final query = box.query().build();
     final db = query.findUnique()!;
+    query.close();
+
     db.queue = uuids;
 
     box.put(db);
