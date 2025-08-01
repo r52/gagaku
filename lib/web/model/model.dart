@@ -326,13 +326,15 @@ class WebSourceFavorites extends _$WebSourceFavorites {
       final listBox = store.box<WebFavoritesList>();
 
       // Add/update link
-      final query = linkBox.query(HistoryLink_.url.equals(link.url)).build();
-      final result = query.findUnique();
-      query.close();
+      if (link.dbid == 0) {
+        final query = linkBox.query(HistoryLink_.url.equals(link.url)).build();
+        final result = query.findUnique();
+        query.close();
 
-      if (result != null) {
-        link.dbid = result.dbid;
-        link.lastAccessed = result.lastAccessed;
+        if (result != null) {
+          link.dbid = result.dbid;
+          link.lastAccessed = result.lastAccessed;
+        }
       }
 
       linkBox.put(link);
@@ -435,14 +437,16 @@ class WebHistoryManager {
       listquery.close();
 
       // Add/update link
-      final linkquery = linkBox
-          .query(HistoryLink_.url.equals(link.url))
-          .build();
-      final result = linkquery.findUnique();
-      linkquery.close();
+      if (link.dbid == 0) {
+        final linkquery = linkBox
+            .query(HistoryLink_.url.equals(link.url))
+            .build();
+        final result = linkquery.findUnique();
+        linkquery.close();
 
-      if (result != null) {
-        link.dbid = result.dbid;
+        if (result != null) {
+          link.dbid = result.dbid;
+        }
       }
 
       linkBox.put(link);

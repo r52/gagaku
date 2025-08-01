@@ -113,7 +113,7 @@ final class WebSourceFavoritesProvider
 }
 
 String _$webSourceFavoritesHash() =>
-    r'f59d16deeaf6e70ac5503bd7274831bfd1681287';
+    r'1bb6548d959aa287275a7e1a2571b45f960f56a2';
 
 abstract class _$WebSourceFavorites
     extends $AsyncNotifier<List<WebFavoritesList>> {

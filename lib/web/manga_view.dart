@@ -6,6 +6,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
+import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
@@ -104,13 +105,27 @@ class WebMangaViewWidget extends HookConsumerWidget {
     );
     final api = ref.watch(proxyProvider);
     final theme = Theme.of(context);
-    final link = HistoryLink(
-      title: manga.title,
-      url: handle.getURL(),
-      cover: manga.cover,
-      handle: handle,
-      lastAccessed: DateTime.now(),
-    );
+
+    final link = useMemoized(() {
+      final url = handle.getURL();
+      final query = GagakuData().store
+          .box<HistoryLink>()
+          .query(HistoryLink_.url.equals(url))
+          .build();
+      final link = query.findUnique();
+      query.close();
+
+      final updated = HistoryLink(
+        dbid: link?.dbid ?? 0,
+        title: manga.title,
+        url: url,
+        cover: manga.cover,
+        handle: handle,
+        lastAccessed: DateTime.now(),
+      );
+
+      return updated;
+    }, [manga, handle]);
 
     final extdata = manga.data;
 
