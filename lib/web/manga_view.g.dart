@@ -11,8 +11,14 @@ const _fetchWebMangaInfoProvider = _FetchWebMangaInfoFamily._();
 
 final class _FetchWebMangaInfoProvider
     extends
-        $FunctionalProvider<AsyncValue<WebManga>, WebManga, FutureOr<WebManga>>
-    with $FutureModifier<WebManga>, $FutureProvider<WebManga> {
+        $FunctionalProvider<
+          AsyncValue<(WebManga, HistoryLink)>,
+          (WebManga, HistoryLink),
+          FutureOr<(WebManga, HistoryLink)>
+        >
+    with
+        $FutureModifier<(WebManga, HistoryLink)>,
+        $FutureProvider<(WebManga, HistoryLink)> {
   const _FetchWebMangaInfoProvider._({
     required _FetchWebMangaInfoFamily super.from,
     required SourceHandler super.argument,
@@ -36,11 +42,12 @@ final class _FetchWebMangaInfoProvider
 
   @$internal
   @override
-  $FutureProviderElement<WebManga> $createElement($ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+  $FutureProviderElement<(WebManga, HistoryLink)> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<WebManga> create(Ref ref) {
+  FutureOr<(WebManga, HistoryLink)> create(Ref ref) {
     final argument = this.argument as SourceHandler;
     return _fetchWebMangaInfo(ref, argument);
   }
@@ -56,10 +63,14 @@ final class _FetchWebMangaInfoProvider
   }
 }
 
-String _$fetchWebMangaInfoHash() => r'e745e301b87e533d34606a34767ffee04286b1ec';
+String _$fetchWebMangaInfoHash() => r'7b848d6df4e5ea8b568b1e36c33603aa175298d2';
 
 final class _FetchWebMangaInfoFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<WebManga>, SourceHandler> {
+    with
+        $FunctionalFamilyOverride<
+          FutureOr<(WebManga, HistoryLink)>,
+          SourceHandler
+        > {
   const _FetchWebMangaInfoFamily._()
     : super(
         retry: noRetry,

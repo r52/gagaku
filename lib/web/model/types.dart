@@ -5,11 +5,16 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:gagaku/model/model.dart';
+import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/reader/main.dart' show CtxCallback;
 import 'package:gagaku/util/freezed.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:objectbox/objectbox.dart';
 import 'package:uuid/uuid.dart';
+
+// Needed for builder
+// ignore: unnecessary_import
+import 'package:objectbox/objectbox.dart';
 
 part 'types.freezed.dart';
 part 'types.g.dart';
@@ -220,6 +225,24 @@ class HistoryLink with _$HistoryLink {
 
   set dbHandle(String? value) {
     handle = value == null ? null : SourceHandler.fromJson(json.decode(value));
+  }
+
+  void resolveDb({Store? store, bool copyParams = false}) {
+    final actualStore = store ?? GagakuData().store;
+    final linkBox = actualStore.box<HistoryLink>();
+
+    if (dbid == 0) {
+      final query = linkBox.query(HistoryLink_.url.equals(url)).build();
+      final result = query.findUnique();
+      query.close();
+
+      if (result != null) {
+        dbid = result.dbid;
+        if (copyParams) {
+          lastAccessed = result.lastAccessed;
+        }
+      }
+    }
   }
 
   factory HistoryLink.fromJson(Map<String, dynamic> json) =>

@@ -47,52 +47,12 @@ final class ProxyProvider
 
 String _$proxyHash() => r'8a4e90bb9775641c76f0be18ce9750786e3b2a4b';
 
-@ProviderFor(favoritesList)
-const favoritesListProvider = FavoritesListProvider._();
-
-final class FavoritesListProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<List<WebFavoritesList>>,
-          List<WebFavoritesList>,
-          Stream<List<WebFavoritesList>>
-        >
-    with
-        $FutureModifier<List<WebFavoritesList>>,
-        $StreamProvider<List<WebFavoritesList>> {
-  const FavoritesListProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'favoritesListProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$favoritesListHash();
-
-  @$internal
-  @override
-  $StreamProviderElement<List<WebFavoritesList>> $createElement(
-    $ProviderPointer pointer,
-  ) => $StreamProviderElement(pointer);
-
-  @override
-  Stream<List<WebFavoritesList>> create(Ref ref) {
-    return favoritesList(ref);
-  }
-}
-
-String _$favoritesListHash() => r'f7a0e706c7eb0a7b01aad42eb5a06a119dffe6f8';
-
 @ProviderFor(WebSourceFavorites)
 const webSourceFavoritesProvider = WebSourceFavoritesProvider._();
 
 final class WebSourceFavoritesProvider
-    extends $AsyncNotifierProvider<WebSourceFavorites, List<WebFavoritesList>> {
+    extends
+        $StreamNotifierProvider<WebSourceFavorites, List<WebFavoritesList>> {
   const WebSourceFavoritesProvider._()
     : super(
         from: null,
@@ -113,11 +73,11 @@ final class WebSourceFavoritesProvider
 }
 
 String _$webSourceFavoritesHash() =>
-    r'1bb6548d959aa287275a7e1a2571b45f960f56a2';
+    r'1901b393f225a3d71865fe5fd9c55612884c0a83';
 
 abstract class _$WebSourceFavorites
-    extends $AsyncNotifier<List<WebFavoritesList>> {
-  FutureOr<List<WebFavoritesList>> build();
+    extends $StreamNotifier<List<WebFavoritesList>> {
+  Stream<List<WebFavoritesList>> build();
   @$mustCallSuper
   @override
   void runBuild() {

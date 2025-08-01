@@ -523,20 +523,13 @@ class FavoritesButton extends HookConsumerWidget {
     final theme = Theme.of(context);
     final mutFav = ref.watch(webSourceFavoritesMutation);
 
-    final favorites = ref.watch(
-      webSourceFavoritesProvider.select(
-        (value) => switch (value) {
-          AsyncValue(value: final data?) => data,
-          _ => <WebFavoritesList>[],
-        },
-      ),
-    );
+    final favorites = ref.watch(webSourceFavoritesProvider).value;
 
     final favlist = useMemoized(
-      () => favorites.map((l) => l.list.contains(link)).toList(),
+      () => favorites?.map((l) => l.list.contains(link)).toList(),
       [favorites],
     );
-    final favorited = useMemoized(() => favlist.any((e) => e), [favlist]);
+    final favorited = useMemoized(() => favlist?.any((e) => e), [favlist]);
 
     return MenuAnchor(
       builder: (context, controller, child) {
@@ -546,7 +539,7 @@ class FavoritesButton extends HookConsumerWidget {
             color: theme.colorScheme.surface.withAlpha(200),
             shape: borderRadius == null ? const CircleBorder() : null,
             borderRadius: borderRadius,
-            child: favorites.isEmpty
+            child: favorites == null
                 ? const SizedBox(
                     width: 40,
                     height: 40,
@@ -568,13 +561,13 @@ class FavoritesButton extends HookConsumerWidget {
           ),
         );
       },
-      menuChildren: favorites.isNotEmpty
+      menuChildren: favorites != null
           ? [
               for (final (idx, cat) in favorites.indexed)
                 CheckboxListTile(
                   controlAffinity: ListTileControlAffinity.leading,
                   title: Text(cat.name),
-                  value: favlist.elementAt(idx),
+                  value: favlist!.elementAt(idx),
                   onChanged: mutFav is! MutationPending
                       ? (bool? value) async {
                           if (value == true) {
@@ -607,8 +600,8 @@ class FavoritesButton extends HookConsumerWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Icon(
-          favorited ? Icons.favorite : Icons.favorite_border,
-          color: favorited ? theme.colorScheme.primary : null,
+          favorited == true ? Icons.favorite : Icons.favorite_border,
+          color: favorited == true ? theme.colorScheme.primary : null,
         ),
       ),
     );

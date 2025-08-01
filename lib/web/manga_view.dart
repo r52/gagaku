@@ -6,7 +6,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
-import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
@@ -21,12 +20,25 @@ import 'package:url_launcher/url_launcher.dart';
 part 'manga_view.g.dart';
 
 @Riverpod(retry: noRetry)
-Future<WebManga> _fetchWebMangaInfo(Ref ref, SourceHandler handle) async {
+Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
+  Ref ref,
+  SourceHandler handle,
+) async {
   final api = ref.watch(proxyProvider);
   final manga = await api.getMangaFromSource(handle);
 
   if (manga != null) {
-    return manga;
+    final link = HistoryLink(
+      title: manga.title,
+      url: handle.getURL(),
+      cover: manga.cover,
+      handle: handle,
+      lastAccessed: DateTime.now(),
+    );
+
+    link.resolveDb();
+
+    return (manga, link);
   }
 
   throw Exception('Invalid WebManga link. Data not found.');
@@ -77,7 +89,8 @@ class WebMangaViewPage extends ConsumerWidget {
           },
         ),
       ),
-      builder: (context, data) => WebMangaViewWidget(manga: data, handle: hndl),
+      builder: (context, data) =>
+          WebMangaViewWidget(manga: data.$1, handle: hndl, link: data.$2),
     );
   }
 }
@@ -87,10 +100,12 @@ class WebMangaViewWidget extends HookConsumerWidget {
     super.key,
     required this.manga,
     required this.handle,
+    required this.link,
   });
 
   final WebManga manga;
   final SourceHandler handle;
+  final HistoryLink link;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -105,27 +120,6 @@ class WebMangaViewWidget extends HookConsumerWidget {
     );
     final api = ref.watch(proxyProvider);
     final theme = Theme.of(context);
-
-    final link = useMemoized(() {
-      final url = handle.getURL();
-      final query = GagakuData().store
-          .box<HistoryLink>()
-          .query(HistoryLink_.url.equals(url))
-          .build();
-      final link = query.findUnique();
-      query.close();
-
-      final updated = HistoryLink(
-        dbid: link?.dbid ?? 0,
-        title: manga.title,
-        url: url,
-        cover: manga.cover,
-        handle: handle,
-        lastAccessed: DateTime.now(),
-      );
-
-      return updated;
-    }, [manga, handle]);
 
     final extdata = manga.data;
 

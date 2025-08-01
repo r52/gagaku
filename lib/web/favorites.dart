@@ -26,14 +26,7 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
         controller ??
         useScrollController();
 
-    final categories = ref.watch(
-      webSourceFavoritesProvider.select(
-        (value) => switch (value) {
-          AsyncValue(value: final data?) => data,
-          _ => <WebFavoritesList>[],
-        },
-      ),
-    );
+    final categories = ref.watch(webSourceFavoritesProvider).value ?? [];
     final tabController = useTabController(
       initialLength: categories.length,
       keys: [categories.length],

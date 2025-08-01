@@ -299,25 +299,19 @@ class ProxyHandler {
 }
 
 @Riverpod(keepAlive: true)
-Stream<List<WebFavoritesList>> favoritesList(Ref ref) async* {
-  final box = GagakuData().store.box<WebFavoritesList>();
-  final stream = box
-      .query(WebFavoritesList_.id.notEquals(historyListUUID))
-      .order(WebFavoritesList_.sortOrder)
-      .watch(triggerImmediately: true)
-      .map((query) => query.find());
-
-  await for (final items in stream) {
-    yield items;
-  }
-}
-
-@Riverpod(keepAlive: true)
 class WebSourceFavorites extends _$WebSourceFavorites {
   @override
-  FutureOr<List<WebFavoritesList>> build() async {
-    final data = await ref.watch(favoritesListProvider.future);
-    return data;
+  Stream<List<WebFavoritesList>> build() async* {
+    final box = GagakuData().store.box<WebFavoritesList>();
+    final stream = box
+        .query(WebFavoritesList_.id.notEquals(historyListUUID))
+        .order(WebFavoritesList_.sortOrder)
+        .watch(triggerImmediately: true)
+        .map((query) => query.find());
+
+    await for (final items in stream) {
+      yield items;
+    }
   }
 
   Future<void> add(WebFavoritesList list, HistoryLink link) async {
@@ -326,17 +320,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
       final listBox = store.box<WebFavoritesList>();
 
       // Add/update link
-      if (link.dbid == 0) {
-        final query = linkBox.query(HistoryLink_.url.equals(link.url)).build();
-        final result = query.findUnique();
-        query.close();
-
-        if (result != null) {
-          link.dbid = result.dbid;
-          link.lastAccessed = result.lastAccessed;
-        }
-      }
-
+      link.resolveDb(store: store, copyParams: true);
       linkBox.put(link);
 
       // Add link to list
@@ -353,6 +337,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
   Future<void> remove(WebFavoritesList list, HistoryLink link) async {
     await GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
       final listBox = store.box<WebFavoritesList>();
+      link.resolveDb(store: store);
 
       list.list.remove(link);
       listBox.put(list);
@@ -362,6 +347,7 @@ class WebSourceFavorites extends _$WebSourceFavorites {
   Future<void> removeFromAll(HistoryLink link) async {
     await GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
       final listBox = store.box<WebFavoritesList>();
+      link.resolveDb(store: store);
 
       final listQuery = listBox
           .query(WebFavoritesList_.id.notEquals(historyListUUID))
@@ -437,18 +423,7 @@ class WebHistoryManager {
       listquery.close();
 
       // Add/update link
-      if (link.dbid == 0) {
-        final linkquery = linkBox
-            .query(HistoryLink_.url.equals(link.url))
-            .build();
-        final result = linkquery.findUnique();
-        linkquery.close();
-
-        if (result != null) {
-          link.dbid = result.dbid;
-        }
-      }
-
+      link.resolveDb(store: store);
       linkBox.put(link);
 
       // Add to list
@@ -483,6 +458,8 @@ class WebHistoryManager {
 
       final list = query.findUnique()!;
       query.close();
+
+      link.resolveDb(store: store);
 
       if (list.list.contains(link)) {
         list.list.remove(link);
