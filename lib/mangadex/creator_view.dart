@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -76,8 +77,8 @@ class _MangaDexCreatorViewWidgetState
   static const info = MangaDexFeeds.creatorTitles;
 
   late final _pagingController = GagakuPagingController<int, Manga>(
-    getNextPageKey:
-        (state) => state.keys?.last != null ? state.keys!.last + info.limit : 0,
+    getNextPageKey: (state) =>
+        state.keys?.last != null ? state.keys!.last + info.limit : 0,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final list = await api.fetchMangaList(
@@ -89,9 +90,13 @@ class _MangaDexCreatorViewWidgetState
 
       final newItems = list.data.cast<Manga>();
 
-      statisticsMutation.run(ref, (ref) async {
-        return await ref.get(statisticsProvider.notifier).get(newItems);
-      });
+      try {
+        statisticsMutation.run(ref, (ref) async {
+          return await ref.get(statisticsProvider.notifier).get(newItems);
+        });
+      } catch (e) {
+        logger.e(e, error: e);
+      }
 
       return PageResultsMetaData(newItems, list.total);
     },

@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -138,9 +139,13 @@ class _MangaDexMangaViewWidgetState
 
       final chapters = chapterlist.data.cast<Chapter>();
 
-      chapterStatsMutation.run(ref, (ref) async {
-        return await ref.get(chapterStatsProvider.notifier).get(chapters);
-      });
+      try {
+        chapterStatsMutation.run(ref, (ref) async {
+          return await ref.get(chapterStatsProvider.notifier).get(chapters);
+        });
+      } catch (e) {
+        logger.e(e, error: e);
+      }
 
       return PageResultsMetaData(chapters, chapterlist.total);
     },
@@ -201,19 +206,23 @@ class _MangaDexMangaViewWidgetState
         limit: MangaDexEndpoints.breakLimit,
       );
 
-      await (
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get(mangas);
-        }),
-        readChaptersMutation(me?.id).run(ref, (ref) async {
-          return await ref
-              .get(readChaptersProvider(me?.id).notifier)
-              .get(mangas);
-        }),
-        ratingsMutation(me?.id).run(ref, (ref) async {
-          await ref.get(ratingsProvider(me?.id).notifier).get(mangas);
-        }),
-      ).wait;
+      try {
+        await (
+          statisticsMutation.run(ref, (ref) async {
+            return await ref.get(statisticsProvider.notifier).get(mangas);
+          }),
+          readChaptersMutation(me?.id).run(ref, (ref) async {
+            return await ref
+                .get(readChaptersProvider(me?.id).notifier)
+                .get(mangas);
+          }),
+          ratingsMutation(me?.id).run(ref, (ref) async {
+            await ref.get(ratingsProvider(me?.id).notifier).get(mangas);
+          }),
+        ).wait;
+      } catch (e) {
+        logger.e(e, error: e);
+      }
 
       return PageResultsMetaData(mangas, widget.manga.relatedMangas.length);
     },

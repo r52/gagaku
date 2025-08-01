@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
@@ -462,19 +463,23 @@ class _InfiniteScrollFeedState
         limit: MangaDexEndpoints.breakLimit,
       );
 
-      await (
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get(mangas);
-        }),
-        readChaptersMutation(me?.id).run(ref, (ref) async {
-          return await ref
-              .get(readChaptersProvider(me?.id).notifier)
-              .get(mangas);
-        }),
-        chapterStatsMutation.run(ref, (ref) async {
-          return await ref.get(chapterStatsProvider.notifier).get(chapters);
-        }),
-      ).wait;
+      try {
+        await (
+          statisticsMutation.run(ref, (ref) async {
+            return await ref.get(statisticsProvider.notifier).get(mangas);
+          }),
+          readChaptersMutation(me?.id).run(ref, (ref) async {
+            return await ref
+                .get(readChaptersProvider(me?.id).notifier)
+                .get(mangas);
+          }),
+          chapterStatsMutation.run(ref, (ref) async {
+            return await ref.get(chapterStatsProvider.notifier).get(chapters);
+          }),
+        ).wait;
+      } catch (e) {
+        logger.e(e, error: e);
+      }
 
       return PageResultsMetaData(chapters, chapterlist.total);
     },
@@ -555,6 +560,7 @@ class _CoverButton extends ConsumerWidget {
         statisticsMutation.run(ref, (ref) async {
           return await ref.get(statisticsProvider.notifier).get([manga]);
         });
+
         context.router.push(
           MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
         );

@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
@@ -289,9 +290,13 @@ class __GroupTitlesTabState extends ConsumerState<_GroupTitlesTab> {
 
       final newItems = list.data.cast<Manga>();
 
-      statisticsMutation.run(ref, (ref) async {
-        return await ref.get(statisticsProvider.notifier).get(newItems);
-      });
+      try {
+        statisticsMutation.run(ref, (ref) async {
+          return await ref.get(statisticsProvider.notifier).get(newItems);
+        });
+      } catch (e) {
+        logger.e(e, error: e);
+      }
 
       return PageResultsMetaData(newItems, list.total);
     },

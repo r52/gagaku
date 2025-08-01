@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -52,8 +53,8 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
       const MangaSearchParameters(query: '', filter: MangaFilters());
 
   late final _pagingController = GagakuPagingController<int, Manga>(
-    getNextPageKey:
-        (state) => state.keys?.last != null ? state.keys!.last + info.limit : 0,
+    getNextPageKey: (state) =>
+        state.keys?.last != null ? state.keys!.last + info.limit : 0,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final filter = _searchParameters;
@@ -68,9 +69,13 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
       final manga = results.data.cast<Manga>();
 
       if (manga.isNotEmpty) {
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get(manga);
-        });
+        try {
+          statisticsMutation.run(ref, (ref) async {
+            return await ref.get(statisticsProvider.notifier).get(manga);
+          });
+        } catch (e) {
+          logger.e(e, error: e);
+        }
       }
 
       return PageResultsMetaData(manga, results.total);
@@ -151,10 +156,9 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                             });
                           }
                         },
-                        color:
-                            _searchParameters.filter.isEmpty
-                                ? theme.disabledColor
-                                : null,
+                        color: _searchParameters.filter.isEmpty
+                            ? theme.disabledColor
+                            : null,
                         icon: const Icon(Icons.filter_list),
                       ),
                     ),
@@ -169,8 +173,10 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                     final term = value.trim();
                     if (term.isNotEmpty) {
                       final history = ref.read(_searchHistoryProvider);
-                      ref.read(_searchHistoryProvider.notifier).state =
-                          {term, ...history}.take(5).toList();
+                      ref.read(_searchHistoryProvider.notifier).state = {
+                        term,
+                        ...history,
+                      }.take(5).toList();
                     }
 
                     unfocusSearchBar();
@@ -190,8 +196,10 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                 final term = value.trim();
                 if (term.isNotEmpty) {
                   final history = ref.read(_searchHistoryProvider);
-                  ref.read(_searchHistoryProvider.notifier).state =
-                      {term, ...history}.take(5).toList();
+                  ref.read(_searchHistoryProvider.notifier).state = {
+                    term,
+                    ...history,
+                  }.take(5).toList();
                 }
 
                 controller.closeView(term);
@@ -207,41 +215,45 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                   _pagingController.refresh();
                 });
               },
-              suggestionsBuilder: (
-                BuildContext context,
-                SearchController controller,
-              ) {
-                final history = ref.read(_searchHistoryProvider);
-                return history
-                    .map(
-                      (e) => ListTile(
-                        titleAlignment: ListTileTitleAlignment.center,
-                        title: Text(e),
-                        onTap: () {
-                          final term = e.trim();
-                          if (term.isNotEmpty) {
-                            final history = ref.read(_searchHistoryProvider);
-                            ref.read(_searchHistoryProvider.notifier).state =
-                                {term, ...history}.take(5).toList();
-                          }
+              suggestionsBuilder:
+                  (BuildContext context, SearchController controller) {
+                    final history = ref.read(_searchHistoryProvider);
+                    return history
+                        .map(
+                          (e) => ListTile(
+                            titleAlignment: ListTileTitleAlignment.center,
+                            title: Text(e),
+                            onTap: () {
+                              final term = e.trim();
+                              if (term.isNotEmpty) {
+                                final history = ref.read(
+                                  _searchHistoryProvider,
+                                );
+                                ref
+                                    .read(_searchHistoryProvider.notifier)
+                                    .state = {
+                                  term,
+                                  ...history,
+                                }.take(5).toList();
+                              }
 
-                          controller.closeView(term);
+                              controller.closeView(term);
 
-                          unfocusSearchBar();
+                              unfocusSearchBar();
 
-                          setState(() {
-                            _searchParameters = filter.copyWith(
-                              query: term,
-                              filter: filter.filter,
-                            );
+                              setState(() {
+                                _searchParameters = filter.copyWith(
+                                  query: term,
+                                  filter: filter.filter,
+                                );
 
-                            _pagingController.refresh();
-                          });
-                        },
-                      ),
-                    )
-                    .toList();
-              },
+                                _pagingController.refresh();
+                              });
+                            },
+                          ),
+                        )
+                        .toList();
+                  },
             ),
           ),
           SliverAppBar(
@@ -392,264 +404,232 @@ class _MangaDexFilterWidget extends HookWidget {
                 ExpansionPanel(
                   canTapOnHeader: true,
                   isExpanded: expanded.value[0],
-                  headerBuilder:
-                      (context, isExpanded) => HookBuilder(
-                        builder: (context) {
-                          final selected = useListenableSelector(
-                            fil,
-                            () => fil.value.contentRating,
-                          );
+                  headerBuilder: (context, isExpanded) => HookBuilder(
+                    builder: (context) {
+                      final selected = useListenableSelector(
+                        fil,
+                        () => fil.value.contentRating,
+                      );
 
-                          return ListTile(
-                            title: Text(
-                              tr.mangadex.contentRating,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle:
-                                selected.isEmpty
-                                    ? Text(tr.search.any)
-                                    : Text(
-                                      selected
-                                          .map((e) => tr[e.label])
-                                          .join(', '),
-                                    ),
-                          );
-                        },
-                      ),
+                      return ListTile(
+                        title: Text(
+                          tr.mangadex.contentRating,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: selected.isEmpty
+                            ? Text(tr.search.any)
+                            : Text(selected.map((e) => tr[e.label]).join(', ')),
+                      );
+                    },
+                  ),
                   body: SizedBox(
                     width: double.infinity,
                     child: _SectionChildren(
                       key: const ValueKey("_contentChildren"),
-                      children:
-                          ContentRating.values
-                              .map(
-                                (e) => HookBuilder(
-                                  builder: (context) {
-                                    final selected = useListenableSelector(
-                                      fil,
-                                      () => fil.value.contentRating.contains(e),
-                                    );
+                      children: ContentRating.values
+                          .map(
+                            (e) => HookBuilder(
+                              builder: (context) {
+                                final selected = useListenableSelector(
+                                  fil,
+                                  () => fil.value.contentRating.contains(e),
+                                );
 
-                                    return FilterChip(
-                                      label: Text(tr[e.label]),
-                                      selectedColor: selectedChipColor,
-                                      selected: selected,
-                                      onSelected: (bool value) {
-                                        if (value) {
-                                          fil.value = MangaFilterAction.action(
-                                            fil.value,
-                                            contentRating: {
-                                              ...fil.value.contentRating,
-                                              e,
-                                            },
-                                          );
-                                        } else {
-                                          fil.value = MangaFilterAction.action(
-                                            fil.value,
-                                            contentRating:
-                                                fil.value.contentRating
-                                                    .where(
-                                                      (element) => element != e,
-                                                    )
-                                                    .toSet(),
-                                          );
-                                        }
-                                      },
-                                    );
+                                return FilterChip(
+                                  label: Text(tr[e.label]),
+                                  selectedColor: selectedChipColor,
+                                  selected: selected,
+                                  onSelected: (bool value) {
+                                    if (value) {
+                                      fil.value = MangaFilterAction.action(
+                                        fil.value,
+                                        contentRating: {
+                                          ...fil.value.contentRating,
+                                          e,
+                                        },
+                                      );
+                                    } else {
+                                      fil.value = MangaFilterAction.action(
+                                        fil.value,
+                                        contentRating: fil.value.contentRating
+                                            .where((element) => element != e)
+                                            .toSet(),
+                                      );
+                                    }
                                   },
-                                ),
-                              )
-                              .toList(),
+                                );
+                              },
+                            ),
+                          )
+                          .toList(),
                     ),
                   ),
                 ),
                 ExpansionPanel(
                   canTapOnHeader: true,
                   isExpanded: expanded.value[1],
-                  headerBuilder:
-                      (context, isExpanded) => HookBuilder(
-                        builder: (context) {
-                          final selected = useListenableSelector(
-                            fil,
-                            () => fil.value.publicationDemographic,
-                          );
+                  headerBuilder: (context, isExpanded) => HookBuilder(
+                    builder: (context) {
+                      final selected = useListenableSelector(
+                        fil,
+                        () => fil.value.publicationDemographic,
+                      );
 
-                          return ListTile(
-                            title: Text(
-                              tr.mangadex.demographic,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle:
-                                selected.isEmpty
-                                    ? Text(tr.search.any)
-                                    : Text(
-                                      selected
-                                          .map((e) => tr[e.label])
-                                          .join(', '),
-                                    ),
-                          );
-                        },
-                      ),
+                      return ListTile(
+                        title: Text(
+                          tr.mangadex.demographic,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: selected.isEmpty
+                            ? Text(tr.search.any)
+                            : Text(selected.map((e) => tr[e.label]).join(', ')),
+                      );
+                    },
+                  ),
                   body: SizedBox(
                     width: double.infinity,
                     child: _SectionChildren(
                       key: const ValueKey("_demographicChildren"),
-                      children:
-                          MangaDemographic.values
-                              .map(
-                                (e) => HookBuilder(
-                                  builder: (context) {
-                                    final selected = useListenableSelector(
-                                      fil,
-                                      () => fil.value.publicationDemographic
-                                          .contains(e),
-                                    );
+                      children: MangaDemographic.values
+                          .map(
+                            (e) => HookBuilder(
+                              builder: (context) {
+                                final selected = useListenableSelector(
+                                  fil,
+                                  () => fil.value.publicationDemographic
+                                      .contains(e),
+                                );
 
-                                    return FilterChip(
-                                      label: Text(e.label),
-                                      selectedColor: selectedChipColor,
-                                      selected: selected,
-                                      onSelected: (bool value) {
-                                        if (value) {
-                                          fil.value = MangaFilterAction.action(
-                                            fil.value,
-                                            publicationDemographic: {
-                                              ...fil
-                                                  .value
-                                                  .publicationDemographic,
-                                              e,
-                                            },
-                                          );
-                                        } else {
-                                          fil.value = MangaFilterAction.action(
-                                            fil.value,
-                                            publicationDemographic:
-                                                fil.value.publicationDemographic
-                                                    .where(
-                                                      (element) => element != e,
-                                                    )
-                                                    .toSet(),
-                                          );
-                                        }
-                                      },
-                                    );
+                                return FilterChip(
+                                  label: Text(e.label),
+                                  selectedColor: selectedChipColor,
+                                  selected: selected,
+                                  onSelected: (bool value) {
+                                    if (value) {
+                                      fil.value = MangaFilterAction.action(
+                                        fil.value,
+                                        publicationDemographic: {
+                                          ...fil.value.publicationDemographic,
+                                          e,
+                                        },
+                                      );
+                                    } else {
+                                      fil.value = MangaFilterAction.action(
+                                        fil.value,
+                                        publicationDemographic: fil
+                                            .value
+                                            .publicationDemographic
+                                            .where((element) => element != e)
+                                            .toSet(),
+                                      );
+                                    }
                                   },
-                                ),
-                              )
-                              .toList(),
+                                );
+                              },
+                            ),
+                          )
+                          .toList(),
                     ),
                   ),
                 ),
                 ExpansionPanel(
                   canTapOnHeader: true,
                   isExpanded: expanded.value[2],
-                  headerBuilder:
-                      (context, isExpanded) => HookBuilder(
-                        builder: (context) {
-                          final selected = useListenableSelector(
-                            fil,
-                            () => fil.value.status,
-                          );
+                  headerBuilder: (context, isExpanded) => HookBuilder(
+                    builder: (context) {
+                      final selected = useListenableSelector(
+                        fil,
+                        () => fil.value.status,
+                      );
 
-                          return ListTile(
-                            title: Text(
-                              tr.mangadex.pubStatus,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle:
-                                selected.isEmpty
-                                    ? Text(tr.search.any)
-                                    : Text(
-                                      selected
-                                          .map((e) => tr[e.label])
-                                          .join(', '),
-                                    ),
-                          );
-                        },
-                      ),
+                      return ListTile(
+                        title: Text(
+                          tr.mangadex.pubStatus,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: selected.isEmpty
+                            ? Text(tr.search.any)
+                            : Text(selected.map((e) => tr[e.label]).join(', ')),
+                      );
+                    },
+                  ),
                   body: SizedBox(
                     width: double.infinity,
                     child: _SectionChildren(
                       key: const ValueKey("_pubChildren"),
-                      children:
-                          MangaStatus.values
-                              .map(
-                                (e) => HookBuilder(
-                                  builder: (context) {
-                                    final selected = useListenableSelector(
-                                      fil,
-                                      () => fil.value.status.contains(e),
-                                    );
+                      children: MangaStatus.values
+                          .map(
+                            (e) => HookBuilder(
+                              builder: (context) {
+                                final selected = useListenableSelector(
+                                  fil,
+                                  () => fil.value.status.contains(e),
+                                );
 
-                                    return FilterChip(
-                                      label: Text(tr[e.label]),
-                                      selectedColor: selectedChipColor,
-                                      selected: selected,
-                                      onSelected: (bool value) {
-                                        if (value) {
-                                          fil.value = MangaFilterAction.action(
-                                            fil.value,
-                                            status: {...fil.value.status, e},
-                                          );
-                                        } else {
-                                          fil.value = MangaFilterAction.action(
-                                            fil.value,
-                                            status:
-                                                fil.value.status
-                                                    .where(
-                                                      (element) => element != e,
-                                                    )
-                                                    .toSet(),
-                                          );
-                                        }
-                                      },
-                                    );
+                                return FilterChip(
+                                  label: Text(tr[e.label]),
+                                  selectedColor: selectedChipColor,
+                                  selected: selected,
+                                  onSelected: (bool value) {
+                                    if (value) {
+                                      fil.value = MangaFilterAction.action(
+                                        fil.value,
+                                        status: {...fil.value.status, e},
+                                      );
+                                    } else {
+                                      fil.value = MangaFilterAction.action(
+                                        fil.value,
+                                        status: fil.value.status
+                                            .where((element) => element != e)
+                                            .toSet(),
+                                      );
+                                    }
                                   },
-                                ),
-                              )
-                              .toList(),
+                                );
+                              },
+                            ),
+                          )
+                          .toList(),
                     ),
                   ),
                 ),
                 ExpansionPanel(
                   canTapOnHeader: true,
                   isExpanded: expanded.value[3],
-                  headerBuilder:
-                      (context, isExpanded) => HookBuilder(
-                        builder: (context) {
-                          final selected = useListenableSelector(
-                            fil,
-                            () => fil.value.author,
-                          );
+                  headerBuilder: (context, isExpanded) => HookBuilder(
+                    builder: (context) {
+                      final selected = useListenableSelector(
+                        fil,
+                        () => fil.value.author,
+                      );
 
-                          return ListTile(
-                            title: Text(
-                              tr.mangaView.author,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                      return ListTile(
+                        title: Text(
+                          tr.mangaView.author,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: selected.isEmpty
+                            ? Text(tr.search.any)
+                            : Text(
+                                selected
+                                    .map((e) => e.attributes.name)
+                                    .join(', '),
                               ),
-                            ),
-                            subtitle:
-                                selected.isEmpty
-                                    ? Text(tr.search.any)
-                                    : Text(
-                                      selected
-                                          .map((e) => e.attributes.name)
-                                          .join(', '),
-                                    ),
-                          );
-                        },
-                      ),
+                      );
+                    },
+                  ),
                   body: SizedBox(
                     width: double.infinity,
                     child: Column(
@@ -673,10 +653,9 @@ class _MangaDexFilterWidget extends HookWidget {
                                 } else {
                                   fil.value = MangaFilterAction.action(
                                     fil.value,
-                                    author:
-                                        fil.value.author
-                                            .where((element) => element != e)
-                                            .toSet(),
+                                    author: fil.value.author
+                                        .where((element) => element != e)
+                                        .toSet(),
                                   );
                                 }
                               },
@@ -692,30 +671,24 @@ class _MangaDexFilterWidget extends HookWidget {
 
                             return _SectionChildren(
                               key: const ValueKey("_selectedAuthors"),
-                              children:
-                                  selected
-                                      .map(
-                                        (e) => InputChip(
-                                          label: Text(e.attributes.name),
-                                          showCheckmark: false,
-                                          selected: true,
-                                          onDeleted: () {
-                                            fil.value =
-                                                MangaFilterAction.action(
-                                                  fil.value,
-                                                  author:
-                                                      fil.value.author
-                                                          .where(
-                                                            (element) =>
-                                                                element != e,
-                                                          )
-                                                          .toSet(),
-                                                );
-                                          },
-                                          selectedColor: selectedChipColor,
-                                        ),
-                                      )
-                                      .toList(),
+                              children: selected
+                                  .map(
+                                    (e) => InputChip(
+                                      label: Text(e.attributes.name),
+                                      showCheckmark: false,
+                                      selected: true,
+                                      onDeleted: () {
+                                        fil.value = MangaFilterAction.action(
+                                          fil.value,
+                                          author: fil.value.author
+                                              .where((element) => element != e)
+                                              .toSet(),
+                                        );
+                                      },
+                                      selectedColor: selectedChipColor,
+                                    ),
+                                  )
+                                  .toList(),
                             );
                           },
                         ),
@@ -726,33 +699,31 @@ class _MangaDexFilterWidget extends HookWidget {
                 ExpansionPanel(
                   canTapOnHeader: true,
                   isExpanded: expanded.value[4],
-                  headerBuilder:
-                      (context, isExpanded) => HookBuilder(
-                        builder: (context) {
-                          final selected = useListenableSelector(
-                            fil,
-                            () => fil.value.artist,
-                          );
+                  headerBuilder: (context, isExpanded) => HookBuilder(
+                    builder: (context) {
+                      final selected = useListenableSelector(
+                        fil,
+                        () => fil.value.artist,
+                      );
 
-                          return ListTile(
-                            title: Text(
-                              tr.mangaView.artist,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                      return ListTile(
+                        title: Text(
+                          tr.mangaView.artist,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: selected.isEmpty
+                            ? Text(tr.search.any)
+                            : Text(
+                                selected
+                                    .map((e) => e.attributes.name)
+                                    .join(', '),
                               ),
-                            ),
-                            subtitle:
-                                selected.isEmpty
-                                    ? Text(tr.search.any)
-                                    : Text(
-                                      selected
-                                          .map((e) => e.attributes.name)
-                                          .join(', '),
-                                    ),
-                          );
-                        },
-                      ),
+                      );
+                    },
+                  ),
                   body: SizedBox(
                     width: double.infinity,
                     child: Column(
@@ -776,10 +747,9 @@ class _MangaDexFilterWidget extends HookWidget {
                                 } else {
                                   fil.value = MangaFilterAction.action(
                                     fil.value,
-                                    artist:
-                                        fil.value.artist
-                                            .where((element) => element != e)
-                                            .toSet(),
+                                    artist: fil.value.artist
+                                        .where((element) => element != e)
+                                        .toSet(),
                                   );
                                 }
                               },
@@ -795,30 +765,24 @@ class _MangaDexFilterWidget extends HookWidget {
 
                             return _SectionChildren(
                               key: const ValueKey("_selectedArtists"),
-                              children:
-                                  selected
-                                      .map(
-                                        (e) => InputChip(
-                                          label: Text(e.attributes.name),
-                                          showCheckmark: false,
-                                          selected: true,
-                                          onDeleted: () {
-                                            fil.value =
-                                                MangaFilterAction.action(
-                                                  fil.value,
-                                                  artist:
-                                                      fil.value.artist
-                                                          .where(
-                                                            (element) =>
-                                                                element != e,
-                                                          )
-                                                          .toSet(),
-                                                );
-                                          },
-                                          selectedColor: selectedChipColor,
-                                        ),
-                                      )
-                                      .toList(),
+                              children: selected
+                                  .map(
+                                    (e) => InputChip(
+                                      label: Text(e.attributes.name),
+                                      showCheckmark: false,
+                                      selected: true,
+                                      onDeleted: () {
+                                        fil.value = MangaFilterAction.action(
+                                          fil.value,
+                                          artist: fil.value.artist
+                                              .where((element) => element != e)
+                                              .toSet(),
+                                        );
+                                      },
+                                      selectedColor: selectedChipColor,
+                                    ),
+                                  )
+                                  .toList(),
                             );
                           },
                         ),
@@ -829,74 +793,72 @@ class _MangaDexFilterWidget extends HookWidget {
                 ExpansionPanel(
                   canTapOnHeader: true,
                   isExpanded: expanded.value[5],
-                  headerBuilder:
-                      (context, isExpanded) => HookBuilder(
-                        builder: (context) {
-                          final included = useListenableSelector(
-                            fil,
-                            () => fil.value.includedTags,
-                          );
-                          final excluded = useListenableSelector(
-                            fil,
-                            () => fil.value.excludedTags,
-                          );
+                  headerBuilder: (context, isExpanded) => HookBuilder(
+                    builder: (context) {
+                      final included = useListenableSelector(
+                        fil,
+                        () => fil.value.includedTags,
+                      );
+                      final excluded = useListenableSelector(
+                        fil,
+                        () => fil.value.excludedTags,
+                      );
 
-                          final includedString = included
-                              .map(
-                                (e) => e.attributes.name.get(
-                                  tr.$meta.locale.languageCode,
-                                ),
-                              )
-                              .join(', ');
-                          final excludedString = excluded
-                              .map(
-                                (e) => e.attributes.name.get(
-                                  tr.$meta.locale.languageCode,
-                                ),
-                              )
-                              .join(', ');
-
-                          return ListTile(
-                            title: Text(
-                              tr.search.filterTags,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      final includedString = included
+                          .map(
+                            (e) => e.attributes.name.get(
+                              tr.$meta.locale.languageCode,
                             ),
-                            subtitle:
-                                included.isEmpty && excluded.isEmpty
-                                    ? Text(tr.search.any)
-                                    : Text.rich(
+                          )
+                          .join(', ');
+                      final excludedString = excluded
+                          .map(
+                            (e) => e.attributes.name.get(
+                              tr.$meta.locale.languageCode,
+                            ),
+                          )
+                          .join(', ');
+
+                      return ListTile(
+                        title: Text(
+                          tr.search.filterTags,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: included.isEmpty && excluded.isEmpty
+                            ? Text(tr.search.any)
+                            : Text.rich(
+                                TextSpan(
+                                  children: [
+                                    if (included.isNotEmpty)
                                       TextSpan(
-                                        children: [
-                                          if (included.isNotEmpty)
-                                            TextSpan(
-                                              text: '+ ',
-                                              style: const TextStyle(
-                                                color: Colors.green,
-                                              ),
-                                            ),
-                                          if (included.isNotEmpty)
-                                            TextSpan(text: includedString),
-                                          if (included.isNotEmpty &&
-                                              excluded.isNotEmpty)
-                                            TextSpan(text: ', '),
-                                          if (excluded.isNotEmpty)
-                                            TextSpan(
-                                              text: '- ',
-                                              style: const TextStyle(
-                                                color: Colors.red,
-                                              ),
-                                            ),
-                                          if (excluded.isNotEmpty)
-                                            TextSpan(text: excludedString),
-                                        ],
+                                        text: '+ ',
+                                        style: const TextStyle(
+                                          color: Colors.green,
+                                        ),
                                       ),
-                                    ),
-                          );
-                        },
-                      ),
+                                    if (included.isNotEmpty)
+                                      TextSpan(text: includedString),
+                                    if (included.isNotEmpty &&
+                                        excluded.isNotEmpty)
+                                      TextSpan(text: ', '),
+                                    if (excluded.isNotEmpty)
+                                      TextSpan(
+                                        text: '- ',
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    if (excluded.isNotEmpty)
+                                      TextSpan(text: excludedString),
+                                  ],
+                                ),
+                              ),
+                      );
+                    },
+                  ),
                   body: SizedBox(
                     width: double.infinity,
                     child: Column(
@@ -909,116 +871,101 @@ class _MangaDexFilterWidget extends HookWidget {
                           ),
                           _SectionChildren(
                             key: ValueKey("_${group.label}Children"),
-                            children:
-                                tags
-                                    .where(
-                                      (element) =>
-                                          element.attributes.group == group,
-                                    )
-                                    .map(
-                                      (e) => HookBuilder(
-                                        builder: (context) {
-                                          final value = useListenableSelector(
-                                            fil,
-                                            () =>
-                                                fil.value.includedTags.contains(
-                                                      e,
-                                                    )
-                                                    ? true
-                                                    : (fil.value.excludedTags
-                                                            .contains(e)
-                                                        ? false
-                                                        : null),
-                                          );
+                            children: tags
+                                .where(
+                                  (element) =>
+                                      element.attributes.group == group,
+                                )
+                                .map(
+                                  (e) => HookBuilder(
+                                    builder: (context) {
+                                      final value = useListenableSelector(
+                                        fil,
+                                        () => fil.value.includedTags.contains(e)
+                                            ? true
+                                            : (fil.value.excludedTags.contains(
+                                                    e,
+                                                  )
+                                                  ? false
+                                                  : null),
+                                      );
 
-                                          return TriStateChip(
-                                            label: Text(
-                                              e.attributes.name.get(
-                                                tr.$meta.locale.languageCode,
-                                              ),
-                                            ),
-                                            selectedColor: Colors.green,
-                                            unselectedColor: Colors.red,
-                                            onChanged: (bool? value) {
-                                              switch (value) {
-                                                case null:
-                                                  fil.value =
-                                                      MangaFilterAction.action(
-                                                        fil.value,
-                                                        includedTags:
-                                                            fil
-                                                                .value
-                                                                .includedTags
-                                                                .where(
-                                                                  (element) =>
-                                                                      element !=
-                                                                      e,
-                                                                )
-                                                                .toSet(),
-                                                        excludedTags:
-                                                            fil
-                                                                .value
-                                                                .excludedTags
-                                                                .where(
-                                                                  (element) =>
-                                                                      element !=
-                                                                      e,
-                                                                )
-                                                                .toSet(),
-                                                      );
-                                                  break;
-                                                case true:
-                                                  fil.value =
-                                                      MangaFilterAction.action(
-                                                        fil.value,
-                                                        includedTags: {
-                                                          ...fil
-                                                              .value
-                                                              .includedTags,
-                                                          e,
-                                                        },
-                                                        excludedTags:
-                                                            fil
-                                                                .value
-                                                                .excludedTags
-                                                                .where(
-                                                                  (element) =>
-                                                                      element !=
-                                                                      e,
-                                                                )
-                                                                .toSet(),
-                                                      );
-                                                  break;
-                                                case false:
-                                                  fil.value =
-                                                      MangaFilterAction.action(
-                                                        fil.value,
-                                                        includedTags:
-                                                            fil
-                                                                .value
-                                                                .includedTags
-                                                                .where(
-                                                                  (element) =>
-                                                                      element !=
-                                                                      e,
-                                                                )
-                                                                .toSet(),
-                                                        excludedTags: {
-                                                          ...fil
-                                                              .value
-                                                              .excludedTags,
-                                                          e,
-                                                        },
-                                                      );
-                                                  break;
-                                              }
-                                            },
-                                            value: value,
-                                          );
+                                      return TriStateChip(
+                                        label: Text(
+                                          e.attributes.name.get(
+                                            tr.$meta.locale.languageCode,
+                                          ),
+                                        ),
+                                        selectedColor: Colors.green,
+                                        unselectedColor: Colors.red,
+                                        onChanged: (bool? value) {
+                                          switch (value) {
+                                            case null:
+                                              fil.value =
+                                                  MangaFilterAction.action(
+                                                    fil.value,
+                                                    includedTags: fil
+                                                        .value
+                                                        .includedTags
+                                                        .where(
+                                                          (element) =>
+                                                              element != e,
+                                                        )
+                                                        .toSet(),
+                                                    excludedTags: fil
+                                                        .value
+                                                        .excludedTags
+                                                        .where(
+                                                          (element) =>
+                                                              element != e,
+                                                        )
+                                                        .toSet(),
+                                                  );
+                                              break;
+                                            case true:
+                                              fil.value =
+                                                  MangaFilterAction.action(
+                                                    fil.value,
+                                                    includedTags: {
+                                                      ...fil.value.includedTags,
+                                                      e,
+                                                    },
+                                                    excludedTags: fil
+                                                        .value
+                                                        .excludedTags
+                                                        .where(
+                                                          (element) =>
+                                                              element != e,
+                                                        )
+                                                        .toSet(),
+                                                  );
+                                              break;
+                                            case false:
+                                              fil.value =
+                                                  MangaFilterAction.action(
+                                                    fil.value,
+                                                    includedTags: fil
+                                                        .value
+                                                        .includedTags
+                                                        .where(
+                                                          (element) =>
+                                                              element != e,
+                                                        )
+                                                        .toSet(),
+                                                    excludedTags: {
+                                                      ...fil.value.excludedTags,
+                                                      e,
+                                                    },
+                                                  );
+                                              break;
+                                          }
                                         },
-                                      ),
-                                    )
-                                    .toList(),
+                                        value: value,
+                                      );
+                                    },
+                                  ),
+                                )
+                                .toList(),
                           ),
                         ],
                         _SectionHeader(
@@ -1178,30 +1125,29 @@ class _CreatorSearchAnchorState extends ConsumerState<_CreatorSearchAnchor> {
   @override
   Widget build(BuildContext context) {
     return SearchAnchor.bar(
-      suggestionsBuilder: (
-        BuildContext context,
-        SearchController controller,
-      ) async {
-        final List<CreatorType>? options =
-            (await _debouncedSearch(controller.text))?.toList();
-        if (options == null) {
-          return _lastOptions;
-        }
+      suggestionsBuilder:
+          (BuildContext context, SearchController controller) async {
+            final List<CreatorType>? options = (await _debouncedSearch(
+              controller.text,
+            ))?.toList();
+            if (options == null) {
+              return _lastOptions;
+            }
 
-        _lastOptions = options.map((e) {
-          return CheckboxListTile(
-            title: Text(e.attributes.name),
-            value: widget.isSelected(e),
-            onChanged: (value) {
-              widget.onSelect(e, value);
-              // XXX: Not very good UX
-              controller.closeView(null);
-            },
-          );
-        });
+            _lastOptions = options.map((e) {
+              return CheckboxListTile(
+                title: Text(e.attributes.name),
+                value: widget.isSelected(e),
+                onChanged: (value) {
+                  widget.onSelect(e, value);
+                  // XXX: Not very good UX
+                  controller.closeView(null);
+                },
+              );
+            });
 
-        return _lastOptions;
-      },
+            return _lastOptions;
+          },
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
@@ -26,22 +27,20 @@ class _MangaDexRecentFeedPageState
   static const info = MangaDexFeeds.recentlyAdded;
 
   late final _pagingController = GagakuPagingController<int, Manga>(
-    getNextPageKey:
-        (state) => state.keys?.last != null ? state.keys!.last + info.limit : 0,
+    getNextPageKey: (state) =>
+        state.keys?.last != null ? state.keys!.last + info.limit : 0,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final settings = ref.read(mdConfigProvider);
 
       final extraParams = {
         'hasAvailableChapters': 'true',
-        'availableTranslatedLanguage[]':
-            settings.translatedLanguages
-                .map(const LanguageConverter().toJson)
-                .toList(),
-        'originalLanguage[]':
-            settings.originalLanguage
-                .map(const LanguageConverter().toJson)
-                .toList(),
+        'availableTranslatedLanguage[]': settings.translatedLanguages
+            .map(const LanguageConverter().toJson)
+            .toList(),
+        'originalLanguage[]': settings.originalLanguage
+            .map(const LanguageConverter().toJson)
+            .toList(),
       };
 
       final list = await api.fetchMangaList(
@@ -54,9 +53,13 @@ class _MangaDexRecentFeedPageState
 
       final newItems = list.data.cast<Manga>();
 
-      statisticsMutation.run(ref, (ref) async {
-        return await ref.get(statisticsProvider.notifier).get(newItems);
-      });
+      try {
+        statisticsMutation.run(ref, (ref) async {
+          return await ref.get(statisticsProvider.notifier).get(newItems);
+        });
+      } catch (e) {
+        logger.e(e, error: e);
+      }
 
       return PageResultsMetaData(newItems, list.total);
     },
