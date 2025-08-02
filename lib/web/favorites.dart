@@ -26,7 +26,9 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
         controller ??
         useScrollController();
 
-    final categories = ref.watch(webSourceFavoritesProvider).value ?? [];
+    final manager = useListenable(WebFavoritesManager());
+    final categories = manager.state;
+
     final tabController = useTabController(
       initialLength: categories.length,
       keys: [categories.length],

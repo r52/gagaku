@@ -15,7 +15,6 @@ import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -511,25 +510,25 @@ class GridMangaItem extends HookConsumerWidget {
   }
 }
 
-class FavoritesButton extends HookConsumerWidget {
+class FavoritesButton extends HookWidget {
   const FavoritesButton({super.key, required this.link, this.borderRadius});
 
   final HistoryLink link;
   final BorderRadiusGeometry? borderRadius;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final tr = context.t;
     final theme = Theme.of(context);
-    final mutFav = ref.watch(webSourceFavoritesMutation);
 
-    final favorites = ref.watch(webSourceFavoritesProvider).value;
+    final manager = useListenable(WebFavoritesManager());
+    final favorites = manager.state;
 
     final favlist = useMemoized(
-      () => favorites?.map((l) => l.list.contains(link)).toList(),
+      () => favorites.map((l) => l.list.contains(link)).toList(),
       [favorites],
     );
-    final favorited = useMemoized(() => favlist?.any((e) => e), [favlist]);
+    final favorited = useMemoized(() => favlist.any((e) => e), [favlist]);
 
     return MenuAnchor(
       builder: (context, controller, child) {
@@ -539,7 +538,7 @@ class FavoritesButton extends HookConsumerWidget {
             color: theme.colorScheme.surface.withAlpha(200),
             shape: borderRadius == null ? const CircleBorder() : null,
             borderRadius: borderRadius,
-            child: favorites == null
+            child: !manager.hasData
                 ? const SizedBox(
                     width: 40,
                     height: 40,
@@ -561,38 +560,23 @@ class FavoritesButton extends HookConsumerWidget {
           ),
         );
       },
-      menuChildren: favorites != null
+      menuChildren: favorites.isNotEmpty
           ? [
               for (final (idx, cat) in favorites.indexed)
                 CheckboxListTile(
                   controlAffinity: ListTileControlAffinity.leading,
                   title: Text(cat.name),
-                  value: favlist!.elementAt(idx),
-                  onChanged: mutFav is! MutationPending
-                      ? (bool? value) async {
-                          if (value == true) {
-                            webSourceFavoritesMutation.run(ref, (ref) async {
-                              await ref
-                                  .get(webSourceFavoritesProvider.notifier)
-                                  .add(cat, link);
-                            });
-                          } else {
-                            webSourceFavoritesMutation.run(ref, (ref) async {
-                              await ref
-                                  .get(webSourceFavoritesProvider.notifier)
-                                  .remove(cat, link);
-                            });
-                          }
-                        }
-                      : null,
+                  value: favlist.elementAt(idx),
+                  onChanged: (bool? value) async {
+                    if (value == true) {
+                      manager.add(cat, link);
+                    } else {
+                      manager.remove(cat, link);
+                    }
+                  },
                 ),
               MenuItemButton(
-                onPressed: () =>
-                    webSourceFavoritesMutation.run(ref, (ref) async {
-                      await ref
-                          .get(webSourceFavoritesProvider.notifier)
-                          .removeFromAll(link);
-                    }),
+                onPressed: () => manager.removeFromAll(link),
                 child: Text(tr.ui.clear),
               ),
             ]

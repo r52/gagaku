@@ -3,7 +3,7 @@ import { Form } from "@paperback/types";
 export class FormManager {
   private _forms: Record<string, Form> = {}
 
-  async initializeForm(id: string, form: Form): Promise<String> {
+  async initializeForm(id: string, form: Form): Promise<string> {
     Object.assign(form, { __underlying_formId: id });
     this._forms[id] = form;
 

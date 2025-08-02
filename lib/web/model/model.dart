@@ -298,20 +298,35 @@ class ProxyHandler {
   }
 }
 
-@Riverpod(keepAlive: true)
-class WebSourceFavorites extends _$WebSourceFavorites {
-  @override
-  Stream<List<WebFavoritesList>> build() async* {
+class WebFavoritesManager extends ChangeNotifier {
+  static final WebFavoritesManager _instance = WebFavoritesManager._internal();
+
+  List<WebFavoritesList> state = [];
+  bool hasData = false;
+  late StreamSubscription<Query<WebFavoritesList>> _sub;
+
+  WebFavoritesManager._internal() {
     final box = GagakuData().store.box<WebFavoritesList>();
     final stream = box
         .query(WebFavoritesList_.id.notEquals(historyListUUID))
         .order(WebFavoritesList_.sortOrder)
-        .watch(triggerImmediately: true)
-        .map((query) => query.find());
+        .watch(triggerImmediately: true);
 
-    await for (final items in stream) {
-      yield items;
-    }
+    _sub = stream.listen((query) {
+      state = query.find();
+      hasData = true;
+      notifyListeners();
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+
+  factory WebFavoritesManager() {
+    return _instance;
   }
 
   Future<void> add(WebFavoritesList list, HistoryLink link) async {
@@ -363,8 +378,6 @@ class WebSourceFavorites extends _$WebSourceFavorites {
     }, null);
   }
 }
-
-final webSourceFavoritesMutation = Mutation<void>();
 
 class WebHistoryManager {
   static final WebHistoryManager _instance = WebHistoryManager._internal();

@@ -18,7 +18,7 @@ declare global {
     function createExtensionSecureState(state: Record<string, any> | undefined): void;
 
     // Form
-    function initializeForm(id: string, form: Form): Promise<String>;
+    function initializeForm(id: string, form: Form): Promise<string>;
     function uninitializeForms(): void;
     function getForm(id: string): Form | undefined;
   }

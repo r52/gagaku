@@ -47,59 +47,6 @@ final class ProxyProvider
 
 String _$proxyHash() => r'8a4e90bb9775641c76f0be18ce9750786e3b2a4b';
 
-@ProviderFor(WebSourceFavorites)
-const webSourceFavoritesProvider = WebSourceFavoritesProvider._();
-
-final class WebSourceFavoritesProvider
-    extends
-        $StreamNotifierProvider<WebSourceFavorites, List<WebFavoritesList>> {
-  const WebSourceFavoritesProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'webSourceFavoritesProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$webSourceFavoritesHash();
-
-  @$internal
-  @override
-  WebSourceFavorites create() => WebSourceFavorites();
-}
-
-String _$webSourceFavoritesHash() =>
-    r'1901b393f225a3d71865fe5fd9c55612884c0a83';
-
-abstract class _$WebSourceFavorites
-    extends $StreamNotifier<List<WebFavoritesList>> {
-  Stream<List<WebFavoritesList>> build();
-  @$mustCallSuper
-  @override
-  void runBuild() {
-    final created = build();
-    final ref =
-        this.ref
-            as $Ref<AsyncValue<List<WebFavoritesList>>, List<WebFavoritesList>>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<
-                AsyncValue<List<WebFavoritesList>>,
-                List<WebFavoritesList>
-              >,
-              AsyncValue<List<WebFavoritesList>>,
-              Object?,
-              Object?
-            >;
-    element.handleValue(ref, created);
-  }
-}
-
 @ProviderFor(WebReadMarkers)
 const webReadMarkersProvider = WebReadMarkersProvider._();
 
