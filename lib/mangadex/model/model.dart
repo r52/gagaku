@@ -246,11 +246,20 @@ MangaDexModel mangadex(Ref ref) {
 }
 
 class MangaDexModel {
-  MangaDexModel(this.ref) {
-    _cache = ref.watch(cacheProvider);
-
-    _dio.interceptors.add(RateLimitingInterceptor());
-
+  MangaDexModel(this.ref)
+    : _cache = ref.read(cacheProvider),
+      _dio =
+          Dio(
+              BaseOptions(
+                connectTimeout: const Duration(seconds: 5),
+                receiveTimeout: const Duration(seconds: 5),
+                validateStatus: (status) => true,
+              ),
+            )
+            ..httpClientAdapter = NativeAdapter(
+              createCronetEngine: () => createCronetEngine(getUserAgent(true)),
+            )
+            ..interceptors.add(RateLimitingInterceptor()) {
     _fresh = Fresh.oAuth2<OIDAuthToken>(
       httpClient: _dio.clone(),
       tokenStorage: MangaDexTokenStorage(),
@@ -264,24 +273,13 @@ class MangaDexModel {
   }
 
   final Ref ref;
+  final CacheManager _cache;
+  final Dio _dio;
 
   OIDAuthToken? _token;
   Credential? _credential;
 
-  final _dio =
-      Dio(
-          BaseOptions(
-            connectTimeout: const Duration(seconds: 5),
-            receiveTimeout: const Duration(seconds: 5),
-            validateStatus: (status) => true,
-          ),
-        )
-        ..httpClientAdapter = NativeAdapter(
-          createCronetEngine: () => createCronetEngine(getUserAgent(true)),
-        );
   late final Fresh<OIDAuthToken> _fresh;
-
-  late final CacheManager _cache;
 
   // void _urlLauncher(String url) async {
   //   var uri = Uri.parse(url);

@@ -60,27 +60,31 @@ ProxyHandler proxy(Ref ref) {
 }
 
 class ProxyHandler {
-  ProxyHandler(this.ref) {
-    _cache = ref.watch(cacheProvider);
-
-    _dio.interceptors.add(RateLimitingInterceptor());
-  }
+  ProxyHandler(this.ref) : _cache = ref.read(cacheProvider);
 
   final Ref ref;
+  final CacheManager _cache;
 
-  final _dio =
-      Dio(
-          BaseOptions(
-            connectTimeout: const Duration(seconds: 5),
-            receiveTimeout: const Duration(seconds: 5),
-            validateStatus: (status) => true,
-          ),
-        )
-        ..httpClientAdapter = NativeAdapter(
-          createCronetEngine: () => createCronetEngine(getUserAgent(false)),
-        );
+  late final Dio _dio = _createDio();
 
-  late final CacheManager _cache;
+  static const _imgurAlbumUrlPrefix = 'https://imgur.com/a/';
+  static const _cubariUrlPrefix = 'https://cubari.moe/';
+  static const _cubariApiBase = 'https://cubari.moe/read/api';
+
+  Dio _createDio() {
+    final dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 5),
+        validateStatus: (status) => true,
+      ),
+    );
+    dio.httpClientAdapter = NativeAdapter(
+      createCronetEngine: () => createCronetEngine(getUserAgent(false)),
+    );
+    dio.interceptors.add(RateLimitingInterceptor());
+    return dio;
+  }
 
   Future<void> invalidateCacheItem(String item) async {
     if (await _cache.exists(item)) {
@@ -111,33 +115,28 @@ class ProxyHandler {
     return updatedLink;
   }
 
-  Future<SourceHandler?> handleUrl({required String url}) async {
-    if (url.startsWith('https://imgur.com/a/')) {
-      final src = url.substring(20);
-      final handle = SourceHandler(
-        type: SourceType.proxy,
-        sourceId: 'imgur',
-        location: src,
-        chapter: '1',
-      );
+  SourceHandler _handleImgurUrl(String url) {
+    final src = url.substring(_imgurAlbumUrlPrefix.length);
+    final handle = SourceHandler(
+      type: SourceType.proxy,
+      sourceId: 'imgur',
+      location: src,
+      chapter: '1',
+    );
 
-      WebHistoryManager().add(
-        HistoryLink(
-          title: url,
-          url: url,
-          handle: handle,
-          lastAccessed: DateTime.now(),
-        ),
-      );
+    WebHistoryManager().add(
+      HistoryLink(
+        title: url,
+        url: url,
+        handle: handle,
+        lastAccessed: DateTime.now(),
+      ),
+    );
 
-      return handle;
-    }
+    return handle;
+  }
 
-    if (url.startsWith('https://cubari.moe/')) {
-      final handle = await _parseProxyUrl(url);
-      return handle;
-    }
-
+  Future<SourceHandler?> _handleExtensionUrl(String url) async {
     final parts = url.split('/');
     if (parts.length != 2) {
       logger.w('Invalid extension url $url');
@@ -164,14 +163,14 @@ class ProxyHandler {
     return handle;
   }
 
-  Future<SourceHandler?> _parseProxyUrl(String url) async {
-    var src = cleanBaseDomains(url);
+  Future<SourceHandler?> _handleProxyUrl(String url) async {
+    final uri = Uri.parse(url);
 
-    if (!src.startsWith('/')) {
+    if (uri.path.isEmpty || uri.pathSegments.isEmpty) {
       return null;
     }
 
-    var proxy = src.split('/');
+    var proxy = uri.pathSegments.toList();
     proxy.removeWhere((element) => element.isEmpty);
 
     if (proxy.length < 2) {
@@ -216,22 +215,45 @@ class ProxyHandler {
 
         logger.d('ProxyHandler: location $location');
 
-        return _parseProxyUrl(location);
+        return _handleProxyUrl(location);
     }
+  }
+
+  Future<SourceHandler?> handleUrl({required String url}) async {
+    if (url.startsWith(_imgurAlbumUrlPrefix)) {
+      return _handleImgurUrl(url);
+    }
+
+    if (url.startsWith(_cubariUrlPrefix)) {
+      final handle = await _handleProxyUrl(url);
+      return handle;
+    }
+
+    return _handleExtensionUrl(url);
+  }
+
+  Future<WebManga?> _getCachedMangaOrNull(String key) async {
+    if (await _cache.exists(key)) {
+      logger.d('CacheManager: retrieving entry $key');
+      return _cache.get<WebManga>(key, WebManga.fromJson);
+    }
+
+    return null;
   }
 
   Future<WebManga?> getMangaFromSource(SourceHandler handle) async {
     switch (handle.type) {
       case SourceType.source:
         final key = handle.getKey();
+        WebManga? manga;
 
-        if (await _cache.exists(key)) {
-          logger.d('CacheManager: retrieving entry $key');
-          final manga = _cache.get<WebManga>(key, WebManga.fromJson);
+        manga = await _getCachedMangaOrNull(key);
+
+        if (manga != null) {
           return manga;
         }
 
-        final manga = await ref
+        manga = await ref
             .read(extensionSourceProvider(handle.sourceId).notifier)
             .getManga(handle.location);
 
@@ -257,12 +279,13 @@ class ProxyHandler {
 
   Future<WebManga> _getMangaFromProxy(SourceHandler handle) async {
     final key = handle.getKey();
-    final url =
-        "https://cubari.moe/read/api/${handle.sourceId}/series/${handle.location}/";
+    final url = "$_cubariApiBase/${handle.sourceId}/series/${handle.location}/";
 
-    if (await _cache.exists(key)) {
-      logger.d('CacheManager: retrieving entry $key');
-      return _cache.get<WebManga>(key, WebManga.fromJson);
+    WebManga? cached;
+    cached = await _getCachedMangaOrNull(key);
+
+    if (cached != null) {
+      return cached;
     }
 
     final response = await _dio.getUri(Uri.parse(url));

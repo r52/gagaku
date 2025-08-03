@@ -48,8 +48,6 @@ abstract class GagakuRoute {
 const gagakuLocalBox =
     'gagaku_box'; // local, device specific, or secure sensitive data
 const gagakuCache = 'gagaku_cache'; // disk cache
-// const gagakuDataBox =
-//     'gagaku_data'; // non-device specific, non-local, insecure data
 
 class GagakuData {
   GagakuData._internal();
@@ -72,8 +70,7 @@ class GagakuData {
     final storage = Hive.box(gagakuLocalBox);
     final dataLocation = storage.get('data_location') ?? appDir.path;
 
+    // non-device specific, non-local, insecure data
     store = await openStore(directory: p.join(dataLocation, "gagaku"));
-
-    // await Hive.openBox(gagakuDataBox, path: dataLocation);
   }
 }
