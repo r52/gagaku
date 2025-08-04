@@ -3,6 +3,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/util/authentication.dart';
+import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/freezed.dart';
 import 'package:gagaku/util/util.dart';
 
@@ -228,8 +229,9 @@ abstract class MangaFilters with _$MangaFilters {
     }
 
     if (publicationDemographic.isNotEmpty) {
-      params['publicationDemographic[]'] =
-          publicationDemographic.map((e) => e.name).toList();
+      params['publicationDemographic[]'] = publicationDemographic
+          .map((e) => e.name)
+          .toList();
     }
 
     if (contentRating.isNotEmpty) {
@@ -530,7 +532,7 @@ mixin ChapterOps implements MangaDexUUID {
       return mangas.first;
     }
 
-    throw Exception('Chapter $id has no associated manga');
+    throw InvalidDataException('Chapter $id has no associated manga');
   }
 
   User? _getUploadUser() {

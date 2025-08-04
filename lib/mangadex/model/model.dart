@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:gagaku/util/authentication.dart';
+import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/http.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/cache.dart';
@@ -455,7 +456,11 @@ class MangaDexModel {
 
     if (response.statusCode! >= 500) {
       logger.e(message);
-      return Exception(message);
+      return ApiException(
+        message: msg,
+        statusCode: response.statusCode,
+        statusMessage: response.statusMessage,
+      );
     }
 
     // MD API error
@@ -722,7 +727,7 @@ class MangaDexModel {
           final msg =
               "fetchMangaList() failed. Invalid filter type ${entity.runtimeType}.";
           logger.e(msg);
-          throw Exception(msg);
+          throw InvalidDataException(msg);
       }
     }
 

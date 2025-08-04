@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/model/types.dart';
+import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -46,27 +47,27 @@ Future<WebReaderData> _fetchWebChapterInfo(
     }
   }
 
-  throw Exception('Invalid WebChapter link. Data not found.');
+  throw InvalidDataException('Invalid WebChapter link. Data not found.');
 }
 
 @Riverpod(retry: noRetry)
-Future<List<ReaderPage>> _getPages(Ref ref, dynamic source) async {
+Future<List<ReaderPage>> _getPages(Ref ref, dynamic data) async {
   List<String> links;
 
-  if (source is String && source.startsWith('/read/')) {
+  if (data is String && data.startsWith('/read/')) {
     final api = ref.watch(proxyProvider);
-    source = await api.getProxyAPI(source);
+    data = await api.getProxyAPI(data);
   }
 
-  if (source is! List) {
-    throw Exception('Unknown source type ($source)');
+  if (data is! List) {
+    throw InvalidDataException('Unknown page data type ($data)');
   }
 
-  if (source.first is! String) {
-    final imgurlist = source.map((e) => ImgurPage.fromJson(e)).toList();
+  if (data.first is! String) {
+    final imgurlist = data.map((e) => ImgurPage.fromJson(e)).toList();
     links = imgurlist.map((e) => e.src).toList();
   } else {
-    links = List<String>.from(source);
+    links = List<String>.from(data);
   }
 
   final pages = links

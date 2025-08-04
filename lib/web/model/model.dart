@@ -10,6 +10,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/model/cache.dart';
+import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/http.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/model.dart';
@@ -67,8 +68,10 @@ class ProxyHandler {
 
   late final Dio _dio = _createDio();
 
-  static const _imgurAlbumUrlPrefix = 'https://imgur.com/a/';
-  static const _cubariUrlPrefix = 'https://cubari.moe/';
+  static const _imgurHost = 'imgur.com';
+  static const _imgurAlbumUrlPrefix = '/a/';
+  static const _cubariHost = 'cubari.moe';
+  static const _cubariReadPrefix = '/read/';
   static const _cubariApiBase = 'https://cubari.moe/read/api';
 
   Dio _createDio() {
@@ -115,8 +118,8 @@ class ProxyHandler {
     return updatedLink;
   }
 
-  SourceHandler _handleImgurUrl(String url) {
-    final src = url.substring(_imgurAlbumUrlPrefix.length);
+  SourceHandler _handleImgurUrl(Uri uri) {
+    final src = uri.path.substring(_imgurAlbumUrlPrefix.length);
     final handle = SourceHandler(
       type: SourceType.proxy,
       sourceId: 'imgur',
@@ -126,8 +129,8 @@ class ProxyHandler {
 
     WebHistoryManager().add(
       HistoryLink(
-        title: url,
-        url: url,
+        title: uri.toString(),
+        url: uri.toString(),
         handle: handle,
         lastAccessed: DateTime.now(),
       ),
@@ -136,20 +139,20 @@ class ProxyHandler {
     return handle;
   }
 
-  Future<SourceHandler?> _handleExtensionUrl(String url) async {
-    final parts = url.split('/');
+  Future<SourceHandler?> _handleExtensionUrl(Uri uri) async {
+    final parts = uri.pathSegments.toList();
     if (parts.length != 2) {
-      logger.w('Invalid extension url $url');
+      logger.w('Invalid extension url ${uri.toString()}');
       return null;
     }
 
     final srcId = parts[0];
 
-    final installed = await ref.watch(extensionInfoListProvider.future);
+    final installed = await ref.read(extensionInfoListProvider.future);
     final src = installed[srcId];
 
     if (src == null) {
-      logger.w('Extension not found. url: $url');
+      logger.w('Extension not found. url: ${uri.toString()}');
       return null;
     }
 
@@ -163,9 +166,7 @@ class ProxyHandler {
     return handle;
   }
 
-  Future<SourceHandler?> _handleProxyUrl(String url) async {
-    final uri = Uri.parse(url);
-
+  Future<SourceHandler?> _parseCubariReadPath(Uri uri) async {
     if (uri.path.isEmpty || uri.pathSegments.isEmpty) {
       return null;
     }
@@ -177,59 +178,67 @@ class ProxyHandler {
       return null;
     }
 
-    switch (proxy[0]) {
-      case 'read':
-        if (proxy.length >= 4) {
-          return SourceHandler(
-            type: SourceType.proxy,
-            sourceId: proxy[1],
-            location: proxy[2],
-            chapter: proxy[3],
-          );
-        }
-
-        return SourceHandler(
-          type: SourceType.proxy,
-          sourceId: proxy[1],
-          location: proxy[2],
-        );
-      default:
-        logger.d('ProxyHandler: retrieving url $url');
-
-        final response = await _dio.getUri(
-          Uri.parse(url),
-          options: Options(followRedirects: false),
-        );
-
-        if (response.statusCode != 302 ||
-            !response.headers.map.containsKey('location') ||
-            response.headers['location']!.isEmpty) {
-          return null;
-        }
-
-        final location = response.headers['location']!.first;
-
-        if (!location.startsWith('/read/')) {
-          return null;
-        }
-
-        logger.d('ProxyHandler: location $location');
-
-        return _handleProxyUrl(location);
+    if (proxy[0] != 'read') {
+      return null;
     }
+
+    if (proxy.length >= 4) {
+      return SourceHandler(
+        type: SourceType.proxy,
+        sourceId: proxy[1],
+        location: proxy[2],
+        chapter: proxy[3],
+      );
+    }
+
+    return SourceHandler(
+      type: SourceType.proxy,
+      sourceId: proxy[1],
+      location: proxy[2],
+    );
+  }
+
+  Future<SourceHandler?> _handleProxyUrl(Uri uri) async {
+    if (!uri.path.startsWith(_cubariReadPrefix)) {
+      logger.d('ProxyHandler: retrieving url ${uri.toString()}');
+
+      final response = await _dio.getUri(
+        uri,
+        options: Options(followRedirects: false),
+      );
+
+      if (response.statusCode != 302 ||
+          response.headers.value('location') == null ||
+          response.headers['location']!.isEmpty) {
+        return null;
+      }
+
+      final location = response.headers['location']!.first;
+
+      if (!location.startsWith(_cubariReadPrefix)) {
+        return null;
+      }
+
+      logger.d('ProxyHandler: location $location');
+
+      uri = Uri.parse(location);
+    }
+
+    return _parseCubariReadPath(uri);
   }
 
   Future<SourceHandler?> handleUrl({required String url}) async {
-    if (url.startsWith(_imgurAlbumUrlPrefix)) {
-      return _handleImgurUrl(url);
+    final uri = Uri.parse(url);
+
+    if (uri.host == _imgurHost && uri.path.startsWith(_imgurAlbumUrlPrefix)) {
+      return _handleImgurUrl(uri);
     }
 
-    if (url.startsWith(_cubariUrlPrefix)) {
-      final handle = await _handleProxyUrl(url);
-      return handle;
+    if (uri.host == _cubariHost) {
+      return _handleProxyUrl(uri);
     }
 
-    return _handleExtensionUrl(url);
+    return _handleExtensionUrl(uri);
   }
 
   Future<WebManga?> _getCachedMangaOrNull(String key) async {
@@ -277,12 +286,11 @@ class ProxyHandler {
     }
   }
 
-  Future<WebManga> _getMangaFromProxy(SourceHandler handle) async {
+  Future<WebManga?> _getMangaFromProxy(SourceHandler handle) async {
     final key = handle.getKey();
     final url = "$_cubariApiBase/${handle.sourceId}/series/${handle.location}/";
 
-    WebManga? cached;
-    cached = await _getCachedMangaOrNull(key);
+    final cached = await _getCachedMangaOrNull(key);
 
     if (cached != null) {
       return cached;
@@ -301,9 +309,11 @@ class ProxyHandler {
       return manga;
     }
 
-    throw Exception(
+    logger.d(
       "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.statusMessage}",
     );
+
+    return null;
   }
 
   Future<dynamic> getProxyAPI(String path) async {
@@ -315,8 +325,10 @@ class ProxyHandler {
       return response.data;
     }
 
-    throw Exception(
-      "Failed to download API data.\nServer returned response code ${response.statusCode}: ${response.statusMessage}",
+    throw ApiException(
+      message: 'Failed to download API data',
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
     );
   }
 }
@@ -677,7 +689,10 @@ class ExtensionSource extends _$ExtensionSource {
       final query = box.query(WebSourceInfo_.id.equals(sourceId)).build();
       source = await query.findUniqueAsync();
       if (source == null) {
-        throw Exception("Source $sourceId failed to initialize: not installed");
+        throw UnknownSourceException(
+          message: "Source failed to initialize: not installed",
+          sourceId: sourceId,
+        );
       }
     } catch (e) {
       logger.e('Error retrieving source info from database', error: e);
@@ -797,8 +812,14 @@ class ExtensionSource extends _$ExtensionSource {
 
       if (response.statusCode != 200) {
         final err = "Failed to load $scriptUrl";
-        logger.d(err);
-        completer.completeError(Exception(err));
+        logger.e(err);
+        completer.completeError(
+          ApiException(
+            message: err,
+            statusCode: response.statusCode,
+            statusMessage: response.reasonPhrase,
+          ),
+        );
         return;
       }
 
@@ -875,7 +896,7 @@ class ExtensionSource extends _$ExtensionSource {
     final source = await future;
 
     if (!source.hasCapability(SourceIntents.settingsUI)) {
-      throw Exception("Source does not support settings");
+      throw UnsupportedError("Source does not support settings");
     }
 
     final result = await _controller?.callAsyncJavaScript(
@@ -889,13 +910,19 @@ return id;
     );
 
     if (result == null || result.error != null) {
-      throw Exception('JavaScript error: ${result?.error}');
+      throw JavaScriptException(
+        message: 'JavaScript error:',
+        errorMessage: result?.error,
+      );
     }
 
     final formid = result.value as FormID;
 
     if (!_forms.containsKey(formid)) {
-      throw Exception('Failed to create form $formid');
+      throw JavaScriptException(
+        message: 'Failed to create form',
+        errorMessage: formid,
+      );
     }
 
     return _forms[formid]!;
@@ -905,7 +932,7 @@ return id;
     final source = await future;
 
     if (!source.hasCapability(SourceIntents.settingsUI)) {
-      throw Exception("Source does not support settings");
+      throw UnsupportedError("Source does not support settings");
     }
 
     final result = await _controller?.callAsyncJavaScript(
@@ -923,17 +950,23 @@ return formid;
     );
 
     if (result == null || result.error != null) {
-      throw Exception('JavaScript error: ${result?.error}');
+      throw JavaScriptException(
+        message: 'JavaScript error:',
+        errorMessage: result?.error,
+      );
     }
 
     final formid = result.value as FormID?;
 
     if (formid == null) {
-      throw Exception('Invalid FormID $id');
+      throw JavaScriptException(message: 'Invalid FormID', errorMessage: id);
     }
 
     if (!_forms.containsKey(formid)) {
-      throw Exception('Failed to create form $formid');
+      throw JavaScriptException(
+        message: 'Failed to create form',
+        errorMessage: formid,
+      );
     }
 
     return _forms[formid]!;
@@ -943,7 +976,7 @@ return formid;
     final source = await future;
 
     if (!source.hasCapability(SourceIntents.settingsUI)) {
-      throw Exception("Source does not support settings");
+      throw UnsupportedError("Source does not support settings");
     }
 
     await _controller?.evaluateJavascript(
@@ -955,7 +988,7 @@ return formid;
     final source = await future;
 
     if (!source.hasCapability(SourceIntents.discoverSections)) {
-      throw Exception("Source does not support discover sections");
+      throw UnsupportedError("Source does not support discover sections");
     }
 
     final result = await _controller?.callAsyncJavaScript(
@@ -963,7 +996,10 @@ return formid;
     );
 
     if (result == null || result.error != null) {
-      throw Exception('JavaScript error: ${result?.error}');
+      throw JavaScriptException(
+        message: 'JavaScript error:',
+        errorMessage: result?.error,
+      );
     }
 
     final rsec = result.value as List<dynamic>;
@@ -979,7 +1015,7 @@ return formid;
     final source = await future;
 
     if (!source.hasCapability(SourceIntents.discoverSections)) {
-      throw Exception("Source does not support discover sections");
+      throw UnsupportedError("Source does not support discover sections");
     }
 
     final result = await _controller?.callAsyncJavaScript(
@@ -997,7 +1033,10 @@ return p;
     );
 
     if (result == null || result.error != null) {
-      throw Exception('JavaScript error: ${result?.error}');
+      throw JavaScriptException(
+        message: 'JavaScript error:',
+        errorMessage: result?.error,
+      );
     }
 
     final items = PagedResults.fromJson(
@@ -1028,7 +1067,10 @@ return await $sourceId.getSearchResults(query, metadata)
     );
 
     if (result == null || result.error != null) {
-      throw Exception('JavaScript error: ${result?.error}');
+      throw JavaScriptException(
+        message: 'JavaScript error:',
+        errorMessage: result?.error,
+      );
     }
 
     final pmangas = PagedResults.fromJson(
@@ -1051,7 +1093,10 @@ return await $sourceId.getSearchResults(query, metadata)
     );
 
     if (mdeets == null || mdeets.error != null) {
-      throw Exception('JavaScript error: ${mdeets?.error}');
+      throw JavaScriptException(
+        message: 'JavaScript error:',
+        errorMessage: mdeets?.error,
+      );
     }
 
     final smanga = SourceManga.fromJson(mdeets.value);
@@ -1070,7 +1115,10 @@ return p;
     );
 
     if (chaps == null || chaps.error != null) {
-      throw Exception('JavaScript error: ${chaps?.error}');
+      throw JavaScriptException(
+        message: 'JavaScript error:',
+        errorMessage: chaps?.error,
+      );
     }
 
     final clist = chaps.value as List<dynamic>;
@@ -1114,7 +1162,10 @@ return p;
     );
 
     if (cdeets == null || cdeets.error != null) {
-      throw Exception('JavaScript error: ${cdeets?.error}');
+      throw JavaScriptException(
+        message: 'JavaScript error:',
+        errorMessage: cdeets?.error,
+      );
     }
 
     final chapterd = ChapterDetails.fromJson(cdeets.value);
@@ -1167,7 +1218,10 @@ Future<WebSourceInfo> getExtensionFromId(Ref ref, String sourceId) async {
     return sources[sourceId]!;
   }
 
-  throw Exception("Invalid missing/source '$sourceId'");
+  throw UnknownSourceException(
+    message: 'Invalid missing/source',
+    sourceId: sourceId,
+  );
 }
 
 class SettingsForm with ChangeNotifier {
@@ -1210,7 +1264,10 @@ return a;
     );
 
     if (result == null || result.error != null) {
-      throw Exception('JavaScript error: ${result?.error}');
+      throw JavaScriptException(
+        message: 'JavaScript error:',
+        errorMessage: result?.error,
+      );
     }
 
     final sections = (result.value as List<dynamic>)
@@ -1234,7 +1291,10 @@ return form.requiresExplicitSubmission();
     );
 
     if (result == null || result.error != null) {
-      throw Exception('JavaScript error: ${result?.error}');
+      throw JavaScriptException(
+        message: 'JavaScript error:',
+        errorMessage: result?.error,
+      );
     }
 
     return result.value as bool;

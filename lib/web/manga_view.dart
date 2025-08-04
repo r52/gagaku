@@ -8,6 +8,7 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/cached_network_image.dart';
+import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -41,7 +42,7 @@ Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
     return (manga, link);
   }
 
-  throw Exception('Invalid WebManga link. Data not found.');
+  throw InvalidDataException('Invalid WebManga link. Data not found.');
 }
 
 @RoutePage()

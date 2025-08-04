@@ -174,7 +174,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'0bdecf04f757b34b9e353bcd8ff74c7427ca7bb8';
+String _$extensionSourceHash() => r'b0ff177770373d85778029e62a13b143220e0278';
 
 final class ExtensionSourceFamily extends $Family
     with
@@ -334,7 +334,7 @@ final class GetExtensionFromIdProvider
 }
 
 String _$getExtensionFromIdHash() =>
-    r'29cbd9751aed6812bbe6bdafc4ecb1a632f17c6b';
+    r'083cb64dc1d406d1a5a26ecf5fa4de16a7a9dced';
 
 final class GetExtensionFromIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<WebSourceInfo>, String> {
