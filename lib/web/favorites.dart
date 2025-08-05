@@ -101,9 +101,21 @@ class WebSourceFavoriteTab extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
+    final filterText = useValueListenable(filterController);
+    final debouncedFilterText = useDebounced(
+      filterText.text,
+      const Duration(milliseconds: 300),
+    );
 
     final query = useMemoized(() {
-      final builder = GagakuData().store.box<HistoryLink>().query();
+      final builder = GagakuData().store.box<HistoryLink>().query(
+        debouncedFilterText == null || debouncedFilterText.isEmpty
+            ? null
+            : HistoryLink_.title.contains(
+                debouncedFilterText,
+                caseSensitive: false,
+              ),
+      );
       builder.backlinkMany(
         WebFavoritesList_.list,
         WebFavoritesList_.id.equals(category.id),
@@ -111,23 +123,16 @@ class WebSourceFavoriteTab extends HookWidget {
       return builder
           .watch(triggerImmediately: true)
           .map((query) => query.find());
-    }, []);
+    }, [debouncedFilterText, category.id]);
     final stream = useStream(query);
     final items = stream.data ?? [];
-    final filterText = useValueListenable(filterController);
-    final fileredItems = useMemoized(
-      () => items
-          .where((i) => i.title.toLowerCase().contains(filterText.text))
-          .toList(),
-      [filterText.text, items, stream.data],
-    );
 
     return WebMangaListWidget(
       noController: true,
       physics: const AlwaysScrollableScrollPhysics(),
       scrollBehavior: MouseTouchScrollBehavior().copyWith(scrollbars: false),
       title: Text(
-        tr.num_titles(n: fileredItems.length),
+        tr.num_titles(n: items.length),
         style: const TextStyle(fontSize: 24),
       ),
       leading: [
@@ -143,10 +148,10 @@ class WebSourceFavoriteTab extends HookWidget {
               stackTrace: stream.stackTrace!,
             ),
           ),
-        if (!stream.hasError && fileredItems.isEmpty)
+        if (!stream.hasError && items.isEmpty)
           SliverFillRemaining(child: Center(child: Text(tr.errors.noitems))),
         WebMangaListViewSliver(
-          items: fileredItems,
+          items: items,
           favoritesKey: category.id,
           showRemoveButton: false,
         ),
