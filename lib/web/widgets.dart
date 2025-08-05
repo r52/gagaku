@@ -520,11 +520,11 @@ class FavoritesButton extends HookWidget {
     final manager = useListenable(WebFavoritesManager());
     final favorites = manager.state;
 
-    final favlist = useMemoized(
-      () => favorites.map((l) => l.list.contains(link)).toList(),
-      [favorites],
-    );
-    final favorited = useMemoized(() => favlist.any((e) => e), [favlist]);
+    final favStatus = useMemoized(() {
+      final favList = manager.getFavoritedListIdsOfLink(link);
+      final isFavorited = favList.isNotEmpty;
+      return (list: favList, isFavorited: isFavorited);
+    }, [favorites, link]);
 
     return MenuAnchor(
       builder: (context, controller, child) {
@@ -558,11 +558,11 @@ class FavoritesButton extends HookWidget {
       },
       menuChildren: favorites.isNotEmpty
           ? [
-              for (final (idx, cat) in favorites.indexed)
+              for (final cat in favorites)
                 CheckboxListTile(
                   controlAffinity: ListTileControlAffinity.leading,
                   title: Text(cat.name),
-                  value: favlist.elementAt(idx),
+                  value: favStatus.list.contains(cat.dbid),
                   onChanged: (bool? value) async {
                     if (value == true) {
                       manager.add(cat, link);
@@ -580,8 +580,8 @@ class FavoritesButton extends HookWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Icon(
-          favorited == true ? Icons.favorite : Icons.favorite_border,
-          color: favorited == true ? theme.colorScheme.primary : null,
+          favStatus.isFavorited ? Icons.favorite : Icons.favorite_border,
+          color: favStatus.isFavorited ? theme.colorScheme.primary : null,
         ),
       ),
     );

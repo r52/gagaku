@@ -340,6 +340,8 @@ class WebFavoritesManager extends ChangeNotifier {
   bool hasData = false;
   late StreamSubscription<Query<WebFavoritesList>> _sub;
 
+  final Map<String, Set<int>> _linkToFavoritesMap = {};
+
   WebFavoritesManager._internal() {
     final box = GagakuData().store.box<WebFavoritesList>();
     final stream = box
@@ -349,9 +351,27 @@ class WebFavoritesManager extends ChangeNotifier {
 
     _sub = stream.listen((query) {
       state = query.find();
+      _rebuildLookupMap();
       hasData = true;
       notifyListeners();
     });
+  }
+
+  void _rebuildLookupMap() {
+    _linkToFavoritesMap.clear();
+    for (final favList in state) {
+      for (final link in favList.list) {
+        if (!_linkToFavoritesMap.containsKey(link.url)) {
+          _linkToFavoritesMap[link.url] = {};
+        }
+
+        _linkToFavoritesMap[link.url]!.add(favList.dbid);
+      }
+    }
+  }
+
+  Set<int> getFavoritedListIdsOfLink(HistoryLink link) {
+    return UnmodifiableSetView(_linkToFavoritesMap[link.url] ?? {});
   }
 
   @override
