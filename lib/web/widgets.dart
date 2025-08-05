@@ -22,23 +22,27 @@ part 'widgets.g.dart';
 
 enum WebMangaListView { grid, list }
 
-Widget? _getSourceIcon(HistoryLink link, Map<String, WebSourceInfo> sources) {
-  Widget? sourceIcon;
+@riverpod
+Map<String, Widget> _extensionIcon(Ref ref) {
+  final sources = ref.watch(
+    extensionInfoListProvider.select(
+      (value) => switch (value) {
+        AsyncValue(value: final data?) => data,
+        _ => <String, WebSourceInfo>{},
+      },
+    ),
+  );
 
-  if (link.handle != null) {
-    final srcId = link.handle!.sourceId;
-    if (sources.containsKey(srcId) && sources[srcId]!.icon.isNotEmpty) {
-      final icon = sources[srcId]!.icon;
-      sourceIcon = Image.network(icon, width: 24, height: 24);
-    } else {
-      sourceIcon = Text(
-        link.handle!.sourceId,
-        style: const TextStyle(fontSize: 12),
-      );
-    }
-  }
+  final icons = sources.map((key, ext) {
+    return MapEntry(
+      key,
+      ext.icon.isNotEmpty
+          ? Image.network(ext.icon, width: 24, height: 24)
+          : Text(ext.id, style: const TextStyle(fontSize: 12)),
+    );
+  });
 
-  return sourceIcon;
+  return UnmodifiableMapView(icons);
 }
 
 @Riverpod(keepAlive: true)
@@ -167,14 +171,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sourcesMap = ref.watch(
-      extensionInfoListProvider.select(
-        (value) => switch (value) {
-          AsyncValue(value: final data?) => data,
-          _ => <String, WebSourceInfo>{},
-        },
-      ),
-    );
+    final extIcons = ref.watch(_extensionIconProvider);
     final api = ref.watch(proxyProvider);
     WebMangaListView view = items != null
         ? ref.watch(_mangaListViewProvider)
@@ -241,7 +238,12 @@ class WebMangaListViewSliver extends ConsumerWidget {
             itemBuilder: (context, index) {
               final tr = context.t;
               final item = items!.elementAt(index);
-              Widget? sourceIcon = _getSourceIcon(item, sourcesMap);
+              final sourceIcon =
+                  extIcons[item.handle?.sourceId] ??
+                  Text(
+                    item.handle?.sourceId ?? '',
+                    style: const TextStyle(fontSize: 12),
+                  );
 
               return ListTile(
                 key: ValueKey(item.url),
@@ -252,7 +254,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ?sourceIcon,
+                    sourceIcon,
                     IconButton(
                       tooltip: tr.mangaActions.removeHistory,
                       icon: const Icon(Icons.delete, color: Colors.red),
@@ -405,14 +407,7 @@ class GridMangaItem extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     useAutomaticKeepAlive();
     final tr = context.t;
-    final sourcesMap = ref.watch(
-      extensionInfoListProvider.select(
-        (value) => switch (value) {
-          AsyncValue(value: final data?) => data,
-          _ => <String, WebSourceInfo>{},
-        },
-      ),
-    );
+    final extIcons = ref.watch(_extensionIconProvider);
     final api = ref.watch(proxyProvider);
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
@@ -436,7 +431,9 @@ class GridMangaItem extends HookConsumerWidget {
           )
         : const Icon(Icons.menu_book, size: 128.0);
 
-    Widget? sourceIcon = _getSourceIcon(link, sourcesMap);
+    final sourceIcon =
+        extIcons[link.handle?.sourceId] ??
+        Text(link.handle?.sourceId ?? '', style: const TextStyle(fontSize: 12));
 
     return InkWell(
       onTap: () async {
@@ -470,17 +467,16 @@ class GridMangaItem extends HookConsumerWidget {
             footer: GridAlbumTextBar(height: 80, text: link.title),
             child: GridAlbumImage(gradient: gradient, child: cover),
           ),
-          if (sourceIcon != null)
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: EdgeInsets.only(right: 0.0, bottom: 0.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [sourceIcon],
-                ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: EdgeInsets.only(right: 0.0, bottom: 0.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [sourceIcon],
               ),
             ),
+          ),
           if (showFavoriteButton)
             Align(
               alignment: Alignment.topLeft,
@@ -845,16 +841,14 @@ class ChapterFeedItem extends HookWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           spacing: 4.0,
-                          children: state.manga.chapters
-                              .take(3)
-                              .map(
-                                (e) => ChapterButtonWidget(
-                                  data: e,
-                                  manga: state.manga,
-                                  handle: state.link.handle!,
-                                ),
-                              )
-                              .toList(),
+                          children: [
+                            for (final item in state.manga.chapters.take(3))
+                              ChapterButtonWidget(
+                                data: item,
+                                manga: state.manga,
+                                handle: state.link.handle!,
+                              ),
+                          ],
                         ),
                       ),
                     ],
@@ -872,15 +866,12 @@ class ChapterFeedItem extends HookWidget {
                       children: [
                         titleBtn,
                         const Divider(height: 10.0),
-                        ...state.manga.chapters
-                            .take(3)
-                            .map(
-                              (e) => ChapterButtonWidget(
-                                data: e,
-                                manga: state.manga,
-                                handle: state.link.handle!,
-                              ),
-                            ),
+                        for (final item in state.manga.chapters.take(3))
+                          ChapterButtonWidget(
+                            data: item,
+                            manga: state.manga,
+                            handle: state.link.handle!,
+                          ),
                       ],
                     ),
                   ),

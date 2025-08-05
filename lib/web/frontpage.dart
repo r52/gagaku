@@ -379,29 +379,28 @@ class ExtensionHomeWidget extends HookConsumerWidget {
                         ),
                       );
                     },
-                    children: sectionResults.items
-                        .map(
-                          (e) => ColoredBox(
-                            color: theme.colorScheme.primaryContainer,
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.theater_comedy, size: 32.0),
-                                  Text(
-                                    (e as GenresCarouselItem).name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    overflow: TextOverflow.clip,
-                                    softWrap: false,
+                    children: [
+                      for (final item in sectionResults.items)
+                        ColoredBox(
+                          color: theme.colorScheme.primaryContainer,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.theater_comedy, size: 32.0),
+                                Text(
+                                  (item as GenresCarouselItem).name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                ],
-                              ),
+                                  overflow: TextOverflow.clip,
+                                  softWrap: false,
+                                ),
+                              ],
                             ),
                           ),
-                        )
-                        .toList(),
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -576,9 +575,10 @@ class MangaCarousel extends StatelessWidget {
           itemExtent: 180,
           shrinkExtent: 180,
           enableSplash: false,
-          children: items
-              .map((e) => GridMangaItem(link: e, showRemoveButton: false))
-              .toList(),
+          children: [
+            for (final item in items)
+              GridMangaItem(link: item, showRemoveButton: false),
+          ],
         ),
       ),
     );

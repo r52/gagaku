@@ -409,27 +409,26 @@ class WebMangaViewWidget extends HookConsumerWidget {
                           in (extdata.mangaInfo.tagGroups ?? <TagSection>[]))
                         MultiChildExpansionTile(
                           title: tagsec.title.capitalize(),
-                          children: tagsec.tags
-                              .map(
-                                (e) => IconTextChip(
-                                  text: e.title,
-                                  onPressed: () => context.router.push(
-                                    ExtensionSearchRoute(
-                                      initialSource: source,
-                                      query: SearchQuery(
-                                        title: '',
-                                        filters: [
-                                          SearchFilterValue(
-                                            id: tagsec.id,
-                                            value: {e.id: 'included'},
-                                          ),
-                                        ],
-                                      ),
+                          children: [
+                            for (final tag in tagsec.tags)
+                              IconTextChip(
+                                text: tag.title,
+                                onPressed: () => context.router.push(
+                                  ExtensionSearchRoute(
+                                    initialSource: source,
+                                    query: SearchQuery(
+                                      title: '',
+                                      filters: [
+                                        SearchFilterValue(
+                                          id: tagsec.id,
+                                          value: {tag.id: 'included'},
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                              )
-                              .toList(),
+                              ),
+                          ],
                         ),
                     MultiChildExpansionTile(
                       title: tr.tracking.links,

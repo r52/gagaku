@@ -714,30 +714,28 @@ class _MangaDexMangaViewWidgetState
                       if (widget.manga.author.isNotEmpty)
                         MultiChildExpansionTile(
                           title: tr.mangaView.author,
-                          children: widget.manga.author
-                              .map(
-                                (e) => ButtonChip(
-                                  text: e.attributes.name,
-                                  onPressed: () {
-                                    router.pushPath('/author/${e.id}');
-                                  },
-                                ),
-                              )
-                              .toList(),
+                          children: [
+                            for (final author in widget.manga.author)
+                              ButtonChip(
+                                text: author.attributes.name,
+                                onPressed: () {
+                                  router.pushPath('/author/${author.id}');
+                                },
+                              ),
+                          ],
                         ),
                       if (widget.manga.artist.isNotEmpty)
                         MultiChildExpansionTile(
                           title: tr.mangaView.artist,
-                          children: widget.manga.artist
-                              .map(
-                                (e) => ButtonChip(
-                                  text: e.attributes.name,
-                                  onPressed: () {
-                                    router.pushPath('/author/${e.id}');
-                                  },
-                                ),
-                              )
-                              .toList(),
+                          children: [
+                            for (final artist in widget.manga.artist)
+                              ButtonChip(
+                                text: artist.attributes.name,
+                                onPressed: () {
+                                  router.pushPath('/author/${artist.id}');
+                                },
+                              ),
+                          ],
                         ),
                       if (widget.manga.attributes!.publicationDemographic !=
                           null)

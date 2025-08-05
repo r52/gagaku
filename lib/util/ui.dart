@@ -280,26 +280,26 @@ class ButtonChip extends StatelessWidget {
 
     return (icon != null)
         ? ElevatedButton.icon(
-          style: bstyle,
-          onPressed: onPressed,
-          icon: icon!,
-          label: Text(
-            text,
-            style:
-                style ??
-                TextStyle(color: theme.colorScheme.onTertiaryContainer),
-          ),
-        )
+            style: bstyle,
+            onPressed: onPressed,
+            icon: icon!,
+            label: Text(
+              text,
+              style:
+                  style ??
+                  TextStyle(color: theme.colorScheme.onTertiaryContainer),
+            ),
+          )
         : ElevatedButton(
-          style: bstyle,
-          onPressed: onPressed,
-          child: Text(
-            text,
-            style:
-                style ??
-                TextStyle(color: theme.colorScheme.onTertiaryContainer),
-          ),
-        );
+            style: bstyle,
+            onPressed: onPressed,
+            child: Text(
+              text,
+              style:
+                  style ??
+                  TextStyle(color: theme.colorScheme.onTertiaryContainer),
+            ),
+          );
   }
 }
 
@@ -640,8 +640,9 @@ class DataProviderWhenWidget<T> extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dataProvider =
-        (initialData != null) ? initialData! : ref.watch(provider);
+    final dataProvider = (initialData != null)
+        ? initialData!
+        : ref.watch(provider);
 
     switch (dataProvider) {
       case AsyncValue(:final error?, :final stackTrace?):
@@ -751,12 +752,11 @@ class Styles {
   }) {
     Future.delayed(
       Duration.zero,
-      () =>
-          state
-            ..removeCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(content: Text(content), backgroundColor: color),
-            ),
+      () => state
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text(content), backgroundColor: color),
+        ),
     );
   }
 

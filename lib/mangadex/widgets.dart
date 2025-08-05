@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
@@ -20,6 +21,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:riverpod/misc.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
@@ -62,6 +64,43 @@ const _openIconB = Icon(Icons.open_in_new, size: 20.0);
 const _openIconS = Icon(Icons.open_in_new, size: 15.0);
 const _scheduleIconB = Icon(Icons.schedule, size: 20.0);
 const _scheduleIconS = Icon(Icons.schedule, size: 15.0);
+
+@Riverpod(dependencies: [theme])
+BoxDecoration readBorderTheme(Ref ref, String mangaId, String chapterId) {
+  final theme = ref.watch(themeProvider);
+
+  final tileColor = theme.colorScheme.primaryContainer;
+  final me = ref.watch(loggedUserProvider).value;
+
+  Border border;
+
+  if (me == null) {
+    border = Border(left: BorderSide(color: tileColor, width: 4.0));
+  } else {
+    bool? isRead = ref.watch(
+      readChaptersProvider(me.id).select(
+        (value) => switch (value) {
+          AsyncValue(value: final data?) =>
+            data[mangaId]?.contains(chapterId) == true,
+          _ => null,
+        },
+      ),
+    );
+
+    border = Border(
+      left: BorderSide(
+        color: isRead == true ? tileColor : Colors.blue,
+        width: 4.0,
+      ),
+    );
+  }
+
+  return BoxDecoration(
+    borderRadius: const BorderRadius.all(Radius.circular(4)),
+    color: tileColor,
+    border: border,
+  );
+}
 
 class MangaDexSliverAppBar extends StatelessWidget {
   const MangaDexSliverAppBar({super.key, this.controller, this.title});
@@ -202,9 +241,10 @@ class MangaProviderCarousel extends StatelessWidget {
             itemExtent: 180,
             shrinkExtent: 180,
             enableSplash: false,
-            children: items
-                .map((e) => GridMangaItem(key: ValueKey(e.id), manga: e))
-                .toList(),
+            children: [
+              for (final item in items)
+                GridMangaItem(key: ValueKey(item.id), manga: item),
+            ],
           ),
         ),
         errorBuilder: (context, defaultChild, error, stacktrace) {
@@ -715,15 +755,14 @@ class ChapterFeedItem extends HookWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           spacing: 4.0,
-                          children: state.chapters
-                              .map(
-                                (e) => _BackLinkedChapterButton(
-                                  key: ValueKey(e.id),
-                                  chapter: e,
-                                  manga: state.manga,
-                                ),
-                              )
-                              .toList(),
+                          children: [
+                            for (final chapter in state.chapters)
+                              _BackLinkedChapterButton(
+                                key: ValueKey(chapter.id),
+                                chapter: chapter,
+                                manga: state.manga,
+                              ),
+                          ],
                         ),
                       ),
                     ],
@@ -741,13 +780,12 @@ class ChapterFeedItem extends HookWidget {
                       children: [
                         titleBtn,
                         const Divider(height: 10.0),
-                        ...state.chapters.map(
-                          (e) => _BackLinkedChapterButton(
-                            key: ValueKey(e.id),
-                            chapter: e,
+                        for (final chapter in state.chapters)
+                          _BackLinkedChapterButton(
+                            key: ValueKey(chapter.id),
+                            chapter: chapter,
                             manga: state.manga,
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -758,6 +796,7 @@ class ChapterFeedItem extends HookWidget {
   }
 }
 
+@Dependencies([readBorderTheme])
 class _ChapterButtonCard extends ConsumerWidget {
   final Chapter chapter;
   final Manga manga;
@@ -773,43 +812,14 @@ class _ChapterButtonCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final theme = Theme.of(context);
-    final tileColor = theme.colorScheme.primaryContainer;
-    final me = ref.watch(loggedUserProvider).value;
-
-    Border border;
-
-    if (me == null) {
-      border = Border(left: BorderSide(color: tileColor, width: 4.0));
-    } else {
-      bool? isRead = ref.watch(
-        readChaptersProvider(me.id).select(
-          (value) => switch (value) {
-            AsyncValue(value: final data?) =>
-              data[manga.id]?.contains(chapter.id) == true,
-            _ => null,
-          },
-        ),
-      );
-
-      border = Border(
-        left: BorderSide(
-          color: isRead == true ? tileColor : Colors.blue,
-          width: 4.0,
-        ),
-      );
-    }
+    final decoration = ref.watch(readBorderThemeProvider(manga.id, chapter.id));
 
     return Ink(
       padding: EdgeInsets.symmetric(
         horizontal: (screenSizeSmall ? 6.0 : 10.0),
         vertical: 4.0,
       ),
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(Radius.circular(4)),
-        color: tileColor,
-        border: border,
-      ),
+      decoration: decoration,
       child: child,
     );
   }
