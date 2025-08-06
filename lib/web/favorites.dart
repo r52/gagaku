@@ -65,10 +65,7 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
                 tabAlignment: TabAlignment.center,
                 isScrollable: true,
                 controller: tabController,
-                tabs: List<Tab>.generate(
-                  categories.length,
-                  (int index) => Tab(text: categories.elementAt(index).name),
-                ),
+                tabs: [for (final cat in categories) Tab(text: cat.name)],
               ),
             ),
           ),

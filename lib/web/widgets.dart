@@ -22,25 +22,23 @@ part 'widgets.g.dart';
 
 enum WebMangaListView { grid, list }
 
-@riverpod
+@Riverpod(keepAlive: true)
 Map<String, Widget> _extensionIcon(Ref ref) {
-  final sources = ref.watch(
+  final icons = ref.watch(
     extensionInfoListProvider.select(
       (value) => switch (value) {
-        AsyncValue(value: final data?) => data,
-        _ => <String, WebSourceInfo>{},
+        AsyncValue(value: final data?) => data.map((key, ext) {
+          return MapEntry(
+            key,
+            ext.icon.isNotEmpty
+                ? Image.network(ext.icon, width: 24, height: 24)
+                : Text(ext.id, style: const TextStyle(fontSize: 12)),
+          );
+        }),
+        _ => <String, Widget>{},
       },
     ),
   );
-
-  final icons = sources.map((key, ext) {
-    return MapEntry(
-      key,
-      ext.icon.isNotEmpty
-          ? Image.network(ext.icon, width: 24, height: 24)
-          : Text(ext.id, style: const TextStyle(fontSize: 12)),
-    );
-  });
 
   return UnmodifiableMapView(icons);
 }
@@ -237,7 +235,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
             findChildIndexCallback: _findChildIndexCb,
             itemBuilder: (context, index) {
               final tr = context.t;
-              final item = items!.elementAt(index);
+              final item = items![index];
               final sourceIcon =
                   extIcons[item.handle?.sourceId] ??
                   Text(
@@ -299,7 +297,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
             ),
             findChildIndexCallback: _findChildIndexCb,
             itemBuilder: (context, index) {
-              final item = items!.elementAt(index);
+              final item = items![index];
               return GridMangaItem(
                 key: ValueKey(item.url),
                 link: item,

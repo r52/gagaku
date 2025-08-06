@@ -1171,7 +1171,7 @@ class MangaListViewSliver extends ConsumerWidget {
           return SliverList.builder(
             findChildIndexCallback: _findChildIndexCb,
             itemBuilder: (BuildContext context, int index) {
-              final manga = items!.elementAt(index);
+              final manga = items![index];
               return _ListMangaItem(
                 key: ValueKey(manga.id),
                 manga: manga,
@@ -1195,7 +1195,7 @@ class MangaListViewSliver extends ConsumerWidget {
             gridDelegate: delegate,
             findChildIndexCallback: _findChildIndexCb,
             itemBuilder: (context, index) {
-              final manga = items!.elementAt(index);
+              final manga = items![index];
               return GridMangaDetailedItem(
                 key: ValueKey(manga.id),
                 manga: manga,
@@ -1217,7 +1217,7 @@ class MangaListViewSliver extends ConsumerWidget {
             gridDelegate: delegate,
             findChildIndexCallback: _findChildIndexCb,
             itemBuilder: (context, index) {
-              final manga = items!.elementAt(index);
+              final manga = items![index];
               return GridMangaItem(
                 key: ValueKey(manga.id),
                 manga: manga,

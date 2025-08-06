@@ -291,8 +291,8 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                     List<DropdownMenuEntry<FilterOrder>>.generate(
                       FilterOrder.values.length,
                       (int index) => DropdownMenuEntry<FilterOrder>(
-                        value: FilterOrder.values.elementAt(index),
-                        label: tr[FilterOrder.values.elementAt(index).label],
+                        value: FilterOrder.values[index],
+                        label: tr[FilterOrder.values[index].label],
                       ),
                     ),
               ),

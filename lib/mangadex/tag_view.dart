@@ -41,10 +41,9 @@ Future<List<Manga>> _trendingThisYear(Ref ref, Tag tag) async {
   final extraParams = {
     'hasAvailableChapters': 'true',
     'createdAtSince': format.format(popularTime),
-    'originalLanguage[]':
-        settings.originalLanguage
-            .map(const LanguageConverter().toJson)
-            .toList(),
+    'originalLanguage[]': settings.originalLanguage
+        .map(const LanguageConverter().toJson)
+        .toList(),
   };
 
   final manga = await api.fetchMangaList(
@@ -67,10 +66,9 @@ Future<List<Manga>> _recentlyAdded(Ref ref, Tag tag) async {
   final settings = ref.watch(mdConfigProvider);
 
   final extraParams = {
-    'originalLanguage[]':
-        settings.originalLanguage
-            .map(const LanguageConverter().toJson)
-            .toList(),
+    'originalLanguage[]': settings.originalLanguage
+        .map(const LanguageConverter().toJson)
+        .toList(),
   };
 
   final manga = await api.fetchMangaList(
@@ -221,10 +219,10 @@ class MangaDexTagViewWidget extends HookConsumerWidget {
                 SliverList.separated(
                   itemCount: widgets.length,
                   itemBuilder: (context, index) {
-                    return widgets.elementAt(index);
+                    return widgets[index];
                   },
-                  separatorBuilder:
-                      (context, index) => const SizedBox(height: 10.0),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 10.0),
                 ),
               ],
               children: [

@@ -23,7 +23,7 @@ final class _ExtensionIconProvider
         argument: null,
         retry: null,
         name: r'_extensionIconProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -51,7 +51,7 @@ final class _ExtensionIconProvider
   }
 }
 
-String _$extensionIconHash() => r'8e80e4ddaf7e15f6a8d3d03f643a1f23bcfff3fe';
+String _$extensionIconHash() => r'51e6b94e5937047780dd1326e161e9f165a05f70';
 
 @ProviderFor(_MangaListView)
 const _mangaListViewProvider = _MangaListViewProvider._();

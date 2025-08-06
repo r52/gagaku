@@ -572,7 +572,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
               },
               separatorBuilder: (_, _) => const SizedBox(height: 4.0),
               itemBuilder: (BuildContext context, int index) {
-                final e = manga.chapters.elementAt(index);
+                final e = manga.chapters[index];
 
                 return ChapterButtonWidget(
                   key: ValueKey(e.hashCode),

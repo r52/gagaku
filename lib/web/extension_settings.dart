@@ -102,7 +102,7 @@ class _FormBuilderState extends ConsumerState<FormBuilder> {
         itemBuilder: (context, index) {
           return FormSectionBuilder(
             source: widget.source,
-            section: data.elementAt(index),
+            section: data[index],
           );
         },
       );

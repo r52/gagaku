@@ -374,7 +374,7 @@ class _MangaDexMangaViewWidgetState
             ref.invalidate(readingStatusProvider(widget.manga));
           }
 
-          switch (_ViewType.values.elementAt(tabview)) {
+          switch (_ViewType.values[tabview]) {
             case _ViewType.chapters:
               return _chapterController.refresh();
             case _ViewType.art:
@@ -866,8 +866,7 @@ class _MangaDexMangaViewWidgetState
                       if (hasRelated) Tab(text: tr.mangaView.related),
                     ],
                   ),
-                  if (_ViewType.values.elementAt(tabview) ==
-                          _ViewType.chapters &&
+                  if (_ViewType.values[tabview] == _ViewType.chapters &&
                       me != null)
                     Padding(
                       padding: const EdgeInsets.all(8),
@@ -1015,7 +1014,7 @@ class _MangaDexMangaViewWidgetState
           body: SafeArea(
             top: false,
             bottom: false,
-            child: switch (_ViewType.values.elementAt(tabview)) {
+            child: switch (_ViewType.values[tabview]) {
               _ViewType.chapters => _MangaChaptersView(
                 manga: widget.manga,
                 controller: _chapterController,
@@ -1139,7 +1138,7 @@ class _MangaCoversView extends StatelessWidget {
                                     return val >= 0 ? val : null;
                                   },
                                   itemBuilder: (BuildContext context, int id) {
-                                    final item = state.items!.elementAt(id);
+                                    final item = state.items![id];
                                     final url = manga.getUrlFromCover(item);
 
                                     return Hero(
@@ -1305,14 +1304,11 @@ class _ChapterListSliver extends HookConsumerWidget {
           // If next chapter is the same number
           // AND previous chapter isn't (or doesnt exist)
           if (index < keysGrouped[vol]!.length - 1 &&
-              keysGrouped[vol]!.elementAt(index + 1).attributes.chapter ==
+              keysGrouped[vol]![index + 1].attributes.chapter ==
                   chapter.attributes.chapter &&
               (index == 0 ||
                   (index > 0 &&
-                      keysGrouped[vol]!
-                              .elementAt(index - 1)
-                              .attributes
-                              .chapter !=
+                      keysGrouped[vol]![index - 1].attributes.chapter !=
                           chapter.attributes.chapter))) {
             list.add(
               _ChapterListElement(
@@ -1375,14 +1371,14 @@ class _ChapterListSliver extends HookConsumerWidget {
           );
 
           if (chapid > 0) {
-            final lastchap = chapters.elementAt(chapid - 1);
+            final lastchap = chapters[chapid - 1];
             lastChapIsSame =
                 lastchap.attributes.chapter == thischap.attributes.chapter &&
                 lastchap.attributes.volume == thischap.attributes.volume;
           }
 
           if (chapid < chapters.length - 1) {
-            final nextchap = chapters.elementAt(chapid + 1);
+            final nextchap = chapters[chapid + 1];
             nextChapIsSame =
                 nextchap.attributes.chapter == thischap.attributes.chapter &&
                 nextchap.attributes.volume == thischap.attributes.volume;
@@ -1543,8 +1539,8 @@ class _ReadingStatusDropdown extends ConsumerWidget {
       dropdownMenuEntries: List<DropdownMenuEntry<MangaReadingStatus>>.generate(
         MangaReadingStatus.values.length,
         (int index) => DropdownMenuEntry<MangaReadingStatus>(
-          value: MangaReadingStatus.values.elementAt(index),
-          label: tr[MangaReadingStatus.values.elementAt(index).label],
+          value: MangaReadingStatus.values[index],
+          label: tr[MangaReadingStatus.values[index].label],
         ),
       ),
     );
@@ -1839,11 +1835,8 @@ class _AddToLibraryDialog extends HookWidget {
                     List<DropdownMenuEntry<MangaReadingStatus>>.generate(
                       MangaReadingStatus.values.length - 1,
                       (int index) => DropdownMenuEntry<MangaReadingStatus>(
-                        value: MangaReadingStatus.values.elementAt(index + 1),
-                        label:
-                            tr[MangaReadingStatus.values
-                                .elementAt(index + 1)
-                                .label],
+                        value: MangaReadingStatus.values[index + 1],
+                        label: tr[MangaReadingStatus.values[index + 1].label],
                       ),
                     ),
               );

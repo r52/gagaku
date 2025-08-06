@@ -84,9 +84,8 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
     useEffect(() {
       void tabCallback() {
         if (!tabController.indexIsChanging) {
-          ref.read(libraryViewTypeProvider.notifier).state = statuses.elementAt(
-            tabController.index,
-          );
+          ref.read(libraryViewTypeProvider.notifier).state =
+              statuses[tabController.index];
         }
       }
 
@@ -113,7 +112,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                 controller: tabController,
                 tabs: List<Tab>.generate(
                   statuses.length,
-                  (int index) => Tab(text: t[statuses.elementAt(index).label]),
+                  (int index) => Tab(text: t[statuses[index].label]),
                 ),
               ),
             ),

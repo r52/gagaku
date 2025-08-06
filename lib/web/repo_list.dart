@@ -64,7 +64,7 @@ class RepoListManager extends HookConsumerWidget {
             : ListView.builder(
                 itemCount: list.value.length,
                 itemBuilder: (context, index) {
-                  final item = list.value.elementAt(index);
+                  final item = list.value[index];
                   return Card(
                     child: ListTile(
                       leading: const Icon(Icons.cloud_download),

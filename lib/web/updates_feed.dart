@@ -346,7 +346,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
         SuperSliverList.builder(
           itemCount: data.length,
           itemBuilder: (context, index) {
-            final item = data.elementAt(index);
+            final item = data[index];
             return ChapterFeedItem(state: item);
           },
         ),

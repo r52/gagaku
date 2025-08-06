@@ -198,7 +198,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
           SliverList.builder(
             itemCount: homepageSources.length,
             itemBuilder: (context, index) {
-              final item = homepageSources.elementAt(index);
+              final item = homepageSources[index];
 
               return _ExtensionHomeCard(
                 key: ValueKey(item.id),
@@ -414,7 +414,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
           SliverList.separated(
             itemCount: homepageWidgets.length,
             itemBuilder: (context, index) {
-              return homepageWidgets.elementAt(index);
+              return homepageWidgets[index];
             },
             separatorBuilder: (context, index) => const SizedBox(height: 10.0),
           ),
