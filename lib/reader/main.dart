@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,7 @@ enum LongStripScale {
 
 typedef CtxCallback = void Function(BuildContext);
 
-class ReaderWidget extends HookConsumerWidget {
+class ReaderWidget extends StatefulHookConsumerWidget {
   const ReaderWidget({
     super.key,
     required this.pages,
@@ -48,6 +49,41 @@ class ReaderWidget extends HookConsumerWidget {
   final CtxCallback? onHeaderPressed;
   final String? externalUrl;
 
+  @override
+  ConsumerState<ReaderWidget> createState() => _ReaderWidgetState();
+}
+
+class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
+  final ValueNotifier<int> currentPage = ValueNotifier<int>(0);
+  final ValueNotifier<String?> subtext = ValueNotifier<String?>('');
+  final ScrollController scrollController = ScrollController();
+  final ListController listController = ListController();
+  final PageController pageController = PageController(initialPage: 0);
+
+  @override
+  void initState() {
+    super.initState();
+    subtext.value =
+        widget.subtitle ??
+        (widget.pages.isNotEmpty ? widget.pages[0].sortKey : '');
+  }
+
+  @override
+  void dispose() {
+    currentPage.dispose();
+    subtext.dispose();
+    scrollController.dispose();
+    listController.dispose();
+    pageController.dispose();
+    super.dispose();
+  }
+
+  void _saveSetting(ReaderConfig updated) {
+    readerConfigSaveMutation.run(ref, (ref) async {
+      return ref.get(readerSettingsProvider.notifier).save(updated);
+    });
+  }
+
   LongStripScale toggleLongStripScale(LongStripScale current) {
     switch (current) {
       case LongStripScale.small:
@@ -59,64 +95,56 @@ class ReaderWidget extends HookConsumerWidget {
     }
   }
 
-  void cachePage(ReaderPage page, BuildContext context) {
+  void cachePage(ReaderPage page) {
     precacheImage(page.provider, context);
     page.cached = true;
   }
 
-  void cachePages(
-    ValueNotifier<int> currentPage,
-    int precacheCount,
-    BuildContext context,
-  ) {
-    final pageCount = pages.length;
+  void cachePages(int precacheCount) {
+    final pageCount = widget.pages.length;
+    final currentIndex = currentPage.value;
 
-    // Forward cache precacheCount() pages
-    if (currentPage.value + 1 < pageCount &&
-        !pages.elementAt(currentPage.value + 1).cached) {
-      while (!pages.elementAt(currentPage.value + 1).cached) {
-        pages.skip(currentPage.value).take(precacheCount).forEach((element) {
-          if (!element.cached) {
-            cachePage(element, context);
-          }
-        });
+    // Forward Caching
+    // Define the range of pages to cache *after* the current one.
+    final forwardStart = currentIndex + 1;
+    final forwardEnd = min(forwardStart + precacheCount, pageCount);
+
+    // Iterate through the forward window and initiate caching for any page
+    // that isn't already cached. This range is only valid if start < end.
+    if (forwardStart < forwardEnd) {
+      for (final page in widget.pages.getRange(forwardStart, forwardEnd)) {
+        if (!page.cached) {
+          cachePage(page);
+        }
       }
     }
 
-    // Try and back cache 3 pages
+    // Backward Caching
     const backCacheAmount = 3;
-    var backCache = currentPage.value - backCacheAmount;
-    if (backCache < 0) {
-      backCache = 0;
-    }
+    // Define the range of pages to cache *before* the current one.
+    final backwardStart = max(0, currentIndex - backCacheAmount);
+    // The range for back-caching ends at the current page (exclusive).
+    final backwardEnd = currentIndex;
 
-    pages.skip(backCache).take(backCacheAmount).forEach((element) {
-      if (!element.cached) {
-        cachePage(element, context);
+    // Iterate through the backward window and initiate caching.
+    // This range is only valid if start < end.
+    if (backwardStart < backwardEnd) {
+      for (final page in widget.pages.getRange(backwardStart, backwardEnd)) {
+        if (!page.cached) {
+          cachePage(page);
+        }
       }
-    });
+    }
   }
 
-  void setPageValue({
-    required int page,
-    required ValueNotifier<int> currentPage,
-    required int precacheCount,
-    required ValueNotifier<String?> subtext,
-    required BuildContext context,
-  }) {
+  void setPageValue({required int page, required int precacheCount}) {
     currentPage.value = page;
-    cachePages(currentPage, precacheCount, context);
-    subtext.value = subtitle ?? pages.elementAt(currentPage.value).sortKey;
+    cachePages(precacheCount);
+    subtext.value = widget.subtitle ?? widget.pages[currentPage.value].sortKey;
   }
 
-  void jumpToPage(
-    int page, {
-    required ReaderFormat format,
-    required PageController pageController,
-    required ListController listController,
-    required ScrollController scrollController,
-  }) {
-    final pageCount = pages.length;
+  void jumpToPage(int page, {required ReaderFormat format}) {
+    final pageCount = widget.pages.length;
     if (page < 0 || page >= pageCount) return;
     assert(page >= 0 && page < pageCount);
 
@@ -144,11 +172,8 @@ class ReaderWidget extends HookConsumerWidget {
     required Duration duration,
     required Curve curve,
     required ReaderFormat format,
-    required PageController pageController,
-    required ListController listController,
-    required ScrollController scrollController,
   }) {
-    assert(page >= 0 && page < pages.length);
+    assert(page >= 0 && page < widget.pages.length);
 
     switch (format) {
       case ReaderFormat.longstrip:
@@ -170,68 +195,27 @@ class ReaderWidget extends HookConsumerWidget {
     }
   }
 
-  void jumpToPreviousPage(
-    ValueNotifier<int> currentPage, {
-    required ReaderFormat format,
-    required PageController pageController,
-    required ListController listController,
-    required ScrollController scrollController,
-  }) {
-    jumpToPage(
-      currentPage.value - 1,
-      format: format,
-      pageController: pageController,
-      listController: listController,
-      scrollController: scrollController,
-    );
+  void jumpToPreviousPage({required ReaderFormat format}) {
+    jumpToPage(currentPage.value - 1, format: format);
   }
 
-  void jumpToNextPage(
-    ValueNotifier<int> currentPage, {
-    required ReaderFormat format,
-    required PageController pageController,
-    required ListController listController,
-    required ScrollController scrollController,
-  }) {
-    jumpToPage(
-      currentPage.value + 1,
-      format: format,
-      pageController: pageController,
-      listController: listController,
-      scrollController: scrollController,
-    );
+  void jumpToNextPage({required ReaderFormat format}) {
+    jumpToPage(currentPage.value + 1, format: format);
   }
 
   KeyEventResult onTapLeft({
-    required ValueNotifier<int> currentPage,
     required ReaderConfig settings,
     required ReaderFormat format,
-    required PageController pageController,
-    required ListController listController,
-    required ScrollController scrollController,
-    required BuildContext context,
   }) {
     if (format == ReaderFormat.longstrip) return KeyEventResult.handled;
 
     switch (settings.direction) {
       case ReaderDirection.leftToRight:
-        jumpToPreviousPage(
-          currentPage,
-          format: format,
-          pageController: pageController,
-          listController: listController,
-          scrollController: scrollController,
-        );
+        jumpToPreviousPage(format: format);
         break;
       case ReaderDirection.rightToLeft:
-        if (currentPage.value < pages.length - 1) {
-          jumpToNextPage(
-            currentPage,
-            format: format,
-            pageController: pageController,
-            listController: listController,
-            scrollController: scrollController,
-          );
+        if (currentPage.value < widget.pages.length - 1) {
+          jumpToNextPage(format: format);
         } else {
           context.maybePop();
         }
@@ -242,38 +226,21 @@ class ReaderWidget extends HookConsumerWidget {
   }
 
   KeyEventResult onTapRight({
-    required ValueNotifier<int> currentPage,
     required ReaderConfig settings,
     required ReaderFormat format,
-    required PageController pageController,
-    required ListController listController,
-    required ScrollController scrollController,
-    required BuildContext context,
   }) {
     if (format == ReaderFormat.longstrip) return KeyEventResult.handled;
 
     switch (settings.direction) {
       case ReaderDirection.leftToRight:
-        if (currentPage.value < pages.length - 1) {
-          jumpToNextPage(
-            currentPage,
-            format: format,
-            pageController: pageController,
-            listController: listController,
-            scrollController: scrollController,
-          );
+        if (currentPage.value < widget.pages.length - 1) {
+          jumpToNextPage(format: format);
         } else {
           context.maybePop();
         }
         break;
       case ReaderDirection.rightToLeft:
-        jumpToPreviousPage(
-          currentPage,
-          format: format,
-          pageController: pageController,
-          listController: listController,
-          scrollController: scrollController,
-        );
+        jumpToPreviousPage(format: format);
         break;
     }
 
@@ -282,13 +249,9 @@ class ReaderWidget extends HookConsumerWidget {
 
   KeyEventResult onTapTop(
     double offset, {
-    required ValueNotifier<int> currentPage,
     required ReaderConfig settings,
     required ReaderFormat format,
     required List<PhotoViewController> viewController,
-    required ListController listController,
-    required ScrollController scrollController,
-    required BuildContext context,
   }) {
     if (format == ReaderFormat.longstrip) {
       scrollController.animateTo(
@@ -313,20 +276,16 @@ class ReaderWidget extends HookConsumerWidget {
 
   KeyEventResult onTapBottom(
     double offset, {
-    required ValueNotifier<int> currentPage,
     required ReaderConfig settings,
     required ReaderFormat format,
     required List<PhotoViewController> viewController,
-    required ListController listController,
-    required ScrollController scrollController,
-    required BuildContext context,
   }) {
     if (format == ReaderFormat.longstrip) {
       if (listController.isAttached && listController.visibleRange != null) {
         final positions = listController.visibleRange;
         final max = positions!.$2;
 
-        if (max == pages.length - 1 &&
+        if (max == widget.pages.length - 1 &&
             scrollController.position.atEdge &&
             scrollController.position.pixels ==
                 scrollController.position.maxScrollExtent) {
@@ -355,11 +314,10 @@ class ReaderWidget extends HookConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final tr = context.t;
-    final pageCount = pages.length;
+    final pageCount = widget.pages.length;
     final focusNode = useFocusNode();
-    final pageController = usePageController(initialPage: 0);
     final scaleStateController = List<PhotoViewScaleStateController>.generate(
       pageCount,
       (index) => usePhotoViewScaleStateController(),
@@ -370,13 +328,7 @@ class ReaderWidget extends HookConsumerWidget {
     );
     final settings = ref.watch(readerSettingsProvider);
     final theme = Theme.of(context);
-    final currentPage = useValueNotifier(0);
-    final listController = useListController();
-    final scrollController = useScrollController();
-    final subtext = useValueNotifier<String?>(
-      subtitle ?? (pages.isNotEmpty ? pages.elementAt(0).sortKey : ''),
-    );
-    final format = longstrip ? ReaderFormat.longstrip : settings.format;
+    final format = widget.longstrip ? ReaderFormat.longstrip : settings.format;
     final isPortrait = DeviceContext.isPortraitMode(context);
     final longStripScale = useValueNotifier(
       isPortrait ? LongStripScale.full : LongStripScale.small,
@@ -395,10 +347,7 @@ class ReaderWidget extends HookConsumerWidget {
             if (context.mounted) {
               setPageValue(
                 page: pageController.page!.toInt(),
-                currentPage: currentPage,
                 precacheCount: precacheCount(),
-                subtext: subtext,
-                context: context,
               );
             }
           });
@@ -417,13 +366,7 @@ class ReaderWidget extends HookConsumerWidget {
 
           Future.delayed(Duration.zero, () {
             if (context.mounted) {
-              setPageValue(
-                page: min,
-                currentPage: currentPage,
-                precacheCount: precacheCount(),
-                subtext: subtext,
-                context: context,
-              );
+              setPageValue(page: min, precacheCount: precacheCount());
             }
           });
         }
@@ -445,7 +388,7 @@ class ReaderWidget extends HookConsumerWidget {
         leading: AutoLeadingButton(),
         title: ListTile(
           title: Text(
-            title,
+            widget.title,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           subtitle: HookBuilder(
@@ -461,24 +404,24 @@ class ReaderWidget extends HookConsumerWidget {
         ),
         actions: [
           Builder(
-            builder:
-                (context) => IconButton(
-                  icon: const Icon(Icons.settings),
-                  onPressed: () => Scaffold.of(context).openEndDrawer(),
-                  tooltip: tr.reader.settings,
-                ),
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+              tooltip: tr.reader.settings,
+            ),
           ),
         ],
       ),
       endDrawer: Drawer(
         width: 320,
-        child: Center(
+        child: SingleChildScrollView(
           child: SafeArea(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               spacing: 10.0,
               children: <Widget>[
-                if (onHeaderPressed != null && drawerHeader != null)
+                if (widget.onHeaderPressed != null &&
+                    widget.drawerHeader != null)
                   TextButton(
                     onPressed: () {
                       // First one pops the drawer
@@ -487,48 +430,40 @@ class ReaderWidget extends HookConsumerWidget {
                       // Second one pops the reader
                       context.maybePop();
 
-                      onHeaderPressed!(context);
+                      widget.onHeaderPressed!(context);
                     },
                     child: Text(
-                      drawerHeader!,
+                      widget.drawerHeader!,
                       style: const TextStyle(fontSize: 18),
                     ),
                   ),
-                if (drawerHeader != null && onHeaderPressed == null)
+                if (widget.drawerHeader != null &&
+                    widget.onHeaderPressed == null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Text(
-                      drawerHeader!,
-                      style: theme.textTheme.labelLarge?.copyWith(fontSize: 18),
+                      widget.drawerHeader!,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontSize: 18,
+                      ),
                     ),
                   ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 10.0,
-                  children: [
-                    HookBuilder(
-                      builder: (_) {
-                        final value = useValueListenable(currentPage);
-                        return OutlinedButton(
-                          onPressed:
-                              (value > 0)
-                                  ? () => jumpToPreviousPage(
-                                    currentPage,
-                                    format: format,
-                                    pageController: pageController,
-                                    listController: listController,
-                                    scrollController: scrollController,
-                                  )
-                                  : null,
+                HookBuilder(
+                  builder: (context) {
+                    final page = useValueListenable(currentPage);
+
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 10.0,
+                      children: [
+                        OutlinedButton(
+                          onPressed: (page > 0)
+                              ? () => jumpToPreviousPage(format: format)
+                              : null,
                           child: const Icon(Icons.arrow_back_ios_new),
-                        );
-                      },
-                    ),
-                    HookBuilder(
-                      builder: (_) {
-                        final value = useValueListenable(currentPage);
-                        return DropdownMenu<int>(
-                          initialSelection: value,
+                        ),
+                        DropdownMenu<int>(
+                          initialSelection: page,
                           width: 80.0,
                           enableFilter: false,
                           enableSearch: false,
@@ -543,38 +478,20 @@ class ReaderWidget extends HookConsumerWidget {
                           ),
                           onSelected: (int? index) {
                             if (index != null) {
-                              jumpToPage(
-                                index,
-                                format: format,
-                                pageController: pageController,
-                                listController: listController,
-                                scrollController: scrollController,
-                              );
+                              jumpToPage(index, format: format);
                             }
                           },
                           dropdownMenuEntries: pageDropdownItems,
-                        );
-                      },
-                    ),
-                    HookBuilder(
-                      builder: (_) {
-                        final value = useValueListenable(currentPage);
-                        return OutlinedButton(
-                          onPressed:
-                              (value < pageCount - 1)
-                                  ? () => jumpToNextPage(
-                                    currentPage,
-                                    format: format,
-                                    pageController: pageController,
-                                    listController: listController,
-                                    scrollController: scrollController,
-                                  )
-                                  : null,
+                        ),
+                        OutlinedButton(
+                          onPressed: (page < pageCount - 1)
+                              ? () => jumpToNextPage(format: format)
+                              : null,
                           child: const Icon(Icons.arrow_forward_ios),
-                        );
-                      },
-                    ),
-                  ],
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 const Divider(),
                 Text(
@@ -589,40 +506,31 @@ class ReaderWidget extends HookConsumerWidget {
                         avatar: Icon(f.icon, color: theme.iconTheme.color),
                         label: Text(tr[f.label]),
                         selected: settings.format == f,
-                        onSelected:
-                            (longstrip)
-                                ? null
-                                : (value) {
-                                  if (value) {
-                                    readerConfigSaveMutation.run(ref, (
-                                      ref,
-                                    ) async {
-                                      return ref
-                                          .get(readerSettingsProvider.notifier)
-                                          .save(settings.copyWith(format: f));
-                                    });
-                                  }
-                                },
+                        onSelected: (widget.longstrip)
+                            ? null
+                            : (value) {
+                                if (value) {
+                                  _saveSetting(settings.copyWith(format: f));
+                                }
+                              },
                       ),
                   ],
                 ),
                 ActionChip(
                   avatar: Icon(Icons.fit_screen, color: theme.iconTheme.color),
                   label: Text(tr.reader.togglePageSize),
-                  onPressed:
-                      (format == ReaderFormat.longstrip)
-                          ? () {
-                            longStripScale.value = toggleLongStripScale(
-                              longStripScale.value,
-                            );
-                          }
-                          : () {
-                            scaleStateController[currentPage.value]
-                                .scaleState = defaultScaleStateCycle(
-                              scaleStateController[currentPage.value]
-                                  .scaleState,
-                            );
-                          },
+                  onPressed: (format == ReaderFormat.longstrip)
+                      ? () {
+                          longStripScale.value = toggleLongStripScale(
+                            longStripScale.value,
+                          );
+                        }
+                      : () {
+                          scaleStateController[currentPage.value]
+                              .scaleState = defaultScaleStateCycle(
+                            scaleStateController[currentPage.value].scaleState,
+                          );
+                        },
                 ),
                 Wrap(
                   alignment: WrapAlignment.center,
@@ -632,22 +540,15 @@ class ReaderWidget extends HookConsumerWidget {
                         avatar: Icon(dir.icon, color: theme.iconTheme.color),
                         label: Text(tr[dir.label]),
                         selected: settings.direction == dir,
-                        onSelected:
-                            (format == ReaderFormat.longstrip)
-                                ? null
-                                : (value) {
-                                  if (value) {
-                                    readerConfigSaveMutation.run(ref, (
-                                      ref,
-                                    ) async {
-                                      return ref
-                                          .get(readerSettingsProvider.notifier)
-                                          .save(
-                                            settings.copyWith(direction: dir),
-                                          );
-                                    });
-                                  }
-                                },
+                        onSelected: (format == ReaderFormat.longstrip)
+                            ? null
+                            : (value) {
+                                if (value) {
+                                  _saveSetting(
+                                    settings.copyWith(direction: dir),
+                                  );
+                                }
+                              },
                       ),
                   ],
                 ),
@@ -659,65 +560,41 @@ class ReaderWidget extends HookConsumerWidget {
                     color: theme.iconTheme.color,
                   ),
                   label: Text(tr.reader.progressBar),
-                  onPressed: () {
-                    readerConfigSaveMutation.run(ref, (ref) async {
-                      return ref
-                          .get(readerSettingsProvider.notifier)
-                          .save(
-                            settings.copyWith(
-                              showProgressBar: !settings.showProgressBar,
-                            ),
-                          );
-                    });
-                  },
+                  onPressed: () => _saveSetting(
+                    settings.copyWith(
+                      showProgressBar: !settings.showProgressBar,
+                    ),
+                  ),
                 ),
                 ActionChip(
                   avatar: Icon(
                     Icons.swipe,
-                    color:
-                        settings.swipeGestures
-                            ? theme.iconTheme.color
-                            : theme.disabledColor,
+                    color: settings.swipeGestures
+                        ? theme.iconTheme.color
+                        : theme.disabledColor,
                   ),
                   label: Text(tr.reader.swipeGestures),
-                  onPressed:
-                      (format == ReaderFormat.longstrip)
-                          ? null
-                          : () {
-                            readerConfigSaveMutation.run(ref, (ref) async {
-                              return ref
-                                  .get(readerSettingsProvider.notifier)
-                                  .save(
-                                    settings.copyWith(
-                                      swipeGestures: !settings.swipeGestures,
-                                    ),
-                                  );
-                            });
-                          },
+                  onPressed: (format == ReaderFormat.longstrip)
+                      ? null
+                      : () => _saveSetting(
+                          settings.copyWith(
+                            swipeGestures: !settings.swipeGestures,
+                          ),
+                        ),
                 ),
                 ActionChip(
                   avatar: Icon(
                     Icons.mouse,
-                    color:
-                        settings.clickToTurn
-                            ? theme.iconTheme.color
-                            : theme.disabledColor,
+                    color: settings.clickToTurn
+                        ? theme.iconTheme.color
+                        : theme.disabledColor,
                   ),
                   label: Text(tr.reader.clickToTurn),
-                  onPressed:
-                      (format == ReaderFormat.longstrip)
-                          ? null
-                          : () {
-                            readerConfigSaveMutation.run(ref, (ref) async {
-                              return ref
-                                  .get(readerSettingsProvider.notifier)
-                                  .save(
-                                    settings.copyWith(
-                                      clickToTurn: !settings.clickToTurn,
-                                    ),
-                                  );
-                            });
-                          },
+                  onPressed: (format == ReaderFormat.longstrip)
+                      ? null
+                      : () => _saveSetting(
+                          settings.copyWith(clickToTurn: !settings.clickToTurn),
+                        ),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -740,11 +617,7 @@ class ReaderWidget extends HookConsumerWidget {
                       ),
                       onSelected: (int? value) {
                         if (value != null) {
-                          readerConfigSaveMutation.run(ref, (ref) async {
-                            return ref
-                                .get(readerSettingsProvider.notifier)
-                                .save(settings.copyWith(precacheCount: value));
-                          });
+                          _saveSetting(settings.copyWith(precacheCount: value));
                         }
                       },
                       dropdownMenuEntries:
@@ -752,10 +625,9 @@ class ReaderWidget extends HookConsumerWidget {
                             10,
                             (int index) => DropdownMenuEntry<int>(
                               value: index + 1,
-                              label:
-                                  (index + 1 > 9)
-                                      ? 'Max (not recommended)'
-                                      : (index + 1).toString(),
+                              label: (index + 1 > 9)
+                                  ? 'Max (not recommended)'
+                                  : (index + 1).toString(),
                             ),
                           ),
                     ),
@@ -771,131 +643,60 @@ class ReaderWidget extends HookConsumerWidget {
         autofocus: true,
         focusNode: focusNode,
         onKeyEvent: (node, event) {
+          // We only care about key down and repeat events.
+          if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+            return KeyEventResult.ignored;
+          }
+
+          final key = event.physicalKey;
+
+          // Handle horizontal navigation only on the initial key press.
           if (event is KeyDownEvent) {
-            switch (event.physicalKey) {
+            switch (key) {
               case PhysicalKeyboardKey.arrowLeft:
-                return onTapLeft(
-                  currentPage: currentPage,
-                  settings: settings,
-                  format: format,
-                  pageController: pageController,
-                  listController: listController,
-                  scrollController: scrollController,
-                  context: context,
-                );
+                return onTapLeft(settings: settings, format: format);
               case PhysicalKeyboardKey.arrowRight:
-                return onTapRight(
-                  currentPage: currentPage,
-                  settings: settings,
-                  format: format,
-                  pageController: pageController,
-                  listController: listController,
-                  scrollController: scrollController,
-                  context: context,
-                );
-              case PhysicalKeyboardKey.arrowUp:
-                return onTapTop(
-                  250,
-                  currentPage: currentPage,
-                  settings: settings,
-                  format: format,
-                  viewController: viewController,
-                  listController: listController,
-                  scrollController: scrollController,
-                  context: context,
-                );
-              case PhysicalKeyboardKey.arrowDown:
-                return onTapBottom(
-                  250,
-                  currentPage: currentPage,
-                  settings: settings,
-                  format: format,
-                  viewController: viewController,
-                  listController: listController,
-                  scrollController: scrollController,
-                  context: context,
-                );
-              case PhysicalKeyboardKey.pageUp:
-                return onTapTop(
-                  1000,
-                  currentPage: currentPage,
-                  settings: settings,
-                  format: format,
-                  viewController: viewController,
-                  listController: listController,
-                  scrollController: scrollController,
-                  context: context,
-                );
-              case PhysicalKeyboardKey.pageDown:
-                return onTapBottom(
-                  1000,
-                  currentPage: currentPage,
-                  settings: settings,
-                  format: format,
-                  viewController: viewController,
-                  listController: listController,
-                  scrollController: scrollController,
-                  context: context,
-                );
-              default:
-                return KeyEventResult.ignored;
-            }
-          } else if (event is KeyRepeatEvent) {
-            switch (event.physicalKey) {
-              case PhysicalKeyboardKey.arrowUp:
-                return onTapTop(
-                  250,
-                  currentPage: currentPage,
-                  settings: settings,
-                  format: format,
-                  viewController: viewController,
-                  listController: listController,
-                  scrollController: scrollController,
-                  context: context,
-                );
-              case PhysicalKeyboardKey.arrowDown:
-                return onTapBottom(
-                  250,
-                  currentPage: currentPage,
-                  settings: settings,
-                  format: format,
-                  viewController: viewController,
-                  listController: listController,
-                  scrollController: scrollController,
-                  context: context,
-                );
-              case PhysicalKeyboardKey.pageUp:
-                return onTapTop(
-                  1000,
-                  currentPage: currentPage,
-                  settings: settings,
-                  format: format,
-                  viewController: viewController,
-                  listController: listController,
-                  scrollController: scrollController,
-                  context: context,
-                );
-              case PhysicalKeyboardKey.pageDown:
-                return onTapBottom(
-                  1000,
-                  currentPage: currentPage,
-                  settings: settings,
-                  format: format,
-                  viewController: viewController,
-                  listController: listController,
-                  scrollController: scrollController,
-                  context: context,
-                );
-              default:
-                return KeyEventResult.ignored;
+                return onTapRight(settings: settings, format: format);
             }
           }
 
-          return KeyEventResult.ignored;
+          // Handle vertical navigation on key press and repeat.
+          switch (key) {
+            case PhysicalKeyboardKey.arrowUp:
+              return onTapTop(
+                250,
+                settings: settings,
+                format: format,
+                viewController: viewController,
+              );
+            case PhysicalKeyboardKey.arrowDown:
+              return onTapBottom(
+                250,
+                settings: settings,
+                format: format,
+                viewController: viewController,
+              );
+            case PhysicalKeyboardKey.pageUp:
+              return onTapTop(
+                1000,
+                settings: settings,
+                format: format,
+                viewController: viewController,
+              );
+            case PhysicalKeyboardKey.pageDown:
+              return onTapBottom(
+                1000,
+                settings: settings,
+                format: format,
+                viewController: viewController,
+              );
+            default:
+              return KeyEventResult.ignored;
+          }
         },
         child: Builder(
           builder: (context) {
-            if (pages.isEmpty && externalUrl != null) {
+            if (widget.pages.isEmpty && widget.externalUrl != null) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -904,11 +705,16 @@ class ReaderWidget extends HookConsumerWidget {
                     const Text('Read on external site:'),
                     ElevatedButton(
                       onPressed: () async {
-                        if (!await launchUrl(Uri.parse(externalUrl!))) {
-                          throw 'Could not launch ${externalUrl!}';
+                        final url = Uri.parse(widget.externalUrl!);
+                        if (!await launchUrl(url)) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Could not launch $url')),
+                            );
+                          }
                         }
                       },
-                      child: Text(externalUrl!),
+                      child: Text(widget.externalUrl!),
                     ),
                   ],
                 ),
@@ -922,79 +728,71 @@ class ReaderWidget extends HookConsumerWidget {
                 listController: listController,
                 controller: scrollController,
                 cacheExtent: mediaSize.height * pageCount,
-                children:
-                    pages
-                        .map(
-                          (page) => Center(
-                            key: ValueKey(page.id),
-                            child: HookBuilder(
-                              builder: (context) {
-                                final scale = useValueListenable(
-                                  longStripScale,
-                                );
-                                final width = mediaSize.width * scale.scale;
-                                return ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    minWidth: width,
-                                    maxWidth: width,
-                                  ),
-                                  child: KeepAliveImage(
-                                    image: page.provider,
-                                    fit: BoxFit.contain,
-                                    alignment: Alignment.topCenter,
-                                    loadingBuilder: (context, child, event) {
-                                      if (event == null) {
-                                        return child;
-                                      }
+                children: [
+                  for (final page in widget.pages)
+                    Center(
+                      key: ValueKey(page.id),
+                      child: HookBuilder(
+                        builder: (context) {
+                          final scale = useValueListenable(longStripScale);
+                          final width = mediaSize.width * scale.scale;
+                          return ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: width,
+                              maxWidth: width,
+                            ),
+                            child: KeepAliveImage(
+                              image: page.provider,
+                              fit: BoxFit.contain,
+                              alignment: Alignment.topCenter,
+                              loadingBuilder: (context, child, event) {
+                                if (event == null) {
+                                  return child;
+                                }
 
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          value:
-                                              event.expectedTotalBytes != null
-                                                  ? event.cumulativeBytesLoaded /
-                                                      event.expectedTotalBytes!
-                                                  : null,
-                                        ),
-                                      );
-                                    },
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: event.expectedTotalBytes != null
+                                        ? event.cumulativeBytesLoaded /
+                                              event.expectedTotalBytes!
+                                        : null,
                                   ),
                                 );
                               },
                             ),
-                          ),
-                        )
-                        .toList(),
+                          );
+                        },
+                      ),
+                    ),
+                ],
               );
             }
 
             return PhotoViewGallery.builder(
               allowImplicitScrolling: true,
               reverse: settings.direction == ReaderDirection.rightToLeft,
-              scrollPhysics:
-                  !settings.swipeGestures
-                      ? const NeverScrollableScrollPhysics()
-                      : null,
+              scrollPhysics: !settings.swipeGestures
+                  ? const NeverScrollableScrollPhysics()
+                  : null,
               backgroundDecoration: const BoxDecoration(color: Colors.black),
               pageController: pageController,
               onPageChanged: (int index) {
                 focusNode.requestFocus();
               },
-              loadingBuilder:
-                  (context, event) => Center(
-                    child: SizedBox(
-                      width: 150,
-                      child: LinearProgressIndicator(
-                        value:
-                            event != null && event.expectedTotalBytes != null
-                                ? event.cumulativeBytesLoaded /
-                                    event.expectedTotalBytes!
-                                : null,
-                      ),
-                    ),
+              loadingBuilder: (context, event) => Center(
+                child: SizedBox(
+                  width: 150,
+                  child: LinearProgressIndicator(
+                    value: event != null && event.expectedTotalBytes != null
+                        ? event.cumulativeBytesLoaded /
+                              event.expectedTotalBytes!
+                        : null,
                   ),
+                ),
+              ),
               itemCount: pageCount,
               builder: (context, index) {
-                final page = pages.elementAt(index);
+                final page = widget.pages[index];
                 return PhotoViewGalleryPageOptions(
                   heroAttributes: PhotoViewHeroAttributes(tag: page.id),
                   imageProvider: page.provider,
@@ -1004,39 +802,22 @@ class ReaderWidget extends HookConsumerWidget {
                   maxScale: PhotoViewComputedScale.covered * 5.0,
                   initialScale: PhotoViewComputedScale.contained,
                   basePosition: Alignment.topCenter,
-                  onTapUp:
-                      settings.clickToTurn
-                          ? (context, details, value) {
-                            focusNode.requestFocus();
+                  onTapUp: settings.clickToTurn
+                      ? (context, details, value) {
+                          focusNode.requestFocus();
 
-                            final taploc = details.localPosition.dx;
-                            final viewport = context.size!.width;
+                          final taploc = details.localPosition.dx;
+                          final viewport = context.size!.width;
 
-                            final tapmargin = viewport / 2.5;
+                          final tapmargin = viewport / 2.5;
 
-                            if (taploc < tapmargin) {
-                              onTapLeft(
-                                currentPage: currentPage,
-                                settings: settings,
-                                format: format,
-                                pageController: pageController,
-                                listController: listController,
-                                scrollController: scrollController,
-                                context: context,
-                              );
-                            } else if (taploc > viewport - tapmargin) {
-                              onTapRight(
-                                currentPage: currentPage,
-                                settings: settings,
-                                format: format,
-                                pageController: pageController,
-                                listController: listController,
-                                scrollController: scrollController,
-                                context: context,
-                              );
-                            }
+                          if (taploc < tapmargin) {
+                            onTapLeft(settings: settings, format: format);
+                          } else if (taploc > viewport - tapmargin) {
+                            onTapRight(settings: settings, format: format);
                           }
-                          : null,
+                        }
+                      : null,
                 );
               },
             );
@@ -1047,27 +828,21 @@ class ReaderWidget extends HookConsumerWidget {
       // forcing bottom sheet width to be 640 max
       // https://github.com/flutter/flutter/pull/122445
       extendBody: true,
-      bottomNavigationBar:
-          settings.showProgressBar
-              ? ProgressIndicator(
-                reverse:
-                    (format != ReaderFormat.longstrip) &&
-                    settings.direction == ReaderDirection.rightToLeft,
-                currentPage: currentPage,
-                itemCount: pageCount,
-                color: theme.colorScheme.primary,
-                onPageSelected:
-                    (index) => animateToPage(
-                      index,
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.easeInOut,
-                      format: format,
-                      pageController: pageController,
-                      listController: listController,
-                      scrollController: scrollController,
-                    ),
-              )
-              : null,
+      bottomNavigationBar: settings.showProgressBar
+          ? ProgressIndicator(
+              reverse:
+                  (format != ReaderFormat.longstrip) &&
+                  settings.direction == ReaderDirection.rightToLeft,
+              currentPage: currentPage,
+              itemCount: pageCount,
+              onPageSelected: (index) => animateToPage(
+                index,
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOut,
+                format: format,
+              ),
+            )
+          : null,
     );
   }
 }
@@ -1078,32 +853,42 @@ class ProgressIndicator extends HookWidget {
     required this.currentPage,
     required this.itemCount,
     required this.onPageSelected,
-    required this.reverse,
-    this.color = Colors.white,
+    this.reverse = false,
+    this.color,
   });
 
   final ValueNotifier<int> currentPage;
   final int itemCount;
   final ValueChanged<int> onPageSelected;
-  final Color color;
+  final Color? color;
   final bool reverse;
 
   static const double _barHeight = 8.0;
 
   @override
   Widget build(BuildContext context) {
-    final sections = useMemoized(() {
-      return List<Widget>.generate(itemCount, (index) {
-        return _ProgressBarSection(
+    final progressColor = color ?? Theme.of(context).colorScheme.primary;
+
+    final sections = useMemoized(
+      () => List<Widget>.generate(
+        itemCount,
+        (index) => _ProgressBarSection(
+          key: ValueKey('progress_bar_section_$index'),
           index: index,
           currentPage: currentPage,
-          color: color,
+          color: progressColor,
           height: _barHeight,
           tooltip: (index + 1).toString(),
           onTap: () => onPageSelected(index),
-        );
-      });
-    });
+        ),
+      ),
+      [itemCount, color, onPageSelected],
+    );
+
+    final children = useMemoized(
+      () => reverse ? sections.reversed.toList() : sections,
+      [sections, reverse],
+    );
 
     return ConstrainedBox(
       constraints: BoxConstraints.loose(const Size.fromHeight(30)),
@@ -1118,15 +903,16 @@ class ProgressIndicator extends HookWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: reverse ? sections.reversed.toList() : sections,
+          children: children,
         ),
       ),
     );
   }
 }
 
-class _ProgressBarSection extends StatelessWidget {
+class _ProgressBarSection extends HookWidget {
   const _ProgressBarSection({
+    super.key,
     required this.index,
     required this.currentPage,
     required this.color,
@@ -1144,6 +930,9 @@ class _ProgressBarSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final page = useValueListenable(currentPage);
+    final isFilled = (index == 0 || page >= index);
+
     return Expanded(
       child: Tooltip(
         message: tooltip,
@@ -1151,17 +940,10 @@ class _ProgressBarSection extends StatelessWidget {
           onTap: onTap,
           child: Align(
             alignment: Alignment.bottomCenter,
-            child: HookBuilder(
-              builder: (context) {
-                final page = useValueListenable(currentPage);
-                return Material(
-                  color:
-                      (index == 0 || page >= index)
-                          ? color
-                          : Colors.transparent,
-                  child: SizedBox(height: height, width: double.infinity),
-                );
-              },
+            child: Container(
+              height: height,
+              width: double.infinity,
+              color: isFilled ? color : Colors.transparent,
             ),
           ),
         ),
