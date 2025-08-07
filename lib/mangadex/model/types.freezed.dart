@@ -4504,7 +4504,7 @@ as Map<String, SelfRating>,
 /// @nodoc
 mixin _$SelfRating implements DiagnosticableTreeMixin {
 
- dynamic get expiry; int get rating;@TimestampSerializer() DateTime get createdAt;
+ int get rating;@TimestampSerializer() DateTime get createdAt;
 /// Create a copy of SelfRating
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -4518,21 +4518,21 @@ $SelfRatingCopyWith<SelfRating> get copyWith => _$SelfRatingCopyWithImpl<SelfRat
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'SelfRating'))
-    ..add(DiagnosticsProperty('expiry', expiry))..add(DiagnosticsProperty('rating', rating))..add(DiagnosticsProperty('createdAt', createdAt));
+    ..add(DiagnosticsProperty('rating', rating))..add(DiagnosticsProperty('createdAt', createdAt));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SelfRating&&const DeepCollectionEquality().equals(other.expiry, expiry)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SelfRating&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(expiry),rating,createdAt);
+int get hashCode => Object.hash(runtimeType,rating,createdAt);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'SelfRating(expiry: $expiry, rating: $rating, createdAt: $createdAt)';
+  return 'SelfRating(rating: $rating, createdAt: $createdAt)';
 }
 
 

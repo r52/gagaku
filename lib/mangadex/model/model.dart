@@ -1276,26 +1276,12 @@ class MangaDexModel {
 
         if (body['ratings'] is List) {
           // If the api returns a List, then the result is null
-          Map<String, SelfRating> map = {};
-
-          for (final m in mangas) {
-            map[m.id] = SelfRating(rating: -1, createdAt: DateTime.now());
-          }
-
-          return map;
+          return {};
         }
 
         final resp = SelfRatingResponse.fromJson(body);
 
-        Map<String, SelfRating> map = {...resp.ratings};
-
-        for (final m in mangas) {
-          if (!map.containsKey(m.id)) {
-            map[m.id] = SelfRating(rating: -1, createdAt: DateTime.now());
-          }
-        }
-
-        return map;
+        return {...resp.ratings};
       } else {
         // Throw if failure
         throw createException("fetchRating() failed.", response);
@@ -2309,8 +2295,8 @@ class ChapterStats extends _$ChapterStats {
 
 final chapterStatsMutation = Mutation<Map<String, ChapterStatistics>>();
 
-@Riverpod(keepAlive: true)
-class Ratings extends _$Ratings {
+@riverpod
+class Ratings extends _$Ratings with AutoDisposeExpiryMix {
   Future<Map<String, SelfRating>> _fetchRatings(Iterable<Manga> mangas) async {
     if (mangas.isEmpty) {
       return {};
@@ -2322,65 +2308,37 @@ class Ratings extends _$Ratings {
   }
 
   @override
-  Future<Map<String, SelfRating>> build(String? userId) async {
-    if (userId == null) {
-      return {};
+  Future<SelfRating?> build(Manga manga) async {
+    disposeAfter(const Duration(minutes: 5));
+
+    final result = await _fetchRatings([manga]);
+
+    if (result.containsKey(manga.id)) {
+      return result[manga.id];
     }
 
-    return _fetchRatings([]);
-  }
-
-  /// Fetch user's self-ratings for the provided list of mangas
-  Future<Map<String, SelfRating>> get(Iterable<Manga> mangas) async {
-    if (userId == null) {
-      return {};
-    }
-
-    final oldstate = await future;
-    final mg = mangas.where(
-      (m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired == true,
-    );
-
-    if (mg.isEmpty) {
-      // No change
-      return oldstate;
-    }
-
-    final map = await _fetchRatings(mg);
-    state = AsyncData({...oldstate, ...map});
-
-    return map;
+    return null;
   }
 
   /// Sets a self-rating for a manga
-  Future<bool> set(Manga manga, int? rating) async {
-    if (userId == null) {
-      throw StateError('User not logged in');
-    }
-
+  Future<bool> set(int? rating) async {
     final api = ref.watch(mangadexProvider);
-    final oldstate = await future;
+    SelfRating? updated = await future;
 
     bool result = await api.setMangaRating(manga, rating);
 
     if (result) {
       switch (rating) {
         case null:
-          oldstate[manga.id] = SelfRating(
-            rating: -1,
-            createdAt: DateTime.now(),
-          );
+          updated = null;
           break;
         case _:
-          oldstate[manga.id] = SelfRating(
-            rating: rating,
-            createdAt: DateTime.now(),
-          );
+          updated = SelfRating(rating: rating, createdAt: DateTime.now());
           break;
       }
     }
 
-    state = AsyncData({...oldstate});
+    state = AsyncData(updated);
 
     return result;
   }
@@ -2556,7 +2514,7 @@ final mangadexHistoryMutation = Mutation<Chapter>();
 class LoggedUser extends _$LoggedUser {
   @override
   Future<User?> build() async {
-    final status = await ref.watch(authControlProvider.selectAsync((s) => s));
+    final status = await ref.watch(authControlProvider.future);
 
     if (status != AuthenticationStatus.authenticated) {
       return null;
@@ -2574,7 +2532,10 @@ class AuthControl extends _$AuthControl {
   @override
   Stream<AuthenticationStatus> build() async* {
     final api = ref.watch(mangadexProvider);
-    yield* api.authenticationStatus;
+
+    await for (final status in api.authenticationStatus) {
+      yield status;
+    }
   }
 
   Future<bool> login(

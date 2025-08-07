@@ -53,9 +53,6 @@ Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
     readChaptersMutation(me?.id).run(ref, (ref) async {
       return await ref.get(readChaptersProvider(me?.id).notifier).get(manga);
     }),
-    ratingsMutation(me?.id).run(ref, (ref) async {
-      await ref.get(ratingsProvider(me?.id).notifier).get(manga);
-    }),
   ).wait;
 
   return manga.first;
@@ -214,9 +211,6 @@ class _MangaDexMangaViewWidgetState
             return await ref
                 .get(readChaptersProvider(me?.id).notifier)
                 .get(mangas);
-          }),
-          ratingsMutation(me?.id).run(ref, (ref) async {
-            await ref.get(ratingsProvider(me?.id).notifier).get(mangas);
           }),
         ).wait;
       } catch (e) {
@@ -1514,25 +1508,11 @@ class _RatingMenu extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final theme = Theme.of(context);
-    final me = ref.watch(loggedUserProvider).value;
-    final ratingProv = ref.watch(ratingsProvider(me?.id));
-    final ratings = ratingProv.value;
-    final ratingsMut = ref.watch(ratingsMutation(me?.id));
-    final hasRating =
-        (ratings != null &&
-        ratings.containsKey(manga.id) &&
-        ratings[manga.id]!.rating > 0);
+    final ratingProv = ref.watch(ratingsProvider(manga));
+    final rating = ratingProv.value;
+    final ratingsMut = ref.watch(ratingsMutation);
+    final hasRating = rating != null;
     final isLoading = ratingsMut is MutationPending || ratingProv.isLoading;
-
-    // Redundancy
-    useEffect(() {
-      Future.delayed(Duration.zero, () async {
-        await ratingsMutation(me?.id).run(ref, (ref) async {
-          await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
-        });
-      });
-      return null;
-    }, [manga, me]);
 
     return MenuAnchor(
       builder: (context, controller, child) {
@@ -1541,7 +1521,7 @@ class _RatingMenu extends HookConsumerWidget {
               ? theme.colorScheme.primaryContainer
               : theme.colorScheme.surface.withAlpha(200),
           borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-          child: (isLoading || ratings == null)
+          child: isLoading
               ? _loadingAction
               : InkWell(
                   onTap: () {
@@ -1559,18 +1539,16 @@ class _RatingMenu extends HookConsumerWidget {
         ...List.generate(
           10,
           (index) => MenuItemButton(
-            onPressed: () => ratingsMutation(me?.id).run(ref, (ref) async {
-              await ref
-                  .get(ratingsProvider(me?.id).notifier)
-                  .set(manga, index + 1);
+            onPressed: () => ratingsMutation.run(ref, (ref) async {
+              await ref.get(ratingsProvider(manga).notifier).set(index + 1);
             }),
             child: Text(tr.mangadex.ratings[index + 1]),
           ),
         ).reversed,
         if (hasRating)
           MenuItemButton(
-            onPressed: () => ratingsMutation(me?.id).run(ref, (ref) async {
-              await ref.get(ratingsProvider(me?.id).notifier).set(manga, null);
+            onPressed: () => ratingsMutation.run(ref, (ref) async {
+              await ref.get(ratingsProvider(manga).notifier).set(null);
             }),
             child: Text(tr.mangadex.ratings[0]),
           ),
@@ -1587,7 +1565,7 @@ class _RatingMenu extends HookConsumerWidget {
             ),
             if (hasRating)
               Text(
-                '${ratings[manga.id]!.rating}',
+                '${rating.rating}',
                 style: TextStyle(color: theme.colorScheme.onPrimaryContainer),
               ),
           ],

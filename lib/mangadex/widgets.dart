@@ -592,10 +592,6 @@ class _CoverButton extends ConsumerWidget {
           ]);
         });
 
-        ratingsMutation(me?.id).run(ref, (ref) async {
-          await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
-        });
-
         statisticsMutation.run(ref, (ref) async {
           return await ref.get(statisticsProvider.notifier).get([manga]);
         });
@@ -653,10 +649,6 @@ class _MangaTitle extends ConsumerWidget {
           ]);
         });
 
-        ratingsMutation(me?.id).run(ref, (ref) async {
-          await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
-        });
-
         statisticsMutation.run(ref, (ref) async {
           return await ref.get(statisticsProvider.notifier).get([manga]);
         });
@@ -700,10 +692,6 @@ class _BackLinkedChapterButton extends ConsumerWidget {
           return await ref.get(readChaptersProvider(me?.id).notifier).get([
             manga,
           ]);
-        });
-
-        ratingsMutation(me?.id).run(ref, (ref) async {
-          await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
         });
 
         statisticsMutation.run(ref, (ref) async {
@@ -1349,10 +1337,6 @@ class GridMangaItem extends HookConsumerWidget {
           ]);
         });
 
-        ratingsMutation(me?.id).run(ref, (ref) async {
-          await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
-        });
-
         statisticsMutation.run(ref, (ref) async {
           return await ref.get(statisticsProvider.notifier).get([manga]);
         });
@@ -1435,9 +1419,6 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                       .get([manga]);
                 });
 
-                ratingsMutation(me?.id).run(ref, (ref) async {
-                  await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
-                });
                 statisticsMutation.run(ref, (ref) async {
                   return await ref.get(statisticsProvider.notifier).get([
                     manga,
@@ -1466,12 +1447,6 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                         return await ref
                             .get(readChaptersProvider(me?.id).notifier)
                             .get([manga]);
-                      });
-
-                      ratingsMutation(me?.id).run(ref, (ref) async {
-                        await ref.get(ratingsProvider(me?.id).notifier).get([
-                          manga,
-                        ]);
                       });
 
                       statisticsMutation.run(ref, (ref) async {
@@ -1557,10 +1532,6 @@ class _ListMangaItem extends HookConsumerWidget {
                       .get([manga]);
                 });
 
-                ratingsMutation(me?.id).run(ref, (ref) async {
-                  await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
-                });
-
                 statisticsMutation.run(ref, (ref) async {
                   return await ref.get(statisticsProvider.notifier).get([
                     manga,
@@ -1600,12 +1571,6 @@ class _ListMangaItem extends HookConsumerWidget {
                         return await ref
                             .get(readChaptersProvider(me?.id).notifier)
                             .get([manga]);
-                      });
-
-                      ratingsMutation(me?.id).run(ref, (ref) async {
-                        await ref.get(ratingsProvider(me?.id).notifier).get([
-                          manga,
-                        ]);
                       });
 
                       statisticsMutation.run(ref, (ref) async {

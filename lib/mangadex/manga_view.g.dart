@@ -55,7 +55,7 @@ final class _FetchMangaFromIdProvider
   }
 }
 
-String _$fetchMangaFromIdHash() => r'047578691fe54f1a5551c53900021afda1928da6';
+String _$fetchMangaFromIdHash() => r'2dad12988cca0a77cab47d87fb9b45a85561a5e4';
 
 final class _FetchMangaFromIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Manga>, String> {

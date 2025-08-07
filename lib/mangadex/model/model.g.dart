@@ -721,14 +721,14 @@ abstract class _$ChapterStats
 const ratingsProvider = RatingsFamily._();
 
 final class RatingsProvider
-    extends $AsyncNotifierProvider<Ratings, Map<String, SelfRating>> {
+    extends $AsyncNotifierProvider<Ratings, SelfRating?> {
   const RatingsProvider._({
     required RatingsFamily super.from,
-    required String? super.argument,
+    required Manga super.argument,
   }) : super(
          retry: null,
          name: r'ratingsProvider',
-         isAutoDispose: false,
+         isAutoDispose: true,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
@@ -758,16 +758,16 @@ final class RatingsProvider
   }
 }
 
-String _$ratingsHash() => r'c3ca1836cb5c3420059aff0b19a7242afd6a8f8a';
+String _$ratingsHash() => r'ec9c2ef2313b39c267e288eb96c7cdd614e5c15e';
 
 final class RatingsFamily extends $Family
     with
         $ClassFamilyOverride<
           Ratings,
-          AsyncValue<Map<String, SelfRating>>,
-          Map<String, SelfRating>,
-          FutureOr<Map<String, SelfRating>>,
-          String?
+          AsyncValue<SelfRating?>,
+          SelfRating?,
+          FutureOr<SelfRating?>,
+          Manga
         > {
   const RatingsFamily._()
     : super(
@@ -775,39 +775,31 @@ final class RatingsFamily extends $Family
         name: r'ratingsProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: false,
+        isAutoDispose: true,
       );
 
-  RatingsProvider call(String? userId) =>
-      RatingsProvider._(argument: userId, from: this);
+  RatingsProvider call(Manga manga) =>
+      RatingsProvider._(argument: manga, from: this);
 
   @override
   String toString() => r'ratingsProvider';
 }
 
-abstract class _$Ratings extends $AsyncNotifier<Map<String, SelfRating>> {
-  late final _$args = ref.$arg as String?;
-  String? get userId => _$args;
+abstract class _$Ratings extends $AsyncNotifier<SelfRating?> {
+  late final _$args = ref.$arg as Manga;
+  Manga get manga => _$args;
 
-  FutureOr<Map<String, SelfRating>> build(String? userId);
+  FutureOr<SelfRating?> build(Manga manga);
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
-    final ref =
-        this.ref
-            as $Ref<
-              AsyncValue<Map<String, SelfRating>>,
-              Map<String, SelfRating>
-            >;
+    final ref = this.ref as $Ref<AsyncValue<SelfRating?>, SelfRating?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<
-                AsyncValue<Map<String, SelfRating>>,
-                Map<String, SelfRating>
-              >,
-              AsyncValue<Map<String, SelfRating>>,
+              AnyNotifier<AsyncValue<SelfRating?>, SelfRating?>,
+              AsyncValue<SelfRating?>,
               Object?,
               Object?
             >;
@@ -1065,7 +1057,7 @@ final class LoggedUserProvider
   LoggedUser create() => LoggedUser();
 }
 
-String _$loggedUserHash() => r'd57241dc04aa26bc80bbb5b0bdb1b3b2e38c5ee2';
+String _$loggedUserHash() => r'8ab1dc95c56b57c32b0b37a2beafb587da10c795';
 
 abstract class _$LoggedUser extends $AsyncNotifier<User?> {
   FutureOr<User?> build();
@@ -1110,7 +1102,7 @@ final class AuthControlProvider
   AuthControl create() => AuthControl();
 }
 
-String _$authControlHash() => r'13720c5ff5dd59eee2b9627e9897aadff31a6983';
+String _$authControlHash() => r'beaad8eb7b740107caff5efd97bec0ac0d849857';
 
 abstract class _$AuthControl extends $StreamNotifier<AuthenticationStatus> {
   Stream<AuthenticationStatus> build();

@@ -873,16 +873,13 @@ abstract class SelfRatingResponse with _$SelfRatingResponse {
 }
 
 @freezed
-abstract class SelfRating with _$SelfRating, ExpiringData {
+abstract class SelfRating with _$SelfRating {
   SelfRating._();
 
   factory SelfRating({
     required int rating,
     @TimestampSerializer() required DateTime createdAt,
   }) = _SelfRating;
-
-  @override
-  final expiry = DateTime.now().add(const Duration(minutes: 10));
 
   factory SelfRating.fromJson(Map<String, dynamic> json) =>
       _$SelfRatingFromJson(json);
