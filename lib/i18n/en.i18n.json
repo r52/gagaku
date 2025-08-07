@@ -50,7 +50,8 @@
     "unknownSourceID": "Unknown source ID $id",
     "fetchFail": "Something went wrong while fetching a new page",
     "pageNotFound": "Page Not Found",
-    "pageNotFoundArg": "Can't find a page for: $url"
+    "pageNotFoundArg": "Can't find a page for: $url",
+    "failedLaunchUrl": "Failed to launch $url"
   },
   "auth": {
     "login": "Login",

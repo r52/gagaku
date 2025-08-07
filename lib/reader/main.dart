@@ -16,8 +16,6 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
-import 'package:url_launcher/url_launcher.dart';
-
 enum LongStripScale {
   small(0.4),
   large(0.8),
@@ -705,14 +703,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                     const Text('Read on external site:'),
                     ElevatedButton(
                       onPressed: () async {
-                        final url = Uri.parse(widget.externalUrl!);
-                        if (!await launchUrl(url)) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Could not launch $url')),
-                            );
-                          }
-                        }
+                        await Styles.tryLaunchUrl(context, widget.externalUrl!);
                       },
                       child: Text(widget.externalUrl!),
                     ),

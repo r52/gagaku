@@ -266,6 +266,9 @@ class TranslationsErrorsEn {
 
 	/// en: 'Can't find a page for: $url'
 	String pageNotFoundArg({required Object url}) => 'Can\'t find a page for: ${url}';
+
+	/// en: 'Failed to launch $url'
+	String failedLaunchUrl({required Object url}) => 'Failed to launch ${url}';
 }
 
 // Path: auth
@@ -1746,6 +1749,7 @@ extension on Translations {
 			case 'errors.fetchFail': return 'Something went wrong while fetching a new page';
 			case 'errors.pageNotFound': return 'Page Not Found';
 			case 'errors.pageNotFoundArg': return ({required Object url}) => 'Can\'t find a page for: ${url}';
+			case 'errors.failedLaunchUrl': return ({required Object url}) => 'Failed to launch ${url}';
 			case 'auth.login': return 'Login';
 			case 'auth.logout': return 'Logout';
 			case 'auth.username': return 'Username';

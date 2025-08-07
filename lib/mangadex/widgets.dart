@@ -24,7 +24,6 @@ import 'package:riverpod/misc.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:url_launcher/url_launcher.dart';
 
 import 'model/types.dart';
 
@@ -1895,9 +1894,7 @@ class CommentChip extends HookWidget {
               final url =
                   'https://forums.mangadex.org/threads/${comments!.threadId}';
 
-              if (!await launchUrl(Uri.parse(url))) {
-                throw 'Could not launch $url';
-              }
+              await Styles.tryLaunchUrl(context, url);
             }
           : null,
     );

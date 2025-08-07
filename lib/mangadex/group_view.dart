@@ -13,7 +13,6 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 part 'group_view.g.dart';
 
@@ -130,11 +129,10 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                           if (group.attributes.website != null)
                             ButtonChip(
                               onPressed: () async {
-                                if (!await launchUrl(
-                                  Uri.parse(group.attributes.website!),
-                                )) {
-                                  throw 'Could not launch ${group.attributes.website!}';
-                                }
+                                await Styles.tryLaunchUrl(
+                                  context,
+                                  group.attributes.website!,
+                                );
                               },
                               text: t.tracking.website,
                             ),
@@ -143,9 +141,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                               onPressed: () async {
                                 final url =
                                     'https://discord.gg/${group.attributes.discord!}';
-                                if (!await launchUrl(Uri.parse(url))) {
-                                  throw 'Could not launch $url';
-                                }
+                                await Styles.tryLaunchUrl(context, url);
                               },
                               text: t.tracking.discord,
                             ),

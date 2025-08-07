@@ -23,25 +23,6 @@ enum GridAlbumExtent {
   const GridAlbumExtent(this.grid, this.detailed);
 }
 
-// @freezed
-// abstract class GagakuConfig with _$GagakuConfig {
-//   const factory GagakuConfig({
-//     /// Theme mode
-//     @Default(ThemeMode.system) ThemeMode themeMode,
-
-//     /// Theme color
-//     @JsonKey(unknownEnumValue: GagakuTheme.lime)
-//     @Default(GagakuTheme.lime)
-//     GagakuTheme theme,
-
-//     // Grid view size
-//     @Default(GridAlbumExtent.medium) GridAlbumExtent gridAlbumExtent,
-//   }) = _GagakuConfig;
-
-//   factory GagakuConfig.fromJson(Map<String, dynamic> json) =>
-//       _$GagakuConfigFromJson(json);
-// }
-
 @unfreezed
 @Entity()
 @JsonSerializable()

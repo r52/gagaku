@@ -8,6 +8,7 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart';
+import 'package:url_launcher/url_launcher.dart' show launchUrl;
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
   const MouseTouchScrollBehavior();
@@ -758,6 +759,19 @@ class Styles {
           SnackBar(content: Text(content), backgroundColor: color),
         ),
     );
+  }
+
+  static Future<void> tryLaunchUrl(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    if (!await launchUrl(uri)) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(t.errors.failedLaunchUrl(url: uri.toString())),
+          ),
+        );
+      }
+    }
   }
 
   static final slideTween = Tween(

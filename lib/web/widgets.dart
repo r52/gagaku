@@ -406,7 +406,6 @@ class GridMangaItem extends HookConsumerWidget {
     useAutomaticKeepAlive();
     final tr = context.t;
     final extIcons = ref.watch(_extensionIconProvider);
-    final api = ref.watch(proxyProvider);
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
@@ -435,6 +434,7 @@ class GridMangaItem extends HookConsumerWidget {
 
     return InkWell(
       onTap: () async {
+        final api = ref.read(proxyProvider);
         final messenger = ScaffoldMessenger.of(context);
         final result = await api.handleLink(link);
 
@@ -465,16 +465,7 @@ class GridMangaItem extends HookConsumerWidget {
             footer: GridAlbumTextBar(height: 80, text: link.title),
             child: GridAlbumImage(gradient: gradient, child: cover),
           ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Padding(
-              padding: EdgeInsets.only(right: 0.0, bottom: 0.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [sourceIcon],
-              ),
-            ),
-          ),
+          Align(alignment: Alignment.bottomRight, child: sourceIcon),
           if (showFavoriteButton)
             Align(
               alignment: Alignment.topLeft,
@@ -484,7 +475,7 @@ class GridMangaItem extends HookConsumerWidget {
             Align(
               alignment: Alignment.topRight,
               child: FloatingActionButton(
-                heroTag: UniqueKey(),
+                heroTag: ObjectKey(link),
                 mini: true,
                 shape: const CircleBorder(),
                 tooltip: tr.mangaActions.removeHistory,

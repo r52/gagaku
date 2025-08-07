@@ -6,7 +6,6 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/types.dart' show RepoInfo;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 const _urlStartValidation = 'http';
 
@@ -75,9 +74,7 @@ class RepoListManager extends HookConsumerWidget {
                           IconButton(
                             tooltip: tr.webSources.repo.browser,
                             onPressed: () async {
-                              if (!await launchUrl(Uri.parse(item.url))) {
-                                throw 'Could not launch $item';
-                              }
+                              await Styles.tryLaunchUrl(context, item.url);
                             },
                             icon: const Icon(Icons.open_in_new),
                           ),

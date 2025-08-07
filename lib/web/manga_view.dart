@@ -16,7 +16,6 @@ import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 part 'manga_view.g.dart';
 
@@ -384,9 +383,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                           data: manga.description,
                           onTapLink: (text, url, title) async {
                             if (url != null) {
-                              if (!await launchUrl(Uri.parse(url))) {
-                                throw 'Could not launch $url';
-                              }
+                              await Styles.tryLaunchUrl(context, url);
                             }
                           },
                         ),
@@ -436,14 +433,14 @@ class WebMangaViewWidget extends HookConsumerWidget {
                         if (handle.type == SourceType.proxy)
                           ButtonChip(
                             onPressed: () async {
-                              final route = cleanBaseDomains(
+                              final route = Uri.parse(
                                 context.router.currentUrl,
                               );
-                              final url = Uri.parse('http://cubari.moe$route');
 
-                              if (!await launchUrl(url)) {
-                                throw 'Could not launch $url';
-                              }
+                              await Styles.tryLaunchUrl(
+                                context,
+                                'http://cubari.moe${route.path}',
+                              );
                             },
                             text: tr.mangaView.openOn(arg: 'cubari.moe'),
                           ),
@@ -453,11 +450,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                           ButtonChip(
                             onPressed: () async {
                               final url = extdata.mangaInfo.shareUrl!;
-                              final uri = Uri.parse(url);
-
-                              if (!await launchUrl(uri)) {
-                                throw 'Could not launch $url';
-                              }
+                              await Styles.tryLaunchUrl(context, url);
                             },
                             text: tr.mangaView.openOn(arg: handle.sourceId),
                           ),

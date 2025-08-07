@@ -8,35 +8,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'config.freezed.dart';
 part 'config.g.dart';
 
-// @freezed
-// abstract class ReaderConfig with _$ReaderConfig {
-//   @Entity(realClass: ReaderConfig)
-//   const factory ReaderConfig({
-//     @Id() @Default(0) int dbid,
-
-//     /// Reader format
-//     @Default(ReaderFormat.single) ReaderFormat format,
-
-//     /// Reader direction
-//     @Default(ReaderDirection.leftToRight) ReaderDirection direction,
-
-//     /// Displays progress bar if true (default false)
-//     @Default(false) bool showProgressBar,
-
-//     /// Enable click/tap to turn page gesture
-//     @Default(true) bool clickToTurn,
-
-//     /// Enable swipe gestures
-//     @Default(true) bool swipeGestures,
-
-//     /// The number of images/pages to preload
-//     @Default(3) int precacheCount,
-//   }) = _ReaderConfig;
-
-//   factory ReaderConfig.fromJson(Map<String, dynamic> json) =>
-//       _$ReaderConfigFromJson(json);
-// }
-
 @unfreezed
 @Entity()
 @JsonSerializable()

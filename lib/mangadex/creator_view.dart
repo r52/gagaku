@@ -12,7 +12,6 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 part 'creator_view.g.dart';
 
@@ -158,9 +157,7 @@ class _MangaDexCreatorViewWidgetState
                                 data: desc,
                                 onTapLink: (text, url, title) async {
                                   if (url != null) {
-                                    if (!await launchUrl(Uri.parse(url))) {
-                                      throw 'Could not launch $url';
-                                    }
+                                    await Styles.tryLaunchUrl(context, url);
                                   }
                                 },
                               ),
@@ -234,9 +231,7 @@ class _LinkChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return ButtonChip(
       onPressed: () async {
-        if (!await launchUrl(Uri.parse(url))) {
-          throw 'Could not launch $url';
-        }
+        await Styles.tryLaunchUrl(context, url);
       },
       text: text,
     );

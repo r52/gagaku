@@ -23,7 +23,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 part 'manga_view.g.dart';
 
@@ -697,9 +696,7 @@ class _MangaDexMangaViewWidgetState
                                   data: desc,
                                   onTapLink: (text, url, title) async {
                                     if (url != null) {
-                                      if (!await launchUrl(Uri.parse(url))) {
-                                        throw 'Could not launch $url';
-                                      }
+                                      await Styles.tryLaunchUrl(context, url);
                                     }
                                   },
                                 ),
@@ -780,9 +777,8 @@ class _MangaDexMangaViewWidgetState
                               onPressed: () async {
                                 final url =
                                     widget.manga.attributes!.links!.raw!;
-                                if (!await launchUrl(Uri.parse(url))) {
-                                  throw 'Could not launch $url';
-                                }
+
+                                await Styles.tryLaunchUrl(context, url);
                               },
                               text: tr.mangaView.officialRaw,
                             ),
@@ -800,9 +796,7 @@ class _MangaDexMangaViewWidgetState
                                       'https://www.mangaupdates.com/series.html?id=${widget.manga.attributes!.links!.mu!}';
                                 }
 
-                                if (!await launchUrl(Uri.parse(url))) {
-                                  throw 'Could not launch $url';
-                                }
+                                await Styles.tryLaunchUrl(context, url);
                               },
                               text: 'MangaUpdates',
                             ),
@@ -811,9 +805,7 @@ class _MangaDexMangaViewWidgetState
                               onPressed: () async {
                                 final url =
                                     'https://anilist.co/manga/${widget.manga.attributes!.links!.al!}';
-                                if (!await launchUrl(Uri.parse(url))) {
-                                  throw 'Could not launch $url';
-                                }
+                                await Styles.tryLaunchUrl(context, url);
                               },
                               text: 'AniList',
                             ),
@@ -822,22 +814,17 @@ class _MangaDexMangaViewWidgetState
                               onPressed: () async {
                                 final url =
                                     'https://myanimelist.net/manga/${widget.manga.attributes!.links!.mal!}';
-                                if (!await launchUrl(Uri.parse(url))) {
-                                  throw 'Could not launch $url';
-                                }
+                                await Styles.tryLaunchUrl(context, url);
                               },
                               text: 'MyAnimeList',
                             ),
                           ButtonChip(
                             onPressed: () async {
-                              final route = cleanBaseDomains(router.currentUrl);
-                              final url = Uri.parse(
-                                'http://mangadex.org$route',
+                              final route = Uri.parse(router.currentUrl);
+                              await Styles.tryLaunchUrl(
+                                context,
+                                'http://mangadex.org${route.path}',
                               );
-
-                              if (!await launchUrl(url)) {
-                                throw 'Could not launch $url';
-                              }
                             },
                             text: tr.mangaView.openOn(arg: 'MangaDex'),
                           ),
