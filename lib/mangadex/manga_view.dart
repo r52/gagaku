@@ -459,136 +459,18 @@ class _MangaDexMangaViewWidgetState
                     spacing: 6.0,
                     children: [
                       if (me != null)
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final followProvider = ref.watch(
-                              followingStatusProvider(widget.manga),
-                            );
-                            final following = followProvider.value;
-                            final setFollowing = ref.watch(
-                              followStatusMutation(widget.manga),
-                            );
-                            final statusProvider = ref.watch(
-                              readingStatusProvider(widget.manga),
-                            );
-                            final reading = statusProvider.value;
-
-                            if (following == null ||
-                                statusProvider.isLoading ||
-                                setFollowing is MutationPending) {
-                              return _loadingAction;
-                            }
-
-                            if (following == false && reading == null) {
-                              return ElevatedButton(
-                                style: Styles.buttonStyle(),
-                                onPressed: () async {
-                                  final result =
-                                      await showDialog<
-                                        (MangaReadingStatus, bool)
-                                      >(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return _AddToLibraryDialog();
-                                        },
-                                      );
-
-                                  if (result != null) {
-                                    readingStatusMutation(widget.manga).run(
-                                      ref,
-                                      (ref) async {
-                                        return await ref
-                                            .get(
-                                              readingStatusProvider(
-                                                widget.manga,
-                                              ).notifier,
-                                            )
-                                            .set(result.$1);
-                                      },
-                                    );
-
-                                    followStatusMutation(widget.manga).run(
-                                      ref,
-                                      (ref) async {
-                                        return await ref
-                                            .get(
-                                              followingStatusProvider(
-                                                widget.manga,
-                                              ).notifier,
-                                            )
-                                            .set(result.$2);
-                                      },
-                                    );
-                                  }
-                                },
-                                child: Text(tr.mangaActions.addToLibrary),
-                              );
-                            }
-
-                            if (reading != null) {
-                              return IconButton(
-                                padding: EdgeInsets.zero,
-                                tooltip: following
-                                    ? tr.mangaActions.unfollow
-                                    : tr.mangaActions.follow,
-                                style: Styles.squareIconButtonStyle(
-                                  backgroundColor: theme.colorScheme.surface
-                                      .withAlpha(200),
-                                ),
-                                color: theme.colorScheme.primary,
-                                onPressed: () async {
-                                  bool set = !following;
-                                  followStatusMutation(widget.manga).run(ref, (
-                                    ref,
-                                  ) async {
-                                    return await ref
-                                        .get(
-                                          followingStatusProvider(
-                                            widget.manga,
-                                          ).notifier,
-                                        )
-                                        .set(set);
-                                  });
-                                },
-                                icon: Icon(
-                                  following
-                                      ? Icons.notifications_active
-                                      : Icons.notifications_off_outlined,
-                                ),
-                              );
-                            }
-
-                            return const SizedBox.shrink();
-                          },
+                        _FollowingStatusButton(
+                          key: ValueKey(
+                            '_FollowingStatusButton(${widget.manga.id})',
+                          ),
+                          manga: widget.manga,
                         ),
                       if (me != null)
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final readProvider = ref.watch(
-                              readingStatusProvider(widget.manga),
-                            );
-                            final reading = readProvider.value;
-                            final setReadingStatus = ref.watch(
-                              readingStatusMutation(widget.manga),
-                            );
-
-                            if (readProvider.isLoading ||
-                                setReadingStatus is MutationPending) {
-                              return _loadingAction;
-                            }
-
-                            if (reading != null) {
-                              return _ReadingStatusDropdown(
-                                key: ValueKey(
-                                  '_ReadingStatusDropdown(${widget.manga.id})',
-                                ),
-                                initial: reading,
-                                manga: widget.manga,
-                              );
-                            }
-
-                            return const SizedBox.shrink();
-                          },
+                        _ReadingStatusDropdown(
+                          key: ValueKey(
+                            '_ReadingStatusDropdown(${widget.manga.id})',
+                          ),
+                          manga: widget.manga,
                         ),
                       if (me != null)
                         _RatingMenu(
@@ -853,8 +735,7 @@ class _MangaDexMangaViewWidgetState
                       if (hasRelated) Tab(text: tr.mangaView.related),
                     ],
                   ),
-                  if (_ViewType.values[tabview] == _ViewType.chapters &&
-                      me != null)
+                  if (_ViewType.values[tabview] == _ViewType.chapters)
                     Padding(
                       padding: const EdgeInsets.all(8),
                       child: Row(
@@ -898,99 +779,103 @@ class _MangaDexMangaViewWidgetState
                             },
                           ),
                           const Spacer(),
-                          PagingListener(
-                            controller: _chapterController,
-                            builder: (context, state, fetchNextPage) {
-                              final chapters = state.items;
+                          if (me != null)
+                            PagingListener(
+                              controller: _chapterController,
+                              builder: (context, state, fetchNextPage) {
+                                final chapters = state.items;
 
-                              final allRead = chapters != null
-                                  ? ref.watch(
-                                      readChaptersProvider(me.id).select(
-                                        (value) => switch (value) {
-                                          AsyncValue(value: final data?) =>
-                                            data[widget.manga.id]?.containsAll(
-                                                  chapters.map((e) => e.id),
-                                                ) ==
-                                                true,
-                                          _ => false,
-                                        },
-                                      ),
-                                    )
-                                  : false;
-
-                              final opt = allRead
-                                  ? tr.mangaView.unread
-                                  : tr.mangaView.read;
-
-                              return ElevatedButton(
-                                style: Styles.buttonStyle(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                  ),
-                                ),
-                                onPressed: () async {
-                                  final result = await showDialog<bool>(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      final nav = Navigator.of(context);
-                                      return AlertDialog(
-                                        title: Text(
-                                          tr.mangaView.markAllAs(arg: opt),
+                                final allRead = chapters != null
+                                    ? ref.watch(
+                                        readChaptersProvider(me.id).select(
+                                          (value) => switch (value) {
+                                            AsyncValue(value: final data?) =>
+                                              data[widget.manga.id]
+                                                      ?.containsAll(
+                                                        chapters.map(
+                                                          (e) => e.id,
+                                                        ),
+                                                      ) ==
+                                                  true,
+                                            _ => false,
+                                          },
                                         ),
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              tr.mangaView.markAllWarning(
-                                                arg: opt,
+                                      )
+                                    : false;
+
+                                final opt = allRead
+                                    ? tr.mangaView.unread
+                                    : tr.mangaView.read;
+
+                                return ElevatedButton(
+                                  style: Styles.buttonStyle(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0,
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    final result = await showDialog<bool>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        final nav = Navigator.of(context);
+                                        return AlertDialog(
+                                          title: Text(
+                                            tr.mangaView.markAllAs(arg: opt),
+                                          ),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                tr.mangaView.markAllWarning(
+                                                  arg: opt,
+                                                ),
                                               ),
+                                            ],
+                                          ),
+                                          actions: <Widget>[
+                                            ElevatedButton(
+                                              child: Text(tr.ui.no),
+                                              onPressed: () {
+                                                nav.pop(false);
+                                              },
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                nav.pop(true);
+                                              },
+                                              child: Text(tr.ui.yes),
                                             ),
                                           ],
-                                        ),
-                                        actions: <Widget>[
-                                          ElevatedButton(
-                                            child: Text(tr.ui.no),
-                                            onPressed: () {
-                                              nav.pop(false);
-                                            },
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              nav.pop(true);
-                                            },
-                                            child: Text(tr.ui.yes),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
+                                        );
+                                      },
+                                    );
 
-                                  if (chapters != null && result == true) {
-                                    readChaptersMutation(me.id).run(ref, (
-                                      ref,
-                                    ) async {
-                                      return await ref
-                                          .get(
-                                            readChaptersProvider(
-                                              me.id,
-                                            ).notifier,
-                                          )
-                                          .set(
-                                            widget.manga,
-                                            read: !allRead ? chapters : null,
-                                            unread: allRead ? chapters : null,
-                                          );
-                                    });
-                                  }
-                                },
-                                child: Text(
-                                  tr.mangaView.markAllVisibleAs(arg: opt),
-                                ),
-                              );
-                            },
-                          ),
+                                    if (chapters != null && result == true) {
+                                      readChaptersMutation(me.id).run(ref, (
+                                        ref,
+                                      ) async {
+                                        return await ref
+                                            .get(
+                                              readChaptersProvider(
+                                                me.id,
+                                              ).notifier,
+                                            )
+                                            .set(
+                                              widget.manga,
+                                              read: !allRead ? chapters : null,
+                                              unread: allRead ? chapters : null,
+                                            );
+                                      });
+                                    }
+                                  },
+                                  child: Text(
+                                    tr.mangaView.markAllVisibleAs(arg: opt),
+                                  ),
+                                );
+                              },
+                            ),
                         ],
                       ),
                     ),
@@ -1475,14 +1360,9 @@ class _CoverArtItem extends HookWidget {
   }
 }
 
-class _ReadingStatusDropdown extends ConsumerWidget {
-  const _ReadingStatusDropdown({
-    super.key,
-    required this.initial,
-    required this.manga,
-  });
+class _FollowingStatusButton extends ConsumerWidget {
+  const _FollowingStatusButton({super.key, required this.manga});
 
-  final MangaReadingStatus initial;
   final Manga manga;
 
   @override
@@ -1490,8 +1370,99 @@ class _ReadingStatusDropdown extends ConsumerWidget {
     final tr = context.t;
     final theme = Theme.of(context);
 
+    final followProvider = ref.watch(followingStatusProvider(manga));
+    final following = followProvider.value;
+    final setFollowing = ref.watch(followStatusMutation(manga));
+    final statusProvider = ref.watch(readingStatusProvider(manga));
+    final reading = statusProvider.value;
+
+    if (following == null ||
+        statusProvider.isLoading ||
+        setFollowing is MutationPending) {
+      return _loadingAction;
+    }
+
+    if (following == false && reading == null) {
+      return ElevatedButton(
+        style: Styles.buttonStyle(),
+        onPressed: () async {
+          final result = await showDialog<(MangaReadingStatus, bool)>(
+            context: context,
+            builder: (BuildContext context) {
+              return _AddToLibraryDialog();
+            },
+          );
+
+          if (result != null) {
+            readingStatusMutation(manga).run(ref, (ref) async {
+              return await ref
+                  .get(readingStatusProvider(manga).notifier)
+                  .set(result.$1);
+            });
+
+            followStatusMutation(manga).run(ref, (ref) async {
+              return await ref
+                  .get(followingStatusProvider(manga).notifier)
+                  .set(result.$2);
+            });
+          }
+        },
+        child: Text(tr.mangaActions.addToLibrary),
+      );
+    }
+
+    if (reading == null) {
+      return const SizedBox.shrink();
+    }
+
+    return IconButton(
+      padding: EdgeInsets.zero,
+      tooltip: following ? tr.mangaActions.unfollow : tr.mangaActions.follow,
+      style: Styles.squareIconButtonStyle(
+        backgroundColor: theme.colorScheme.surface.withAlpha(200),
+      ),
+      color: theme.colorScheme.primary,
+      onPressed: () async {
+        bool set = !following;
+        followStatusMutation(manga).run(ref, (ref) async {
+          return await ref
+              .get(followingStatusProvider(manga).notifier)
+              .set(set);
+        });
+      },
+      icon: Icon(
+        following
+            ? Icons.notifications_active
+            : Icons.notifications_off_outlined,
+      ),
+    );
+  }
+}
+
+class _ReadingStatusDropdown extends ConsumerWidget {
+  const _ReadingStatusDropdown({super.key, required this.manga});
+
+  final Manga manga;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
+    final theme = Theme.of(context);
+
+    final readProvider = ref.watch(readingStatusProvider(manga));
+    final reading = readProvider.value;
+    final setReadingStatus = ref.watch(readingStatusMutation(manga));
+
+    if (readProvider.isLoading || setReadingStatus is MutationPending) {
+      return _loadingAction;
+    }
+
+    if (reading == null) {
+      return const SizedBox.shrink();
+    }
+
     return DropdownMenu<MangaReadingStatus>(
-      initialSelection: initial,
+      initialSelection: reading,
       width: 175.0,
       enableFilter: false,
       enableSearch: false,
