@@ -1,4 +1,9 @@
+import 'package:gagaku/objectbox.g.dart';
+import 'package:gagaku/version.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart'
+    show getApplicationDocumentsDirectory;
 
 abstract class GagakuRoute {
   static const chapterfeed = 'titles/feed';
@@ -43,27 +48,29 @@ abstract class GagakuRoute {
 const gagakuLocalBox =
     'gagaku_box'; // local, device specific, or secure sensitive data
 const gagakuCache = 'gagaku_cache'; // disk cache
-const gagakuDataBox =
-    'gagaku_data'; // non-device specific, non-local, insecure data
 
 class GagakuData {
   GagakuData._internal();
 
   static final GagakuData _instance = GagakuData._internal();
 
+  late final Store store;
+
   // Default user agent
-  String gagakuUserAgent = 'gagaku/1.x';
+  final String gagakuUserAgent = '$kPackageName/$kPackageVersion';
 
   factory GagakuData() {
     return _instance;
   }
-}
 
-Future<void> initGagakuBoxes() async {
-  await Hive.openBox(gagakuLocalBox);
+  Future<void> initGagakuBoxes() async {
+    final appDir = await getApplicationDocumentsDirectory();
+    await Hive.openBox(gagakuLocalBox);
 
-  final storage = Hive.box(gagakuLocalBox);
-  final dataLocation = storage.get('data_location');
+    final storage = Hive.box(gagakuLocalBox);
+    final dataLocation = storage.get('data_location') ?? appDir.path;
 
-  await Hive.openBox(gagakuDataBox, path: dataLocation);
+    // non-device specific, non-local, insecure data
+    store = await openStore(directory: p.join(dataLocation, "gagaku"));
+  }
 }

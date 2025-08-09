@@ -47,116 +47,11 @@ final class ProxyProvider
 
 String _$proxyHash() => r'8a4e90bb9775641c76f0be18ce9750786e3b2a4b';
 
-@ProviderFor(WebSourceFavorites)
-const webSourceFavoritesProvider = WebSourceFavoritesProvider._();
-
-final class WebSourceFavoritesProvider
-    extends
-        $AsyncNotifierProvider<
-          WebSourceFavorites,
-          Map<String, List<HistoryLink>>
-        > {
-  const WebSourceFavoritesProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'webSourceFavoritesProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$webSourceFavoritesHash();
-
-  @$internal
-  @override
-  WebSourceFavorites create() => WebSourceFavorites();
-}
-
-String _$webSourceFavoritesHash() =>
-    r'c8183125f0ca25be2c0ab0b100dfd16a567f9b94';
-
-abstract class _$WebSourceFavorites
-    extends $AsyncNotifier<Map<String, List<HistoryLink>>> {
-  FutureOr<Map<String, List<HistoryLink>>> build();
-  @$mustCallSuper
-  @override
-  void runBuild() {
-    final created = build();
-    final ref =
-        this.ref
-            as $Ref<
-              AsyncValue<Map<String, List<HistoryLink>>>,
-              Map<String, List<HistoryLink>>
-            >;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<
-                AsyncValue<Map<String, List<HistoryLink>>>,
-                Map<String, List<HistoryLink>>
-              >,
-              AsyncValue<Map<String, List<HistoryLink>>>,
-              Object?,
-              Object?
-            >;
-    element.handleValue(ref, created);
-  }
-}
-
-@ProviderFor(WebSourceHistory)
-const webSourceHistoryProvider = WebSourceHistoryProvider._();
-
-final class WebSourceHistoryProvider
-    extends $AsyncNotifierProvider<WebSourceHistory, Queue<HistoryLink>> {
-  const WebSourceHistoryProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'webSourceHistoryProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$webSourceHistoryHash();
-
-  @$internal
-  @override
-  WebSourceHistory create() => WebSourceHistory();
-}
-
-String _$webSourceHistoryHash() => r'c628fef95497386236877f4b452293d66d7ad95f';
-
-abstract class _$WebSourceHistory extends $AsyncNotifier<Queue<HistoryLink>> {
-  FutureOr<Queue<HistoryLink>> build();
-  @$mustCallSuper
-  @override
-  void runBuild() {
-    final created = build();
-    final ref =
-        this.ref as $Ref<AsyncValue<Queue<HistoryLink>>, Queue<HistoryLink>>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<AsyncValue<Queue<HistoryLink>>, Queue<HistoryLink>>,
-              AsyncValue<Queue<HistoryLink>>,
-              Object?,
-              Object?
-            >;
-    element.handleValue(ref, created);
-  }
-}
-
 @ProviderFor(WebReadMarkers)
 const webReadMarkersProvider = WebReadMarkersProvider._();
 
 final class WebReadMarkersProvider
-    extends $AsyncNotifierProvider<WebReadMarkers, Map<String, Set<String>>> {
+    extends $AsyncNotifierProvider<WebReadMarkers, ReadMarkersDB> {
   const WebReadMarkersProvider._()
     : super(
         from: null,
@@ -176,35 +71,67 @@ final class WebReadMarkersProvider
   WebReadMarkers create() => WebReadMarkers();
 }
 
-String _$webReadMarkersHash() => r'85072d9873e221da4ec97977e70d020e81752f36';
+String _$webReadMarkersHash() => r'94c78980a45d993d6e93e40c31184f93e5635b7d';
 
-abstract class _$WebReadMarkers
-    extends $AsyncNotifier<Map<String, Set<String>>> {
-  FutureOr<Map<String, Set<String>>> build();
+abstract class _$WebReadMarkers extends $AsyncNotifier<ReadMarkersDB> {
+  FutureOr<ReadMarkersDB> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref =
-        this.ref
-            as $Ref<
-              AsyncValue<Map<String, Set<String>>>,
-              Map<String, Set<String>>
-            >;
+    final ref = this.ref as $Ref<AsyncValue<ReadMarkersDB>, ReadMarkersDB>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<
-                AsyncValue<Map<String, Set<String>>>,
-                Map<String, Set<String>>
-              >,
-              AsyncValue<Map<String, Set<String>>>,
+              AnyNotifier<AsyncValue<ReadMarkersDB>, ReadMarkersDB>,
+              AsyncValue<ReadMarkersDB>,
               Object?,
               Object?
             >;
     element.handleValue(ref, created);
   }
 }
+
+@ProviderFor(installedSources)
+const installedSourcesProvider = InstalledSourcesProvider._();
+
+final class InstalledSourcesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<WebSourceInfo>>,
+          List<WebSourceInfo>,
+          Stream<List<WebSourceInfo>>
+        >
+    with
+        $FutureModifier<List<WebSourceInfo>>,
+        $StreamProvider<List<WebSourceInfo>> {
+  const InstalledSourcesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'installedSourcesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$installedSourcesHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<List<WebSourceInfo>> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<List<WebSourceInfo>> create(Ref ref) {
+    return installedSources(ref);
+  }
+}
+
+String _$installedSourcesHash() => r'ec6937fd410c5666607ee8943bb59a91ffb42b23';
 
 @ProviderFor(ExtensionSource)
 const extensionSourceProvider = ExtensionSourceFamily._();
@@ -247,7 +174,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'770cb27b110b4686e715c0e8e2f29fd102be7190';
+String _$extensionSourceHash() => r'b0ff177770373d85778029e62a13b143220e0278';
 
 final class ExtensionSourceFamily extends $Family
     with
@@ -321,7 +248,7 @@ final class ExtensionInfoListProvider
   ExtensionInfoList create() => ExtensionInfoList();
 }
 
-String _$extensionInfoListHash() => r'05c7ab9b9fbd82c74fe15598b6cb718c4253a4a0';
+String _$extensionInfoListHash() => r'5450a457cad1e9211abd092e3a12fdea12901a9f';
 
 abstract class _$ExtensionInfoList
     extends $AsyncNotifier<Map<String, WebSourceInfo>> {
@@ -407,7 +334,7 @@ final class GetExtensionFromIdProvider
 }
 
 String _$getExtensionFromIdHash() =>
-    r'29cbd9751aed6812bbe6bdafc4ecb1a632f17c6b';
+    r'083cb64dc1d406d1a5a26ecf5fa4de16a7a9dced';
 
 final class GetExtensionFromIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<WebSourceInfo>, String> {

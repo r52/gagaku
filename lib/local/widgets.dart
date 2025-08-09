@@ -38,14 +38,13 @@ class LibraryListWidget extends ConsumerWidget {
         ...leading,
         SliverAppBar(
           pinned: true,
-          leading:
-              (item.parent != null && onTap != null)
-                  ? BackButton(
-                    onPressed: () {
-                      onTap!(item.parent!);
-                    },
-                  )
-                  : const SizedBox.shrink(),
+          leading: (item.parent != null && onTap != null)
+              ? BackButton(
+                  onPressed: () {
+                    onTap!(item.parent!);
+                  },
+                )
+              : const SizedBox.shrink(),
           title: title,
           actions: [
             const GridExtentSlider(),
@@ -79,11 +78,8 @@ class LibraryListWidget extends ConsumerWidget {
                       List<DropdownMenuEntry<LibrarySort>>.generate(
                         LibrarySort.values.length,
                         (int index) => DropdownMenuEntry<LibrarySort>(
-                          value: LibrarySort.values.elementAt(index),
-                          label:
-                              context.t[LibrarySort.values
-                                  .elementAt(index)
-                                  .label],
+                          value: LibrarySort.values[index],
+                          label: context.t[LibrarySort.values[index].label],
                         ),
                       ),
                 );
@@ -104,7 +100,7 @@ class LibraryListWidget extends ConsumerWidget {
             return val >= 0 ? val : null;
           },
           itemBuilder: (context, index) {
-            final i = item.children.elementAt(index);
+            final i = item.children[index];
             return _GridLibraryItem(key: ValueKey(i.id), item: i, onTap: onTap);
           },
           itemCount: item.children.length,
@@ -132,17 +128,9 @@ class _GridLibraryItem extends HookWidget {
 
     final image = GridAlbumImage(
       gradient: gradient,
-      child:
-          item.thumbnail != null
-              ? Image.file(
-                File(item.thumbnail!),
-                width: 256.0,
-                fit: BoxFit.cover,
-              )
-              : Icon(
-                item.isReadable ? Icons.menu_book : Icons.folder,
-                size: 128.0,
-              ),
+      child: item.thumbnail != null
+          ? Image.file(File(item.thumbnail!), width: 256.0, fit: BoxFit.cover)
+          : Icon(item.isReadable ? Icons.menu_book : Icons.folder, size: 128.0),
     );
 
     return Tooltip(

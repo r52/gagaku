@@ -17,10 +17,9 @@ class ExtensionSettingsPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final results = useMemoized(
-      () =>
-          ref
-              .read(extensionSourceProvider(source.id).notifier)
-              .getSettingsForm(),
+      () => ref
+          .read(extensionSourceProvider(source.id).notifier)
+          .getSettingsForm(),
       [source],
     );
     final future = useFuture(results);
@@ -103,7 +102,7 @@ class _FormBuilderState extends ConsumerState<FormBuilder> {
         itemBuilder: (context, index) {
           return FormSectionBuilder(
             source: widget.source,
-            section: data.elementAt(index),
+            section: data[index],
           );
         },
       );
@@ -265,8 +264,9 @@ class SelectRowBuilder extends HookConsumerWidget {
             if (element.maxItemCount == 1) {
               return Center(
                 child: DropdownMenu<String>(
-                  initialSelection:
-                      data.value.isNotEmpty ? data.value.first : null,
+                  initialSelection: data.value.isNotEmpty
+                      ? data.value.first
+                      : null,
                   requestFocusOnTap: false,
                   enableSearch: false,
                   enableFilter: false,
@@ -289,65 +289,55 @@ class SelectRowBuilder extends HookConsumerWidget {
             } else {
               return Center(
                 child: MenuAnchor(
-                  builder:
-                      (context, controller, child) => SizedBox(
-                        width: double.infinity,
-                        child: Material(
-                          color: theme.colorScheme.surfaceContainerHighest,
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(6.0),
-                          ),
-                          child: InkWell(
-                            onTap: () {
-                              if (controller.isOpen) {
-                                controller.close();
-                              } else {
-                                controller.open();
-                              }
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child: child,
-                            ),
-                          ),
+                  builder: (context, controller, child) => SizedBox(
+                    width: double.infinity,
+                    child: Material(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(6.0),
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          if (controller.isOpen) {
+                            controller.close();
+                          } else {
+                            controller.open();
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(6.0),
+                          child: child,
                         ),
                       ),
-                  menuChildren: List.generate(
-                    element.options.length,
-                    (index) => Builder(
-                      builder: (_) {
-                        final option = element.options.elementAt(index);
-                        return CheckboxListTile(
-                          controlAffinity: ListTileControlAffinity.leading,
-                          title: Text(option.title),
-                          value: data.value.contains(option.id),
-                          onChanged: (bool? value) async {
-                            if (value == true) {
-                              if (element.maxItemCount != null &&
-                                  data.value.length == element.maxItemCount) {
-                                return;
-                              }
-
-                              data.value = [...data.value, option.id];
-                            } else {
-                              if (data.value.length == element.minItemCount) {
-                                return;
-                              }
-                              data.value = [...data.value..remove(option.id)];
-                            }
-
-                            ref
-                                .read(
-                                  extensionSourceProvider(source.id).notifier,
-                                )
-                                .callBinding(element.onValueChange, [
-                                  data.value,
-                                ]);
-                          },
-                        );
-                      },
                     ),
                   ),
+                  menuChildren: [
+                    for (final option in element.options)
+                      CheckboxListTile(
+                        controlAffinity: ListTileControlAffinity.leading,
+                        title: Text(option.title),
+                        value: data.value.contains(option.id),
+                        onChanged: (bool? value) async {
+                          if (value == true) {
+                            if (element.maxItemCount != null &&
+                                data.value.length == element.maxItemCount) {
+                              return;
+                            }
+
+                            data.value = [...data.value, option.id];
+                          } else {
+                            if (data.value.length == element.minItemCount) {
+                              return;
+                            }
+                            data.value = [...data.value..remove(option.id)];
+                          }
+
+                          ref
+                              .read(extensionSourceProvider(source.id).notifier)
+                              .callBinding(element.onValueChange, [data.value]);
+                        },
+                      ),
+                  ],
                   child: Column(
                     children: [
                       Wrap(
@@ -484,19 +474,14 @@ class NavigationRowBuilder extends HookConsumerWidget {
           title: Text(element.title),
           subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
           trailing: Icon(Icons.arrow_forward_ios),
-          onTap:
-              () => nav.push(
-                PageTransitionRouteBuilder(
-                  pageTransitionsBuilder:
-                      const FadeForwardsPageTransitionsBuilder(),
-                  pageBuilder:
-                      (context, animation, secondaryAnimation) => FormBuilder(
-                        source: source,
-                        form: data,
-                        isTopLevel: false,
-                      ),
-                ),
-              ),
+          onTap: () => nav.push(
+            PageTransitionRouteBuilder(
+              pageTransitionsBuilder:
+                  const FadeForwardsPageTransitionsBuilder(),
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  FormBuilder(source: source, form: data, isTopLevel: false),
+            ),
+          ),
         ),
       );
     }

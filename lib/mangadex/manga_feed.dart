@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -24,8 +25,8 @@ class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
   static const info = MangaDexFeeds.latestChapters;
 
   late final _pagingController = GagakuPagingController<int, Manga>(
-    getNextPageKey:
-        (state) => state.keys?.last != null ? state.keys!.last + info.limit : 0,
+    getNextPageKey: (state) =>
+        state.keys?.last != null ? state.keys!.last + info.limit : 0,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
 
@@ -44,9 +45,13 @@ class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
         limit: MangaDexEndpoints.breakLimit,
       );
 
-      statisticsMutation.run(ref, (ref) async {
-        return await ref.get(statisticsProvider.notifier).get(mangas);
-      });
+      try {
+        statisticsMutation.run(ref, (ref) async {
+          return await ref.get(statisticsProvider.notifier).get(mangas);
+        });
+      } catch (e) {
+        logger.e(e, error: e);
+      }
 
       return PageResultsMetaData(mangas, chapterlist.total);
     },
@@ -54,8 +59,8 @@ class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
       final api = ref.watch(mangadexProvider);
       await api.invalidateAll(info.key);
     },
-    getIsLastPage:
-        (state, data) => (state.keys?.last ?? 0) + info.limit >= data.total!,
+    getIsLastPage: (state, data) =>
+        (state.keys?.last ?? 0) + info.limit >= data.total!,
   );
 
   @override

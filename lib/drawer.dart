@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/model/model.dart';
-import 'package:gagaku/util/util.dart';
 import 'package:gagaku/version.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -13,14 +12,15 @@ class MainDrawer extends ConsumerWidget {
   const MainDrawer({super.key});
 
   static int _calculateSelectedIndex(BuildContext context) {
-    final location = cleanBaseDomains(AutoRouter.of(context).currentUrl);
+    final route = Uri.parse(AutoRouter.of(context).currentUrl);
+    final path = route.path;
 
-    if (location.startsWith(GagakuRoute.web) ||
-        location.startsWith(GagakuRoute.extension)) {
+    if (path.startsWith(GagakuRoute.web) ||
+        path.startsWith(GagakuRoute.extension)) {
       return 2;
     }
 
-    switch (location) {
+    switch (path) {
       case GagakuRoute.local:
         return 1;
       case GagakuRoute.config:
@@ -136,13 +136,10 @@ class MainDrawer extends ConsumerWidget {
                   TextSpan(
                     style: const TextStyle(color: Colors.blue),
                     text: 'GitHub',
-                    recognizer:
-                        TapGestureRecognizer()
-                          ..onTap = () {
-                            launchUrl(
-                              Uri.parse('https://github.com/r52/gagaku'),
-                            );
-                          },
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        launchUrl(Uri.parse('https://github.com/r52/gagaku'));
+                      },
                   ),
                   const TextSpan(text: '.'),
                 ],

@@ -332,7 +332,7 @@ final class UserListsProvider
   }
 }
 
-String _$userListsHash() => r'6da44adb834cd3eed979da23b82ef732cc8bd5aa';
+String _$userListsHash() => r'd81822ac7862464faac52a965edaf4d105a7f082';
 
 final class UserListsFamily extends $Family
     with
@@ -423,7 +423,7 @@ final class FollowedListsProvider
   }
 }
 
-String _$followedListsHash() => r'4aaa9bc709e5363b1369b1d71e1f95fe1993a393';
+String _$followedListsHash() => r'54cee419f2a26ec151129216f934f9e248b90445';
 
 final class FollowedListsFamily extends $Family
     with
@@ -587,7 +587,7 @@ final class TagListProvider
   TagList create() => TagList();
 }
 
-String _$tagListHash() => r'7710550e802e80112d520dbd855732c41c68ab29';
+String _$tagListHash() => r'0196fc7cdaa7989fc6255d343c1c3b2e19c37d1f';
 
 abstract class _$TagList extends $AsyncNotifier<Iterable<Tag>> {
   FutureOr<Iterable<Tag>> build();
@@ -721,14 +721,14 @@ abstract class _$ChapterStats
 const ratingsProvider = RatingsFamily._();
 
 final class RatingsProvider
-    extends $AsyncNotifierProvider<Ratings, Map<String, SelfRating>> {
+    extends $AsyncNotifierProvider<Ratings, SelfRating?> {
   const RatingsProvider._({
     required RatingsFamily super.from,
-    required String? super.argument,
+    required Manga super.argument,
   }) : super(
          retry: null,
          name: r'ratingsProvider',
-         isAutoDispose: false,
+         isAutoDispose: true,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
@@ -758,16 +758,16 @@ final class RatingsProvider
   }
 }
 
-String _$ratingsHash() => r'c3ca1836cb5c3420059aff0b19a7242afd6a8f8a';
+String _$ratingsHash() => r'ec9c2ef2313b39c267e288eb96c7cdd614e5c15e';
 
 final class RatingsFamily extends $Family
     with
         $ClassFamilyOverride<
           Ratings,
-          AsyncValue<Map<String, SelfRating>>,
-          Map<String, SelfRating>,
-          FutureOr<Map<String, SelfRating>>,
-          String?
+          AsyncValue<SelfRating?>,
+          SelfRating?,
+          FutureOr<SelfRating?>,
+          Manga
         > {
   const RatingsFamily._()
     : super(
@@ -775,39 +775,31 @@ final class RatingsFamily extends $Family
         name: r'ratingsProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: false,
+        isAutoDispose: true,
       );
 
-  RatingsProvider call(String? userId) =>
-      RatingsProvider._(argument: userId, from: this);
+  RatingsProvider call(Manga manga) =>
+      RatingsProvider._(argument: manga, from: this);
 
   @override
   String toString() => r'ratingsProvider';
 }
 
-abstract class _$Ratings extends $AsyncNotifier<Map<String, SelfRating>> {
-  late final _$args = ref.$arg as String?;
-  String? get userId => _$args;
+abstract class _$Ratings extends $AsyncNotifier<SelfRating?> {
+  late final _$args = ref.$arg as Manga;
+  Manga get manga => _$args;
 
-  FutureOr<Map<String, SelfRating>> build(String? userId);
+  FutureOr<SelfRating?> build(Manga manga);
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
-    final ref =
-        this.ref
-            as $Ref<
-              AsyncValue<Map<String, SelfRating>>,
-              Map<String, SelfRating>
-            >;
+    final ref = this.ref as $Ref<AsyncValue<SelfRating?>, SelfRating?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<
-                AsyncValue<Map<String, SelfRating>>,
-                Map<String, SelfRating>
-              >,
-              AsyncValue<Map<String, SelfRating>>,
+              AnyNotifier<AsyncValue<SelfRating?>, SelfRating?>,
+              AsyncValue<SelfRating?>,
               Object?,
               Object?
             >;
@@ -1020,7 +1012,7 @@ final class MangaDexHistoryProvider
   MangaDexHistory create() => MangaDexHistory();
 }
 
-String _$mangaDexHistoryHash() => r'14cbf217392b743742d5187b09301305347dcde4';
+String _$mangaDexHistoryHash() => r'69a7136e00bba032eb52913de7e66d3bc8429d49';
 
 abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
   FutureOr<Queue<Chapter>> build();
@@ -1065,7 +1057,7 @@ final class LoggedUserProvider
   LoggedUser create() => LoggedUser();
 }
 
-String _$loggedUserHash() => r'd57241dc04aa26bc80bbb5b0bdb1b3b2e38c5ee2';
+String _$loggedUserHash() => r'8ab1dc95c56b57c32b0b37a2beafb587da10c795';
 
 abstract class _$LoggedUser extends $AsyncNotifier<User?> {
   FutureOr<User?> build();
@@ -1110,7 +1102,7 @@ final class AuthControlProvider
   AuthControl create() => AuthControl();
 }
 
-String _$authControlHash() => r'6045bfaeadb331af63daec0d99a665da85753b1a';
+String _$authControlHash() => r'beaad8eb7b740107caff5efd97bec0ac0d849857';
 
 abstract class _$AuthControl extends $StreamNotifier<AuthenticationStatus> {
   Stream<AuthenticationStatus> build();

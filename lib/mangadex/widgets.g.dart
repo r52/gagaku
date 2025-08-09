@@ -59,5 +59,86 @@ abstract class _$MangaListView extends $Notifier<MangaListView> {
   }
 }
 
+@ProviderFor(readBorderTheme)
+const readBorderThemeProvider = ReadBorderThemeFamily._();
+
+final class ReadBorderThemeProvider
+    extends $FunctionalProvider<BoxDecoration, BoxDecoration, BoxDecoration>
+    with $Provider<BoxDecoration> {
+  const ReadBorderThemeProvider._({
+    required ReadBorderThemeFamily super.from,
+    required (String, String) super.argument,
+  }) : super(
+         retry: null,
+         name: r'readBorderThemeProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  static const $allTransitiveDependencies0 = themeProvider;
+
+  @override
+  String debugGetCreateSourceHash() => _$readBorderThemeHash();
+
+  @override
+  String toString() {
+    return r'readBorderThemeProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<BoxDecoration> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  BoxDecoration create(Ref ref) {
+    final argument = this.argument as (String, String);
+    return readBorderTheme(ref, argument.$1, argument.$2);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(BoxDecoration value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<BoxDecoration>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ReadBorderThemeProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$readBorderThemeHash() => r'af9b9b235f3f1d51a702fa382c66086fb8869b1d';
+
+final class ReadBorderThemeFamily extends $Family
+    with $FunctionalFamilyOverride<BoxDecoration, (String, String)> {
+  const ReadBorderThemeFamily._()
+    : super(
+        retry: null,
+        name: r'readBorderThemeProvider',
+        dependencies: const <ProviderOrFamily>[themeProvider],
+        $allTransitiveDependencies: const <ProviderOrFamily>[
+          ReadBorderThemeProvider.$allTransitiveDependencies0,
+        ],
+        isAutoDispose: true,
+      );
+
+  ReadBorderThemeProvider call(String mangaId, String chapterId) =>
+      ReadBorderThemeProvider._(argument: (mangaId, chapterId), from: this);
+
+  @override
+  String toString() => r'readBorderThemeProvider';
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

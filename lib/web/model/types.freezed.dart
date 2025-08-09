@@ -11,6 +11,62 @@ part of 'types.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
+/// @nodoc
+mixin _$ReadMarkersDB {
+
+ int get dbid; set dbid(int value); Map<String, Set<String>> get markers; set markers(Map<String, Set<String>> value);
+/// Create a copy of ReadMarkersDB
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ReadMarkersDBCopyWith<ReadMarkersDB> get copyWith => _$ReadMarkersDBCopyWithImpl<ReadMarkersDB>(this as ReadMarkersDB, _$identity);
+
+
+
+
+
+@override
+String toString() {
+  return 'ReadMarkersDB(dbid: $dbid, markers: $markers)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ReadMarkersDBCopyWith<$Res>  {
+  factory $ReadMarkersDBCopyWith(ReadMarkersDB value, $Res Function(ReadMarkersDB) _then) = _$ReadMarkersDBCopyWithImpl;
+@useResult
+$Res call({
+ int dbid, Map<String, Set<String>> markers
+});
+
+
+
+
+}
+/// @nodoc
+class _$ReadMarkersDBCopyWithImpl<$Res>
+    implements $ReadMarkersDBCopyWith<$Res> {
+  _$ReadMarkersDBCopyWithImpl(this._self, this._then);
+
+  final ReadMarkersDB _self;
+  final $Res Function(ReadMarkersDB) _then;
+
+/// Create a copy of ReadMarkersDB
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? dbid = null,Object? markers = null,}) {
+  return _then(ReadMarkersDB(
+dbid: null == dbid ? _self.dbid : dbid // ignore: cast_nullable_to_non_nullable
+as int,markers: null == markers ? _self.markers : markers // ignore: cast_nullable_to_non_nullable
+as Map<String, Set<String>>,
+  ));
+}
+
+}
+
+
+
 
 /// @nodoc
 mixin _$ChapterEntry {
@@ -472,22 +528,20 @@ $WebMangaCopyWith<$Res> get manga {
 /// @nodoc
 mixin _$HistoryLink {
 
- String get title; String get url; String? get cover; SourceHandler? get handle;
+ int get dbid; set dbid(int value); String get title; set title(String value); String get url; set url(String value); String? get cover; set cover(String? value); SourceHandler? get handle; set handle(SourceHandler? value); DateTime? get lastAccessed; set lastAccessed(DateTime? value); dynamic get lists;
 /// Create a copy of HistoryLink
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $HistoryLinkCopyWith<HistoryLink> get copyWith => _$HistoryLinkCopyWithImpl<HistoryLink>(this as HistoryLink, _$identity);
 
-  /// Serializes this HistoryLink to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 
 
 @override
 String toString() {
-  return 'HistoryLink(title: $title, url: $url, cover: $cover, handle: $handle)';
+  return 'HistoryLink(dbid: $dbid, title: $title, url: $url, cover: $cover, handle: $handle, lastAccessed: $lastAccessed, lists: $lists)';
 }
 
 
@@ -498,11 +552,11 @@ abstract mixin class $HistoryLinkCopyWith<$Res>  {
   factory $HistoryLinkCopyWith(HistoryLink value, $Res Function(HistoryLink) _then) = _$HistoryLinkCopyWithImpl;
 @useResult
 $Res call({
- String title, String url, String? cover, SourceHandler? handle
+ int dbid, String title, String url, String? cover, SourceHandler? handle, DateTime? lastAccessed
 });
 
 
-$SourceHandlerCopyWith<$Res>? get handle;
+
 
 }
 /// @nodoc
@@ -515,111 +569,21 @@ class _$HistoryLinkCopyWithImpl<$Res>
 
 /// Create a copy of HistoryLink
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? url = null,Object? cover = freezed,Object? handle = freezed,}) {
-  return _then(_self.copyWith(
-title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+@pragma('vm:prefer-inline') @override $Res call({Object? dbid = null,Object? title = null,Object? url = null,Object? cover = freezed,Object? handle = freezed,Object? lastAccessed = freezed,}) {
+  return _then(HistoryLink(
+dbid: null == dbid ? _self.dbid : dbid // ignore: cast_nullable_to_non_nullable
+as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String,cover: freezed == cover ? _self.cover : cover // ignore: cast_nullable_to_non_nullable
 as String?,handle: freezed == handle ? _self.handle : handle // ignore: cast_nullable_to_non_nullable
-as SourceHandler?,
-  ));
-}
-/// Create a copy of HistoryLink
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$SourceHandlerCopyWith<$Res>? get handle {
-    if (_self.handle == null) {
-    return null;
-  }
-
-  return $SourceHandlerCopyWith<$Res>(_self.handle!, (value) {
-    return _then(_self.copyWith(handle: value));
-  });
-}
-}
-
-
-
-/// @nodoc
-@JsonSerializable()
-
-class _HistoryLink extends HistoryLink {
-  const _HistoryLink({required this.title, required this.url, this.cover, this.handle}): super._();
-  factory _HistoryLink.fromJson(Map<String, dynamic> json) => _$HistoryLinkFromJson(json);
-
-@override final  String title;
-@override final  String url;
-@override final  String? cover;
-@override final  SourceHandler? handle;
-
-/// Create a copy of HistoryLink
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$HistoryLinkCopyWith<_HistoryLink> get copyWith => __$HistoryLinkCopyWithImpl<_HistoryLink>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$HistoryLinkToJson(this, );
-}
-
-
-
-@override
-String toString() {
-  return 'HistoryLink(title: $title, url: $url, cover: $cover, handle: $handle)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$HistoryLinkCopyWith<$Res> implements $HistoryLinkCopyWith<$Res> {
-  factory _$HistoryLinkCopyWith(_HistoryLink value, $Res Function(_HistoryLink) _then) = __$HistoryLinkCopyWithImpl;
-@override @useResult
-$Res call({
- String title, String url, String? cover, SourceHandler? handle
-});
-
-
-@override $SourceHandlerCopyWith<$Res>? get handle;
-
-}
-/// @nodoc
-class __$HistoryLinkCopyWithImpl<$Res>
-    implements _$HistoryLinkCopyWith<$Res> {
-  __$HistoryLinkCopyWithImpl(this._self, this._then);
-
-  final _HistoryLink _self;
-  final $Res Function(_HistoryLink) _then;
-
-/// Create a copy of HistoryLink
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? url = null,Object? cover = freezed,Object? handle = freezed,}) {
-  return _then(_HistoryLink(
-title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
-as String,cover: freezed == cover ? _self.cover : cover // ignore: cast_nullable_to_non_nullable
-as String?,handle: freezed == handle ? _self.handle : handle // ignore: cast_nullable_to_non_nullable
-as SourceHandler?,
+as SourceHandler?,lastAccessed: freezed == lastAccessed ? _self.lastAccessed : lastAccessed // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
-/// Create a copy of HistoryLink
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$SourceHandlerCopyWith<$Res>? get handle {
-    if (_self.handle == null) {
-    return null;
-  }
+}
 
-  return $SourceHandlerCopyWith<$Res>(_self.handle!, (value) {
-    return _then(_self.copyWith(handle: value));
-  });
-}
-}
+
 
 
 /// @nodoc
@@ -1073,29 +1037,20 @@ as String,
 /// @nodoc
 mixin _$WebSourceInfo {
 
- String get id; String get name; String get repo; String? get baseUrl; SupportedVersion get version; String get icon;@SourceIntentParser() List<SourceIntents> get capabilities;
+ int get dbid; set dbid(int value); String get id; String get name; String get repo; String? get baseUrl; SupportedVersion get version; set version(SupportedVersion value); String get icon; List<SourceIntents> get capabilities; set capabilities(List<SourceIntents> value);
 /// Create a copy of WebSourceInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $WebSourceInfoCopyWith<WebSourceInfo> get copyWith => _$WebSourceInfoCopyWithImpl<WebSourceInfo>(this as WebSourceInfo, _$identity);
 
-  /// Serializes this WebSourceInfo to a JSON map.
-  Map<String, dynamic> toJson();
 
 
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebSourceInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.repo, repo) || other.repo == repo)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&const DeepCollectionEquality().equals(other.capabilities, capabilities));
-}
 
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,name,repo,baseUrl,version,icon,const DeepCollectionEquality().hash(capabilities));
 
 @override
 String toString() {
-  return 'WebSourceInfo(id: $id, name: $name, repo: $repo, baseUrl: $baseUrl, version: $version, icon: $icon, capabilities: $capabilities)';
+  return 'WebSourceInfo(dbid: $dbid, id: $id, name: $name, repo: $repo, baseUrl: $baseUrl, version: $version, icon: $icon, capabilities: $capabilities)';
 }
 
 
@@ -1106,7 +1061,7 @@ abstract mixin class $WebSourceInfoCopyWith<$Res>  {
   factory $WebSourceInfoCopyWith(WebSourceInfo value, $Res Function(WebSourceInfo) _then) = _$WebSourceInfoCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String repo, String? baseUrl, SupportedVersion version, String icon,@SourceIntentParser() List<SourceIntents> capabilities
+ int dbid, String id, String name, String repo, String? baseUrl, SupportedVersion version, String icon, List<SourceIntents> capabilities
 });
 
 
@@ -1123,9 +1078,10 @@ class _$WebSourceInfoCopyWithImpl<$Res>
 
 /// Create a copy of WebSourceInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? repo = null,Object? baseUrl = freezed,Object? version = null,Object? icon = null,Object? capabilities = null,}) {
-  return _then(_self.copyWith(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+@pragma('vm:prefer-inline') @override $Res call({Object? dbid = null,Object? id = null,Object? name = null,Object? repo = null,Object? baseUrl = freezed,Object? version = null,Object? icon = null,Object? capabilities = null,}) {
+  return _then(WebSourceInfo(
+dbid: null == dbid ? _self.dbid : dbid // ignore: cast_nullable_to_non_nullable
+as int,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,repo: null == repo ? _self.repo : repo // ignore: cast_nullable_to_non_nullable
 as String,baseUrl: freezed == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
@@ -1139,93 +1095,6 @@ as List<SourceIntents>,
 }
 
 
-
-/// @nodoc
-@JsonSerializable()
-
-class _WebSourceInfo extends WebSourceInfo {
-  const _WebSourceInfo({required this.id, required this.name, required this.repo, this.baseUrl, this.version = SupportedVersion.v0_8, required this.icon, @SourceIntentParser() final  List<SourceIntents> capabilities = const [SourceIntents.mangaChapters]}): _capabilities = capabilities,super._();
-  factory _WebSourceInfo.fromJson(Map<String, dynamic> json) => _$WebSourceInfoFromJson(json);
-
-@override final  String id;
-@override final  String name;
-@override final  String repo;
-@override final  String? baseUrl;
-@override@JsonKey() final  SupportedVersion version;
-@override final  String icon;
- final  List<SourceIntents> _capabilities;
-@override@JsonKey()@SourceIntentParser() List<SourceIntents> get capabilities {
-  if (_capabilities is EqualUnmodifiableListView) return _capabilities;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_capabilities);
-}
-
-
-/// Create a copy of WebSourceInfo
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$WebSourceInfoCopyWith<_WebSourceInfo> get copyWith => __$WebSourceInfoCopyWithImpl<_WebSourceInfo>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$WebSourceInfoToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebSourceInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.repo, repo) || other.repo == repo)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&const DeepCollectionEquality().equals(other._capabilities, _capabilities));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,name,repo,baseUrl,version,icon,const DeepCollectionEquality().hash(_capabilities));
-
-@override
-String toString() {
-  return 'WebSourceInfo(id: $id, name: $name, repo: $repo, baseUrl: $baseUrl, version: $version, icon: $icon, capabilities: $capabilities)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$WebSourceInfoCopyWith<$Res> implements $WebSourceInfoCopyWith<$Res> {
-  factory _$WebSourceInfoCopyWith(_WebSourceInfo value, $Res Function(_WebSourceInfo) _then) = __$WebSourceInfoCopyWithImpl;
-@override @useResult
-$Res call({
- String id, String name, String repo, String? baseUrl, SupportedVersion version, String icon,@SourceIntentParser() List<SourceIntents> capabilities
-});
-
-
-
-
-}
-/// @nodoc
-class __$WebSourceInfoCopyWithImpl<$Res>
-    implements _$WebSourceInfoCopyWith<$Res> {
-  __$WebSourceInfoCopyWithImpl(this._self, this._then);
-
-  final _WebSourceInfo _self;
-  final $Res Function(_WebSourceInfo) _then;
-
-/// Create a copy of WebSourceInfo
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? repo = null,Object? baseUrl = freezed,Object? version = null,Object? icon = null,Object? capabilities = null,}) {
-  return _then(_WebSourceInfo(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,repo: null == repo ? _self.repo : repo // ignore: cast_nullable_to_non_nullable
-as String,baseUrl: freezed == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
-as String?,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
-as SupportedVersion,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
-as String,capabilities: null == capabilities ? _self._capabilities : capabilities // ignore: cast_nullable_to_non_nullable
-as List<SourceIntents>,
-  ));
-}
-
-
-}
 
 
 /// @nodoc
@@ -2251,7 +2120,7 @@ $BuiltWithCopyWith<$Res> get builtWith {
 /// @nodoc
 mixin _$RepoInfo {
 
- String get name; String get url;
+ int get dbid; set dbid(int value); String get name; String get url;
 /// Create a copy of RepoInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2262,16 +2131,16 @@ $RepoInfoCopyWith<RepoInfo> get copyWith => _$RepoInfoCopyWithImpl<RepoInfo>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RepoInfo&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RepoInfo&&(identical(other.dbid, dbid) || other.dbid == dbid)&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,url);
+int get hashCode => Object.hash(runtimeType,dbid,name,url);
 
 @override
 String toString() {
-  return 'RepoInfo(name: $name, url: $url)';
+  return 'RepoInfo(dbid: $dbid, name: $name, url: $url)';
 }
 
 
@@ -2282,7 +2151,7 @@ abstract mixin class $RepoInfoCopyWith<$Res>  {
   factory $RepoInfoCopyWith(RepoInfo value, $Res Function(RepoInfo) _then) = _$RepoInfoCopyWithImpl;
 @useResult
 $Res call({
- String name, String url
+ int dbid, String name, String url
 });
 
 
@@ -2299,9 +2168,10 @@ class _$RepoInfoCopyWithImpl<$Res>
 
 /// Create a copy of RepoInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? url = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? dbid = null,Object? name = null,Object? url = null,}) {
   return _then(RepoInfo(
-name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+dbid: null == dbid ? _self.dbid : dbid // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -2315,7 +2185,7 @@ as String,
 /// @nodoc
 mixin _$RepoData {
 
- String get name; String get url; SupportedVersion get version;
+ int get dbid; set dbid(int value); String get name; String get url; SupportedVersion get version;
 /// Create a copy of RepoData
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2326,16 +2196,16 @@ $RepoDataCopyWith<RepoData> get copyWith => _$RepoDataCopyWithImpl<RepoData>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RepoData&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url)&&(identical(other.version, version) || other.version == version));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RepoData&&(identical(other.dbid, dbid) || other.dbid == dbid)&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url)&&(identical(other.version, version) || other.version == version));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,url,version);
+int get hashCode => Object.hash(runtimeType,dbid,name,url,version);
 
 @override
 String toString() {
-  return 'RepoData(name: $name, url: $url, version: $version)';
+  return 'RepoData(dbid: $dbid, name: $name, url: $url, version: $version)';
 }
 
 
@@ -2346,7 +2216,7 @@ abstract mixin class $RepoDataCopyWith<$Res> implements $RepoInfoCopyWith<$Res> 
   factory $RepoDataCopyWith(RepoData value, $Res Function(RepoData) _then) = _$RepoDataCopyWithImpl;
 @useResult
 $Res call({
- String name, String url, SupportedVersion version
+ int dbid, String name, String url, SupportedVersion version
 });
 
 
@@ -2363,9 +2233,10 @@ class _$RepoDataCopyWithImpl<$Res>
 
 /// Create a copy of RepoData
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? url = null,Object? version = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? dbid = null,Object? name = null,Object? url = null,Object? version = null,}) {
   return _then(RepoData(
-name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+dbid: null == dbid ? _self.dbid : dbid // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
 as SupportedVersion,

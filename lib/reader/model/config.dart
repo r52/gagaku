@@ -1,54 +1,94 @@
-import 'dart:convert';
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/reader/model/types.dart';
-import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:objectbox/objectbox.dart';
 import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'config.freezed.dart';
 part 'config.g.dart';
 
-@freezed
-abstract class ReaderConfig with _$ReaderConfig {
-  const factory ReaderConfig({
-    /// Reader format
-    @Default(ReaderFormat.single) ReaderFormat format,
+@unfreezed
+@Entity()
+@JsonSerializable()
+class ReaderConfig with _$ReaderConfig {
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @Id()
+  int dbid;
 
-    /// Reader direction
-    @Default(ReaderDirection.leftToRight) ReaderDirection direction,
+  /// Reader format
+  @override
+  @Transient()
+  ReaderFormat format;
 
-    /// Displays progress bar if true (default false)
-    @Default(false) bool showProgressBar,
+  /// Reader direction
+  @override
+  @Transient()
+  ReaderDirection direction;
 
-    /// Enable click/tap to turn page gesture
-    @Default(true) bool clickToTurn,
+  /// Displays progress bar if true (default false)
+  @override
+  bool showProgressBar;
 
-    /// Enable swipe gestures
-    @Default(true) bool swipeGestures,
+  /// Enable click/tap to turn page gesture
+  @override
+  bool clickToTurn;
 
-    /// The number of images/pages to preload
-    @Default(3) int precacheCount,
-  }) = _ReaderConfig;
+  /// Enable swipe gestures
+  @override
+  bool swipeGestures;
+
+  /// The number of images/pages to preload
+  @override
+  int precacheCount;
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  String get dbFormat => format.name;
+
+  set dbFormat(String value) {
+    format = ReaderFormat.values.byName(value);
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  String get dbDirection => direction.name;
+
+  set dbDirection(String value) {
+    direction = ReaderDirection.values.byName(value);
+  }
+
+  ReaderConfig({
+    this.dbid = 0,
+    this.format = ReaderFormat.single,
+    this.direction = ReaderDirection.leftToRight,
+    this.showProgressBar = false,
+    this.clickToTurn = true,
+    this.swipeGestures = true,
+    this.precacheCount = 3,
+  });
 
   factory ReaderConfig.fromJson(Map<String, dynamic> json) =>
       _$ReaderConfigFromJson(json);
+
+  Map<String, Object?> toJson() => _$ReaderConfigToJson(this);
 }
 
 @riverpod
 class ReaderSettings extends _$ReaderSettings {
   ReaderConfig _fetch() {
-    final box = Hive.box(gagakuDataBox);
-    final str = box.get('reader');
+    final box = GagakuData().store.box<ReaderConfig>();
+    final query = box.query().build();
 
-    if (str == null) {
-      return const ReaderConfig();
+    ReaderConfig? cfg;
+    cfg = query.findUnique();
+    query.close();
+
+    if (cfg == null) {
+      cfg = ReaderConfig();
+      box.put(cfg);
     }
 
-    final content = json.decode(str) as Map<String, dynamic>;
-
-    return ReaderConfig.fromJson(content);
+    return cfg;
   }
 
   @override
@@ -57,9 +97,21 @@ class ReaderSettings extends _$ReaderSettings {
   }
 
   ReaderConfig save(ReaderConfig update) {
+    final box = GagakuData().store.box<ReaderConfig>();
+
+    if (update.dbid == 0) {
+      final query = box.query().build();
+      final cfg = query.findUnique();
+      query.close();
+
+      if (cfg != null) {
+        update.dbid = cfg.dbid;
+      }
+    }
+
     state = update;
-    final box = Hive.box(gagakuDataBox);
-    box.put('reader', json.encode(update.toJson()));
+
+    box.put(update);
 
     return update;
   }

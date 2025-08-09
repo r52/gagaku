@@ -54,11 +54,10 @@ Future<List<ReaderPage>> _fetchChapterPages(Ref ref, Chapter chapter) async {
   final api = ref.watch(mangadexProvider);
   final mpages = await api.getChapterServer(chapter);
 
-  final pages =
-      mpages.pages.map((pageUrl) {
-        final url = mpages.baseUrl + pageUrl;
-        return ReaderPage(provider: NetworkImage(url));
-      }).toList();
+  final pages = mpages.pages.map((pageUrl) {
+    final url = mpages.baseUrl + pageUrl;
+    return ReaderPage(provider: NetworkImage(url));
+  }).toList();
 
   ref.onDispose(() {
     pages.clear();
@@ -95,33 +94,24 @@ class MangaDexReaderPage extends ConsumerWidget {
     return DataProviderWhenWidget(
       provider: _fetchChapterDataProvider(chapterId),
       errorBuilder: (context, child, _, _) => Scaffold(body: child),
-      builder:
-          (context, data) => MangaDexReaderWidget(
-            chapter: data.chapter,
-            manga: data.manga,
-            title: data.title,
-            link: data.manga.attributes!.title.get('en'),
-            onLinkPressed: (context) async {
-              readChaptersMutation(me?.id).run(ref, (ref) async {
-                return await ref.get(readChaptersProvider(me?.id).notifier).get(
-                  [data.manga],
-                );
-              });
+      builder: (context, data) => MangaDexReaderWidget(
+        chapter: data.chapter,
+        manga: data.manga,
+        title: data.title,
+        link: data.manga.attributes!.title.get('en'),
+        onLinkPressed: (context) async {
+          readChaptersMutation(me?.id).run(ref, (ref) async {
+            return await ref.get(readChaptersProvider(me?.id).notifier).get([
+              data.manga,
+            ]);
+          });
 
-              ratingsMutation(me?.id).run(ref, (ref) async {
-                await ref.get(ratingsProvider(me?.id).notifier).get([
-                  data.manga,
-                ]);
-              });
-
-              statisticsMutation.run(ref, (ref) async {
-                return await ref.get(statisticsProvider.notifier).get([
-                  data.manga,
-                ]);
-              });
-              context.router.navigatePath('/title/${data.manga.id}');
-            },
-          ),
+          statisticsMutation.run(ref, (ref) async {
+            return await ref.get(statisticsProvider.notifier).get([data.manga]);
+          });
+          context.router.navigatePath('/title/${data.manga.id}');
+        },
+      ),
     );
   }
 }
@@ -181,21 +171,19 @@ class MangaDexReaderWidget extends HookConsumerWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchChapterPagesProvider(chapter),
-      errorBuilder:
-          (context, child, _, _) => Scaffold(
-            appBar: AppBar(leading: const BackButton()),
-            body: child,
-          ),
-      builder:
-          (context, pages) => ReaderWidget(
-            pages: pages,
-            title: title,
-            subtitle: manga.attributes!.title.get('en'),
-            longstrip: manga.longStrip,
-            drawerHeader: link,
-            onHeaderPressed: onLinkPressed,
-            externalUrl: chapter.attributes.externalUrl,
-          ),
+      errorBuilder: (context, child, _, _) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: child,
+      ),
+      builder: (context, pages) => ReaderWidget(
+        pages: pages,
+        title: title,
+        subtitle: manga.attributes!.title.get('en'),
+        longstrip: manga.longStrip,
+        drawerHeader: link,
+        onHeaderPressed: onLinkPressed,
+        externalUrl: chapter.attributes.externalUrl,
+      ),
       loadingWidget: const Center(child: CircularProgressIndicator()),
     );
   }

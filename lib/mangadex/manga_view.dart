@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -22,7 +23,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 part 'manga_view.g.dart';
 
@@ -52,9 +52,6 @@ Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
     }),
     readChaptersMutation(me?.id).run(ref, (ref) async {
       return await ref.get(readChaptersProvider(me?.id).notifier).get(manga);
-    }),
-    ratingsMutation(me?.id).run(ref, (ref) async {
-      await ref.get(ratingsProvider(me?.id).notifier).get(manga);
     }),
   ).wait;
 
@@ -92,15 +89,13 @@ class MangaDexMangaViewPage extends ConsumerWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchMangaFromIdProvider(mangaId),
-      errorBuilder:
-          (context, child, _, _) => Scaffold(
-            body: RefreshIndicator(
-              onRefresh:
-                  () async =>
-                      ref.refresh(_fetchMangaFromIdProvider(mangaId).future),
-              child: child,
-            ),
-          ),
+      errorBuilder: (context, child, _, _) => Scaffold(
+        body: RefreshIndicator(
+          onRefresh: () async =>
+              ref.refresh(_fetchMangaFromIdProvider(mangaId).future),
+          child: child,
+        ),
+      ),
       builder: (context, manga) => MangaDexMangaViewWidget(manga: manga),
     );
   }
@@ -122,9 +117,8 @@ class _MangaDexMangaViewWidgetState
   static const coverInfo = MangaDexFeeds.mangaCovers;
 
   late final _chapterController = GagakuPagingController<int, Chapter>(
-    getNextPageKey:
-        (state) =>
-            state.keys?.last != null ? state.keys!.last + chapterInfo.limit : 0,
+    getNextPageKey: (state) =>
+        state.keys?.last != null ? state.keys!.last + chapterInfo.limit : 0,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final sort = ref.watch(mangaChaptersListSortProvider);
@@ -141,9 +135,13 @@ class _MangaDexMangaViewWidgetState
 
       final chapters = chapterlist.data.cast<Chapter>();
 
-      chapterStatsMutation.run(ref, (ref) async {
-        return await ref.get(chapterStatsProvider.notifier).get(chapters);
-      });
+      try {
+        chapterStatsMutation.run(ref, (ref) async {
+          return await ref.get(chapterStatsProvider.notifier).get(chapters);
+        });
+      } catch (e) {
+        logger.e(e, error: e);
+      }
 
       return PageResultsMetaData(chapters, chapterlist.total);
     },
@@ -154,9 +152,8 @@ class _MangaDexMangaViewWidgetState
   );
 
   late final _coverController = GagakuPagingController<int, CoverArt>(
-    getNextPageKey:
-        (state) =>
-            state.keys?.last != null ? state.keys!.last + coverInfo.limit : 0,
+    getNextPageKey: (state) =>
+        state.keys?.last != null ? state.keys!.last + coverInfo.limit : 0,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final covers = await api.getCoverList(widget.manga, offset: pageKey);
@@ -205,19 +202,20 @@ class _MangaDexMangaViewWidgetState
         limit: MangaDexEndpoints.breakLimit,
       );
 
-      await (
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get(mangas);
-        }),
-        readChaptersMutation(me?.id).run(ref, (ref) async {
-          return await ref
-              .get(readChaptersProvider(me?.id).notifier)
-              .get(mangas);
-        }),
-        ratingsMutation(me?.id).run(ref, (ref) async {
-          await ref.get(ratingsProvider(me?.id).notifier).get(mangas);
-        }),
-      ).wait;
+      try {
+        await (
+          statisticsMutation.run(ref, (ref) async {
+            return await ref.get(statisticsProvider.notifier).get(mangas);
+          }),
+          readChaptersMutation(me?.id).run(ref, (ref) async {
+            return await ref
+                .get(readChaptersProvider(me?.id).notifier)
+                .get(mangas);
+          }),
+        ).wait;
+      } catch (e) {
+        logger.e(e, error: e);
+      }
 
       return PageResultsMetaData(mangas, widget.manga.relatedMangas.length);
     },
@@ -241,8 +239,9 @@ class _MangaDexMangaViewWidgetState
 
     final hasRelated = widget.manga.relatedMangas.isNotEmpty;
     final tabController = useTabController(
-      initialLength:
-          hasRelated ? _ViewType.values.length : _ViewType.values.length - 1,
+      initialLength: hasRelated
+          ? _ViewType.values.length
+          : _ViewType.values.length - 1,
     );
     final tabview = useListenableSelector(
       tabController,
@@ -281,10 +280,8 @@ class _MangaDexMangaViewWidgetState
                 (e) => IconTextChip(
                   key: ValueKey(e.id),
                   text: e.attributes.name.get(tr.$meta.locale.languageCode),
-                  onPressed:
-                      () => router.push(
-                        MangaDexTagViewRoute(tagId: e.id, tag: e),
-                      ),
+                  onPressed: () =>
+                      router.push(MangaDexTagViewRoute(tagId: e.id, tag: e)),
                 ),
               )
               .toList(),
@@ -310,38 +307,36 @@ class _MangaDexMangaViewWidgetState
     }
 
     final moreMenu = MenuAnchor(
-      builder:
-          (context, controller, child) => IconButton(
-            style: Styles.squareIconButtonStyle(
-              backgroundColor: theme.colorScheme.surface.withAlpha(200),
-            ),
-            onPressed: () {
-              if (controller.isOpen) {
-                controller.close();
-              } else {
-                controller.open();
-              }
-            },
-            icon: const Icon(Icons.more_vert),
-          ),
+      builder: (context, controller, child) => IconButton(
+        style: Styles.squareIconButtonStyle(
+          backgroundColor: theme.colorScheme.surface.withAlpha(200),
+        ),
+        onPressed: () {
+          if (controller.isOpen) {
+            controller.close();
+          } else {
+            controller.open();
+          }
+        },
+        icon: const Icon(Icons.more_vert),
+      ),
       menuChildren: [
         MenuItemButton(
-          onPressed:
-              () => context.router.push(
-                ExtensionSearchRoute(
-                  query: SearchQuery(
-                    title: widget.manga.attributes!.title.get(
-                      tr.$meta.locale.languageCode,
-                    ),
-                  ),
+          onPressed: () => context.router.push(
+            ExtensionSearchRoute(
+              query: SearchQuery(
+                title: widget.manga.attributes!.title.get(
+                  tr.$meta.locale.languageCode,
                 ),
               ),
+            ),
+          ),
           leadingIcon: const Icon(Icons.search),
           child: Text(tr.webSources.searchWithExt),
         ),
         MenuItemButton(
-          onPressed:
-              () => Clipboard.setData(
+          onPressed: () =>
+              Clipboard.setData(
                 ClipboardData(
                   text: 'gagaku://open${context.router.currentUrl}',
                 ),
@@ -372,7 +367,7 @@ class _MangaDexMangaViewWidgetState
             ref.invalidate(readingStatusProvider(widget.manga));
           }
 
-          switch (_ViewType.values.elementAt(tabview)) {
+          switch (_ViewType.values[tabview]) {
             case _ViewType.chapters:
               return _chapterController.refresh();
             case _ViewType.art:
@@ -436,8 +431,8 @@ class _MangaDexMangaViewWidgetState
                             (context, url, downloadProgress) => const Center(
                               child: CircularProgressIndicator(),
                             ),
-                        errorWidget:
-                            (context, url, error) => const Icon(Icons.error),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
                       ),
                       Align(
                         alignment: Alignment.bottomLeft,
@@ -458,136 +453,18 @@ class _MangaDexMangaViewWidgetState
                     spacing: 6.0,
                     children: [
                       if (me != null)
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final followProvider = ref.watch(
-                              followingStatusProvider(widget.manga),
-                            );
-                            final following = followProvider.value;
-                            final setFollowing = ref.watch(
-                              followStatusMutation(widget.manga),
-                            );
-                            final statusProvider = ref.watch(
-                              readingStatusProvider(widget.manga),
-                            );
-                            final reading = statusProvider.value;
-
-                            if (following == null ||
-                                statusProvider.isLoading ||
-                                setFollowing is MutationPending) {
-                              return _loadingAction;
-                            }
-
-                            if (following == false && reading == null) {
-                              return ElevatedButton(
-                                style: Styles.buttonStyle(),
-                                onPressed: () async {
-                                  final result = await showDialog<
-                                    (MangaReadingStatus, bool)
-                                  >(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return _AddToLibraryDialog();
-                                    },
-                                  );
-
-                                  if (result != null) {
-                                    readingStatusMutation(widget.manga).run(
-                                      ref,
-                                      (ref) async {
-                                        return await ref
-                                            .get(
-                                              readingStatusProvider(
-                                                widget.manga,
-                                              ).notifier,
-                                            )
-                                            .set(result.$1);
-                                      },
-                                    );
-
-                                    followStatusMutation(widget.manga).run(
-                                      ref,
-                                      (ref) async {
-                                        return await ref
-                                            .get(
-                                              followingStatusProvider(
-                                                widget.manga,
-                                              ).notifier,
-                                            )
-                                            .set(result.$2);
-                                      },
-                                    );
-                                  }
-                                },
-                                child: Text(tr.mangaActions.addToLibrary),
-                              );
-                            }
-
-                            if (reading != null) {
-                              return IconButton(
-                                padding: EdgeInsets.zero,
-                                tooltip:
-                                    following
-                                        ? tr.mangaActions.unfollow
-                                        : tr.mangaActions.follow,
-                                style: Styles.squareIconButtonStyle(
-                                  backgroundColor: theme.colorScheme.surface
-                                      .withAlpha(200),
-                                ),
-                                color: theme.colorScheme.primary,
-                                onPressed: () async {
-                                  bool set = !following;
-                                  followStatusMutation(widget.manga).run(ref, (
-                                    ref,
-                                  ) async {
-                                    return await ref
-                                        .get(
-                                          followingStatusProvider(
-                                            widget.manga,
-                                          ).notifier,
-                                        )
-                                        .set(set);
-                                  });
-                                },
-                                icon: Icon(
-                                  following
-                                      ? Icons.notifications_active
-                                      : Icons.notifications_off_outlined,
-                                ),
-                              );
-                            }
-
-                            return const SizedBox.shrink();
-                          },
+                        _FollowingStatusButton(
+                          key: ValueKey(
+                            '_FollowingStatusButton(${widget.manga.id})',
+                          ),
+                          manga: widget.manga,
                         ),
                       if (me != null)
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final readProvider = ref.watch(
-                              readingStatusProvider(widget.manga),
-                            );
-                            final reading = readProvider.value;
-                            final setReadingStatus = ref.watch(
-                              readingStatusMutation(widget.manga),
-                            );
-
-                            if (readProvider.isLoading ||
-                                setReadingStatus is MutationPending) {
-                              return _loadingAction;
-                            }
-
-                            if (reading != null) {
-                              return _ReadingStatusDropdown(
-                                key: ValueKey(
-                                  '_ReadingStatusDropdown(${widget.manga.id})',
-                                ),
-                                initial: reading,
-                                manga: widget.manga,
-                              );
-                            }
-
-                            return const SizedBox.shrink();
-                          },
+                        _ReadingStatusDropdown(
+                          key: ValueKey(
+                            '_ReadingStatusDropdown(${widget.manga.id})',
+                          ),
+                          manga: widget.manga,
                         ),
                       if (me != null)
                         _RatingMenu(
@@ -639,8 +516,8 @@ class _MangaDexMangaViewWidgetState
                                   tileColor:
                                       theme.colorScheme.surfaceContainerHighest,
                                   title: Text(entry.first.value),
-                                  onTap:
-                                      () => Clipboard.setData(
+                                  onTap: () =>
+                                      Clipboard.setData(
                                         ClipboardData(text: entry.first.value),
                                       ).then((_) {
                                         if (!context.mounted) return;
@@ -662,14 +539,13 @@ class _MangaDexMangaViewWidgetState
                                       backgroundColor: theme.colorScheme.surface
                                           .withAlpha(200),
                                     ),
-                                    onPressed:
-                                        () => context.router.push(
-                                          ExtensionSearchRoute(
-                                            query: SearchQuery(
-                                              title: entry.first.value,
-                                            ),
-                                          ),
+                                    onPressed: () => context.router.push(
+                                      ExtensionSearchRoute(
+                                        query: SearchQuery(
+                                          title: entry.first.value,
                                         ),
+                                      ),
+                                    ),
                                     icon: const Icon(Icons.search),
                                   ),
                                 ),
@@ -696,9 +572,7 @@ class _MangaDexMangaViewWidgetState
                                   data: desc,
                                   onTapLink: (text, url, title) async {
                                     if (url != null) {
-                                      if (!await launchUrl(Uri.parse(url))) {
-                                        throw 'Could not launch $url';
-                                      }
+                                      await Styles.tryLaunchUrl(context, url);
                                     }
                                   },
                                 ),
@@ -713,32 +587,28 @@ class _MangaDexMangaViewWidgetState
                       if (widget.manga.author.isNotEmpty)
                         MultiChildExpansionTile(
                           title: tr.mangaView.author,
-                          children:
-                              widget.manga.author
-                                  .map(
-                                    (e) => ButtonChip(
-                                      text: e.attributes.name,
-                                      onPressed: () {
-                                        router.pushPath('/author/${e.id}');
-                                      },
-                                    ),
-                                  )
-                                  .toList(),
+                          children: [
+                            for (final author in widget.manga.author)
+                              ButtonChip(
+                                text: author.attributes.name,
+                                onPressed: () {
+                                  router.pushPath('/author/${author.id}');
+                                },
+                              ),
+                          ],
                         ),
                       if (widget.manga.artist.isNotEmpty)
                         MultiChildExpansionTile(
                           title: tr.mangaView.artist,
-                          children:
-                              widget.manga.artist
-                                  .map(
-                                    (e) => ButtonChip(
-                                      text: e.attributes.name,
-                                      onPressed: () {
-                                        router.pushPath('/author/${e.id}');
-                                      },
-                                    ),
-                                  )
-                                  .toList(),
+                          children: [
+                            for (final artist in widget.manga.artist)
+                              ButtonChip(
+                                text: artist.attributes.name,
+                                onPressed: () {
+                                  router.pushPath('/author/${artist.id}');
+                                },
+                              ),
+                          ],
                         ),
                       if (widget.manga.attributes!.publicationDemographic !=
                           null)
@@ -750,12 +620,11 @@ class _MangaDexMangaViewWidgetState
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: IconTextChip(
-                                  text:
-                                      widget
-                                          .manga
-                                          .attributes!
-                                          .publicationDemographic!
-                                          .label,
+                                  text: widget
+                                      .manga
+                                      .attributes!
+                                      .publicationDemographic!
+                                      .label,
                                 ),
                               ),
                             ),
@@ -784,9 +653,8 @@ class _MangaDexMangaViewWidgetState
                               onPressed: () async {
                                 final url =
                                     widget.manga.attributes!.links!.raw!;
-                                if (!await launchUrl(Uri.parse(url))) {
-                                  throw 'Could not launch $url';
-                                }
+
+                                await Styles.tryLaunchUrl(context, url);
                               },
                               text: tr.mangaView.officialRaw,
                             ),
@@ -804,9 +672,7 @@ class _MangaDexMangaViewWidgetState
                                       'https://www.mangaupdates.com/series.html?id=${widget.manga.attributes!.links!.mu!}';
                                 }
 
-                                if (!await launchUrl(Uri.parse(url))) {
-                                  throw 'Could not launch $url';
-                                }
+                                await Styles.tryLaunchUrl(context, url);
                               },
                               text: 'MangaUpdates',
                             ),
@@ -815,9 +681,7 @@ class _MangaDexMangaViewWidgetState
                               onPressed: () async {
                                 final url =
                                     'https://anilist.co/manga/${widget.manga.attributes!.links!.al!}';
-                                if (!await launchUrl(Uri.parse(url))) {
-                                  throw 'Could not launch $url';
-                                }
+                                await Styles.tryLaunchUrl(context, url);
                               },
                               text: 'AniList',
                             ),
@@ -826,22 +690,17 @@ class _MangaDexMangaViewWidgetState
                               onPressed: () async {
                                 final url =
                                     'https://myanimelist.net/manga/${widget.manga.attributes!.links!.mal!}';
-                                if (!await launchUrl(Uri.parse(url))) {
-                                  throw 'Could not launch $url';
-                                }
+                                await Styles.tryLaunchUrl(context, url);
                               },
                               text: 'MyAnimeList',
                             ),
                           ButtonChip(
                             onPressed: () async {
-                              final route = cleanBaseDomains(router.currentUrl);
-                              final url = Uri.parse(
-                                'http://mangadex.org$route',
+                              final route = Uri.parse(router.currentUrl);
+                              await Styles.tryLaunchUrl(
+                                context,
+                                'http://mangadex.org${route.path}',
                               );
-
-                              if (!await launchUrl(url)) {
-                                throw 'Could not launch $url';
-                              }
                             },
                             text: tr.mangaView.openOn(arg: 'MangaDex'),
                           ),
@@ -870,9 +729,7 @@ class _MangaDexMangaViewWidgetState
                       if (hasRelated) Tab(text: tr.mangaView.related),
                     ],
                   ),
-                  if (_ViewType.values.elementAt(tabview) ==
-                          _ViewType.chapters &&
-                      me != null)
+                  if (_ViewType.values[tabview] == _ViewType.chapters)
                     Padding(
                       padding: const EdgeInsets.all(8),
                       child: Row(
@@ -891,18 +748,20 @@ class _MangaDexMangaViewWidgetState
                                 onPressed: () {
                                   if (sort == ListSort.descending) {
                                     ref
-                                        .read(
-                                          mangaChaptersListSortProvider
-                                              .notifier,
-                                        )
-                                        .state = ListSort.ascending;
+                                            .read(
+                                              mangaChaptersListSortProvider
+                                                  .notifier,
+                                            )
+                                            .state =
+                                        ListSort.ascending;
                                   } else {
                                     ref
-                                        .read(
-                                          mangaChaptersListSortProvider
-                                              .notifier,
-                                        )
-                                        .state = ListSort.descending;
+                                            .read(
+                                              mangaChaptersListSortProvider
+                                                  .notifier,
+                                            )
+                                            .state =
+                                        ListSort.descending;
                                   }
 
                                   setState(() {
@@ -914,14 +773,14 @@ class _MangaDexMangaViewWidgetState
                             },
                           ),
                           const Spacer(),
-                          PagingListener(
-                            controller: _chapterController,
-                            builder: (context, state, fetchNextPage) {
-                              final chapters = state.items;
+                          if (me != null)
+                            PagingListener(
+                              controller: _chapterController,
+                              builder: (context, state, fetchNextPage) {
+                                final chapters = state.items;
 
-                              final allRead =
-                                  chapters != null
-                                      ? ref.watch(
+                                final allRead = chapters != null
+                                    ? ref.watch(
                                         readChaptersProvider(me.id).select(
                                           (value) => switch (value) {
                                             AsyncValue(value: final data?) =>
@@ -936,82 +795,81 @@ class _MangaDexMangaViewWidgetState
                                           },
                                         ),
                                       )
-                                      : false;
+                                    : false;
 
-                              final opt =
-                                  allRead
-                                      ? tr.mangaView.unread
-                                      : tr.mangaView.read;
+                                final opt = allRead
+                                    ? tr.mangaView.unread
+                                    : tr.mangaView.read;
 
-                              return ElevatedButton(
-                                style: Styles.buttonStyle(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
+                                return ElevatedButton(
+                                  style: Styles.buttonStyle(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0,
+                                    ),
                                   ),
-                                ),
-                                onPressed: () async {
-                                  final result = await showDialog<bool>(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      final nav = Navigator.of(context);
-                                      return AlertDialog(
-                                        title: Text(
-                                          tr.mangaView.markAllAs(arg: opt),
-                                        ),
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              tr.mangaView.markAllWarning(
-                                                arg: opt,
+                                  onPressed: () async {
+                                    final result = await showDialog<bool>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        final nav = Navigator.of(context);
+                                        return AlertDialog(
+                                          title: Text(
+                                            tr.mangaView.markAllAs(arg: opt),
+                                          ),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                tr.mangaView.markAllWarning(
+                                                  arg: opt,
+                                                ),
                                               ),
+                                            ],
+                                          ),
+                                          actions: <Widget>[
+                                            ElevatedButton(
+                                              child: Text(tr.ui.no),
+                                              onPressed: () {
+                                                nav.pop(false);
+                                              },
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                nav.pop(true);
+                                              },
+                                              child: Text(tr.ui.yes),
                                             ),
                                           ],
-                                        ),
-                                        actions: <Widget>[
-                                          ElevatedButton(
-                                            child: Text(tr.ui.no),
-                                            onPressed: () {
-                                              nav.pop(false);
-                                            },
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              nav.pop(true);
-                                            },
-                                            child: Text(tr.ui.yes),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
+                                        );
+                                      },
+                                    );
 
-                                  if (chapters != null && result == true) {
-                                    readChaptersMutation(me.id).run(ref, (
-                                      ref,
-                                    ) async {
-                                      return await ref
-                                          .get(
-                                            readChaptersProvider(
-                                              me.id,
-                                            ).notifier,
-                                          )
-                                          .set(
-                                            widget.manga,
-                                            read: !allRead ? chapters : null,
-                                            unread: allRead ? chapters : null,
-                                          );
-                                    });
-                                  }
-                                },
-                                child: Text(
-                                  tr.mangaView.markAllVisibleAs(arg: opt),
-                                ),
-                              );
-                            },
-                          ),
+                                    if (chapters != null && result == true) {
+                                      readChaptersMutation(me.id).run(ref, (
+                                        ref,
+                                      ) async {
+                                        return await ref
+                                            .get(
+                                              readChaptersProvider(
+                                                me.id,
+                                              ).notifier,
+                                            )
+                                            .set(
+                                              widget.manga,
+                                              read: !allRead ? chapters : null,
+                                              unread: allRead ? chapters : null,
+                                            );
+                                      });
+                                    }
+                                  },
+                                  child: Text(
+                                    tr.mangaView.markAllVisibleAs(arg: opt),
+                                  ),
+                                );
+                              },
+                            ),
                         ],
                       ),
                     ),
@@ -1022,7 +880,7 @@ class _MangaDexMangaViewWidgetState
           body: SafeArea(
             top: false,
             bottom: false,
-            child: switch (_ViewType.values.elementAt(tabview)) {
+            child: switch (_ViewType.values[tabview]) {
               _ViewType.chapters => _MangaChaptersView(
                 manga: widget.manga,
                 controller: _chapterController,
@@ -1108,75 +966,67 @@ class _MangaCoversView extends StatelessWidget {
               fetchNextPage: fetchNextPage,
               builderDelegate: PagedChildBuilderDelegate<CoverArt>(
                 animateTransitions: true,
-                itemBuilder:
-                    (context, item, index) => _CoverArtItem(
-                      key: ValueKey(item.id),
-                      cover: item,
-                      manga: manga,
-                      page: index,
-                      onTap: () async {
-                        Navigator.push(
-                          context,
-                          TransparentOverlay(
+                itemBuilder: (context, item, index) => _CoverArtItem(
+                  key: ValueKey(item.id),
+                  cover: item,
+                  manga: manga,
+                  page: index,
+                  onTap: () async {
+                    Navigator.push(
+                      context,
+                      TransparentOverlay(
+                        builder: (context) {
+                          return HookBuilder(
                             builder: (context) {
-                              return HookBuilder(
-                                builder: (context) {
-                                  final controller = usePageController(
-                                    initialPage: index,
-                                  );
-                                  return Scaffold(
-                                    appBar: AppBar(
-                                      backgroundColor: Colors.transparent,
-                                      leading: CloseButton(
-                                        style: IconButton.styleFrom(
-                                          backgroundColor: Colors.black,
-                                        ),
-                                      ),
+                              final controller = usePageController(
+                                initialPage: index,
+                              );
+                              return Scaffold(
+                                appBar: AppBar(
+                                  backgroundColor: Colors.transparent,
+                                  leading: CloseButton(
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: Colors.black,
                                     ),
-                                    backgroundColor: Colors.transparent,
-                                    extendBody: true,
-                                    extendBodyBehindAppBar: true,
-                                    body: PageView.builder(
-                                      scrollBehavior:
-                                          const MouseTouchScrollBehavior(),
-                                      findChildIndexCallback: (key) {
-                                        final valueKey =
-                                            key as ValueKey<String>;
-                                        final val = state.items!.indexWhere(
-                                          (i) => i.id == valueKey.value,
-                                        );
-                                        return val >= 0 ? val : null;
-                                      },
-                                      itemBuilder: (
-                                        BuildContext context,
-                                        int id,
-                                      ) {
-                                        final item = state.items!.elementAt(id);
-                                        final url = manga.getUrlFromCover(item);
+                                  ),
+                                ),
+                                backgroundColor: Colors.transparent,
+                                extendBody: true,
+                                extendBodyBehindAppBar: true,
+                                body: PageView.builder(
+                                  scrollBehavior:
+                                      const MouseTouchScrollBehavior(),
+                                  findChildIndexCallback: (key) {
+                                    final valueKey = key as ValueKey<String>;
+                                    final val = state.items!.indexWhere(
+                                      (i) => i.id == valueKey.value,
+                                    );
+                                    return val >= 0 ? val : null;
+                                  },
+                                  itemBuilder: (BuildContext context, int id) {
+                                    final item = state.items![id];
+                                    final url = manga.getUrlFromCover(item);
 
-                                        return Hero(
-                                          key: ValueKey(item.id),
-                                          tag: item.id,
-                                          child: Container(
-                                            padding: const EdgeInsets.all(10.0),
-                                            color: Colors.transparent,
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: CachedNetworkImage(
-                                                imageUrl: url,
-                                                cacheManager: gagakuImageCache,
-                                                imageBuilder: (
-                                                  context,
-                                                  imageProvider,
-                                                ) {
+                                    return Hero(
+                                      key: ValueKey(item.id),
+                                      tag: item.id,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(10.0),
+                                        color: Colors.transparent,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: CachedNetworkImage(
+                                            imageUrl: url,
+                                            cacheManager: gagakuImageCache,
+                                            imageBuilder:
+                                                (context, imageProvider) {
                                                   return PhotoView(
                                                     backgroundDecoration:
                                                         const BoxDecoration(
-                                                          color:
-                                                              Colors
-                                                                  .transparent,
+                                                          color: Colors
+                                                              .transparent,
                                                         ),
                                                     imageProvider:
                                                         imageProvider,
@@ -1193,36 +1043,36 @@ class _MangaCoversView extends StatelessWidget {
                                                             .contained,
                                                   );
                                                 },
-                                                fit: BoxFit.contain,
-                                                progressIndicatorBuilder:
-                                                    (
-                                                      context,
-                                                      url,
-                                                      downloadProgress,
-                                                    ) => const Center(
-                                                      child:
-                                                          CircularProgressIndicator(),
-                                                    ),
-                                                errorWidget:
-                                                    (context, url, error) =>
-                                                        const Icon(Icons.error),
-                                              ),
-                                            ),
+                                            fit: BoxFit.contain,
+                                            progressIndicatorBuilder:
+                                                (
+                                                  context,
+                                                  url,
+                                                  downloadProgress,
+                                                ) => const Center(
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                ),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    const Icon(Icons.error),
                                           ),
-                                        );
-                                      },
-                                      itemCount: state.items!.length,
-                                      controller: controller,
-                                      scrollDirection: Axis.horizontal,
-                                    ),
-                                  );
-                                },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  itemCount: state.items!.length,
+                                  controller: controller,
+                                  scrollDirection: Axis.horizontal,
+                                ),
                               );
                             },
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
               ),
             );
           },
@@ -1320,22 +1170,18 @@ class _ChapterListSliver extends HookConsumerWidget {
           // If next chapter is the same number
           // AND previous chapter isn't (or doesnt exist)
           if (index < keysGrouped[vol]!.length - 1 &&
-              keysGrouped[vol]!.elementAt(index + 1).attributes.chapter ==
+              keysGrouped[vol]![index + 1].attributes.chapter ==
                   chapter.attributes.chapter &&
               (index == 0 ||
                   (index > 0 &&
-                      keysGrouped[vol]!
-                              .elementAt(index - 1)
-                              .attributes
-                              .chapter !=
+                      keysGrouped[vol]![index - 1].attributes.chapter !=
                           chapter.attributes.chapter))) {
             list.add(
               _ChapterListElement(
                 _ChapterListElementType.header,
-                header:
-                    chapter.attributes.chapter != null
-                        ? tr.mangaView.chapter(n: chapter.attributes.chapter!)
-                        : chapter.title,
+                header: chapter.attributes.chapter != null
+                    ? tr.mangaView.chapter(n: chapter.attributes.chapter!)
+                    : chapter.title,
               ),
             );
           }
@@ -1354,13 +1200,10 @@ class _ChapterListSliver extends HookConsumerWidget {
     }, [state]);
 
     final newState = PagingState<int, _ChapterListElement>(
-      pages:
-          state.keys == null
-              ? null
-              : List.generate(
-                state.keys!.length,
-                (i) => i == 0 ? builtItems! : [],
-              ),
+      error: state.error,
+      pages: state.keys == null
+          ? null
+          : List.generate(state.keys!.length, (i) => i == 0 ? builtItems! : []),
       keys: state.keys,
       hasNextPage: state.hasNextPage,
       isLoading: state.isLoading,
@@ -1394,14 +1237,14 @@ class _ChapterListSliver extends HookConsumerWidget {
           );
 
           if (chapid > 0) {
-            final lastchap = chapters.elementAt(chapid - 1);
+            final lastchap = chapters[chapid - 1];
             lastChapIsSame =
                 lastchap.attributes.chapter == thischap.attributes.chapter &&
                 lastchap.attributes.volume == thischap.attributes.volume;
           }
 
           if (chapid < chapters.length - 1) {
-            final nextchap = chapters.elementAt(chapid + 1);
+            final nextchap = chapters[chapid + 1];
             nextChapIsSame =
                 nextchap.attributes.chapter == thischap.attributes.chapter &&
                 nextchap.attributes.volume == thischap.attributes.volume;
@@ -1476,9 +1319,8 @@ class _CoverArtItem extends HookWidget {
         imageUrl: url.quality(quality: CoverArtQuality.medium),
         cacheManager: gagakuImageCache,
         width: 256.0,
-        progressIndicatorBuilder:
-            (context, url, downloadProgress) =>
-                const Center(child: CircularProgressIndicator()),
+        progressIndicatorBuilder: (context, url, downloadProgress) =>
+            const Center(child: CircularProgressIndicator()),
         errorWidget: (context, url, error) => const Icon(Icons.error),
         fit: BoxFit.cover,
       ),
@@ -1498,13 +1340,12 @@ class _CoverArtItem extends HookWidget {
             }
           },
           child: GridTile(
-            footer:
-                cover.attributes?.volume != null
-                    ? GridAlbumTextBar(
-                      height: 40,
-                      text: tr.mangaView.volume(n: cover.attributes!.volume!),
-                    )
-                    : null,
+            footer: cover.attributes?.volume != null
+                ? GridAlbumTextBar(
+                    height: 40,
+                    text: tr.mangaView.volume(n: cover.attributes!.volume!),
+                  )
+                : null,
             child: image,
           ),
         ),
@@ -1513,14 +1354,9 @@ class _CoverArtItem extends HookWidget {
   }
 }
 
-class _ReadingStatusDropdown extends ConsumerWidget {
-  const _ReadingStatusDropdown({
-    super.key,
-    required this.initial,
-    required this.manga,
-  });
+class _FollowingStatusButton extends ConsumerWidget {
+  const _FollowingStatusButton({super.key, required this.manga});
 
-  final MangaReadingStatus initial;
   final Manga manga;
 
   @override
@@ -1528,8 +1364,99 @@ class _ReadingStatusDropdown extends ConsumerWidget {
     final tr = context.t;
     final theme = Theme.of(context);
 
+    final followProvider = ref.watch(followingStatusProvider(manga));
+    final following = followProvider.value;
+    final setFollowing = ref.watch(followStatusMutation(manga));
+    final statusProvider = ref.watch(readingStatusProvider(manga));
+    final reading = statusProvider.value;
+
+    if (following == null ||
+        statusProvider.isLoading ||
+        setFollowing is MutationPending) {
+      return _loadingAction;
+    }
+
+    if (following == false && reading == null) {
+      return ElevatedButton(
+        style: Styles.buttonStyle(),
+        onPressed: () async {
+          final result = await showDialog<(MangaReadingStatus, bool)>(
+            context: context,
+            builder: (BuildContext context) {
+              return _AddToLibraryDialog();
+            },
+          );
+
+          if (result != null) {
+            readingStatusMutation(manga).run(ref, (ref) async {
+              return await ref
+                  .get(readingStatusProvider(manga).notifier)
+                  .set(result.$1);
+            });
+
+            followStatusMutation(manga).run(ref, (ref) async {
+              return await ref
+                  .get(followingStatusProvider(manga).notifier)
+                  .set(result.$2);
+            });
+          }
+        },
+        child: Text(tr.mangaActions.addToLibrary),
+      );
+    }
+
+    if (reading == null) {
+      return const SizedBox.shrink();
+    }
+
+    return IconButton(
+      padding: EdgeInsets.zero,
+      tooltip: following ? tr.mangaActions.unfollow : tr.mangaActions.follow,
+      style: Styles.squareIconButtonStyle(
+        backgroundColor: theme.colorScheme.surface.withAlpha(200),
+      ),
+      color: theme.colorScheme.primary,
+      onPressed: () async {
+        bool set = !following;
+        followStatusMutation(manga).run(ref, (ref) async {
+          return await ref
+              .get(followingStatusProvider(manga).notifier)
+              .set(set);
+        });
+      },
+      icon: Icon(
+        following
+            ? Icons.notifications_active
+            : Icons.notifications_off_outlined,
+      ),
+    );
+  }
+}
+
+class _ReadingStatusDropdown extends ConsumerWidget {
+  const _ReadingStatusDropdown({super.key, required this.manga});
+
+  final Manga manga;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
+    final theme = Theme.of(context);
+
+    final readProvider = ref.watch(readingStatusProvider(manga));
+    final reading = readProvider.value;
+    final setReadingStatus = ref.watch(readingStatusMutation(manga));
+
+    if (readProvider.isLoading || setReadingStatus is MutationPending) {
+      return _loadingAction;
+    }
+
+    if (reading == null) {
+      return const SizedBox.shrink();
+    }
+
     return DropdownMenu<MangaReadingStatus>(
-      initialSelection: initial,
+      initialSelection: reading,
       width: 175.0,
       enableFilter: false,
       enableSearch: false,
@@ -1564,8 +1491,8 @@ class _ReadingStatusDropdown extends ConsumerWidget {
       dropdownMenuEntries: List<DropdownMenuEntry<MangaReadingStatus>>.generate(
         MangaReadingStatus.values.length,
         (int index) => DropdownMenuEntry<MangaReadingStatus>(
-          value: MangaReadingStatus.values.elementAt(index),
-          label: tr[MangaReadingStatus.values.elementAt(index).label],
+          value: MangaReadingStatus.values[index],
+          label: tr[MangaReadingStatus.values[index].label],
         ),
       ),
     );
@@ -1581,70 +1508,48 @@ class _RatingMenu extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final theme = Theme.of(context);
-    final me = ref.watch(loggedUserProvider).value;
-    final ratingProv = ref.watch(ratingsProvider(me?.id));
-    final ratings = ratingProv.value;
-    final ratingsMut = ref.watch(ratingsMutation(me?.id));
-    final hasRating =
-        (ratings != null &&
-            ratings.containsKey(manga.id) &&
-            ratings[manga.id]!.rating > 0);
+    final ratingProv = ref.watch(ratingsProvider(manga));
+    final rating = ratingProv.value;
+    final ratingsMut = ref.watch(ratingsMutation);
+    final hasRating = rating != null;
     final isLoading = ratingsMut is MutationPending || ratingProv.isLoading;
-
-    // Redundancy
-    useEffect(() {
-      Future.delayed(Duration.zero, () async {
-        await ratingsMutation(me?.id).run(ref, (ref) async {
-          await ref.get(ratingsProvider(me?.id).notifier).get([manga]);
-        });
-      });
-      return null;
-    }, [manga, me]);
 
     return MenuAnchor(
       builder: (context, controller, child) {
         return Material(
-          color:
-              hasRating
-                  ? theme.colorScheme.primaryContainer
-                  : theme.colorScheme.surface.withAlpha(200),
+          color: hasRating
+              ? theme.colorScheme.primaryContainer
+              : theme.colorScheme.surface.withAlpha(200),
           borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-          child:
-              (isLoading || ratings == null)
-                  ? _loadingAction
-                  : InkWell(
-                    onTap: () {
-                      if (controller.isOpen) {
-                        controller.close();
-                      } else {
-                        controller.open();
-                      }
-                    },
-                    child: child,
-                  ),
+          child: isLoading
+              ? _loadingAction
+              : InkWell(
+                  onTap: () {
+                    if (controller.isOpen) {
+                      controller.close();
+                    } else {
+                      controller.open();
+                    }
+                  },
+                  child: child,
+                ),
         );
       },
       menuChildren: [
         ...List.generate(
           10,
           (index) => MenuItemButton(
-            onPressed:
-                () => ratingsMutation(me?.id).run(ref, (ref) async {
-                  await ref
-                      .get(ratingsProvider(me?.id).notifier)
-                      .set(manga, index + 1);
-                }),
+            onPressed: () => ratingsMutation.run(ref, (ref) async {
+              await ref.get(ratingsProvider(manga).notifier).set(index + 1);
+            }),
             child: Text(tr.mangadex.ratings[index + 1]),
           ),
         ).reversed,
         if (hasRating)
           MenuItemButton(
-            onPressed:
-                () => ratingsMutation(me?.id).run(ref, (ref) async {
-                  await ref
-                      .get(ratingsProvider(me?.id).notifier)
-                      .set(manga, null);
-                }),
+            onPressed: () => ratingsMutation.run(ref, (ref) async {
+              await ref.get(ratingsProvider(manga).notifier).set(null);
+            }),
             child: Text(tr.mangadex.ratings[0]),
           ),
       ],
@@ -1660,7 +1565,7 @@ class _RatingMenu extends HookConsumerWidget {
             ),
             if (hasRating)
               Text(
-                '${ratings[manga.id]!.rating}',
+                '${rating.rating}',
                 style: TextStyle(color: theme.colorScheme.onPrimaryContainer),
               ),
           ],
@@ -1693,42 +1598,35 @@ class _UserListsMenu extends ConsumerWidget {
         return Material(
           color: theme.colorScheme.surface.withAlpha(200),
           borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-          child:
-              isLoading
-                  ? _loadingAction
-                  : InkWell(
-                    onTap: () {
-                      if (controller.isOpen) {
-                        controller.close();
-                      } else {
-                        controller.open();
-                      }
-                    },
-                    child: child,
-                  ),
+          child: isLoading
+              ? _loadingAction
+              : InkWell(
+                  onTap: () {
+                    if (controller.isOpen) {
+                      controller.close();
+                    } else {
+                      controller.open();
+                    }
+                  },
+                  child: child,
+                ),
         );
       },
       menuChildren: [
         if (userLists != null)
-          ...List.generate(
-            userLists.length,
-            (index) => CheckboxListTile(
+          for (final list in userLists)
+            CheckboxListTile(
               controlAffinity: ListTileControlAffinity.leading,
-              title: Text(userLists.elementAt(index).attributes.name),
-              value: userLists.elementAt(index).set.contains(manga.id),
+              title: Text(list.attributes.name),
+              value: list.set.contains(manga.id),
               onChanged: (bool? value) async {
                 userListModifyMutation(me?.id).run(ref, (ref) async {
                   return await ref
                       .get(userListsProvider(me?.id).notifier)
-                      .updateList(
-                        userLists.elementAt(index),
-                        manga,
-                        value == true,
-                      );
+                      .updateList(list, manga, value == true);
                 });
               },
             ),
-          ),
         MenuItemButton(
           child: Text(tr.mangadex.createNewListBtn),
           onPressed: () async {
@@ -1771,10 +1669,9 @@ class _UserListsMenu extends ConsumerWidget {
                                 title: Text(tr.mangadex.privateList),
                                 value: private == CustomListVisibility.private,
                                 onChanged: (bool? value) async {
-                                  nprivate.value =
-                                      (value == true)
-                                          ? CustomListVisibility.private
-                                          : CustomListVisibility.public;
+                                  nprivate.value = (value == true)
+                                      ? CustomListVisibility.private
+                                      : CustomListVisibility.public;
                                 },
                               );
                             },
@@ -1795,17 +1692,16 @@ class _UserListsMenu extends ConsumerWidget {
                               () => nameController.text.isEmpty,
                             );
                             return ElevatedButton(
-                              onPressed:
-                                  nameIsEmpty
-                                      ? null
-                                      : () {
-                                        if (nameController.text.isNotEmpty) {
-                                          nav.pop((
-                                            nameController.text,
-                                            nprivate.value,
-                                          ));
-                                        }
-                                      },
+                              onPressed: nameIsEmpty
+                                  ? null
+                                  : () {
+                                      if (nameController.text.isNotEmpty) {
+                                        nav.pop((
+                                          nameController.text,
+                                          nprivate.value,
+                                        ));
+                                      }
+                                    },
                               child: Text(tr.ui.create),
                             );
                           },
@@ -1875,11 +1771,8 @@ class _AddToLibraryDialog extends HookWidget {
                     List<DropdownMenuEntry<MangaReadingStatus>>.generate(
                       MangaReadingStatus.values.length - 1,
                       (int index) => DropdownMenuEntry<MangaReadingStatus>(
-                        value: MangaReadingStatus.values.elementAt(index + 1),
-                        label:
-                            tr[MangaReadingStatus.values
-                                .elementAt(index + 1)
-                                .label],
+                        value: MangaReadingStatus.values[index + 1],
+                        label: tr[MangaReadingStatus.values[index + 1].label],
                       ),
                     ),
               );

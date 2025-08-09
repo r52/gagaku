@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/cache.dart';
@@ -13,7 +14,6 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/model/types.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:gagaku/version.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -48,7 +48,9 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(CacheEntryAdapter());
   await Hive.openLazyBox<CacheEntry>(gagakuCache);
-  await initGagakuBoxes();
+
+  final gdat = GagakuData();
+  await gdat.initGagakuBoxes();
 
   final appdir = await getApplicationSupportDirectory();
 
@@ -63,19 +65,15 @@ void main() async {
       dateTimeFormat: DateTimeFormat.onlyTime,
       excludeBox: {Level.trace: true, Level.debug: true, Level.info: true},
     ),
-    output:
-        DeviceContext.isDesktop()
-            ? (kReleaseMode
-                ? FileOutput(file: File(p.join(appdir.path, 'gagaku.log')))
-                : MultiOutput([
+    output: DeviceContext.isDesktop()
+        ? (kReleaseMode
+              ? FileOutput(file: File(p.join(appdir.path, 'gagaku.log')))
+              : MultiOutput([
                   FileOutput(file: File(p.join(appdir.path, 'gagaku.log'))),
                   ConsoleOutput(),
                 ]))
-            : null,
+        : null,
   );
-
-  final gdat = GagakuData();
-  gdat.gagakuUserAgent = '$kPackageName/$kPackageVersion';
 
   runApp(ProviderScope(child: TranslationProvider(child: App())));
 }
@@ -126,6 +124,14 @@ class App extends ConsumerWidget {
         deepLinkBuilder: handleDeepLink,
       ),
       restorationScopeId: 'app_root_restore',
+      builder: (context, child) {
+        final theme = Theme.of(context);
+
+        return ProviderScope(
+          overrides: [themeProvider.overrideWithValue(theme)],
+          child: child!,
+        );
+      },
     );
   }
 }

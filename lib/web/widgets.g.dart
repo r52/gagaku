@@ -6,6 +6,53 @@ part of 'widgets.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+@ProviderFor(_extensionIcon)
+const _extensionIconProvider = _ExtensionIconProvider._();
+
+final class _ExtensionIconProvider
+    extends
+        $FunctionalProvider<
+          Map<String, Widget>,
+          Map<String, Widget>,
+          Map<String, Widget>
+        >
+    with $Provider<Map<String, Widget>> {
+  const _ExtensionIconProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'_extensionIconProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$extensionIconHash();
+
+  @$internal
+  @override
+  $ProviderElement<Map<String, Widget>> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  Map<String, Widget> create(Ref ref) {
+    return _extensionIcon(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, Widget> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Map<String, Widget>>(value),
+    );
+  }
+}
+
+String _$extensionIconHash() => r'51e6b94e5937047780dd1326e161e9f165a05f70';
+
 @ProviderFor(_MangaListView)
 const _mangaListViewProvider = _MangaListViewProvider._();
 

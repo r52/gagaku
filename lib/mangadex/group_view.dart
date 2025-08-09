@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
@@ -12,7 +13,6 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 part 'group_view.g.dart';
 
@@ -77,7 +77,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
 
     final settings = ref.watch(mdConfigProvider);
     final isBlacklisted = settings.groupBlacklist.contains(group.id);
-    final cfg = useRef(settings);
+    final cfg = useRef(settings.copyWith());
 
     const bottomNavigationBarItems = <Widget>[
       NavigationDestination(icon: Icon(Icons.info), label: 'Info'),
@@ -129,11 +129,10 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                           if (group.attributes.website != null)
                             ButtonChip(
                               onPressed: () async {
-                                if (!await launchUrl(
-                                  Uri.parse(group.attributes.website!),
-                                )) {
-                                  throw 'Could not launch ${group.attributes.website!}';
-                                }
+                                await Styles.tryLaunchUrl(
+                                  context,
+                                  group.attributes.website!,
+                                );
                               },
                               text: t.tracking.website,
                             ),
@@ -142,9 +141,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                               onPressed: () async {
                                 final url =
                                     'https://discord.gg/${group.attributes.discord!}';
-                                if (!await launchUrl(Uri.parse(url))) {
-                                  throw 'Could not launch $url';
-                                }
+                                await Styles.tryLaunchUrl(context, url);
                               },
                               text: t.tracking.discord,
                             ),
@@ -193,16 +190,16 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
         actions: [
           ElevatedButton.icon(
             style: Styles.buttonStyle(
-              backgroundColor:
-                  isBlacklisted ? Colors.green.shade900 : Colors.red.shade900,
+              backgroundColor: isBlacklisted
+                  ? Colors.green.shade900
+                  : Colors.red.shade900,
             ),
             onPressed: () {
               if (isBlacklisted) {
                 cfg.value = settings.copyWith(
-                  groupBlacklist:
-                      settings.groupBlacklist
-                          .where((element) => element != group.id)
-                          .toSet(),
+                  groupBlacklist: settings.groupBlacklist
+                      .where((element) => element != group.id)
+                      .toSet(),
                 );
               } else {
                 cfg.value = settings.copyWith(
@@ -276,8 +273,8 @@ class __GroupTitlesTabState extends ConsumerState<_GroupTitlesTab> {
   static const info = MangaDexFeeds.groupTitles;
 
   late final _pagingController = GagakuPagingController<int, Manga>(
-    getNextPageKey:
-        (state) => state.keys?.last != null ? state.keys!.last + info.limit : 0,
+    getNextPageKey: (state) =>
+        state.keys?.last != null ? state.keys!.last + info.limit : 0,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final list = await api.fetchMangaList(
@@ -289,9 +286,13 @@ class __GroupTitlesTabState extends ConsumerState<_GroupTitlesTab> {
 
       final newItems = list.data.cast<Manga>();
 
-      statisticsMutation.run(ref, (ref) async {
-        return await ref.get(statisticsProvider.notifier).get(newItems);
-      });
+      try {
+        statisticsMutation.run(ref, (ref) async {
+          return await ref.get(statisticsProvider.notifier).get(newItems);
+        });
+      } catch (e) {
+        logger.e(e, error: e);
+      }
 
       return PageResultsMetaData(newItems, list.total);
     },

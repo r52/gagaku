@@ -62,7 +62,7 @@ final class _FetchWebChapterInfoProvider
 }
 
 String _$fetchWebChapterInfoHash() =>
-    r'0ae89d758f7deeab8aefa6a41104968b4f65d4dd';
+    r'5fd05e519ea421c4c6317a014452328c3ee3bc48';
 
 final class _FetchWebChapterInfoFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<WebReaderData>, SourceHandler> {
@@ -137,7 +137,7 @@ final class _GetPagesProvider
   }
 }
 
-String _$getPagesHash() => r'5320750977e9ac6f538a3e72f33d50420ace0501';
+String _$getPagesHash() => r'baf00fe9575de9570c73445277b0e4a8b8c6ace6';
 
 final class _GetPagesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, dynamic> {
@@ -150,8 +150,8 @@ final class _GetPagesFamily extends $Family
         isAutoDispose: true,
       );
 
-  _GetPagesProvider call(dynamic source) =>
-      _GetPagesProvider._(argument: source, from: this);
+  _GetPagesProvider call(dynamic data) =>
+      _GetPagesProvider._(argument: data, from: this);
 
   @override
   String toString() => r'_getPagesProvider';

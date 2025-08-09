@@ -50,14 +50,12 @@ Future<List<Manga>> _recentlyAdded(Ref ref) async {
 
   final extraParams = {
     'hasAvailableChapters': 'true',
-    'availableTranslatedLanguage[]':
-        settings.translatedLanguages
-            .map(const LanguageConverter().toJson)
-            .toList(),
-    'originalLanguage[]':
-        settings.originalLanguage
-            .map(const LanguageConverter().toJson)
-            .toList(),
+    'availableTranslatedLanguage[]': settings.translatedLanguages
+        .map(const LanguageConverter().toJson)
+        .toList(),
+    'originalLanguage[]': settings.originalLanguage
+        .map(const LanguageConverter().toJson)
+        .toList(),
   };
 
   final info = MangaDexFeeds.recentlyAdded;
@@ -139,23 +137,20 @@ class MangaDexFrontPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return DataProviderWhenWidget(
       provider: _fetchFrontPageDataProvider,
-      errorBuilder:
-          (context, child, _, _) => Consumer(
-            child: child,
-            builder:
-                (context, ref, child) => RefreshIndicator(
-                  onRefresh: () {
-                    return ref.refresh(_fetchFrontPageDataProvider.future);
-                  },
-                  child: child!,
-                ),
-          ),
-      builder:
-          (context, data) => _FrontPageWidget(
-            key: ValueKey('_FrontPageWidget'),
-            data: data,
-            controller: controller,
-          ),
+      errorBuilder: (context, child, _, _) => Consumer(
+        child: child,
+        builder: (context, ref, child) => RefreshIndicator(
+          onRefresh: () {
+            return ref.refresh(_fetchFrontPageDataProvider.future);
+          },
+          child: child!,
+        ),
+      ),
+      builder: (context, data) => _FrontPageWidget(
+        key: ValueKey('_FrontPageWidget'),
+        data: data,
+        controller: controller,
+      ),
     );
   }
 }
@@ -248,10 +243,10 @@ class _FrontPageWidget extends HookConsumerWidget {
             SliverList.separated(
               itemCount: frontPageWidgets.length,
               itemBuilder: (context, index) {
-                return frontPageWidgets.elementAt(index);
+                return frontPageWidgets[index];
               },
-              separatorBuilder:
-                  (context, index) => const SizedBox(height: 10.0),
+              separatorBuilder: (context, index) =>
+                  const SizedBox(height: 10.0),
             ),
           ],
         ),

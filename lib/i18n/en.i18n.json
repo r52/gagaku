@@ -33,7 +33,8 @@
     "makeDefault": "Make Default",
     "retry": "Retry",
     "irreversibleWarning": "NOTE: THIS ACTION IS IRREVERSIBLE",
-    "filterItems": "Filter Items"
+    "filterItems": "Filter Items",
+    "sureContinue": "Are you sure you want to continue?"
   },
   "errors": {
     "noresults": "No results",
@@ -49,7 +50,8 @@
     "unknownSourceID": "Unknown source ID $id",
     "fetchFail": "Something went wrong while fetching a new page",
     "pageNotFound": "Page Not Found",
-    "pageNotFoundArg": "Can't find a page for: $url"
+    "pageNotFoundArg": "Can't find a page for: $url",
+    "failedLaunchUrl": "Failed to launch $url"
   },
   "auth": {
     "login": "Login",
@@ -125,6 +127,8 @@
       "usedCategoryWarning": "Category name already used",
       "categoriesToUpdate": "Categories to Update",
       "categoriesToUpdateDesc": "Select categories which manga will be updated in Updates view",
+      "categoryDelete": "@:ui.delete Category",
+      "categoryDeleteWarn": "Deleting a category will remove all items in it",
       "clearAll": "Clear All Extension Settings",
       "clearAllDesc": "Clears all extension settings. Recommended when replacing or upgrading extensions.",
       "clearAllWarning": "Are you sure you want to delete all extension settings?",

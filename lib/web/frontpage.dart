@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/extension_settings.dart';
-import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
@@ -26,46 +26,40 @@ class _ExtensionHomeCard extends ConsumerWidget {
 
     return DataProviderWhenWidget(
       provider: extensionSourceProvider(extensionInfo.id),
-      errorBuilder:
-          (context, defaultChild, error, stacktrace) =>
-              Card(child: defaultChild),
+      errorBuilder: (context, defaultChild, error, stacktrace) =>
+          Card(child: defaultChild),
       builder: (BuildContext context, source) {
         return Card(
           child: ListTile(
-            leading:
-                source.icon.isNotEmpty
-                    ? Image.network(source.icon, width: 36, height: 36)
-                    : const Icon(Icons.rss_feed),
+            leading: source.icon.isNotEmpty
+                ? Image.network(source.icon, width: 36, height: 36)
+                : const Icon(Icons.rss_feed),
             title: Text(source.name),
-            onTap:
-                source.hasCapability(SourceIntents.discoverSections)
-                    ? () => context.router.push(
-                      ExtensionHomeRoute(sourceId: source.id, source: source),
-                    )
-                    : null,
+            onTap: source.hasCapability(SourceIntents.discoverSections)
+                ? () => context.router.push(
+                    ExtensionHomeRoute(sourceId: source.id, source: source),
+                  )
+                : null,
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (source.hasCapability(SourceIntents.settingsUI))
                   IconButton(
                     icon: const Icon(Icons.settings),
-                    onPressed:
-                        () => nav.push(
-                          SlideTransitionRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                                    ExtensionSettingsPage(source: source),
-                          ),
-                        ),
+                    onPressed: () => nav.push(
+                      SlideTransitionRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            ExtensionSettingsPage(source: source),
+                      ),
+                    ),
                     tooltip: tr.webSources.source.settings,
                   ),
                 if (source.hasCapability(SourceIntents.mangaSearch))
                   IconButton(
                     icon: const Icon(Icons.search),
-                    onPressed:
-                        () => context.router.push(
-                          ExtensionSearchRoute(initialSource: source),
-                        ),
+                    onPressed: () => context.router.push(
+                      ExtensionSearchRoute(initialSource: source),
+                    ),
                     tooltip: tr.search.arg(arg: source.name),
                   ),
               ],
@@ -100,7 +94,8 @@ class WebSourceFrontPage extends HookConsumerWidget {
         Future.delayed(Duration.zero, () async {
           if (!context.mounted) return;
           final messenger = ScaffoldMessenger.of(context);
-          final list = ref.read(webConfigProvider.select((c) => c.repoList));
+          final box = GagakuData().store.box<RepoInfo>();
+          final list = box.getAll();
 
           if (action == 'addrepo') {
             final name = data['displayName']!;
@@ -152,13 +147,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
                     ),
                   );
               } else {
-                webConfigSaveMutation.run(ref, (ref) async {
-                  return ref
-                      .get(webConfigProvider.notifier)
-                      .saveWith(
-                        repoList: [...list, RepoInfo(name: name, url: url)],
-                      );
-                });
+                box.put(RepoInfo(name: name, url: url));
 
                 messenger
                   ..removeCurrentSnackBar()
@@ -177,7 +166,12 @@ class WebSourceFrontPage extends HookConsumerWidget {
     }, []);
 
     final installed = ref.watch(
-      webConfigProvider.select((cfg) => cfg.installedSources),
+      installedSourcesProvider.select(
+        (value) => switch (value) {
+          AsyncValue(value: final data?) => data,
+          _ => <WebSourceInfo>[],
+        },
+      ),
     );
 
     final homepageSources = <WebSourceInfo>[];
@@ -204,7 +198,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
           SliverList.builder(
             itemCount: homepageSources.length,
             itemBuilder: (context, index) {
-              final item = homepageSources.elementAt(index);
+              final item = homepageSources[index];
 
               return _ExtensionHomeCard(
                 key: ValueKey(item.id),
@@ -259,10 +253,9 @@ class ExtensionHomeWidget extends HookConsumerWidget {
     final controller = useScrollController();
     final refresh = useState(0);
     final sectionsFuture = useMemoized(
-      () =>
-          ref
-              .read(extensionSourceProvider(source.id).notifier)
-              .getDiscoverSections(),
+      () => ref
+          .read(extensionSourceProvider(source.id).notifier)
+          .getDiscoverSections(),
       [source, refresh.value],
     );
     final sectionsSnapshot = useFuture(sectionsFuture);
@@ -341,12 +334,11 @@ class ExtensionHomeWidget extends HookConsumerWidget {
                 onPressed: () {
                   nav.push(
                     SlideTransitionRouteBuilder(
-                      pageBuilder:
-                          (context, animation, secondaryAnimation) =>
-                              _DiscoverSectionPage(
-                                source: source,
-                                section: section,
-                              ),
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          _DiscoverSectionPage(
+                            source: source,
+                            section: section,
+                          ),
                     ),
                   );
                 },
@@ -362,12 +354,9 @@ class ExtensionHomeWidget extends HookConsumerWidget {
           }
 
           if (section.type != DiscoverSectionType.genres) {
-            final mangas =
-                sectionResults.items
-                    .map(
-                      (e) => HistoryLink.fromDiscoverySectionItem(source.id, e),
-                    )
-                    .toList();
+            final mangas = sectionResults.items
+                .map((e) => HistoryLink.fromDiscoverySectionItem(source.id, e))
+                .toList();
             homepageWidgets.add(MangaCarousel(items: mangas));
           } else {
             homepageWidgets.add(
@@ -390,30 +379,28 @@ class ExtensionHomeWidget extends HookConsumerWidget {
                         ),
                       );
                     },
-                    children:
-                        sectionResults.items
-                            .map(
-                              (e) => ColoredBox(
-                                color: theme.colorScheme.primaryContainer,
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.theater_comedy, size: 32.0),
-                                      Text(
-                                        (e as GenresCarouselItem).name,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        overflow: TextOverflow.clip,
-                                        softWrap: false,
-                                      ),
-                                    ],
+                    children: [
+                      for (final item in sectionResults.items)
+                        ColoredBox(
+                          color: theme.colorScheme.primaryContainer,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.theater_comedy, size: 32.0),
+                                Text(
+                                  (item as GenresCarouselItem).name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
                                   ),
+                                  overflow: TextOverflow.clip,
+                                  softWrap: false,
                                 ),
-                              ),
-                            )
-                            .toList(),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -427,7 +414,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
           SliverList.separated(
             itemCount: homepageWidgets.length,
             itemBuilder: (context, index) {
-              return homepageWidgets.elementAt(index);
+              return homepageWidgets[index];
             },
             separatorBuilder: (context, index) => const SizedBox(height: 10.0),
           ),
@@ -456,24 +443,21 @@ class ExtensionHomeWidget extends HookConsumerWidget {
                 IconButton(
                   color: theme.colorScheme.onPrimaryContainer,
                   icon: const Icon(Icons.search),
-                  onPressed:
-                      () => context.router.push(
-                        ExtensionSearchRoute(initialSource: source),
-                      ),
+                  onPressed: () => context.router.push(
+                    ExtensionSearchRoute(initialSource: source),
+                  ),
                   tooltip: tr.search.arg(arg: source.name),
                 ),
               if (source.hasCapability(SourceIntents.settingsUI))
                 IconButton(
                   color: theme.colorScheme.onPrimaryContainer,
                   icon: const Icon(Icons.settings),
-                  onPressed:
-                      () => nav.push(
-                        SlideTransitionRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  ExtensionSettingsPage(source: source),
-                        ),
-                      ),
+                  onPressed: () => nav.push(
+                    SlideTransitionRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          ExtensionSettingsPage(source: source),
+                    ),
+                  ),
                   tooltip: tr.webSources.source.settings,
                 ),
             ],
@@ -514,8 +498,8 @@ class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
   Map<String, dynamic>? metadata = {'page': 1};
 
   late final _pagingController = GagakuPagingController<dynamic, HistoryLink>(
-    getNextPageKey:
-        (state) => state.keys?.last == null ? {'page': 1} : metadata,
+    getNextPageKey: (state) =>
+        state.keys?.last == null ? {'page': 1} : metadata,
     fetchPage: (pageKey) async {
       final results = await ref
           .read(extensionSourceProvider(widget.source.id).notifier)
@@ -591,10 +575,10 @@ class MangaCarousel extends StatelessWidget {
           itemExtent: 180,
           shrinkExtent: 180,
           enableSplash: false,
-          children:
-              items
-                  .map((e) => GridMangaItem(link: e, showRemoveButton: false))
-                  .toList(),
+          children: [
+            for (final item in items)
+              GridMangaItem(link: item, showRemoveButton: false),
+          ],
         ),
       ),
     );

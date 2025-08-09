@@ -8,7 +8,7 @@ import 'package:http/io_client.dart';
 import 'package:http/retry.dart';
 
 const _baseUserAgent =
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:138.0) Gecko/20100101 Firefox/138.0';
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0';
 
 String getUserAgent([bool useCustomUA = false]) {
   return useCustomUA ? GagakuData().gagakuUserAgent : _baseUserAgent;
@@ -45,9 +45,8 @@ class RateLimitedClient extends http.BaseClient {
         _createHttpClient(useCustomUA),
         retries: 2,
         when: (response) => false,
-        whenError:
-            (error, stacktrace) =>
-                error is HttpException || error is http.ClientException,
+        whenError: (error, stacktrace) =>
+            error is HttpException || error is http.ClientException,
       );
 
   @override

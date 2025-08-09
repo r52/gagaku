@@ -11,6 +11,7 @@ import 'package:gagaku/model/config.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/model/types.dart';
+import 'package:gagaku/settings/convert.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -42,20 +43,9 @@ class AppSettingsPage extends HookConsumerWidget {
       output[key as String] = djson;
     }
 
-    final dbox = Hive.box(gagakuDataBox);
+    final outputdata = await const GagakuBackupDataV2().write(output);
 
-    for (final key in dbox.keys) {
-      if (_backupExcludeKeys.contains(key)) {
-        continue;
-      }
-
-      final data = dbox.get(key);
-      final djson = json.decode(data);
-      output[key as String] = djson;
-    }
-
-    final outputdata = json.encode(output);
-
+    if (!context.mounted) return null;
     final result = await FilePicker.platform.saveFile(
       dialogTitle: context.t.backup.data,
       fileName:
@@ -129,10 +119,14 @@ class AppSettingsPage extends HookConsumerWidget {
     final udata = utf8.decode(data);
     final jdata = json.decode(udata) as Map<String, dynamic>;
 
-    final dbox = Hive.box(gagakuDataBox);
-
-    for (final MapEntry(:key, :value) in jdata.entries) {
-      await dbox.put(key, json.encode(value));
+    switch (jdata["version"]) {
+      case 2:
+        await const GagakuBackupDataV2().read(jdata);
+        break;
+      case 1:
+      default:
+        await const GagakuBackupDataV1().read(jdata);
+        break;
     }
 
     // cleanup old data
@@ -324,67 +318,105 @@ class AppSettingsPage extends HookConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     spacing: 10.0,
                     children: [
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final result = await _backupData(context);
+                      HookBuilder(
+                        builder: (context) {
+                          final isLoading = useState(false);
 
-                          if (result != null) {
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context)
-                              ..removeCurrentSnackBar()
-                              ..showSnackBar(
-                                SnackBar(
-                                  content: Text(t.backup.success),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                          } else {
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context)
-                              ..removeCurrentSnackBar()
-                              ..showSnackBar(
-                                SnackBar(
-                                  content: Text(t.backup.cancelled),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                          }
+                          return ElevatedButton.icon(
+                            onPressed: isLoading.value
+                                ? null
+                                : () async {
+                                    isLoading.value = true;
+                                    final result = await _backupData(context);
+                                    isLoading.value = false;
+
+                                    if (result != null) {
+                                      if (!context.mounted) return;
+                                      ScaffoldMessenger.of(context)
+                                        ..removeCurrentSnackBar()
+                                        ..showSnackBar(
+                                          SnackBar(
+                                            content: Text(t.backup.success),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        );
+                                    } else {
+                                      if (!context.mounted) return;
+                                      ScaffoldMessenger.of(context)
+                                        ..removeCurrentSnackBar()
+                                        ..showSnackBar(
+                                          SnackBar(
+                                            content: Text(t.backup.cancelled),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                    }
+                                  },
+                            icon: isLoading.value
+                                ? CircularProgressIndicator(
+                                    constraints: BoxConstraints.expand(
+                                      width: 20,
+                                      height: 20,
+                                    ),
+                                  )
+                                : const Icon(Icons.save),
+                            label: Text(t.backup.toFile),
+                          );
                         },
-                        icon: const Icon(Icons.save),
-                        label: Text(t.backup.toFile),
                       ),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final result = await _restoreBackup(context);
+                      HookBuilder(
+                        builder: (context) {
+                          final isLoading = useState(false);
+                          return ElevatedButton.icon(
+                            onPressed: isLoading.value
+                                ? null
+                                : () async {
+                                    isLoading.value = true;
+                                    final result = await _restoreBackup(
+                                      context,
+                                    );
+                                    isLoading.value = false;
 
-                          String msg = t.backup.restoreSuccess;
-                          Color bg = Colors.green;
+                                    String msg = t.backup.restoreSuccess;
+                                    Color bg = Colors.green;
 
-                          if (!context.mounted) return;
-                          switch (result) {
-                            case true:
-                              msg = t.backup.restoreSuccess;
-                              bg = Colors.green;
-                              break;
-                            case false:
-                              msg = t.backup.restoreFail;
-                              bg = Colors.red;
-                              break;
-                            case null:
-                              msg = t.backup.restoreCancelled;
-                              bg = Colors.red;
-                              break;
-                          }
+                                    if (!context.mounted) return;
+                                    switch (result) {
+                                      case true:
+                                        msg = t.backup.restoreSuccess;
+                                        bg = Colors.green;
+                                        break;
+                                      case false:
+                                        msg = t.backup.restoreFail;
+                                        bg = Colors.red;
+                                        break;
+                                      case null:
+                                        msg = t.backup.restoreCancelled;
+                                        bg = Colors.red;
+                                        break;
+                                    }
 
-                          if (!context.mounted) return;
-                          ScaffoldMessenger.of(context)
-                            ..removeCurrentSnackBar()
-                            ..showSnackBar(
-                              SnackBar(content: Text(msg), backgroundColor: bg),
-                            );
+                                    if (!context.mounted) return;
+                                    ScaffoldMessenger.of(context)
+                                      ..removeCurrentSnackBar()
+                                      ..showSnackBar(
+                                        SnackBar(
+                                          content: Text(msg),
+                                          backgroundColor: bg,
+                                        ),
+                                      );
+                                  },
+                            icon: isLoading.value
+                                ? CircularProgressIndicator(
+                                    constraints: BoxConstraints.expand(
+                                      width: 20,
+                                      height: 20,
+                                    ),
+                                  )
+                                : const Icon(Icons.settings_backup_restore),
+                            label: Text(t.backup.fromFile),
+                          );
                         },
-                        icon: const Icon(Icons.settings_backup_restore),
-                        label: Text(t.backup.fromFile),
                       ),
                     ],
                   ),
@@ -408,12 +440,13 @@ class AppSettingsPage extends HookConsumerWidget {
                           : Text(t.backup.dataLocDefault)),
                       ElevatedButton.icon(
                         onPressed: () async {
-                          final perms =
-                              await Permission.manageExternalStorage.request();
+                          final perms = await Permission.manageExternalStorage
+                              .request();
 
                           if (perms.isGranted) {
-                            String? selectedDirectory =
-                                await FilePicker.platform.getDirectoryPath();
+                            String? selectedDirectory = await FilePicker
+                                .platform
+                                .getDirectoryPath();
 
                             if (selectedDirectory != null) {
                               await gbox.put(
