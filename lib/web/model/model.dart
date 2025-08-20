@@ -1246,12 +1246,17 @@ Future<WebSourceInfo> getExtensionFromId(Ref ref, String sourceId) async {
 
 class SettingsForm with ChangeNotifier {
   SettingsForm({required this.id, required InAppWebViewController controller})
-    : _controller = controller;
+    : _controller = controller {
+    _sections = _getSections();
+  }
 
   final FormID id;
   final InAppWebViewController _controller;
 
-  Future<List<FormSectionElement>> getSections() async {
+  late Future<List<FormSectionElement>> _sections;
+  Future<List<FormSectionElement>> get sections => _sections;
+
+  Future<List<FormSectionElement>> _getSections() async {
     final result = await _controller.callAsyncJavaScript(
       functionBody:
           """
@@ -1335,8 +1340,8 @@ return form.$method?.();
     );
   }
 
-  void reloadForm() {
-    _controller.callAsyncJavaScript(
+  Future<void> reloadForm() async {
+    await _controller.callAsyncJavaScript(
       arguments: {'formid': id},
       functionBody: """
 var form = window.Application.getForm(formid);
@@ -1347,6 +1352,8 @@ if (typeof form === "undefined") {
 form.formWillAppear?.();
 """,
     );
+
+    _sections = _getSections();
 
     notifyListeners();
   }

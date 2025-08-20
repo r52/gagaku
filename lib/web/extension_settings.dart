@@ -78,11 +78,7 @@ class _FormBuilderState extends ConsumerState<FormBuilder> {
   Widget build(BuildContext context) {
     final tr = context.t;
     final form = useListenable(widget.form);
-    final results = useMemoized(() => form.getSections(), [
-      widget.source,
-      form,
-    ]);
-    final future = useFuture(results);
+    final future = useFuture(form.sections);
 
     Widget body = Center(child: CircularProgressIndicator());
 
