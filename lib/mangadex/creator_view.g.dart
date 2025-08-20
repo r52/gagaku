@@ -29,7 +29,7 @@ final class _FetchCreatorFromIdProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$fetchCreatorFromIdHash();
+  String debugGetCreateSourceHash() => _$_fetchCreatorFromIdHash();
 
   @override
   String toString() {
@@ -61,7 +61,7 @@ final class _FetchCreatorFromIdProvider
   }
 }
 
-String _$fetchCreatorFromIdHash() =>
+String _$_fetchCreatorFromIdHash() =>
     r'4c8996715ea032e63f63141f4711917fa730362f';
 
 final class _FetchCreatorFromIdFamily extends $Family

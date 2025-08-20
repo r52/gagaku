@@ -24,7 +24,7 @@ final class _FetchGroupFromIdProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$fetchGroupFromIdHash();
+  String debugGetCreateSourceHash() => _$_fetchGroupFromIdHash();
 
   @override
   String toString() {
@@ -55,7 +55,7 @@ final class _FetchGroupFromIdProvider
   }
 }
 
-String _$fetchGroupFromIdHash() => r'f1a1c9382f6e492c172d9eeb3e8622b544612bea';
+String _$_fetchGroupFromIdHash() => r'f1a1c9382f6e492c172d9eeb3e8622b544612bea';
 
 final class _FetchGroupFromIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Group>, String> {

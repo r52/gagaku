@@ -22,7 +22,7 @@ part 'widgets.g.dart';
 
 enum WebMangaListView { grid, list }
 
-@Riverpod(keepAlive: true)
+@riverpod
 Map<String, Widget> _extensionIcon(Ref ref) {
   final icons = ref.watch(
     extensionInfoListProvider.select(

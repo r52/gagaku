@@ -23,13 +23,13 @@ final class _ExtensionIconProvider
         argument: null,
         retry: null,
         name: r'_extensionIconProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$extensionIconHash();
+  String debugGetCreateSourceHash() => _$_extensionIconHash();
 
   @$internal
   @override
@@ -51,7 +51,7 @@ final class _ExtensionIconProvider
   }
 }
 
-String _$extensionIconHash() => r'51e6b94e5937047780dd1326e161e9f165a05f70';
+String _$_extensionIconHash() => r'1eed8e398b683c4271d78b056af4c760df63584e';
 
 @ProviderFor(_MangaListView)
 const _mangaListViewProvider = _MangaListViewProvider._();
@@ -70,7 +70,7 @@ final class _MangaListViewProvider
       );
 
   @override
-  String debugGetCreateSourceHash() => _$mangaListViewHash();
+  String debugGetCreateSourceHash() => _$_mangaListViewHash();
 
   @$internal
   @override
@@ -85,7 +85,7 @@ final class _MangaListViewProvider
   }
 }
 
-String _$mangaListViewHash() => r'7612ea641ea8b61bcc8a8f95606c95d63d0d5111';
+String _$_mangaListViewHash() => r'7612ea641ea8b61bcc8a8f95606c95d63d0d5111';
 
 abstract class _$MangaListView extends $Notifier<WebMangaListView> {
   WebMangaListView build();

@@ -29,7 +29,7 @@ final class _FetchGroupDataProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$fetchGroupDataHash();
+  String debugGetCreateSourceHash() => _$_fetchGroupDataHash();
 
   @override
   String toString() {
@@ -60,7 +60,7 @@ final class _FetchGroupDataProvider
   }
 }
 
-String _$fetchGroupDataHash() => r'24d9984bf59cd196477e31f308827f4594f6115a';
+String _$_fetchGroupDataHash() => r'24d9984bf59cd196477e31f308827f4594f6115a';
 
 final class _FetchGroupDataFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Set<Group>>, Iterable<String>> {

@@ -5,7 +5,9 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([readBorderTheme])
 @RoutePage()
 class MangaDexGlobalFeedPage extends HookWidget {
   const MangaDexGlobalFeedPage({super.key});

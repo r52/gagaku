@@ -29,7 +29,7 @@ final class _GetDirectoryPagesProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$getDirectoryPagesHash();
+  String debugGetCreateSourceHash() => _$_getDirectoryPagesHash();
 
   @override
   String toString() {
@@ -61,7 +61,8 @@ final class _GetDirectoryPagesProvider
   }
 }
 
-String _$getDirectoryPagesHash() => r'599be990d7fb9529e4c9f52cd1d9057e839a3eab';
+String _$_getDirectoryPagesHash() =>
+    r'599be990d7fb9529e4c9f52cd1d9057e839a3eab';
 
 final class _GetDirectoryPagesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, String> {

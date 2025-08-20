@@ -9,7 +9,9 @@ import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([readBorderTheme])
 @RoutePage()
 class MangaDexHistoryFeedPage extends StatefulHookConsumerWidget {
   const MangaDexHistoryFeedPage({super.key, this.controller});

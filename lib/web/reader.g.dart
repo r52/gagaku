@@ -29,7 +29,7 @@ final class _FetchWebChapterInfoProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$fetchWebChapterInfoHash();
+  String debugGetCreateSourceHash() => _$_fetchWebChapterInfoHash();
 
   @override
   String toString() {
@@ -61,7 +61,7 @@ final class _FetchWebChapterInfoProvider
   }
 }
 
-String _$fetchWebChapterInfoHash() =>
+String _$_fetchWebChapterInfoHash() =>
     r'5fd05e519ea421c4c6317a014452328c3ee3bc48';
 
 final class _FetchWebChapterInfoFamily extends $Family
@@ -105,7 +105,7 @@ final class _GetPagesProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$getPagesHash();
+  String debugGetCreateSourceHash() => _$_getPagesHash();
 
   @override
   String toString() {
@@ -137,7 +137,7 @@ final class _GetPagesProvider
   }
 }
 
-String _$getPagesHash() => r'baf00fe9575de9570c73445277b0e4a8b8c6ace6';
+String _$_getPagesHash() => r'baf00fe9575de9570c73445277b0e4a8b8c6ace6';
 
 final class _GetPagesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, dynamic> {
@@ -180,7 +180,7 @@ final class _GetSourcePagesProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$getSourcePagesHash();
+  String debugGetCreateSourceHash() => _$_getSourcePagesHash();
 
   @override
   String toString() {
@@ -212,7 +212,7 @@ final class _GetSourcePagesProvider
   }
 }
 
-String _$getSourcePagesHash() => r'e76f59888cefdfb3b6b5800a243fbf4eec05c088';
+String _$_getSourcePagesHash() => r'e76f59888cefdfb3b6b5800a243fbf4eec05c088';
 
 final class _GetSourcePagesFamily extends $Family
     with

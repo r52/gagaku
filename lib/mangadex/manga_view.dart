@@ -22,6 +22,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:riverpod/experimental/mutation.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'manga_view.g.dart';
@@ -58,6 +59,7 @@ Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
   return manga.first;
 }
 
+@Dependencies([readBorderTheme])
 @RoutePage()
 class MangaDexMangaViewWithNamePage extends MangaDexMangaViewPage {
   const MangaDexMangaViewWithNamePage({
@@ -69,6 +71,7 @@ class MangaDexMangaViewWithNamePage extends MangaDexMangaViewPage {
   final String? name;
 }
 
+@Dependencies([readBorderTheme])
 @RoutePage()
 class MangaDexMangaViewPage extends ConsumerWidget {
   const MangaDexMangaViewPage({
@@ -101,6 +104,7 @@ class MangaDexMangaViewPage extends ConsumerWidget {
   }
 }
 
+@Dependencies([readBorderTheme])
 class MangaDexMangaViewWidget extends StatefulHookConsumerWidget {
   const MangaDexMangaViewWidget({super.key, required this.manga});
 
@@ -916,6 +920,7 @@ class _MangaDexMangaViewWidgetState
   }
 }
 
+@Dependencies([readBorderTheme])
 class _MangaChaptersView extends StatelessWidget {
   const _MangaChaptersView({required this.manga, required this.controller});
 
@@ -1098,6 +1103,7 @@ class _ChapterListElement {
   final bool bold;
 }
 
+@Dependencies([readBorderTheme])
 class _ChapterListSliver extends HookConsumerWidget {
   const _ChapterListSliver({
     required this.state,

@@ -24,7 +24,7 @@ final class _FetchMangaFromIdProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$fetchMangaFromIdHash();
+  String debugGetCreateSourceHash() => _$_fetchMangaFromIdHash();
 
   @override
   String toString() {
@@ -55,7 +55,7 @@ final class _FetchMangaFromIdProvider
   }
 }
 
-String _$fetchMangaFromIdHash() => r'2dad12988cca0a77cab47d87fb9b45a85561a5e4';
+String _$_fetchMangaFromIdHash() => r'2dad12988cca0a77cab47d87fb9b45a85561a5e4';
 
 final class _FetchMangaFromIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Manga>, String> {

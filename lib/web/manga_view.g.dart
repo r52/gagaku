@@ -31,7 +31,7 @@ final class _FetchWebMangaInfoProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$fetchWebMangaInfoHash();
+  String debugGetCreateSourceHash() => _$_fetchWebMangaInfoHash();
 
   @override
   String toString() {
@@ -63,7 +63,8 @@ final class _FetchWebMangaInfoProvider
   }
 }
 
-String _$fetchWebMangaInfoHash() => r'b05c98ce188c86d30154448acd47bd9677693013';
+String _$_fetchWebMangaInfoHash() =>
+    r'b05c98ce188c86d30154448acd47bd9677693013';
 
 final class _FetchWebMangaInfoFamily extends $Family
     with

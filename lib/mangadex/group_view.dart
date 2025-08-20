@@ -12,6 +12,7 @@ import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'group_view.g.dart';
@@ -25,6 +26,7 @@ Future<Group> _fetchGroupFromId(Ref ref, String groupId) async {
   return group.first;
 }
 
+@Dependencies([readBorderTheme])
 @RoutePage()
 class MangaDexGroupViewWithNamePage extends MangaDexGroupViewPage {
   const MangaDexGroupViewWithNamePage({
@@ -36,6 +38,7 @@ class MangaDexGroupViewWithNamePage extends MangaDexGroupViewPage {
   final String? name;
 }
 
+@Dependencies([readBorderTheme])
 @RoutePage()
 class MangaDexGroupViewPage extends StatelessWidget {
   const MangaDexGroupViewPage({
@@ -64,6 +67,7 @@ class MangaDexGroupViewPage extends StatelessWidget {
   }
 }
 
+@Dependencies([readBorderTheme])
 class MangaDexGroupViewWidget extends HookConsumerWidget {
   const MangaDexGroupViewWidget({super.key, required this.group});
 

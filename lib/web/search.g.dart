@@ -23,7 +23,7 @@ final class _SearchHistoryProvider
       );
 
   @override
-  String debugGetCreateSourceHash() => _$searchHistoryHash();
+  String debugGetCreateSourceHash() => _$_searchHistoryHash();
 
   @$internal
   @override
@@ -38,7 +38,7 @@ final class _SearchHistoryProvider
   }
 }
 
-String _$searchHistoryHash() => r'03b2bdeb09ccc897e60e3e498de7f80aa8df9377';
+String _$_searchHistoryHash() => r'03b2bdeb09ccc897e60e3e498de7f80aa8df9377';
 
 abstract class _$SearchHistory extends $Notifier<List<String>> {
   List<String> build();

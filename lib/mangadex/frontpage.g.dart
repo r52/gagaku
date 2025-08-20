@@ -29,7 +29,7 @@ final class _PopularTitlesProvider
       );
 
   @override
-  String debugGetCreateSourceHash() => _$popularTitlesHash();
+  String debugGetCreateSourceHash() => _$_popularTitlesHash();
 
   @$internal
   @override
@@ -43,7 +43,7 @@ final class _PopularTitlesProvider
   }
 }
 
-String _$popularTitlesHash() => r'bd736590bbe6e6adcb7fbb060e3794725e3fc049';
+String _$_popularTitlesHash() => r'bd736590bbe6e6adcb7fbb060e3794725e3fc049';
 
 @ProviderFor(_recentlyAdded)
 const _recentlyAddedProvider = _RecentlyAddedProvider._();
@@ -68,7 +68,7 @@ final class _RecentlyAddedProvider
       );
 
   @override
-  String debugGetCreateSourceHash() => _$recentlyAddedHash();
+  String debugGetCreateSourceHash() => _$_recentlyAddedHash();
 
   @$internal
   @override
@@ -82,7 +82,7 @@ final class _RecentlyAddedProvider
   }
 }
 
-String _$recentlyAddedHash() => r'c674998b67a04d66d78727ed66605b1af2dfa8db';
+String _$_recentlyAddedHash() => r'c674998b67a04d66d78727ed66605b1af2dfa8db';
 
 @ProviderFor(_latestUpdates)
 const _latestUpdatesProvider = _LatestUpdatesProvider._();
@@ -107,7 +107,7 @@ final class _LatestUpdatesProvider
       );
 
   @override
-  String debugGetCreateSourceHash() => _$latestUpdatesHash();
+  String debugGetCreateSourceHash() => _$_latestUpdatesHash();
 
   @$internal
   @override
@@ -121,7 +121,7 @@ final class _LatestUpdatesProvider
   }
 }
 
-String _$latestUpdatesHash() => r'7681a094cf7bb2e9c23ef54b0bd3d06a8fc198ec';
+String _$_latestUpdatesHash() => r'7681a094cf7bb2e9c23ef54b0bd3d06a8fc198ec';
 
 @ProviderFor(_fetchCustomListManga)
 const _fetchCustomListMangaProvider = _FetchCustomListMangaFamily._();
@@ -146,7 +146,7 @@ final class _FetchCustomListMangaProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$fetchCustomListMangaHash();
+  String debugGetCreateSourceHash() => _$_fetchCustomListMangaHash();
 
   @override
   String toString() {
@@ -178,7 +178,7 @@ final class _FetchCustomListMangaProvider
   }
 }
 
-String _$fetchCustomListMangaHash() =>
+String _$_fetchCustomListMangaHash() =>
     r'648d090100f7187d80742bc2314663f501e62bc1';
 
 final class _FetchCustomListMangaFamily extends $Family
@@ -222,7 +222,7 @@ final class _FetchFrontPageDataProvider
       );
 
   @override
-  String debugGetCreateSourceHash() => _$fetchFrontPageDataHash();
+  String debugGetCreateSourceHash() => _$_fetchFrontPageDataHash();
 
   @$internal
   @override
@@ -236,7 +236,7 @@ final class _FetchFrontPageDataProvider
   }
 }
 
-String _$fetchFrontPageDataHash() =>
+String _$_fetchFrontPageDataHash() =>
     r'245417f155ec4ebbefb21699348d9bf828acaeff';
 
 // ignore_for_file: type=lint

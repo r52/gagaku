@@ -323,6 +323,7 @@ class MarkReadButton extends ConsumerWidget {
   }
 }
 
+@Dependencies([readBorderTheme])
 class ChapterFeedWidget extends HookWidget {
   const ChapterFeedWidget({
     super.key,
@@ -441,6 +442,7 @@ class ChapterFeedWidget extends HookWidget {
   }
 }
 
+@Dependencies([readBorderTheme])
 class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
   const InfiniteScrollChapterFeedWidget({
     super.key,
@@ -670,6 +672,7 @@ class _MangaTitle extends ConsumerWidget {
   }
 }
 
+@Dependencies([readBorderTheme])
 class _BackLinkedChapterButton extends ConsumerWidget {
   const _BackLinkedChapterButton({
     super.key,
@@ -705,6 +708,7 @@ class _BackLinkedChapterButton extends ConsumerWidget {
   }
 }
 
+@Dependencies([readBorderTheme])
 class ChapterFeedItem extends HookWidget {
   const ChapterFeedItem({super.key, required this.state});
 
@@ -812,6 +816,7 @@ class _ChapterButtonCard extends ConsumerWidget {
   }
 }
 
+@Dependencies([readBorderTheme])
 class ChapterButtonWidget extends HookWidget {
   const ChapterButtonWidget({
     super.key,

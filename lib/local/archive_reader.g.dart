@@ -29,7 +29,7 @@ final class _GetArchivePagesProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$getArchivePagesHash();
+  String debugGetCreateSourceHash() => _$_getArchivePagesHash();
 
   @override
   String toString() {
@@ -61,7 +61,7 @@ final class _GetArchivePagesProvider
   }
 }
 
-String _$getArchivePagesHash() => r'a1e7575662cd6f4c098bd314d1b7308a3e29b50a';
+String _$_getArchivePagesHash() => r'a1e7575662cd6f4c098bd314d1b7308a3e29b50a';
 
 final class _GetArchivePagesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, String> {
