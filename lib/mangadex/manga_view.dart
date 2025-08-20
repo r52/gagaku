@@ -1310,7 +1310,6 @@ class _CoverArtItem extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
-    useAutomaticKeepAlive();
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );

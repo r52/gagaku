@@ -403,7 +403,6 @@ class GridMangaItem extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    useAutomaticKeepAlive();
     final tr = context.t;
     final extIcons = ref.watch(_extensionIconProvider);
     final aniController = useAnimationController(
@@ -800,7 +799,6 @@ class ChapterFeedItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    useAutomaticKeepAlive();
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     final titleBtn = _MangaTitle(

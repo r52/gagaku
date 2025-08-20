@@ -716,7 +716,6 @@ class ChapterFeedItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    useAutomaticKeepAlive();
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     final titleBtn = _MangaTitle(
@@ -1312,7 +1311,6 @@ class GridMangaItem extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    useAutomaticKeepAlive();
     final me = ref.watch(loggedUserProvider).value;
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
@@ -1397,7 +1395,6 @@ class GridMangaDetailedItem extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    useAutomaticKeepAlive();
     final me = ref.watch(loggedUserProvider).value;
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
@@ -1519,7 +1516,6 @@ class _ListMangaItem extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    useAutomaticKeepAlive();
     final me = ref.watch(loggedUserProvider).value;
     final theme = Theme.of(context);
 
