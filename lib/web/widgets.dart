@@ -510,9 +510,33 @@ class FavoritesButton extends HookWidget {
 
     final favStatus = useMemoized(() {
       final favList = manager.getFavoritedListIdsOfLink(link);
-      final isFavorited = favList.isNotEmpty;
-      return (list: favList, isFavorited: isFavorited);
+      return (list: favList, isFavorited: favList.isNotEmpty);
     }, [favorites, link]);
+
+    final menuChildren = useMemoized(() {
+      if (favorites.isEmpty) return <Widget>[];
+
+      return [
+        for (final cat in favorites)
+          CheckboxListTile(
+            controlAffinity: ListTileControlAffinity.leading,
+            title: Text(cat.name),
+            value: favStatus.list.contains(cat.dbid),
+            onChanged: (bool? value) async {
+              if (value == true) {
+                manager.add(cat, link);
+              } else {
+                manager.remove(cat, link);
+              }
+            },
+          ),
+        if (favStatus.isFavorited)
+          MenuItemButton(
+            onPressed: () => manager.removeFromAll(link),
+            child: Text(tr.ui.clear),
+          ),
+      ];
+    }, [favorites, favStatus, manager, link, tr]);
 
     return MenuAnchor(
       builder: (context, controller, child) {
@@ -544,27 +568,7 @@ class FavoritesButton extends HookWidget {
           ),
         );
       },
-      menuChildren: favorites.isNotEmpty
-          ? [
-              for (final cat in favorites)
-                CheckboxListTile(
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: Text(cat.name),
-                  value: favStatus.list.contains(cat.dbid),
-                  onChanged: (bool? value) async {
-                    if (value == true) {
-                      manager.add(cat, link);
-                    } else {
-                      manager.remove(cat, link);
-                    }
-                  },
-                ),
-              MenuItemButton(
-                onPressed: () => manager.removeFromAll(link),
-                child: Text(tr.ui.clear),
-              ),
-            ]
-          : [],
+      menuChildren: menuChildren,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Icon(
