@@ -1347,7 +1347,6 @@ class _CoverArtItem extends HookWidget {
           child: GridTile(
             footer: cover.attributes?.volume != null
                 ? GridAlbumTextBar(
-                    height: 40,
                     text: tr.mangaView.volume(n: cover.attributes!.volume!),
                   )
                 : null,

@@ -79,28 +79,21 @@ class GridAlbumImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(4.0)),
-      ),
+    return Container(
       clipBehavior: Clip.antiAlias,
-      child: Stack(
-        fit: StackFit.passthrough,
-        children: [
-          child,
-          SizedBox.expand(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: FractionalOffset.bottomCenter,
-                  end: gradient,
-                  colors: const [Colors.black, Colors.transparent],
-                ),
-              ),
-            ),
-          ),
-        ],
+      decoration: const ShapeDecoration(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(4.0)),
+        ),
       ),
+      foregroundDecoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: gradient,
+          colors: const [Colors.black87, Colors.transparent],
+        ),
+      ),
+      child: child,
     );
   }
 }
@@ -108,38 +101,38 @@ class GridAlbumImage extends StatelessWidget {
 class GridAlbumTextBar extends StatelessWidget {
   const GridAlbumTextBar({
     super.key,
-    required this.height,
     this.leading,
     this.backgroundColor,
     required this.text,
   });
 
-  final double height;
   final Widget? leading;
   final Color? backgroundColor;
   final String text;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: GridTileBar(
-        leading: leading,
-        backgroundColor: backgroundColor,
-        title: Text(
-          text,
-          softWrap: true,
-          style: const TextStyle(
-            color: Colors.white,
-            shadows: <Shadow>[
-              Shadow(
-                offset: Offset(1.0, 1.0),
-                color: Color.fromARGB(255, 0, 0, 0),
-              ),
-            ],
-            overflow: TextOverflow.clip,
+    return Container(
+      color: backgroundColor,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      alignment: Alignment.centerLeft,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (leading != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: leading!,
+            ),
+          Expanded(
+            child: Text(
+              text,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -737,8 +730,8 @@ class Styles {
   );
 
   static final coverArtGradientTween = Tween(
-    begin: FractionalOffset.center,
-    end: FractionalOffset.topCenter,
+    begin: Alignment.center,
+    end: Alignment.topCenter,
   );
 
   static const List<Widget> loadingOverlay = [

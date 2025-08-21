@@ -1368,13 +1368,11 @@ class GridMangaItem extends HookConsumerWidget {
               )
             : (header != null
                   ? GridAlbumTextBar(
-                      height: 40,
                       backgroundColor: Colors.black87,
                       text: header!,
                     )
                   : null),
         footer: GridAlbumTextBar(
-          height: 80,
           leading: CountryFlag(
             flag: manga.attributes!.originalLanguage.flag,
             size: 18,

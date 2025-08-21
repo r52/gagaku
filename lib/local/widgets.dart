@@ -149,7 +149,7 @@ class _GridLibraryItem extends HookWidget {
           }
         },
         child: GridTile(
-          footer: GridAlbumTextBar(height: 80, text: item.name ?? item.path),
+          footer: GridAlbumTextBar(text: item.name ?? item.path),
           child: image,
         ),
       ),

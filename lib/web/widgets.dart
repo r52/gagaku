@@ -461,7 +461,7 @@ class GridMangaItem extends HookConsumerWidget {
       child: Stack(
         children: [
           GridTile(
-            footer: GridAlbumTextBar(height: 80, text: link.title),
+            footer: GridAlbumTextBar(text: link.title),
             child: GridAlbumImage(gradient: gradient, child: cover),
           ),
           Align(alignment: Alignment.bottomRight, child: sourceIcon),
