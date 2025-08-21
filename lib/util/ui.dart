@@ -3,11 +3,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:url_launcher/url_launcher.dart' show launchUrl;
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
@@ -244,7 +246,8 @@ class CountryFlag extends StatelessWidget {
   }
 }
 
-class ButtonChip extends StatelessWidget {
+@Dependencies([chipTextStyle])
+class ButtonChip extends ConsumerWidget {
   const ButtonChip({
     super.key,
     this.icon,
@@ -261,8 +264,9 @@ class ButtonChip extends StatelessWidget {
   final VoidCallback? onPressed;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final textStyle = ref.watch(chipTextStyleProvider).merge(style);
 
     final bstyle = Styles.buttonStyle(
       backgroundColor: color ?? theme.colorScheme.tertiaryContainer,
@@ -277,27 +281,18 @@ class ButtonChip extends StatelessWidget {
             style: bstyle,
             onPressed: onPressed,
             icon: icon!,
-            label: Text(
-              text,
-              style:
-                  style ??
-                  TextStyle(color: theme.colorScheme.onTertiaryContainer),
-            ),
+            label: Text(text, style: textStyle),
           )
         : ElevatedButton(
             style: bstyle,
             onPressed: onPressed,
-            child: Text(
-              text,
-              style:
-                  style ??
-                  TextStyle(color: theme.colorScheme.onTertiaryContainer),
-            ),
+            child: Text(text, style: textStyle),
           );
   }
 }
 
-class IconTextChip extends StatelessWidget {
+@Dependencies([chipTextStyle])
+class IconTextChip extends ConsumerWidget {
   const IconTextChip({
     super.key,
     this.icon,
@@ -314,8 +309,9 @@ class IconTextChip extends StatelessWidget {
   final VoidCallback? onPressed;
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textStyle = ref.watch(chipTextStyleProvider).merge(style);
+    final theme = ColorScheme.of(context);
 
     Widget child = Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
@@ -327,9 +323,7 @@ class IconTextChip extends StatelessWidget {
           Flexible(
             child: Text(
               text,
-              style:
-                  style ??
-                  TextStyle(color: theme.colorScheme.onTertiaryContainer),
+              style: textStyle,
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -345,7 +339,7 @@ class IconTextChip extends StatelessWidget {
       constraints: const BoxConstraints(maxHeight: 24.0),
       child: Material(
         borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-        color: color ?? theme.colorScheme.tertiaryContainer,
+        color: color ?? theme.tertiaryContainer,
         child: child,
       ),
     );

@@ -8,6 +8,7 @@ import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
@@ -15,6 +16,7 @@ import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:number_paginator/number_paginator.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'tag_view.g.dart';
@@ -85,6 +87,7 @@ Future<List<Manga>> _recentlyAdded(Ref ref, Tag tag) async {
   return manga.data.cast<Manga>();
 }
 
+@Dependencies([chipTextStyle])
 @RoutePage()
 class MangaDexTagViewWithNamePage extends MangaDexTagViewPage {
   const MangaDexTagViewWithNamePage({
@@ -96,6 +99,7 @@ class MangaDexTagViewWithNamePage extends MangaDexTagViewPage {
   final String? name;
 }
 
+@Dependencies([chipTextStyle])
 @RoutePage()
 class MangaDexTagViewPage extends StatelessWidget {
   const MangaDexTagViewPage({
@@ -124,6 +128,7 @@ class MangaDexTagViewPage extends StatelessWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class MangaDexTagViewWidget extends HookConsumerWidget {
   const MangaDexTagViewWidget({super.key, required this.tag});
 

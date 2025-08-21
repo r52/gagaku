@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/cached_network_image.dart';
@@ -15,6 +16,7 @@ import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'manga_view.g.dart';
@@ -44,6 +46,7 @@ Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
   throw InvalidDataException('Invalid WebManga link. Data not found.');
 }
 
+@Dependencies([chipTextStyle])
 @RoutePage()
 class WebMangaViewPage extends ConsumerWidget {
   const WebMangaViewPage({
@@ -95,6 +98,7 @@ class WebMangaViewPage extends ConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class WebMangaViewWidget extends HookConsumerWidget {
   const WebMangaViewWidget({
     super.key,
@@ -583,6 +587,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class MangaStatisticsRow extends StatelessWidget {
   const MangaStatisticsRow({super.key, required this.manga});
 
@@ -617,6 +622,7 @@ class MangaStatisticsRow extends StatelessWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class ContentChip extends StatelessWidget {
   const ContentChip({super.key, required this.content});
 

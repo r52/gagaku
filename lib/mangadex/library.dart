@@ -8,11 +8,13 @@ import 'package:gagaku/mangadex/login_password.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library.g.dart';
@@ -45,6 +47,7 @@ Future<List<String>> _getLibraryListByType(
   return results;
 }
 
+@Dependencies([chipTextStyle])
 @RoutePage()
 class MangaDexLibraryPage extends StatelessWidget {
   const MangaDexLibraryPage({super.key, this.controller});
@@ -59,6 +62,7 @@ class MangaDexLibraryPage extends StatelessWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class MangaDexLibraryWidget extends HookConsumerWidget {
   const MangaDexLibraryWidget({super.key, this.controller});
 

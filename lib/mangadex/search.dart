@@ -8,10 +8,12 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'search.g.dart';
@@ -27,6 +29,7 @@ class _SearchHistory extends _$SearchHistory {
       state = cb(state);
 }
 
+@Dependencies([chipTextStyle])
 @RoutePage()
 class MangaDexSearchPage extends StatefulHookConsumerWidget {
   const MangaDexSearchPage({

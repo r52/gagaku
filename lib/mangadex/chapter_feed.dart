@@ -6,12 +6,13 @@ import 'package:gagaku/mangadex/login_password.dart';
 import 'package:gagaku/mangadex/manga_feed.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 
 enum _FeedViewType { chapters, manga }
 
-@Dependencies([readBorderTheme])
+@Dependencies([readBorderTheme, chipTextStyle])
 @RoutePage()
 class MangaDexChapterFeedPage extends StatelessWidget {
   const MangaDexChapterFeedPage({super.key, this.controller});
@@ -26,7 +27,7 @@ class MangaDexChapterFeedPage extends StatelessWidget {
   }
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([readBorderTheme, chipTextStyle])
 class MangaDexChapterFeedWidget extends HookWidget {
   const MangaDexChapterFeedWidget({super.key, this.controller});
   final ScrollController? controller;

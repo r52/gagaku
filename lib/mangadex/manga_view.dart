@@ -12,6 +12,7 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
@@ -59,7 +60,7 @@ Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
   return manga.first;
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([readBorderTheme, chipTextStyle])
 @RoutePage()
 class MangaDexMangaViewWithNamePage extends MangaDexMangaViewPage {
   const MangaDexMangaViewWithNamePage({
@@ -71,7 +72,7 @@ class MangaDexMangaViewWithNamePage extends MangaDexMangaViewPage {
   final String? name;
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([readBorderTheme, chipTextStyle])
 @RoutePage()
 class MangaDexMangaViewPage extends ConsumerWidget {
   const MangaDexMangaViewPage({
@@ -104,7 +105,7 @@ class MangaDexMangaViewPage extends ConsumerWidget {
   }
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([readBorderTheme, chipTextStyle])
 class MangaDexMangaViewWidget extends StatefulHookConsumerWidget {
   const MangaDexMangaViewWidget({super.key, required this.manga});
 
@@ -920,7 +921,7 @@ class _MangaDexMangaViewWidgetState
   }
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([readBorderTheme, chipTextStyle])
 class _MangaChaptersView extends StatelessWidget {
   const _MangaChaptersView({required this.manga, required this.controller});
 
@@ -1103,7 +1104,7 @@ class _ChapterListElement {
   final bool bold;
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([readBorderTheme, chipTextStyle])
 class _ChapterListSliver extends HookConsumerWidget {
   const _ChapterListSliver({
     required this.state,

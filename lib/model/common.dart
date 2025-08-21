@@ -7,3 +7,8 @@ part 'common.g.dart';
 ThemeData theme(Ref ref) {
   throw UnimplementedError();
 }
+
+@Riverpod(dependencies: [])
+TextStyle chipTextStyle(Ref ref) {
+  throw UnimplementedError();
+}

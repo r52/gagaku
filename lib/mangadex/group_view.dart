@@ -8,6 +8,7 @@ import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -26,7 +27,7 @@ Future<Group> _fetchGroupFromId(Ref ref, String groupId) async {
   return group.first;
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([chipTextStyle, readBorderTheme])
 @RoutePage()
 class MangaDexGroupViewWithNamePage extends MangaDexGroupViewPage {
   const MangaDexGroupViewWithNamePage({
@@ -38,7 +39,7 @@ class MangaDexGroupViewWithNamePage extends MangaDexGroupViewPage {
   final String? name;
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([chipTextStyle, readBorderTheme])
 @RoutePage()
 class MangaDexGroupViewPage extends StatelessWidget {
   const MangaDexGroupViewPage({
@@ -67,7 +68,7 @@ class MangaDexGroupViewPage extends StatelessWidget {
   }
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([chipTextStyle, readBorderTheme])
 class MangaDexGroupViewWidget extends HookConsumerWidget {
   const MangaDexGroupViewWidget({super.key, required this.group});
 
@@ -258,6 +259,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class _GroupTitlesTab extends ConsumerStatefulWidget {
   const _GroupTitlesTab({
     super.key,

@@ -5,6 +5,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -15,7 +16,7 @@ import 'package:riverpod_annotation/experimental/scope.dart';
 
 enum _ViewType { titles, feed }
 
-@Dependencies([readBorderTheme])
+@Dependencies([chipTextStyle, readBorderTheme])
 @RoutePage()
 class MangaDexListViewWithNamePage extends MangaDexListViewPage {
   const MangaDexListViewWithNamePage({
@@ -27,7 +28,7 @@ class MangaDexListViewWithNamePage extends MangaDexListViewPage {
   final String? name;
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([chipTextStyle, readBorderTheme])
 @RoutePage()
 class MangaDexListViewPage extends HookConsumerWidget {
   const MangaDexListViewPage({super.key, @PathParam() required this.listId});

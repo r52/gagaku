@@ -128,7 +128,12 @@ class App extends ConsumerWidget {
         final theme = Theme.of(context);
 
         return ProviderScope(
-          overrides: [themeProvider.overrideWithValue(theme)],
+          overrides: [
+            themeProvider.overrideWithValue(theme),
+            chipTextStyleProvider.overrideWithValue(
+              TextStyle(color: theme.colorScheme.onTertiaryContainer),
+            ),
+          ],
           child: child!,
         );
       },

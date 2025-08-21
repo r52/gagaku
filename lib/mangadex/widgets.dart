@@ -45,12 +45,6 @@ class _MangaListView extends _$MangaListView {
       state = cb(state);
 }
 
-const _endChip = IconTextChip(
-  key: ValueKey('END'),
-  color: Colors.blue,
-  text: 'END',
-);
-
 const _groupIconB = Icon(Icons.group, size: 20.0);
 const _groupIconS = Icon(Icons.group, size: 15.0);
 const _circleIconB = Icon(Icons.add_circle, size: 20.0);
@@ -323,7 +317,7 @@ class MarkReadButton extends ConsumerWidget {
   }
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([chipTextStyle, readBorderTheme])
 class ChapterFeedWidget extends HookWidget {
   const ChapterFeedWidget({
     super.key,
@@ -442,7 +436,7 @@ class ChapterFeedWidget extends HookWidget {
   }
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([readBorderTheme, chipTextStyle])
 class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
   const InfiniteScrollChapterFeedWidget({
     super.key,
@@ -672,7 +666,7 @@ class _MangaTitle extends ConsumerWidget {
   }
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([chipTextStyle, readBorderTheme])
 class _BackLinkedChapterButton extends ConsumerWidget {
   const _BackLinkedChapterButton({
     super.key,
@@ -708,7 +702,7 @@ class _BackLinkedChapterButton extends ConsumerWidget {
   }
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([chipTextStyle, readBorderTheme])
 class ChapterFeedItem extends HookWidget {
   const ChapterFeedItem({super.key, required this.state});
 
@@ -815,7 +809,7 @@ class _ChapterButtonCard extends ConsumerWidget {
   }
 }
 
-@Dependencies([readBorderTheme])
+@Dependencies([chipTextStyle, readBorderTheme])
 class ChapterButtonWidget extends HookWidget {
   const ChapterButtonWidget({
     super.key,
@@ -909,7 +903,12 @@ class ChapterButtonWidget extends HookWidget {
                   manga: manga,
                 ),
               ),
-              if (isEndChapter) _endChip,
+              if (isEndChapter)
+                IconTextChip(
+                  key: ValueKey('END'),
+                  color: Colors.blue,
+                  text: 'END',
+                ),
             ],
           ),
         ),
@@ -1122,6 +1121,7 @@ class MangaListWidget extends HookConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class MangaListViewSliver extends ConsumerWidget {
   const MangaListViewSliver({
     super.key,
@@ -1385,6 +1385,7 @@ class GridMangaItem extends HookConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class GridMangaDetailedItem extends HookConsumerWidget {
   const GridMangaDetailedItem({super.key, required this.manga, this.header});
 
@@ -1506,6 +1507,7 @@ class GridMangaDetailedItem extends HookConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class _ListMangaItem extends HookConsumerWidget {
   const _ListMangaItem({super.key, required this.manga, this.header});
 
@@ -1647,6 +1649,7 @@ class ChapterTitle extends ConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class MangaGenreRow extends HookWidget {
   const MangaGenreRow({super.key, required this.manga});
 
@@ -1688,6 +1691,7 @@ class MangaGenreRow extends HookWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class MangaStatisticsRow extends HookConsumerWidget {
   const MangaStatisticsRow({
     super.key,
@@ -1771,6 +1775,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class _GroupRow extends HookWidget {
   final Chapter chapter;
 
@@ -1834,6 +1839,7 @@ class _PubTime extends StatelessWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class CommentChip extends HookWidget {
   final StatisticsDetailsComments? comments;
 
@@ -1865,6 +1871,7 @@ class CommentChip extends HookWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class MangaStatusChip extends StatelessWidget {
   const MangaStatusChip({
     super.key,
@@ -1897,6 +1904,7 @@ class MangaStatusChip extends StatelessWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class ContentRatingChip extends StatelessWidget {
   const ContentRatingChip({super.key, required this.rating});
 
@@ -1916,6 +1924,7 @@ class ContentRatingChip extends StatelessWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class ContentChip extends StatelessWidget {
   const ContentChip({super.key, required this.content});
 
