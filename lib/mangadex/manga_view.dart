@@ -981,100 +981,11 @@ class _MangaCoversView extends StatelessWidget {
                     Navigator.push(
                       context,
                       TransparentOverlay(
-                        builder: (context) {
-                          return HookBuilder(
-                            builder: (context) {
-                              final controller = usePageController(
-                                initialPage: index,
-                              );
-                              return Scaffold(
-                                appBar: AppBar(
-                                  backgroundColor: Colors.transparent,
-                                  leading: CloseButton(
-                                    style: IconButton.styleFrom(
-                                      backgroundColor: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                                backgroundColor: Colors.transparent,
-                                extendBody: true,
-                                extendBodyBehindAppBar: true,
-                                body: PageView.builder(
-                                  scrollBehavior:
-                                      const MouseTouchScrollBehavior(),
-                                  findChildIndexCallback: (key) {
-                                    final valueKey = key as ValueKey<String>;
-                                    final val = state.items!.indexWhere(
-                                      (i) => i.id == valueKey.value,
-                                    );
-                                    return val >= 0 ? val : null;
-                                  },
-                                  itemBuilder: (BuildContext context, int id) {
-                                    final item = state.items![id];
-                                    final url = manga.getUrlFromCover(item);
-
-                                    return Hero(
-                                      key: ValueKey(item.id),
-                                      tag: item.id,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(10.0),
-                                        color: Colors.transparent,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: CachedNetworkImage(
-                                            imageUrl: url,
-                                            cacheManager: gagakuImageCache,
-                                            imageBuilder:
-                                                (context, imageProvider) {
-                                                  return PhotoView(
-                                                    backgroundDecoration:
-                                                        const BoxDecoration(
-                                                          color: Colors
-                                                              .transparent,
-                                                        ),
-                                                    imageProvider:
-                                                        imageProvider,
-                                                    minScale:
-                                                        PhotoViewComputedScale
-                                                            .contained *
-                                                        0.8,
-                                                    maxScale:
-                                                        PhotoViewComputedScale
-                                                            .covered *
-                                                        5.0,
-                                                    initialScale:
-                                                        PhotoViewComputedScale
-                                                            .contained,
-                                                  );
-                                                },
-                                            fit: BoxFit.contain,
-                                            progressIndicatorBuilder:
-                                                (
-                                                  context,
-                                                  url,
-                                                  downloadProgress,
-                                                ) => const Center(
-                                                  child:
-                                                      CircularProgressIndicator(),
-                                                ),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    const Icon(Icons.error),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  itemCount: state.items!.length,
-                                  controller: controller,
-                                  scrollDirection: Axis.horizontal,
-                                ),
-                              );
-                            },
-                          );
-                        },
+                        builder: (context) => _CoverArtPagedOverlay(
+                          index: index,
+                          manga: manga,
+                          items: state.items!,
+                        ),
                       ),
                     );
                   },
@@ -1343,6 +1254,82 @@ class _CoverArtItem extends HookWidget {
             child: image,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _CoverArtPagedOverlay extends HookWidget {
+  const _CoverArtPagedOverlay({
+    required this.index,
+    required this.items,
+    required this.manga,
+  });
+
+  final int index;
+  final List<CoverArt> items;
+  final Manga manga;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = usePageController(initialPage: index);
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        leading: CloseButton(
+          style: IconButton.styleFrom(backgroundColor: Colors.black),
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      body: PageView.builder(
+        scrollBehavior: const MouseTouchScrollBehavior(),
+        findChildIndexCallback: (key) {
+          final valueKey = key as ValueKey<String>;
+          final val = items.indexWhere((i) => i.id == valueKey.value);
+          return val >= 0 ? val : null;
+        },
+        itemBuilder: (BuildContext context, int id) {
+          final item = items[id];
+          final url = manga.getUrlFromCover(item);
+
+          return Hero(
+            key: ValueKey(item.id),
+            tag: item.id,
+            child: Container(
+              padding: const EdgeInsets.all(10.0),
+              color: Colors.transparent,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: CachedNetworkImage(
+                  imageUrl: url,
+                  cacheManager: gagakuImageCache,
+                  imageBuilder: (context, imageProvider) {
+                    return PhotoView(
+                      backgroundDecoration: const BoxDecoration(
+                        color: Colors.transparent,
+                      ),
+                      imageProvider: imageProvider,
+                      minScale: PhotoViewComputedScale.contained * 0.8,
+                      maxScale: PhotoViewComputedScale.covered * 5.0,
+                      initialScale: PhotoViewComputedScale.contained,
+                    );
+                  },
+                  fit: BoxFit.contain,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      const Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                ),
+              ),
+            ),
+          );
+        },
+        itemCount: items.length,
+        controller: controller,
+        scrollDirection: Axis.horizontal,
       ),
     );
   }
