@@ -1126,15 +1126,20 @@ class _ChapterListSliver extends HookConsumerWidget {
       return items;
     }, [state]);
 
-    final newState = PagingState<int, _ChapterListElement>(
-      error: state.error,
-      pages: state.keys == null
-          ? null
-          : List.generate(state.keys!.length, (i) => i == 0 ? builtItems! : []),
-      keys: state.keys,
-      hasNextPage: state.hasNextPage,
-      isLoading: state.isLoading,
-    );
+    final newState = useMemoized(() {
+      return PagingState<int, _ChapterListElement>(
+        error: state.error,
+        pages: state.keys == null
+            ? null
+            : List.generate(
+                state.keys!.length,
+                (i) => i == 0 ? builtItems! : [],
+              ),
+        keys: state.keys,
+        hasNextPage: state.hasNextPage,
+        isLoading: state.isLoading,
+      );
+    }, [builtItems, state]);
 
     return PagedSliverList.separated(
       state: newState,

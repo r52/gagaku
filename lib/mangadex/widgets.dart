@@ -390,21 +390,23 @@ class ChapterFeedWidget extends HookWidget {
 
                   final future = useFuture(builtItems);
 
-                  final newState = PagingState<int, ChapterFeedItemData>(
-                    error: state.error,
-                    pages: state.keys == null || !future.hasData
-                        ? null
-                        : List.generate(
-                            state.keys!.length,
-                            (i) => i == 0 ? future.data! : [],
-                          ),
-                    keys: future.hasData ? state.keys : null,
-                    hasNextPage: state.hasNextPage,
-                    isLoading:
-                        future.connectionState == ConnectionState.waiting ||
-                        !future.hasData ||
-                        state.isLoading,
-                  );
+                  final newState = useMemoized(() {
+                    return PagingState<int, ChapterFeedItemData>(
+                      error: state.error ?? future.error,
+                      pages: state.keys == null || !future.hasData
+                          ? null
+                          : List.generate(
+                              state.keys!.length,
+                              (i) => i == 0 ? future.data! : [],
+                            ),
+                      keys: future.hasData ? state.keys : null,
+                      hasNextPage: state.hasNextPage,
+                      isLoading:
+                          future.connectionState == ConnectionState.waiting ||
+                          !future.hasData ||
+                          state.isLoading,
+                    );
+                  }, [future, state]);
 
                   return PagedSuperSliverList(
                     state: newState,
