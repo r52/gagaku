@@ -1096,12 +1096,14 @@ class _ChapterListElement {
     this.header,
     this.chapter,
     this.bold = false,
+    this.isIndented = false,
   }) : assert(header != null || chapter != null);
 
   final _ChapterListElementType type;
   final String? header;
   final Chapter? chapter;
   final bool bold;
+  final bool isIndented;
 }
 
 @Dependencies([readBorderTheme, chipTextStyle])
@@ -1174,20 +1176,26 @@ class _ChapterListSliver extends HookConsumerWidget {
         }
 
         items = keysGrouped[vol]!.foldIndexed(items, (index, list, chapter) {
+          final volumeChapters = keysGrouped[vol]!;
+          final currentChapter = chapter.attributes.chapter;
+
           // If next chapter is the same number
           // AND previous chapter isn't (or doesnt exist)
-          if (index < keysGrouped[vol]!.length - 1 &&
-              keysGrouped[vol]![index + 1].attributes.chapter ==
-                  chapter.attributes.chapter &&
-              (index == 0 ||
-                  (index > 0 &&
-                      keysGrouped[vol]![index - 1].attributes.chapter !=
-                          chapter.attributes.chapter))) {
+          final nextIsSame =
+              index < volumeChapters.length - 1 &&
+              volumeChapters[index + 1].attributes.chapter == currentChapter;
+          final prevIsNotSame =
+              index == 0 ||
+              (index > 0 &&
+                  volumeChapters[index - 1].attributes.chapter !=
+                      currentChapter);
+
+          if (nextIsSame && prevIsNotSame) {
             list.add(
               _ChapterListElement(
                 _ChapterListElementType.header,
-                header: chapter.attributes.chapter != null
-                    ? tr.mangaView.chapter(n: chapter.attributes.chapter!)
+                header: currentChapter != null
+                    ? tr.mangaView.chapter(n: currentChapter)
                     : chapter.title,
               ),
             );
@@ -1197,6 +1205,7 @@ class _ChapterListSliver extends HookConsumerWidget {
             _ChapterListElement(
               _ChapterListElementType.chapter,
               chapter: chapter,
+              isIndented: nextIsSame || !prevIsNotSame,
             ),
           );
           return list;
@@ -1222,9 +1231,6 @@ class _ChapterListSliver extends HookConsumerWidget {
       separatorBuilder: (_, index) => const SizedBox(height: 4.0),
       builderDelegate: PagedChildBuilderDelegate<_ChapterListElement>(
         itemBuilder: (context, item, index) {
-          var lastChapIsSame = false;
-          var nextChapIsSame = false;
-
           if (item.type == _ChapterListElementType.header) {
             return _ChapterListHeader(
               key: ValueKey(item.header!),
@@ -1234,32 +1240,15 @@ class _ChapterListSliver extends HookConsumerWidget {
           }
 
           // is chapter beyond this point
-
-          final chapid = chapters!.indexWhere((c) => c.id == item.chapter!.id);
-          final thischap = item.chapter!;
           final chapbtn = ChapterButtonWidget(
-            key: ValueKey(thischap.id),
-            chapter: thischap,
+            key: ValueKey(item.chapter!.id),
+            chapter: item.chapter!,
             manga: manga,
           );
 
-          if (chapid > 0) {
-            final lastchap = chapters[chapid - 1];
-            lastChapIsSame =
-                lastchap.attributes.chapter == thischap.attributes.chapter &&
-                lastchap.attributes.volume == thischap.attributes.volume;
-          }
-
-          if (chapid < chapters.length - 1) {
-            final nextchap = chapters[chapid + 1];
-            nextChapIsSame =
-                nextchap.attributes.chapter == thischap.attributes.chapter &&
-                nextchap.attributes.volume == thischap.attributes.volume;
-          }
-
-          if (lastChapIsSame || nextChapIsSame) {
+          if (item.isIndented) {
             return Row(
-              key: ValueKey(thischap.id),
+              key: ValueKey(item.chapter!.id),
               children: [
                 const Icon(Icons.subdirectory_arrow_right, size: 15.0),
                 Flexible(child: chapbtn),
