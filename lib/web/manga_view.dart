@@ -567,13 +567,44 @@ class WebMangaViewWidget extends HookConsumerWidget {
                 );
                 return val >= 0 ? val : null;
               },
-              separatorBuilder: (_, _) => const SizedBox(height: 4.0),
+              separatorBuilder: (_, index) {
+                final current = manga.chapters[index];
+
+                final prevName = (index > 0)
+                    ? manga.chapters[index - 1].name
+                    : null;
+                final nextName = (index < manga.chapters.length - 1)
+                    ? manga.chapters[index + 1].name
+                    : null;
+                final afterNextName = (index < manga.chapters.length - 2)
+                    ? manga.chapters[index + 2].name
+                    : null;
+
+                final followsGroup = current.name == prevName;
+                final continuesGroup = current.name == nextName;
+                final isBeforeNewGroup =
+                    nextName != null &&
+                    afterNextName != null &&
+                    nextName == afterNextName &&
+                    current.name != nextName;
+
+                if (!continuesGroup || isBeforeNewGroup) {
+                  final isStandalone = !followsGroup && !continuesGroup;
+                  if (isStandalone && !isBeforeNewGroup) {
+                    return const SizedBox(height: 4.0);
+                  }
+
+                  return const Divider(height: 12.0);
+                }
+
+                return const SizedBox(height: 4.0);
+              },
               itemBuilder: (BuildContext context, int index) {
-                final e = manga.chapters[index];
+                final current = manga.chapters[index];
 
                 return ChapterButtonWidget(
-                  key: ValueKey(e.hashCode),
-                  data: e,
+                  key: ValueKey(current.hashCode),
+                  data: current,
                   manga: manga,
                   handle: handle,
                 );
