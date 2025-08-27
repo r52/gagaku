@@ -156,7 +156,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                               return MangaListWidget(
                                 title: Text(
                                   t.num_manga(n: list.length),
-                                  style: const TextStyle(fontSize: 24),
+                                  style: CommonTextStyles.twentyfour,
                                 ),
                                 scrollBehavior: MouseTouchScrollBehavior()
                                     .copyWith(scrollbars: false),

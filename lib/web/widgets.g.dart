@@ -51,7 +51,7 @@ final class _ExtensionIconProvider
   }
 }
 
-String _$_extensionIconHash() => r'1eed8e398b683c4271d78b056af4c760df63584e';
+String _$_extensionIconHash() => r'fdf9ba6fcf51980d54414ebae2514f1e107aef30';
 
 @ProviderFor(_MangaListView)
 const _mangaListViewProvider = _MangaListViewProvider._();

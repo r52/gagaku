@@ -292,7 +292,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                       return MangaListWidget(
                         title: Text(
                           '${tr.titles} ${list != null ? '(${list!.set.length} > ${selected.state.length})' : '(${selected.state.length})'}',
-                          style: const TextStyle(fontSize: 24),
+                          style: CommonTextStyles.twentyfour,
                         ),
                         physics: const AlwaysScrollableScrollPhysics(),
                         controller: scrollController,

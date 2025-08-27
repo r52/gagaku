@@ -87,8 +87,8 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
   SearchQuery? query;
 
   late final _pagingController = GagakuPagingController<dynamic, HistoryLink>(
-    getNextPageKey:
-        (state) => state.keys?.last == null ? {'page': 1} : metadata,
+    getNextPageKey: (state) =>
+        state.keys?.last == null ? {'page': 1} : metadata,
     fetchPage: (pageKey) async {
       if (query == null || query!.isEmpty) {
         return PageResultsMetaData([]);
@@ -145,50 +145,44 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
         showToggle: false,
         title: DataProviderWhenWidget(
           provider: extensionInfoListProvider,
-          errorBuilder:
-              (context, defaultChild, error, stacktrace) => Tooltip(
-                message: tr.webSources.loadInstalledSourcesError,
-                child: Icon(Icons.error),
-              ),
-          builder:
-              (context, extensions) => HookBuilder(
-                builder: (context) {
-                  final searchExtensions = useMemoized(
-                    () => Map.fromEntries(
-                      extensions.entries.where(
-                        (e) => e.value.hasCapability(SourceIntents.mangaSearch),
-                      ),
-                    ),
-                    [extensions],
-                  );
+          errorBuilder: (context, defaultChild, error, stacktrace) => Tooltip(
+            message: tr.webSources.loadInstalledSourcesError,
+            child: Icon(Icons.error),
+          ),
+          builder: (context, extensions) => HookBuilder(
+            builder: (context) {
+              final searchExtensions = useMemoized(
+                () => Map.fromEntries(
+                  extensions.entries.where(
+                    (e) => e.value.hasCapability(SourceIntents.mangaSearch),
+                  ),
+                ),
+                [extensions],
+              );
 
-                  return DropdownMenu<WebSourceInfo>(
-                    initialSelection: searchExtensions[source.id],
-                    width: 200,
-                    requestFocusOnTap: false,
-                    enableSearch: false,
-                    enableFilter: false,
-                    dropdownMenuEntries:
-                        searchExtensions.values
-                            .map(
-                              (opt) => DropdownMenuEntry(
-                                value: opt,
-                                label: opt.name,
-                              ),
-                            )
-                            .toList(),
-                    onSelected: (WebSourceInfo? opt) {
-                      if (opt != null) {
-                        setState(() {
-                          source = opt;
-                          query = query?.copyWith(filters: []);
-                        });
-                        _pagingController.refresh();
-                      }
-                    },
-                  );
+              return DropdownMenu<WebSourceInfo>(
+                initialSelection: searchExtensions[source.id],
+                width: 200,
+                requestFocusOnTap: false,
+                enableSearch: false,
+                enableFilter: false,
+                dropdownMenuEntries: searchExtensions.values
+                    .map(
+                      (opt) => DropdownMenuEntry(value: opt, label: opt.name),
+                    )
+                    .toList(),
+                onSelected: (WebSourceInfo? opt) {
+                  if (opt != null) {
+                    setState(() {
+                      source = opt;
+                      query = query?.copyWith(filters: []);
+                    });
+                    _pagingController.refresh();
+                  }
                 },
-              ),
+              );
+            },
+          ),
         ),
         leading: [
           SliverAppBar(
@@ -215,8 +209,10 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                     final term = value.trim();
                     if (term.isNotEmpty) {
                       final history = ref.read(_searchHistoryProvider);
-                      ref.read(_searchHistoryProvider.notifier).state =
-                          {term, ...history}.take(5).toList();
+                      ref.read(_searchHistoryProvider.notifier).state = {
+                        term,
+                        ...history,
+                      }.take(5).toList();
                     }
 
                     if (controller.isOpen) {
@@ -226,10 +222,9 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                     unfocusSearchBar();
 
                     setState(() {
-                      query =
-                          query != null
-                              ? query!.copyWith(title: term.toLowerCase())
-                              : SearchQuery(title: term.toLowerCase());
+                      query = query != null
+                          ? query!.copyWith(title: term.toLowerCase())
+                          : SearchQuery(title: term.toLowerCase());
                     });
                     _pagingController.refresh();
                   },
@@ -255,18 +250,16 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
 
                           if (result != null) {
                             setState(() {
-                              query =
-                                  query != null
-                                      ? query!.copyWith(filters: result)
-                                      : SearchQuery(title: '', filters: result);
+                              query = query != null
+                                  ? query!.copyWith(filters: result)
+                                  : SearchQuery(title: '', filters: result);
                             });
                             _pagingController.refresh();
                           }
                         },
-                        color:
-                            (query == null || query!.filters.isEmpty)
-                                ? theme.disabledColor
-                                : null,
+                        color: (query == null || query!.filters.isEmpty)
+                            ? theme.disabledColor
+                            : null,
                         icon: const Icon(Icons.filter_list),
                       ),
                     ),
@@ -277,8 +270,10 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                 final term = value.trim();
                 if (term.isNotEmpty) {
                   final history = ref.read(_searchHistoryProvider);
-                  ref.read(_searchHistoryProvider.notifier).state =
-                      {term, ...history}.take(5).toList();
+                  ref.read(_searchHistoryProvider.notifier).state = {
+                    term,
+                    ...history,
+                  }.take(5).toList();
                 }
 
                 if (controller.isOpen) {
@@ -288,49 +283,51 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                 unfocusSearchBar();
 
                 setState(() {
-                  query =
-                      query != null
-                          ? query!.copyWith(title: term.toLowerCase())
-                          : SearchQuery(title: term.toLowerCase());
+                  query = query != null
+                      ? query!.copyWith(title: term.toLowerCase())
+                      : SearchQuery(title: term.toLowerCase());
                 });
                 _pagingController.refresh();
               },
-              suggestionsBuilder: (
-                BuildContext context,
-                SearchController controller,
-              ) {
-                final history = ref.read(_searchHistoryProvider);
-                return history
-                    .map(
-                      (e) => ListTile(
-                        titleAlignment: ListTileTitleAlignment.center,
-                        title: Text(e),
-                        onTap: () {
-                          final term = e.trim();
-                          if (term.isNotEmpty) {
-                            final history = ref.read(_searchHistoryProvider);
-                            ref.read(_searchHistoryProvider.notifier).state =
-                                {term, ...history}.take(5).toList();
-                          }
+              suggestionsBuilder:
+                  (BuildContext context, SearchController controller) {
+                    final history = ref.read(_searchHistoryProvider);
+                    return history
+                        .map(
+                          (e) => ListTile(
+                            titleAlignment: ListTileTitleAlignment.center,
+                            title: Text(e),
+                            onTap: () {
+                              final term = e.trim();
+                              if (term.isNotEmpty) {
+                                final history = ref.read(
+                                  _searchHistoryProvider,
+                                );
+                                ref
+                                    .read(_searchHistoryProvider.notifier)
+                                    .state = {
+                                  term,
+                                  ...history,
+                                }.take(5).toList();
+                              }
 
-                          if (controller.isOpen) {
-                            controller.closeView(term);
-                          }
+                              if (controller.isOpen) {
+                                controller.closeView(term);
+                              }
 
-                          unfocusSearchBar();
+                              unfocusSearchBar();
 
-                          setState(() {
-                            query =
-                                query != null
+                              setState(() {
+                                query = query != null
                                     ? query!.copyWith(title: term.toLowerCase())
                                     : SearchQuery(title: term.toLowerCase());
-                          });
-                          _pagingController.refresh();
-                        },
-                      ),
-                    )
-                    .toList();
-              },
+                              });
+                              _pagingController.refresh();
+                            },
+                          ),
+                        )
+                        .toList();
+                  },
             ),
           ),
         ],
@@ -364,13 +361,9 @@ class _ExtensionFilterWidgetState
     return ExpansionPanel(
       canTapOnHeader: true,
       isExpanded: isExpanded,
-      headerBuilder:
-          (context, isExpanded) => ListTile(
-            title: Text(
-              filter.title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
+      headerBuilder: (context, isExpanded) => ListTile(
+        title: Text(filter.title, style: CommonTextStyles.eighteenBold),
+      ),
       body: SizedBox(
         width: double.infinity,
         child: switch (filter) {
@@ -383,13 +376,11 @@ class _ExtensionFilterWidgetState
               requestFocusOnTap: false,
               enableSearch: false,
               enableFilter: false,
-              dropdownMenuEntries:
-                  options
-                      .map(
-                        (opt) =>
-                            DropdownMenuEntry(value: opt.id, label: opt.value),
-                      )
-                      .toList(),
+              dropdownMenuEntries: options
+                  .map(
+                    (opt) => DropdownMenuEntry(value: opt.id, label: opt.value),
+                  )
+                  .toList(),
               onSelected: (String? opt) {
                 if (opt != null) {
                   fil.value.removeWhere((f) => f.id == id);
@@ -415,108 +406,101 @@ class _ExtensionFilterWidgetState
               children: [
                 _SectionChildren(
                   key: ValueKey('_SectionChildren($id)'),
-                  children:
-                      options
-                          .map(
-                            (opt) => HookBuilder(
-                              builder: (context) {
-                                final value = useListenableSelector(
-                                  fil,
-                                  () =>
-                                      (fil.value
-                                              .firstWhereOrNull(
-                                                (f) => f.id == id,
-                                              )
-                                              ?.value
-                                          as Map<String, dynamic>?)?[opt.id],
-                                );
+                  children: options
+                      .map(
+                        (opt) => HookBuilder(
+                          builder: (context) {
+                            final value = useListenableSelector(
+                              fil,
+                              () =>
+                                  (fil.value
+                                          .firstWhereOrNull((f) => f.id == id)
+                                          ?.value
+                                      as Map<String, dynamic>?)?[opt.id],
+                            );
 
-                                if (allowExclusion) {
-                                  return TriStateChip(
-                                    label: Text(opt.value),
-                                    selectedColor: Colors.green,
-                                    unselectedColor: Colors.red,
-                                    onChanged: (bool? value) {
-                                      Map<String, dynamic>? map = {
-                                        ...?(fil.value
-                                                .firstWhereOrNull(
-                                                  (f) => f.id == id,
-                                                )
-                                                ?.value
-                                            as Map<String, dynamic>?),
-                                      };
+                            if (allowExclusion) {
+                              return TriStateChip(
+                                label: Text(opt.value),
+                                selectedColor: Colors.green,
+                                unselectedColor: Colors.red,
+                                onChanged: (bool? value) {
+                                  Map<String, dynamic>? map = {
+                                    ...?(fil.value
+                                            .firstWhereOrNull((f) => f.id == id)
+                                            ?.value
+                                        as Map<String, dynamic>?),
+                                  };
 
-                                      switch (value) {
-                                        case null:
-                                          map.remove(opt.id);
-                                          break;
-                                        case true:
-                                          if (maximum == null ||
-                                              (map.entries.length < maximum)) {
-                                            map[opt.id] = 'included';
-                                          }
-                                          break;
-                                        case false:
-                                          map[opt.id] = 'excluded';
-                                          break;
+                                  switch (value) {
+                                    case null:
+                                      map.remove(opt.id);
+                                      break;
+                                    case true:
+                                      if (maximum == null ||
+                                          (map.entries.length < maximum)) {
+                                        map[opt.id] = 'included';
                                       }
+                                      break;
+                                    case false:
+                                      map[opt.id] = 'excluded';
+                                      break;
+                                  }
 
-                                      fil.value.removeWhere((f) => f.id == id);
-                                      fil.value = [
-                                        ...fil.value,
-                                        if (map.isNotEmpty)
-                                          SearchFilterValue(id: id, value: map),
-                                      ];
-                                    },
-                                    value: switch (value) {
-                                      'included' => true,
-                                      'excluded' => false,
-                                      null => null,
-                                      Object() => null,
-                                    },
-                                  );
-                                } else {
-                                  return InputChip(
-                                    label: Text(opt.value),
-                                    selected: value == 'included',
-                                    onSelected: (selected) {
-                                      Map<String, dynamic>? map = {
-                                        ...?(fil.value
-                                                .firstWhereOrNull(
-                                                  (f) => f.id == id,
-                                                )
-                                                ?.value
-                                            as Map<String, dynamic>?),
-                                      };
+                                  fil.value.removeWhere((f) => f.id == id);
+                                  fil.value = [
+                                    ...fil.value,
+                                    if (map.isNotEmpty)
+                                      SearchFilterValue(id: id, value: map),
+                                  ];
+                                },
+                                value: switch (value) {
+                                  'included' => true,
+                                  'excluded' => false,
+                                  null => null,
+                                  Object() => null,
+                                },
+                              );
+                            } else {
+                              return InputChip(
+                                label: Text(opt.value),
+                                selected: value == 'included',
+                                onSelected: (selected) {
+                                  Map<String, dynamic>? map = {
+                                    ...?(fil.value
+                                            .firstWhereOrNull((f) => f.id == id)
+                                            ?.value
+                                        as Map<String, dynamic>?),
+                                  };
 
-                                      switch (selected) {
-                                        case true:
-                                          if (maximum == null ||
-                                              (map.entries.length < maximum)) {
-                                            map[opt.id] = 'included';
-                                          }
-                                          break;
-                                        case false:
-                                          if (allowEmptySelection ||
-                                              map.entries.length > 1) {
-                                            map.remove(opt.id);
-                                          }
-                                          break;
+                                  switch (selected) {
+                                    case true:
+                                      if (maximum == null ||
+                                          (map.entries.length < maximum)) {
+                                        map[opt.id] = 'included';
                                       }
+                                      break;
+                                    case false:
+                                      if (allowEmptySelection ||
+                                          map.entries.length > 1) {
+                                        map.remove(opt.id);
+                                      }
+                                      break;
+                                  }
 
-                                      fil.value.removeWhere((f) => f.id == id);
-                                      fil.value = [
-                                        ...fil.value,
-                                        if (map.isNotEmpty)
-                                          SearchFilterValue(id: id, value: map),
-                                      ];
-                                    },
-                                  );
-                                }
-                              },
-                            ),
-                          )
-                          .toList(),
+                                  fil.value.removeWhere((f) => f.id == id);
+                                  fil.value = [
+                                    ...fil.value,
+                                    if (map.isNotEmpty)
+                                      SearchFilterValue(id: id, value: map),
+                                  ];
+                                },
+                              );
+                            }
+                          },
+                        ),
+                      )
+                      .toList(),
                 ),
               ],
             ),
@@ -573,11 +557,9 @@ class _ExtensionFilterWidgetState
   @override
   Widget build(BuildContext context) {
     return SimpleFutureBuilder(
-      futureBuilder:
-          () =>
-              ref
-                  .read(extensionSourceProvider(widget.source.id).notifier)
-                  .getFilters(),
+      futureBuilder: () => ref
+          .read(extensionSourceProvider(widget.source.id).notifier)
+          .getFilters(),
       keys: [widget.source],
       builder: (context, extFilters) {
         final tr = context.t;

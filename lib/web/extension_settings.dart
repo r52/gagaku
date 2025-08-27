@@ -195,10 +195,7 @@ class FormSectionBuilder extends StatelessWidget {
     return Column(
       children: [
         if (section.header != null)
-          Text(
-            section.header!,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
+          Text(section.header!, style: CommonTextStyles.twentyBold),
         for (final item in section.items)
           FormItemDelegateBuilder(source: source, element: item),
         if (section.footer != null) Text(section.footer!),

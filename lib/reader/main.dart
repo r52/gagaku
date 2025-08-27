@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/reader/model/config.dart';
-import 'package:gagaku/reader/model/controller_hooks.dart';
 import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -58,8 +57,21 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
   final ListController listController = ListController();
   final PageController pageController = PageController(initialPage: 0);
 
+  late final List<PhotoViewScaleStateController> scaleStateController;
+  late final List<PhotoViewController> viewController;
+
   @override
   void initState() {
+    scaleStateController = List<PhotoViewScaleStateController>.generate(
+      widget.pages.length,
+      (index) => PhotoViewScaleStateController(),
+    );
+
+    viewController = List<PhotoViewController>.generate(
+      widget.pages.length,
+      (index) => PhotoViewController(),
+    );
+
     super.initState();
     subtext.value =
         widget.subtitle ??
@@ -73,6 +85,15 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     scrollController.dispose();
     listController.dispose();
     pageController.dispose();
+
+    for (final controller in scaleStateController) {
+      controller.dispose();
+    }
+
+    for (final controller in viewController) {
+      controller.dispose();
+    }
+
     super.dispose();
   }
 
@@ -249,7 +270,6 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     double offset, {
     required ReaderConfig settings,
     required ReaderFormat format,
-    required List<PhotoViewController> viewController,
   }) {
     if (format == ReaderFormat.longstrip) {
       scrollController.animateTo(
@@ -276,7 +296,6 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     double offset, {
     required ReaderConfig settings,
     required ReaderFormat format,
-    required List<PhotoViewController> viewController,
   }) {
     if (format == ReaderFormat.longstrip) {
       if (listController.isAttached && listController.visibleRange != null) {
@@ -316,14 +335,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     final tr = context.t;
     final pageCount = widget.pages.length;
     final focusNode = useFocusNode();
-    final scaleStateController = List<PhotoViewScaleStateController>.generate(
-      pageCount,
-      (index) => usePhotoViewScaleStateController(),
-    );
-    final viewController = List<PhotoViewController>.generate(
-      pageCount,
-      (index) => usePhotoViewController(),
-    );
+
     final settings = ref.watch(readerSettingsProvider);
     final theme = Theme.of(context);
     final format = widget.longstrip ? ReaderFormat.longstrip : settings.format;
@@ -426,7 +438,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                     },
                     child: Text(
                       widget.drawerHeader!,
-                      style: const TextStyle(fontSize: 18),
+                      style: CommonTextStyles.eighteen,
                     ),
                   ),
                 if (widget.drawerHeader != null &&
@@ -496,10 +508,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                   },
                 ),
                 const Divider(),
-                Text(
-                  tr.reader.settings,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
+                Text(tr.reader.settings, style: CommonTextStyles.twentyBold),
                 Wrap(
                   alignment: WrapAlignment.center,
                   children: [
@@ -665,33 +674,13 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
           // Handle vertical navigation on key press and repeat.
           switch (key) {
             case PhysicalKeyboardKey.arrowUp:
-              return onTapTop(
-                250,
-                settings: settings,
-                format: format,
-                viewController: viewController,
-              );
+              return onTapTop(250, settings: settings, format: format);
             case PhysicalKeyboardKey.arrowDown:
-              return onTapBottom(
-                250,
-                settings: settings,
-                format: format,
-                viewController: viewController,
-              );
+              return onTapBottom(250, settings: settings, format: format);
             case PhysicalKeyboardKey.pageUp:
-              return onTapTop(
-                1000,
-                settings: settings,
-                format: format,
-                viewController: viewController,
-              );
+              return onTapTop(1000, settings: settings, format: format);
             case PhysicalKeyboardKey.pageDown:
-              return onTapBottom(
-                1000,
-                settings: settings,
-                format: format,
-                viewController: viewController,
-              );
+              return onTapBottom(1000, settings: settings, format: format);
             default:
               return KeyEventResult.ignored;
           }

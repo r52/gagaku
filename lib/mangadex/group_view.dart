@@ -320,7 +320,7 @@ class __GroupTitlesTabState extends ConsumerState<_GroupTitlesTab> {
     return RefreshIndicator(
       onRefresh: () async => _pagingController.refresh(),
       child: MangaListWidget(
-        title: Text(t.mangadex.groupTitles, style: TextStyle(fontSize: 24)),
+        title: Text(t.mangadex.groupTitles, style: CommonTextStyles.twentyfour),
         physics: const AlwaysScrollableScrollPhysics(),
         controller: widget.controller,
         children: [MangaListViewSliver(controller: _pagingController)],

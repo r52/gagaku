@@ -215,7 +215,7 @@ class _MangaDexCreatorViewWidgetState
           ],
           title: Text(
             tr.mangadex.creator.works,
-            style: TextStyle(fontSize: 24),
+            style: CommonTextStyles.twentyfour,
           ),
           physics: const AlwaysScrollableScrollPhysics(),
           controller: scrollController,

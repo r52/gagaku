@@ -166,7 +166,7 @@ class _FrontPageWidget extends HookConsumerWidget {
     final t = context.t;
     final api = ref.watch(mangadexProvider);
     final router = AutoRouter.of(context);
-    const style = TextStyle(fontSize: 24);
+    const style = CommonTextStyles.twentyfour;
 
     final staffPicks = _fetchCustomListMangaProvider(data.staffPicks);
     final seasonal = _fetchCustomListMangaProvider(data.seasonal);

@@ -83,7 +83,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
             SliverAppBar(
               automaticallyImplyLeading: false,
               pinned: true,
-              title: Text(tr.history.text, style: TextStyle(fontSize: 24)),
+              title: Text(tr.history.text, style: CommonTextStyles.twentyfour),
               actions: [
                 ElevatedButton.icon(
                   style: Styles.buttonStyle(),

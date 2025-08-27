@@ -32,7 +32,7 @@ Map<String, Widget> _extensionIcon(Ref ref) {
             key,
             ext.icon.isNotEmpty
                 ? Image.network(ext.icon, width: 24, height: 24)
-                : Text(ext.id, style: const TextStyle(fontSize: 12)),
+                : Text(ext.id, style: CommonTextStyles.twelve),
           );
         }),
         _ => <String, Widget>{},
@@ -240,7 +240,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                   extIcons[item.handle?.sourceId] ??
                   Text(
                     item.handle?.sourceId ?? '',
-                    style: const TextStyle(fontSize: 12),
+                    style: CommonTextStyles.twelve,
                   );
 
               return ListTile(
@@ -429,7 +429,7 @@ class GridMangaItem extends HookConsumerWidget {
 
     final sourceIcon =
         extIcons[link.handle?.sourceId] ??
-        Text(link.handle?.sourceId ?? '', style: const TextStyle(fontSize: 12));
+        Text(link.handle?.sourceId ?? '', style: CommonTextStyles.twelve);
 
     return InkWell(
       onTap: () async {
@@ -945,7 +945,7 @@ class _MangaTitle extends ConsumerWidget {
         minimumSize: const Size(0.0, 24.0),
         shape: const RoundedRectangleBorder(),
         foregroundColor: theme.colorScheme.onSurface,
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        textStyle: CommonTextStyles.sixteenBold,
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {

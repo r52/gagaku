@@ -11,9 +11,8 @@ class LocalLibrarySettingsRouteBuilder<T>
     extends SlideTransitionRouteBuilder<T> {
   LocalLibrarySettingsRouteBuilder()
     : super(
-        pageBuilder:
-            (context, animation, secondaryAnimation) =>
-                const LocalLibrarySettingsWidget(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const LocalLibrarySettingsWidget(),
       );
 }
 
@@ -64,7 +63,7 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
             SettingCardWidget(
               title: Text(
                 tr.localLibrary.settings.libraryPath,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: CommonTextStyles.twentyBold,
               ),
               subtitle: Text(tr.localLibrary.settings.libraryPathDesc),
               builder: (context) {
@@ -76,12 +75,13 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
                       Text(config.value.libraryDirectory),
                       ElevatedButton.icon(
                         onPressed: () async {
-                          final perms =
-                              await Permission.manageExternalStorage.request();
+                          final perms = await Permission.manageExternalStorage
+                              .request();
 
                           if (perms.isGranted) {
-                            String? selectedDirectory =
-                                await FilePicker.platform.getDirectoryPath();
+                            String? selectedDirectory = await FilePicker
+                                .platform
+                                .getDirectoryPath();
 
                             if (selectedDirectory != null) {
                               config.value = config.value.copyWith(

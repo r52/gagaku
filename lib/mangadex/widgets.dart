@@ -361,7 +361,7 @@ class ChapterFeedWidget extends HookWidget {
                   ),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text(title!, style: const TextStyle(fontSize: 24)),
+                    child: Text(title!, style: CommonTextStyles.twentyfour),
                   ),
                 ),
               ),
@@ -621,10 +621,10 @@ class _CoverButton extends ConsumerWidget {
   }
 }
 
-class _MangaTitle extends ConsumerWidget {
+class MangaTitleButton extends ConsumerWidget {
   final Manga manga;
 
-  const _MangaTitle({super.key, required this.manga});
+  const MangaTitleButton({super.key, required this.manga});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -635,9 +635,8 @@ class _MangaTitle extends ConsumerWidget {
       style: TextButton.styleFrom(
         alignment: Alignment.centerLeft,
         minimumSize: const Size(0.0, 24.0),
-        shape: const RoundedRectangleBorder(),
         foregroundColor: theme.colorScheme.onSurface,
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        textStyle: CommonTextStyles.sixteenBold,
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {
@@ -714,7 +713,7 @@ class ChapterFeedItem extends HookWidget {
   Widget build(BuildContext context) {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
-    final titleBtn = _MangaTitle(
+    final titleBtn = MangaTitleButton(
       key: ValueKey('_MangaTitle(${state.manga.id})'),
       manga: state.manga,
     );
@@ -1375,10 +1374,7 @@ class GridMangaItem extends HookConsumerWidget {
                     )
                   : null),
         footer: GridAlbumTextBar(
-          leading: CountryFlag(
-            flag: manga.attributes!.originalLanguage.flag,
-            size: 18,
-          ),
+          leading: CountryFlag(flag: manga.attributes!.originalLanguage.flag),
           text: manga.attributes!.title.get('en'),
         ),
         child: image,
@@ -1398,7 +1394,6 @@ class GridMangaDetailedItem extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.watch(loggedUserProvider).value;
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final theme = Theme.of(context);
 
     return Card(
       child: Padding(
@@ -1407,39 +1402,7 @@ class GridMangaDetailedItem extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 8.0,
           children: [
-            TextButton.icon(
-              style: TextButton.styleFrom(
-                foregroundColor: theme.colorScheme.onSurface,
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onPressed: () async {
-                readChaptersMutation(me?.id).run(ref, (ref) async {
-                  return await ref
-                      .get(readChaptersProvider(me?.id).notifier)
-                      .get([manga]);
-                });
-
-                statisticsMutation.run(ref, (ref) async {
-                  return await ref.get(statisticsProvider.notifier).get([
-                    manga,
-                  ]);
-                });
-                context.router.push(
-                  MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
-                );
-              },
-              icon: CountryFlag(
-                flag: manga.attributes!.originalLanguage.flag,
-                size: 18,
-              ),
-              label: Text(
-                manga.attributes!.title.get('en'),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
+            MangaTitleButton(manga: manga),
             Expanded(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1519,7 +1482,6 @@ class _ListMangaItem extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.watch(loggedUserProvider).value;
-    final theme = Theme.of(context);
 
     return Card(
       child: Padding(
@@ -1561,36 +1523,7 @@ class _ListMangaItem extends HookConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 10.0,
                 children: [
-                  TextButton.icon(
-                    style: TextButton.styleFrom(
-                      foregroundColor: theme.colorScheme.onSurface,
-                      textStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onPressed: () async {
-                      readChaptersMutation(me?.id).run(ref, (ref) async {
-                        return await ref
-                            .get(readChaptersProvider(me?.id).notifier)
-                            .get([manga]);
-                      });
-
-                      statisticsMutation.run(ref, (ref) async {
-                        return await ref.get(statisticsProvider.notifier).get([
-                          manga,
-                        ]);
-                      });
-                      context.router.push(
-                        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
-                      );
-                    },
-                    icon: CountryFlag(
-                      flag: manga.attributes!.originalLanguage.flag,
-                      size: 18,
-                    ),
-                    label: Text(manga.attributes!.title.get('en')),
-                  ),
+                  MangaTitleButton(manga: manga),
                   if (header != null) IconTextChip(text: header!),
                   MangaGenreRow(
                     key: ValueKey('MangaGenreRow(${manga.id})'),

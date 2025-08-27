@@ -174,7 +174,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
                                 return MangaListWidget(
                                   title: Text(
                                     '${t.titles} (${list.set.length})',
-                                    style: const TextStyle(fontSize: 24),
+                                    style: CommonTextStyles.twentyfour,
                                   ),
                                   physics:
                                       const AlwaysScrollableScrollPhysics(),

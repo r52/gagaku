@@ -138,7 +138,7 @@ class MangaDexTagViewWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final api = ref.watch(mangadexProvider);
-    const style = TextStyle(fontSize: 24);
+    const style = CommonTextStyles.twentyfour;
 
     // popular list
     final popularPage = useState(0);

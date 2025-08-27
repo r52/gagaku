@@ -191,10 +191,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                           children: [
                             Text(
                               handle.sourceId,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: CommonTextStyles.twelveBold,
                             ),
                             if (source != null && source.icon.isNotEmpty)
                               Image.network(source.icon, width: 24, height: 24),
@@ -466,7 +463,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                   padding: EdgeInsets.all(8),
                   child: Text(
                     tr.mangaView.chapters,
-                    style: TextStyle(fontSize: 24),
+                    style: CommonTextStyles.twentyfour,
                   ),
                 ),
                 Padding(

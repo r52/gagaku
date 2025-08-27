@@ -226,7 +226,7 @@ class MultiChildExpansionTile extends StatelessWidget {
   }
 }
 
-class CountryFlag extends StatelessWidget {
+class CountryFlag extends HookWidget {
   const CountryFlag({super.key, required this.flag, this.size = 18});
 
   final String flag;
@@ -234,15 +234,9 @@ class CountryFlag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      flag,
-      softWrap: false,
-      style: TextStyle(
-        fontFamily: 'Twemoji',
-        fontSize: size,
-        overflow: TextOverflow.clip,
-      ),
-    );
+    final style = ThemeCache().getFlagTheme(size);
+
+    return Text(flag, softWrap: false, style: style);
   }
 }
 
@@ -699,7 +693,41 @@ class SimpleFutureBuilder<T> extends HookWidget {
   }
 }
 
-class Styles {
+abstract final class CommonTextStyles {
+  static const defaultBold = TextStyle(fontWeight: FontWeight.bold);
+
+  static const twelve = TextStyle(fontSize: 12);
+  static const twelveBold = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.bold,
+  );
+
+  static const sixteen = TextStyle(fontSize: 16);
+  static const sixteenBold = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+  );
+
+  static const eighteen = TextStyle(fontSize: 18);
+  static const eighteenBold = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+  );
+
+  static const twenty = TextStyle(fontSize: 20);
+  static const twentyBold = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+  );
+
+  static const twentyfour = TextStyle(fontSize: 24);
+  static const twentyfourBold = TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+  );
+}
+
+abstract final class Styles {
   static ButtonStyle squareIconButtonStyle({Color? backgroundColor}) =>
       IconButton.styleFrom(
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,

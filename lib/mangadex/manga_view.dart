@@ -897,7 +897,7 @@ class _MangaDexMangaViewWidgetState
               _ViewType.related => MangaListWidget(
                 title: Text(
                   tr.mangaView.relatedTitles,
-                  style: TextStyle(fontSize: 24),
+                  style: CommonTextStyles.twentyfour,
                 ),
                 noController: true,
                 children: [

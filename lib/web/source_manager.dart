@@ -357,7 +357,7 @@ class _SourceDescription extends StatelessWidget {
           title,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: CommonTextStyles.defaultBold,
         ),
         const Padding(padding: EdgeInsets.only(bottom: 2.0)),
         Expanded(
@@ -365,10 +365,10 @@ class _SourceDescription extends StatelessWidget {
             subtitle,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12.0),
+            style: CommonTextStyles.twelve,
           ),
         ),
-        Text('by $author, v$version', style: const TextStyle(fontSize: 12.0)),
+        Text('by $author, v$version', style: CommonTextStyles.twelve),
         if (badges.isNotEmpty)
           Row(
             children: badges

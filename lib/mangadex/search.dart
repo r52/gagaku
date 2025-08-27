@@ -344,6 +344,7 @@ class _MangaDexFilterWidget extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    const titleStyle = CommonTextStyles.eighteenBold;
     final tr = context.t;
     final nav = Navigator.of(context);
     final theme = Theme.of(context);
@@ -417,10 +418,7 @@ class _MangaDexFilterWidget extends HookWidget {
                       return ListTile(
                         title: Text(
                           tr.mangadex.contentRating,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: titleStyle,
                         ),
                         subtitle: selected.isEmpty
                             ? Text(tr.search.any)
@@ -482,13 +480,7 @@ class _MangaDexFilterWidget extends HookWidget {
                       );
 
                       return ListTile(
-                        title: Text(
-                          tr.mangadex.demographic,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        title: Text(tr.mangadex.demographic, style: titleStyle),
                         subtitle: selected.isEmpty
                             ? Text(tr.search.any)
                             : Text(selected.map((e) => tr[e.label]).join(', ')),
@@ -552,13 +544,7 @@ class _MangaDexFilterWidget extends HookWidget {
                       );
 
                       return ListTile(
-                        title: Text(
-                          tr.mangadex.pubStatus,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        title: Text(tr.mangadex.pubStatus, style: titleStyle),
                         subtitle: selected.isEmpty
                             ? Text(tr.search.any)
                             : Text(selected.map((e) => tr[e.label]).join(', ')),
@@ -616,13 +602,7 @@ class _MangaDexFilterWidget extends HookWidget {
                       );
 
                       return ListTile(
-                        title: Text(
-                          tr.mangaView.author,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        title: Text(tr.mangaView.author, style: titleStyle),
                         subtitle: selected.isEmpty
                             ? Text(tr.search.any)
                             : Text(
@@ -710,13 +690,7 @@ class _MangaDexFilterWidget extends HookWidget {
                       );
 
                       return ListTile(
-                        title: Text(
-                          tr.mangaView.artist,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        title: Text(tr.mangaView.artist, style: titleStyle),
                         subtitle: selected.isEmpty
                             ? Text(tr.search.any)
                             : Text(
@@ -823,13 +797,7 @@ class _MangaDexFilterWidget extends HookWidget {
                           .join(', ');
 
                       return ListTile(
-                        title: Text(
-                          tr.search.filterTags,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        title: Text(tr.search.filterTags, style: titleStyle),
                         subtitle: included.isEmpty && excluded.isEmpty
                             ? Text(tr.search.any)
                             : Text.rich(
@@ -1059,10 +1027,7 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Text(
-        header,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
+      child: Text(header, style: CommonTextStyles.eighteenBold),
     );
   }
 }
