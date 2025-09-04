@@ -21,6 +21,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'manga_view.g.dart';
 
+enum _ChapterDivider { none, divider }
+
 @Riverpod(retry: noRetry)
 Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
   Ref ref,
@@ -133,6 +135,40 @@ class WebMangaViewWidget extends HookConsumerWidget {
       });
       return null;
     }, []);
+
+    final separators = useMemoized(
+      () => List.generate(manga.chapters.length, (index) {
+        final current = manga.chapters[index];
+
+        final prevName = (index > 0) ? manga.chapters[index - 1].name : null;
+        final nextName = (index < manga.chapters.length - 1)
+            ? manga.chapters[index + 1].name
+            : null;
+        final afterNextName = (index < manga.chapters.length - 2)
+            ? manga.chapters[index + 2].name
+            : null;
+
+        final followsGroup = current.name == prevName;
+        final continuesGroup = current.name == nextName;
+        final isBeforeNewGroup =
+            nextName != null &&
+            afterNextName != null &&
+            nextName == afterNextName &&
+            current.name != nextName;
+
+        if (!continuesGroup || isBeforeNewGroup) {
+          final isStandalone = !followsGroup && !continuesGroup;
+          if (isStandalone && !isBeforeNewGroup) {
+            return _ChapterDivider.none;
+          }
+
+          return _ChapterDivider.divider;
+        }
+
+        return _ChapterDivider.none;
+      }),
+      [manga.chapters],
+    );
 
     return Scaffold(
       body: RefreshIndicator(
@@ -565,32 +601,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                 return val >= 0 ? val : null;
               },
               separatorBuilder: (_, index) {
-                final current = manga.chapters[index];
-
-                final prevName = (index > 0)
-                    ? manga.chapters[index - 1].name
-                    : null;
-                final nextName = (index < manga.chapters.length - 1)
-                    ? manga.chapters[index + 1].name
-                    : null;
-                final afterNextName = (index < manga.chapters.length - 2)
-                    ? manga.chapters[index + 2].name
-                    : null;
-
-                final followsGroup = current.name == prevName;
-                final continuesGroup = current.name == nextName;
-                final isBeforeNewGroup =
-                    nextName != null &&
-                    afterNextName != null &&
-                    nextName == afterNextName &&
-                    current.name != nextName;
-
-                if (!continuesGroup || isBeforeNewGroup) {
-                  final isStandalone = !followsGroup && !continuesGroup;
-                  if (isStandalone && !isBeforeNewGroup) {
-                    return const SizedBox(height: 4.0);
-                  }
-
+                if (separators[index] == _ChapterDivider.divider) {
                   return const Divider(height: 12.0);
                 }
 
