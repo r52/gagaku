@@ -82,6 +82,19 @@ jobs:
       #   run: |
       #     npm ci
       #     npm run deploy
+      - name: Set up signing key
+        if: matrix.builder == 'android'
+        shell: bash
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          echo "$KEYSTORE" | base64 --decode > app/keystore.jks
+          echo "storeFile=keystore.jks" >> key.properties
+          echo "keyAlias=upload" >> key.properties
+          echo "storePassword=$KEYSTORE_PASSWORD" >> key.properties
+          echo "keyPassword=$KEYSTORE_PASSWORD" >> key.properties
+        working-directory: ./android
 
       - name: Build Project
         run: flutter build ${{ matrix.pkg }}
