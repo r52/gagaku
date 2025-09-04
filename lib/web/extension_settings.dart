@@ -78,11 +78,7 @@ class _FormBuilderState extends ConsumerState<FormBuilder> {
   Widget build(BuildContext context) {
     final tr = context.t;
     final form = useListenable(widget.form);
-    final results = useMemoized(() => form.getSections(), [
-      widget.source,
-      form,
-    ]);
-    final future = useFuture(results);
+    final future = useFuture(form.sections);
 
     Widget body = Center(child: CircularProgressIndicator());
 
@@ -199,10 +195,7 @@ class FormSectionBuilder extends StatelessWidget {
     return Column(
       children: [
         if (section.header != null)
-          Text(
-            section.header!,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
+          Text(section.header!, style: CommonTextStyles.twentyBold),
         for (final item in section.items)
           FormItemDelegateBuilder(source: source, element: item),
         if (section.footer != null) Text(section.footer!),

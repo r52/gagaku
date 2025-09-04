@@ -8,10 +8,12 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'search.g.dart';
@@ -27,6 +29,7 @@ class _SearchHistory extends _$SearchHistory {
       state = cb(state);
 }
 
+@Dependencies([chipTextStyle])
 @RoutePage()
 class MangaDexSearchPage extends StatefulHookConsumerWidget {
   const MangaDexSearchPage({
@@ -341,6 +344,7 @@ class _MangaDexFilterWidget extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    const titleStyle = CommonTextStyles.eighteenBold;
     final tr = context.t;
     final nav = Navigator.of(context);
     final theme = Theme.of(context);
@@ -414,10 +418,7 @@ class _MangaDexFilterWidget extends HookWidget {
                       return ListTile(
                         title: Text(
                           tr.mangadex.contentRating,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: titleStyle,
                         ),
                         subtitle: selected.isEmpty
                             ? Text(tr.search.any)
@@ -479,13 +480,7 @@ class _MangaDexFilterWidget extends HookWidget {
                       );
 
                       return ListTile(
-                        title: Text(
-                          tr.mangadex.demographic,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        title: Text(tr.mangadex.demographic, style: titleStyle),
                         subtitle: selected.isEmpty
                             ? Text(tr.search.any)
                             : Text(selected.map((e) => tr[e.label]).join(', ')),
@@ -549,13 +544,7 @@ class _MangaDexFilterWidget extends HookWidget {
                       );
 
                       return ListTile(
-                        title: Text(
-                          tr.mangadex.pubStatus,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        title: Text(tr.mangadex.pubStatus, style: titleStyle),
                         subtitle: selected.isEmpty
                             ? Text(tr.search.any)
                             : Text(selected.map((e) => tr[e.label]).join(', ')),
@@ -613,13 +602,7 @@ class _MangaDexFilterWidget extends HookWidget {
                       );
 
                       return ListTile(
-                        title: Text(
-                          tr.mangaView.author,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        title: Text(tr.mangaView.author, style: titleStyle),
                         subtitle: selected.isEmpty
                             ? Text(tr.search.any)
                             : Text(
@@ -707,13 +690,7 @@ class _MangaDexFilterWidget extends HookWidget {
                       );
 
                       return ListTile(
-                        title: Text(
-                          tr.mangaView.artist,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        title: Text(tr.mangaView.artist, style: titleStyle),
                         subtitle: selected.isEmpty
                             ? Text(tr.search.any)
                             : Text(
@@ -820,13 +797,7 @@ class _MangaDexFilterWidget extends HookWidget {
                           .join(', ');
 
                       return ListTile(
-                        title: Text(
-                          tr.search.filterTags,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        title: Text(tr.search.filterTags, style: titleStyle),
                         subtitle: included.isEmpty && excluded.isEmpty
                             ? Text(tr.search.any)
                             : Text.rich(
@@ -1056,10 +1027,7 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Text(
-        header,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
+      child: Text(header, style: CommonTextStyles.eighteenBold),
     );
   }
 }

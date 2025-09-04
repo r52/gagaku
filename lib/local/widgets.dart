@@ -118,7 +118,6 @@ class _GridLibraryItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    useAutomaticKeepAlive();
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
@@ -150,7 +149,7 @@ class _GridLibraryItem extends HookWidget {
           }
         },
         child: GridTile(
-          footer: GridAlbumTextBar(height: 80, text: item.name ?? item.path),
+          footer: GridAlbumTextBar(text: item.name ?? item.path),
           child: image,
         ),
       ),

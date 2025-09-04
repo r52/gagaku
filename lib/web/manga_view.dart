@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/cached_network_image.dart';
@@ -15,9 +16,12 @@ import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'manga_view.g.dart';
+
+enum _ChapterDivider { none, divider }
 
 @Riverpod(retry: noRetry)
 Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
@@ -44,6 +48,7 @@ Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
   throw InvalidDataException('Invalid WebManga link. Data not found.');
 }
 
+@Dependencies([chipTextStyle])
 @RoutePage()
 class WebMangaViewPage extends ConsumerWidget {
   const WebMangaViewPage({
@@ -95,6 +100,7 @@ class WebMangaViewPage extends ConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class WebMangaViewWidget extends HookConsumerWidget {
   const WebMangaViewWidget({
     super.key,
@@ -129,6 +135,40 @@ class WebMangaViewWidget extends HookConsumerWidget {
       });
       return null;
     }, []);
+
+    final separators = useMemoized(
+      () => List.generate(manga.chapters.length, (index) {
+        final current = manga.chapters[index];
+
+        final prevName = (index > 0) ? manga.chapters[index - 1].name : null;
+        final nextName = (index < manga.chapters.length - 1)
+            ? manga.chapters[index + 1].name
+            : null;
+        final afterNextName = (index < manga.chapters.length - 2)
+            ? manga.chapters[index + 2].name
+            : null;
+
+        final followsGroup = current.name == prevName;
+        final continuesGroup = current.name == nextName;
+        final isBeforeNewGroup =
+            nextName != null &&
+            afterNextName != null &&
+            nextName == afterNextName &&
+            current.name != nextName;
+
+        if (!continuesGroup || isBeforeNewGroup) {
+          final isStandalone = !followsGroup && !continuesGroup;
+          if (isStandalone && !isBeforeNewGroup) {
+            return _ChapterDivider.none;
+          }
+
+          return _ChapterDivider.divider;
+        }
+
+        return _ChapterDivider.none;
+      }),
+      [manga.chapters],
+    );
 
     return Scaffold(
       body: RefreshIndicator(
@@ -187,10 +227,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                           children: [
                             Text(
                               handle.sourceId,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: CommonTextStyles.twelveBold,
                             ),
                             if (source != null && source.icon.isNotEmpty)
                               Image.network(source.icon, width: 24, height: 24),
@@ -462,7 +499,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                   padding: EdgeInsets.all(8),
                   child: Text(
                     tr.mangaView.chapters,
-                    style: TextStyle(fontSize: 24),
+                    style: CommonTextStyles.twentyfour,
                   ),
                 ),
                 Padding(
@@ -563,13 +600,19 @@ class WebMangaViewWidget extends HookConsumerWidget {
                 );
                 return val >= 0 ? val : null;
               },
-              separatorBuilder: (_, _) => const SizedBox(height: 4.0),
+              separatorBuilder: (_, index) {
+                if (separators[index] == _ChapterDivider.divider) {
+                  return const Divider(height: 12.0);
+                }
+
+                return const SizedBox(height: 4.0);
+              },
               itemBuilder: (BuildContext context, int index) {
-                final e = manga.chapters[index];
+                final current = manga.chapters[index];
 
                 return ChapterButtonWidget(
-                  key: ValueKey(e.hashCode),
-                  data: e,
+                  key: ValueKey(current.hashCode),
+                  data: current,
                   manga: manga,
                   handle: handle,
                 );
@@ -583,6 +626,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class MangaStatisticsRow extends StatelessWidget {
   const MangaStatisticsRow({super.key, required this.manga});
 
@@ -617,6 +661,7 @@ class MangaStatisticsRow extends StatelessWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class ContentChip extends StatelessWidget {
   const ContentChip({super.key, required this.content});
 

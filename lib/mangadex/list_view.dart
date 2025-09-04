@@ -5,15 +5,18 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
 enum _ViewType { titles, feed }
 
+@Dependencies([chipTextStyle, readBorderTheme])
 @RoutePage()
 class MangaDexListViewWithNamePage extends MangaDexListViewPage {
   const MangaDexListViewWithNamePage({
@@ -25,6 +28,7 @@ class MangaDexListViewWithNamePage extends MangaDexListViewPage {
   final String? name;
 }
 
+@Dependencies([chipTextStyle, readBorderTheme])
 @RoutePage()
 class MangaDexListViewPage extends HookConsumerWidget {
   const MangaDexListViewPage({super.key, @PathParam() required this.listId});
@@ -86,8 +90,9 @@ class MangaDexListViewPage extends HookConsumerWidget {
                 children: [
                   Consumer(
                     builder: (context, ref, child) {
-                      final followedLists =
-                          ref.watch(followedListsProvider(me?.id)).value;
+                      final followedLists = ref
+                          .watch(followedListsProvider(me?.id))
+                          .value;
 
                       final idx = followedLists?.indexWhere(
                         (e) => e.id == list.id,
@@ -101,10 +106,8 @@ class MangaDexListViewPage extends HookConsumerWidget {
                         style: Styles.squareIconButtonStyle(
                           backgroundColor: theme.colorScheme.surfaceContainer,
                         ),
-                        onPressed:
-                            () => followedListMutation(me?.id).run(ref, (
-                              ref,
-                            ) async {
+                        onPressed: () =>
+                            followedListMutation(me?.id).run(ref, (ref) async {
                               return await ref
                                   .get(followedListsProvider(me?.id).notifier)
                                   .setFollow(list, idx == -1);
@@ -171,7 +174,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
                                 return MangaListWidget(
                                   title: Text(
                                     '${t.titles} (${list.set.length})',
-                                    style: const TextStyle(fontSize: 24),
+                                    style: CommonTextStyles.twentyfour,
                                   ),
                                   physics:
                                       const AlwaysScrollableScrollPhysics(),

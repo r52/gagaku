@@ -82,7 +82,7 @@ final class _GetLibraryListByTypeProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$getLibraryListByTypeHash();
+  String debugGetCreateSourceHash() => _$_getLibraryListByTypeHash();
 
   @override
   String toString() {
@@ -114,7 +114,7 @@ final class _GetLibraryListByTypeProvider
   }
 }
 
-String _$getLibraryListByTypeHash() =>
+String _$_getLibraryListByTypeHash() =>
     r'a6aea92fe0c99298555dacf03ab6856d99923016';
 
 final class _GetLibraryListByTypeFamily extends $Family

@@ -188,7 +188,10 @@ class WebSourceFrontPage extends HookConsumerWidget {
         SliverAppBar(
           automaticallyImplyLeading: false,
           pinned: true,
-          title: Text(tr.webSources.homepages, style: TextStyle(fontSize: 24)),
+          title: Text(
+            tr.webSources.homepages,
+            style: CommonTextStyles.twentyfour,
+          ),
         ),
         if (homepageSources.isEmpty)
           SliverToBoxAdapter(
@@ -249,7 +252,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
     final theme = Theme.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final nav = Navigator.of(context);
-    const style = TextStyle(fontSize: 24);
+    const style = CommonTextStyles.twentyfour;
     final controller = useScrollController();
     final refresh = useState(0);
     final sectionsFuture = useMemoized(

@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
@@ -13,7 +14,9 @@ import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
 import 'package:riverpod/experimental/mutation.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([chipTextStyle])
 class QueriedMangaDexEditListScreen extends ConsumerWidget {
   const QueriedMangaDexEditListScreen({super.key, required this.listId});
 
@@ -42,11 +45,13 @@ class QueriedMangaDexEditListScreen extends ConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 @RoutePage()
 class MangaDexCreateListScreen extends MangaDexEditListScreen {
   const MangaDexCreateListScreen({super.key}) : super();
 }
 
+@Dependencies([chipTextStyle])
 @RoutePage()
 class MangaDexEditListScreen extends HookConsumerWidget {
   const MangaDexEditListScreen({
@@ -125,30 +130,28 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                   final vis = useValueListenable(visibility);
                   final listNameChanged = useListenableSelector(
                     listNameController,
-                    () =>
-                        list != null
-                            ? listNameController.text != list!.attributes.name
-                            : listNameController.text.isNotEmpty,
+                    () => list != null
+                        ? listNameController.text != list!.attributes.name
+                        : listNameController.text.isNotEmpty,
                   );
 
                   return ElevatedButton(
                     style: Styles.buttonStyle(),
                     onPressed:
                         listNameChanged ||
-                                (list != null &&
-                                    !setEquals(selected.state, list!.set)) ||
-                                (list != null &&
-                                    vis != list!.attributes.visibility)
-                            ? () async {
-                              final messenger = ScaffoldMessenger.of(context);
+                            (list != null &&
+                                !setEquals(selected.state, list!.set)) ||
+                            (list != null && vis != list!.attributes.visibility)
+                        ? () async {
+                            final messenger = ScaffoldMessenger.of(context);
 
-                              if (listNameController.text.isNotEmpty) {
-                                Future<CustomList?> success;
+                            if (listNameController.text.isNotEmpty) {
+                              Future<CustomList?> success;
 
-                                if (list != null) {
-                                  success = userListModifyMutation(
-                                    me?.id,
-                                  ).run(ref, (ref) async {
+                              if (list != null) {
+                                success = userListModifyMutation(me?.id).run(
+                                  ref,
+                                  (ref) async {
                                     return await ref
                                         .get(userListsProvider(me?.id).notifier)
                                         .editList(
@@ -157,39 +160,40 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                                           vis,
                                           selected.state,
                                         );
-                                  });
-                                } else {
-                                  success = userListNewMutation(
-                                    me?.id,
-                                  ).run(ref, (ref) async {
-                                    return await ref
-                                        .get(userListsProvider(me?.id).notifier)
-                                        .newList(
-                                          listNameController.text,
-                                          vis,
-                                          selected.state,
-                                        );
-                                  });
-                                }
-
-                                success.then((_) {
-                                  if (!context.mounted) return;
-                                  context.maybePop(true);
-                                });
+                                  },
+                                );
                               } else {
-                                messenger
-                                  ..removeCurrentSnackBar()
-                                  ..showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        tr.mangadex.listNameEmptyWarning,
-                                      ),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
+                                success = userListNewMutation(me?.id).run(ref, (
+                                  ref,
+                                ) async {
+                                  return await ref
+                                      .get(userListsProvider(me?.id).notifier)
+                                      .newList(
+                                        listNameController.text,
+                                        vis,
+                                        selected.state,
+                                      );
+                                });
                               }
+
+                              success.then((_) {
+                                if (!context.mounted) return;
+                                context.maybePop(true);
+                              });
+                            } else {
+                              messenger
+                                ..removeCurrentSnackBar()
+                                ..showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      tr.mangadex.listNameEmptyWarning,
+                                    ),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
                             }
-                            : null,
+                          }
+                        : null,
                     child: Text(list != null ? tr.ui.save : tr.ui.create),
                   );
                 },
@@ -250,8 +254,9 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                 ),
                 ElevatedButton(
                   style: Styles.buttonStyle(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primaryContainer,
                   ),
                   onPressed: () {
                     router
@@ -287,7 +292,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                       return MangaListWidget(
                         title: Text(
                           '${tr.titles} ${list != null ? '(${list!.set.length} > ${selected.state.length})' : '(${selected.state.length})'}',
-                          style: const TextStyle(fontSize: 24),
+                          style: CommonTextStyles.twentyfour,
                         ),
                         physics: const AlwaysScrollableScrollPhysics(),
                         controller: scrollController,

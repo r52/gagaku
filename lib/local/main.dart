@@ -56,18 +56,17 @@ class LocalLibraryHomeScreen extends StatelessWidget {
             spacing: 8.0,
             children: [
               MenuAnchor(
-                builder:
-                    (context, controller, child) => IconButton(
-                      color: theme.colorScheme.onPrimaryContainer,
-                      onPressed: () {
-                        if (controller.isOpen) {
-                          controller.close();
-                        } else {
-                          controller.open();
-                        }
-                      },
-                      icon: const Icon(Icons.more_vert),
-                    ),
+                builder: (context, controller, child) => IconButton(
+                  color: theme.colorScheme.onPrimaryContainer,
+                  onPressed: () {
+                    if (controller.isOpen) {
+                      controller.close();
+                    } else {
+                      controller.open();
+                    }
+                  },
+                  icon: const Icon(Icons.more_vert),
+                ),
                 menuChildren: [
                   MenuItemButton(
                     onPressed: () async {
@@ -181,7 +180,7 @@ class LocalLibraryHomeScreen extends StatelessWidget {
                 LibraryListWidget(
                   title: Text(
                     currentItem.value!.path,
-                    style: const TextStyle(fontSize: 24),
+                    style: CommonTextStyles.twentyfour,
                   ),
                   item: currentItem.value!,
                   onTap: (item) {

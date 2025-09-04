@@ -23,7 +23,7 @@ final class _MangaListViewProvider
       );
 
   @override
-  String debugGetCreateSourceHash() => _$mangaListViewHash();
+  String debugGetCreateSourceHash() => _$_mangaListViewHash();
 
   @$internal
   @override
@@ -38,7 +38,7 @@ final class _MangaListViewProvider
   }
 }
 
-String _$mangaListViewHash() => r'a50742a83f1633f48634570c1cd45301db55fad3';
+String _$_mangaListViewHash() => r'a50742a83f1633f48634570c1cd45301db55fad3';
 
 abstract class _$MangaListView extends $Notifier<MangaListView> {
   MangaListView build();

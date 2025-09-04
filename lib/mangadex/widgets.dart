@@ -45,12 +45,6 @@ class _MangaListView extends _$MangaListView {
       state = cb(state);
 }
 
-const _endChip = IconTextChip(
-  key: ValueKey('END'),
-  color: Colors.blue,
-  text: 'END',
-);
-
 const _groupIconB = Icon(Icons.group, size: 20.0);
 const _groupIconS = Icon(Icons.group, size: 15.0);
 const _circleIconB = Icon(Icons.add_circle, size: 20.0);
@@ -323,6 +317,7 @@ class MarkReadButton extends ConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle, readBorderTheme])
 class ChapterFeedWidget extends HookWidget {
   const ChapterFeedWidget({
     super.key,
@@ -366,7 +361,7 @@ class ChapterFeedWidget extends HookWidget {
                   ),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text(title!, style: const TextStyle(fontSize: 24)),
+                    child: Text(title!, style: CommonTextStyles.twentyfour),
                   ),
                 ),
               ),
@@ -395,21 +390,23 @@ class ChapterFeedWidget extends HookWidget {
 
                   final future = useFuture(builtItems);
 
-                  final newState = PagingState<int, ChapterFeedItemData>(
-                    error: state.error,
-                    pages: state.keys == null || !future.hasData
-                        ? null
-                        : List.generate(
-                            state.keys!.length,
-                            (i) => i == 0 ? future.data! : [],
-                          ),
-                    keys: future.hasData ? state.keys : null,
-                    hasNextPage: state.hasNextPage,
-                    isLoading:
-                        future.connectionState == ConnectionState.waiting ||
-                        !future.hasData ||
-                        state.isLoading,
-                  );
+                  final newState = useMemoized(() {
+                    return PagingState<int, ChapterFeedItemData>(
+                      error: state.error ?? future.error,
+                      pages: state.keys == null || !future.hasData
+                          ? null
+                          : List.generate(
+                              state.keys!.length,
+                              (i) => i == 0 ? future.data! : [],
+                            ),
+                      keys: future.hasData ? state.keys : null,
+                      hasNextPage: state.hasNextPage,
+                      isLoading:
+                          future.connectionState == ConnectionState.waiting ||
+                          !future.hasData ||
+                          state.isLoading,
+                    );
+                  }, [future, state]);
 
                   return PagedSuperSliverList(
                     state: newState,
@@ -441,6 +438,7 @@ class ChapterFeedWidget extends HookWidget {
   }
 }
 
+@Dependencies([readBorderTheme, chipTextStyle])
 class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
   const InfiniteScrollChapterFeedWidget({
     super.key,
@@ -623,10 +621,10 @@ class _CoverButton extends ConsumerWidget {
   }
 }
 
-class _MangaTitle extends ConsumerWidget {
+class MangaTitleButton extends ConsumerWidget {
   final Manga manga;
 
-  const _MangaTitle({super.key, required this.manga});
+  const MangaTitleButton({super.key, required this.manga});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -637,9 +635,8 @@ class _MangaTitle extends ConsumerWidget {
       style: TextButton.styleFrom(
         alignment: Alignment.centerLeft,
         minimumSize: const Size(0.0, 24.0),
-        shape: const RoundedRectangleBorder(),
         foregroundColor: theme.colorScheme.onSurface,
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        textStyle: CommonTextStyles.sixteenBold,
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {
@@ -670,6 +667,7 @@ class _MangaTitle extends ConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle, readBorderTheme])
 class _BackLinkedChapterButton extends ConsumerWidget {
   const _BackLinkedChapterButton({
     super.key,
@@ -705,6 +703,7 @@ class _BackLinkedChapterButton extends ConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle, readBorderTheme])
 class ChapterFeedItem extends HookWidget {
   const ChapterFeedItem({super.key, required this.state});
 
@@ -712,10 +711,9 @@ class ChapterFeedItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    useAutomaticKeepAlive();
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
-    final titleBtn = _MangaTitle(
+    final titleBtn = MangaTitleButton(
       key: ValueKey('_MangaTitle(${state.manga.id})'),
       manga: state.manga,
     );
@@ -812,6 +810,7 @@ class _ChapterButtonCard extends ConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle, readBorderTheme])
 class ChapterButtonWidget extends HookWidget {
   const ChapterButtonWidget({
     super.key,
@@ -905,7 +904,12 @@ class ChapterButtonWidget extends HookWidget {
                   manga: manga,
                 ),
               ),
-              if (isEndChapter) _endChip,
+              if (isEndChapter)
+                IconTextChip(
+                  key: ValueKey('END'),
+                  color: Colors.blue,
+                  text: 'END',
+                ),
             ],
           ),
         ),
@@ -1118,6 +1122,7 @@ class MangaListWidget extends HookConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class MangaListViewSliver extends ConsumerWidget {
   const MangaListViewSliver({
     super.key,
@@ -1307,7 +1312,6 @@ class GridMangaItem extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    useAutomaticKeepAlive();
     final me = ref.watch(loggedUserProvider).value;
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
@@ -1365,17 +1369,12 @@ class GridMangaItem extends HookConsumerWidget {
               )
             : (header != null
                   ? GridAlbumTextBar(
-                      height: 40,
                       backgroundColor: Colors.black87,
                       text: header!,
                     )
                   : null),
         footer: GridAlbumTextBar(
-          height: 80,
-          leading: CountryFlag(
-            flag: manga.attributes!.originalLanguage.flag,
-            size: 18,
-          ),
+          leading: CountryFlag(flag: manga.attributes!.originalLanguage.flag),
           text: manga.attributes!.title.get('en'),
         ),
         child: image,
@@ -1384,6 +1383,7 @@ class GridMangaItem extends HookConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class GridMangaDetailedItem extends HookConsumerWidget {
   const GridMangaDetailedItem({super.key, required this.manga, this.header});
 
@@ -1392,10 +1392,8 @@ class GridMangaDetailedItem extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    useAutomaticKeepAlive();
     final me = ref.watch(loggedUserProvider).value;
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final theme = Theme.of(context);
 
     return Card(
       child: Padding(
@@ -1404,39 +1402,7 @@ class GridMangaDetailedItem extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 8.0,
           children: [
-            TextButton.icon(
-              style: TextButton.styleFrom(
-                foregroundColor: theme.colorScheme.onSurface,
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onPressed: () async {
-                readChaptersMutation(me?.id).run(ref, (ref) async {
-                  return await ref
-                      .get(readChaptersProvider(me?.id).notifier)
-                      .get([manga]);
-                });
-
-                statisticsMutation.run(ref, (ref) async {
-                  return await ref.get(statisticsProvider.notifier).get([
-                    manga,
-                  ]);
-                });
-                context.router.push(
-                  MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
-                );
-              },
-              icon: CountryFlag(
-                flag: manga.attributes!.originalLanguage.flag,
-                size: 18,
-              ),
-              label: Text(
-                manga.attributes!.title.get('en'),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
+            MangaTitleButton(manga: manga),
             Expanded(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1506,6 +1472,7 @@ class GridMangaDetailedItem extends HookConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class _ListMangaItem extends HookConsumerWidget {
   const _ListMangaItem({super.key, required this.manga, this.header});
 
@@ -1514,9 +1481,7 @@ class _ListMangaItem extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    useAutomaticKeepAlive();
     final me = ref.watch(loggedUserProvider).value;
-    final theme = Theme.of(context);
 
     return Card(
       child: Padding(
@@ -1558,36 +1523,7 @@ class _ListMangaItem extends HookConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 10.0,
                 children: [
-                  TextButton.icon(
-                    style: TextButton.styleFrom(
-                      foregroundColor: theme.colorScheme.onSurface,
-                      textStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onPressed: () async {
-                      readChaptersMutation(me?.id).run(ref, (ref) async {
-                        return await ref
-                            .get(readChaptersProvider(me?.id).notifier)
-                            .get([manga]);
-                      });
-
-                      statisticsMutation.run(ref, (ref) async {
-                        return await ref.get(statisticsProvider.notifier).get([
-                          manga,
-                        ]);
-                      });
-                      context.router.push(
-                        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
-                      );
-                    },
-                    icon: CountryFlag(
-                      flag: manga.attributes!.originalLanguage.flag,
-                      size: 18,
-                    ),
-                    label: Text(manga.attributes!.title.get('en')),
-                  ),
+                  MangaTitleButton(manga: manga),
                   if (header != null) IconTextChip(text: header!),
                   MangaGenreRow(
                     key: ValueKey('MangaGenreRow(${manga.id})'),
@@ -1648,6 +1584,7 @@ class ChapterTitle extends ConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class MangaGenreRow extends HookWidget {
   const MangaGenreRow({super.key, required this.manga});
 
@@ -1689,6 +1626,7 @@ class MangaGenreRow extends HookWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class MangaStatisticsRow extends HookConsumerWidget {
   const MangaStatisticsRow({
     super.key,
@@ -1772,6 +1710,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class _GroupRow extends HookWidget {
   final Chapter chapter;
 
@@ -1835,6 +1774,7 @@ class _PubTime extends StatelessWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class CommentChip extends HookWidget {
   final StatisticsDetailsComments? comments;
 
@@ -1866,6 +1806,7 @@ class CommentChip extends HookWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class MangaStatusChip extends StatelessWidget {
   const MangaStatusChip({
     super.key,
@@ -1898,6 +1839,7 @@ class MangaStatusChip extends StatelessWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class ContentRatingChip extends StatelessWidget {
   const ContentRatingChip({super.key, required this.rating});
 
@@ -1917,6 +1859,7 @@ class ContentRatingChip extends StatelessWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class ContentChip extends StatelessWidget {
   const ContentChip({super.key, required this.content});
 

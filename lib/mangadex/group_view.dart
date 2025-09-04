@@ -8,10 +8,12 @@ import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'group_view.g.dart';
@@ -25,6 +27,7 @@ Future<Group> _fetchGroupFromId(Ref ref, String groupId) async {
   return group.first;
 }
 
+@Dependencies([chipTextStyle, readBorderTheme])
 @RoutePage()
 class MangaDexGroupViewWithNamePage extends MangaDexGroupViewPage {
   const MangaDexGroupViewWithNamePage({
@@ -36,6 +39,7 @@ class MangaDexGroupViewWithNamePage extends MangaDexGroupViewPage {
   final String? name;
 }
 
+@Dependencies([chipTextStyle, readBorderTheme])
 @RoutePage()
 class MangaDexGroupViewPage extends StatelessWidget {
   const MangaDexGroupViewPage({
@@ -64,6 +68,7 @@ class MangaDexGroupViewPage extends StatelessWidget {
   }
 }
 
+@Dependencies([chipTextStyle, readBorderTheme])
 class MangaDexGroupViewWidget extends HookConsumerWidget {
   const MangaDexGroupViewWidget({super.key, required this.group});
 
@@ -254,6 +259,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class _GroupTitlesTab extends ConsumerStatefulWidget {
   const _GroupTitlesTab({
     super.key,
@@ -314,7 +320,7 @@ class __GroupTitlesTabState extends ConsumerState<_GroupTitlesTab> {
     return RefreshIndicator(
       onRefresh: () async => _pagingController.refresh(),
       child: MangaListWidget(
-        title: Text(t.mangadex.groupTitles, style: TextStyle(fontSize: 24)),
+        title: Text(t.mangadex.groupTitles, style: CommonTextStyles.twentyfour),
         physics: const AlwaysScrollableScrollPhysics(),
         controller: widget.controller,
         children: [MangaListViewSliver(controller: _pagingController)],

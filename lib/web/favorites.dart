@@ -130,7 +130,7 @@ class WebSourceFavoriteTab extends HookWidget {
       scrollBehavior: MouseTouchScrollBehavior().copyWith(scrollbars: false),
       title: Text(
         tr.num_titles(n: items.length),
-        style: const TextStyle(fontSize: 24),
+        style: CommonTextStyles.twentyfour,
       ),
       leading: [
         SliverOverlapInjector(

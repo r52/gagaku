@@ -12,6 +12,7 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
@@ -22,6 +23,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:riverpod/experimental/mutation.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'manga_view.g.dart';
@@ -58,6 +60,7 @@ Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
   return manga.first;
 }
 
+@Dependencies([readBorderTheme, chipTextStyle])
 @RoutePage()
 class MangaDexMangaViewWithNamePage extends MangaDexMangaViewPage {
   const MangaDexMangaViewWithNamePage({
@@ -69,6 +72,7 @@ class MangaDexMangaViewWithNamePage extends MangaDexMangaViewPage {
   final String? name;
 }
 
+@Dependencies([readBorderTheme, chipTextStyle])
 @RoutePage()
 class MangaDexMangaViewPage extends ConsumerWidget {
   const MangaDexMangaViewPage({
@@ -101,6 +105,7 @@ class MangaDexMangaViewPage extends ConsumerWidget {
   }
 }
 
+@Dependencies([readBorderTheme, chipTextStyle])
 class MangaDexMangaViewWidget extends StatefulHookConsumerWidget {
   const MangaDexMangaViewWidget({super.key, required this.manga});
 
@@ -892,7 +897,7 @@ class _MangaDexMangaViewWidgetState
               _ViewType.related => MangaListWidget(
                 title: Text(
                   tr.mangaView.relatedTitles,
-                  style: TextStyle(fontSize: 24),
+                  style: CommonTextStyles.twentyfour,
                 ),
                 noController: true,
                 children: [
@@ -916,6 +921,7 @@ class _MangaDexMangaViewWidgetState
   }
 }
 
+@Dependencies([readBorderTheme, chipTextStyle])
 class _MangaChaptersView extends StatelessWidget {
   const _MangaChaptersView({required this.manga, required this.controller});
 
@@ -975,100 +981,11 @@ class _MangaCoversView extends StatelessWidget {
                     Navigator.push(
                       context,
                       TransparentOverlay(
-                        builder: (context) {
-                          return HookBuilder(
-                            builder: (context) {
-                              final controller = usePageController(
-                                initialPage: index,
-                              );
-                              return Scaffold(
-                                appBar: AppBar(
-                                  backgroundColor: Colors.transparent,
-                                  leading: CloseButton(
-                                    style: IconButton.styleFrom(
-                                      backgroundColor: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                                backgroundColor: Colors.transparent,
-                                extendBody: true,
-                                extendBodyBehindAppBar: true,
-                                body: PageView.builder(
-                                  scrollBehavior:
-                                      const MouseTouchScrollBehavior(),
-                                  findChildIndexCallback: (key) {
-                                    final valueKey = key as ValueKey<String>;
-                                    final val = state.items!.indexWhere(
-                                      (i) => i.id == valueKey.value,
-                                    );
-                                    return val >= 0 ? val : null;
-                                  },
-                                  itemBuilder: (BuildContext context, int id) {
-                                    final item = state.items![id];
-                                    final url = manga.getUrlFromCover(item);
-
-                                    return Hero(
-                                      key: ValueKey(item.id),
-                                      tag: item.id,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(10.0),
-                                        color: Colors.transparent,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: CachedNetworkImage(
-                                            imageUrl: url,
-                                            cacheManager: gagakuImageCache,
-                                            imageBuilder:
-                                                (context, imageProvider) {
-                                                  return PhotoView(
-                                                    backgroundDecoration:
-                                                        const BoxDecoration(
-                                                          color: Colors
-                                                              .transparent,
-                                                        ),
-                                                    imageProvider:
-                                                        imageProvider,
-                                                    minScale:
-                                                        PhotoViewComputedScale
-                                                            .contained *
-                                                        0.8,
-                                                    maxScale:
-                                                        PhotoViewComputedScale
-                                                            .covered *
-                                                        5.0,
-                                                    initialScale:
-                                                        PhotoViewComputedScale
-                                                            .contained,
-                                                  );
-                                                },
-                                            fit: BoxFit.contain,
-                                            progressIndicatorBuilder:
-                                                (
-                                                  context,
-                                                  url,
-                                                  downloadProgress,
-                                                ) => const Center(
-                                                  child:
-                                                      CircularProgressIndicator(),
-                                                ),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    const Icon(Icons.error),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  itemCount: state.items!.length,
-                                  controller: controller,
-                                  scrollDirection: Axis.horizontal,
-                                ),
-                              );
-                            },
-                          );
-                        },
+                        builder: (context) => _CoverArtPagedOverlay(
+                          index: index,
+                          manga: manga,
+                          items: state.items!,
+                        ),
                       ),
                     );
                   },
@@ -1090,14 +1007,17 @@ class _ChapterListElement {
     this.header,
     this.chapter,
     this.bold = false,
+    this.isIndented = false,
   }) : assert(header != null || chapter != null);
 
   final _ChapterListElementType type;
   final String? header;
   final Chapter? chapter;
   final bool bold;
+  final bool isIndented;
 }
 
+@Dependencies([readBorderTheme, chipTextStyle])
 class _ChapterListSliver extends HookConsumerWidget {
   const _ChapterListSliver({
     required this.state,
@@ -1167,20 +1087,26 @@ class _ChapterListSliver extends HookConsumerWidget {
         }
 
         items = keysGrouped[vol]!.foldIndexed(items, (index, list, chapter) {
+          final volumeChapters = keysGrouped[vol]!;
+          final currentChapter = chapter.attributes.chapter;
+
           // If next chapter is the same number
           // AND previous chapter isn't (or doesnt exist)
-          if (index < keysGrouped[vol]!.length - 1 &&
-              keysGrouped[vol]![index + 1].attributes.chapter ==
-                  chapter.attributes.chapter &&
-              (index == 0 ||
-                  (index > 0 &&
-                      keysGrouped[vol]![index - 1].attributes.chapter !=
-                          chapter.attributes.chapter))) {
+          final nextIsSame =
+              index < volumeChapters.length - 1 &&
+              volumeChapters[index + 1].attributes.chapter == currentChapter;
+          final prevIsNotSame =
+              index == 0 ||
+              (index > 0 &&
+                  volumeChapters[index - 1].attributes.chapter !=
+                      currentChapter);
+
+          if (nextIsSame && prevIsNotSame) {
             list.add(
               _ChapterListElement(
                 _ChapterListElementType.header,
-                header: chapter.attributes.chapter != null
-                    ? tr.mangaView.chapter(n: chapter.attributes.chapter!)
+                header: currentChapter != null
+                    ? tr.mangaView.chapter(n: currentChapter)
                     : chapter.title,
               ),
             );
@@ -1190,6 +1116,7 @@ class _ChapterListSliver extends HookConsumerWidget {
             _ChapterListElement(
               _ChapterListElementType.chapter,
               chapter: chapter,
+              isIndented: nextIsSame || !prevIsNotSame,
             ),
           );
           return list;
@@ -1199,15 +1126,20 @@ class _ChapterListSliver extends HookConsumerWidget {
       return items;
     }, [state]);
 
-    final newState = PagingState<int, _ChapterListElement>(
-      error: state.error,
-      pages: state.keys == null
-          ? null
-          : List.generate(state.keys!.length, (i) => i == 0 ? builtItems! : []),
-      keys: state.keys,
-      hasNextPage: state.hasNextPage,
-      isLoading: state.isLoading,
-    );
+    final newState = useMemoized(() {
+      return PagingState<int, _ChapterListElement>(
+        error: state.error,
+        pages: state.keys == null
+            ? null
+            : List.generate(
+                state.keys!.length,
+                (i) => i == 0 ? builtItems! : [],
+              ),
+        keys: state.keys,
+        hasNextPage: state.hasNextPage,
+        isLoading: state.isLoading,
+      );
+    }, [builtItems, state]);
 
     return PagedSliverList.separated(
       state: newState,
@@ -1215,9 +1147,6 @@ class _ChapterListSliver extends HookConsumerWidget {
       separatorBuilder: (_, index) => const SizedBox(height: 4.0),
       builderDelegate: PagedChildBuilderDelegate<_ChapterListElement>(
         itemBuilder: (context, item, index) {
-          var lastChapIsSame = false;
-          var nextChapIsSame = false;
-
           if (item.type == _ChapterListElementType.header) {
             return _ChapterListHeader(
               key: ValueKey(item.header!),
@@ -1227,32 +1156,15 @@ class _ChapterListSliver extends HookConsumerWidget {
           }
 
           // is chapter beyond this point
-
-          final chapid = chapters!.indexWhere((c) => c.id == item.chapter!.id);
-          final thischap = item.chapter!;
           final chapbtn = ChapterButtonWidget(
-            key: ValueKey(thischap.id),
-            chapter: thischap,
+            key: ValueKey(item.chapter!.id),
+            chapter: item.chapter!,
             manga: manga,
           );
 
-          if (chapid > 0) {
-            final lastchap = chapters[chapid - 1];
-            lastChapIsSame =
-                lastchap.attributes.chapter == thischap.attributes.chapter &&
-                lastchap.attributes.volume == thischap.attributes.volume;
-          }
-
-          if (chapid < chapters.length - 1) {
-            final nextchap = chapters[chapid + 1];
-            nextChapIsSame =
-                nextchap.attributes.chapter == thischap.attributes.chapter &&
-                nextchap.attributes.volume == thischap.attributes.volume;
-          }
-
-          if (lastChapIsSame || nextChapIsSame) {
+          if (item.isIndented) {
             return Row(
-              key: ValueKey(thischap.id),
+              key: ValueKey(item.chapter!.id),
               children: [
                 const Icon(Icons.subdirectory_arrow_right, size: 15.0),
                 Flexible(child: chapbtn),
@@ -1304,7 +1216,6 @@ class _CoverArtItem extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
-    useAutomaticKeepAlive();
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
@@ -1342,13 +1253,88 @@ class _CoverArtItem extends HookWidget {
           child: GridTile(
             footer: cover.attributes?.volume != null
                 ? GridAlbumTextBar(
-                    height: 40,
                     text: tr.mangaView.volume(n: cover.attributes!.volume!),
                   )
                 : null,
             child: image,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _CoverArtPagedOverlay extends HookWidget {
+  const _CoverArtPagedOverlay({
+    required this.index,
+    required this.items,
+    required this.manga,
+  });
+
+  final int index;
+  final List<CoverArt> items;
+  final Manga manga;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = usePageController(initialPage: index);
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        leading: CloseButton(
+          style: IconButton.styleFrom(backgroundColor: Colors.black),
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      body: PageView.builder(
+        scrollBehavior: const MouseTouchScrollBehavior(),
+        findChildIndexCallback: (key) {
+          final valueKey = key as ValueKey<String>;
+          final val = items.indexWhere((i) => i.id == valueKey.value);
+          return val >= 0 ? val : null;
+        },
+        itemBuilder: (BuildContext context, int id) {
+          final item = items[id];
+          final url = manga.getUrlFromCover(item);
+
+          return Hero(
+            key: ValueKey(item.id),
+            tag: item.id,
+            child: Container(
+              padding: const EdgeInsets.all(10.0),
+              color: Colors.transparent,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: CachedNetworkImage(
+                  imageUrl: url,
+                  cacheManager: gagakuImageCache,
+                  imageBuilder: (context, imageProvider) {
+                    return PhotoView(
+                      backgroundDecoration: const BoxDecoration(
+                        color: Colors.transparent,
+                      ),
+                      imageProvider: imageProvider,
+                      minScale: PhotoViewComputedScale.contained * 0.8,
+                      maxScale: PhotoViewComputedScale.covered * 5.0,
+                      initialScale: PhotoViewComputedScale.contained,
+                    );
+                  },
+                  fit: BoxFit.contain,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      const Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                ),
+              ),
+            ),
+          );
+        },
+        itemCount: items.length,
+        controller: controller,
+        scrollDirection: Axis.horizontal,
       ),
     );
   }

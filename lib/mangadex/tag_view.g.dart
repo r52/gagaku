@@ -24,7 +24,7 @@ final class _FetchTagFromIdProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$fetchTagFromIdHash();
+  String debugGetCreateSourceHash() => _$_fetchTagFromIdHash();
 
   @override
   String toString() {
@@ -55,7 +55,7 @@ final class _FetchTagFromIdProvider
   }
 }
 
-String _$fetchTagFromIdHash() => r'2c3e3ce63b6f16972e9614f7e4b35c823accb4b8';
+String _$_fetchTagFromIdHash() => r'2c3e3ce63b6f16972e9614f7e4b35c823accb4b8';
 
 final class _FetchTagFromIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Tag>, String> {
@@ -98,7 +98,7 @@ final class _TrendingThisYearProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$trendingThisYearHash();
+  String debugGetCreateSourceHash() => _$_trendingThisYearHash();
 
   @override
   String toString() {
@@ -130,7 +130,7 @@ final class _TrendingThisYearProvider
   }
 }
 
-String _$trendingThisYearHash() => r'47ab90f1630dc5d55dd7ae5fea6f357bf4b6b497';
+String _$_trendingThisYearHash() => r'47ab90f1630dc5d55dd7ae5fea6f357bf4b6b497';
 
 final class _TrendingThisYearFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Manga>>, Tag> {
@@ -173,7 +173,7 @@ final class _RecentlyAddedProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$recentlyAddedHash();
+  String debugGetCreateSourceHash() => _$_recentlyAddedHash();
 
   @override
   String toString() {
@@ -205,7 +205,7 @@ final class _RecentlyAddedProvider
   }
 }
 
-String _$recentlyAddedHash() => r'db80c62e64ad17d0dc404af963c83b475bd891dd';
+String _$_recentlyAddedHash() => r'db80c62e64ad17d0dc404af963c83b475bd891dd';
 
 final class _RecentlyAddedFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Manga>>, Tag> {

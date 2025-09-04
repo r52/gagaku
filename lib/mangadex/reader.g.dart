@@ -29,7 +29,7 @@ final class _FetchChapterDataProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$fetchChapterDataHash();
+  String debugGetCreateSourceHash() => _$_fetchChapterDataHash();
 
   @override
   String toString() {
@@ -60,7 +60,7 @@ final class _FetchChapterDataProvider
   }
 }
 
-String _$fetchChapterDataHash() => r'bd8f9de01ae3994fb8c48e31214f6d5cd6d7ed42';
+String _$_fetchChapterDataHash() => r'bd8f9de01ae3994fb8c48e31214f6d5cd6d7ed42';
 
 final class _FetchChapterDataFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<ReaderData>, String> {
@@ -103,7 +103,7 @@ final class _FetchChapterPagesProvider
        );
 
   @override
-  String debugGetCreateSourceHash() => _$fetchChapterPagesHash();
+  String debugGetCreateSourceHash() => _$_fetchChapterPagesHash();
 
   @override
   String toString() {
@@ -135,7 +135,8 @@ final class _FetchChapterPagesProvider
   }
 }
 
-String _$fetchChapterPagesHash() => r'3663bdc5e029081976b001c22486f86c43530c38';
+String _$_fetchChapterPagesHash() =>
+    r'3663bdc5e029081976b001c22486f86c43530c38';
 
 final class _FetchChapterPagesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, Chapter> {

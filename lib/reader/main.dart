@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/reader/model/config.dart';
-import 'package:gagaku/reader/model/controller_hooks.dart';
 import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -58,8 +57,21 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
   final ListController listController = ListController();
   final PageController pageController = PageController(initialPage: 0);
 
+  late final List<PhotoViewScaleStateController> scaleStateController;
+  late final List<PhotoViewController> viewController;
+
   @override
   void initState() {
+    scaleStateController = List<PhotoViewScaleStateController>.generate(
+      widget.pages.length,
+      (index) => PhotoViewScaleStateController(),
+    );
+
+    viewController = List<PhotoViewController>.generate(
+      widget.pages.length,
+      (index) => PhotoViewController(),
+    );
+
     super.initState();
     subtext.value =
         widget.subtitle ??
@@ -73,6 +85,15 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     scrollController.dispose();
     listController.dispose();
     pageController.dispose();
+
+    for (final controller in scaleStateController) {
+      controller.dispose();
+    }
+
+    for (final controller in viewController) {
+      controller.dispose();
+    }
+
     super.dispose();
   }
 
@@ -249,7 +270,6 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     double offset, {
     required ReaderConfig settings,
     required ReaderFormat format,
-    required List<PhotoViewController> viewController,
   }) {
     if (format == ReaderFormat.longstrip) {
       scrollController.animateTo(
@@ -276,7 +296,6 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     double offset, {
     required ReaderConfig settings,
     required ReaderFormat format,
-    required List<PhotoViewController> viewController,
   }) {
     if (format == ReaderFormat.longstrip) {
       if (listController.isAttached && listController.visibleRange != null) {
@@ -316,14 +335,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     final tr = context.t;
     final pageCount = widget.pages.length;
     final focusNode = useFocusNode();
-    final scaleStateController = List<PhotoViewScaleStateController>.generate(
-      pageCount,
-      (index) => usePhotoViewScaleStateController(),
-    );
-    final viewController = List<PhotoViewController>.generate(
-      pageCount,
-      (index) => usePhotoViewController(),
-    );
+
     final settings = ref.watch(readerSettingsProvider);
     final theme = Theme.of(context);
     final format = widget.longstrip ? ReaderFormat.longstrip : settings.format;
@@ -373,12 +385,6 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
       listController.addListener(listPosCb);
       return () => listController.removeListener(listPosCb);
     }, [listController, settings]);
-
-    final pageDropdownItems = List<DropdownMenuEntry<int>>.generate(
-      pageCount,
-      (int index) =>
-          DropdownMenuEntry<int>(value: index, label: (index + 1).toString()),
-    );
 
     return Scaffold(
       extendBodyBehindAppBar: false,
@@ -432,7 +438,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                     },
                     child: Text(
                       widget.drawerHeader!,
-                      style: const TextStyle(fontSize: 18),
+                      style: CommonTextStyles.eighteen,
                     ),
                   ),
                 if (widget.drawerHeader != null &&
@@ -449,6 +455,16 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                 HookBuilder(
                   builder: (context) {
                     final page = useValueListenable(currentPage);
+                    final pagesDropDown = useMemoized(
+                      () => List<DropdownMenuEntry<int>>.generate(
+                        pageCount,
+                        (int index) => DropdownMenuEntry<int>(
+                          value: index,
+                          label: (index + 1).toString(),
+                        ),
+                      ),
+                      [pageCount],
+                    );
 
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -479,7 +495,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                               jumpToPage(index, format: format);
                             }
                           },
-                          dropdownMenuEntries: pageDropdownItems,
+                          dropdownMenuEntries: pagesDropDown,
                         ),
                         OutlinedButton(
                           onPressed: (page < pageCount - 1)
@@ -492,10 +508,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                   },
                 ),
                 const Divider(),
-                Text(
-                  tr.reader.settings,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
+                Text(tr.reader.settings, style: CommonTextStyles.twentyBold),
                 Wrap(
                   alignment: WrapAlignment.center,
                   children: [
@@ -661,159 +674,92 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
           // Handle vertical navigation on key press and repeat.
           switch (key) {
             case PhysicalKeyboardKey.arrowUp:
-              return onTapTop(
-                250,
-                settings: settings,
-                format: format,
-                viewController: viewController,
-              );
+              return onTapTop(250, settings: settings, format: format);
             case PhysicalKeyboardKey.arrowDown:
-              return onTapBottom(
-                250,
-                settings: settings,
-                format: format,
-                viewController: viewController,
-              );
+              return onTapBottom(250, settings: settings, format: format);
             case PhysicalKeyboardKey.pageUp:
-              return onTapTop(
-                1000,
-                settings: settings,
-                format: format,
-                viewController: viewController,
-              );
+              return onTapTop(1000, settings: settings, format: format);
             case PhysicalKeyboardKey.pageDown:
-              return onTapBottom(
-                1000,
-                settings: settings,
-                format: format,
-                viewController: viewController,
-              );
+              return onTapBottom(1000, settings: settings, format: format);
             default:
               return KeyEventResult.ignored;
           }
         },
-        child: Builder(
-          builder: (context) {
-            if (widget.pages.isEmpty && widget.externalUrl != null) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 10.0,
-                  children: [
-                    const Text('Read on external site:'),
-                    ElevatedButton(
-                      onPressed: () async {
-                        await Styles.tryLaunchUrl(context, widget.externalUrl!);
-                      },
-                      child: Text(widget.externalUrl!),
-                    ),
-                  ],
+        child: switch (widget.pages.isEmpty) {
+          true when widget.externalUrl != null => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 10.0,
+              children: [
+                const Text('Read on external site:'),
+                ElevatedButton(
+                  onPressed: () async {
+                    await Styles.tryLaunchUrl(context, widget.externalUrl!);
+                  },
+                  child: Text(widget.externalUrl!),
                 ),
-              );
-            }
-
-            if (format == ReaderFormat.longstrip) {
-              final mediaSize = MediaQuery.sizeOf(context);
-
-              return SuperListView(
-                listController: listController,
-                controller: scrollController,
-                cacheExtent: mediaSize.height * pageCount,
-                children: [
-                  for (final page in widget.pages)
-                    Center(
-                      key: ValueKey(page.id),
-                      child: HookBuilder(
-                        builder: (context) {
-                          final scale = useValueListenable(longStripScale);
-                          final width = mediaSize.width * scale.scale;
-                          return ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minWidth: width,
-                              maxWidth: width,
-                            ),
-                            child: KeepAliveImage(
-                              image: page.provider,
-                              fit: BoxFit.contain,
-                              alignment: Alignment.topCenter,
-                              loadingBuilder: (context, child, event) {
-                                if (event == null) {
-                                  return child;
-                                }
-
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value: event.expectedTotalBytes != null
-                                        ? event.cumulativeBytesLoaded /
-                                              event.expectedTotalBytes!
-                                        : null,
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                ],
-              );
-            }
-
-            return PhotoViewGallery.builder(
-              allowImplicitScrolling: true,
-              reverse: settings.direction == ReaderDirection.rightToLeft,
-              scrollPhysics: !settings.swipeGestures
-                  ? const NeverScrollableScrollPhysics()
-                  : null,
-              backgroundDecoration: const BoxDecoration(color: Colors.black),
-              pageController: pageController,
-              onPageChanged: (int index) {
-                focusNode.requestFocus();
-              },
-              loadingBuilder: (context, event) => Center(
-                child: SizedBox(
-                  width: 150,
-                  child: LinearProgressIndicator(
-                    value: event != null && event.expectedTotalBytes != null
-                        ? event.cumulativeBytesLoaded /
-                              event.expectedTotalBytes!
-                        : null,
-                  ),
+              ],
+            ),
+          ),
+          _ when format == ReaderFormat.longstrip => _LongStripView(
+            listController: listController,
+            scrollController: scrollController,
+            pages: widget.pages,
+            scale: longStripScale,
+          ),
+          _ => PhotoViewGallery.builder(
+            allowImplicitScrolling: true,
+            reverse: settings.direction == ReaderDirection.rightToLeft,
+            scrollPhysics: !settings.swipeGestures
+                ? const NeverScrollableScrollPhysics()
+                : null,
+            backgroundDecoration: const BoxDecoration(color: Colors.black),
+            pageController: pageController,
+            onPageChanged: (int index) {
+              focusNode.requestFocus();
+            },
+            loadingBuilder: (context, event) => Center(
+              child: SizedBox(
+                width: 150,
+                child: LinearProgressIndicator(
+                  value: event != null && event.expectedTotalBytes != null
+                      ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
+                      : null,
                 ),
               ),
-              itemCount: pageCount,
-              builder: (context, index) {
-                final page = widget.pages[index];
-                return PhotoViewGalleryPageOptions(
-                  heroAttributes: PhotoViewHeroAttributes(tag: page.id),
-                  imageProvider: page.provider,
-                  controller: viewController[index],
-                  scaleStateController: scaleStateController[index],
-                  minScale: PhotoViewComputedScale.contained * 1.0,
-                  maxScale: PhotoViewComputedScale.covered * 5.0,
-                  initialScale: PhotoViewComputedScale.contained,
-                  basePosition: Alignment.topCenter,
-                  onTapUp: settings.clickToTurn
-                      ? (context, details, value) {
-                          focusNode.requestFocus();
+            ),
+            itemCount: pageCount,
+            builder: (context, index) {
+              final page = widget.pages[index];
+              return PhotoViewGalleryPageOptions(
+                heroAttributes: PhotoViewHeroAttributes(tag: page.id),
+                imageProvider: page.provider,
+                controller: viewController[index],
+                scaleStateController: scaleStateController[index],
+                minScale: PhotoViewComputedScale.contained * 1.0,
+                maxScale: PhotoViewComputedScale.covered * 5.0,
+                initialScale: PhotoViewComputedScale.contained,
+                basePosition: Alignment.topCenter,
+                onTapUp: settings.clickToTurn
+                    ? (context, details, value) {
+                        focusNode.requestFocus();
 
-                          final taploc = details.localPosition.dx;
-                          final viewport = context.size!.width;
+                        final taploc = details.localPosition.dx;
+                        final viewport = context.size!.width;
 
-                          final tapmargin = viewport / 2.5;
+                        final tapmargin = viewport / 2.5;
 
-                          if (taploc < tapmargin) {
-                            onTapLeft(settings: settings, format: format);
-                          } else if (taploc > viewport - tapmargin) {
-                            onTapRight(settings: settings, format: format);
-                          }
+                        if (taploc < tapmargin) {
+                          onTapLeft(settings: settings, format: format);
+                        } else if (taploc > viewport - tapmargin) {
+                          onTapRight(settings: settings, format: format);
                         }
-                      : null,
-                );
-              },
-            );
-          },
-        ),
+                      }
+                    : null,
+              );
+            },
+          ),
+        },
       ),
       // Can't use bottomSheet anymore due to Material 3 specs
       // forcing bottom sheet width to be 640 max
@@ -938,6 +884,82 @@ class _ProgressBarSection extends HookWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _LongStripView extends StatelessWidget {
+  final ListController? listController;
+  final ScrollController? scrollController;
+  final List<ReaderPage> pages;
+  final ValueNotifier<LongStripScale> scale;
+
+  const _LongStripView({
+    this.listController,
+    this.scrollController,
+    required this.pages,
+    required this.scale,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final pageCount = pages.length;
+    final mediaSize = MediaQuery.sizeOf(context);
+
+    return SuperListView(
+      listController: listController,
+      controller: scrollController,
+      cacheExtent: mediaSize.height * pageCount,
+      children: [
+        for (final page in pages)
+          Center(
+            key: ValueKey(page.id),
+            child: _LongStripPage(
+              contextWidth: mediaSize.width,
+              scale: scale,
+              page: page,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _LongStripPage extends HookWidget {
+  const _LongStripPage({
+    required this.page,
+    required this.contextWidth,
+    required this.scale,
+  });
+
+  final ValueNotifier<LongStripScale> scale;
+  final ReaderPage page;
+  final double contextWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    final scl = useValueListenable(scale);
+    final width = contextWidth * scl.scale;
+    return ConstrainedBox(
+      constraints: BoxConstraints(minWidth: width, maxWidth: width),
+      child: KeepAliveImage(
+        image: page.provider,
+        fit: BoxFit.contain,
+        alignment: Alignment.topCenter,
+        loadingBuilder: (context, child, event) {
+          if (event == null) {
+            return child;
+          }
+
+          return Center(
+            child: CircularProgressIndicator(
+              value: event.expectedTotalBytes != null
+                  ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
+                  : null,
+            ),
+          );
+        },
       ),
     );
   }

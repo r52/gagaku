@@ -22,7 +22,7 @@ part 'widgets.g.dart';
 
 enum WebMangaListView { grid, list }
 
-@Riverpod(keepAlive: true)
+@riverpod
 Map<String, Widget> _extensionIcon(Ref ref) {
   final icons = ref.watch(
     extensionInfoListProvider.select(
@@ -32,7 +32,7 @@ Map<String, Widget> _extensionIcon(Ref ref) {
             key,
             ext.icon.isNotEmpty
                 ? Image.network(ext.icon, width: 24, height: 24)
-                : Text(ext.id, style: const TextStyle(fontSize: 12)),
+                : Text(ext.id, style: CommonTextStyles.twelve),
           );
         }),
         _ => <String, Widget>{},
@@ -240,7 +240,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                   extIcons[item.handle?.sourceId] ??
                   Text(
                     item.handle?.sourceId ?? '',
-                    style: const TextStyle(fontSize: 12),
+                    style: CommonTextStyles.twelve,
                   );
 
               return ListTile(
@@ -403,7 +403,6 @@ class GridMangaItem extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    useAutomaticKeepAlive();
     final tr = context.t;
     final extIcons = ref.watch(_extensionIconProvider);
     final aniController = useAnimationController(
@@ -430,7 +429,7 @@ class GridMangaItem extends HookConsumerWidget {
 
     final sourceIcon =
         extIcons[link.handle?.sourceId] ??
-        Text(link.handle?.sourceId ?? '', style: const TextStyle(fontSize: 12));
+        Text(link.handle?.sourceId ?? '', style: CommonTextStyles.twelve);
 
     return InkWell(
       onTap: () async {
@@ -462,7 +461,7 @@ class GridMangaItem extends HookConsumerWidget {
       child: Stack(
         children: [
           GridTile(
-            footer: GridAlbumTextBar(height: 80, text: link.title),
+            footer: GridAlbumTextBar(text: link.title),
             child: GridAlbumImage(gradient: gradient, child: cover),
           ),
           Align(alignment: Alignment.bottomRight, child: sourceIcon),
@@ -511,9 +510,33 @@ class FavoritesButton extends HookWidget {
 
     final favStatus = useMemoized(() {
       final favList = manager.getFavoritedListIdsOfLink(link);
-      final isFavorited = favList.isNotEmpty;
-      return (list: favList, isFavorited: isFavorited);
+      return (list: favList, isFavorited: favList.isNotEmpty);
     }, [favorites, link]);
+
+    final menuChildren = useMemoized(() {
+      if (favorites.isEmpty) return <Widget>[];
+
+      return [
+        for (final cat in favorites)
+          CheckboxListTile(
+            controlAffinity: ListTileControlAffinity.leading,
+            title: Text(cat.name),
+            value: favStatus.list.contains(cat.dbid),
+            onChanged: (bool? value) async {
+              if (value == true) {
+                manager.add(cat, link);
+              } else {
+                manager.remove(cat, link);
+              }
+            },
+          ),
+        if (favStatus.isFavorited)
+          MenuItemButton(
+            onPressed: () => manager.removeFromAll(link),
+            child: Text(tr.ui.clear),
+          ),
+      ];
+    }, [favorites, favStatus, manager, link, tr]);
 
     return MenuAnchor(
       builder: (context, controller, child) {
@@ -545,27 +568,7 @@ class FavoritesButton extends HookWidget {
           ),
         );
       },
-      menuChildren: favorites.isNotEmpty
-          ? [
-              for (final cat in favorites)
-                CheckboxListTile(
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: Text(cat.name),
-                  value: favStatus.list.contains(cat.dbid),
-                  onChanged: (bool? value) async {
-                    if (value == true) {
-                      manager.add(cat, link);
-                    } else {
-                      manager.remove(cat, link);
-                    }
-                  },
-                ),
-              MenuItemButton(
-                onPressed: () => manager.removeFromAll(link),
-                child: Text(tr.ui.clear),
-              ),
-            ]
-          : [],
+      menuChildren: menuChildren,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Icon(
@@ -800,7 +803,6 @@ class ChapterFeedItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    useAutomaticKeepAlive();
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     final titleBtn = _MangaTitle(
@@ -943,7 +945,7 @@ class _MangaTitle extends ConsumerWidget {
         minimumSize: const Size(0.0, 24.0),
         shape: const RoundedRectangleBorder(),
         foregroundColor: theme.colorScheme.onSurface,
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        textStyle: CommonTextStyles.sixteenBold,
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {

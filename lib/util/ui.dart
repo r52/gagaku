@@ -3,11 +3,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:url_launcher/url_launcher.dart' show launchUrl;
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
@@ -79,28 +81,21 @@ class GridAlbumImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(4.0)),
-      ),
+    return Container(
       clipBehavior: Clip.antiAlias,
-      child: Stack(
-        fit: StackFit.passthrough,
-        children: [
-          child,
-          SizedBox.expand(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: FractionalOffset.bottomCenter,
-                  end: gradient,
-                  colors: const [Colors.black, Colors.transparent],
-                ),
-              ),
-            ),
-          ),
-        ],
+      decoration: const ShapeDecoration(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(4.0)),
+        ),
       ),
+      foregroundDecoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: gradient,
+          colors: const [Colors.black87, Colors.transparent],
+        ),
+      ),
+      child: child,
     );
   }
 }
@@ -108,38 +103,38 @@ class GridAlbumImage extends StatelessWidget {
 class GridAlbumTextBar extends StatelessWidget {
   const GridAlbumTextBar({
     super.key,
-    required this.height,
     this.leading,
     this.backgroundColor,
     required this.text,
   });
 
-  final double height;
   final Widget? leading;
   final Color? backgroundColor;
   final String text;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: GridTileBar(
-        leading: leading,
-        backgroundColor: backgroundColor,
-        title: Text(
-          text,
-          softWrap: true,
-          style: const TextStyle(
-            color: Colors.white,
-            shadows: <Shadow>[
-              Shadow(
-                offset: Offset(1.0, 1.0),
-                color: Color.fromARGB(255, 0, 0, 0),
-              ),
-            ],
-            overflow: TextOverflow.clip,
+    return Container(
+      color: backgroundColor,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      alignment: Alignment.centerLeft,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (leading != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: leading!,
+            ),
+          Expanded(
+            child: Text(
+              text,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -231,7 +226,7 @@ class MultiChildExpansionTile extends StatelessWidget {
   }
 }
 
-class CountryFlag extends StatelessWidget {
+class CountryFlag extends HookWidget {
   const CountryFlag({super.key, required this.flag, this.size = 18});
 
   final String flag;
@@ -239,19 +234,14 @@ class CountryFlag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      flag,
-      softWrap: false,
-      style: TextStyle(
-        fontFamily: 'Twemoji',
-        fontSize: size,
-        overflow: TextOverflow.clip,
-      ),
-    );
+    final style = ThemeCache().getFlagTheme(size);
+
+    return Text(flag, softWrap: false, style: style);
   }
 }
 
-class ButtonChip extends StatelessWidget {
+@Dependencies([chipTextStyle])
+class ButtonChip extends ConsumerWidget {
   const ButtonChip({
     super.key,
     this.icon,
@@ -268,8 +258,9 @@ class ButtonChip extends StatelessWidget {
   final VoidCallback? onPressed;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final textStyle = ref.watch(chipTextStyleProvider).merge(style);
 
     final bstyle = Styles.buttonStyle(
       backgroundColor: color ?? theme.colorScheme.tertiaryContainer,
@@ -284,27 +275,18 @@ class ButtonChip extends StatelessWidget {
             style: bstyle,
             onPressed: onPressed,
             icon: icon!,
-            label: Text(
-              text,
-              style:
-                  style ??
-                  TextStyle(color: theme.colorScheme.onTertiaryContainer),
-            ),
+            label: Text(text, style: textStyle),
           )
         : ElevatedButton(
             style: bstyle,
             onPressed: onPressed,
-            child: Text(
-              text,
-              style:
-                  style ??
-                  TextStyle(color: theme.colorScheme.onTertiaryContainer),
-            ),
+            child: Text(text, style: textStyle),
           );
   }
 }
 
-class IconTextChip extends StatelessWidget {
+@Dependencies([chipTextStyle])
+class IconTextChip extends ConsumerWidget {
   const IconTextChip({
     super.key,
     this.icon,
@@ -321,8 +303,9 @@ class IconTextChip extends StatelessWidget {
   final VoidCallback? onPressed;
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textStyle = ref.watch(chipTextStyleProvider).merge(style);
+    final theme = ColorScheme.of(context);
 
     Widget child = Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
@@ -334,9 +317,7 @@ class IconTextChip extends StatelessWidget {
           Flexible(
             child: Text(
               text,
-              style:
-                  style ??
-                  TextStyle(color: theme.colorScheme.onTertiaryContainer),
+              style: textStyle,
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -352,7 +333,7 @@ class IconTextChip extends StatelessWidget {
       constraints: const BoxConstraints(maxHeight: 24.0),
       child: Material(
         borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-        color: color ?? theme.colorScheme.tertiaryContainer,
+        color: color ?? theme.tertiaryContainer,
         child: child,
       ),
     );
@@ -712,7 +693,41 @@ class SimpleFutureBuilder<T> extends HookWidget {
   }
 }
 
-class Styles {
+abstract final class CommonTextStyles {
+  static const defaultBold = TextStyle(fontWeight: FontWeight.bold);
+
+  static const twelve = TextStyle(fontSize: 12);
+  static const twelveBold = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.bold,
+  );
+
+  static const sixteen = TextStyle(fontSize: 16);
+  static const sixteenBold = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+  );
+
+  static const eighteen = TextStyle(fontSize: 18);
+  static const eighteenBold = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+  );
+
+  static const twenty = TextStyle(fontSize: 20);
+  static const twentyBold = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+  );
+
+  static const twentyfour = TextStyle(fontSize: 24);
+  static const twentyfourBold = TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+  );
+}
+
+abstract final class Styles {
   static ButtonStyle squareIconButtonStyle({Color? backgroundColor}) =>
       IconButton.styleFrom(
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -737,8 +752,8 @@ class Styles {
   );
 
   static final coverArtGradientTween = Tween(
-    begin: FractionalOffset.center,
-    end: FractionalOffset.topCenter,
+    begin: Alignment.center,
+    end: Alignment.topCenter,
   );
 
   static const List<Widget> loadingOverlay = [

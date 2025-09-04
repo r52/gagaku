@@ -23,6 +23,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    const titleStyle = CommonTextStyles.twentyBold;
     final tr = context.t;
     final nav = Navigator.of(context);
     final theme = Theme.of(context);
@@ -67,7 +68,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
             SettingCardWidget(
               title: Text(
                 tr.mangadex.settings.translatedLanguages,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: titleStyle,
               ),
               subtitle: Text(tr.mangadex.settings.translatedLanguagesDesc),
               builder: (context) {
@@ -158,7 +159,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
             SettingCardWidget(
               title: Text(
                 tr.mangadex.settings.originalLanguage,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: titleStyle,
               ),
               subtitle: Text(tr.mangadex.settings.originalLanguageDesc),
               builder: (context) {
@@ -245,7 +246,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
             SettingCardWidget(
               title: Text(
                 tr.mangadex.settings.contentRating,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: titleStyle,
               ),
               builder: (context) {
                 return Center(
@@ -326,10 +327,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
               },
             ),
             SettingCardWidget(
-              title: Text(
-                tr.mangadex.settings.dataSaver,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+              title: Text(tr.mangadex.settings.dataSaver, style: titleStyle),
               builder: (context) {
                 return Center(
                   child: Row(
@@ -353,7 +351,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
             SettingCardWidget(
               title: Text(
                 tr.mangadex.settings.groupBlacklist,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: titleStyle,
               ),
               builder: (context) {
                 if (config.value.groupBlacklist.isEmpty) {

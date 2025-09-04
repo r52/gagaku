@@ -24,6 +24,7 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    const titleStyle = CommonTextStyles.twentyBold;
     final tr = context.t;
     final nav = Navigator.of(context);
     final cfg = ref.watch(webConfigProvider);
@@ -88,10 +89,7 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
             SettingCardWidget(
-              title: Text(
-                tr.webSources.settings.repos,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+              title: Text(tr.webSources.settings.repos, style: titleStyle),
               subtitle: Text(tr.webSources.settings.reposDesc),
               builder: (context) {
                 return Center(
@@ -112,10 +110,7 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
               },
             ),
             SettingCardWidget(
-              title: Text(
-                tr.webSources.settings.categories,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+              title: Text(tr.webSources.settings.categories, style: titleStyle),
               subtitle: Text(tr.webSources.settings.categoriesDesc),
               builder: (context) {
                 return Center(
@@ -142,7 +137,7 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
             SettingCardWidget(
               title: Text(
                 tr.webSources.settings.categoriesToUpdate,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: titleStyle,
               ),
               subtitle: Text(tr.webSources.settings.categoriesToUpdateDesc),
               builder: (context) {
@@ -172,10 +167,7 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
               },
             ),
             SettingCardWidget(
-              title: Text(
-                t.webSources.settings.clearAll,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+              title: Text(t.webSources.settings.clearAll, style: titleStyle),
               subtitle: Text(t.webSources.settings.clearAllDesc),
               builder: (context) {
                 return Center(

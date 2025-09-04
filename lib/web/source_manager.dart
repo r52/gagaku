@@ -6,6 +6,7 @@ import 'package:flutter/material.dart' hide Badge;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -14,7 +15,9 @@ import 'package:gagaku/web/settings.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([chipTextStyle])
 class SourceManager extends HookConsumerWidget {
   const SourceManager({super.key});
 
@@ -279,6 +282,7 @@ class SourceManager extends HookConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class _SourceItem extends StatelessWidget {
   const _SourceItem({
     required this.thumbnail,
@@ -328,6 +332,7 @@ class _SourceItem extends StatelessWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class _SourceDescription extends StatelessWidget {
   const _SourceDescription({
     required this.title,
@@ -352,7 +357,7 @@ class _SourceDescription extends StatelessWidget {
           title,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: CommonTextStyles.defaultBold,
         ),
         const Padding(padding: EdgeInsets.only(bottom: 2.0)),
         Expanded(
@@ -360,10 +365,10 @@ class _SourceDescription extends StatelessWidget {
             subtitle,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12.0),
+            style: CommonTextStyles.twelve,
           ),
         ),
-        Text('by $author, v$version', style: const TextStyle(fontSize: 12.0)),
+        Text('by $author, v$version', style: CommonTextStyles.twelve),
         if (badges.isNotEmpty)
           Row(
             children: badges

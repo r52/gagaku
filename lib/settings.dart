@@ -145,6 +145,8 @@ class AppSettingsPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    const titleStyle = CommonTextStyles.twentyBold;
+
     final t = context.t;
     final cache = ref.watch(cacheProvider);
     final cfg = ref.watch(gagakuSettingsProvider);
@@ -163,10 +165,7 @@ class AppSettingsPage extends HookConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
             SettingCardWidget(
-              title: Text(
-                t.theme.mode,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+              title: Text(t.theme.mode, style: titleStyle),
               builder: (context) {
                 return Center(
                   child: DropdownMenu<ThemeMode>(
@@ -203,10 +202,7 @@ class AppSettingsPage extends HookConsumerWidget {
               },
             ),
             SettingCardWidget(
-              title: Text(
-                t.theme.color,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+              title: Text(t.theme.color, style: titleStyle),
               builder: (context) {
                 return Center(
                   child: DropdownMenu<GagakuTheme>(
@@ -246,10 +242,7 @@ class AppSettingsPage extends HookConsumerWidget {
               },
             ),
             SettingCardWidget(
-              title: Text(
-                t.cache.clear,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+              title: Text(t.cache.clear, style: titleStyle),
               subtitle: Text(t.cache.clearSub),
               builder: (context) {
                 return Center(
@@ -307,10 +300,7 @@ class AppSettingsPage extends HookConsumerWidget {
               },
             ),
             SettingCardWidget(
-              title: Text(
-                t.backup.data,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+              title: Text(t.backup.data, style: titleStyle),
               subtitle: Text(t.backup.dataSub),
               builder: (context) {
                 return Center(
@@ -424,10 +414,7 @@ class AppSettingsPage extends HookConsumerWidget {
               },
             ),
             SettingCardWidget(
-              title: Text(
-                t.backup.dataLocation,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+              title: Text(t.backup.dataLocation, style: titleStyle),
               subtitle: Text(t.backup.dataLocSub),
               builder: (context) {
                 return Center(
