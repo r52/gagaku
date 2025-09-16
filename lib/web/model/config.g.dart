@@ -22,6 +22,9 @@ Map<String, dynamic> _$ExtensionConfigToJson(_ExtensionConfig instance) =>
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
 @ProviderFor(WebConfig)
 const webConfigProvider = WebConfigProvider._();
 
@@ -181,6 +184,3 @@ abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateDB> {
     element.handleValue(ref, created);
   }
 }
-
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
