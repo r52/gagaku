@@ -692,7 +692,7 @@ Stream<List<WebSourceInfo>> installedSources(Ref ref) async* {
   }
 }
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: true, retry: noRetry)
 class ExtensionSource extends _$ExtensionSource {
   HeadlessInAppWebView? _view;
   InAppWebViewController? get _controller =>
@@ -733,6 +733,12 @@ class ExtensionSource extends _$ExtensionSource {
         onLoadStop: (controller, url) =>
             _onWebViewLoadStop(controller, url, source!, completer),
       );
+
+      Timer(const Duration(seconds: 10), () {
+        if (!completer.isCompleted) {
+          completer.completeError(Exception('$sourceId load timeout'));
+        }
+      });
     } catch (e) {
       logger.w('Error creating extension view', error: e);
       completer.completeError(e);

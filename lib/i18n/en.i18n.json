@@ -165,6 +165,7 @@
       "installedVersion": " (installed: v${version})",
       "noTagsWarning": "This extension provides no filter options"
     },
+    "sourceUnavailable": "Source ${id} Unavailable",
     "noSourcesWarning": "No extensions installed!",
     "noSearchableSourcesWarning": "No searchable extensions installed!",
     "sourceSearch": "Extension Search",

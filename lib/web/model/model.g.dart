@@ -142,7 +142,7 @@ final class ExtensionSourceProvider
     required ExtensionSourceFamily super.from,
     required String super.argument,
   }) : super(
-         retry: null,
+         retry: noRetry,
          name: r'extensionSourceProvider',
          isAutoDispose: false,
          dependencies: null,
@@ -174,7 +174,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'81fe469b62a628beb392573d5fcf9a6d6f407e0c';
+String _$extensionSourceHash() => r'1d50730452bda12b075f2af91f1da8aa10c14f3b';
 
 final class ExtensionSourceFamily extends $Family
     with
@@ -187,7 +187,7 @@ final class ExtensionSourceFamily extends $Family
         > {
   const ExtensionSourceFamily._()
     : super(
-        retry: null,
+        retry: noRetry,
         name: r'extensionSourceProvider',
         dependencies: null,
         $allTransitiveDependencies: null,

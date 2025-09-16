@@ -25,16 +25,14 @@ enum WebMangaListView { grid, list }
 @riverpod
 Map<String, Widget> _extensionIcon(Ref ref) {
   final icons = ref.watch(
-    extensionInfoListProvider.select(
+    installedSourcesProvider.select(
       (value) => switch (value) {
-        AsyncValue(value: final data?) => data.map((key, ext) {
-          return MapEntry(
-            key,
-            ext.icon.isNotEmpty
+        AsyncValue(value: final data?) => {
+          for (final ext in data)
+            ext.id: ext.icon.isNotEmpty
                 ? Image.network(ext.icon, width: 24, height: 24)
                 : Text(ext.id, style: CommonTextStyles.twelve),
-          );
-        }),
+        },
         _ => <String, Widget>{},
       },
     ),

@@ -421,6 +421,9 @@ class TranslationsWebSourcesEn {
 	late final TranslationsWebSourcesRepoEn repo = TranslationsWebSourcesRepoEn.internal(_root);
 	late final TranslationsWebSourcesSourceEn source = TranslationsWebSourcesSourceEn.internal(_root);
 
+	/// en: 'Source ${id} Unavailable'
+	String sourceUnavailable({required Object id}) => 'Source ${id} Unavailable';
+
 	/// en: 'No extensions installed!'
 	String get noSourcesWarning => 'No extensions installed!';
 
@@ -1839,6 +1842,7 @@ extension on Translations {
 			case 'webSources.source.sourceAddOK': return 'Extension enabled';
 			case 'webSources.source.installedVersion': return ({required Object version}) => ' (installed: v${version})';
 			case 'webSources.source.noTagsWarning': return 'This extension provides no filter options';
+			case 'webSources.sourceUnavailable': return ({required Object id}) => 'Source ${id} Unavailable';
 			case 'webSources.noSourcesWarning': return 'No extensions installed!';
 			case 'webSources.noSearchableSourcesWarning': return 'No searchable extensions installed!';
 			case 'webSources.sourceSearch': return 'Extension Search';

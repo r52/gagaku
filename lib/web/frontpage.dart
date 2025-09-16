@@ -26,8 +26,15 @@ class _ExtensionHomeCard extends ConsumerWidget {
 
     return DataProviderWhenWidget(
       provider: extensionSourceProvider(extensionInfo.id),
-      errorBuilder: (context, defaultChild, error, stacktrace) =>
-          Card(child: defaultChild),
+      errorBuilder: (context, defaultChild, error, stacktrace) {
+        return Card(
+          child: ListTile(
+            title: Text(tr.webSources.sourceUnavailable(id: extensionInfo.id)),
+            enabled: false,
+            subtitle: Text('$error'),
+          ),
+        );
+      },
       builder: (BuildContext context, source) {
         return Card(
           child: ListTile(
