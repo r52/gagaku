@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/version.dart';
 import 'package:hive_ce/hive.dart';
@@ -68,7 +71,11 @@ class GagakuData {
     await Hive.openBox(gagakuLocalBox);
 
     final storage = Hive.box(gagakuLocalBox);
-    final dataLocation = storage.get('data_location') ?? appDir.path;
+    final dataLocation =
+        ((!Platform.isWindows || !kDebugMode)
+            ? storage.get('data_location')
+            : null) ??
+        appDir.path;
 
     // non-device specific, non-local, insecure data
     store = await openStore(directory: p.join(dataLocation, "gagaku"));

@@ -150,7 +150,9 @@ class WebSourceFavoriteTab extends HookWidget {
         WebMangaListViewSliver(
           items: items,
           favoritesKey: category.id,
+          showFavoriteButton: true,
           showRemoveButton: false,
+          showSearchButton: true,
         ),
       ],
     );

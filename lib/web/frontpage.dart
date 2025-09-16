@@ -562,7 +562,9 @@ class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
           children: [
             WebMangaListViewSliver(
               controller: _pagingController,
+              showFavoriteButton: true,
               showRemoveButton: false,
+              showSearchButton: false,
             ),
           ],
         ),
@@ -587,7 +589,12 @@ class MangaCarousel extends StatelessWidget {
           enableSplash: false,
           children: [
             for (final item in items)
-              GridMangaItem(link: item, showRemoveButton: false),
+              GridMangaItem(
+                link: item,
+                showFavoriteButton: true,
+                showRemoveButton: false,
+                showSearchButton: false,
+              ),
           ],
         ),
       ),

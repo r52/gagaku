@@ -122,7 +122,14 @@ class WebSourceHistoryPage extends HookConsumerWidget {
               ],
             ),
           ],
-          children: [WebMangaListViewSliver(items: stream.data!)],
+          children: [
+            WebMangaListViewSliver(
+              items: stream.data!,
+              showFavoriteButton: true,
+              showRemoveButton: true,
+              showSearchButton: true,
+            ),
+          ],
         ),
       // AsyncValue(:final error?, :final stackTrace?) =>
       _ when stream.hasError => ErrorList(

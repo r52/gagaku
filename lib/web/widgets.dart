@@ -150,12 +150,16 @@ class WebMangaListViewSliver extends ConsumerWidget {
     this.items,
     this.controller,
     this.favoritesKey,
-    this.showRemoveButton = true,
+    required this.showFavoriteButton,
+    required this.showRemoveButton,
+    required this.showSearchButton,
   }) : assert(items != null || controller != null);
 
   final String? favoritesKey;
   final List<HistoryLink>? items;
+  final bool showFavoriteButton;
   final bool showRemoveButton;
+  final bool showSearchButton;
 
   final PagingController<dynamic, HistoryLink>? controller;
 
@@ -299,7 +303,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
               return GridMangaItem(
                 key: ValueKey(item.url),
                 link: item,
+                showFavoriteButton: showFavoriteButton,
                 showRemoveButton: showRemoveButton,
+                showSearchButton: showSearchButton,
               );
             },
             itemCount: items!.length,
@@ -376,7 +382,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
                   return GridMangaItem(
                     key: ValueKey(item.url),
                     link: item,
+                    showFavoriteButton: showFavoriteButton,
                     showRemoveButton: showRemoveButton,
+                    showSearchButton: showSearchButton,
                   );
                 },
               ),
@@ -391,13 +399,15 @@ class GridMangaItem extends HookConsumerWidget {
   const GridMangaItem({
     super.key,
     required this.link,
-    this.showFavoriteButton = true,
-    this.showRemoveButton = true,
+    required this.showFavoriteButton,
+    required this.showRemoveButton,
+    required this.showSearchButton,
   });
 
   final HistoryLink link;
   final bool showFavoriteButton;
   final bool showRemoveButton;
+  final bool showSearchButton;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -468,22 +478,46 @@ class GridMangaItem extends HookConsumerWidget {
               alignment: Alignment.topLeft,
               child: FavoritesButton(link: link),
             ),
-          if (showRemoveButton)
+          if (showSearchButton || showRemoveButton)
             Align(
               alignment: Alignment.topRight,
-              child: FloatingActionButton(
-                heroTag: ObjectKey(link),
-                mini: true,
-                shape: const CircleBorder(),
-                tooltip: tr.mangaActions.removeHistory,
-                onPressed: () async {
-                  WebHistoryManager().remove(link);
-                },
-                backgroundColor: theme.colorScheme.errorContainer,
-                child: Icon(
-                  Icons.delete,
-                  color: theme.colorScheme.onErrorContainer,
+              child: MenuAnchor(
+                builder: (context, controller, child) => IconButton(
+                  style: Styles.squareIconButtonStyle(
+                    backgroundColor: theme.colorScheme.surface.withAlpha(200),
+                  ),
+                  onPressed: () {
+                    if (controller.isOpen) {
+                      controller.close();
+                    } else {
+                      controller.open();
+                    }
+                  },
+                  icon: const Icon(Icons.more_vert),
                 ),
+                menuChildren: [
+                  if (showSearchButton)
+                    MenuItemButton(
+                      onPressed: () => context.router.push(
+                        ExtensionSearchRoute(
+                          query: SearchQuery(title: link.title),
+                        ),
+                      ),
+                      leadingIcon: const Icon(Icons.search),
+                      child: Text(tr.webSources.searchWithExt),
+                    ),
+                  if (showRemoveButton)
+                    MenuItemButton(
+                      onPressed: () async {
+                        WebHistoryManager().remove(link);
+                      },
+                      leadingIcon: Icon(
+                        Icons.delete,
+                        color: theme.colorScheme.error,
+                      ),
+                      child: Text(tr.mangaActions.removeHistory),
+                    ),
+                ],
               ),
             ),
         ],
