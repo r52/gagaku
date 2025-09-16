@@ -148,8 +148,14 @@ class ProxyHandler {
 
     final srcId = parts[0];
 
-    final installed = await ref.read(extensionInfoListProvider.future);
-    final src = installed[srcId];
+    WebSourceInfo? src;
+
+    try {
+      src = await ref.read(extensionSourceProvider(srcId).future);
+    } catch (e) {
+      logger.w('extensionSourceProvider($srcId) failed');
+      src = null;
+    }
 
     if (src == null) {
       logger.w('Extension not found. url: ${uri.toString()}');
