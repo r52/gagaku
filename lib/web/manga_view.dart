@@ -127,6 +127,15 @@ class WebMangaViewWidget extends HookConsumerWidget {
     final api = ref.watch(proxyProvider);
     final theme = Theme.of(context);
 
+    // handle legacy share url
+    final shareUrlFuture = useMemoized(
+      () => ref
+          .read(extensionSourceProvider(handle.sourceId).notifier)
+          .getMangaURL(handle.location),
+      [handle],
+    );
+    final shareUrl = useFuture(shareUrlFuture);
+
     final extdata = manga.data;
 
     useEffect(() {
@@ -483,10 +492,12 @@ class WebMangaViewWidget extends HookConsumerWidget {
                           ),
                         if (handle.type == SourceType.source &&
                             extdata != null &&
-                            extdata.mangaInfo.shareUrl != null)
+                            (extdata.mangaInfo.shareUrl != null ||
+                                shareUrl.data != null))
                           ButtonChip(
                             onPressed: () async {
-                              final url = extdata.mangaInfo.shareUrl!;
+                              final url =
+                                  extdata.mangaInfo.shareUrl ?? shareUrl.data!;
                               await Styles.tryLaunchUrl(context, url);
                             },
                             text: tr.mangaView.openOn(arg: handle.sourceId),
