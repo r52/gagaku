@@ -50,6 +50,7 @@ void main() async {
   await Hive.openLazyBox<CacheEntry>(gagakuCache);
 
   final gdat = GagakuData();
+  await gdat.initData();
   await gdat.initGagakuBoxes();
 
   final appdir = await getApplicationSupportDirectory();
