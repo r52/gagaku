@@ -93,7 +93,7 @@ export class MockRequestManager implements RequestManager {
   constructor(selectorRegistry: SelectorRegistry) {
     this.selectorRegistry = selectorRegistry
     this.registeredInterceptors = []
-    this.userAgent = 'Mozilla/5.0 (Android 16; Mobile; rv:141.0) Gecko/141.0 Firefox/141.0'
+    this.userAgent = 'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.52 Mobile Safari/537.36'
   }
 
   registerInterceptor(
@@ -151,7 +151,12 @@ export class MockRequestManager implements RequestManager {
             requestBody = rawBody
           } else {
             requestBody = Object.keys(rawBody).reduce((formData, key) => {
-              formData.append(key, (rawBody as Record<string, unknown>)[key])
+              const value = (rawBody as Record<string, unknown>)[key]
+              if (typeof value === 'string' || value instanceof Blob) {
+                formData.append(key, value)
+              } else if (value !== undefined && value !== null) {
+                formData.append(key, String(value))
+              }
               return formData
             }, new FormData())
           }
@@ -178,7 +183,7 @@ export class MockRequestManager implements RequestManager {
 
     const fetchResponse = await fetch(finalRequest.url, {
       method: finalRequest.method,
-      body: requestBody,
+      body: requestBody ?? null,
       headers: requestHeaders,
     })
 
@@ -219,8 +224,8 @@ export class MockRequestManager implements RequestManager {
         name: name!,
         value: value!,
         domain: domain ?? parseURL(fetchResponse.url).hostname!,
-        path,
-        expires,
+        path: path ?? '/',
+        expires: expires ?? new Date(),
       })
     }
 
