@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/objectbox.g.dart';
@@ -17,6 +16,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:native_dio_adapter/native_dio_adapter.dart' hide URLRequest;
 import 'package:riverpod/experimental/mutation.dart';
@@ -53,6 +53,38 @@ void openWebSource(BuildContext context, SourceHandler handle) {
       ),
     );
   }
+}
+
+String _processReferrer(String? baseUrl) {
+  String referrer = baseUrl ?? '';
+
+  if (referrer.isNotEmpty) {
+    if (!referrer.startsWith('https://')) {
+      referrer = 'https://$referrer';
+    }
+
+    if (!referrer.endsWith('/')) {
+      referrer = '$referrer/';
+    }
+  }
+
+  return referrer;
+}
+
+@riverpod
+Map<String, String> extensionReferrer(Ref ref) {
+  final refer = ref.watch(
+    installedSourcesProvider.select(
+      (value) => switch (value) {
+        AsyncValue(value: final data?) => {
+          for (final ext in data) ext.id: _processReferrer(ext.baseUrl),
+        },
+        _ => <String, String>{},
+      },
+    ),
+  );
+
+  return UnmodifiableMapView(refer);
 }
 
 @Riverpod(keepAlive: true)
@@ -766,7 +798,10 @@ class ExtensionSource extends _$ExtensionSource {
             forMainFrameOnly: false,
           ),
         ]),
-        initialSettings: InAppWebViewSettings(isInspectable: kDebugMode),
+        initialSettings: InAppWebViewSettings(
+          browserAcceleratorKeysEnabled: false,
+          isInspectable: false,
+        ),
         onLoadStart: (controller, url) {
           if (_initialized) {
             controller.stopLoading();
@@ -1229,9 +1264,15 @@ return p;
       return null;
     }
 
-    final result = await _controller?.evaluateJavascript(
-      source: "$sourceId?.getMangaShareUrl('$mangaId')",
-    );
+    dynamic result;
+
+    try {
+      result = await _controller?.evaluateJavascript(
+        source: "$sourceId?.getMangaShareUrl('$mangaId')",
+      );
+    } catch (e) {
+      return null;
+    }
 
     return result;
   }
@@ -1239,7 +1280,8 @@ return p;
   Future<List<SearchFilter>?> getFilters() async {
     await future;
 
-    return _filters?.map((e) => e.copyWith()).toList();
+    final filters = _filters?.map((e) => e.copyWith()).toList();
+    return filters;
   }
 }
 

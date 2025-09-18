@@ -10,6 +10,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/exception.dart';
+import 'package:gagaku/util/http.dart' show baseUserAgent;
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -124,6 +125,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
         },
       ),
     );
+    final refer = ref.watch(extensionReferrerProvider);
     final api = ref.watch(proxyProvider);
     final theme = Theme.of(context);
 
@@ -137,6 +139,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
     final shareUrl = useFuture(shareUrlFuture);
 
     final extdata = manga.data;
+
+    String referer = refer[handle.sourceId] ?? '';
 
     useEffect(() {
       Future.delayed(Duration.zero, () async {
@@ -215,6 +219,10 @@ class WebMangaViewWidget extends HookConsumerWidget {
                   children: [
                     CachedNetworkImage(
                       imageUrl: manga.cover,
+                      httpHeaders: {
+                        'referer': referer,
+                        'user-agent': baseUserAgent,
+                      },
                       cacheManager: gagakuImageCache,
                       memCacheWidth: 512,
                       maxWidthDiskCache: 512,

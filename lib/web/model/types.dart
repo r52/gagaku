@@ -265,7 +265,7 @@ class HistoryLink with _$HistoryLink {
   );
 
   factory HistoryLink.fromDiscoverySectionItem(
-    String sourceId,
+    WebSourceInfo source,
     DiscoverSectionItem item,
   ) {
     return switch (item) {
@@ -274,23 +274,43 @@ class HistoryLink with _$HistoryLink {
       ),
       ChapterUpdatesCarouselItem() => HistoryLink(
         title: item.title,
-        url: '$sourceId/${item.mangaId}',
+        url: '${source.id}/${item.mangaId}',
         cover: item.imageUrl,
+        handle: SourceHandler(
+          type: SourceType.source,
+          sourceId: source.id,
+          location: item.mangaId,
+        ),
       ),
       ProminentCarouselItem() => HistoryLink(
         title: item.title,
-        url: '$sourceId/${item.mangaId}',
+        url: '${source.id}/${item.mangaId}',
         cover: item.imageUrl,
+        handle: SourceHandler(
+          type: SourceType.source,
+          sourceId: source.id,
+          location: item.mangaId,
+        ),
       ),
       SimpleCarouselItem() => HistoryLink(
         title: item.title,
-        url: '$sourceId/${item.mangaId}',
+        url: '${source.id}/${item.mangaId}',
         cover: item.imageUrl,
+        handle: SourceHandler(
+          type: SourceType.source,
+          sourceId: source.id,
+          location: item.mangaId,
+        ),
       ),
       FeaturedCarouselItem() => HistoryLink(
         title: item.title,
-        url: '$sourceId/${item.mangaId}',
+        url: '${source.id}/${item.mangaId}',
         cover: item.imageUrl,
+        handle: SourceHandler(
+          type: SourceType.source,
+          sourceId: source.id,
+          location: item.mangaId,
+        ),
       ),
     };
   }

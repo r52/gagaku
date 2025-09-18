@@ -365,7 +365,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
 
           if (section.type != DiscoverSectionType.genres) {
             final mangas = sectionResults.items
-                .map((e) => HistoryLink.fromDiscoverySectionItem(source.id, e))
+                .map((e) => HistoryLink.fromDiscoverySectionItem(source, e))
                 .toList();
             homepageWidgets.add(MangaCarousel(items: mangas));
           } else {
@@ -516,7 +516,7 @@ class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
           .getDiscoverSectionItems(widget.section, metadata);
 
       final m = results.items.map(
-        (e) => HistoryLink.fromDiscoverySectionItem(widget.source.id, e),
+        (e) => HistoryLink.fromDiscoverySectionItem(widget.source, e),
       );
 
       metadata = results.metadata;

@@ -6,6 +6,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/util/exception.dart';
+import 'package:gagaku/util/http.dart' show baseUserAgent;
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -87,32 +88,24 @@ Future<List<ReaderPage>> _getSourcePages(
   dynamic chapter,
   SourceHandler handle,
 ) async {
-  String referer = '';
   List<String>? links = [];
 
   final sourceId = handle.sourceId;
 
-  final ext = await ref.watch(extensionSourceProvider(sourceId).future);
+  final refer = ref.watch(extensionReferrerProvider);
   links = await ref
       .read(extensionSourceProvider(sourceId).notifier)
       .getChapterPages(chapter as Chapter);
 
-  referer = ext.baseUrl ?? '';
-
-  if (referer.isNotEmpty) {
-    if (!referer.startsWith('https://')) {
-      referer = 'https://$referer';
-    }
-
-    if (!referer.endsWith('/')) {
-      referer = '$referer/';
-    }
-  }
+  String referer = refer[sourceId] ?? '';
 
   final pages = links
       .map(
         (e) => ReaderPage(
-          provider: NetworkImage(e, headers: {'referer': referer}),
+          provider: NetworkImage(
+            e,
+            headers: {'referer': referer, 'user-agent': baseUserAgent},
+          ),
         ),
       )
       .toList();

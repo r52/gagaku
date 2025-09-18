@@ -9,6 +9,53 @@ part of 'model.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
+@ProviderFor(extensionReferrer)
+const extensionReferrerProvider = ExtensionReferrerProvider._();
+
+final class ExtensionReferrerProvider
+    extends
+        $FunctionalProvider<
+          Map<String, String>,
+          Map<String, String>,
+          Map<String, String>
+        >
+    with $Provider<Map<String, String>> {
+  const ExtensionReferrerProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'extensionReferrerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$extensionReferrerHash();
+
+  @$internal
+  @override
+  $ProviderElement<Map<String, String>> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  Map<String, String> create(Ref ref) {
+    return extensionReferrer(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Map<String, String>>(value),
+    );
+  }
+}
+
+String _$extensionReferrerHash() => r'13ddbba7059d5caf3026b45cc998d2b1595b8f20';
+
 @ProviderFor(proxy)
 const proxyProvider = ProxyProvider._();
 
@@ -177,7 +224,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'a938eb5277549649ce723b018787e4859417ca20';
+String _$extensionSourceHash() => r'6e429a8920361acaea25ddc44e7f3151d2015f42';
 
 final class ExtensionSourceFamily extends $Family
     with

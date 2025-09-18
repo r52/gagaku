@@ -9,6 +9,7 @@ import 'package:gagaku/model/config.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/cached_network_image.dart';
+import 'package:gagaku/util/http.dart' show baseUserAgent;
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -413,6 +414,8 @@ class GridMangaItem extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final extIcons = ref.watch(_extensionIconProvider);
+    final refer = ref.watch(extensionReferrerProvider);
+
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
@@ -421,9 +424,12 @@ class GridMangaItem extends HookConsumerWidget {
     );
     final theme = Theme.of(context);
 
+    String referer = refer[link.handle?.sourceId] ?? '';
+
     final Widget cover = link.cover != null
         ? CachedNetworkImage(
             imageUrl: link.cover!,
+            httpHeaders: {'referer': referer, 'user-agent': baseUserAgent},
             cacheManager: gagakuImageCache,
             memCacheWidth: 512,
             maxWidthDiskCache: 512,

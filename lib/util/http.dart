@@ -7,11 +7,11 @@ import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'package:http/retry.dart';
 
-const _baseUserAgent =
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0';
+const baseUserAgent =
+    'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.52 Mobile Safari/537.36';
 
 String getUserAgent([bool useCustomUA = false]) {
-  return useCustomUA ? GagakuData().gagakuUserAgent : _baseUserAgent;
+  return useCustomUA ? GagakuData().gagakuUserAgent : baseUserAgent;
 }
 
 CronetEngine createCronetEngine(String userAgent) => CronetEngine.build(
