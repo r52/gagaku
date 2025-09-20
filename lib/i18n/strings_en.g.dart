@@ -453,6 +453,12 @@ class TranslationsWebSourcesEn {
 
 	/// en: 'Search with extensions'
 	String get searchWithExt => 'Search with extensions';
+
+	/// en: 'Your manga browsing history appears here'
+	String get historyHere => 'Your manga browsing history appears here';
+
+	/// en: 'Save History?'
+	String get saveHistory => 'Save History?';
 }
 
 // Path: search
@@ -1853,6 +1859,8 @@ extension on Translations {
 			case 'webSources.favorites': return 'Favorites';
 			case 'webSources.loadInstalledSourcesError': return 'Error loading installed sources';
 			case 'webSources.searchWithExt': return 'Search with extensions';
+			case 'webSources.historyHere': return 'Your manga browsing history appears here';
+			case 'webSources.saveHistory': return 'Save History?';
 			case 'search.text': return 'Search';
 			case 'search.arg': return ({required Object arg}) => 'Search ${arg}';
 			case 'search.filters': return 'Search Filters';

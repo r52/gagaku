@@ -13,6 +13,7 @@ import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/http.dart' show baseUserAgent;
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
@@ -117,6 +118,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
+    final cfg = ref.watch(webConfigProvider);
     final source = ref.watch(
       getExtensionFromIdProvider(handle.sourceId).select(
         (value) => switch (value) {
@@ -143,9 +145,11 @@ class WebMangaViewWidget extends HookConsumerWidget {
     String referer = refer[handle.sourceId] ?? '';
 
     useEffect(() {
-      Future.delayed(Duration.zero, () async {
-        WebHistoryManager().add(link);
-      });
+      if (cfg.preserveHistory) {
+        Future.delayed(Duration.zero, () async {
+          WebHistoryManager().add(link);
+        });
+      }
       return null;
     }, []);
 

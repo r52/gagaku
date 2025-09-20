@@ -6,6 +6,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/ui.dart';
@@ -22,6 +23,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final api = ref.watch(proxyProvider);
+    final cfg = ref.watch(webConfigProvider);
 
     final scrollController =
         DefaultScrollController.maybeOf(context, 'WebSourceHistoryPage') ??
@@ -45,6 +47,24 @@ class WebSourceHistoryPage extends HookConsumerWidget {
     // Pre-initialize sources
     final _ = ref.watch(extensionInfoListProvider);
 
+    final saveHistoryRow = Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 4.0,
+      children: [
+        Switch(
+          value: cfg.preserveHistory,
+          onChanged: (bool value) {
+            webConfigSaveMutation.run(ref, (ref) async {
+              return ref
+                  .get(webConfigProvider.notifier)
+                  .saveWith(preserveHistory: value);
+            });
+          },
+        ),
+        Text(tr.webSources.saveHistory, style: CommonTextStyles.sixteenBold),
+      ],
+    );
+
     return switch (stream.connectionState) {
       // AsyncValue(value: final history?) when history.list.isEmpty =>
       ConnectionState.active when stream.data == null || stream.data!.isEmpty =>
@@ -53,6 +73,13 @@ class WebSourceHistoryPage extends HookConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 10.0,
             children: [
+              saveHistoryRow,
+              Text(tr.webSources.historyHere),
+              ElevatedButton.icon(
+                onPressed: () => openLinkDialog(context, api),
+                icon: const Icon(Icons.link),
+                label: Text(tr.webSources.openLink),
+              ),
               Tooltip(
                 message: tr.webSources.supportedUrl.arg(
                   arg: '\ncubari.moe\nimgur.com',
@@ -66,11 +93,6 @@ class WebSourceHistoryPage extends HookConsumerWidget {
                   ],
                 ),
               ),
-              ElevatedButton.icon(
-                onPressed: () => openLinkDialog(context, api),
-                icon: const Icon(Icons.link),
-                label: Text(tr.webSources.openLink),
-              ),
             ],
           ),
         ),
@@ -79,6 +101,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
         WebMangaListWidget(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: scrollController,
+          title: saveHistoryRow,
           leading: [
             SliverAppBar(
               automaticallyImplyLeading: false,

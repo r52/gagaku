@@ -13,10 +13,14 @@ _ExtensionConfig _$ExtensionConfigFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      preserveHistory: json['preserveHistory'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$ExtensionConfigToJson(_ExtensionConfig instance) =>
-    <String, dynamic>{'categoriesToUpdate': instance.categoriesToUpdate};
+    <String, dynamic>{
+      'categoriesToUpdate': instance.categoriesToUpdate,
+      'preserveHistory': instance.preserveHistory,
+    };
 
 // **************************************************************************
 // RiverpodGenerator
@@ -57,7 +61,7 @@ final class WebConfigProvider
   }
 }
 
-String _$webConfigHash() => r'3946a046f37b982630c47c257cf1cb6ad37d53f4';
+String _$webConfigHash() => r'82047ba484958c37d164589d9a338be3a6fa04da';
 
 abstract class _$WebConfig extends $Notifier<ExtensionConfig> {
   ExtensionConfig build();

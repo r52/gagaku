@@ -175,7 +175,9 @@
     "resetAllReadWarning": "Are you sure you want to reset all read markers?",
     "favorites": "Favorites",
     "loadInstalledSourcesError": "Error loading installed sources",
-    "searchWithExt": "Search with extensions"
+    "searchWithExt": "Search with extensions",
+    "historyHere": "Your manga browsing history appears here",
+    "saveHistory": "Save History?"
   },
   "search": {
     "text": "Search",

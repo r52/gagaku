@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:111371867039964082",
-      "lastPropertyId": "3:7984173099377989269",
+      "lastPropertyId": "4:477225497001240540",
       "name": "ExtensionConfig",
       "properties": [
         {
@@ -18,6 +18,11 @@
           "id": "3:7984173099377989269",
           "name": "categoriesToUpdate",
           "type": 30
+        },
+        {
+          "id": "4:477225497001240540",
+          "name": "preserveHistory",
+          "type": 1
         }
       ],
       "relations": []

@@ -27,7 +27,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 111371867039964082),
     name: 'ExtensionConfig',
-    lastPropertyId: const obx_int.IdUid(3, 7984173099377989269),
+    lastPropertyId: const obx_int.IdUid(4, 477225497001240540),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -40,6 +40,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(3, 7984173099377989269),
         name: 'categoriesToUpdate',
         type: 30,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 477225497001240540),
+        name: 'preserveHistory',
+        type: 1,
         flags: 0,
       ),
     ],
@@ -494,9 +500,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
               .map(fbb.writeString)
               .toList(growable: false),
         );
-        fbb.startTable(4);
+        fbb.startTable(5);
         fbb.addInt64(0, object.dbid);
         fbb.addOffset(2, categoriesToUpdateOffset);
+        fbb.addBool(3, object.preserveHistory);
         fbb.finish(fbb.endTable());
         return object.dbid;
       },
@@ -513,9 +520,16 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fb.StringReader(asciiOptimization: true),
           lazy: false,
         ).vTableGet(buffer, rootOffset, 8, []);
+        final preserveHistoryParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          false,
+        );
         final object = ExtensionConfig(
           dbid: dbidParam,
           categoriesToUpdate: categoriesToUpdateParam,
+          preserveHistory: preserveHistoryParam,
         );
 
         return object;
@@ -1077,6 +1091,11 @@ class ExtensionConfig_ {
       obx.QueryStringVectorProperty<ExtensionConfig>(
         _entities[0].properties[1],
       );
+
+  /// See [ExtensionConfig.preserveHistory].
+  static final preserveHistory = obx.QueryBooleanProperty<ExtensionConfig>(
+    _entities[0].properties[2],
+  );
 }
 
 /// [ExtensionStateDB] entity fields to define ObjectBox queries.
