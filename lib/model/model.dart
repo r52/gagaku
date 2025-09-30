@@ -80,11 +80,11 @@ class GagakuData {
     await Hive.openBox(gagakuLocalBox);
 
     final storage = Hive.box(gagakuLocalBox);
-    final dataLocation =
-        ((!Platform.isWindows || !kDebugMode)
-            ? storage.get('data_location')
-            : null) ??
-        appDir.path;
+    // On Windows debug builds, always use the default appDir.path to avoid issues
+    // with a previously set data location. In other cases, respect the stored 'data_location'.
+    final dataLocation = (Platform.isWindows && kDebugMode)
+        ? appDir.path
+        : (storage.get('data_location') ?? appDir.path);
 
     // non-device specific, non-local, insecure data
     store = await openStore(directory: p.join(dataLocation, "gagaku"));
