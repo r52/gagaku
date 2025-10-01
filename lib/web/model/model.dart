@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/objectbox.g.dart';
@@ -17,6 +16,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:native_dio_adapter/native_dio_adapter.dart' hide URLRequest;
 import 'package:riverpod/experimental/mutation.dart';
@@ -53,6 +53,38 @@ void openWebSource(BuildContext context, SourceHandler handle) {
       ),
     );
   }
+}
+
+String _processReferrer(String? baseUrl) {
+  String referrer = baseUrl ?? '';
+
+  if (referrer.isNotEmpty) {
+    if (!referrer.startsWith('https://')) {
+      referrer = 'https://$referrer';
+    }
+
+    if (!referrer.endsWith('/')) {
+      referrer = '$referrer/';
+    }
+  }
+
+  return referrer;
+}
+
+@riverpod
+Map<String, String> extensionReferrer(Ref ref) {
+  final refer = ref.watch(
+    installedSourcesProvider.select(
+      (value) => switch (value) {
+        AsyncValue(value: final data?) => {
+          for (final ext in data) ext.id: _processReferrer(ext.baseUrl),
+        },
+        _ => <String, String>{},
+      },
+    ),
+  );
+
+  return UnmodifiableMapView(refer);
 }
 
 @Riverpod(keepAlive: true)
@@ -148,8 +180,14 @@ class ProxyHandler {
 
     final srcId = parts[0];
 
-    final installed = await ref.read(extensionInfoListProvider.future);
-    final src = installed[srcId];
+    WebSourceInfo? src;
+
+    try {
+      src = await ref.read(extensionSourceProvider(srcId).future);
+    } catch (e) {
+      logger.w('extensionSourceProvider($srcId) failed');
+      src = null;
+    }
 
     if (src == null) {
       logger.w('Extension not found. url: ${uri.toString()}');
@@ -692,8 +730,10 @@ Stream<List<WebSourceInfo>> installedSources(Ref ref) async* {
   }
 }
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: true, retry: noRetry)
 class ExtensionSource extends _$ExtensionSource {
+  bool _initialized = false;
+  String? _extensionBody;
   HeadlessInAppWebView? _view;
   InAppWebViewController? get _controller =>
       (_view?.isRunning() ?? false) ? _view?.webViewController : null;
@@ -714,6 +754,26 @@ class ExtensionSource extends _$ExtensionSource {
           sourceId: sourceId,
         );
       }
+
+      final sourceFile = switch (source.version) {
+        SupportedVersion.v0_8 => 'source.js',
+        SupportedVersion.v0_9 => 'index.js',
+      };
+
+      final scriptUrl = '${source.repo}/${source.id}/$sourceFile';
+      final response = await http.get(Uri.parse(scriptUrl));
+
+      if (response.statusCode != 200) {
+        final err = "Failed to load $scriptUrl";
+        logger.e(err);
+        throw ApiException(
+          message: err,
+          statusCode: response.statusCode,
+          statusMessage: response.reasonPhrase,
+        );
+      }
+
+      _extensionBody = response.body;
     } catch (e) {
       logger.e('Error retrieving source info from database', error: e);
       rethrow; // Re-throw to prevent further execution
@@ -726,13 +786,39 @@ class ExtensionSource extends _$ExtensionSource {
         initialUrlRequest: URLRequest(
           url: WebUri(source.baseUrl ?? 'about:blank'),
         ),
-        initialSettings: InAppWebViewSettings(isInspectable: kDebugMode),
+        initialUserScripts: UnmodifiableListView<UserScript>([
+          UserScript(
+            source: GagakuData().extensionHost,
+            injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+            forMainFrameOnly: false,
+          ),
+          UserScript(
+            source: _extensionBody!,
+            injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+            forMainFrameOnly: false,
+          ),
+        ]),
+        initialSettings: InAppWebViewSettings(
+          browserAcceleratorKeysEnabled: false,
+          isInspectable: false,
+        ),
+        onLoadStart: (controller, url) {
+          if (_initialized) {
+            controller.stopLoading();
+          }
+        },
         onWebViewCreated: (controller) {
           _setupJavaScriptHandlers(controller, sourceId);
         },
         onLoadStop: (controller, url) =>
             _onWebViewLoadStop(controller, url, source!, completer),
       );
+
+      Timer(const Duration(seconds: 10), () async {
+        if (!completer.isCompleted) {
+          completer.completeError(Exception('$sourceId load timeout'));
+        }
+      });
     } catch (e) {
       logger.w('Error creating extension view', error: e);
       completer.completeError(e);
@@ -744,6 +830,8 @@ class ExtensionSource extends _$ExtensionSource {
     ref.onDispose(() {
       _view?.dispose();
     });
+
+    _initialized = true;
 
     return source;
   }
@@ -818,34 +906,6 @@ class ExtensionSource extends _$ExtensionSource {
     Completer<void> completer,
   ) async {
     try {
-      await controller.injectJavascriptFileFromAsset(
-        assetFilePath: "assets/extensionhost/bundle.js",
-      );
-
-      final sourceFile = switch (source.version) {
-        SupportedVersion.v0_8 => 'source.js',
-        SupportedVersion.v0_9 => 'index.js',
-      };
-
-      final scriptUrl = '${source.repo}/${source.id}/$sourceFile';
-      final response = await http.get(Uri.parse(scriptUrl));
-
-      if (response.statusCode != 200) {
-        final err = "Failed to load $scriptUrl";
-        logger.e(err);
-        completer.completeError(
-          ApiException(
-            message: err,
-            statusCode: response.statusCode,
-            statusMessage: response.reasonPhrase,
-          ),
-        );
-        return;
-      }
-
-      final script = response.body;
-      await controller.evaluateJavascript(source: script);
-
       final sourceId = source.id;
 
       final initScript = switch (source.version) {
@@ -855,6 +915,10 @@ class ExtensionSource extends _$ExtensionSource {
           "var ${source.id} = window.source.${source.id};",
       };
       await controller.evaluateJavascript(source: initScript);
+
+      if (_initialized) {
+        return;
+      }
 
       // Set extension state
       final extstate = ref
@@ -892,7 +956,7 @@ class ExtensionSource extends _$ExtensionSource {
       logger.d("Extension ${source.name} ready");
       completer.complete();
     } catch (e) {
-      logger.e('Error during WebView load stop', error: e);
+      logger.e('(${source.id}) Error during WebView load stop', error: e);
       completer.completeError(e);
     }
   }
@@ -1200,9 +1264,15 @@ return p;
       return null;
     }
 
-    final result = await _controller?.evaluateJavascript(
-      source: "$sourceId?.getMangaShareUrl('$mangaId')",
-    );
+    dynamic result;
+
+    try {
+      result = await _controller?.evaluateJavascript(
+        source: "$sourceId?.getMangaShareUrl('$mangaId')",
+      );
+    } catch (e) {
+      return null;
+    }
 
     return result;
   }
@@ -1210,7 +1280,8 @@ return p;
   Future<List<SearchFilter>?> getFilters() async {
     await future;
 
-    return _filters?.map((e) => e.copyWith()).toList();
+    final filters = _filters?.map((e) => e.copyWith()).toList();
+    return filters;
   }
 }
 

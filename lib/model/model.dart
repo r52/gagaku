@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/version.dart';
 import 'package:hive_ce/hive.dart';
@@ -56,6 +60,8 @@ class GagakuData {
 
   late final Store store;
 
+  late final String extensionHost;
+
   // Default user agent
   final String gagakuUserAgent = '$kPackageName/$kPackageVersion';
 
@@ -63,12 +69,22 @@ class GagakuData {
     return _instance;
   }
 
+  Future<void> initData() async {
+    extensionHost = await rootBundle.loadString(
+      'assets/extensionhost/bundle.js',
+    );
+  }
+
   Future<void> initGagakuBoxes() async {
     final appDir = await getApplicationDocumentsDirectory();
     await Hive.openBox(gagakuLocalBox);
 
     final storage = Hive.box(gagakuLocalBox);
-    final dataLocation = storage.get('data_location') ?? appDir.path;
+    // On Windows debug builds, always use the default appDir.path to avoid issues
+    // with a previously set data location. In other cases, respect the stored 'data_location'.
+    final dataLocation = (Platform.isWindows && kDebugMode)
+        ? appDir.path
+        : (storage.get('data_location') ?? appDir.path);
 
     // non-device specific, non-local, insecure data
     store = await openStore(directory: p.join(dataLocation, "gagaku"));

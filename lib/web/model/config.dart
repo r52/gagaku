@@ -23,6 +23,7 @@ abstract class ExtensionConfig with _$ExtensionConfig {
     @Default(0)
     int dbid,
     @Default([]) List<String> categoriesToUpdate,
+    @Default(true) bool preserveHistory,
   }) = _ExtensionConfig;
 
   factory ExtensionConfig.fromJson(Map<String, dynamic> json) =>
@@ -52,11 +53,18 @@ class WebConfig extends _$WebConfig {
     return _fetch();
   }
 
-  ExtensionConfig saveWith({List<String>? categoriesToUpdate}) {
+  ExtensionConfig saveWith({
+    List<String>? categoriesToUpdate,
+    bool? preserveHistory,
+  }) {
     var update = state;
 
     if (categoriesToUpdate != null) {
       update = update.copyWith(categoriesToUpdate: categoriesToUpdate);
+    }
+
+    if (preserveHistory != null) {
+      update = update.copyWith(preserveHistory: preserveHistory);
     }
 
     state = update;

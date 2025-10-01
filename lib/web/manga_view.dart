@@ -10,8 +10,10 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/exception.dart';
+import 'package:gagaku/util/http.dart' show baseUserAgent;
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
@@ -116,6 +118,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
+    final cfg = ref.watch(webConfigProvider);
     final source = ref.watch(
       getExtensionFromIdProvider(handle.sourceId).select(
         (value) => switch (value) {
@@ -124,15 +127,29 @@ class WebMangaViewWidget extends HookConsumerWidget {
         },
       ),
     );
+    final refer = ref.watch(extensionReferrerProvider);
     final api = ref.watch(proxyProvider);
     final theme = Theme.of(context);
 
+    // handle legacy share url
+    final shareUrlFuture = useMemoized(
+      () => ref
+          .read(extensionSourceProvider(handle.sourceId).notifier)
+          .getMangaURL(handle.location),
+      [handle],
+    );
+    final shareUrl = useFuture(shareUrlFuture);
+
     final extdata = manga.data;
 
+    String referer = refer[handle.sourceId] ?? '';
+
     useEffect(() {
-      Future.delayed(Duration.zero, () async {
-        WebHistoryManager().add(link);
-      });
+      if (cfg.preserveHistory) {
+        Future.delayed(Duration.zero, () async {
+          WebHistoryManager().add(link);
+        });
+      }
       return null;
     }, []);
 
@@ -206,6 +223,10 @@ class WebMangaViewWidget extends HookConsumerWidget {
                   children: [
                     CachedNetworkImage(
                       imageUrl: manga.cover,
+                      httpHeaders: {
+                        'referer': referer,
+                        'user-agent': baseUserAgent,
+                      },
                       cacheManager: gagakuImageCache,
                       memCacheWidth: 512,
                       maxWidthDiskCache: 512,
@@ -483,10 +504,12 @@ class WebMangaViewWidget extends HookConsumerWidget {
                           ),
                         if (handle.type == SourceType.source &&
                             extdata != null &&
-                            extdata.mangaInfo.shareUrl != null)
+                            (extdata.mangaInfo.shareUrl != null ||
+                                shareUrl.data != null))
                           ButtonChip(
                             onPressed: () async {
-                              final url = extdata.mangaInfo.shareUrl!;
+                              final url =
+                                  extdata.mangaInfo.shareUrl ?? shareUrl.data!;
                               await Styles.tryLaunchUrl(context, url);
                             },
                             text: tr.mangaView.openOn(arg: handle.sourceId),

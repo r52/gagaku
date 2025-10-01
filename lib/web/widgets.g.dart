@@ -6,6 +6,9 @@ part of 'widgets.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
 @ProviderFor(_extensionIcon)
 const _extensionIconProvider = _ExtensionIconProvider._();
 
@@ -51,7 +54,7 @@ final class _ExtensionIconProvider
   }
 }
 
-String _$_extensionIconHash() => r'fdf9ba6fcf51980d54414ebae2514f1e107aef30';
+String _$_extensionIconHash() => r'61813649fc5f797bcabfa31fff00b6c8cdc096f3';
 
 @ProviderFor(_MangaListView)
 const _mangaListViewProvider = _MangaListViewProvider._();
@@ -105,6 +108,3 @@ abstract class _$MangaListView extends $Notifier<WebMangaListView> {
     element.handleValue(ref, created);
   }
 }
-
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

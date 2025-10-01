@@ -40,7 +40,7 @@ dependencies:
   freezed_annotation: ^3.0.0
   hive_ce: ^2.11.1
   hive_ce_flutter: ^2.3.0
-  hooks_riverpod: ^3.0.0-dev.17
+  hooks_riverpod: ^3.0.0
   http: ^1.2.0
   json_annotation: ^4.9.0
   openid_client:
@@ -52,8 +52,8 @@ dependencies:
   path: ^1.9.0
   path_provider: ^2.0.15
   photo_view: ^0.15.0
-  riverpod: ^3.0.0-dev.16
-  riverpod_annotation: ^3.0.0-dev.17
+  riverpod: ^3.0.0
+  riverpod_annotation: ^3.0.0
   timeago:
     git:
       url: https://github.com/andresaraujo/timeago.dart
@@ -62,7 +62,7 @@ dependencies:
   url_launcher: ^6.1.10
   number_paginator: ^1.0.0
   collection: ^1.19.0
-  device_info_plus: ^11.0.0
+  device_info_plus: ^12.1.0
   super_sliver_list: ^0.4.0
   uuid: ^4.4.0
   permission_handler: ^12.0.0
@@ -101,9 +101,9 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   custom_lint: ^0.8.0
-  riverpod_lint: ^3.0.0-dev.17
+  riverpod_lint: ^3.0.0
   build_runner: ^2.5.4
-  riverpod_generator: ^3.0.0-dev.17
+  riverpod_generator: ^3.0.0
   freezed: ^3.0.2
   json_serializable: ^6.6.1
   flutter_native_splash: ^2.2.19

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -5,12 +7,14 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
+import 'package:gagaku/util/number_paginator_controller_hook.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:number_paginator/number_paginator.dart';
 
 @RoutePage()
 class WebSourceFavoritesPage extends HookConsumerWidget {
@@ -78,6 +82,7 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
             WebSourceFavoriteTab(
               category: cat,
               filterController: filterController,
+              scrollController: scrollController,
             ),
         ],
       ),
@@ -90,14 +95,20 @@ class WebSourceFavoriteTab extends HookWidget {
     super.key,
     required this.category,
     required this.filterController,
+    this.scrollController,
   });
 
   final WebFavoritesList category;
   final TextEditingController filterController;
+  final ScrollController? scrollController;
+
+  static const _displayLimit = 32;
 
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
+    final pageController = useNumberPaginatorController();
+    final currentPage = useValueListenable(pageController);
     final filterText = useValueListenable(filterController);
     final debouncedFilterText = useDebounced(
       filterText.text,
@@ -124,33 +135,65 @@ class WebSourceFavoriteTab extends HookWidget {
     final stream = useStream(query);
     final items = stream.data ?? [];
 
-    return WebMangaListWidget(
-      noController: true,
-      physics: const AlwaysScrollableScrollPhysics(),
-      scrollBehavior: MouseTouchScrollBehavior().copyWith(scrollbars: false),
-      title: Text(
-        tr.num_titles(n: items.length),
-        style: CommonTextStyles.twentyfour,
-      ),
-      leading: [
-        SliverOverlapInjector(
-          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-        ),
-      ],
+    final pagedItems = useMemoized(() {
+      int start = pageController.currentPage * _displayLimit;
+      if (start > items.length) {
+        start = 0;
+        pageController.currentPage = 0;
+      }
+
+      final end = min(start + _displayLimit, items.length);
+      return items.getRange(start, end).toList();
+    }, [items, currentPage]);
+
+    return Column(
       children: [
-        if (stream.hasError)
-          SliverFillRemaining(
-            child: ErrorList(
-              error: stream.error!,
-              stackTrace: stream.stackTrace!,
+        Expanded(
+          child: WebMangaListWidget(
+            noController: true,
+            physics: const AlwaysScrollableScrollPhysics(),
+            scrollBehavior: MouseTouchScrollBehavior().copyWith(
+              scrollbars: false,
             ),
+            title: Text(
+              tr.num_titles(n: items.length),
+              style: CommonTextStyles.twentyfour,
+            ),
+            leading: [
+              SliverOverlapInjector(
+                handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                  context,
+                ),
+              ),
+            ],
+            children: [
+              if (stream.hasError)
+                SliverFillRemaining(
+                  child: ErrorList(
+                    error: stream.error!,
+                    stackTrace: stream.stackTrace!,
+                  ),
+                ),
+              if (!stream.hasError && items.isEmpty)
+                SliverFillRemaining(
+                  child: Center(child: Text(tr.errors.noitems)),
+                ),
+              WebMangaListViewSliver(
+                items: pagedItems,
+                favoritesKey: category.id,
+                showFavoriteButton: true,
+                showRemoveButton: false,
+                showSearchButton: true,
+              ),
+            ],
           ),
-        if (!stream.hasError && items.isEmpty)
-          SliverFillRemaining(child: Center(child: Text(tr.errors.noitems))),
-        WebMangaListViewSliver(
-          items: items,
-          favoritesKey: category.id,
-          showRemoveButton: false,
+        ),
+        NumberPaginator(
+          controller: pageController,
+          numberPages: max((items.length / _displayLimit).ceil(), 1),
+          onPageChange: (int index) {
+            scrollController?.jumpTo(0.0);
+          },
         ),
       ],
     );

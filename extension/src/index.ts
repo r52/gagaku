@@ -202,6 +202,8 @@ export function ApplicationPolyfill(): typeof Application {
     getForm: formManager.getForm.bind(formManager),
 
     isResourceLimited: false,
+    filterAdultTitles: false,
+    filterMatureTitles: false,
 
     Selector: selectorRegistry.Selector.bind(selectorRegistry),
     SelectorRegistry: selectorRegistry,

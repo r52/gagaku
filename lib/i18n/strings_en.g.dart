@@ -421,6 +421,9 @@ class TranslationsWebSourcesEn {
 	late final TranslationsWebSourcesRepoEn repo = TranslationsWebSourcesRepoEn.internal(_root);
 	late final TranslationsWebSourcesSourceEn source = TranslationsWebSourcesSourceEn.internal(_root);
 
+	/// en: 'Source ${id} Unavailable'
+	String sourceUnavailable({required Object id}) => 'Source ${id} Unavailable';
+
 	/// en: 'No extensions installed!'
 	String get noSourcesWarning => 'No extensions installed!';
 
@@ -450,6 +453,12 @@ class TranslationsWebSourcesEn {
 
 	/// en: 'Search with extensions'
 	String get searchWithExt => 'Search with extensions';
+
+	/// en: 'Your manga browsing history appears here'
+	String get historyHere => 'Your manga browsing history appears here';
+
+	/// en: 'Save History?'
+	String get saveHistory => 'Save History?';
 }
 
 // Path: search
@@ -1839,6 +1848,7 @@ extension on Translations {
 			case 'webSources.source.sourceAddOK': return 'Extension enabled';
 			case 'webSources.source.installedVersion': return ({required Object version}) => ' (installed: v${version})';
 			case 'webSources.source.noTagsWarning': return 'This extension provides no filter options';
+			case 'webSources.sourceUnavailable': return ({required Object id}) => 'Source ${id} Unavailable';
 			case 'webSources.noSourcesWarning': return 'No extensions installed!';
 			case 'webSources.noSearchableSourcesWarning': return 'No searchable extensions installed!';
 			case 'webSources.sourceSearch': return 'Extension Search';
@@ -1849,6 +1859,8 @@ extension on Translations {
 			case 'webSources.favorites': return 'Favorites';
 			case 'webSources.loadInstalledSourcesError': return 'Error loading installed sources';
 			case 'webSources.searchWithExt': return 'Search with extensions';
+			case 'webSources.historyHere': return 'Your manga browsing history appears here';
+			case 'webSources.saveHistory': return 'Save History?';
 			case 'search.text': return 'Search';
 			case 'search.arg': return ({required Object arg}) => 'Search ${arg}';
 			case 'search.filters': return 'Search Filters';

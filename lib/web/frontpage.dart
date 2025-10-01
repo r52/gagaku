@@ -26,8 +26,15 @@ class _ExtensionHomeCard extends ConsumerWidget {
 
     return DataProviderWhenWidget(
       provider: extensionSourceProvider(extensionInfo.id),
-      errorBuilder: (context, defaultChild, error, stacktrace) =>
-          Card(child: defaultChild),
+      errorBuilder: (context, defaultChild, error, stacktrace) {
+        return Card(
+          child: ListTile(
+            title: Text(tr.webSources.sourceUnavailable(id: extensionInfo.id)),
+            enabled: false,
+            subtitle: Text('$error'),
+          ),
+        );
+      },
       builder: (BuildContext context, source) {
         return Card(
           child: ListTile(
@@ -358,7 +365,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
 
           if (section.type != DiscoverSectionType.genres) {
             final mangas = sectionResults.items
-                .map((e) => HistoryLink.fromDiscoverySectionItem(source.id, e))
+                .map((e) => HistoryLink.fromDiscoverySectionItem(source, e))
                 .toList();
             homepageWidgets.add(MangaCarousel(items: mangas));
           } else {
@@ -509,7 +516,7 @@ class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
           .getDiscoverSectionItems(widget.section, metadata);
 
       final m = results.items.map(
-        (e) => HistoryLink.fromDiscoverySectionItem(widget.source.id, e),
+        (e) => HistoryLink.fromDiscoverySectionItem(widget.source, e),
       );
 
       metadata = results.metadata;
@@ -555,7 +562,9 @@ class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
           children: [
             WebMangaListViewSliver(
               controller: _pagingController,
+              showFavoriteButton: true,
               showRemoveButton: false,
+              showSearchButton: false,
             ),
           ],
         ),
@@ -580,7 +589,12 @@ class MangaCarousel extends StatelessWidget {
           enableSplash: false,
           children: [
             for (final item in items)
-              GridMangaItem(link: item, showRemoveButton: false),
+              GridMangaItem(
+                link: item,
+                showFavoriteButton: true,
+                showRemoveButton: false,
+                showSearchButton: false,
+              ),
           ],
         ),
       ),

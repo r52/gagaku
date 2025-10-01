@@ -334,7 +334,9 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
         children: [
           WebMangaListViewSliver(
             controller: _pagingController,
+            showFavoriteButton: true,
             showRemoveButton: false,
+            showSearchButton: false,
           ),
         ],
       ),

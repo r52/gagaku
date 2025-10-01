@@ -13,14 +13,21 @@ _ExtensionConfig _$ExtensionConfigFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      preserveHistory: json['preserveHistory'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$ExtensionConfigToJson(_ExtensionConfig instance) =>
-    <String, dynamic>{'categoriesToUpdate': instance.categoriesToUpdate};
+    <String, dynamic>{
+      'categoriesToUpdate': instance.categoriesToUpdate,
+      'preserveHistory': instance.preserveHistory,
+    };
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
 @ProviderFor(WebConfig)
 const webConfigProvider = WebConfigProvider._();
@@ -54,7 +61,7 @@ final class WebConfigProvider
   }
 }
 
-String _$webConfigHash() => r'3946a046f37b982630c47c257cf1cb6ad37d53f4';
+String _$webConfigHash() => r'82047ba484958c37d164589d9a338be3a6fa04da';
 
 abstract class _$WebConfig extends $Notifier<ExtensionConfig> {
   ExtensionConfig build();
@@ -181,6 +188,3 @@ abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateDB> {
     element.handleValue(ref, created);
   }
 }
-
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
