@@ -1038,3 +1038,45 @@ _SearchFilterValue _$SearchFilterValueFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$SearchFilterValueToJson(_SearchFilterValue instance) =>
     <String, dynamic>{'id': instance.id, 'value': instance.value};
+
+_ExecuteInWebViewSource _$ExecuteInWebViewSourceFromJson(
+  Map<String, dynamic> json,
+) => _ExecuteInWebViewSource(
+  html: json['html'] as String,
+  baseUrl: json['baseUrl'] as String,
+  loadCSS: json['loadCSS'] as bool,
+  loadImages: json['loadImages'] as bool,
+);
+
+Map<String, dynamic> _$ExecuteInWebViewSourceToJson(
+  _ExecuteInWebViewSource instance,
+) => <String, dynamic>{
+  'html': instance.html,
+  'baseUrl': instance.baseUrl,
+  'loadCSS': instance.loadCSS,
+  'loadImages': instance.loadImages,
+};
+
+_ExecuteInWebViewContext _$ExecuteInWebViewContextFromJson(
+  Map<String, dynamic> json,
+) => _ExecuteInWebViewContext(
+  source: ExecuteInWebViewSource.fromJson(
+    json['source'] as Map<String, dynamic>,
+  ),
+  inject: json['inject'] as String,
+);
+
+Map<String, dynamic> _$ExecuteInWebViewContextToJson(
+  _ExecuteInWebViewContext instance,
+) => <String, dynamic>{
+  'source': instance.source.toJson(),
+  'inject': instance.inject,
+};
+
+_WebViewExecutionResult _$WebViewExecutionResultFromJson(
+  Map<String, dynamic> json,
+) => _WebViewExecutionResult(result: json['result']);
+
+Map<String, dynamic> _$WebViewExecutionResultToJson(
+  _WebViewExecutionResult instance,
+) => <String, dynamic>{'result': instance.result};

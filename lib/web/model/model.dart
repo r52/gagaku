@@ -897,6 +897,49 @@ class ExtensionSource extends _$ExtensionSource {
         _forms.clear();
       },
     );
+
+    controller.addJavaScriptHandler(
+      handlerName: 'executeInWebView',
+      callback: (JavaScriptHandlerFunctionData data) async {
+        final context = ExecuteInWebViewContext.fromJson(data.args[0]);
+
+        final temp = HeadlessInAppWebView(
+          initialData: InAppWebViewInitialData(
+            data: context.source.html,
+            baseUrl: WebUri(context.source.baseUrl),
+          ),
+          initialSettings: InAppWebViewSettings(
+            loadsImagesAutomatically: context.source.loadImages,
+            browserAcceleratorKeysEnabled: false,
+            isInspectable: false,
+          ),
+        );
+
+        await temp.run();
+        final control = temp.webViewController;
+
+        if (control != null) {
+          final results = await controller.callAsyncJavaScript(
+            functionBody: context.inject,
+          );
+
+          await temp.dispose();
+
+          if (results == null || results.error != null) {
+            throw JavaScriptException(
+              message: 'JavaScript error:',
+              errorMessage: results?.error,
+            );
+          }
+
+          return {'result': results.value};
+        }
+
+        await temp.dispose();
+
+        return {'result': null};
+      },
+    );
   }
 
   Future<void> _onWebViewLoadStop(

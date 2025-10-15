@@ -6490,4 +6490,436 @@ as String,value: null == value ? _self.value : value ,
 
 }
 
+
+/// @nodoc
+mixin _$ExecuteInWebViewSource {
+
+ String get html; String get baseUrl; bool get loadCSS; bool get loadImages;
+/// Create a copy of ExecuteInWebViewSource
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ExecuteInWebViewSourceCopyWith<ExecuteInWebViewSource> get copyWith => _$ExecuteInWebViewSourceCopyWithImpl<ExecuteInWebViewSource>(this as ExecuteInWebViewSource, _$identity);
+
+  /// Serializes this ExecuteInWebViewSource to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExecuteInWebViewSource&&(identical(other.html, html) || other.html == html)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.loadCSS, loadCSS) || other.loadCSS == loadCSS)&&(identical(other.loadImages, loadImages) || other.loadImages == loadImages));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,html,baseUrl,loadCSS,loadImages);
+
+@override
+String toString() {
+  return 'ExecuteInWebViewSource(html: $html, baseUrl: $baseUrl, loadCSS: $loadCSS, loadImages: $loadImages)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ExecuteInWebViewSourceCopyWith<$Res>  {
+  factory $ExecuteInWebViewSourceCopyWith(ExecuteInWebViewSource value, $Res Function(ExecuteInWebViewSource) _then) = _$ExecuteInWebViewSourceCopyWithImpl;
+@useResult
+$Res call({
+ String html, String baseUrl, bool loadCSS, bool loadImages
+});
+
+
+
+
+}
+/// @nodoc
+class _$ExecuteInWebViewSourceCopyWithImpl<$Res>
+    implements $ExecuteInWebViewSourceCopyWith<$Res> {
+  _$ExecuteInWebViewSourceCopyWithImpl(this._self, this._then);
+
+  final ExecuteInWebViewSource _self;
+  final $Res Function(ExecuteInWebViewSource) _then;
+
+/// Create a copy of ExecuteInWebViewSource
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? html = null,Object? baseUrl = null,Object? loadCSS = null,Object? loadImages = null,}) {
+  return _then(_self.copyWith(
+html: null == html ? _self.html : html // ignore: cast_nullable_to_non_nullable
+as String,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
+as String,loadCSS: null == loadCSS ? _self.loadCSS : loadCSS // ignore: cast_nullable_to_non_nullable
+as bool,loadImages: null == loadImages ? _self.loadImages : loadImages // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _ExecuteInWebViewSource implements ExecuteInWebViewSource {
+  const _ExecuteInWebViewSource({required this.html, required this.baseUrl, required this.loadCSS, required this.loadImages});
+  factory _ExecuteInWebViewSource.fromJson(Map<String, dynamic> json) => _$ExecuteInWebViewSourceFromJson(json);
+
+@override final  String html;
+@override final  String baseUrl;
+@override final  bool loadCSS;
+@override final  bool loadImages;
+
+/// Create a copy of ExecuteInWebViewSource
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ExecuteInWebViewSourceCopyWith<_ExecuteInWebViewSource> get copyWith => __$ExecuteInWebViewSourceCopyWithImpl<_ExecuteInWebViewSource>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ExecuteInWebViewSourceToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExecuteInWebViewSource&&(identical(other.html, html) || other.html == html)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.loadCSS, loadCSS) || other.loadCSS == loadCSS)&&(identical(other.loadImages, loadImages) || other.loadImages == loadImages));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,html,baseUrl,loadCSS,loadImages);
+
+@override
+String toString() {
+  return 'ExecuteInWebViewSource(html: $html, baseUrl: $baseUrl, loadCSS: $loadCSS, loadImages: $loadImages)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ExecuteInWebViewSourceCopyWith<$Res> implements $ExecuteInWebViewSourceCopyWith<$Res> {
+  factory _$ExecuteInWebViewSourceCopyWith(_ExecuteInWebViewSource value, $Res Function(_ExecuteInWebViewSource) _then) = __$ExecuteInWebViewSourceCopyWithImpl;
+@override @useResult
+$Res call({
+ String html, String baseUrl, bool loadCSS, bool loadImages
+});
+
+
+
+
+}
+/// @nodoc
+class __$ExecuteInWebViewSourceCopyWithImpl<$Res>
+    implements _$ExecuteInWebViewSourceCopyWith<$Res> {
+  __$ExecuteInWebViewSourceCopyWithImpl(this._self, this._then);
+
+  final _ExecuteInWebViewSource _self;
+  final $Res Function(_ExecuteInWebViewSource) _then;
+
+/// Create a copy of ExecuteInWebViewSource
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? html = null,Object? baseUrl = null,Object? loadCSS = null,Object? loadImages = null,}) {
+  return _then(_ExecuteInWebViewSource(
+html: null == html ? _self.html : html // ignore: cast_nullable_to_non_nullable
+as String,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
+as String,loadCSS: null == loadCSS ? _self.loadCSS : loadCSS // ignore: cast_nullable_to_non_nullable
+as bool,loadImages: null == loadImages ? _self.loadImages : loadImages // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$ExecuteInWebViewContext {
+
+ ExecuteInWebViewSource get source; String get inject;
+/// Create a copy of ExecuteInWebViewContext
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ExecuteInWebViewContextCopyWith<ExecuteInWebViewContext> get copyWith => _$ExecuteInWebViewContextCopyWithImpl<ExecuteInWebViewContext>(this as ExecuteInWebViewContext, _$identity);
+
+  /// Serializes this ExecuteInWebViewContext to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExecuteInWebViewContext&&(identical(other.source, source) || other.source == source)&&(identical(other.inject, inject) || other.inject == inject));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,source,inject);
+
+@override
+String toString() {
+  return 'ExecuteInWebViewContext(source: $source, inject: $inject)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ExecuteInWebViewContextCopyWith<$Res>  {
+  factory $ExecuteInWebViewContextCopyWith(ExecuteInWebViewContext value, $Res Function(ExecuteInWebViewContext) _then) = _$ExecuteInWebViewContextCopyWithImpl;
+@useResult
+$Res call({
+ ExecuteInWebViewSource source, String inject
+});
+
+
+$ExecuteInWebViewSourceCopyWith<$Res> get source;
+
+}
+/// @nodoc
+class _$ExecuteInWebViewContextCopyWithImpl<$Res>
+    implements $ExecuteInWebViewContextCopyWith<$Res> {
+  _$ExecuteInWebViewContextCopyWithImpl(this._self, this._then);
+
+  final ExecuteInWebViewContext _self;
+  final $Res Function(ExecuteInWebViewContext) _then;
+
+/// Create a copy of ExecuteInWebViewContext
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? source = null,Object? inject = null,}) {
+  return _then(_self.copyWith(
+source: null == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
+as ExecuteInWebViewSource,inject: null == inject ? _self.inject : inject // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+/// Create a copy of ExecuteInWebViewContext
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ExecuteInWebViewSourceCopyWith<$Res> get source {
+  
+  return $ExecuteInWebViewSourceCopyWith<$Res>(_self.source, (value) {
+    return _then(_self.copyWith(source: value));
+  });
+}
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _ExecuteInWebViewContext implements ExecuteInWebViewContext {
+  const _ExecuteInWebViewContext({required this.source, required this.inject});
+  factory _ExecuteInWebViewContext.fromJson(Map<String, dynamic> json) => _$ExecuteInWebViewContextFromJson(json);
+
+@override final  ExecuteInWebViewSource source;
+@override final  String inject;
+
+/// Create a copy of ExecuteInWebViewContext
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ExecuteInWebViewContextCopyWith<_ExecuteInWebViewContext> get copyWith => __$ExecuteInWebViewContextCopyWithImpl<_ExecuteInWebViewContext>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ExecuteInWebViewContextToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExecuteInWebViewContext&&(identical(other.source, source) || other.source == source)&&(identical(other.inject, inject) || other.inject == inject));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,source,inject);
+
+@override
+String toString() {
+  return 'ExecuteInWebViewContext(source: $source, inject: $inject)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ExecuteInWebViewContextCopyWith<$Res> implements $ExecuteInWebViewContextCopyWith<$Res> {
+  factory _$ExecuteInWebViewContextCopyWith(_ExecuteInWebViewContext value, $Res Function(_ExecuteInWebViewContext) _then) = __$ExecuteInWebViewContextCopyWithImpl;
+@override @useResult
+$Res call({
+ ExecuteInWebViewSource source, String inject
+});
+
+
+@override $ExecuteInWebViewSourceCopyWith<$Res> get source;
+
+}
+/// @nodoc
+class __$ExecuteInWebViewContextCopyWithImpl<$Res>
+    implements _$ExecuteInWebViewContextCopyWith<$Res> {
+  __$ExecuteInWebViewContextCopyWithImpl(this._self, this._then);
+
+  final _ExecuteInWebViewContext _self;
+  final $Res Function(_ExecuteInWebViewContext) _then;
+
+/// Create a copy of ExecuteInWebViewContext
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? source = null,Object? inject = null,}) {
+  return _then(_ExecuteInWebViewContext(
+source: null == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
+as ExecuteInWebViewSource,inject: null == inject ? _self.inject : inject // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+/// Create a copy of ExecuteInWebViewContext
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ExecuteInWebViewSourceCopyWith<$Res> get source {
+  
+  return $ExecuteInWebViewSourceCopyWith<$Res>(_self.source, (value) {
+    return _then(_self.copyWith(source: value));
+  });
+}
+}
+
+
+/// @nodoc
+mixin _$WebViewExecutionResult {
+
+ dynamic get result;
+/// Create a copy of WebViewExecutionResult
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WebViewExecutionResultCopyWith<WebViewExecutionResult> get copyWith => _$WebViewExecutionResultCopyWithImpl<WebViewExecutionResult>(this as WebViewExecutionResult, _$identity);
+
+  /// Serializes this WebViewExecutionResult to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebViewExecutionResult&&const DeepCollectionEquality().equals(other.result, result));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(result));
+
+@override
+String toString() {
+  return 'WebViewExecutionResult(result: $result)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WebViewExecutionResultCopyWith<$Res>  {
+  factory $WebViewExecutionResultCopyWith(WebViewExecutionResult value, $Res Function(WebViewExecutionResult) _then) = _$WebViewExecutionResultCopyWithImpl;
+@useResult
+$Res call({
+ dynamic result
+});
+
+
+
+
+}
+/// @nodoc
+class _$WebViewExecutionResultCopyWithImpl<$Res>
+    implements $WebViewExecutionResultCopyWith<$Res> {
+  _$WebViewExecutionResultCopyWithImpl(this._self, this._then);
+
+  final WebViewExecutionResult _self;
+  final $Res Function(WebViewExecutionResult) _then;
+
+/// Create a copy of WebViewExecutionResult
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? result = freezed,}) {
+  return _then(_self.copyWith(
+result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
+as dynamic,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _WebViewExecutionResult implements WebViewExecutionResult {
+  const _WebViewExecutionResult({required this.result});
+  factory _WebViewExecutionResult.fromJson(Map<String, dynamic> json) => _$WebViewExecutionResultFromJson(json);
+
+@override final  dynamic result;
+
+/// Create a copy of WebViewExecutionResult
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WebViewExecutionResultCopyWith<_WebViewExecutionResult> get copyWith => __$WebViewExecutionResultCopyWithImpl<_WebViewExecutionResult>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$WebViewExecutionResultToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebViewExecutionResult&&const DeepCollectionEquality().equals(other.result, result));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(result));
+
+@override
+String toString() {
+  return 'WebViewExecutionResult(result: $result)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WebViewExecutionResultCopyWith<$Res> implements $WebViewExecutionResultCopyWith<$Res> {
+  factory _$WebViewExecutionResultCopyWith(_WebViewExecutionResult value, $Res Function(_WebViewExecutionResult) _then) = __$WebViewExecutionResultCopyWithImpl;
+@override @useResult
+$Res call({
+ dynamic result
+});
+
+
+
+
+}
+/// @nodoc
+class __$WebViewExecutionResultCopyWithImpl<$Res>
+    implements _$WebViewExecutionResultCopyWith<$Res> {
+  __$WebViewExecutionResultCopyWithImpl(this._self, this._then);
+
+  final _WebViewExecutionResult _self;
+  final $Res Function(_WebViewExecutionResult) _then;
+
+/// Create a copy of WebViewExecutionResult
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? result = freezed,}) {
+  return _then(_WebViewExecutionResult(
+result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
+as dynamic,
+  ));
+}
+
+
+}
+
 // dart format on

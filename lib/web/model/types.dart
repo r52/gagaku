@@ -1330,3 +1330,39 @@ abstract class SearchFilterValue with _$SearchFilterValue {
   factory SearchFilterValue.fromSearchFilter(SearchFilter filter) =>
       SearchFilterValue(id: filter.id, value: filter.value);
 }
+
+@freezed
+abstract class ExecuteInWebViewSource with _$ExecuteInWebViewSource {
+  const factory ExecuteInWebViewSource({
+    required String html,
+    required String baseUrl,
+    required bool loadCSS,
+    required bool loadImages,
+  }) = _ExecuteInWebViewSource;
+
+  factory ExecuteInWebViewSource.fromJson(Map<String, dynamic> json) =>
+      _$ExecuteInWebViewSourceFromJson(json);
+}
+
+@freezed
+abstract class ExecuteInWebViewContext with _$ExecuteInWebViewContext {
+  const factory ExecuteInWebViewContext({
+    required ExecuteInWebViewSource source,
+    required String inject,
+    // storage: Cookies
+  }) = _ExecuteInWebViewContext;
+
+  factory ExecuteInWebViewContext.fromJson(Map<String, dynamic> json) =>
+      _$ExecuteInWebViewContextFromJson(json);
+}
+
+@freezed
+abstract class WebViewExecutionResult with _$WebViewExecutionResult {
+  const factory WebViewExecutionResult({
+    required dynamic result,
+    // storage: Cookies
+  }) = _WebViewExecutionResult;
+
+  factory WebViewExecutionResult.fromJson(Map<String, dynamic> json) =>
+      _$WebViewExecutionResultFromJson(json);
+}
