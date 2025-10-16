@@ -735,8 +735,13 @@ class ExtensionSource extends _$ExtensionSource {
   bool _initialized = false;
   String? _extensionBody;
   HeadlessInAppWebView? _view;
+  HeadlessInAppWebView? _executeView;
   InAppWebViewController? get _controller =>
       (_view?.isRunning() ?? false) ? _view?.webViewController : null;
+  InAppWebViewController? get _execController =>
+      (_executeView?.isRunning() ?? false)
+      ? _executeView?.webViewController
+      : null;
 
   List<SearchFilter>? _filters;
   final Map<String, SettingsForm> _forms = {};
@@ -814,6 +819,13 @@ class ExtensionSource extends _$ExtensionSource {
             _onWebViewLoadStop(controller, url, source!, completer),
       );
 
+      _executeView = HeadlessInAppWebView(
+        initialSettings: InAppWebViewSettings(
+          browserAcceleratorKeysEnabled: false,
+          isInspectable: false,
+        ),
+      );
+
       Timer(const Duration(seconds: 30), () async {
         if (!completer.isCompleted) {
           completer.completeError(Exception('$sourceId load timeout'));
@@ -825,10 +837,12 @@ class ExtensionSource extends _$ExtensionSource {
     }
 
     await _view?.run();
+    await _executeView?.run();
     await completer.future;
 
     ref.onDispose(() {
       _view?.dispose();
+      _executeView?.dispose();
     });
 
     _initialized = true;
@@ -903,41 +917,33 @@ class ExtensionSource extends _$ExtensionSource {
       callback: (JavaScriptHandlerFunctionData data) async {
         final context = ExecuteInWebViewContext.fromJson(data.args[0]);
 
-        final temp = HeadlessInAppWebView(
-          initialData: InAppWebViewInitialData(
-            data: context.source.html,
-            baseUrl: WebUri(context.source.baseUrl),
-          ),
-          initialSettings: InAppWebViewSettings(
+        final control = _execController;
+
+        await control?.setSettings(
+          settings: InAppWebViewSettings(
             loadsImagesAutomatically: context.source.loadImages,
             browserAcceleratorKeysEnabled: false,
             isInspectable: false,
           ),
         );
 
-        try {
-          await temp.run();
-          final control = temp.webViewController;
+        await control?.loadData(
+          data: context.source.html,
+          baseUrl: WebUri(context.source.baseUrl),
+        );
 
-          if (control != null) {
-            final results = await control.callAsyncJavaScript(
-              functionBody: context.inject,
-            );
+        final results = await control?.callAsyncJavaScript(
+          functionBody: context.inject,
+        );
 
-            if (results == null || results.error != null) {
-              throw JavaScriptException(
-                message: 'JavaScript error:',
-                errorMessage: results?.error,
-              );
-            }
-
-            return {'result': results.value};
-          }
-
-          return {'result': null};
-        } finally {
-          await temp.dispose();
+        if (results == null || results.error != null) {
+          throw JavaScriptException(
+            message: 'JavaScript error:',
+            errorMessage: results?.error,
+          );
         }
+
+        return {'result': results.value};
       },
     );
   }
