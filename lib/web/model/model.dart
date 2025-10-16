@@ -915,29 +915,29 @@ class ExtensionSource extends _$ExtensionSource {
           ),
         );
 
-        await temp.run();
-        final control = temp.webViewController;
+        try {
+          await temp.run();
+          final control = temp.webViewController;
 
-        if (control != null) {
-          final results = await controller.callAsyncJavaScript(
-            functionBody: context.inject,
-          );
-
-          await temp.dispose();
-
-          if (results == null || results.error != null) {
-            throw JavaScriptException(
-              message: 'JavaScript error:',
-              errorMessage: results?.error,
+          if (control != null) {
+            final results = await control.callAsyncJavaScript(
+              functionBody: context.inject,
             );
+
+            if (results == null || results.error != null) {
+              throw JavaScriptException(
+                message: 'JavaScript error:',
+                errorMessage: results?.error,
+              );
+            }
+
+            return {'result': results.value};
           }
 
-          return {'result': results.value};
+          return {'result': null};
+        } finally {
+          await temp.dispose();
         }
-
-        await temp.dispose();
-
-        return {'result': null};
       },
     );
   }
