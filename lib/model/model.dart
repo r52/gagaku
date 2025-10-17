@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:gagaku/log.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/version.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart'
     show getApplicationDocumentsDirectory;
@@ -65,6 +68,8 @@ class GagakuData {
   // Default user agent
   final String gagakuUserAgent = '$kPackageName/$kPackageVersion';
 
+  List<String> blockers = [];
+
   factory GagakuData() {
     return _instance;
   }
@@ -73,6 +78,21 @@ class GagakuData {
     extensionHost = await rootBundle.loadString(
       'assets/extensionhost/bundle.js',
     );
+
+    final blockerUri = Uri.parse(
+      'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/blockers.txt',
+    );
+
+    final response = await http.get(blockerUri);
+
+    if (response.statusCode != 200) {
+      final err = "Failed to load $blockerUri";
+      logger.e(err);
+      return;
+    }
+
+    LineSplitter ls = LineSplitter();
+    blockers = ls.convert(response.body);
   }
 
   Future<void> initGagakuBoxes() async {

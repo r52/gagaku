@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/objectbox.g.dart';
@@ -735,13 +736,8 @@ class ExtensionSource extends _$ExtensionSource {
   bool _initialized = false;
   String? _extensionBody;
   HeadlessInAppWebView? _view;
-  HeadlessInAppWebView? _executeView;
   InAppWebViewController? get _controller =>
       (_view?.isRunning() ?? false) ? _view?.webViewController : null;
-  InAppWebViewController? get _execController =>
-      (_executeView?.isRunning() ?? false)
-      ? _executeView?.webViewController
-      : null;
 
   List<SearchFilter>? _filters;
   final Map<String, SettingsForm> _forms = {};
@@ -786,6 +782,16 @@ class ExtensionSource extends _$ExtensionSource {
 
     final completer = Completer<void>();
 
+    final List<ContentBlocker> contentBlockers = [];
+    for (final filter in GagakuData().blockers) {
+      contentBlockers.add(
+        ContentBlocker(
+          trigger: ContentBlockerTrigger(urlFilter: filter),
+          action: ContentBlockerAction(type: ContentBlockerActionType.BLOCK),
+        ),
+      );
+    }
+
     try {
       _view = HeadlessInAppWebView(
         initialUrlRequest: URLRequest(
@@ -804,6 +810,9 @@ class ExtensionSource extends _$ExtensionSource {
           ),
         ]),
         initialSettings: InAppWebViewSettings(
+          contentBlockers: defaultTargetPlatform == TargetPlatform.android
+              ? contentBlockers
+              : [],
           browserAcceleratorKeysEnabled: false,
           isInspectable: false,
         ),
@@ -819,13 +828,6 @@ class ExtensionSource extends _$ExtensionSource {
             _onWebViewLoadStop(controller, url, source!, completer),
       );
 
-      _executeView = HeadlessInAppWebView(
-        initialSettings: InAppWebViewSettings(
-          browserAcceleratorKeysEnabled: false,
-          isInspectable: false,
-        ),
-      );
-
       Timer(const Duration(seconds: 30), () async {
         if (!completer.isCompleted) {
           completer.completeError(Exception('$sourceId load timeout'));
@@ -837,12 +839,10 @@ class ExtensionSource extends _$ExtensionSource {
     }
 
     await _view?.run();
-    await _executeView?.run();
     await completer.future;
 
     ref.onDispose(() {
       _view?.dispose();
-      _executeView?.dispose();
     });
 
     _initialized = true;
@@ -916,34 +916,43 @@ class ExtensionSource extends _$ExtensionSource {
       handlerName: 'executeInWebView',
       callback: (JavaScriptHandlerFunctionData data) async {
         final context = ExecuteInWebViewContext.fromJson(data.args[0]);
+        final completer = Completer<Map<String, dynamic>>();
 
-        final control = _execController;
-
-        await control?.setSettings(
-          settings: InAppWebViewSettings(
+        final temp = HeadlessInAppWebView(
+          initialData: InAppWebViewInitialData(
+            data: context.source.html,
+            baseUrl: WebUri(context.source.baseUrl),
+          ),
+          initialSettings: InAppWebViewSettings(
             loadsImagesAutomatically: context.source.loadImages,
             browserAcceleratorKeysEnabled: false,
             isInspectable: false,
           ),
+          onLoadStop: (controller, url) async {
+            final results = await controller.callAsyncJavaScript(
+              functionBody: context.inject,
+            );
+
+            if (results == null || results.error != null) {
+              completer.completeError(
+                JavaScriptException(
+                  message: 'JavaScript error:',
+                  errorMessage: results?.error,
+                ),
+              );
+              return;
+            }
+
+            completer.complete({'result': results.value});
+          },
         );
 
-        await control?.loadData(
-          data: context.source.html,
-          baseUrl: WebUri(context.source.baseUrl),
-        );
+        await temp.run();
+        final result = await completer.future;
 
-        final results = await control?.callAsyncJavaScript(
-          functionBody: context.inject,
-        );
+        temp.dispose();
 
-        if (results == null || results.error != null) {
-          throw JavaScriptException(
-            message: 'JavaScript error:',
-            errorMessage: results?.error,
-          );
-        }
-
-        return {'result': results.value};
+        return result;
       },
     );
   }
