@@ -963,8 +963,8 @@ class ExtensionSource extends _$ExtensionSource {
             if (results == null || results.error != null) {
               completer.completeError(
                 JavaScriptException(
-                  message: 'JavaScript error:',
-                  errorMessage: results?.error,
+                  message: 'JavaScript error in executeInWebView:',
+                  errorMessage: '${context.source.baseUrl} - ${results?.error}',
                 ),
               );
               return;
