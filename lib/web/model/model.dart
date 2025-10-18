@@ -782,15 +782,14 @@ class ExtensionSource extends _$ExtensionSource {
 
     final completer = Completer<void>();
 
-    final List<ContentBlocker> contentBlockers = [];
-    for (final filter in GagakuData().blockers) {
-      contentBlockers.add(
-        ContentBlocker(
-          trigger: ContentBlockerTrigger(urlFilter: filter),
-          action: ContentBlockerAction(type: ContentBlockerActionType.BLOCK),
-        ),
-      );
-    }
+    final contentBlockers = GagakuData().blockers
+        .map(
+          (filter) => ContentBlocker(
+            trigger: ContentBlockerTrigger(urlFilter: filter),
+            action: ContentBlockerAction(type: ContentBlockerActionType.BLOCK),
+          ),
+        )
+        .toList();
 
     try {
       _view = HeadlessInAppWebView(
@@ -924,6 +923,34 @@ class ExtensionSource extends _$ExtensionSource {
             baseUrl: WebUri(context.source.baseUrl),
           ),
           initialSettings: InAppWebViewSettings(
+            contentBlockers: defaultTargetPlatform == TargetPlatform.android
+                ? [
+                    if (!context.source.loadCSS)
+                      ContentBlocker(
+                        trigger: ContentBlockerTrigger(
+                          urlFilter: ".*",
+                          resourceType: [
+                            ContentBlockerTriggerResourceType.STYLE_SHEET,
+                          ],
+                        ),
+                        action: ContentBlockerAction(
+                          type: ContentBlockerActionType.BLOCK,
+                        ),
+                      ),
+                    if (!context.source.loadImages)
+                      ContentBlocker(
+                        trigger: ContentBlockerTrigger(
+                          urlFilter: ".*",
+                          resourceType: [
+                            ContentBlockerTriggerResourceType.IMAGE,
+                          ],
+                        ),
+                        action: ContentBlockerAction(
+                          type: ContentBlockerActionType.BLOCK,
+                        ),
+                      ),
+                  ]
+                : [],
             loadsImagesAutomatically: context.source.loadImages,
             browserAcceleratorKeysEnabled: false,
             isInspectable: false,
@@ -947,12 +974,15 @@ class ExtensionSource extends _$ExtensionSource {
           },
         );
 
-        await temp.run();
-        final result = await completer.future;
-
-        temp.dispose();
-
-        return result;
+        try {
+          await temp.run();
+          final result = await completer.future.timeout(
+            const Duration(seconds: 30),
+          );
+          return result;
+        } finally {
+          temp.dispose();
+        }
       },
     );
   }

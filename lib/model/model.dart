@@ -83,16 +83,19 @@ class GagakuData {
       'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/blockers.txt',
     );
 
-    final response = await http.get(blockerUri);
+    try {
+      final response = await http.get(blockerUri);
 
-    if (response.statusCode != 200) {
-      final err = "Failed to load $blockerUri";
-      logger.e(err);
-      return;
+      if (response.statusCode != 200) {
+        final err = "Failed to load $blockerUri";
+        logger.e(err);
+      } else {
+        LineSplitter ls = LineSplitter();
+        blockers = ls.convert(response.body);
+      }
+    } catch (e) {
+      logger.e(e);
     }
-
-    LineSplitter ls = LineSplitter();
-    blockers = ls.convert(response.body);
   }
 
   Future<void> initGagakuBoxes() async {

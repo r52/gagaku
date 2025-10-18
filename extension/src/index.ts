@@ -165,6 +165,8 @@ export function ApplicationPolyfill(): typeof Application {
       if ("gagaku" in globalThis) {
         return globalThis.gagaku?.callHandler("executeInWebView", context);
       }
+
+      throw new Error("`executeInWebView` is not available in this context.");
     },
 
     // gagaku
