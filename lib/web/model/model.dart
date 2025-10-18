@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/objectbox.g.dart';
@@ -781,6 +782,15 @@ class ExtensionSource extends _$ExtensionSource {
 
     final completer = Completer<void>();
 
+    final contentBlockers = GagakuData().blockers
+        .map(
+          (filter) => ContentBlocker(
+            trigger: ContentBlockerTrigger(urlFilter: filter),
+            action: ContentBlockerAction(type: ContentBlockerActionType.BLOCK),
+          ),
+        )
+        .toList();
+
     try {
       _view = HeadlessInAppWebView(
         initialUrlRequest: URLRequest(
@@ -799,6 +809,9 @@ class ExtensionSource extends _$ExtensionSource {
           ),
         ]),
         initialSettings: InAppWebViewSettings(
+          contentBlockers: defaultTargetPlatform == TargetPlatform.android
+              ? contentBlockers
+              : [],
           browserAcceleratorKeysEnabled: false,
           isInspectable: false,
         ),
@@ -814,7 +827,7 @@ class ExtensionSource extends _$ExtensionSource {
             _onWebViewLoadStop(controller, url, source!, completer),
       );
 
-      Timer(const Duration(seconds: 10), () async {
+      Timer(const Duration(seconds: 30), () async {
         if (!completer.isCompleted) {
           completer.completeError(Exception('$sourceId load timeout'));
         }
@@ -895,6 +908,81 @@ class ExtensionSource extends _$ExtensionSource {
       handlerName: 'uninitializeForms',
       callback: (JavaScriptHandlerFunctionData data) {
         _forms.clear();
+      },
+    );
+
+    controller.addJavaScriptHandler(
+      handlerName: 'executeInWebView',
+      callback: (JavaScriptHandlerFunctionData data) async {
+        final context = ExecuteInWebViewContext.fromJson(data.args[0]);
+        final completer = Completer<Map<String, dynamic>>();
+
+        final temp = HeadlessInAppWebView(
+          initialData: InAppWebViewInitialData(
+            data: context.source.html,
+            baseUrl: WebUri(context.source.baseUrl),
+          ),
+          initialSettings: InAppWebViewSettings(
+            contentBlockers: defaultTargetPlatform == TargetPlatform.android
+                ? [
+                    if (!context.source.loadCSS)
+                      ContentBlocker(
+                        trigger: ContentBlockerTrigger(
+                          urlFilter: ".*",
+                          resourceType: [
+                            ContentBlockerTriggerResourceType.STYLE_SHEET,
+                          ],
+                        ),
+                        action: ContentBlockerAction(
+                          type: ContentBlockerActionType.BLOCK,
+                        ),
+                      ),
+                    if (!context.source.loadImages)
+                      ContentBlocker(
+                        trigger: ContentBlockerTrigger(
+                          urlFilter: ".*",
+                          resourceType: [
+                            ContentBlockerTriggerResourceType.IMAGE,
+                          ],
+                        ),
+                        action: ContentBlockerAction(
+                          type: ContentBlockerActionType.BLOCK,
+                        ),
+                      ),
+                  ]
+                : [],
+            loadsImagesAutomatically: context.source.loadImages,
+            browserAcceleratorKeysEnabled: false,
+            isInspectable: false,
+          ),
+          onLoadStop: (controller, url) async {
+            final results = await controller.callAsyncJavaScript(
+              functionBody: context.inject,
+            );
+
+            if (results == null || results.error != null) {
+              completer.completeError(
+                JavaScriptException(
+                  message: 'JavaScript error in executeInWebView:',
+                  errorMessage: '${context.source.baseUrl} - ${results?.error}',
+                ),
+              );
+              return;
+            }
+
+            completer.complete({'result': results.value});
+          },
+        );
+
+        try {
+          await temp.run();
+          final result = await completer.future.timeout(
+            const Duration(seconds: 30),
+          );
+          return result;
+        } finally {
+          temp.dispose();
+        }
       },
     );
   }

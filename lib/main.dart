@@ -35,6 +35,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   LocaleSettings.useDeviceLocale();
 
+  PlatformInAppWebViewController.debugLoggingSettings.excludeFilter.add(
+    RegExp(r"onConsoleMessage"),
+  );
+
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
   }

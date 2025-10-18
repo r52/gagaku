@@ -87,7 +87,7 @@ dependencies:
     git:
       url: https://github.com/ubuntu-flutter-community/flutter_spinbox
       ref: ab0000f
-  objectbox: ^4.3.1
+  objectbox: ^5.0.0
   objectbox_flutter_libs: any
 
 dev_dependencies:

@@ -161,8 +161,12 @@ export function ApplicationPolyfill(): typeof Application {
       }
     },
 
-    executeInWebView: function () {
-      throw new Error('Not Implemented')
+    executeInWebView: function (context) {
+      if ("gagaku" in globalThis) {
+        return globalThis.gagaku?.callHandler("executeInWebView", context);
+      }
+
+      throw new Error("`executeInWebView` is not available in this context.");
     },
 
     // gagaku
