@@ -431,8 +431,8 @@ class GridMangaItem extends HookConsumerWidget {
             imageUrl: link.cover!,
             httpHeaders: {'referer': referer, 'user-agent': baseUserAgent},
             cacheManager: gagakuImageCache,
-            memCacheWidth: 512,
-            maxWidthDiskCache: 512,
+            memCacheWidth: 256,
+            maxWidthDiskCache: 256,
             width: 128.0,
             progressIndicatorBuilder: (context, url, downloadProgress) =>
                 const Center(child: CircularProgressIndicator()),
@@ -499,7 +499,7 @@ class GridMangaItem extends HookConsumerWidget {
                       controller.open();
                     }
                   },
-                  icon: const Icon(Icons.more_vert),
+                  icon: child!,
                 ),
                 menuChildren: [
                   if (showSearchButton)
@@ -524,6 +524,7 @@ class GridMangaItem extends HookConsumerWidget {
                       child: Text(tr.mangaActions.removeHistory),
                     ),
                 ],
+                child: const Icon(Icons.more_vert_outlined),
               ),
             ),
         ],
@@ -947,8 +948,8 @@ class _CoverButton extends ConsumerWidget {
       child: CachedNetworkImage(
         imageUrl: link.cover!,
         cacheManager: gagakuImageCache,
-        memCacheWidth: 512,
-        maxWidthDiskCache: 512,
+        memCacheWidth: 256,
+        maxWidthDiskCache: 256,
         imageBuilder: (context, imageProvider) => DecoratedBox(
           decoration: BoxDecoration(
             image: DecorationImage(image: imageProvider),

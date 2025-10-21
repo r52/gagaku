@@ -1413,7 +1413,10 @@ class MangaDexSearchRouteArgs {
     if (other is! MangaDexSearchRouteArgs) return false;
     return key == other.key &&
         selectMode == other.selectMode &&
-        const _i34.SetEquality().equals(selectedTitles, other.selectedTitles) &&
+        const _i34.SetEquality<String>().equals(
+          selectedTitles,
+          other.selectedTitles,
+        ) &&
         parameters == other.parameters;
   }
 
@@ -1421,7 +1424,7 @@ class MangaDexSearchRouteArgs {
   int get hashCode =>
       key.hashCode ^
       selectMode.hashCode ^
-      const _i34.SetEquality().hash(selectedTitles) ^
+      const _i34.SetEquality<String>().hash(selectedTitles) ^
       parameters.hashCode;
 }
 
