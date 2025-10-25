@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -10,6 +9,7 @@ import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -127,7 +127,6 @@ Future<FrontPageData> _fetchFrontPageData(Ref ref) async {
   return data;
 }
 
-@RoutePage()
 class MangaDexFrontPage extends StatelessWidget {
   const MangaDexFrontPage({super.key, this.controller});
 
@@ -165,7 +164,6 @@ class _FrontPageWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.t;
     final api = ref.watch(mangadexProvider);
-    final router = AutoRouter.of(context);
     const style = CommonTextStyles.twentyfour;
 
     final staffPicks = _fetchCustomListMangaProvider(data.staffPicks);
@@ -181,7 +179,7 @@ class _FrontPageWidget extends HookConsumerWidget {
       const MangaProviderCarousel(provider: _popularTitlesProvider),
       TextButton.icon(
         onPressed: () {
-          router.pushPath('/titles/latest');
+          context.push('/titles/latest');
         },
         label: Text(t.chapterFeed.latestUpdates, style: style),
         icon: const Icon(Icons.arrow_forward),
@@ -190,7 +188,7 @@ class _FrontPageWidget extends HookConsumerWidget {
       const MangaProviderCarousel(provider: _latestUpdatesProvider),
       TextButton.icon(
         onPressed: () {
-          router.pushPath('/list/${data.staffPicks}');
+          context.push('/list/${data.staffPicks}');
         },
         label: Text(t.mangadex.staffPicks, style: style),
         icon: const Icon(Icons.arrow_forward),
@@ -199,7 +197,7 @@ class _FrontPageWidget extends HookConsumerWidget {
       MangaProviderCarousel(provider: staffPicks),
       TextButton.icon(
         onPressed: () {
-          router.pushPath('/list/${data.seasonal}');
+          context.push('/list/${data.seasonal}');
         },
         label: Text(t.mangadex.seasonal, style: style),
         icon: const Icon(Icons.arrow_forward),
@@ -208,7 +206,7 @@ class _FrontPageWidget extends HookConsumerWidget {
       MangaProviderCarousel(provider: seasonal),
       TextButton.icon(
         onPressed: () {
-          router.pushPath('/titles/recent');
+          context.push('/titles/recent');
         },
         label: Text(t.mangadex.recentlyAdded, style: style),
         icon: const Icon(Icons.arrow_forward),

@@ -1,10 +1,9 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/model/model.dart';
-import 'package:gagaku/routes.gr.dart';
+import 'package:gagaku/model/common.dart';
+import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
@@ -13,6 +12,7 @@ import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
 class _ExtensionHomeCard extends ConsumerWidget {
   final WebSourceInfo extensionInfo;
@@ -43,9 +43,10 @@ class _ExtensionHomeCard extends ConsumerWidget {
                 : const Icon(Icons.rss_feed),
             title: Text(source.name),
             onTap: source.hasCapability(SourceIntents.discoverSections)
-                ? () => context.router.push(
-                    ExtensionHomeRoute(sourceId: source.id, source: source),
-                  )
+                ? () => ExtensionHomeRoute(
+                    sourceId: source.id,
+                    source: source,
+                  ).push(context)
                 : null,
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -64,9 +65,9 @@ class _ExtensionHomeCard extends ConsumerWidget {
                 if (source.hasCapability(SourceIntents.mangaSearch))
                   IconButton(
                     icon: const Icon(Icons.search),
-                    onPressed: () => context.router.push(
-                      ExtensionSearchRoute(initialSource: source),
-                    ),
+                    onPressed: () => ExtensionSearchRoute(
+                      initialSource: source,
+                    ).push(context),
                     tooltip: tr.search.arg(arg: source.name),
                   ),
               ],
@@ -78,11 +79,9 @@ class _ExtensionHomeCard extends ConsumerWidget {
   }
 }
 
-@RoutePage()
 class WebSourceFrontPage extends HookConsumerWidget {
-  const WebSourceFrontPage({super.key, this.controller, this.process});
+  const WebSourceFrontPage({super.key, this.controller});
 
-  final Uri? process;
   final ScrollController? controller;
 
   @override
@@ -92,85 +91,6 @@ class WebSourceFrontPage extends HookConsumerWidget {
         DefaultScrollController.maybeOf(context, 'WebSourceFrontPage') ??
         controller ??
         useScrollController();
-
-    useEffect(() {
-      if (process != null && process!.isScheme('paperback')) {
-        final action = process!.host;
-        final data = process!.queryParameters;
-
-        Future.delayed(Duration.zero, () async {
-          if (!context.mounted) return;
-          final messenger = ScaffoldMessenger.of(context);
-          final box = GagakuData().store.box<RepoInfo>();
-          final list = box.getAll();
-
-          if (action == 'addrepo') {
-            final name = data['displayName']!;
-            final url = data['url']!;
-            final result = await showDialog<bool>(
-              context: context,
-              builder: (BuildContext context) {
-                final nav = Navigator.of(context);
-                return AlertDialog(
-                  title: Text(tr.webSources.repo.add),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(tr.webSources.repo.addConfirm(repo: name)),
-                      Text(tr.webSources.repo.addWarning),
-                    ],
-                  ),
-                  actions: <Widget>[
-                    ElevatedButton(
-                      child: Text(tr.ui.no),
-                      onPressed: () {
-                        nav.pop(null);
-                      },
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        nav.pop(true);
-                      },
-                      child: Text(tr.ui.yes),
-                    ),
-                  ],
-                );
-              },
-            );
-
-            if (result != null && context.mounted) {
-              if (!context.mounted) return;
-
-              final exists = list.indexWhere((e) => e.url == url) > -1;
-
-              if (exists) {
-                messenger
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text(tr.webSources.repo.repoExists),
-                      backgroundColor: Colors.orange,
-                    ),
-                  );
-              } else {
-                box.put(RepoInfo(name: name, url: url));
-
-                messenger
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text(tr.webSources.repo.repoAddOK),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-              }
-            }
-          }
-        });
-      }
-      return null;
-    }, []);
 
     final installed = ref.watch(
       installedSourcesProvider.select(
@@ -221,13 +141,9 @@ class WebSourceFrontPage extends HookConsumerWidget {
   }
 }
 
-@RoutePage()
+@Dependencies([chipTextStyle])
 class ExtensionHomePage extends StatelessWidget {
-  const ExtensionHomePage({
-    super.key,
-    @PathParam() required this.sourceId,
-    this.source,
-  });
+  const ExtensionHomePage({super.key, required this.sourceId, this.source});
 
   final String sourceId;
   final WebSourceInfo? source;
@@ -248,6 +164,7 @@ class ExtensionHomePage extends StatelessWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class ExtensionHomeWidget extends HookConsumerWidget {
   final WebSourceInfo source;
 
@@ -382,12 +299,10 @@ class ExtensionHomeWidget extends HookConsumerWidget {
                           sectionResults.items.elementAt(idx)
                               as GenresCarouselItem;
 
-                      context.router.push(
-                        ExtensionSearchRoute(
-                          initialSource: source,
-                          query: element.searchQuery,
-                        ),
-                      );
+                      ExtensionSearchRoute(
+                        initialSource: source,
+                        query: element.searchQuery,
+                      ).push(context);
                     },
                     children: [
                       for (final item in sectionResults.items)
@@ -444,7 +359,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
           },
           child: TitleFlexBar(title: source.name),
         ),
-        leading: AutoLeadingButton(),
+        leading: const BackButton(),
         actions: [
           OverflowBar(
             spacing: 0.0,
@@ -453,9 +368,8 @@ class ExtensionHomeWidget extends HookConsumerWidget {
                 IconButton(
                   color: theme.colorScheme.onPrimaryContainer,
                   icon: const Icon(Icons.search),
-                  onPressed: () => context.router.push(
-                    ExtensionSearchRoute(initialSource: source),
-                  ),
+                  onPressed: () =>
+                      ExtensionSearchRoute(initialSource: source).push(context),
                   tooltip: tr.search.arg(arg: source.name),
                 ),
               if (source.hasCapability(SourceIntents.settingsUI))
@@ -493,6 +407,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class _DiscoverSectionPage extends StatefulHookConsumerWidget {
   const _DiscoverSectionPage({required this.source, required this.section});
 
@@ -551,7 +466,7 @@ class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
           },
           child: TitleFlexBar(title: widget.section.title),
         ),
-        leading: AutoLeadingButton(),
+        leading: const BackButton(),
       ),
       body: RefreshIndicator(
         onRefresh: () async => _pagingController.refresh(),

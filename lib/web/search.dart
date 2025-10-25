@@ -1,8 +1,8 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -10,6 +10,7 @@ import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'search.g.dart';
@@ -25,7 +26,7 @@ class _SearchHistory extends _$SearchHistory {
       state = cb(state);
 }
 
-@RoutePage()
+@Dependencies([chipTextStyle])
 class ExtensionSearchPage extends StatelessWidget {
   const ExtensionSearchPage({super.key, this.initialSource, this.query});
 
@@ -51,7 +52,7 @@ class ExtensionSearchPage extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               title: Text(t.webSources.sourceSearch),
-              leading: AutoLeadingButton(),
+              leading: const BackButton(),
             ),
             body: Center(child: Text(t.webSources.noSearchableSourcesWarning)),
           );
@@ -66,6 +67,7 @@ class ExtensionSearchPage extends StatelessWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class ExtensionSearchWidget extends StatefulHookConsumerWidget {
   const ExtensionSearchWidget({
     super.key,
@@ -186,7 +188,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
         ),
         leading: [
           SliverAppBar(
-            leading: AutoLeadingButton(),
+            leading: const BackButton(),
             pinned: true,
             snap: false,
             floating: false,

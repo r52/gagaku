@@ -1,15 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/objectbox.g.dart';
-import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/model/cache.dart';
+import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/http.dart';
 import 'package:gagaku/log.dart';
@@ -36,23 +35,19 @@ void openWebSource(BuildContext context, SourceHandler handle) {
       readerData = WebReaderData(source: code, handle: handle);
     }
 
-    context.router.push(
-      ProxyWebSourceReaderRoute(
-        proxy: handle.sourceId,
-        code: handle.location,
-        chapter: handle.chapter!,
-        page: '1',
-        readerData: readerData,
-      ),
-    );
+    ProxyWebSourceReaderRoute(
+      proxy: handle.sourceId,
+      code: handle.location,
+      chapter: handle.chapter!,
+      page: '1',
+      $extra: readerData,
+    ).push(context);
   } else {
-    context.router.push(
-      WebMangaViewRoute(
-        sourceId: handle.sourceId,
-        mangaId: handle.location,
-        handle: handle,
-      ),
-    );
+    WebMangaViewRoute(
+      sourceId: handle.sourceId,
+      mangaId: handle.location,
+      handle: handle,
+    ).push(context);
   }
 }
 
@@ -782,14 +777,18 @@ class ExtensionSource extends _$ExtensionSource {
 
     final completer = Completer<void>();
 
-    final contentBlockers = GagakuData().blockers
-        .map(
-          (filter) => ContentBlocker(
+    final contentBlockers = <ContentBlocker>[];
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      for (final filter in GagakuData().blockers) {
+        contentBlockers.add(
+          ContentBlocker(
             trigger: ContentBlockerTrigger(urlFilter: filter),
             action: ContentBlockerAction(type: ContentBlockerActionType.BLOCK),
           ),
-        )
-        .toList();
+        );
+      }
+    }
 
     try {
       _view = HeadlessInAppWebView(
@@ -811,7 +810,7 @@ class ExtensionSource extends _$ExtensionSource {
         initialSettings: InAppWebViewSettings(
           contentBlockers: defaultTargetPlatform == TargetPlatform.android
               ? contentBlockers
-              : [],
+              : null,
           browserAcceleratorKeysEnabled: false,
           isInspectable: false,
         ),
@@ -950,7 +949,7 @@ class ExtensionSource extends _$ExtensionSource {
                         ),
                       ),
                   ]
-                : [],
+                : null,
             loadsImagesAutomatically: context.source.loadImages,
             browserAcceleratorKeysEnabled: false,
             isInspectable: false,

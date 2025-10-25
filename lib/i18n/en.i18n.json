@@ -140,7 +140,7 @@
       "newRepo": "@:ui.addNew Repo",
       "browser": "View in browser",
       "add": "@:ui.add Repo",
-      "addConfirm": "Are you sure you want to add the repo ${repo}?",
+      "addConfirm": "Are you sure you want to add the repo ${repo} from ${url}?",
       "addWarning": "Ensure that you are only adding trusted sources!",
       "urlHint": "Repo URL",
       "nameHint": "Repo Name",

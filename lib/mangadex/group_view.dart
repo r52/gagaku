@@ -1,5 +1,4 @@
 import 'package:animations/animations.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -28,28 +27,10 @@ Future<Group> _fetchGroupFromId(Ref ref, String groupId) async {
 }
 
 @Dependencies([chipTextStyle, readBorderTheme])
-@RoutePage()
-class MangaDexGroupViewWithNamePage extends MangaDexGroupViewPage {
-  const MangaDexGroupViewWithNamePage({
-    super.key,
-    @PathParam() required super.groupId,
-    @PathParam() this.name,
-  });
-
-  final String? name;
-}
-
-@Dependencies([chipTextStyle, readBorderTheme])
-@RoutePage()
 class MangaDexGroupViewPage extends StatelessWidget {
-  const MangaDexGroupViewPage({
-    super.key,
-    @PathParam() required this.groupId,
-    this.group,
-  });
+  const MangaDexGroupViewPage({super.key, required this.groupId, this.group});
 
   final String groupId;
-
   final Group? group;
 
   @override
@@ -181,7 +162,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: AutoLeadingButton(),
+        leading: const BackButton(),
         flexibleSpace: GestureDetector(
           onTap: () {
             controllers[view.value.index].animateTo(
@@ -259,7 +240,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
+@Dependencies([chipTextStyle, readBorderTheme])
 class _GroupTitlesTab extends ConsumerStatefulWidget {
   const _GroupTitlesTab({
     super.key,

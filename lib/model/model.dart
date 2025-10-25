@@ -13,10 +13,10 @@ import 'package:path_provider/path_provider.dart'
     show getApplicationDocumentsDirectory;
 
 abstract class GagakuRoute {
-  static const chapterfeed = 'titles/feed';
-  static const library = 'titles/follows';
-  static const history = 'my/history';
-  static const lists = 'my/lists';
+  static const chapterfeed = '/titles/feed';
+  static const library = '/titles/follows';
+  static const history = '/my/history';
+  static const lists = '/my/lists';
 
   static const latestfeed = '/titles/latest';
   static const recentfeed = '/titles/recent';
@@ -39,15 +39,16 @@ abstract class GagakuRoute {
   static const local = '/local';
 
   static const extension = '/extensions';
-  static const extensionUpdates = 'updates';
-  static const extensionSaved = 'saved';
-  static const extensionHistory = 'history';
+  static const extensionUpdates = '/extensions/updates';
+  static const extensionSaved = '/extensions/saved';
+  static const extensionHistory = '/extensions/history';
   static const extensionHomePage = '/extensions/:sourceId/home';
   static const extensionSearch = '/extensions/search';
   static const web = '/read';
   static const webManga = '/read/:sourceId/:mangaId';
   static const proxyChapter = '/read/:proxy/:code/:chapter/:page';
   static const extensionChapter = '/read-chapter/:sourceId/:mangaId/:chapterId';
+  static const extensionAddRepo = '/extensions/addrepo';
 
   static const config = '/config';
 }

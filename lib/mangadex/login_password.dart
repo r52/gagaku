@@ -1,15 +1,15 @@
 import 'dart:convert';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/types.dart' show MangaDexCredentials;
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/model/model.dart';
+import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/experimental/mutation.dart';
@@ -54,7 +54,7 @@ class MangaDexLoginWidget extends ConsumerWidget {
               child: Center(
                 child: ElevatedButton.icon(
                   onPressed: () async {
-                    AutoRouter.of(context).push(MangaDexLoginRoute());
+                    const MangaDexLoginRoute().push(context);
                   },
                   label: Text(tr.mangadex.login),
                   icon: const Icon(Icons.https),
@@ -95,7 +95,6 @@ class MangaDexLoginWidget extends ConsumerWidget {
   }
 }
 
-@RoutePage()
 class MangaDexLoginScreen extends HookConsumerWidget {
   const MangaDexLoginScreen({super.key});
 
@@ -106,10 +105,9 @@ class MangaDexLoginScreen extends HookConsumerWidget {
     final storage = Hive.box(gagakuLocalBox);
 
     final credstr = storage.get('mangadex_credentials');
-    final creds =
-        credstr != null
-            ? MangaDexCredentials.fromJson(json.decode(credstr))
-            : null;
+    final creds = credstr != null
+        ? MangaDexCredentials.fromJson(json.decode(credstr))
+        : null;
 
     final user = creds?.username;
     final clientId = creds?.clientId;
@@ -216,7 +214,7 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                         child: Text(tr.ui.cancel),
                         onPressed: () {
                           passwordController.clear();
-                          context.maybePop();
+                          context.pop();
                         },
                       ),
                       HookBuilder(
@@ -241,60 +239,58 @@ class MangaDexLoginScreen extends HookConsumerWidget {
                           return ElevatedButton(
                             onPressed:
                                 (usernameIsEmpty ||
-                                        passwordIsEmpty ||
-                                        clientIdIsEmpty ||
-                                        clientSecretIsEmpty ||
-                                        login is MutationPending)
-                                    ? null
-                                    : () async {
-                                      final router = AutoRouter.of(context);
-                                      final messenger = ScaffoldMessenger.of(
-                                        context,
-                                      );
+                                    passwordIsEmpty ||
+                                    clientIdIsEmpty ||
+                                    clientSecretIsEmpty ||
+                                    login is MutationPending)
+                                ? null
+                                : () async {
+                                    final messenger = ScaffoldMessenger.of(
+                                      context,
+                                    );
 
-                                      if (usernameController.text.isNotEmpty &&
-                                          passwordController.text.isNotEmpty &&
-                                          clientIdController.text.isNotEmpty &&
-                                          clientSecretController
-                                              .text
-                                              .isNotEmpty) {
-                                        final loginSuccess =
-                                            authControlLoginMutation.run(ref, (
-                                              ref,
-                                            ) async {
-                                              return await ref
-                                                  .get(
-                                                    authControlProvider
-                                                        .notifier,
-                                                  )
-                                                  .login(
-                                                    usernameController.text,
-                                                    passwordController.text,
-                                                    clientIdController.text,
-                                                    clientSecretController.text,
-                                                  );
-                                            });
+                                    if (usernameController.text.isNotEmpty &&
+                                        passwordController.text.isNotEmpty &&
+                                        clientIdController.text.isNotEmpty &&
+                                        clientSecretController
+                                            .text
+                                            .isNotEmpty) {
+                                      final loginSuccess =
+                                          authControlLoginMutation.run(ref, (
+                                            ref,
+                                          ) async {
+                                            return await ref
+                                                .get(
+                                                  authControlProvider.notifier,
+                                                )
+                                                .login(
+                                                  usernameController.text,
+                                                  passwordController.text,
+                                                  clientIdController.text,
+                                                  clientSecretController.text,
+                                                );
+                                          });
 
-                                        loginSuccess.then((success) {
-                                          if (!context.mounted) return;
-                                          if (success) {
-                                            router.maybePop();
-                                            passwordController.clear();
-                                          }
-                                        });
-                                      } else {
-                                        messenger
-                                          ..removeCurrentSnackBar()
-                                          ..showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                tr.auth.fieldsEmptyWarning,
-                                              ),
-                                              backgroundColor: Colors.red,
+                                      loginSuccess.then((success) {
+                                        if (!context.mounted) return;
+                                        if (success) {
+                                          context.pop();
+                                          passwordController.clear();
+                                        }
+                                      });
+                                    } else {
+                                      messenger
+                                        ..removeCurrentSnackBar()
+                                        ..showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              tr.auth.fieldsEmptyWarning,
                                             ),
-                                          );
-                                      }
-                                    },
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                    }
+                                  },
                             child: Text(tr.auth.login),
                           );
                         },

@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -9,7 +8,6 @@ import 'package:gagaku/util/ui.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 
 @Dependencies([readBorderTheme, chipTextStyle])
-@RoutePage()
 class MangaDexGlobalFeedPage extends HookWidget {
   const MangaDexGlobalFeedPage({super.key});
 
@@ -31,7 +29,7 @@ class MangaDexGlobalFeedPage extends HookWidget {
           },
           child: TitleFlexBar(title: t.chapterFeed.latestUpdates),
         ),
-        leading: AutoLeadingButton(),
+        leading: const BackButton(),
       ),
       body: InfiniteScrollChapterFeedWidget(
         feedKey: info.key,

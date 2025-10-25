@@ -1,18 +1,17 @@
 // ignore_for_file: unused_element
 import 'package:animations/animations.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/common.dart';
-import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/mangadex/settings.dart';
 import 'package:gagaku/reader/main.dart';
+import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
@@ -124,7 +123,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
           IconButton(
             color: theme.colorScheme.onPrimaryContainer,
             icon: const Icon(Icons.search),
-            onPressed: () => context.router.push(MangaDexSearchRoute()),
+            onPressed: () => MangaDexSearchRoute().push(context),
             tooltip: tr.search.arg(arg: 'MangaDex'),
           ),
           Tooltip(
@@ -159,8 +158,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
                           color: theme.colorScheme.onPrimaryContainer,
                           tooltip: tr.auth.login,
                           icon: const Icon(Icons.login),
-                          onPressed: () =>
-                              context.router.push(MangaDexLoginRoute()),
+                          onPressed: () => MangaDexLoginRoute().push(context),
                         )
                       : MenuAnchor(
                           builder: (context, controller, child) => IconButton(
@@ -594,9 +592,7 @@ class _CoverButton extends ConsumerWidget {
           return await ref.get(statisticsProvider.notifier).get([manga]);
         });
 
-        context.router.push(
-          MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
-        );
+        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context);
       },
       style: TextButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
@@ -649,9 +645,7 @@ class MangaTitleButton extends ConsumerWidget {
         statisticsMutation.run(ref, (ref) async {
           return await ref.get(statisticsProvider.notifier).get([manga]);
         });
-        context.router.push(
-          MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
-        );
+        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context);
       },
       icon: CountryFlag(
         key: ValueKey(
@@ -695,9 +689,7 @@ class _BackLinkedChapterButton extends ConsumerWidget {
         statisticsMutation.run(ref, (ref) async {
           return await ref.get(statisticsProvider.notifier).get([manga]);
         });
-        context.router.push(
-          MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
-        );
+        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context);
       },
     );
   }
@@ -992,18 +984,16 @@ class ChapterButtonWidget extends HookWidget {
 
     return InkWell(
       onTap: () {
-        context.router.push(
-          MangaDexReaderRoute(
-            chapterId: chapter.id,
-            readerData: ReaderData(
-              title: chapter.title,
-              chapter: chapter,
-              manga: manga,
-              link: manga.attributes!.title.get('en'),
-              onLinkPressed: onLinkPressed,
-            ),
+        MangaDexReaderRoute(
+          chapterId: chapter.id,
+          $extra: ReaderData(
+            title: chapter.title,
+            chapter: chapter,
+            manga: manga,
+            link: manga.attributes!.title.get('en'),
+            onLinkPressed: onLinkPressed,
           ),
-        );
+        ).push(context);
       },
       child: _ChapterButtonCard(
         key: ValueKey('_ChapterButtonCard(${chapter.id})'),
@@ -1344,9 +1334,7 @@ class GridMangaItem extends HookConsumerWidget {
         statisticsMutation.run(ref, (ref) async {
           return await ref.get(statisticsProvider.notifier).get([manga]);
         });
-        context.router.push(
-          MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
-        );
+        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context);
       },
       onHover: (hovering) {
         if (hovering) {
@@ -1420,9 +1408,10 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                           manga,
                         ]);
                       });
-                      context.router.push(
-                        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
-                      );
+                      MangaDexMangaViewRoute(
+                        mangaId: manga.id,
+                        manga: manga,
+                      ).push(context);
                     },
                     child: CachedNetworkImage(
                       imageUrl: manga.getFirstCoverUrl(
@@ -1502,9 +1491,10 @@ class _ListMangaItem extends HookConsumerWidget {
                     manga,
                   ]);
                 });
-                context.router.push(
-                  MangaDexMangaViewRoute(mangaId: manga.id, manga: manga),
-                );
+                MangaDexMangaViewRoute(
+                  mangaId: manga.id,
+                  manga: manga,
+                ).push(context);
               },
               child: CachedNetworkImage(
                 imageUrl: manga.getFirstCoverUrl(
@@ -1606,9 +1596,8 @@ class MangaGenreRow extends HookWidget {
             (e) => IconTextChip(
               key: ValueKey(e.id),
               text: e.attributes.name.get(tr.$meta.locale.languageCode),
-              onPressed: () => context.router.push(
-                MangaDexTagViewRoute(tagId: e.id, tag: e),
-              ),
+              onPressed: () =>
+                  MangaDexTagViewRoute(tagId: e.id, tag: e).push(context),
             ),
           );
     }, [manga]);
@@ -1730,9 +1719,7 @@ class _GroupRow extends HookWidget {
             icon: isOfficialPub ? _circleIconB : null,
             text: g.attributes.name,
             onPressed: () {
-              context.router.push(
-                MangaDexGroupViewRoute(groupId: g.id, group: g),
-              );
+              MangaDexGroupViewRoute(groupId: g.id, $extra: g).push(context);
             },
           ),
         ),

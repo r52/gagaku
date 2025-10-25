@@ -909,3 +909,18 @@ class TransparentOverlay<T> extends ModalRoute<T> {
     return FadeTransition(opacity: animation, child: child);
   }
 }
+
+class DialogPage extends Page<void> {
+  const DialogPage({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Route<void> createRoute(BuildContext context) {
+    return DialogRoute<void>(
+      context: context,
+      settings: this,
+      builder: (BuildContext context) => child,
+    );
+  }
+}

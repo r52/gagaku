@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -13,12 +12,13 @@ import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/model/common.dart';
-import 'package:gagaku/routes.gr.dart';
+import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/types.dart' show SearchQuery;
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:photo_view/photo_view.dart';
@@ -61,25 +61,8 @@ Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
 }
 
 @Dependencies([readBorderTheme, chipTextStyle])
-@RoutePage()
-class MangaDexMangaViewWithNamePage extends MangaDexMangaViewPage {
-  const MangaDexMangaViewWithNamePage({
-    super.key,
-    @PathParam() required super.mangaId,
-    @PathParam() this.name,
-  });
-
-  final String? name;
-}
-
-@Dependencies([readBorderTheme, chipTextStyle])
-@RoutePage()
 class MangaDexMangaViewPage extends ConsumerWidget {
-  const MangaDexMangaViewPage({
-    super.key,
-    @PathParam() required this.mangaId,
-    this.manga,
-  });
+  const MangaDexMangaViewPage({super.key, required this.mangaId, this.manga});
 
   final String mangaId;
 
@@ -238,7 +221,6 @@ class _MangaDexMangaViewWidgetState
   Widget build(BuildContext context) {
     final tr = context.t;
     final messenger = ScaffoldMessenger.of(context);
-    final router = AutoRouter.of(context);
     final me = ref.watch(loggedUserProvider).value;
     final theme = Theme.of(context);
 
@@ -286,7 +268,7 @@ class _MangaDexMangaViewWidgetState
                   key: ValueKey(e.id),
                   text: e.attributes.name.get(tr.$meta.locale.languageCode),
                   onPressed: () =>
-                      router.push(MangaDexTagViewRoute(tagId: e.id, tag: e)),
+                      MangaDexTagViewRoute(tagId: e.id, tag: e).push(context),
                 ),
               )
               .toList(),
@@ -327,15 +309,13 @@ class _MangaDexMangaViewWidgetState
       ),
       menuChildren: [
         MenuItemButton(
-          onPressed: () => context.router.push(
-            ExtensionSearchRoute(
-              query: SearchQuery(
-                title: widget.manga.attributes!.title.get(
-                  tr.$meta.locale.languageCode,
-                ),
+          onPressed: () => ExtensionSearchRoute(
+            query: SearchQuery(
+              title: widget.manga.attributes!.title.get(
+                tr.$meta.locale.languageCode,
               ),
             ),
-          ),
+          ).push(context),
           leadingIcon: const Icon(Icons.search),
           child: Text(tr.webSources.searchWithExt),
         ),
@@ -343,7 +323,7 @@ class _MangaDexMangaViewWidgetState
           onPressed: () =>
               Clipboard.setData(
                 ClipboardData(
-                  text: 'gagaku://open${context.router.currentUrl}',
+                  text: 'gagaku://open${GoRouterState.of(context).uri.path}',
                 ),
               ).then((_) {
                 if (!context.mounted) return;
@@ -402,7 +382,7 @@ class _MangaDexMangaViewWidgetState
                 forceElevated: innerBoxIsScrolled,
                 expandedHeight: 250.0,
                 collapsedHeight: 100.0,
-                leading: AutoLeadingButton(),
+                leading: const BackButton(),
                 flexibleSpace: FlexibleSpaceBar(
                   expandedTitleScale: 2.0,
                   title: Text(
@@ -544,13 +524,11 @@ class _MangaDexMangaViewWidgetState
                                       backgroundColor: theme.colorScheme.surface
                                           .withAlpha(200),
                                     ),
-                                    onPressed: () => context.router.push(
-                                      ExtensionSearchRoute(
-                                        query: SearchQuery(
-                                          title: entry.first.value,
-                                        ),
+                                    onPressed: () => ExtensionSearchRoute(
+                                      query: SearchQuery(
+                                        title: entry.first.value,
                                       ),
-                                    ),
+                                    ).push(context),
                                     icon: const Icon(Icons.search),
                                   ),
                                 ),
@@ -597,7 +575,7 @@ class _MangaDexMangaViewWidgetState
                               ButtonChip(
                                 text: author.attributes.name,
                                 onPressed: () {
-                                  router.pushPath('/author/${author.id}');
+                                  context.push('/author/${author.id}');
                                 },
                               ),
                           ],
@@ -610,7 +588,7 @@ class _MangaDexMangaViewWidgetState
                               ButtonChip(
                                 text: artist.attributes.name,
                                 onPressed: () {
-                                  router.pushPath('/author/${artist.id}');
+                                  context.push('/author/${artist.id}');
                                 },
                               ),
                           ],
@@ -701,7 +679,7 @@ class _MangaDexMangaViewWidgetState
                             ),
                           ButtonChip(
                             onPressed: () async {
-                              final route = Uri.parse(router.currentUrl);
+                              final route = GoRouterState.of(context).uri;
                               await Styles.tryLaunchUrl(
                                 context,
                                 'http://mangadex.org${route.path}',

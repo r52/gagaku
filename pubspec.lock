@@ -81,22 +81,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.13.0"
-  auto_route:
-    dependency: "direct main"
-    description:
-      name: auto_route
-      sha256: "14d4c91a073dd1b1e2678cbea66b3c09c13e5c8111db2d9f3212db9e3cf744b5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "10.2.0"
-  auto_route_generator:
-    dependency: "direct dev"
-    description:
-      name: auto_route_generator
-      sha256: "3411b3ad9fda50e8bce5a3494a9e0d7385082438e22721febc9e3af08a35bc11"
-      url: "https://pub.dev"
-    source: hosted
-    version: "10.2.5"
   boolean_selector:
     dependency: transitive
     description:
@@ -297,14 +281,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.6"
-  crypto_keys_plus:
+  crypto_keys:
     dependency: transitive
     description:
-      name: crypto_keys_plus
-      sha256: a64dc8b3555e730aa183067fbb666efd9996bc2d0cfda4517c77607d9e2adf91
+      name: crypto_keys
+      sha256: "2ed305a11a3e5d16dd7f489121c956fd19b9816938bb68bc7ed3a379827a304e"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.3.0+2"
   csslib:
     dependency: transitive
     description:
@@ -726,6 +710,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.3"
+  go_router:
+    dependency: "direct main"
+    description:
+      name: go_router
+      sha256: d8f590a69729f719177ea68eb1e598295e8dbc41bbc247fed78b2c8a25660d7c
+      url: "https://pub.dev"
+    source: hosted
+    version: "16.3.0"
+  go_router_builder:
+    dependency: "direct dev"
+    description:
+      name: go_router_builder
+      sha256: e0646fb5586e04e1df92678f539059f38e4314848f06dd4f3cd87fed434e16b5
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.1"
   graphs:
     dependency: transitive
     description:
@@ -738,18 +738,18 @@ packages:
     dependency: "direct main"
     description:
       name: hive_ce
-      sha256: e3a9d2608350ca5ae1fcaa594bbc24c443cf8e67cd16b89ec258fb0bcccb0847
+      sha256: "81d39a03c4c0ba5938260a8c3547d2e71af59defecea21793d57fc3551f0d230"
       url: "https://pub.dev"
     source: hosted
-    version: "2.15.0"
+    version: "2.15.1"
   hive_ce_flutter:
     dependency: "direct main"
     description:
       name: hive_ce_flutter
-      sha256: f5bd57fda84402bca7557fedb8c629c96c8ea10fab4a542968d7b60864ca02cc
+      sha256: "26d656c9e8974f0732f1d09020e2d7b08ba841b8961a02dbfb6caf01474b0e9a"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.2"
+    version: "2.3.3"
   hooks_riverpod:
     dependency: "direct main"
     description:
@@ -854,14 +854,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.14.2"
-  jose_plus:
+  jose:
     dependency: transitive
     description:
-      name: jose_plus
-      sha256: c262694c2f8e74825a70d0b7339c24a285fd8856f9b35b0848aa23fa1d26e724
+      name: jose
+      sha256: bd8dd0bee653a78be16f5e2c0387117906f8f5171f7dcc29e3246b6c7cb73918
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.7"
+    version: "0.3.5"
   js:
     dependency: transitive
     description:
@@ -910,14 +910,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
-  lean_builder:
-    dependency: transitive
-    description:
-      name: lean_builder
-      sha256: ef5cd5f907157eb7aa87d1704504b5a6386d2cbff88a3c2b3344477bab323ee9
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.2"
   lints:
     dependency: transitive
     description:
@@ -1059,10 +1051,10 @@ packages:
     description:
       path: "."
       ref: password
-      resolved-ref: "9ac1837425766beb11ef8d0164963c9acc331b9e"
+      resolved-ref: "8996b65965494f9de7466586b7413f7324f09533"
       url: "https://github.com/r52/openid_client.git"
     source: git
-    version: "0.4.9"
+    version: "0.4.9+1"
   package_config:
     dependency: transitive
     description:
@@ -1247,6 +1239,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
+  quiver:
+    dependency: transitive
+    description:
+      name: quiver
+      sha256: ea0b925899e64ecdfbf9c7becb60d5b50e706ade44a85b2363be2a22d88117d2
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.2"
   riverpod:
     dependency: "direct main"
     description:
@@ -1336,10 +1336,10 @@ packages:
     dependency: "direct main"
     description:
       name: slang
-      sha256: "59615afd67de95033c0f14a8596d0691a17fa4cbf28eb4af23f00ed58c80b8f6"
+      sha256: bb92f1777d086483251dd1a359d86d174d2ea3f8000eb7f55ad7ef9a1323c9e7
       url: "https://pub.dev"
     source: hosted
-    version: "4.9.1"
+    version: "4.9.2"
   slang_build_runner:
     dependency: "direct dev"
     description:
@@ -1725,14 +1725,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
-  x509_plus:
+  x509:
     dependency: transitive
     description:
-      name: x509_plus
-      sha256: f9f5caade6077c9a605125428d0bf79c002afa35a475d400849adb1a25ebeee6
+      name: x509
+      sha256: cbd1a63846884afd273cda247b0365284c8d85a365ca98e110413f93d105b935
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.3"
+    version: "0.2.4+3"
   xdg_directories:
     dependency: transitive
     description:
@@ -1749,14 +1749,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.6.1"
-  xxh3:
-    dependency: transitive
-    description:
-      name: xxh3
-      sha256: "399a0438f5d426785723c99da6b16e136f4953fb1e9db0bf270bd41dd4619916"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.0"
   yaml:
     dependency: "direct dev"
     description:

@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/cache.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
@@ -18,11 +18,12 @@ import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 enum _UpdateState { stopped, run, running, stopping }
 
-@RoutePage()
+@Dependencies([chipTextStyle])
 class WebSourceUpdatesPage extends StatefulHookConsumerWidget {
   const WebSourceUpdatesPage({super.key, this.controller});
 

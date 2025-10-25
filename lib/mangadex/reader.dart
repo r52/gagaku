@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/mangadex/model/model.dart';
@@ -9,6 +8,7 @@ import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -66,11 +66,10 @@ Future<List<ReaderPage>> _fetchChapterPages(Ref ref, Chapter chapter) async {
   return pages;
 }
 
-@RoutePage()
 class MangaDexReaderPage extends ConsumerWidget {
   const MangaDexReaderPage({
     super.key,
-    @PathParam() required this.chapterId,
+    required this.chapterId,
     this.readerData,
   });
 
@@ -109,7 +108,7 @@ class MangaDexReaderPage extends ConsumerWidget {
           statisticsMutation.run(ref, (ref) async {
             return await ref.get(statisticsProvider.notifier).get([data.manga]);
           });
-          context.router.navigatePath('/title/${data.manga.id}');
+          context.go('/title/${data.manga.id}', extra: data.manga);
         },
       ),
     );
