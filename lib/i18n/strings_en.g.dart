@@ -3,6 +3,7 @@
 ///
 // coverage:ignore-file
 // ignore_for_file: type=lint, unused_import
+// dart format off
 
 part of 'strings.g.dart';
 
@@ -1715,450 +1716,441 @@ extension on Translations {
 	}
 
 	dynamic _flatMapFunction$0(String path) {
-		switch (path) {
-			case 'ui.add': return 'Add';
-			case 'ui.addNew': return 'Add New';
-			case 'ui.go': return 'Go';
-			case 'ui.ok': return 'Ok';
-			case 'ui.cancel': return 'Cancel';
-			case 'ui.yes': return 'Yes';
-			case 'ui.no': return 'No';
-			case 'ui.on': return 'On';
-			case 'ui.off': return 'Off';
-			case 'ui.none': return 'None';
-			case 'ui.block': return 'Block';
-			case 'ui.unblock': return 'Unblock';
-			case 'ui.follow': return 'Follow';
-			case 'ui.unfollow': return 'Unfollow';
-			case 'ui.create': return 'Create';
-			case 'ui.browse': return 'Browse';
-			case 'ui.manage': return 'Manage';
-			case 'ui.edit': return 'Edit';
-			case 'ui.save': return 'Save';
-			case 'ui.delete': return 'Delete';
-			case 'ui.rename': return 'Rename';
-			case 'ui.clear': return 'Clear';
-			case 'ui.gridView': return 'Grid view';
-			case 'ui.listView': return 'List view';
-			case 'ui.detailedView': return 'Detailed view';
-			case 'ui.gridSize': return 'Grid Size';
-			case 'ui.loadingDot': return 'Loading...';
-			case 'ui.copyClipboard': return 'Copied to clipboard!';
-			case 'ui.pasteClipboard': return 'Paste from Clipboard';
-			case 'ui.dragHint': return 'Hint: Drag to reorder';
-			case 'ui.makeDefault': return 'Make Default';
-			case 'ui.retry': return 'Retry';
-			case 'ui.irreversibleWarning': return 'NOTE: THIS ACTION IS IRREVERSIBLE';
-			case 'ui.filterItems': return 'Filter Items';
-			case 'ui.sureContinue': return 'Are you sure you want to continue?';
-			case 'errors.noresults': return 'No results';
-			case 'errors.notitles': return 'No titles';
-			case 'errors.nomanga': return 'No manga';
-			case 'errors.nolists': return 'No lists';
-			case 'errors.norepos': return 'No repos';
-			case 'errors.noitems': return 'No items';
-			case 'errors.unsupportedUrl': return 'Unsupported URL';
-			case 'errors.loginFail': return ({required Object reason}) => 'Failed to login: ${reason}';
-			case 'errors.notLoggedIn': return 'Operation failed. User not logged in';
-			case 'errors.unsupportedSource': return 'Unsupported extension type';
-			case 'errors.unknownSourceID': return ({required Object id}) => 'Unknown source ID ${id}';
-			case 'errors.fetchFail': return 'Something went wrong while fetching a new page';
-			case 'errors.pageNotFound': return 'Page Not Found';
-			case 'errors.pageNotFoundArg': return ({required Object url}) => 'Can\'t find a page for: ${url}';
-			case 'errors.failedLaunchUrl': return ({required Object url}) => 'Failed to launch ${url}';
-			case 'auth.login': return 'Login';
-			case 'auth.logout': return 'Logout';
-			case 'auth.username': return 'Username';
-			case 'auth.password': return 'Password';
-			case 'auth.usernameEmptyWarning': return 'Username cannot be empty';
-			case 'auth.passwordEmptyWarning': return 'Password cannot be empty';
-			case 'auth.clientId': return 'Client ID';
-			case 'auth.clientSecret': return 'Client Secret';
-			case 'auth.clientIdEmptyWarning': return 'Client ID cannot be empty';
-			case 'auth.clientSecretEmptyWarning': return 'Client Secret cannot be empty';
-			case 'auth.fieldsEmptyWarning': return 'Username/Password/Client ID/Client Secret cannot be empty';
-			case 'auth.loggedInAs': return ({required Object user}) => 'Logged in as: ${user}';
-			case 'auth.authenticating': return 'Authenticating...';
-			case 'sort.desc': return 'Descending';
-			case 'sort.asc': return 'Ascending';
-			case 'library': return 'Library';
-			case 'history.text': return 'History';
-			case 'history.clear': return 'Clear History';
-			case 'history.clearWarning': return 'Are you sure you want to remove all history?';
-			case 'localLibrary.text': return 'Local Library';
-			case 'localLibrary.extractingArchive': return 'Extracting archive...';
-			case 'localLibrary.loadingDir': return 'Loading directory...';
-			case 'localLibrary.archiveUnreadableWarning': return 'This archive contains no readable images!';
-			case 'localLibrary.dirUnreadableWarning': return 'This directory contains no readable images!';
-			case 'localLibrary.settings.libraryPath': return 'Manga Library Path';
-			case 'localLibrary.settings.libraryPathDesc': return 'Choose where to search for your manga library';
-			case 'localLibrary.readArchive': return 'Read Archive';
-			case 'localLibrary.noPathWarning': return 'No library directory set!';
-			case 'localLibrary.setPath': return 'Set Library Directory';
-			case 'localLibrary.scanning': return 'Scanning library...';
-			case 'localLibrary.errors.permissionDenied': return 'Permissions denied';
-			case 'localLibrary.errors.emptyLibrary': return 'Library is empty!';
-			case 'localLibrary.errors.pathNotSet': return 'Library directory not set!';
-			case 'localLibrary.sort.name_desc': return 'Name descending';
-			case 'localLibrary.sort.name_asc': return 'Name ascending';
-			case 'localLibrary.sort.modified_desc': return 'Modified descending';
-			case 'localLibrary.sort.modified_asc': return 'Modified ascending';
-			case 'webSources.text': return 'Web Sources';
-			case 'webSources.home': return 'Home';
-			case 'webSources.homepages': return 'Homepages';
-			case 'webSources.openUrl': return 'Open URL';
-			case 'webSources.openLink': return 'Open Link';
-			case 'webSources.supportedUrl.text': return 'Supported URLs';
-			case 'webSources.supportedUrl.arg': return ({required Object arg}) => '${_root.webSources.supportedUrl.text}:${arg}';
-			case 'webSources.settings.repos': return 'Repos';
-			case 'webSources.settings.reposDesc': return 'Configure source repos';
-			case 'webSources.settings.categories': return 'Favorite Categories';
-			case 'webSources.settings.categoriesDesc': return 'Set up favourite list categories';
-			case 'webSources.settings.newCategory': return '${_root.ui.addNew} Category';
-			case 'webSources.settings.addCategory': return '${_root.ui.add} Category';
-			case 'webSources.settings.renameCategory': return '${_root.ui.rename} Category';
-			case 'webSources.settings.categoryName': return 'Category name';
-			case 'webSources.settings.emptyCategoryWarning': return 'Category name cannot be empty';
-			case 'webSources.settings.usedCategoryWarning': return 'Category name already used';
-			case 'webSources.settings.categoriesToUpdate': return 'Categories to Update';
-			case 'webSources.settings.categoriesToUpdateDesc': return 'Select categories which manga will be updated in Updates view';
-			case 'webSources.settings.categoryDelete': return '${_root.ui.delete} Category';
-			case 'webSources.settings.categoryDeleteWarn': return 'Deleting a category will remove all items in it';
-			case 'webSources.settings.clearAll': return 'Clear All Extension Settings';
-			case 'webSources.settings.clearAllDesc': return 'Clears all extension settings. Recommended when replacing or upgrading extensions.';
-			case 'webSources.settings.clearAllWarning': return 'Are you sure you want to delete all extension settings?';
-			case 'webSources.settings.clearSettings': return 'Clear Settings';
-			case 'webSources.settings.clearSuccess': return 'Settings Cleared';
-			case 'webSources.repo.list': return 'Repo List';
-			case 'webSources.repo.newRepo': return '${_root.ui.addNew} Repo';
-			case 'webSources.repo.browser': return 'View in browser';
-			case 'webSources.repo.add': return '${_root.ui.add} Repo';
-			case 'webSources.repo.addConfirm': return ({required Object repo, required Object url}) => 'Are you sure you want to add the repo ${repo} from ${url}?';
-			case 'webSources.repo.addWarning': return 'Ensure that you are only adding trusted sources!';
-			case 'webSources.repo.urlHint': return 'Repo URL';
-			case 'webSources.repo.nameHint': return 'Repo Name';
-			case 'webSources.repo.urlEmptyWarning': return 'URL cannot be empty';
-			case 'webSources.repo.nameEmptyWarning': return 'Name cannot be empty';
-			case 'webSources.repo.urlInvalidWarning': return 'Must be a valid URL';
-			case 'webSources.repo.repoAddOK': return 'Repo added';
-			case 'webSources.repo.repoExists': return 'Repo already exists';
-			case 'webSources.repo.missingRepo': return 'Missing Repo';
-			case 'webSources.source.settings': return 'Extension Settings';
-			case 'webSources.source.manager': return 'Extension Manager';
-			case 'webSources.source.noDataWarning': return 'No repos nor extensions installed!';
-			case 'webSources.source.refresh': return 'Refresh repos';
-			case 'webSources.source.delete': return ({required Object arg}) => '${_root.ui.delete} ${arg}';
-			case 'webSources.source.add': return ({required Object arg}) => '${_root.ui.add} ${arg}';
-			case 'webSources.source.update': return ({required Object arg}) => 'Update/Replace ${arg}';
-			case 'webSources.source.sourceDeleteOK': return 'Extension disabled';
-			case 'webSources.source.sourceUpdateOK': return 'Extension updated';
-			case 'webSources.source.sourceAddOK': return 'Extension enabled';
-			case 'webSources.source.installedVersion': return ({required Object version}) => ' (installed: v${version})';
-			case 'webSources.source.noTagsWarning': return 'This extension provides no filter options';
-			case 'webSources.sourceUnavailable': return ({required Object id}) => 'Source ${id} Unavailable';
-			case 'webSources.noSourcesWarning': return 'No extensions installed!';
-			case 'webSources.noSearchableSourcesWarning': return 'No searchable extensions installed!';
-			case 'webSources.sourceSearch': return 'Extension Search';
-			case 'webSources.resetRead': return 'Reset Read Markers';
-			case 'webSources.resetReadWarning': return 'Are you sure you want to reset all read markers for this manga?';
-			case 'webSources.resetAllRead': return 'Reset all Read Markers';
-			case 'webSources.resetAllReadWarning': return 'Are you sure you want to reset all read markers?';
-			case 'webSources.favorites': return 'Favorites';
-			case 'webSources.loadInstalledSourcesError': return 'Error loading installed sources';
-			case 'webSources.searchWithExt': return 'Search with extensions';
-			case 'webSources.historyHere': return 'Your manga browsing history appears here';
-			case 'webSources.saveHistory': return 'Save History?';
-			case 'search.text': return 'Search';
-			case 'search.arg': return ({required Object arg}) => 'Search ${arg}';
-			case 'search.filters': return 'Search Filters';
-			case 'search.resetFilters': return 'Reset Filters';
-			case 'search.applyFilters': return 'Apply Filters';
-			case 'search.selectedTagFilters': return 'Selected Tag Filters';
-			case 'search.filterTags': return 'Filter tags';
-			case 'search.otherOptions': return 'Other Options';
-			case 'search.inclusion': return 'Inclusion Mode';
-			case 'search.exclusion': return 'Exclusion Mode';
-			case 'search.any': return 'Any';
-			case 'settings': return 'Settings';
-			case 'arg_settings': return ({required Object arg}) => '${arg} ${_root.settings}';
-			case 'saveSettings': return 'Save Settings';
-			case 'num_manga': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
-				one: '${n} Manga',
-				other: '${n} Manga',
-			);
-			case 'titles': return 'Titles';
-			case 'num_titles': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
-				one: '${n} Title',
-				other: '${n} Titles',
-			);
-			case 'feed': return 'Feed';
-			case 'num_items': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
-				one: '${n} item',
-				other: '${n} items',
-			);
-			case 'theme.mode': return 'Theme Mode';
-			case 'theme.color': return 'Theme Color';
-			case 'theme.light': return 'Light';
-			case 'theme.dark': return 'Dark';
-			case 'theme.system': return 'System Defined';
-			case 'reader.direction.leftToRight': return 'Left to Right';
-			case 'reader.direction.rightToLeft': return 'Right to Left';
-			case 'reader.format.single': return 'Single';
-			case 'reader.format.longstrip': return 'Long Strip';
-			case 'reader.settings': return 'Reader Settings';
-			case 'reader.togglePageSize': return 'Toggle Page Size';
-			case 'reader.progressBar': return 'Progress Bar';
-			case 'reader.swipeGestures': return 'Swipe Gestures';
-			case 'reader.clickToTurn': return 'Click/Tap to Turn Page';
-			case 'reader.precacheCount': return 'Page Preload';
-			case 'mangadex.home': return 'Home';
-			case 'mangadex.myFeed': return 'My Feed';
-			case 'mangadex.myLists': return 'My Lists';
-			case 'mangadex.followedLists': return 'Followed Lists';
-			case 'mangadex.popularNewTitles': return 'Popular New Titles';
-			case 'mangadex.staffPicks': return 'Staff Picks';
-			case 'mangadex.seasonal': return 'Seasonal';
-			case 'mangadex.recentlyAdded': return 'Recently Added';
-			case 'mangadex.byChapter': return 'By Chapter';
-			case 'mangadex.byManga': return 'By Manga';
-			case 'mangadex.localHistory': return 'Reading History (local)';
-			case 'mangadex.noFollowsMsg': return 'Find some manga to follow!';
-			case 'mangadex.noHistoryMsg': return 'No reading history';
-			case 'mangadex.createNewList': return 'Create New List';
-			case 'mangadex.createNewListBtn': return '+ ${_root.mangadex.createNewList}';
-			case 'mangadex.listName': return 'List Name';
-			case 'mangadex.listFeed': return 'List Feed';
-			case 'mangadex.listNameEmptyWarning': return 'List name cannot be empty';
-			case 'mangadex.listNotExistError': return ({required Object id}) => 'List with ID ${id} does not exist!';
-			case 'mangadex.editList': return '${_root.ui.edit} List';
-			case 'mangadex.editListError': return ({required Object error}) => 'Failed to edit list: ${error}';
-			case 'mangadex.createList': return '${_root.ui.create} List';
-			case 'mangadex.deleteList': return '${_root.ui.delete} List';
-			case 'mangadex.deleteListOk': return 'List deleted';
-			case 'mangadex.deleteListError': return ({required Object error}) => 'Failed to delete list: ${error}';
-			case 'mangadex.deleteListWarning': return ({required Object list}) => 'Are you sure you want to permanently delete \'${list}\'?';
-			case 'mangadex.privateList': return 'Private list';
-			case 'mangadex.newList': return 'New List';
-			case 'mangadex.newListOk': return 'New list created';
-			case 'mangadex.newListError': return ({required Object error}) => 'Failed to create list: ${error}';
-			case 'mangadex.officialPub': return 'Official Publisher';
-			case 'mangadex.noGroup': return 'No Group';
-			case 'mangadex.groupDesc': return 'Group Description';
-			case 'mangadex.groupFeed': return 'Group Feed';
-			case 'mangadex.groupTitles': return 'Group Titles';
-			case 'mangadex.login': return 'Login to MangaDex';
-			case 'mangadex.contentRating': return 'Content Rating';
-			case 'mangadex.demographic': return 'Demographic';
-			case 'mangadex.pubStatus': return 'Publication Status';
-			case 'mangadex.trendingThisYear': return 'Trending this year';
-			case 'mangadex.byPopularity': return 'By Popularity';
-			case 'mangadex.tagTitles': return ({required Object tag}) => 'Browse all ${tag} titles';
-			case 'mangadex.creator.biography': return 'Biography';
-			case 'mangadex.creator.follow': return 'Follow';
-			case 'mangadex.creator.works': return 'Works';
-			case 'mangadex.visibility': return 'Visibility';
-			case 'mangadex.listVisibility.private': return 'Private';
-			case 'mangadex.listVisibility.public': return 'Public';
-			case 'mangadex.addTitles': return '${_root.ui.add} ${_root.titles}';
-			case 'mangadex.settings.translatedLanguages': return 'Chapter Language Filter';
-			case 'mangadex.settings.translatedLanguagesDesc': return 'Show only chapters from these languages';
-			case 'mangadex.settings.originalLanguage': return 'Original Language Filter';
-			case 'mangadex.settings.originalLanguageDesc': return 'Only show titles originally published in these languages. If no languages are selected, no filter will be applied';
-			case 'mangadex.settings.contentRating': return 'Content Filter';
-			case 'mangadex.settings.dataSaver': return 'Data Saver';
-			case 'mangadex.settings.groupBlacklist': return 'Blocked Groups';
-			case 'mangadex.settings.selectLanguages': return 'Select Languages';
-			case 'mangadex.settings.selectContentFilters': return 'Select Content Filters';
-			case 'mangadex.sort.relevance_asc': return 'Worst Match';
-			case 'mangadex.sort.relevance_desc': return 'Best Match';
-			case 'mangadex.sort.followedCount_asc': return 'Fewest Follows';
-			case 'mangadex.sort.followedCount_desc': return 'Most Follows';
-			case 'mangadex.sort.latestUploadedChapter_asc': return 'Oldest Upload';
-			case 'mangadex.sort.latestUploadedChapter_desc': return 'Latest Upload';
-			case 'mangadex.sort.updatedAt_asc': return 'Oldest Update';
-			case 'mangadex.sort.updatedAt_desc': return 'Latest Update';
-			case 'mangadex.sort.createdAt_asc': return 'Oldest Added';
-			case 'mangadex.sort.createdAt_desc': return 'Recently Added';
-			case 'mangadex.sort.year_asc': return 'Year Ascending';
-			case 'mangadex.sort.year_desc': return 'Year Descending';
-			case 'mangadex.sort.title_asc': return 'Title Ascending';
-			case 'mangadex.sort.title_desc': return 'Title Descending';
-			case 'mangadex.ratings.0': return 'Remove Rating';
-			case 'mangadex.ratings.1': return '(1) Appalling';
-			case 'mangadex.ratings.2': return '(2) Horrible';
-			case 'mangadex.ratings.3': return '(3) Very Bad';
-			case 'mangadex.ratings.4': return '(4) Bad';
-			case 'mangadex.ratings.5': return '(5) Average';
-			case 'mangadex.ratings.6': return '(6) Fine';
-			case 'mangadex.ratings.7': return '(7) Good';
-			case 'mangadex.ratings.8': return '(8) Very Good';
-			case 'mangadex.ratings.9': return '(9) Great';
-			case 'mangadex.ratings.10': return '(10) Masterpiece';
-			case 'mangaView.altTitles': return 'Alt. Titles';
-			case 'mangaView.synopsis': return 'Synopsis';
-			case 'mangaView.info': return 'Info';
-			case 'mangaView.author': return 'Author';
-			case 'mangaView.artist': return 'Artist';
-			case 'mangaView.demographic': return 'Demographics';
-			case 'mangaView.genre': return 'Genres';
-			case 'mangaView.theme': return 'Themes';
-			case 'mangaView.format': return 'Format';
-			case 'mangaView.track': return 'Track';
-			case 'mangaView.openOn': return ({required Object arg}) => 'Open on ${arg}';
-			case 'mangaView.chapters': return 'Chapters';
-			case 'mangaView.art': return 'Art';
-			case 'mangaView.related': return 'Related';
-			case 'mangaView.relatedTitles': return 'Related Titles';
-			case 'mangaView.volume': return ({required Object n}) => 'Volume ${n}';
-			case 'mangaView.noVolume': return 'No Volume';
-			case 'mangaView.chapter': return ({required Object n}) => 'Chapter ${n}';
-			case 'mangaView.officialRaw': return 'Official Raw';
-			case 'mangaView.finalChapter': return 'Final Volume/Chapter';
-			case 'mangaView.markAllVisibleAs': return ({required Object arg}) => 'Mark all visible as ${arg}';
-			case 'mangaView.markAllAs': return ({required Object arg}) => 'Mark all as ${arg}';
-			case 'mangaView.read': return 'read';
-			case 'mangaView.unread': return 'unread';
-			case 'mangaView.markAllWarning': return ({required Object arg}) => 'Are you sure you want to mark all visible chapters as ${arg}?';
-			case 'mangaView.noChaptersMsg': return 'No Chapters';
-			case 'mangaView.markAs': return ({required Object arg}) => 'Mark as ${arg}';
-			case 'mangaView.copyLink': return 'Copy gagaku link';
-			case 'readingStatus.remove': return 'Remove';
-			case 'readingStatus.reading': return 'Reading';
-			case 'readingStatus.on_hold': return 'On Hold';
-			case 'readingStatus.plan_to_read': return 'Plan to Read';
-			case 'readingStatus.dropped': return 'Dropped';
-			case 'readingStatus.re_reading': return 'Re-reading';
-			case 'readingStatus.completed': return 'Completed';
-			case 'mangaStatus.completed': return 'Completed';
-			case 'mangaStatus.ongoing': return 'Ongoing';
-			case 'mangaStatus.cancelled': return 'Cancelled';
-			case 'mangaStatus.hiatus': return 'Hiatus';
-			case 'mangaActions.addToLibrary': return 'Add to Library';
-			case 'mangaActions.follow': return 'Follow Manga';
-			case 'mangaActions.unfollow': return 'Unfollow Manga';
-			case 'mangaActions.favorite': return 'Add to Favorites';
-			case 'mangaActions.unfavorite': return 'Remove from Favorites';
-			case 'mangaActions.removeHistory': return 'Remove from History';
-			case 'mangaRelations.monochrome': return 'Monochrome';
-			case 'mangaRelations.main_story': return 'Main Story';
-			case 'mangaRelations.adapted_from': return 'Adapted from';
-			case 'mangaRelations.based_on': return 'Based on';
-			case 'mangaRelations.prequel': return 'Prequel';
-			case 'mangaRelations.side_story': return 'Side story';
-			case 'mangaRelations.doujinshi': return 'Doujinshi';
-			case 'mangaRelations.same_franchise': return 'Same franchise';
-			case 'mangaRelations.shared_universe': return 'Shared universe';
-			case 'mangaRelations.sequel': return 'Sequel';
-			case 'mangaRelations.spin_off': return 'Spinoff';
-			case 'mangaRelations.alternate_story': return 'Alternate story';
-			case 'mangaRelations.alternate_version': return 'Alternate version';
-			case 'mangaRelations.preserialization': return 'Pre-serialization';
-			case 'mangaRelations.colored': return 'Colored';
-			case 'mangaRelations.serialization': return 'Serialization';
-			case 'tracking.links': return 'Links';
-			case 'tracking.discord': return 'Discord';
-			case 'tracking.website': return 'Website';
-			case 'tracking.nothing': return 'Nothing here!';
-			case 'contentRating.safe': return 'Safe';
-			case 'contentRating.suggestive': return 'Suggestive';
-			case 'contentRating.erotica': return 'Erotica';
-			case 'contentRating.pornographic': return 'Pornographic';
-			case 'language.en': return 'English';
-			case 'language.ar': return 'Arabic';
-			case 'language.az': return 'Azerbaijani';
-			case 'language.bn': return 'Bengali';
-			case 'language.bg': return 'Bulgarian';
-			case 'language.my': return 'Burmese';
-			case 'language.ca': return 'Catalan';
-			case 'language.zh': return 'Chinese (Simp.)';
-			case 'language.zh_hk': return 'Chinese (Trad.)';
-			case 'language.hr': return 'Croatian';
-			case 'language.cs': return 'Czech';
-			case 'language.da': return 'Danish';
-			case 'language.nl': return 'Dutch';
-			case 'language.eo': return 'Esperanto';
-			case 'language.et': return 'Estonian';
-			case 'language.tl': return 'Filipino';
-			case 'language.fi': return 'Finnish';
-			case 'language.fr': return 'French';
-			case 'language.ka': return 'Georgian';
-			case 'language.de': return 'German';
-			case 'language.el': return 'Greek';
-			case 'language.he': return 'Hebrew';
-			case 'language.hi': return 'Hindi';
-			case 'language.hu': return 'Hungarian';
-			case 'language.id': return 'Indonesian';
-			case 'language.it': return 'Italian';
-			case 'language.ja': return 'Japanese';
-			case 'language.kk': return 'Kazakh';
-			case 'language.ko': return 'Korean';
-			case 'language.la': return 'Latin';
-			case 'language.lt': return 'Lithuanian';
-			case 'language.ms': return 'Malay';
-			case 'language.mn': return 'Mongolian';
-			case 'language.ne': return 'Nepali';
-			case 'language.no': return 'Norwegian';
-			case 'language.fa': return 'Persian';
-			case 'language.pl': return 'Polish';
-			case 'language.pt_br': return 'Portuguese (BR)';
-			case 'language.pt': return 'Portuguese';
-			case 'language.ro': return 'Romanian';
-			case 'language.ru': return 'Russian';
-			case 'language.sr': return 'Serbian';
-			case 'language.sk': return 'Slovak';
-			case 'language.es': return 'Spanish';
-			case 'language.es_la': return 'Spanish (LATAM)';
-			case 'language.sv': return 'Swedish';
-			case 'language.ta': return 'Tamil';
-			case 'language.th': return 'Thai';
-			case 'language.tr': return 'Turkish';
-			case 'language.uk': return 'Ukrainian';
-			case 'language.vi': return 'Vietnam';
-			case 'language.ja_ro': return 'Japanese (Romanized)';
-			case 'language.ko_ro': return 'Korean (Romanized)';
-			case 'language.zh_ro': return 'Chinese (Romanized)';
-			case 'language.other': return 'Other';
-			case 'colors.lime': return 'Lime';
-			case 'colors.grey': return 'Grey';
-			case 'colors.amber': return 'Amber';
-			case 'colors.blue': return 'Blue';
-			case 'colors.teal': return 'Teal';
-			case 'colors.green': return 'Green';
-			case 'colors.lightgreen': return 'Light Green';
-			case 'colors.red': return 'Red';
-			case 'colors.orange': return 'Orange';
-			case 'colors.yellow': return 'Yellow';
-			case 'colors.purple': return 'Purple';
-			case 'cache.clear': return 'Clear Cache';
-			case 'cache.clearSub': return 'Deletes all cached data. ONLY DO THIS IF YOU KNOW WHAT YOU ARE DOING!';
-			case 'cache.clearWarning': return 'Are you sure you want to delete all cached data?';
-			case 'cache.clearSuccess': return 'Cache cleared';
-			case 'backup.data': return 'Backup Data';
-			case 'backup.dataSub': return 'Backup all gagaku data and settings (excludes MangaDex login, local library files)\nNOTE: when restoring, restart the app for changes to take effect';
-			case 'backup.restore': return 'Restore Backup';
-			case 'backup.restoreWarning': return 'Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?';
-			case 'backup.toFile': return 'Backup Data to File';
-			case 'backup.fromFile': return 'Restore Data from File';
-			case 'backup.success': return 'Backup saved';
-			case 'backup.restoreSuccess': return 'Backup restored. Restart gagaku for changes to take effect';
-			case 'backup.cancelled': return 'Backup cancelled';
-			case 'backup.restoreCancelled': return 'Backup restore cancelled';
-			case 'backup.restoreFail': return 'Backup restore failed';
-			case 'backup.dataLocation': return 'Database Directory';
-			case 'backup.dataLocSub': return 'Changes the directory where gagaku reads and stores its database.\nRequires app restart to take effect.';
-			case 'backup.dataLocDefault': return 'Default';
-			case 'chapterFeed.latestUpdates': return 'Latest Updates';
-			case 'chapterFeed.updates': return 'Updates';
-			case 'chapterFeed.updatingFeed': return 'Updating Feed';
-			case 'chapterFeed.updatingItem': return ({required Object item}) => 'Updating: ${item}';
-			case 'chapterFeed.done': return 'Update complete!';
-			case 'chapterFeed.stop': return 'Stop Update';
-			case 'chapterFeed.stopping': return 'Stopping Update...';
-			case 'chapterFeed.updateRequired': return 'Update required! No feed data or data out of date';
-			case 'permissions.needed': return 'Permissions Needed';
-			case 'permissions.request': return 'Extra permissions are required to update your feed in the background.';
-			default: return null;
-		}
+		return switch (path) {
+			'ui.add' => 'Add',
+			'ui.addNew' => 'Add New',
+			'ui.go' => 'Go',
+			'ui.ok' => 'Ok',
+			'ui.cancel' => 'Cancel',
+			'ui.yes' => 'Yes',
+			'ui.no' => 'No',
+			'ui.on' => 'On',
+			'ui.off' => 'Off',
+			'ui.none' => 'None',
+			'ui.block' => 'Block',
+			'ui.unblock' => 'Unblock',
+			'ui.follow' => 'Follow',
+			'ui.unfollow' => 'Unfollow',
+			'ui.create' => 'Create',
+			'ui.browse' => 'Browse',
+			'ui.manage' => 'Manage',
+			'ui.edit' => 'Edit',
+			'ui.save' => 'Save',
+			'ui.delete' => 'Delete',
+			'ui.rename' => 'Rename',
+			'ui.clear' => 'Clear',
+			'ui.gridView' => 'Grid view',
+			'ui.listView' => 'List view',
+			'ui.detailedView' => 'Detailed view',
+			'ui.gridSize' => 'Grid Size',
+			'ui.loadingDot' => 'Loading...',
+			'ui.copyClipboard' => 'Copied to clipboard!',
+			'ui.pasteClipboard' => 'Paste from Clipboard',
+			'ui.dragHint' => 'Hint: Drag to reorder',
+			'ui.makeDefault' => 'Make Default',
+			'ui.retry' => 'Retry',
+			'ui.irreversibleWarning' => 'NOTE: THIS ACTION IS IRREVERSIBLE',
+			'ui.filterItems' => 'Filter Items',
+			'ui.sureContinue' => 'Are you sure you want to continue?',
+			'errors.noresults' => 'No results',
+			'errors.notitles' => 'No titles',
+			'errors.nomanga' => 'No manga',
+			'errors.nolists' => 'No lists',
+			'errors.norepos' => 'No repos',
+			'errors.noitems' => 'No items',
+			'errors.unsupportedUrl' => 'Unsupported URL',
+			'errors.loginFail' => ({required Object reason}) => 'Failed to login: ${reason}',
+			'errors.notLoggedIn' => 'Operation failed. User not logged in',
+			'errors.unsupportedSource' => 'Unsupported extension type',
+			'errors.unknownSourceID' => ({required Object id}) => 'Unknown source ID ${id}',
+			'errors.fetchFail' => 'Something went wrong while fetching a new page',
+			'errors.pageNotFound' => 'Page Not Found',
+			'errors.pageNotFoundArg' => ({required Object url}) => 'Can\'t find a page for: ${url}',
+			'errors.failedLaunchUrl' => ({required Object url}) => 'Failed to launch ${url}',
+			'auth.login' => 'Login',
+			'auth.logout' => 'Logout',
+			'auth.username' => 'Username',
+			'auth.password' => 'Password',
+			'auth.usernameEmptyWarning' => 'Username cannot be empty',
+			'auth.passwordEmptyWarning' => 'Password cannot be empty',
+			'auth.clientId' => 'Client ID',
+			'auth.clientSecret' => 'Client Secret',
+			'auth.clientIdEmptyWarning' => 'Client ID cannot be empty',
+			'auth.clientSecretEmptyWarning' => 'Client Secret cannot be empty',
+			'auth.fieldsEmptyWarning' => 'Username/Password/Client ID/Client Secret cannot be empty',
+			'auth.loggedInAs' => ({required Object user}) => 'Logged in as: ${user}',
+			'auth.authenticating' => 'Authenticating...',
+			'sort.desc' => 'Descending',
+			'sort.asc' => 'Ascending',
+			'library' => 'Library',
+			'history.text' => 'History',
+			'history.clear' => 'Clear History',
+			'history.clearWarning' => 'Are you sure you want to remove all history?',
+			'localLibrary.text' => 'Local Library',
+			'localLibrary.extractingArchive' => 'Extracting archive...',
+			'localLibrary.loadingDir' => 'Loading directory...',
+			'localLibrary.archiveUnreadableWarning' => 'This archive contains no readable images!',
+			'localLibrary.dirUnreadableWarning' => 'This directory contains no readable images!',
+			'localLibrary.settings.libraryPath' => 'Manga Library Path',
+			'localLibrary.settings.libraryPathDesc' => 'Choose where to search for your manga library',
+			'localLibrary.readArchive' => 'Read Archive',
+			'localLibrary.noPathWarning' => 'No library directory set!',
+			'localLibrary.setPath' => 'Set Library Directory',
+			'localLibrary.scanning' => 'Scanning library...',
+			'localLibrary.errors.permissionDenied' => 'Permissions denied',
+			'localLibrary.errors.emptyLibrary' => 'Library is empty!',
+			'localLibrary.errors.pathNotSet' => 'Library directory not set!',
+			'localLibrary.sort.name_desc' => 'Name descending',
+			'localLibrary.sort.name_asc' => 'Name ascending',
+			'localLibrary.sort.modified_desc' => 'Modified descending',
+			'localLibrary.sort.modified_asc' => 'Modified ascending',
+			'webSources.text' => 'Web Sources',
+			'webSources.home' => 'Home',
+			'webSources.homepages' => 'Homepages',
+			'webSources.openUrl' => 'Open URL',
+			'webSources.openLink' => 'Open Link',
+			'webSources.supportedUrl.text' => 'Supported URLs',
+			'webSources.supportedUrl.arg' => ({required Object arg}) => '${_root.webSources.supportedUrl.text}:${arg}',
+			'webSources.settings.repos' => 'Repos',
+			'webSources.settings.reposDesc' => 'Configure source repos',
+			'webSources.settings.categories' => 'Favorite Categories',
+			'webSources.settings.categoriesDesc' => 'Set up favourite list categories',
+			'webSources.settings.newCategory' => '${_root.ui.addNew} Category',
+			'webSources.settings.addCategory' => '${_root.ui.add} Category',
+			'webSources.settings.renameCategory' => '${_root.ui.rename} Category',
+			'webSources.settings.categoryName' => 'Category name',
+			'webSources.settings.emptyCategoryWarning' => 'Category name cannot be empty',
+			'webSources.settings.usedCategoryWarning' => 'Category name already used',
+			'webSources.settings.categoriesToUpdate' => 'Categories to Update',
+			'webSources.settings.categoriesToUpdateDesc' => 'Select categories which manga will be updated in Updates view',
+			'webSources.settings.categoryDelete' => '${_root.ui.delete} Category',
+			'webSources.settings.categoryDeleteWarn' => 'Deleting a category will remove all items in it',
+			'webSources.settings.clearAll' => 'Clear All Extension Settings',
+			'webSources.settings.clearAllDesc' => 'Clears all extension settings. Recommended when replacing or upgrading extensions.',
+			'webSources.settings.clearAllWarning' => 'Are you sure you want to delete all extension settings?',
+			'webSources.settings.clearSettings' => 'Clear Settings',
+			'webSources.settings.clearSuccess' => 'Settings Cleared',
+			'webSources.repo.list' => 'Repo List',
+			'webSources.repo.newRepo' => '${_root.ui.addNew} Repo',
+			'webSources.repo.browser' => 'View in browser',
+			'webSources.repo.add' => '${_root.ui.add} Repo',
+			'webSources.repo.addConfirm' => ({required Object repo, required Object url}) => 'Are you sure you want to add the repo ${repo} from ${url}?',
+			'webSources.repo.addWarning' => 'Ensure that you are only adding trusted sources!',
+			'webSources.repo.urlHint' => 'Repo URL',
+			'webSources.repo.nameHint' => 'Repo Name',
+			'webSources.repo.urlEmptyWarning' => 'URL cannot be empty',
+			'webSources.repo.nameEmptyWarning' => 'Name cannot be empty',
+			'webSources.repo.urlInvalidWarning' => 'Must be a valid URL',
+			'webSources.repo.repoAddOK' => 'Repo added',
+			'webSources.repo.repoExists' => 'Repo already exists',
+			'webSources.repo.missingRepo' => 'Missing Repo',
+			'webSources.source.settings' => 'Extension Settings',
+			'webSources.source.manager' => 'Extension Manager',
+			'webSources.source.noDataWarning' => 'No repos nor extensions installed!',
+			'webSources.source.refresh' => 'Refresh repos',
+			'webSources.source.delete' => ({required Object arg}) => '${_root.ui.delete} ${arg}',
+			'webSources.source.add' => ({required Object arg}) => '${_root.ui.add} ${arg}',
+			'webSources.source.update' => ({required Object arg}) => 'Update/Replace ${arg}',
+			'webSources.source.sourceDeleteOK' => 'Extension disabled',
+			'webSources.source.sourceUpdateOK' => 'Extension updated',
+			'webSources.source.sourceAddOK' => 'Extension enabled',
+			'webSources.source.installedVersion' => ({required Object version}) => ' (installed: v${version})',
+			'webSources.source.noTagsWarning' => 'This extension provides no filter options',
+			'webSources.sourceUnavailable' => ({required Object id}) => 'Source ${id} Unavailable',
+			'webSources.noSourcesWarning' => 'No extensions installed!',
+			'webSources.noSearchableSourcesWarning' => 'No searchable extensions installed!',
+			'webSources.sourceSearch' => 'Extension Search',
+			'webSources.resetRead' => 'Reset Read Markers',
+			'webSources.resetReadWarning' => 'Are you sure you want to reset all read markers for this manga?',
+			'webSources.resetAllRead' => 'Reset all Read Markers',
+			'webSources.resetAllReadWarning' => 'Are you sure you want to reset all read markers?',
+			'webSources.favorites' => 'Favorites',
+			'webSources.loadInstalledSourcesError' => 'Error loading installed sources',
+			'webSources.searchWithExt' => 'Search with extensions',
+			'webSources.historyHere' => 'Your manga browsing history appears here',
+			'webSources.saveHistory' => 'Save History?',
+			'search.text' => 'Search',
+			'search.arg' => ({required Object arg}) => 'Search ${arg}',
+			'search.filters' => 'Search Filters',
+			'search.resetFilters' => 'Reset Filters',
+			'search.applyFilters' => 'Apply Filters',
+			'search.selectedTagFilters' => 'Selected Tag Filters',
+			'search.filterTags' => 'Filter tags',
+			'search.otherOptions' => 'Other Options',
+			'search.inclusion' => 'Inclusion Mode',
+			'search.exclusion' => 'Exclusion Mode',
+			'search.any' => 'Any',
+			'settings' => 'Settings',
+			'arg_settings' => ({required Object arg}) => '${arg} ${_root.settings}',
+			'saveSettings' => 'Save Settings',
+			'num_manga' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${n} Manga', other: '${n} Manga', ), 
+			'titles' => 'Titles',
+			'num_titles' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${n} Title', other: '${n} Titles', ), 
+			'feed' => 'Feed',
+			'num_items' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${n} item', other: '${n} items', ), 
+			'theme.mode' => 'Theme Mode',
+			'theme.color' => 'Theme Color',
+			'theme.light' => 'Light',
+			'theme.dark' => 'Dark',
+			'theme.system' => 'System Defined',
+			'reader.direction.leftToRight' => 'Left to Right',
+			'reader.direction.rightToLeft' => 'Right to Left',
+			'reader.format.single' => 'Single',
+			'reader.format.longstrip' => 'Long Strip',
+			'reader.settings' => 'Reader Settings',
+			'reader.togglePageSize' => 'Toggle Page Size',
+			'reader.progressBar' => 'Progress Bar',
+			'reader.swipeGestures' => 'Swipe Gestures',
+			'reader.clickToTurn' => 'Click/Tap to Turn Page',
+			'reader.precacheCount' => 'Page Preload',
+			'mangadex.home' => 'Home',
+			'mangadex.myFeed' => 'My Feed',
+			'mangadex.myLists' => 'My Lists',
+			'mangadex.followedLists' => 'Followed Lists',
+			'mangadex.popularNewTitles' => 'Popular New Titles',
+			'mangadex.staffPicks' => 'Staff Picks',
+			'mangadex.seasonal' => 'Seasonal',
+			'mangadex.recentlyAdded' => 'Recently Added',
+			'mangadex.byChapter' => 'By Chapter',
+			'mangadex.byManga' => 'By Manga',
+			'mangadex.localHistory' => 'Reading History (local)',
+			'mangadex.noFollowsMsg' => 'Find some manga to follow!',
+			'mangadex.noHistoryMsg' => 'No reading history',
+			'mangadex.createNewList' => 'Create New List',
+			'mangadex.createNewListBtn' => '+ ${_root.mangadex.createNewList}',
+			'mangadex.listName' => 'List Name',
+			'mangadex.listFeed' => 'List Feed',
+			'mangadex.listNameEmptyWarning' => 'List name cannot be empty',
+			'mangadex.listNotExistError' => ({required Object id}) => 'List with ID ${id} does not exist!',
+			'mangadex.editList' => '${_root.ui.edit} List',
+			'mangadex.editListError' => ({required Object error}) => 'Failed to edit list: ${error}',
+			'mangadex.createList' => '${_root.ui.create} List',
+			'mangadex.deleteList' => '${_root.ui.delete} List',
+			'mangadex.deleteListOk' => 'List deleted',
+			'mangadex.deleteListError' => ({required Object error}) => 'Failed to delete list: ${error}',
+			'mangadex.deleteListWarning' => ({required Object list}) => 'Are you sure you want to permanently delete \'${list}\'?',
+			'mangadex.privateList' => 'Private list',
+			'mangadex.newList' => 'New List',
+			'mangadex.newListOk' => 'New list created',
+			'mangadex.newListError' => ({required Object error}) => 'Failed to create list: ${error}',
+			'mangadex.officialPub' => 'Official Publisher',
+			'mangadex.noGroup' => 'No Group',
+			'mangadex.groupDesc' => 'Group Description',
+			'mangadex.groupFeed' => 'Group Feed',
+			'mangadex.groupTitles' => 'Group Titles',
+			'mangadex.login' => 'Login to MangaDex',
+			'mangadex.contentRating' => 'Content Rating',
+			'mangadex.demographic' => 'Demographic',
+			'mangadex.pubStatus' => 'Publication Status',
+			'mangadex.trendingThisYear' => 'Trending this year',
+			'mangadex.byPopularity' => 'By Popularity',
+			'mangadex.tagTitles' => ({required Object tag}) => 'Browse all ${tag} titles',
+			'mangadex.creator.biography' => 'Biography',
+			'mangadex.creator.follow' => 'Follow',
+			'mangadex.creator.works' => 'Works',
+			'mangadex.visibility' => 'Visibility',
+			'mangadex.listVisibility.private' => 'Private',
+			'mangadex.listVisibility.public' => 'Public',
+			'mangadex.addTitles' => '${_root.ui.add} ${_root.titles}',
+			'mangadex.settings.translatedLanguages' => 'Chapter Language Filter',
+			'mangadex.settings.translatedLanguagesDesc' => 'Show only chapters from these languages',
+			'mangadex.settings.originalLanguage' => 'Original Language Filter',
+			'mangadex.settings.originalLanguageDesc' => 'Only show titles originally published in these languages. If no languages are selected, no filter will be applied',
+			'mangadex.settings.contentRating' => 'Content Filter',
+			'mangadex.settings.dataSaver' => 'Data Saver',
+			'mangadex.settings.groupBlacklist' => 'Blocked Groups',
+			'mangadex.settings.selectLanguages' => 'Select Languages',
+			'mangadex.settings.selectContentFilters' => 'Select Content Filters',
+			'mangadex.sort.relevance_asc' => 'Worst Match',
+			'mangadex.sort.relevance_desc' => 'Best Match',
+			'mangadex.sort.followedCount_asc' => 'Fewest Follows',
+			'mangadex.sort.followedCount_desc' => 'Most Follows',
+			'mangadex.sort.latestUploadedChapter_asc' => 'Oldest Upload',
+			'mangadex.sort.latestUploadedChapter_desc' => 'Latest Upload',
+			'mangadex.sort.updatedAt_asc' => 'Oldest Update',
+			'mangadex.sort.updatedAt_desc' => 'Latest Update',
+			'mangadex.sort.createdAt_asc' => 'Oldest Added',
+			'mangadex.sort.createdAt_desc' => 'Recently Added',
+			'mangadex.sort.year_asc' => 'Year Ascending',
+			'mangadex.sort.year_desc' => 'Year Descending',
+			'mangadex.sort.title_asc' => 'Title Ascending',
+			'mangadex.sort.title_desc' => 'Title Descending',
+			'mangadex.ratings.0' => 'Remove Rating',
+			'mangadex.ratings.1' => '(1) Appalling',
+			'mangadex.ratings.2' => '(2) Horrible',
+			'mangadex.ratings.3' => '(3) Very Bad',
+			'mangadex.ratings.4' => '(4) Bad',
+			'mangadex.ratings.5' => '(5) Average',
+			'mangadex.ratings.6' => '(6) Fine',
+			'mangadex.ratings.7' => '(7) Good',
+			'mangadex.ratings.8' => '(8) Very Good',
+			'mangadex.ratings.9' => '(9) Great',
+			'mangadex.ratings.10' => '(10) Masterpiece',
+			'mangaView.altTitles' => 'Alt. Titles',
+			'mangaView.synopsis' => 'Synopsis',
+			'mangaView.info' => 'Info',
+			'mangaView.author' => 'Author',
+			'mangaView.artist' => 'Artist',
+			'mangaView.demographic' => 'Demographics',
+			'mangaView.genre' => 'Genres',
+			'mangaView.theme' => 'Themes',
+			'mangaView.format' => 'Format',
+			'mangaView.track' => 'Track',
+			'mangaView.openOn' => ({required Object arg}) => 'Open on ${arg}',
+			'mangaView.chapters' => 'Chapters',
+			'mangaView.art' => 'Art',
+			'mangaView.related' => 'Related',
+			'mangaView.relatedTitles' => 'Related Titles',
+			'mangaView.volume' => ({required Object n}) => 'Volume ${n}',
+			'mangaView.noVolume' => 'No Volume',
+			'mangaView.chapter' => ({required Object n}) => 'Chapter ${n}',
+			'mangaView.officialRaw' => 'Official Raw',
+			'mangaView.finalChapter' => 'Final Volume/Chapter',
+			'mangaView.markAllVisibleAs' => ({required Object arg}) => 'Mark all visible as ${arg}',
+			'mangaView.markAllAs' => ({required Object arg}) => 'Mark all as ${arg}',
+			'mangaView.read' => 'read',
+			'mangaView.unread' => 'unread',
+			'mangaView.markAllWarning' => ({required Object arg}) => 'Are you sure you want to mark all visible chapters as ${arg}?',
+			'mangaView.noChaptersMsg' => 'No Chapters',
+			'mangaView.markAs' => ({required Object arg}) => 'Mark as ${arg}',
+			'mangaView.copyLink' => 'Copy gagaku link',
+			'readingStatus.remove' => 'Remove',
+			'readingStatus.reading' => 'Reading',
+			'readingStatus.on_hold' => 'On Hold',
+			'readingStatus.plan_to_read' => 'Plan to Read',
+			'readingStatus.dropped' => 'Dropped',
+			'readingStatus.re_reading' => 'Re-reading',
+			'readingStatus.completed' => 'Completed',
+			'mangaStatus.completed' => 'Completed',
+			'mangaStatus.ongoing' => 'Ongoing',
+			'mangaStatus.cancelled' => 'Cancelled',
+			'mangaStatus.hiatus' => 'Hiatus',
+			'mangaActions.addToLibrary' => 'Add to Library',
+			'mangaActions.follow' => 'Follow Manga',
+			'mangaActions.unfollow' => 'Unfollow Manga',
+			'mangaActions.favorite' => 'Add to Favorites',
+			'mangaActions.unfavorite' => 'Remove from Favorites',
+			'mangaActions.removeHistory' => 'Remove from History',
+			'mangaRelations.monochrome' => 'Monochrome',
+			'mangaRelations.main_story' => 'Main Story',
+			'mangaRelations.adapted_from' => 'Adapted from',
+			'mangaRelations.based_on' => 'Based on',
+			'mangaRelations.prequel' => 'Prequel',
+			'mangaRelations.side_story' => 'Side story',
+			'mangaRelations.doujinshi' => 'Doujinshi',
+			'mangaRelations.same_franchise' => 'Same franchise',
+			'mangaRelations.shared_universe' => 'Shared universe',
+			'mangaRelations.sequel' => 'Sequel',
+			'mangaRelations.spin_off' => 'Spinoff',
+			'mangaRelations.alternate_story' => 'Alternate story',
+			'mangaRelations.alternate_version' => 'Alternate version',
+			'mangaRelations.preserialization' => 'Pre-serialization',
+			'mangaRelations.colored' => 'Colored',
+			'mangaRelations.serialization' => 'Serialization',
+			'tracking.links' => 'Links',
+			'tracking.discord' => 'Discord',
+			'tracking.website' => 'Website',
+			'tracking.nothing' => 'Nothing here!',
+			'contentRating.safe' => 'Safe',
+			'contentRating.suggestive' => 'Suggestive',
+			'contentRating.erotica' => 'Erotica',
+			'contentRating.pornographic' => 'Pornographic',
+			'language.en' => 'English',
+			'language.ar' => 'Arabic',
+			'language.az' => 'Azerbaijani',
+			'language.bn' => 'Bengali',
+			'language.bg' => 'Bulgarian',
+			'language.my' => 'Burmese',
+			'language.ca' => 'Catalan',
+			'language.zh' => 'Chinese (Simp.)',
+			'language.zh_hk' => 'Chinese (Trad.)',
+			'language.hr' => 'Croatian',
+			'language.cs' => 'Czech',
+			'language.da' => 'Danish',
+			'language.nl' => 'Dutch',
+			'language.eo' => 'Esperanto',
+			'language.et' => 'Estonian',
+			'language.tl' => 'Filipino',
+			'language.fi' => 'Finnish',
+			'language.fr' => 'French',
+			'language.ka' => 'Georgian',
+			'language.de' => 'German',
+			'language.el' => 'Greek',
+			'language.he' => 'Hebrew',
+			'language.hi' => 'Hindi',
+			'language.hu' => 'Hungarian',
+			'language.id' => 'Indonesian',
+			'language.it' => 'Italian',
+			'language.ja' => 'Japanese',
+			'language.kk' => 'Kazakh',
+			'language.ko' => 'Korean',
+			'language.la' => 'Latin',
+			'language.lt' => 'Lithuanian',
+			'language.ms' => 'Malay',
+			'language.mn' => 'Mongolian',
+			'language.ne' => 'Nepali',
+			'language.no' => 'Norwegian',
+			'language.fa' => 'Persian',
+			'language.pl' => 'Polish',
+			'language.pt_br' => 'Portuguese (BR)',
+			'language.pt' => 'Portuguese',
+			'language.ro' => 'Romanian',
+			'language.ru' => 'Russian',
+			'language.sr' => 'Serbian',
+			'language.sk' => 'Slovak',
+			'language.es' => 'Spanish',
+			'language.es_la' => 'Spanish (LATAM)',
+			'language.sv' => 'Swedish',
+			'language.ta' => 'Tamil',
+			'language.th' => 'Thai',
+			'language.tr' => 'Turkish',
+			'language.uk' => 'Ukrainian',
+			'language.vi' => 'Vietnam',
+			'language.ja_ro' => 'Japanese (Romanized)',
+			'language.ko_ro' => 'Korean (Romanized)',
+			'language.zh_ro' => 'Chinese (Romanized)',
+			'language.other' => 'Other',
+			'colors.lime' => 'Lime',
+			'colors.grey' => 'Grey',
+			'colors.amber' => 'Amber',
+			'colors.blue' => 'Blue',
+			'colors.teal' => 'Teal',
+			'colors.green' => 'Green',
+			'colors.lightgreen' => 'Light Green',
+			'colors.red' => 'Red',
+			'colors.orange' => 'Orange',
+			'colors.yellow' => 'Yellow',
+			'colors.purple' => 'Purple',
+			'cache.clear' => 'Clear Cache',
+			'cache.clearSub' => 'Deletes all cached data. ONLY DO THIS IF YOU KNOW WHAT YOU ARE DOING!',
+			'cache.clearWarning' => 'Are you sure you want to delete all cached data?',
+			'cache.clearSuccess' => 'Cache cleared',
+			'backup.data' => 'Backup Data',
+			'backup.dataSub' => 'Backup all gagaku data and settings (excludes MangaDex login, local library files)\nNOTE: when restoring, restart the app for changes to take effect',
+			'backup.restore' => 'Restore Backup',
+			'backup.restoreWarning' => 'Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?',
+			'backup.toFile' => 'Backup Data to File',
+			'backup.fromFile' => 'Restore Data from File',
+			'backup.success' => 'Backup saved',
+			'backup.restoreSuccess' => 'Backup restored. Restart gagaku for changes to take effect',
+			'backup.cancelled' => 'Backup cancelled',
+			'backup.restoreCancelled' => 'Backup restore cancelled',
+			'backup.restoreFail' => 'Backup restore failed',
+			'backup.dataLocation' => 'Database Directory',
+			'backup.dataLocSub' => 'Changes the directory where gagaku reads and stores its database.\nRequires app restart to take effect.',
+			'backup.dataLocDefault' => 'Default',
+			'chapterFeed.latestUpdates' => 'Latest Updates',
+			'chapterFeed.updates' => 'Updates',
+			'chapterFeed.updatingFeed' => 'Updating Feed',
+			'chapterFeed.updatingItem' => ({required Object item}) => 'Updating: ${item}',
+			'chapterFeed.done' => 'Update complete!',
+			'chapterFeed.stop' => 'Stop Update',
+			'chapterFeed.stopping' => 'Stopping Update...',
+			'chapterFeed.updateRequired' => 'Update required! No feed data or data out of date',
+			'permissions.needed' => 'Permissions Needed',
+			'permissions.request' => 'Extra permissions are required to update your feed in the background.',
+			_ => null,
+		};
 	}
 }
 
