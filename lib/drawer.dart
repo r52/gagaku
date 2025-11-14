@@ -1,10 +1,10 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/i18n/strings.g.dart';
-import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/model/model.dart';
+import 'package:gagaku/routes.dart';
 import 'package:gagaku/version.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -12,7 +12,7 @@ class MainDrawer extends ConsumerWidget {
   const MainDrawer({super.key});
 
   static int _calculateSelectedIndex(BuildContext context) {
-    final route = Uri.parse(AutoRouter.of(context).currentUrl);
+    final route = GoRouterState.of(context).uri;
     final path = route.path;
 
     if (path.startsWith(GagakuRoute.web) ||
@@ -26,10 +26,10 @@ class MainDrawer extends ConsumerWidget {
       case GagakuRoute.config:
         return 3;
       case '/':
-      case '/${GagakuRoute.chapterfeed}':
-      case '/${GagakuRoute.library}':
-      case '/${GagakuRoute.lists}':
-      case '/${GagakuRoute.history}':
+      case GagakuRoute.chapterfeed:
+      case GagakuRoute.library:
+      case GagakuRoute.lists:
+      case GagakuRoute.history:
       default:
         return 0;
     }
@@ -40,16 +40,16 @@ class MainDrawer extends ConsumerWidget {
 
     switch (index) {
       case 0:
-        AutoRouter.of(context).navigate(MangaDexHomeRoute());
+        const MangaDexFrontRoute().go(context);
         break;
       case 1:
-        AutoRouter.of(context).navigate(LocalLibraryHomeRoute());
+        const LocalLibraryHomeRoute().go(context);
         break;
       case 2:
-        AutoRouter.of(context).navigate(WebSourceHomeRoute());
+        const WebSourceFrontRoute().go(context);
         break;
       case 3:
-        AutoRouter.of(context).navigate(AppSettingsRoute());
+        const AppSettingsRoute().go(context);
         break;
     }
   }

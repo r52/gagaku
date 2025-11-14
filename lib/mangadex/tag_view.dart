@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -9,7 +8,7 @@ import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/model/common.dart';
-import 'package:gagaku/routes.gr.dart';
+import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -88,25 +87,8 @@ Future<List<Manga>> _recentlyAdded(Ref ref, Tag tag) async {
 }
 
 @Dependencies([chipTextStyle])
-@RoutePage()
-class MangaDexTagViewWithNamePage extends MangaDexTagViewPage {
-  const MangaDexTagViewWithNamePage({
-    super.key,
-    @PathParam() required super.tagId,
-    @PathParam() this.name,
-  });
-
-  final String? name;
-}
-
-@Dependencies([chipTextStyle])
-@RoutePage()
 class MangaDexTagViewPage extends StatelessWidget {
-  const MangaDexTagViewPage({
-    super.key,
-    @PathParam() required this.tagId,
-    this.tag,
-  });
+  const MangaDexTagViewPage({super.key, required this.tagId, this.tag});
 
   final String tagId;
 
@@ -162,14 +144,12 @@ class MangaDexTagViewWidget extends HookConsumerWidget {
       MangaProviderCarousel(provider: _trendingThisYearProvider(tag)),
       TextButton.icon(
         onPressed: () {
-          context.router.push(
-            MangaDexSearchRoute(
-              parameters: MangaSearchParameters(
-                query: '',
-                filter: MangaFilters(includedTags: {tag}),
-              ),
+          MangaDexSearchRoute(
+            $extra: MangaSearchParameters(
+              query: '',
+              filter: MangaFilters(includedTags: {tag}),
             ),
-          );
+          ).push(context);
         },
         label: Text(
           tr.mangadex.tagTitles(
@@ -186,7 +166,7 @@ class MangaDexTagViewWidget extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: AutoLeadingButton(),
+        leading: const BackButton(),
         flexibleSpace: GestureDetector(
           onTap: () {
             scrollController.animateTo(

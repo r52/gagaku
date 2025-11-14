@@ -82,7 +82,7 @@ class GridAlbumImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      clipBehavior: Clip.antiAlias,
+      clipBehavior: Clip.hardEdge,
       decoration: const ShapeDecoration(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(4.0)),
@@ -907,5 +907,20 @@ class TransparentOverlay<T> extends ModalRoute<T> {
     Widget child,
   ) {
     return FadeTransition(opacity: animation, child: child);
+  }
+}
+
+class DialogPage extends Page<void> {
+  const DialogPage({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Route<void> createRoute(BuildContext context) {
+    return DialogRoute<void>(
+      context: context,
+      settings: this,
+      builder: (BuildContext context) => child,
+    );
   }
 }

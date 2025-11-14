@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,7 +6,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/model.dart';
-import 'package:gagaku/routes.gr.dart';
+import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/http.dart' show baseUserAgent;
@@ -17,6 +16,7 @@ import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -51,12 +51,11 @@ Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
 }
 
 @Dependencies([chipTextStyle])
-@RoutePage()
 class WebMangaViewPage extends ConsumerWidget {
   const WebMangaViewPage({
     super.key,
-    @PathParam() required this.sourceId,
-    @PathParam() required this.mangaId,
+    required this.sourceId,
+    required this.mangaId,
     this.handle,
   });
 
@@ -81,7 +80,7 @@ class WebMangaViewPage extends ConsumerWidget {
     return DataProviderWhenWidget(
       provider: _fetchWebMangaInfoProvider(hndl),
       errorBuilder: (context, child, _, _) => Scaffold(
-        appBar: AppBar(leading: AutoLeadingButton()),
+        appBar: AppBar(leading: const BackButton()),
         body: Consumer(
           child: child,
           builder: (context, ref, child) {
@@ -201,7 +200,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
               snap: false,
               floating: false,
               expandedHeight: 250.0,
-              leading: AutoLeadingButton(),
+              leading: const BackButton(),
               flexibleSpace: FlexibleSpaceBar(
                 expandedTitleScale: 2.0,
                 title: Text(
@@ -228,8 +227,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
                         'user-agent': baseUserAgent,
                       },
                       cacheManager: gagakuImageCache,
-                      memCacheWidth: 512,
-                      maxWidthDiskCache: 512,
+                      memCacheWidth: 256,
+                      maxWidthDiskCache: 256,
                       colorBlendMode: BlendMode.modulate,
                       color: Colors.grey,
                       fit: BoxFit.cover,
@@ -276,12 +275,10 @@ class WebMangaViewWidget extends HookConsumerWidget {
                           200,
                         ),
                       ),
-                      onPressed: () => context.router.push(
-                        ExtensionSearchRoute(
-                          initialSource: source,
-                          query: SearchQuery(title: manga.title),
-                        ),
-                      ),
+                      onPressed: () => ExtensionSearchRoute(
+                        initialSource: source,
+                        query: SearchQuery(title: manga.title),
+                      ).push(context),
                       icon: const Icon(Icons.search),
                     ),
                     MenuAnchor(
@@ -352,7 +349,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                               Clipboard.setData(
                                 ClipboardData(
                                   text:
-                                      'gagaku://open${context.router.currentUrl}',
+                                      'gagaku://open${GoRouterState.of(context).uri.path}',
                                 ),
                               ).then((_) {
                                 if (!context.mounted) return;
@@ -416,12 +413,10 @@ class WebMangaViewWidget extends HookConsumerWidget {
                                 backgroundColor: theme.colorScheme.surface
                                     .withAlpha(200),
                               ),
-                              onPressed: () => context.router.push(
-                                ExtensionSearchRoute(
-                                  initialSource: source,
-                                  query: SearchQuery(title: alttitle),
-                                ),
-                              ),
+                              onPressed: () => ExtensionSearchRoute(
+                                initialSource: source,
+                                query: SearchQuery(title: alttitle),
+                              ).push(context),
                               icon: const Icon(Icons.search),
                             ),
                           ),
@@ -468,20 +463,18 @@ class WebMangaViewWidget extends HookConsumerWidget {
                             for (final tag in tagsec.tags)
                               IconTextChip(
                                 text: tag.title,
-                                onPressed: () => context.router.push(
-                                  ExtensionSearchRoute(
-                                    initialSource: source,
-                                    query: SearchQuery(
-                                      title: '',
-                                      filters: [
-                                        SearchFilterValue(
-                                          id: tagsec.id,
-                                          value: {tag.id: 'included'},
-                                        ),
-                                      ],
-                                    ),
+                                onPressed: () => ExtensionSearchRoute(
+                                  initialSource: source,
+                                  query: SearchQuery(
+                                    title: '',
+                                    filters: [
+                                      SearchFilterValue(
+                                        id: tagsec.id,
+                                        value: {tag.id: 'included'},
+                                      ),
+                                    ],
                                   ),
-                                ),
+                                ).push(context),
                               ),
                           ],
                         ),
@@ -491,9 +484,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                         if (handle.type == SourceType.proxy)
                           ButtonChip(
                             onPressed: () async {
-                              final route = Uri.parse(
-                                context.router.currentUrl,
-                              );
+                              final route = GoRouterState.of(context).uri;
 
                               await Styles.tryLaunchUrl(
                                 context,

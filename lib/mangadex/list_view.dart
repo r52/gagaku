@@ -1,14 +1,13 @@
 import 'dart:math';
 
 import 'package:animations/animations.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/common.dart';
-import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
@@ -17,28 +16,14 @@ import 'package:riverpod_annotation/experimental/scope.dart';
 enum _ViewType { titles, feed }
 
 @Dependencies([chipTextStyle, readBorderTheme])
-@RoutePage()
-class MangaDexListViewWithNamePage extends MangaDexListViewPage {
-  const MangaDexListViewWithNamePage({
-    super.key,
-    @PathParam() required super.listId,
-    @PathParam() this.name,
-  });
-
-  final String? name;
-}
-
-@Dependencies([chipTextStyle, readBorderTheme])
-@RoutePage()
 class MangaDexListViewPage extends HookConsumerWidget {
-  const MangaDexListViewPage({super.key, @PathParam() required this.listId});
+  const MangaDexListViewPage({super.key, required this.listId});
 
   final String listId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.t;
-    final router = AutoRouter.of(context);
     final theme = Theme.of(context);
     final view = useState(_ViewType.titles);
     final me = ref.watch(loggedUserProvider).value;
@@ -73,7 +58,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
       case AsyncValue(hasValue: true, value: final list) when list != null:
         return Scaffold(
           appBar: AppBar(
-            leading: AutoLeadingButton(),
+            leading: const BackButton(),
             flexibleSpace: GestureDetector(
               onTap: () {
                 controllers[view.value.index].animateTo(
@@ -126,7 +111,7 @@ class MangaDexListViewPage extends HookConsumerWidget {
                         backgroundColor: theme.colorScheme.surfaceContainer,
                       ),
                       onPressed: () {
-                        router.push(MangaDexEditListRoute(list: list));
+                        MangaDexEditListRoute(list: list).push(context);
                       },
                       icon: const Icon(Icons.edit),
                       tooltip: t.ui.edit,

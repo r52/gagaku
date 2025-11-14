@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/reader/main.dart';
@@ -117,13 +116,12 @@ Future<List<ReaderPage>> _getSourcePages(
   return pages;
 }
 
-@RoutePage()
 class ProxyWebSourceReaderPage extends StatelessWidget {
   const ProxyWebSourceReaderPage({
     super.key,
-    @PathParam() required this.proxy,
-    @PathParam() required this.code,
-    @PathParam() required this.chapter,
+    required this.proxy,
+    required this.code,
+    required this.chapter,
     this.page,
     this.readerData,
   });
@@ -158,7 +156,7 @@ class ProxyWebSourceReaderPage extends StatelessWidget {
     return DataProviderWhenWidget(
       provider: _fetchWebChapterInfoProvider(handle),
       errorBuilder: (context, child, _, _) => Scaffold(
-        appBar: AppBar(leading: AutoLeadingButton()),
+        appBar: AppBar(leading: const BackButton()),
         body: child,
       ),
       builder: (context, data) => WebSourceReaderWidget(
@@ -173,13 +171,12 @@ class ProxyWebSourceReaderPage extends StatelessWidget {
   }
 }
 
-@RoutePage()
 class ExtensionReaderPage extends StatelessWidget {
   const ExtensionReaderPage({
     super.key,
-    @PathParam() required this.sourceId,
-    @PathParam() required this.mangaId,
-    @PathParam() required this.chapterId,
+    required this.sourceId,
+    required this.mangaId,
+    required this.chapterId,
     this.readerData,
   });
 
@@ -211,7 +208,7 @@ class ExtensionReaderPage extends StatelessWidget {
     return DataProviderWhenWidget(
       provider: _fetchWebChapterInfoProvider(handle),
       errorBuilder: (context, child, _, _) => Scaffold(
-        appBar: AppBar(leading: AutoLeadingButton()),
+        appBar: AppBar(leading: const BackButton()),
         body: child,
       ),
       builder: (context, data) => WebSourceReaderWidget(
@@ -276,7 +273,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
           ? _getPagesProvider(source)
           : _getSourcePagesProvider(source, handle),
       errorBuilder: (context, child, _, _) => Scaffold(
-        appBar: AppBar(leading: AutoLeadingButton()),
+        appBar: AppBar(leading: const BackButton()),
         body: child,
       ),
       builder: (context, pages) => ReaderWidget(

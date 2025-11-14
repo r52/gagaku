@@ -1,221 +1,53 @@
-import 'dart:async';
+import 'dart:convert';
 
-import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
+import 'package:gagaku/local/main.dart';
+import 'package:gagaku/mangadex/chapter_feed.dart';
+import 'package:gagaku/mangadex/creator_view.dart';
+import 'package:gagaku/mangadex/edit_list.dart';
+import 'package:gagaku/mangadex/frontpage.dart';
+import 'package:gagaku/mangadex/group_view.dart';
+import 'package:gagaku/mangadex/history_feed.dart';
+import 'package:gagaku/mangadex/latest_feed.dart';
+import 'package:gagaku/mangadex/library.dart';
+import 'package:gagaku/mangadex/list_view.dart';
+import 'package:gagaku/mangadex/lists.dart';
+import 'package:gagaku/mangadex/login_password.dart';
+import 'package:gagaku/mangadex/main.dart';
+import 'package:gagaku/mangadex/manga_view.dart';
+import 'package:gagaku/mangadex/model/types.dart';
+import 'package:gagaku/mangadex/reader.dart';
+import 'package:gagaku/mangadex/recent_feed.dart';
+import 'package:gagaku/mangadex/search.dart';
+import 'package:gagaku/mangadex/tag_view.dart';
 import 'package:gagaku/model/model.dart';
-import 'package:gagaku/routes.gr.dart';
+import 'package:gagaku/settings.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/web/favorites.dart';
+import 'package:gagaku/web/frontpage.dart';
+import 'package:gagaku/web/history.dart';
+import 'package:gagaku/web/main.dart';
+import 'package:gagaku/web/manga_view.dart';
+import 'package:gagaku/web/model/types.dart' hide Tag;
+import 'package:gagaku/web/reader.dart';
+import 'package:gagaku/web/repo_list.dart';
+import 'package:gagaku/web/search.dart';
+import 'package:gagaku/web/updates_feed.dart';
+import 'package:go_router/go_router.dart';
 
-FutureOr<DeepLink> handleDeepLink(PlatformDeepLink deepLink) {
-  if (deepLink.uri.isScheme('paperback')) {
-    return DeepLink.single(WebSourceFrontRoute(process: deepLink.uri));
+part 'routes.g.dart';
+part 'local/routes.dart';
+part 'mangadex/routes.dart';
+part 'web/routes.dart';
+
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
+@TypedGoRoute<AppSettingsRoute>(path: GagakuRoute.config)
+class AppSettingsRoute extends GoRouteData with $AppSettingsRoute {
+  const AppSettingsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return AppSettingsPage();
   }
-
-  return deepLink;
-}
-
-@AutoRouterConfig(replaceInRouteName: 'Screen|Page,Route')
-class AppRouter extends RootStackRouter {
-  @override
-  RouteType get defaultRouteType => RouteType.material();
-
-  @override
-  List<AutoRoute> get routes => [
-    // MD
-    CustomRoute(
-      path: GagakuRoute.latestfeed,
-      page: MangaDexGlobalFeedRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.recentfeed,
-      page: MangaDexRecentFeedRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.chapter,
-      page: MangaDexReaderRoute.page,
-      transitionsBuilder: Styles.slideTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.manga,
-      page: MangaDexMangaViewRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.mangaAlt,
-      page: MangaDexMangaViewWithNameRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.list,
-      page: MangaDexListViewRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.listAlt,
-      page: MangaDexListViewWithNameRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.creator,
-      page: MangaDexCreatorViewRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.creatorAlt,
-      page: MangaDexCreatorViewWithNameRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.group,
-      page: MangaDexGroupViewRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.groupAlt,
-      page: MangaDexGroupViewWithNameRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.search,
-      page: MangaDexSearchRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.listEdit,
-      page: MangaDexEditListRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.listCreate,
-      page: MangaDexCreateListRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.tag,
-      page: MangaDexTagViewRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.tagAlt,
-      page: MangaDexTagViewWithNameRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.login,
-      page: MangaDexLoginRoute.page,
-      transitionsBuilder: Styles.slideTransitionBuilder,
-    ),
-    AutoRoute(
-      path: '/',
-      page: MangaDexHomeRoute.page,
-      initial: true,
-      children: [
-        CustomRoute(
-          path: '',
-          page: MangaDexFrontRoute.page,
-          initial: true,
-          transitionsBuilder: Styles.fadeThroughTransitionBuilder,
-        ),
-        CustomRoute(
-          path: GagakuRoute.chapterfeed,
-          page: MangaDexChapterFeedRoute.page,
-          transitionsBuilder: Styles.fadeThroughTransitionBuilder,
-        ),
-        CustomRoute(
-          path: GagakuRoute.library,
-          page: MangaDexLibraryRoute.page,
-          transitionsBuilder: Styles.fadeThroughTransitionBuilder,
-        ),
-        CustomRoute(
-          path: GagakuRoute.lists,
-          page: MangaDexListsRoute.page,
-          transitionsBuilder: Styles.fadeThroughTransitionBuilder,
-        ),
-        CustomRoute(
-          path: GagakuRoute.history,
-          page: MangaDexHistoryFeedRoute.page,
-          transitionsBuilder: Styles.fadeThroughTransitionBuilder,
-        ),
-      ],
-    ),
-
-    // Local
-    CustomRoute(path: GagakuRoute.local, page: LocalLibraryHomeRoute.page),
-
-    // Extensions
-    CustomRoute(
-      path: GagakuRoute.proxyChapter,
-      page: ProxyWebSourceReaderRoute.page,
-      transitionsBuilder: Styles.slideTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.extensionChapter,
-      page: ExtensionReaderRoute.page,
-      transitionsBuilder: Styles.slideTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.extensionHomePage,
-      page: ExtensionHomeRoute.page,
-      transitionsBuilder: Styles.slideTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.extensionSearch,
-      page: ExtensionSearchRoute.page,
-      transitionsBuilder: Styles.slideTransitionBuilder,
-    ),
-    CustomRoute(
-      path: GagakuRoute.webManga,
-      page: WebMangaViewRoute.page,
-      transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
-    ),
-    AutoRoute(
-      path: GagakuRoute.extension,
-      page: WebSourceHomeRoute.page,
-      children: [
-        CustomRoute(
-          path: '',
-          page: WebSourceFrontRoute.page,
-          initial: true,
-          transitionsBuilder: Styles.fadeThroughTransitionBuilder,
-        ),
-        CustomRoute(
-          path: GagakuRoute.extensionUpdates,
-          page: WebSourceUpdatesRoute.page,
-          transitionsBuilder: Styles.fadeThroughTransitionBuilder,
-        ),
-        CustomRoute(
-          path: GagakuRoute.extensionSaved,
-          page: WebSourceFavoritesRoute.page,
-          transitionsBuilder: Styles.fadeThroughTransitionBuilder,
-        ),
-        CustomRoute(
-          path: GagakuRoute.extensionHistory,
-          page: WebSourceHistoryRoute.page,
-          transitionsBuilder: Styles.fadeThroughTransitionBuilder,
-        ),
-      ],
-    ),
-
-    // Global Settings
-    AutoRoute(path: GagakuRoute.config, page: AppSettingsRoute.page),
-
-    // Catch all
-    AutoRoute(path: '/404', page: NotFoundRoute.page),
-    AutoRoute(
-      path: '*',
-      page: const PageInfo.emptyShell('404Route'),
-      guards: [
-        AutoRouteGuard.redirect((resolver) {
-          final route = resolver.route;
-          return NotFoundRoute(uri: route.fullPath);
-        }),
-      ],
-    ),
-  ];
-
-  @override
-  List<AutoRouteGuard> get guards => [
-    // optionally add root guards here
-  ];
 }

@@ -1,22 +1,21 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/i18n/strings.g.dart';
-import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/mangadex/login_password.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/experimental/mutation.dart';
 
 enum _ListViewType { self, followed }
 
-@RoutePage()
 class MangaDexListsPage extends StatelessWidget {
   const MangaDexListsPage({super.key, this.controller});
 
@@ -39,7 +38,6 @@ class MangaDexListsWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.t;
     final messenger = ScaffoldMessenger.of(context);
-    final router = AutoRouter.of(context);
     final theme = Theme.of(context);
     final scrollController =
         DefaultScrollController.maybeOf(context, 'MangaDexListsPage') ??
@@ -141,7 +139,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
         label: Text(t.mangadex.newList),
         onPressed: () {
           final messenger = ScaffoldMessenger.of(context);
-          router.push<bool>(MangaDexEditListRoute()).then((success) {
+          MangaDexEditListRoute().push<bool>(context).then((success) {
             if (!context.mounted) return;
             if (success == true) {
               messenger
@@ -276,16 +274,16 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                 ),
                                 MenuItemButton(
                                   onPressed: () {
-                                    router.push(
-                                      MangaDexEditListRoute(list: item),
-                                    );
+                                    MangaDexEditListRoute(
+                                      list: item,
+                                    ).push(context);
                                   },
                                   child: Text(t.ui.edit),
                                 ),
                               ],
                             ),
                             onTap: () {
-                              router.pushPath('/list/${item.id}');
+                              context.push('/list/${item.id}');
                             },
                           ),
                         );
@@ -412,16 +410,16 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                     item.user!.id == me.id)
                                   MenuItemButton(
                                     onPressed: () {
-                                      router.push(
-                                        MangaDexEditListRoute(list: item),
-                                      );
+                                      MangaDexEditListRoute(
+                                        list: item,
+                                      ).push(context);
                                     },
                                     child: Text(t.ui.edit),
                                   ),
                               ],
                             ),
                             onTap: () {
-                              router.pushPath('/list/${item.id}');
+                              context.push('/list/${item.id}');
                             },
                           ),
                         );

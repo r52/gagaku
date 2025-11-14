@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -10,6 +9,7 @@ import 'package:gagaku/reader/model/config.dart';
 import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -236,7 +236,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
         if (currentPage.value < widget.pages.length - 1) {
           jumpToNextPage(format: format);
         } else {
-          context.maybePop();
+          context.pop();
         }
         break;
     }
@@ -255,7 +255,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
         if (currentPage.value < widget.pages.length - 1) {
           jumpToNextPage(format: format);
         } else {
-          context.maybePop();
+          context.pop();
         }
         break;
       case ReaderDirection.rightToLeft:
@@ -306,7 +306,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
             scrollController.position.atEdge &&
             scrollController.position.pixels ==
                 scrollController.position.maxScrollExtent) {
-          context.maybePop();
+          context.pop();
         } else {
           scrollController.animateTo(
             scrollController.offset + offset,
@@ -389,7 +389,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     return Scaffold(
       extendBodyBehindAppBar: false,
       appBar: AppBar(
-        leading: AutoLeadingButton(),
+        leading: const BackButton(),
         title: ListTile(
           title: Text(
             widget.title,
@@ -429,10 +429,10 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                   TextButton(
                     onPressed: () {
                       // First one pops the drawer
-                      context.maybePop();
+                      context.pop();
 
                       // Second one pops the reader
-                      context.maybePop();
+                      context.pop();
 
                       widget.onHeaderPressed!(context);
                     },

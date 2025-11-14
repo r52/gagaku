@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -13,7 +12,6 @@ import 'package:gagaku/web/ui.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-@RoutePage()
 class WebSourceHistoryPage extends HookConsumerWidget {
   const WebSourceHistoryPage({super.key, this.controller});
 

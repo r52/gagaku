@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -12,6 +11,7 @@ import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -29,8 +29,7 @@ class _SearchHistory extends _$SearchHistory {
       state = cb(state);
 }
 
-@Dependencies([chipTextStyle])
-@RoutePage()
+@Dependencies([chipTextStyle, readBorderTheme])
 class MangaDexSearchPage extends StatefulHookConsumerWidget {
   const MangaDexSearchPage({
     super.key,
@@ -118,7 +117,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
           SliverAppBar(
             leading: BackButton(
               onPressed: () {
-                context.maybePop(widget.selectMode ? selected.state : null);
+                context.pop(widget.selectMode ? selected.state : null);
               },
             ),
             pinned: true,

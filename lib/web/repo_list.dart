@@ -191,3 +191,42 @@ class NewRepoDialog extends HookWidget {
     );
   }
 }
+
+class AddRepoDialog extends HookWidget {
+  const AddRepoDialog({super.key, required this.name, required this.url});
+
+  final String name;
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    final tr = context.t;
+    final nav = Navigator.of(context);
+
+    return AlertDialog(
+      title: Text(tr.webSources.repo.add),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(tr.webSources.repo.addConfirm(repo: name, url: url)),
+          Text(tr.webSources.repo.addWarning),
+        ],
+      ),
+      actions: <Widget>[
+        ElevatedButton(
+          child: Text(tr.ui.no),
+          onPressed: () {
+            nav.pop(null);
+          },
+        ),
+        TextButton(
+          onPressed: () {
+            nav.pop(true);
+          },
+          child: Text(tr.ui.yes),
+        ),
+      ],
+    );
+  }
+}

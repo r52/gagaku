@@ -224,7 +224,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'2cdde60dd226bd1ca602903407d75894514b1a0f';
+String _$extensionSourceHash() => r'e69caa3f0bee6fdb01d8e7b1167b133a795083a4';
 
 final class ExtensionSourceFamily extends $Family
     with

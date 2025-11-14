@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_spinbox/flutter_spinbox.dart';
@@ -41,7 +40,7 @@ class ExtensionSettingsPage extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(tr.arg_settings(arg: source.name)),
-        leading: AutoLeadingButton(),
+        leading: const BackButton(),
       ),
       body: SafeArea(child: body),
     );
@@ -109,7 +108,7 @@ class _FormBuilderState extends ConsumerState<FormBuilder> {
     return Scaffold(
       appBar: AppBar(
         title: Text(tr.arg_settings(arg: widget.source.name)),
-        leading: AutoLeadingButton(),
+        leading: const BackButton(),
       ),
       body: SafeArea(child: body),
     );

@@ -1,16 +1,16 @@
 import 'dart:math';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/common.dart';
-import 'package:gagaku/routes.gr.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
 import 'package:riverpod/experimental/mutation.dart';
@@ -46,19 +46,13 @@ class QueriedMangaDexEditListScreen extends ConsumerWidget {
 }
 
 @Dependencies([chipTextStyle])
-@RoutePage()
 class MangaDexCreateListScreen extends MangaDexEditListScreen {
   const MangaDexCreateListScreen({super.key}) : super();
 }
 
 @Dependencies([chipTextStyle])
-@RoutePage()
 class MangaDexEditListScreen extends HookConsumerWidget {
-  const MangaDexEditListScreen({
-    super.key,
-    @PathParam() this.listId,
-    this.list,
-  });
+  const MangaDexEditListScreen({super.key, this.listId, this.list});
 
   final String? listId;
   final CustomList? list;
@@ -67,7 +61,6 @@ class MangaDexEditListScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final messenger = ScaffoldMessenger.of(context);
-    final router = AutoRouter.of(context);
     final me = ref.watch(loggedUserProvider).value;
     final listNameController = useTextEditingController(
       text: list?.attributes.name,
@@ -110,7 +103,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: AutoLeadingButton(),
+        leading: const BackButton(),
         flexibleSpace: TitleFlexBar(
           title: list != null ? tr.mangadex.editList : tr.mangadex.createList,
         ),
@@ -122,7 +115,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                 style: Styles.buttonStyle(),
                 child: const Text('Cancel'),
                 onPressed: () {
-                  context.maybePop();
+                  context.pop();
                 },
               ),
               HookBuilder(
@@ -178,7 +171,7 @@ class MangaDexEditListScreen extends HookConsumerWidget {
 
                               success.then((_) {
                                 if (!context.mounted) return;
-                                context.maybePop(true);
+                                context.pop(true);
                               });
                             } else {
                               messenger
@@ -259,23 +252,19 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                     ).colorScheme.primaryContainer,
                   ),
                   onPressed: () {
-                    router
-                        .push<Set<String>>(
-                          MangaDexSearchRoute(
-                            selectMode: true,
-                            selectedTitles: selected.state,
+                    MangaDexSearchRoute(
+                      selectMode: true,
+                      selectedTitles: selected.state,
+                    ).push<Set<String>>(context).then((result) {
+                      if (result != null) {
+                        selected.dispatch(
+                          MangaSetAction(
+                            action: MangaSetActions.replace,
+                            replacement: result,
                           ),
-                        )
-                        .then((result) {
-                          if (result != null) {
-                            selected.dispatch(
-                              MangaSetAction(
-                                action: MangaSetActions.replace,
-                                replacement: result,
-                              ),
-                            );
-                          }
-                        });
+                        );
+                      }
+                    });
                   },
                   child: Text(tr.mangadex.addTitles),
                 ),

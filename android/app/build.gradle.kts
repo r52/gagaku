@@ -17,7 +17,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "r52.gagaku"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.2.12479018"
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true

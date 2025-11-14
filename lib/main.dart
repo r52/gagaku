@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -14,6 +13,8 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/model/types.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:gagaku/web/deeplink.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -86,7 +87,30 @@ void main() async {
 class App extends ConsumerWidget {
   App({super.key});
 
-  final _router = AppRouter();
+  final _router = GoRouter(
+    routes: $appRoutes,
+    initialLocation: '/',
+    navigatorKey: rootNavigatorKey,
+    errorBuilder: (BuildContext context, GoRouterState state) {
+      return ErrorRoute(error: state.error!).build(context, state);
+    },
+    onEnter:
+        (
+          BuildContext context,
+          GoRouterState current,
+          GoRouterState next,
+          GoRouter router,
+        ) async {
+          final scheme = next.uri.scheme;
+
+          switch (scheme) {
+            case PBLinkDelegate.scheme:
+              return await PBLinkDelegate().process(context, next, router);
+            default:
+              return const Allow();
+          }
+        },
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -124,10 +148,7 @@ class App extends ConsumerWidget {
       ),
       themeMode: config.themeMode,
       debugShowCheckedModeBanner: false,
-      routerConfig: _router.config(
-        rebuildStackOnDeepLink: true,
-        deepLinkBuilder: handleDeepLink,
-      ),
+      routerConfig: _router,
       restorationScopeId: 'app_root_restore',
       builder: (context, child) {
         final theme = Theme.of(context);
@@ -146,11 +167,20 @@ class App extends ConsumerWidget {
   }
 }
 
-@RoutePage()
-class NotFoundScreen extends StatelessWidget {
-  const NotFoundScreen({super.key, @QueryParam() this.uri = ''});
+class ErrorRoute extends GoRouteData {
+  ErrorRoute({required this.error});
+  final Exception error;
 
-  final String uri;
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return NotFoundScreen(error: error);
+  }
+}
+
+class NotFoundScreen extends StatelessWidget {
+  const NotFoundScreen({super.key, required this.error});
+
+  final Exception error;
 
   @override
   Widget build(BuildContext context) {
@@ -158,9 +188,11 @@ class NotFoundScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(t.errors.pageNotFound),
-        leading: AutoLeadingButton(),
+        leading: const BackButton(),
       ),
-      body: Center(child: Text(t.errors.pageNotFoundArg(url: uri))),
+      body: Center(
+        child: Text(t.errors.pageNotFoundArg(url: error.toString())),
+      ),
     );
   }
 }

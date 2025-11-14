@@ -1,19 +1,19 @@
 import 'dart:collection';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/reader/main.dart';
-import 'package:gagaku/routes.gr.dart';
+import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/http.dart' show baseUserAgent;
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -431,8 +431,8 @@ class GridMangaItem extends HookConsumerWidget {
             imageUrl: link.cover!,
             httpHeaders: {'referer': referer, 'user-agent': baseUserAgent},
             cacheManager: gagakuImageCache,
-            memCacheWidth: 512,
-            maxWidthDiskCache: 512,
+            memCacheWidth: 256,
+            maxWidthDiskCache: 256,
             width: 128.0,
             progressIndicatorBuilder: (context, url, downloadProgress) =>
                 const Center(child: CircularProgressIndicator()),
@@ -499,16 +499,14 @@ class GridMangaItem extends HookConsumerWidget {
                       controller.open();
                     }
                   },
-                  icon: const Icon(Icons.more_vert),
+                  icon: child!,
                 ),
                 menuChildren: [
                   if (showSearchButton)
                     MenuItemButton(
-                      onPressed: () => context.router.push(
-                        ExtensionSearchRoute(
-                          query: SearchQuery(title: link.title),
-                        ),
-                      ),
+                      onPressed: () => ExtensionSearchRoute(
+                        query: SearchQuery(title: link.title),
+                      ).push(context),
                       leadingIcon: const Icon(Icons.search),
                       child: Text(tr.webSources.searchWithExt),
                     ),
@@ -524,6 +522,7 @@ class GridMangaItem extends HookConsumerWidget {
                       child: Text(tr.mangaActions.removeHistory),
                     ),
                 ],
+                child: const Icon(Icons.more_vert_outlined),
               ),
             ),
         ],
@@ -717,11 +716,11 @@ class ChapterButtonWidget extends HookConsumerWidget {
       onLinkPressed: onLinkPressed,
     );
 
-    PageRouteInfo route = ProxyWebSourceReaderRoute(
+    GoRouteData route = ProxyWebSourceReaderRoute(
       proxy: handle.sourceId,
       code: handle.location,
       chapter: chapterkey,
-      readerData: readerData,
+      $extra: readerData,
     );
 
     if (handle.type == SourceType.source) {
@@ -729,7 +728,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
         sourceId: handle.sourceId,
         mangaId: handle.location,
         chapterId: (sourceValue as Chapter).chapterId,
-        readerData: readerData,
+        $extra: readerData,
       );
     }
 
@@ -773,9 +772,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
     );
 
     return InkWell(
-      onTap: () {
-        context.router.push(route);
-      },
+      onTap: () => route.push(context),
       child: _ChapterButtonCard(
         key: ValueKey('_ChapterButtonCard($chapterkey)'),
         mangaKey: mangakey,
@@ -947,8 +944,8 @@ class _CoverButton extends ConsumerWidget {
       child: CachedNetworkImage(
         imageUrl: link.cover!,
         cacheManager: gagakuImageCache,
-        memCacheWidth: 512,
-        maxWidthDiskCache: 512,
+        memCacheWidth: 256,
+        maxWidthDiskCache: 256,
         imageBuilder: (context, imageProvider) => DecoratedBox(
           decoration: BoxDecoration(
             image: DecorationImage(image: imageProvider),

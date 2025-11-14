@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
@@ -24,29 +23,15 @@ Future<CreatorType> _fetchCreatorFromId(Ref ref, String creatorId) async {
   return creator.first;
 }
 
-@Dependencies([chipTextStyle])
-@RoutePage()
-class MangaDexCreatorViewWithNamePage extends MangaDexCreatorViewPage {
-  const MangaDexCreatorViewWithNamePage({
-    super.key,
-    @PathParam() required super.creatorId,
-    @PathParam() this.name,
-  });
-
-  final String? name;
-}
-
-@Dependencies([chipTextStyle])
-@RoutePage()
+@Dependencies([chipTextStyle, readBorderTheme])
 class MangaDexCreatorViewPage extends StatelessWidget {
   const MangaDexCreatorViewPage({
     super.key,
-    @PathParam() required this.creatorId,
+    required this.creatorId,
     this.creator,
   });
 
   final String creatorId;
-
   final CreatorType? creator;
 
   @override
@@ -65,7 +50,7 @@ class MangaDexCreatorViewPage extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
+@Dependencies([chipTextStyle, readBorderTheme])
 class MangaDexCreatorViewWidget extends StatefulHookConsumerWidget {
   const MangaDexCreatorViewWidget({super.key, required this.creator});
 
@@ -131,7 +116,7 @@ class _MangaDexCreatorViewWidgetState
               pinned: true,
               snap: false,
               floating: false,
-              leading: AutoLeadingButton(),
+              leading: const BackButton(),
               flexibleSpace: GestureDetector(
                 onTap: () {
                   scrollController.animateTo(
