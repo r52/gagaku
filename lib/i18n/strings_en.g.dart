@@ -9,7 +9,7 @@ part of 'strings.g.dart';
 
 // Path: <root>
 typedef TranslationsEn = Translations; // ignore: unused_element
-class Translations implements BaseTranslations<AppLocale, Translations> {
+class Translations with BaseTranslations<AppLocale, Translations> {
 	/// Returns the current translations of the given [context].
 	///
 	/// Usage:
@@ -1712,10 +1712,6 @@ class TranslationsMangadexSortEn {
 /// so the map is split into smaller functions (512 entries each).
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
-		return _flatMapFunction$0(path);
-	}
-
-	dynamic _flatMapFunction$0(String path) {
 		return switch (path) {
 			'ui.add' => 'Add',
 			'ui.addNew' => 'Add New',
@@ -2153,4 +2149,3 @@ extension on Translations {
 		};
 	}
 }
-
