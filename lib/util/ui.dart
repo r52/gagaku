@@ -313,7 +313,7 @@ class IconTextChip extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         spacing: 4.0,
         children: [
-          if (icon != null) icon!,
+          ?icon,
           Flexible(
             child: Text(
               text,
@@ -488,10 +488,7 @@ class SettingCardWidget extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: Column(
-                spacing: 10.0,
-                children: [title, if (subtitle != null) subtitle!],
-              ),
+              child: Column(spacing: 10.0, children: [title, ?subtitle]),
             ),
             Expanded(child: builder(context)),
           ],

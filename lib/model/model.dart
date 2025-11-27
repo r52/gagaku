@@ -70,6 +70,7 @@ class GagakuData {
   final String gagakuUserAgent = '$kPackageName/$kPackageVersion';
 
   List<String> blockers = [];
+  Map<String, dynamic> knownHosts = {};
 
   factory GagakuData() {
     return _instance;
@@ -93,6 +94,23 @@ class GagakuData {
       } else {
         LineSplitter ls = LineSplitter();
         blockers = ls.convert(response.body);
+      }
+    } catch (e) {
+      logger.e(e);
+    }
+
+    final hostsUri = Uri.parse(
+      'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/known_hosts.json',
+    );
+
+    try {
+      final response = await http.get(hostsUri);
+
+      if (response.statusCode != 200) {
+        final err = "Failed to load $hostsUri";
+        logger.e(err);
+      } else {
+        knownHosts = json.decode(response.body);
       }
     } catch (e) {
       logger.e(e);

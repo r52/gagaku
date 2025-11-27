@@ -804,6 +804,14 @@ sealed class SourceVersion with _$SourceVersion {
   }
 
   String? getBaseUrl() {
+    final hosts = GagakuData().knownHosts;
+
+    if (hosts.containsKey(id)) {
+      return hosts[id];
+    }
+
+    // Best guess
+
     RegExp exp = RegExp(r'((https:\/\/)?\w+\.\w+)');
 
     String? result = switch (this) {
