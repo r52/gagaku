@@ -826,7 +826,7 @@ class ExtensionSource extends _$ExtensionSource {
             _onWebViewLoadStop(controller, url, source!, completer),
       );
 
-      Timer(const Duration(seconds: 30), () async {
+      Timer(const Duration(seconds: 60), () async {
         if (!completer.isCompleted) {
           completer.completeError(Exception('$sourceId load timeout'));
         }
