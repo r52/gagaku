@@ -706,18 +706,18 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: c92d18e1fe994cb06d48aa786c46b142a5633067e8297cff6b5a3ac742620104
+      sha256: eff94d2a6fc79fa8b811dde79c7549808c2346037ee107a1121b4a644c745f2a
       url: "https://pub.dev"
     source: hosted
-    version: "17.0.0"
+    version: "17.0.1"
   go_router_builder:
     dependency: "direct dev"
     description:
       name: go_router_builder
-      sha256: e0646fb5586e04e1df92678f539059f38e4314848f06dd4f3cd87fed434e16b5
+      sha256: "8f1dd8cc23850dba4223104231682a9410576720cb24693fb0eb925c49b2abe3"
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.1"
+    version: "4.1.3"
   graphs:
     dependency: transitive
     description:
@@ -810,10 +810,10 @@ packages:
     dependency: transitive
     description:
       name: image
-      sha256: "4e973fcf4caae1a4be2fa0a13157aa38a8f9cb049db6529aa00b4d71abc4d928"
+      sha256: "51555e36056541237b15b57afc31a0f53d4f9aefd9bd00873a6dc0090e54e332"
       url: "https://pub.dev"
     source: hosted
-    version: "4.5.4"
+    version: "4.6.0"
   infinite_scroll_pagination:
     dependency: "direct main"
     description:
@@ -1018,26 +1018,26 @@ packages:
     dependency: "direct main"
     description:
       name: objectbox
-      sha256: "9c7a37ef0b35fe64d67f58022809f0c82bd215b4e01d4cbf714d470b41237a25"
+      sha256: "2897412ebc1ea9786be3cfc309e29fbc87dc8eac6b77a5a25b65ed25c92057e0"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.2"
+    version: "5.0.4"
   objectbox_flutter_libs:
     dependency: "direct main"
     description:
       name: objectbox_flutter_libs
-      sha256: "461b4052533820c4e3ec0600ac2cc1597d8bb998640f1812b999c02a19901676"
+      sha256: "2595fb53aa54227a5ea8b2eb3bc66bedcc316959efdf995df9921641a2c7d0b2"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.2"
+    version: "5.0.4"
   objectbox_generator:
     dependency: "direct dev"
     description:
       name: objectbox_generator
-      sha256: cb3d3bd9b73c9b5f6795092bf939938aaaa49c826eca5980968fdf383246405b
+      sha256: "57039844d0c68fa27ce85015dfb724c9e32e8e4adae512f7a5a8884f7fb64690"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.2"
+    version: "5.0.4"
   objective_c:
     dependency: transitive
     description:
@@ -1344,10 +1344,10 @@ packages:
     dependency: "direct main"
     description:
       name: slang
-      sha256: "8f5ae507de811e245b7a3187d3191e9eefe7d8f2c22f150663f15bb0f1559367"
+      sha256: "263159a93864a13a0f2486326e200cb38214a8e82a3c83a48c20ac24a8eed329"
       url: "https://pub.dev"
     source: hosted
-    version: "4.11.0"
+    version: "4.11.1"
   slang_build_runner:
     dependency: "direct dev"
     description:
