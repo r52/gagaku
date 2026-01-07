@@ -57,6 +57,11 @@ const gagakuLocalBox =
     'gagaku_box'; // local, device specific, or secure sensitive data
 const gagakuCache = 'gagaku_cache'; // disk cache
 
+const _blockers =
+    'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/blockers.txt';
+const _knownHosts =
+    'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/known_hosts.json';
+
 class GagakuData {
   GagakuData._internal();
 
@@ -81,9 +86,7 @@ class GagakuData {
       'assets/extensionhost/bundle.js',
     );
 
-    final blockerUri = Uri.parse(
-      'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/blockers.txt',
-    );
+    final blockerUri = Uri.parse(_blockers);
 
     try {
       final response = await http.get(blockerUri);
@@ -99,9 +102,7 @@ class GagakuData {
       logger.e(e);
     }
 
-    final hostsUri = Uri.parse(
-      'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/known_hosts.json',
-    );
+    final hostsUri = Uri.parse(_knownHosts);
 
     try {
       final response = await http.get(hostsUri);
