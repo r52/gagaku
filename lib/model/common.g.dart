@@ -10,20 +10,20 @@ part of 'common.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(theme)
-const themeProvider = ThemeProvider._();
+final themeProvider = ThemeProvider._();
 
 final class ThemeProvider
     extends $FunctionalProvider<ThemeData, ThemeData, ThemeData>
     with $Provider<ThemeData> {
-  const ThemeProvider._()
+  ThemeProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'themeProvider',
         isAutoDispose: true,
-        dependencies: const <ProviderOrFamily>[],
-        $allTransitiveDependencies: const <ProviderOrFamily>[],
+        dependencies: <ProviderOrFamily>[],
+        $allTransitiveDependencies: <ProviderOrFamily>[],
       );
 
   @override
@@ -51,20 +51,20 @@ final class ThemeProvider
 String _$themeHash() => r'0fea6438c8bee8be98515c10e8e67c2e75c6af46';
 
 @ProviderFor(chipTextStyle)
-const chipTextStyleProvider = ChipTextStyleProvider._();
+final chipTextStyleProvider = ChipTextStyleProvider._();
 
 final class ChipTextStyleProvider
     extends $FunctionalProvider<TextStyle, TextStyle, TextStyle>
     with $Provider<TextStyle> {
-  const ChipTextStyleProvider._()
+  ChipTextStyleProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'chipTextStyleProvider',
         isAutoDispose: true,
-        dependencies: const <ProviderOrFamily>[],
-        $allTransitiveDependencies: const <ProviderOrFamily>[],
+        dependencies: <ProviderOrFamily>[],
+        $allTransitiveDependencies: <ProviderOrFamily>[],
       );
 
   @override

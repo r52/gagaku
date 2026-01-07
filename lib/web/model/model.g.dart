@@ -10,7 +10,7 @@ part of 'model.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(extensionReferrer)
-const extensionReferrerProvider = ExtensionReferrerProvider._();
+final extensionReferrerProvider = ExtensionReferrerProvider._();
 
 final class ExtensionReferrerProvider
     extends
@@ -20,7 +20,7 @@ final class ExtensionReferrerProvider
           Map<String, String>
         >
     with $Provider<Map<String, String>> {
-  const ExtensionReferrerProvider._()
+  ExtensionReferrerProvider._()
     : super(
         from: null,
         argument: null,
@@ -57,12 +57,12 @@ final class ExtensionReferrerProvider
 String _$extensionReferrerHash() => r'13ddbba7059d5caf3026b45cc998d2b1595b8f20';
 
 @ProviderFor(proxy)
-const proxyProvider = ProxyProvider._();
+final proxyProvider = ProxyProvider._();
 
 final class ProxyProvider
     extends $FunctionalProvider<ProxyHandler, ProxyHandler, ProxyHandler>
     with $Provider<ProxyHandler> {
-  const ProxyProvider._()
+  ProxyProvider._()
     : super(
         from: null,
         argument: null,
@@ -98,11 +98,11 @@ final class ProxyProvider
 String _$proxyHash() => r'8a4e90bb9775641c76f0be18ce9750786e3b2a4b';
 
 @ProviderFor(WebReadMarkers)
-const webReadMarkersProvider = WebReadMarkersProvider._();
+final webReadMarkersProvider = WebReadMarkersProvider._();
 
 final class WebReadMarkersProvider
     extends $AsyncNotifierProvider<WebReadMarkers, ReadMarkersDB> {
-  const WebReadMarkersProvider._()
+  WebReadMarkersProvider._()
     : super(
         from: null,
         argument: null,
@@ -128,7 +128,6 @@ abstract class _$WebReadMarkers extends $AsyncNotifier<ReadMarkersDB> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<AsyncValue<ReadMarkersDB>, ReadMarkersDB>;
     final element =
         ref.element
@@ -138,12 +137,12 @@ abstract class _$WebReadMarkers extends $AsyncNotifier<ReadMarkersDB> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(installedSources)
-const installedSourcesProvider = InstalledSourcesProvider._();
+final installedSourcesProvider = InstalledSourcesProvider._();
 
 final class InstalledSourcesProvider
     extends
@@ -155,7 +154,7 @@ final class InstalledSourcesProvider
     with
         $FutureModifier<List<WebSourceInfo>>,
         $StreamProvider<List<WebSourceInfo>> {
-  const InstalledSourcesProvider._()
+  InstalledSourcesProvider._()
     : super(
         from: null,
         argument: null,
@@ -184,11 +183,11 @@ final class InstalledSourcesProvider
 String _$installedSourcesHash() => r'ec6937fd410c5666607ee8943bb59a91ffb42b23';
 
 @ProviderFor(ExtensionSource)
-const extensionSourceProvider = ExtensionSourceFamily._();
+final extensionSourceProvider = ExtensionSourceFamily._();
 
 final class ExtensionSourceProvider
     extends $AsyncNotifierProvider<ExtensionSource, WebSourceInfo> {
-  const ExtensionSourceProvider._({
+  ExtensionSourceProvider._({
     required ExtensionSourceFamily super.from,
     required String super.argument,
   }) : super(
@@ -235,7 +234,7 @@ final class ExtensionSourceFamily extends $Family
           FutureOr<WebSourceInfo>,
           String
         > {
-  const ExtensionSourceFamily._()
+  ExtensionSourceFamily._()
     : super(
         retry: noRetry,
         name: r'extensionSourceProvider',
@@ -259,7 +258,6 @@ abstract class _$ExtensionSource extends $AsyncNotifier<WebSourceInfo> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(_$args);
     final ref = this.ref as $Ref<AsyncValue<WebSourceInfo>, WebSourceInfo>;
     final element =
         ref.element
@@ -269,17 +267,17 @@ abstract class _$ExtensionSource extends $AsyncNotifier<WebSourceInfo> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(ExtensionInfoList)
-const extensionInfoListProvider = ExtensionInfoListProvider._();
+final extensionInfoListProvider = ExtensionInfoListProvider._();
 
 final class ExtensionInfoListProvider
     extends
         $AsyncNotifierProvider<ExtensionInfoList, Map<String, WebSourceInfo>> {
-  const ExtensionInfoListProvider._()
+  ExtensionInfoListProvider._()
     : super(
         from: null,
         argument: null,
@@ -306,7 +304,6 @@ abstract class _$ExtensionInfoList
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref =
         this.ref
             as $Ref<
@@ -324,12 +321,12 @@ abstract class _$ExtensionInfoList
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(getExtensionFromId)
-const getExtensionFromIdProvider = GetExtensionFromIdFamily._();
+final getExtensionFromIdProvider = GetExtensionFromIdFamily._();
 
 final class GetExtensionFromIdProvider
     extends
@@ -339,7 +336,7 @@ final class GetExtensionFromIdProvider
           FutureOr<WebSourceInfo>
         >
     with $FutureModifier<WebSourceInfo>, $FutureProvider<WebSourceInfo> {
-  const GetExtensionFromIdProvider._({
+  GetExtensionFromIdProvider._({
     required GetExtensionFromIdFamily super.from,
     required String super.argument,
   }) : super(
@@ -388,7 +385,7 @@ String _$getExtensionFromIdHash() =>
 
 final class GetExtensionFromIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<WebSourceInfo>, String> {
-  const GetExtensionFromIdFamily._()
+  GetExtensionFromIdFamily._()
     : super(
         retry: noRetry,
         name: r'getExtensionFromIdProvider',

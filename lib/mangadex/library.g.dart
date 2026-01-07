@@ -10,11 +10,11 @@ part of 'library.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(LibraryViewType)
-const libraryViewTypeProvider = LibraryViewTypeProvider._();
+final libraryViewTypeProvider = LibraryViewTypeProvider._();
 
 final class LibraryViewTypeProvider
     extends $NotifierProvider<LibraryViewType, MangaReadingStatus> {
-  const LibraryViewTypeProvider._()
+  LibraryViewTypeProvider._()
     : super(
         from: null,
         argument: null,
@@ -48,7 +48,6 @@ abstract class _$LibraryViewType extends $Notifier<MangaReadingStatus> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<MangaReadingStatus, MangaReadingStatus>;
     final element =
         ref.element
@@ -58,12 +57,12 @@ abstract class _$LibraryViewType extends $Notifier<MangaReadingStatus> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(_getLibraryListByType)
-const _getLibraryListByTypeProvider = _GetLibraryListByTypeFamily._();
+final _getLibraryListByTypeProvider = _GetLibraryListByTypeFamily._();
 
 final class _GetLibraryListByTypeProvider
     extends
@@ -73,7 +72,7 @@ final class _GetLibraryListByTypeProvider
           FutureOr<List<String>>
         >
     with $FutureModifier<List<String>>, $FutureProvider<List<String>> {
-  const _GetLibraryListByTypeProvider._({
+  _GetLibraryListByTypeProvider._({
     required _GetLibraryListByTypeFamily super.from,
     required MangaReadingStatus super.argument,
   }) : super(
@@ -122,7 +121,7 @@ String _$_getLibraryListByTypeHash() =>
 
 final class _GetLibraryListByTypeFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<String>>, MangaReadingStatus> {
-  const _GetLibraryListByTypeFamily._()
+  _GetLibraryListByTypeFamily._()
     : super(
         retry: noRetry,
         name: r'_getLibraryListByTypeProvider',

@@ -10,7 +10,7 @@ part of 'widgets.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(_extensionIcon)
-const _extensionIconProvider = _ExtensionIconProvider._();
+final _extensionIconProvider = _ExtensionIconProvider._();
 
 final class _ExtensionIconProvider
     extends
@@ -20,7 +20,7 @@ final class _ExtensionIconProvider
           Map<String, Widget>
         >
     with $Provider<Map<String, Widget>> {
-  const _ExtensionIconProvider._()
+  _ExtensionIconProvider._()
     : super(
         from: null,
         argument: null,
@@ -57,11 +57,11 @@ final class _ExtensionIconProvider
 String _$_extensionIconHash() => r'61813649fc5f797bcabfa31fff00b6c8cdc096f3';
 
 @ProviderFor(_MangaListView)
-const _mangaListViewProvider = _MangaListViewProvider._();
+final _mangaListViewProvider = _MangaListViewProvider._();
 
 final class _MangaListViewProvider
     extends $NotifierProvider<_MangaListView, WebMangaListView> {
-  const _MangaListViewProvider._()
+  _MangaListViewProvider._()
     : super(
         from: null,
         argument: null,
@@ -95,7 +95,6 @@ abstract class _$MangaListView extends $Notifier<WebMangaListView> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<WebMangaListView, WebMangaListView>;
     final element =
         ref.element
@@ -105,6 +104,6 @@ abstract class _$MangaListView extends $Notifier<WebMangaListView> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

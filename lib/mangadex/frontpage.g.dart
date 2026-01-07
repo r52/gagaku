@@ -10,7 +10,7 @@ part of 'frontpage.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(_popularTitles)
-const _popularTitlesProvider = _PopularTitlesProvider._();
+final _popularTitlesProvider = _PopularTitlesProvider._();
 
 final class _PopularTitlesProvider
     extends
@@ -20,7 +20,7 @@ final class _PopularTitlesProvider
           FutureOr<List<Manga>>
         >
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
-  const _PopularTitlesProvider._()
+  _PopularTitlesProvider._()
     : super(
         from: null,
         argument: null,
@@ -49,7 +49,7 @@ final class _PopularTitlesProvider
 String _$_popularTitlesHash() => r'bd736590bbe6e6adcb7fbb060e3794725e3fc049';
 
 @ProviderFor(_recentlyAdded)
-const _recentlyAddedProvider = _RecentlyAddedProvider._();
+final _recentlyAddedProvider = _RecentlyAddedProvider._();
 
 final class _RecentlyAddedProvider
     extends
@@ -59,7 +59,7 @@ final class _RecentlyAddedProvider
           FutureOr<List<Manga>>
         >
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
-  const _RecentlyAddedProvider._()
+  _RecentlyAddedProvider._()
     : super(
         from: null,
         argument: null,
@@ -88,7 +88,7 @@ final class _RecentlyAddedProvider
 String _$_recentlyAddedHash() => r'c674998b67a04d66d78727ed66605b1af2dfa8db';
 
 @ProviderFor(_latestUpdates)
-const _latestUpdatesProvider = _LatestUpdatesProvider._();
+final _latestUpdatesProvider = _LatestUpdatesProvider._();
 
 final class _LatestUpdatesProvider
     extends
@@ -98,7 +98,7 @@ final class _LatestUpdatesProvider
           FutureOr<List<Manga>>
         >
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
-  const _LatestUpdatesProvider._()
+  _LatestUpdatesProvider._()
     : super(
         from: null,
         argument: null,
@@ -127,7 +127,7 @@ final class _LatestUpdatesProvider
 String _$_latestUpdatesHash() => r'7681a094cf7bb2e9c23ef54b0bd3d06a8fc198ec';
 
 @ProviderFor(_fetchCustomListManga)
-const _fetchCustomListMangaProvider = _FetchCustomListMangaFamily._();
+final _fetchCustomListMangaProvider = _FetchCustomListMangaFamily._();
 
 final class _FetchCustomListMangaProvider
     extends
@@ -137,7 +137,7 @@ final class _FetchCustomListMangaProvider
           FutureOr<List<Manga>>
         >
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
-  const _FetchCustomListMangaProvider._({
+  _FetchCustomListMangaProvider._({
     required _FetchCustomListMangaFamily super.from,
     required String super.argument,
   }) : super(
@@ -186,7 +186,7 @@ String _$_fetchCustomListMangaHash() =>
 
 final class _FetchCustomListMangaFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Manga>>, String> {
-  const _FetchCustomListMangaFamily._()
+  _FetchCustomListMangaFamily._()
     : super(
         retry: noRetry,
         name: r'_fetchCustomListMangaProvider',
@@ -203,7 +203,7 @@ final class _FetchCustomListMangaFamily extends $Family
 }
 
 @ProviderFor(_fetchFrontPageData)
-const _fetchFrontPageDataProvider = _FetchFrontPageDataProvider._();
+final _fetchFrontPageDataProvider = _FetchFrontPageDataProvider._();
 
 final class _FetchFrontPageDataProvider
     extends
@@ -213,7 +213,7 @@ final class _FetchFrontPageDataProvider
           FutureOr<FrontPageData>
         >
     with $FutureModifier<FrontPageData>, $FutureProvider<FrontPageData> {
-  const _FetchFrontPageDataProvider._()
+  _FetchFrontPageDataProvider._()
     : super(
         from: null,
         argument: null,

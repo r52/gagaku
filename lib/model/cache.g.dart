@@ -10,12 +10,12 @@ part of 'cache.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(cache)
-const cacheProvider = CacheProvider._();
+final cacheProvider = CacheProvider._();
 
 final class CacheProvider
     extends $FunctionalProvider<CacheManager, CacheManager, CacheManager>
     with $Provider<CacheManager> {
-  const CacheProvider._()
+  CacheProvider._()
     : super(
         from: null,
         argument: null,

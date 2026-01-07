@@ -47,11 +47,11 @@ const _$ReaderDirectionEnumMap = {
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(ReaderSettings)
-const readerSettingsProvider = ReaderSettingsProvider._();
+final readerSettingsProvider = ReaderSettingsProvider._();
 
 final class ReaderSettingsProvider
     extends $NotifierProvider<ReaderSettings, ReaderConfig> {
-  const ReaderSettingsProvider._()
+  ReaderSettingsProvider._()
     : super(
         from: null,
         argument: null,
@@ -85,7 +85,6 @@ abstract class _$ReaderSettings extends $Notifier<ReaderConfig> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<ReaderConfig, ReaderConfig>;
     final element =
         ref.element
@@ -95,6 +94,6 @@ abstract class _$ReaderSettings extends $Notifier<ReaderConfig> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

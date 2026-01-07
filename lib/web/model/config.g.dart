@@ -30,11 +30,11 @@ Map<String, dynamic> _$ExtensionConfigToJson(_ExtensionConfig instance) =>
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(WebConfig)
-const webConfigProvider = WebConfigProvider._();
+final webConfigProvider = WebConfigProvider._();
 
 final class WebConfigProvider
     extends $NotifierProvider<WebConfig, ExtensionConfig> {
-  const WebConfigProvider._()
+  WebConfigProvider._()
     : super(
         from: null,
         argument: null,
@@ -68,7 +68,6 @@ abstract class _$WebConfig extends $Notifier<ExtensionConfig> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<ExtensionConfig, ExtensionConfig>;
     final element =
         ref.element
@@ -78,16 +77,16 @@ abstract class _$WebConfig extends $Notifier<ExtensionConfig> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(ExtensionState)
-const extensionStateProvider = ExtensionStateProvider._();
+final extensionStateProvider = ExtensionStateProvider._();
 
 final class ExtensionStateProvider
     extends $NotifierProvider<ExtensionState, ExtensionStateDB> {
-  const ExtensionStateProvider._()
+  ExtensionStateProvider._()
     : super(
         from: null,
         argument: null,
@@ -121,7 +120,6 @@ abstract class _$ExtensionState extends $Notifier<ExtensionStateDB> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<ExtensionStateDB, ExtensionStateDB>;
     final element =
         ref.element
@@ -131,16 +129,16 @@ abstract class _$ExtensionState extends $Notifier<ExtensionStateDB> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(ExtensionSecureState)
-const extensionSecureStateProvider = ExtensionSecureStateProvider._();
+final extensionSecureStateProvider = ExtensionSecureStateProvider._();
 
 final class ExtensionSecureStateProvider
     extends $NotifierProvider<ExtensionSecureState, ExtensionStateDB> {
-  const ExtensionSecureStateProvider._()
+  ExtensionSecureStateProvider._()
     : super(
         from: null,
         argument: null,
@@ -175,7 +173,6 @@ abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateDB> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<ExtensionStateDB, ExtensionStateDB>;
     final element =
         ref.element
@@ -185,6 +182,6 @@ abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateDB> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

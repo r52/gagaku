@@ -10,7 +10,7 @@ part of 'manga_view.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(_fetchWebMangaInfo)
-const _fetchWebMangaInfoProvider = _FetchWebMangaInfoFamily._();
+final _fetchWebMangaInfoProvider = _FetchWebMangaInfoFamily._();
 
 final class _FetchWebMangaInfoProvider
     extends
@@ -22,7 +22,7 @@ final class _FetchWebMangaInfoProvider
     with
         $FutureModifier<(WebManga, HistoryLink)>,
         $FutureProvider<(WebManga, HistoryLink)> {
-  const _FetchWebMangaInfoProvider._({
+  _FetchWebMangaInfoProvider._({
     required _FetchWebMangaInfoFamily super.from,
     required SourceHandler super.argument,
   }) : super(
@@ -75,7 +75,7 @@ final class _FetchWebMangaInfoFamily extends $Family
           FutureOr<(WebManga, HistoryLink)>,
           SourceHandler
         > {
-  const _FetchWebMangaInfoFamily._()
+  _FetchWebMangaInfoFamily._()
     : super(
         retry: noRetry,
         name: r'_fetchWebMangaInfoProvider',

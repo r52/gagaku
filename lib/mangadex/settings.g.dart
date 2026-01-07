@@ -10,7 +10,7 @@ part of 'settings.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(_fetchGroupData)
-const _fetchGroupDataProvider = _FetchGroupDataFamily._();
+final _fetchGroupDataProvider = _FetchGroupDataFamily._();
 
 final class _FetchGroupDataProvider
     extends
@@ -20,7 +20,7 @@ final class _FetchGroupDataProvider
           FutureOr<Set<Group>>
         >
     with $FutureModifier<Set<Group>>, $FutureProvider<Set<Group>> {
-  const _FetchGroupDataProvider._({
+  _FetchGroupDataProvider._({
     required _FetchGroupDataFamily super.from,
     required Iterable<String> super.argument,
   }) : super(
@@ -67,7 +67,7 @@ String _$_fetchGroupDataHash() => r'24d9984bf59cd196477e31f308827f4594f6115a';
 
 final class _FetchGroupDataFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Set<Group>>, Iterable<String>> {
-  const _FetchGroupDataFamily._()
+  _FetchGroupDataFamily._()
     : super(
         retry: null,
         name: r'_fetchGroupDataProvider',

@@ -10,11 +10,11 @@ part of 'search.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(_SearchHistory)
-const _searchHistoryProvider = _SearchHistoryProvider._();
+final _searchHistoryProvider = _SearchHistoryProvider._();
 
 final class _SearchHistoryProvider
     extends $NotifierProvider<_SearchHistory, List<String>> {
-  const _SearchHistoryProvider._()
+  _SearchHistoryProvider._()
     : super(
         from: null,
         argument: null,
@@ -48,7 +48,6 @@ abstract class _$SearchHistory extends $Notifier<List<String>> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<List<String>, List<String>>;
     final element =
         ref.element
@@ -58,6 +57,6 @@ abstract class _$SearchHistory extends $Notifier<List<String>> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

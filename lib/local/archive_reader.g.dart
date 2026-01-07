@@ -10,7 +10,7 @@ part of 'archive_reader.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(_getArchivePages)
-const _getArchivePagesProvider = _GetArchivePagesFamily._();
+final _getArchivePagesProvider = _GetArchivePagesFamily._();
 
 final class _GetArchivePagesProvider
     extends
@@ -20,7 +20,7 @@ final class _GetArchivePagesProvider
           FutureOr<List<ReaderPage>>
         >
     with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {
-  const _GetArchivePagesProvider._({
+  _GetArchivePagesProvider._({
     required _GetArchivePagesFamily super.from,
     required String super.argument,
   }) : super(
@@ -68,7 +68,7 @@ String _$_getArchivePagesHash() => r'a1e7575662cd6f4c098bd314d1b7308a3e29b50a';
 
 final class _GetArchivePagesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, String> {
-  const _GetArchivePagesFamily._()
+  _GetArchivePagesFamily._()
     : super(
         retry: null,
         name: r'_getArchivePagesProvider',

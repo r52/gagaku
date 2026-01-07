@@ -65,11 +65,11 @@ const _$ContentRatingEnumMap = {
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(MdConfig)
-const mdConfigProvider = MdConfigProvider._();
+final mdConfigProvider = MdConfigProvider._();
 
 final class MdConfigProvider
     extends $NotifierProvider<MdConfig, MangaDexConfig> {
-  const MdConfigProvider._()
+  MdConfigProvider._()
     : super(
         from: null,
         argument: null,
@@ -103,7 +103,6 @@ abstract class _$MdConfig extends $Notifier<MangaDexConfig> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<MangaDexConfig, MangaDexConfig>;
     final element =
         ref.element
@@ -113,6 +112,6 @@ abstract class _$MdConfig extends $Notifier<MangaDexConfig> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

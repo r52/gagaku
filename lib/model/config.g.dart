@@ -64,11 +64,11 @@ const _$GridAlbumExtentEnumMap = {
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(GagakuSettings)
-const gagakuSettingsProvider = GagakuSettingsProvider._();
+final gagakuSettingsProvider = GagakuSettingsProvider._();
 
 final class GagakuSettingsProvider
     extends $NotifierProvider<GagakuSettings, GagakuConfig> {
-  const GagakuSettingsProvider._()
+  GagakuSettingsProvider._()
     : super(
         from: null,
         argument: null,
@@ -102,7 +102,6 @@ abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<GagakuConfig, GagakuConfig>;
     final element =
         ref.element
@@ -112,6 +111,6 @@ abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
