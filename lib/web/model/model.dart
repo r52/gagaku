@@ -735,6 +735,7 @@ class ExtensionSource extends _$ExtensionSource {
       (_view?.isRunning() ?? false) ? _view?.webViewController : null;
 
   List<SearchFilter>? _filters;
+  List<SortingOption>? _sortingOptions;
   final Map<String, SettingsForm> _forms = {};
 
   @override
@@ -1040,6 +1041,19 @@ class ExtensionSource extends _$ExtensionSource {
         _filters = rsec.map((e) => SearchFilter.fromJson(e)).toList();
       }
 
+      // Get sort options
+      // XXX: dummy query, nobody actually uses the query arg
+      final params = SearchQuery(title: "").toJson();
+      final sortopts = await controller.callAsyncJavaScript(
+        arguments: {'query': params},
+        functionBody: "return await ${source.id}?.getSortingOptions();",
+      );
+
+      if (sortopts != null && sortopts.value != null) {
+        final ssec = sortopts.value as List<dynamic>;
+        _sortingOptions = ssec.map((e) => SortingOption.fromJson(e)).toList();
+      }
+
       logger.d("Extension ${source.name} ready");
       completer.complete();
     } catch (e) {
@@ -1229,11 +1243,17 @@ return p;
     }
 
     final params = query.toJson();
+
+    // TODO: support actual sorting options if they exist
+    final sortOp = (_sortingOptions != null && _sortingOptions!.isNotEmpty)
+        ? _sortingOptions!.first.toJson()
+        : null;
+
     final result = await _controller?.callAsyncJavaScript(
-      arguments: {'query': params, 'metadata': metadata},
+      arguments: {'query': params, 'metadata': metadata, 'sortOp': sortOp},
       functionBody:
           """
-return await $sourceId.getSearchResults(query, metadata)
+return await $sourceId.getSearchResults(query, metadata, sortOp)
 """,
     );
 

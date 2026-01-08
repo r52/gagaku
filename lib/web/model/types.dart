@@ -952,6 +952,15 @@ class NullableContentRatingParser
 enum ContentRating { EVERYONE, MATURE, ADULT }
 
 @freezed
+abstract class SortingOption with _$SortingOption {
+  const factory SortingOption({required String id, required String label}) =
+      _SortingOption;
+
+  factory SortingOption.fromJson(Map<String, dynamic> json) =>
+      _$SortingOptionFromJson(json);
+}
+
+@freezed
 abstract class SearchQuery with _$SearchQuery {
   const SearchQuery._();
 

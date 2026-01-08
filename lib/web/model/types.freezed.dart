@@ -2501,6 +2501,143 @@ as bool,
 
 
 /// @nodoc
+mixin _$SortingOption {
+
+ String get id; String get label;
+/// Create a copy of SortingOption
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SortingOptionCopyWith<SortingOption> get copyWith => _$SortingOptionCopyWithImpl<SortingOption>(this as SortingOption, _$identity);
+
+  /// Serializes this SortingOption to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SortingOption&&(identical(other.id, id) || other.id == id)&&(identical(other.label, label) || other.label == label));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,label);
+
+@override
+String toString() {
+  return 'SortingOption(id: $id, label: $label)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $SortingOptionCopyWith<$Res>  {
+  factory $SortingOptionCopyWith(SortingOption value, $Res Function(SortingOption) _then) = _$SortingOptionCopyWithImpl;
+@useResult
+$Res call({
+ String id, String label
+});
+
+
+
+
+}
+/// @nodoc
+class _$SortingOptionCopyWithImpl<$Res>
+    implements $SortingOptionCopyWith<$Res> {
+  _$SortingOptionCopyWithImpl(this._self, this._then);
+
+  final SortingOption _self;
+  final $Res Function(SortingOption) _then;
+
+/// Create a copy of SortingOption
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? label = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _SortingOption implements SortingOption {
+  const _SortingOption({required this.id, required this.label});
+  factory _SortingOption.fromJson(Map<String, dynamic> json) => _$SortingOptionFromJson(json);
+
+@override final  String id;
+@override final  String label;
+
+/// Create a copy of SortingOption
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SortingOptionCopyWith<_SortingOption> get copyWith => __$SortingOptionCopyWithImpl<_SortingOption>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$SortingOptionToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SortingOption&&(identical(other.id, id) || other.id == id)&&(identical(other.label, label) || other.label == label));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,label);
+
+@override
+String toString() {
+  return 'SortingOption(id: $id, label: $label)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$SortingOptionCopyWith<$Res> implements $SortingOptionCopyWith<$Res> {
+  factory _$SortingOptionCopyWith(_SortingOption value, $Res Function(_SortingOption) _then) = __$SortingOptionCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String label
+});
+
+
+
+
+}
+/// @nodoc
+class __$SortingOptionCopyWithImpl<$Res>
+    implements _$SortingOptionCopyWith<$Res> {
+  __$SortingOptionCopyWithImpl(this._self, this._then);
+
+  final _SortingOption _self;
+  final $Res Function(_SortingOption) _then;
+
+/// Create a copy of SortingOption
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? label = null,}) {
+  return _then(_SortingOption(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$SearchQuery {
 
  String get title; List<SearchFilterValue> get filters;
