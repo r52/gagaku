@@ -10,7 +10,7 @@ part of 'directory_reader.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(_getDirectoryPages)
-const _getDirectoryPagesProvider = _GetDirectoryPagesFamily._();
+final _getDirectoryPagesProvider = _GetDirectoryPagesFamily._();
 
 final class _GetDirectoryPagesProvider
     extends
@@ -20,7 +20,7 @@ final class _GetDirectoryPagesProvider
           FutureOr<List<ReaderPage>>
         >
     with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {
-  const _GetDirectoryPagesProvider._({
+  _GetDirectoryPagesProvider._({
     required _GetDirectoryPagesFamily super.from,
     required String super.argument,
   }) : super(
@@ -69,7 +69,7 @@ String _$_getDirectoryPagesHash() =>
 
 final class _GetDirectoryPagesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, String> {
-  const _GetDirectoryPagesFamily._()
+  _GetDirectoryPagesFamily._()
     : super(
         retry: null,
         name: r'_getDirectoryPagesProvider',

@@ -57,6 +57,11 @@ const gagakuLocalBox =
     'gagaku_box'; // local, device specific, or secure sensitive data
 const gagakuCache = 'gagaku_cache'; // disk cache
 
+const _blockers =
+    'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/blockers.txt';
+const _knownHosts =
+    'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/known_hosts.json';
+
 class GagakuData {
   GagakuData._internal();
 
@@ -70,6 +75,7 @@ class GagakuData {
   final String gagakuUserAgent = '$kPackageName/$kPackageVersion';
 
   List<String> blockers = [];
+  Map<String, dynamic> knownHosts = {};
 
   factory GagakuData() {
     return _instance;
@@ -80,19 +86,28 @@ class GagakuData {
       'assets/extensionhost/bundle.js',
     );
 
-    final blockerUri = Uri.parse(
-      'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/blockers.txt',
-    );
+    final blockerUri = Uri.parse(_blockers);
+    final hostsUri = Uri.parse(_knownHosts);
 
     try {
-      final response = await http.get(blockerUri);
+      final (blockerResp, hostsResp) = await (
+        http.get(blockerUri),
+        http.get(hostsUri),
+      ).wait;
 
-      if (response.statusCode != 200) {
+      if (blockerResp.statusCode != 200) {
         final err = "Failed to load $blockerUri";
         logger.e(err);
       } else {
         LineSplitter ls = LineSplitter();
-        blockers = ls.convert(response.body);
+        blockers = ls.convert(blockerResp.body);
+      }
+
+      if (hostsResp.statusCode != 200) {
+        final err = "Failed to load $hostsUri";
+        logger.e(err);
+      } else {
+        knownHosts = json.decode(hostsResp.body);
       }
     } catch (e) {
       logger.e(e);

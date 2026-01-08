@@ -271,9 +271,7 @@ class SelectRowBuilder extends HookConsumerWidget {
                       data.value = [value];
                       ref
                           .read(extensionSourceProvider(source.id).notifier)
-                          .callBinding(element.onValueChange, [
-                            [data.value],
-                          ]);
+                          .callBinding(element.onValueChange, [data.value]);
                     }
                   },
                 ),

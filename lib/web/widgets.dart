@@ -104,7 +104,7 @@ class WebMangaListWidget extends HookConsumerWidget {
                 ),
                 child: Row(
                   children: [
-                    if (title != null) title!,
+                    ?title,
                     const Spacer(),
                     const GridExtentSlider(),
                     if (showToggle)

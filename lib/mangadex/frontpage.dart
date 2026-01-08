@@ -176,7 +176,7 @@ class _FrontPageWidget extends HookConsumerWidget {
 
     final frontPageWidgets = [
       Center(child: Text(t.mangadex.popularNewTitles, style: style)),
-      const MangaProviderCarousel(provider: _popularTitlesProvider),
+      MangaProviderCarousel(provider: _popularTitlesProvider),
       TextButton.icon(
         onPressed: () {
           context.push('/titles/latest');
@@ -185,7 +185,7 @@ class _FrontPageWidget extends HookConsumerWidget {
         icon: const Icon(Icons.arrow_forward),
         iconAlignment: IconAlignment.end,
       ),
-      const MangaProviderCarousel(provider: _latestUpdatesProvider),
+      MangaProviderCarousel(provider: _latestUpdatesProvider),
       TextButton.icon(
         onPressed: () {
           context.push('/list/${data.staffPicks}');
@@ -212,7 +212,7 @@ class _FrontPageWidget extends HookConsumerWidget {
         icon: const Icon(Icons.arrow_forward),
         iconAlignment: IconAlignment.end,
       ),
-      const MangaProviderCarousel(provider: _recentlyAddedProvider),
+      MangaProviderCarousel(provider: _recentlyAddedProvider),
     ];
 
     return RefreshIndicator(

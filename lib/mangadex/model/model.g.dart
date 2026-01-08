@@ -10,12 +10,12 @@ part of 'model.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(mangadex)
-const mangadexProvider = MangadexProvider._();
+final mangadexProvider = MangadexProvider._();
 
 final class MangadexProvider
     extends $FunctionalProvider<MangaDexModel, MangaDexModel, MangaDexModel>
     with $Provider<MangaDexModel> {
-  const MangadexProvider._()
+  MangadexProvider._()
     : super(
         from: null,
         argument: null,
@@ -51,11 +51,11 @@ final class MangadexProvider
 String _$mangadexHash() => r'4f95e2d6037a2e23987c4eafa80322c88c003f20';
 
 @ProviderFor(MangaChaptersListSort)
-const mangaChaptersListSortProvider = MangaChaptersListSortProvider._();
+final mangaChaptersListSortProvider = MangaChaptersListSortProvider._();
 
 final class MangaChaptersListSortProvider
     extends $NotifierProvider<MangaChaptersListSort, ListSort> {
-  const MangaChaptersListSortProvider._()
+  MangaChaptersListSortProvider._()
     : super(
         from: null,
         argument: null,
@@ -90,7 +90,6 @@ abstract class _$MangaChaptersListSort extends $Notifier<ListSort> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<ListSort, ListSort>;
     final element =
         ref.element
@@ -100,16 +99,16 @@ abstract class _$MangaChaptersListSort extends $Notifier<ListSort> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(ReadChapters)
-const readChaptersProvider = ReadChaptersFamily._();
+final readChaptersProvider = ReadChaptersFamily._();
 
 final class ReadChaptersProvider
     extends $AsyncNotifierProvider<ReadChapters, ReadChaptersMap> {
-  const ReadChaptersProvider._({
+  ReadChaptersProvider._({
     required ReadChaptersFamily super.from,
     required String? super.argument,
   }) : super(
@@ -156,7 +155,7 @@ final class ReadChaptersFamily extends $Family
           FutureOr<ReadChaptersMap>,
           String?
         > {
-  const ReadChaptersFamily._()
+  ReadChaptersFamily._()
     : super(
         retry: null,
         name: r'readChaptersProvider',
@@ -180,7 +179,6 @@ abstract class _$ReadChapters extends $AsyncNotifier<ReadChaptersMap> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(_$args);
     final ref = this.ref as $Ref<AsyncValue<ReadChaptersMap>, ReadChaptersMap>;
     final element =
         ref.element
@@ -190,17 +188,17 @@ abstract class _$ReadChapters extends $AsyncNotifier<ReadChaptersMap> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(UserLibrary)
-const userLibraryProvider = UserLibraryFamily._();
+final userLibraryProvider = UserLibraryFamily._();
 
 final class UserLibraryProvider
     extends
         $AsyncNotifierProvider<UserLibrary, Map<String, MangaReadingStatus>> {
-  const UserLibraryProvider._({
+  UserLibraryProvider._({
     required UserLibraryFamily super.from,
     required String? super.argument,
   }) : super(
@@ -247,7 +245,7 @@ final class UserLibraryFamily extends $Family
           FutureOr<Map<String, MangaReadingStatus>>,
           String?
         > {
-  const UserLibraryFamily._()
+  UserLibraryFamily._()
     : super(
         retry: null,
         name: r'userLibraryProvider',
@@ -272,7 +270,6 @@ abstract class _$UserLibrary
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(_$args);
     final ref =
         this.ref
             as $Ref<
@@ -290,16 +287,16 @@ abstract class _$UserLibrary
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(UserLists)
-const userListsProvider = UserListsFamily._();
+final userListsProvider = UserListsFamily._();
 
 final class UserListsProvider
     extends $AsyncNotifierProvider<UserLists, List<CustomList>> {
-  const UserListsProvider._({
+  UserListsProvider._({
     required UserListsFamily super.from,
     required String? super.argument,
   }) : super(
@@ -346,7 +343,7 @@ final class UserListsFamily extends $Family
           FutureOr<List<CustomList>>,
           String?
         > {
-  const UserListsFamily._()
+  UserListsFamily._()
     : super(
         retry: null,
         name: r'userListsProvider',
@@ -370,7 +367,6 @@ abstract class _$UserLists extends $AsyncNotifier<List<CustomList>> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(_$args);
     final ref =
         this.ref as $Ref<AsyncValue<List<CustomList>>, List<CustomList>>;
     final element =
@@ -381,16 +377,16 @@ abstract class _$UserLists extends $AsyncNotifier<List<CustomList>> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(FollowedLists)
-const followedListsProvider = FollowedListsFamily._();
+final followedListsProvider = FollowedListsFamily._();
 
 final class FollowedListsProvider
     extends $AsyncNotifierProvider<FollowedLists, List<CustomList>> {
-  const FollowedListsProvider._({
+  FollowedListsProvider._({
     required FollowedListsFamily super.from,
     required String? super.argument,
   }) : super(
@@ -437,7 +433,7 @@ final class FollowedListsFamily extends $Family
           FutureOr<List<CustomList>>,
           String?
         > {
-  const FollowedListsFamily._()
+  FollowedListsFamily._()
     : super(
         retry: null,
         name: r'followedListsProvider',
@@ -461,7 +457,6 @@ abstract class _$FollowedLists extends $AsyncNotifier<List<CustomList>> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(_$args);
     final ref =
         this.ref as $Ref<AsyncValue<List<CustomList>>, List<CustomList>>;
     final element =
@@ -472,16 +467,16 @@ abstract class _$FollowedLists extends $AsyncNotifier<List<CustomList>> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(ListSource)
-const listSourceProvider = ListSourceFamily._();
+final listSourceProvider = ListSourceFamily._();
 
 final class ListSourceProvider
     extends $AsyncNotifierProvider<ListSource, CustomList?> {
-  const ListSourceProvider._({
+  ListSourceProvider._({
     required ListSourceFamily super.from,
     required String super.argument,
   }) : super(
@@ -528,7 +523,7 @@ final class ListSourceFamily extends $Family
           FutureOr<CustomList?>,
           String
         > {
-  const ListSourceFamily._()
+  ListSourceFamily._()
     : super(
         retry: noRetry,
         name: r'listSourceProvider',
@@ -552,7 +547,6 @@ abstract class _$ListSource extends $AsyncNotifier<CustomList?> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(_$args);
     final ref = this.ref as $Ref<AsyncValue<CustomList?>, CustomList?>;
     final element =
         ref.element
@@ -562,16 +556,16 @@ abstract class _$ListSource extends $AsyncNotifier<CustomList?> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(TagList)
-const tagListProvider = TagListProvider._();
+final tagListProvider = TagListProvider._();
 
 final class TagListProvider
     extends $AsyncNotifierProvider<TagList, Iterable<Tag>> {
-  const TagListProvider._()
+  TagListProvider._()
     : super(
         from: null,
         argument: null,
@@ -597,7 +591,6 @@ abstract class _$TagList extends $AsyncNotifier<Iterable<Tag>> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<AsyncValue<Iterable<Tag>>, Iterable<Tag>>;
     final element =
         ref.element
@@ -607,16 +600,16 @@ abstract class _$TagList extends $AsyncNotifier<Iterable<Tag>> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(Statistics)
-const statisticsProvider = StatisticsProvider._();
+final statisticsProvider = StatisticsProvider._();
 
 final class StatisticsProvider
     extends $AsyncNotifierProvider<Statistics, Map<String, MangaStatistics>> {
-  const StatisticsProvider._()
+  StatisticsProvider._()
     : super(
         from: null,
         argument: null,
@@ -643,7 +636,6 @@ abstract class _$Statistics
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref =
         this.ref
             as $Ref<
@@ -661,17 +653,17 @@ abstract class _$Statistics
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(ChapterStats)
-const chapterStatsProvider = ChapterStatsProvider._();
+final chapterStatsProvider = ChapterStatsProvider._();
 
 final class ChapterStatsProvider
     extends
         $AsyncNotifierProvider<ChapterStats, Map<String, ChapterStatistics>> {
-  const ChapterStatsProvider._()
+  ChapterStatsProvider._()
     : super(
         from: null,
         argument: null,
@@ -698,7 +690,6 @@ abstract class _$ChapterStats
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref =
         this.ref
             as $Ref<
@@ -716,16 +707,16 @@ abstract class _$ChapterStats
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(Ratings)
-const ratingsProvider = RatingsFamily._();
+final ratingsProvider = RatingsFamily._();
 
 final class RatingsProvider
     extends $AsyncNotifierProvider<Ratings, SelfRating?> {
-  const RatingsProvider._({
+  RatingsProvider._({
     required RatingsFamily super.from,
     required Manga super.argument,
   }) : super(
@@ -772,7 +763,7 @@ final class RatingsFamily extends $Family
           FutureOr<SelfRating?>,
           Manga
         > {
-  const RatingsFamily._()
+  RatingsFamily._()
     : super(
         retry: null,
         name: r'ratingsProvider',
@@ -796,7 +787,6 @@ abstract class _$Ratings extends $AsyncNotifier<SelfRating?> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(_$args);
     final ref = this.ref as $Ref<AsyncValue<SelfRating?>, SelfRating?>;
     final element =
         ref.element
@@ -806,16 +796,16 @@ abstract class _$Ratings extends $AsyncNotifier<SelfRating?> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(ReadingStatus)
-const readingStatusProvider = ReadingStatusFamily._();
+final readingStatusProvider = ReadingStatusFamily._();
 
 final class ReadingStatusProvider
     extends $AsyncNotifierProvider<ReadingStatus, MangaReadingStatus?> {
-  const ReadingStatusProvider._({
+  ReadingStatusProvider._({
     required ReadingStatusFamily super.from,
     required Manga super.argument,
   }) : super(
@@ -862,7 +852,7 @@ final class ReadingStatusFamily extends $Family
           FutureOr<MangaReadingStatus?>,
           Manga
         > {
-  const ReadingStatusFamily._()
+  ReadingStatusFamily._()
     : super(
         retry: null,
         name: r'readingStatusProvider',
@@ -886,7 +876,6 @@ abstract class _$ReadingStatus extends $AsyncNotifier<MangaReadingStatus?> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(_$args);
     final ref =
         this.ref as $Ref<AsyncValue<MangaReadingStatus?>, MangaReadingStatus?>;
     final element =
@@ -897,16 +886,16 @@ abstract class _$ReadingStatus extends $AsyncNotifier<MangaReadingStatus?> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(FollowingStatus)
-const followingStatusProvider = FollowingStatusFamily._();
+final followingStatusProvider = FollowingStatusFamily._();
 
 final class FollowingStatusProvider
     extends $AsyncNotifierProvider<FollowingStatus, bool> {
-  const FollowingStatusProvider._({
+  FollowingStatusProvider._({
     required FollowingStatusFamily super.from,
     required Manga super.argument,
   }) : super(
@@ -953,7 +942,7 @@ final class FollowingStatusFamily extends $Family
           FutureOr<bool>,
           Manga
         > {
-  const FollowingStatusFamily._()
+  FollowingStatusFamily._()
     : super(
         retry: null,
         name: r'followingStatusProvider',
@@ -977,7 +966,6 @@ abstract class _$FollowingStatus extends $AsyncNotifier<bool> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(_$args);
     final ref = this.ref as $Ref<AsyncValue<bool>, bool>;
     final element =
         ref.element
@@ -987,16 +975,16 @@ abstract class _$FollowingStatus extends $AsyncNotifier<bool> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(MangaDexHistory)
-const mangaDexHistoryProvider = MangaDexHistoryProvider._();
+final mangaDexHistoryProvider = MangaDexHistoryProvider._();
 
 final class MangaDexHistoryProvider
     extends $AsyncNotifierProvider<MangaDexHistory, Queue<Chapter>> {
-  const MangaDexHistoryProvider._()
+  MangaDexHistoryProvider._()
     : super(
         from: null,
         argument: null,
@@ -1022,7 +1010,6 @@ abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<AsyncValue<Queue<Chapter>>, Queue<Chapter>>;
     final element =
         ref.element
@@ -1032,16 +1019,16 @@ abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(LoggedUser)
-const loggedUserProvider = LoggedUserProvider._();
+final loggedUserProvider = LoggedUserProvider._();
 
 final class LoggedUserProvider
     extends $AsyncNotifierProvider<LoggedUser, User?> {
-  const LoggedUserProvider._()
+  LoggedUserProvider._()
     : super(
         from: null,
         argument: null,
@@ -1067,7 +1054,6 @@ abstract class _$LoggedUser extends $AsyncNotifier<User?> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<AsyncValue<User?>, User?>;
     final element =
         ref.element
@@ -1077,16 +1063,16 @@ abstract class _$LoggedUser extends $AsyncNotifier<User?> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(AuthControl)
-const authControlProvider = AuthControlProvider._();
+final authControlProvider = AuthControlProvider._();
 
 final class AuthControlProvider
     extends $StreamNotifierProvider<AuthControl, AuthenticationStatus> {
-  const AuthControlProvider._()
+  AuthControlProvider._()
     : super(
         from: null,
         argument: null,
@@ -1112,7 +1098,6 @@ abstract class _$AuthControl extends $StreamNotifier<AuthenticationStatus> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref =
         this.ref
             as $Ref<AsyncValue<AuthenticationStatus>, AuthenticationStatus>;
@@ -1127,6 +1112,6 @@ abstract class _$AuthControl extends $StreamNotifier<AuthenticationStatus> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

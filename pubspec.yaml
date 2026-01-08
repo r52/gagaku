@@ -53,7 +53,7 @@ dependencies:
   path_provider: ^2.0.15
   photo_view: ^0.15.0
   riverpod: ^3.0.0
-  riverpod_annotation: ^3.0.0
+  riverpod_annotation: ^4.0.0
   timeago:
     git:
       url: https://github.com/andresaraujo/timeago.dart
@@ -103,7 +103,7 @@ dev_dependencies:
   custom_lint: ^0.8.0
   riverpod_lint: ^3.0.0
   build_runner: ^2.5.4
-  riverpod_generator: ^3.0.0
+  riverpod_generator: ^4.0.0+1
   freezed: ^3.0.2
   json_serializable: ^6.6.1
   flutter_native_splash: ^2.2.19

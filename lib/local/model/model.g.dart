@@ -10,11 +10,11 @@ part of 'model.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(LibrarySortType)
-const librarySortTypeProvider = LibrarySortTypeProvider._();
+final librarySortTypeProvider = LibrarySortTypeProvider._();
 
 final class LibrarySortTypeProvider
     extends $NotifierProvider<LibrarySortType, LibrarySort> {
-  const LibrarySortTypeProvider._()
+  LibrarySortTypeProvider._()
     : super(
         from: null,
         argument: null,
@@ -48,7 +48,6 @@ abstract class _$LibrarySortType extends $Notifier<LibrarySort> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<LibrarySort, LibrarySort>;
     final element =
         ref.element
@@ -58,16 +57,16 @@ abstract class _$LibrarySortType extends $Notifier<LibrarySort> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(LocalLibrary)
-const localLibraryProvider = LocalLibraryProvider._();
+final localLibraryProvider = LocalLibraryProvider._();
 
 final class LocalLibraryProvider
     extends $AsyncNotifierProvider<LocalLibrary, LocalLibraryItem> {
-  const LocalLibraryProvider._()
+  LocalLibraryProvider._()
     : super(
         from: null,
         argument: null,
@@ -93,7 +92,6 @@ abstract class _$LocalLibrary extends $AsyncNotifier<LocalLibraryItem> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref =
         this.ref as $Ref<AsyncValue<LocalLibraryItem>, LocalLibraryItem>;
     final element =
@@ -104,16 +102,16 @@ abstract class _$LocalLibrary extends $AsyncNotifier<LocalLibraryItem> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(SupportedFormats)
-const supportedFormatsProvider = SupportedFormatsProvider._();
+final supportedFormatsProvider = SupportedFormatsProvider._();
 
 final class SupportedFormatsProvider
     extends $AsyncNotifierProvider<SupportedFormats, FormatInfo> {
-  const SupportedFormatsProvider._()
+  SupportedFormatsProvider._()
     : super(
         from: null,
         argument: null,
@@ -139,7 +137,6 @@ abstract class _$SupportedFormats extends $AsyncNotifier<FormatInfo> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<AsyncValue<FormatInfo>, FormatInfo>;
     final element =
         ref.element
@@ -149,6 +146,6 @@ abstract class _$SupportedFormats extends $AsyncNotifier<FormatInfo> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

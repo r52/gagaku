@@ -804,6 +804,14 @@ sealed class SourceVersion with _$SourceVersion {
   }
 
   String? getBaseUrl() {
+    final hosts = GagakuData().knownHosts;
+
+    if (hosts.containsKey(id)) {
+      return hosts[id];
+    }
+
+    // Best guess
+
     RegExp exp = RegExp(r'((https:\/\/)?\w+\.\w+)');
 
     String? result = switch (this) {
@@ -942,6 +950,15 @@ class NullableContentRatingParser
 
 // ignore: constant_identifier_names
 enum ContentRating { EVERYONE, MATURE, ADULT }
+
+@freezed
+abstract class SortingOption with _$SortingOption {
+  const factory SortingOption({required String id, required String label}) =
+      _SortingOption;
+
+  factory SortingOption.fromJson(Map<String, dynamic> json) =>
+      _$SortingOptionFromJson(json);
+}
 
 @freezed
 abstract class SearchQuery with _$SearchQuery {

@@ -10,7 +10,7 @@ part of 'reader.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(_fetchChapterData)
-const _fetchChapterDataProvider = _FetchChapterDataFamily._();
+final _fetchChapterDataProvider = _FetchChapterDataFamily._();
 
 final class _FetchChapterDataProvider
     extends
@@ -20,7 +20,7 @@ final class _FetchChapterDataProvider
           FutureOr<ReaderData>
         >
     with $FutureModifier<ReaderData>, $FutureProvider<ReaderData> {
-  const _FetchChapterDataProvider._({
+  _FetchChapterDataProvider._({
     required _FetchChapterDataFamily super.from,
     required String super.argument,
   }) : super(
@@ -67,7 +67,7 @@ String _$_fetchChapterDataHash() => r'bd8f9de01ae3994fb8c48e31214f6d5cd6d7ed42';
 
 final class _FetchChapterDataFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<ReaderData>, String> {
-  const _FetchChapterDataFamily._()
+  _FetchChapterDataFamily._()
     : super(
         retry: noRetry,
         name: r'_fetchChapterDataProvider',
@@ -84,7 +84,7 @@ final class _FetchChapterDataFamily extends $Family
 }
 
 @ProviderFor(_fetchChapterPages)
-const _fetchChapterPagesProvider = _FetchChapterPagesFamily._();
+final _fetchChapterPagesProvider = _FetchChapterPagesFamily._();
 
 final class _FetchChapterPagesProvider
     extends
@@ -94,7 +94,7 @@ final class _FetchChapterPagesProvider
           FutureOr<List<ReaderPage>>
         >
     with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {
-  const _FetchChapterPagesProvider._({
+  _FetchChapterPagesProvider._({
     required _FetchChapterPagesFamily super.from,
     required Chapter super.argument,
   }) : super(
@@ -143,7 +143,7 @@ String _$_fetchChapterPagesHash() =>
 
 final class _FetchChapterPagesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, Chapter> {
-  const _FetchChapterPagesFamily._()
+  _FetchChapterPagesFamily._()
     : super(
         retry: noRetry,
         name: r'_fetchChapterPagesProvider',

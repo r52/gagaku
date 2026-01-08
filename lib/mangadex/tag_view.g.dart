@@ -10,12 +10,12 @@ part of 'tag_view.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(_fetchTagFromId)
-const _fetchTagFromIdProvider = _FetchTagFromIdFamily._();
+final _fetchTagFromIdProvider = _FetchTagFromIdFamily._();
 
 final class _FetchTagFromIdProvider
     extends $FunctionalProvider<AsyncValue<Tag>, Tag, FutureOr<Tag>>
     with $FutureModifier<Tag>, $FutureProvider<Tag> {
-  const _FetchTagFromIdProvider._({
+  _FetchTagFromIdProvider._({
     required _FetchTagFromIdFamily super.from,
     required String super.argument,
   }) : super(
@@ -62,7 +62,7 @@ String _$_fetchTagFromIdHash() => r'2c3e3ce63b6f16972e9614f7e4b35c823accb4b8';
 
 final class _FetchTagFromIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Tag>, String> {
-  const _FetchTagFromIdFamily._()
+  _FetchTagFromIdFamily._()
     : super(
         retry: noRetry,
         name: r'_fetchTagFromIdProvider',
@@ -79,7 +79,7 @@ final class _FetchTagFromIdFamily extends $Family
 }
 
 @ProviderFor(_trendingThisYear)
-const _trendingThisYearProvider = _TrendingThisYearFamily._();
+final _trendingThisYearProvider = _TrendingThisYearFamily._();
 
 final class _TrendingThisYearProvider
     extends
@@ -89,7 +89,7 @@ final class _TrendingThisYearProvider
           FutureOr<List<Manga>>
         >
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
-  const _TrendingThisYearProvider._({
+  _TrendingThisYearProvider._({
     required _TrendingThisYearFamily super.from,
     required Tag super.argument,
   }) : super(
@@ -137,7 +137,7 @@ String _$_trendingThisYearHash() => r'47ab90f1630dc5d55dd7ae5fea6f357bf4b6b497';
 
 final class _TrendingThisYearFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Manga>>, Tag> {
-  const _TrendingThisYearFamily._()
+  _TrendingThisYearFamily._()
     : super(
         retry: noRetry,
         name: r'_trendingThisYearProvider',
@@ -154,7 +154,7 @@ final class _TrendingThisYearFamily extends $Family
 }
 
 @ProviderFor(_recentlyAdded)
-const _recentlyAddedProvider = _RecentlyAddedFamily._();
+final _recentlyAddedProvider = _RecentlyAddedFamily._();
 
 final class _RecentlyAddedProvider
     extends
@@ -164,7 +164,7 @@ final class _RecentlyAddedProvider
           FutureOr<List<Manga>>
         >
     with $FutureModifier<List<Manga>>, $FutureProvider<List<Manga>> {
-  const _RecentlyAddedProvider._({
+  _RecentlyAddedProvider._({
     required _RecentlyAddedFamily super.from,
     required Tag super.argument,
   }) : super(
@@ -212,7 +212,7 @@ String _$_recentlyAddedHash() => r'db80c62e64ad17d0dc404af963c83b475bd891dd';
 
 final class _RecentlyAddedFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Manga>>, Tag> {
-  const _RecentlyAddedFamily._()
+  _RecentlyAddedFamily._()
     : super(
         retry: noRetry,
         name: r'_recentlyAddedProvider',

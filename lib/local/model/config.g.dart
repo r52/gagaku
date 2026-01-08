@@ -22,11 +22,11 @@ Map<String, dynamic> _$LocalLibConfigToJson(_LocalLibConfig instance) =>
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(LocalConfig)
-const localConfigProvider = LocalConfigProvider._();
+final localConfigProvider = LocalConfigProvider._();
 
 final class LocalConfigProvider
     extends $NotifierProvider<LocalConfig, LocalLibConfig> {
-  const LocalConfigProvider._()
+  LocalConfigProvider._()
     : super(
         from: null,
         argument: null,
@@ -60,7 +60,6 @@ abstract class _$LocalConfig extends $Notifier<LocalLibConfig> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<LocalLibConfig, LocalLibConfig>;
     final element =
         ref.element
@@ -70,6 +69,6 @@ abstract class _$LocalConfig extends $Notifier<LocalLibConfig> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

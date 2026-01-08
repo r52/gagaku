@@ -10,7 +10,7 @@ part of 'reader.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(_fetchWebChapterInfo)
-const _fetchWebChapterInfoProvider = _FetchWebChapterInfoFamily._();
+final _fetchWebChapterInfoProvider = _FetchWebChapterInfoFamily._();
 
 final class _FetchWebChapterInfoProvider
     extends
@@ -20,7 +20,7 @@ final class _FetchWebChapterInfoProvider
           FutureOr<WebReaderData>
         >
     with $FutureModifier<WebReaderData>, $FutureProvider<WebReaderData> {
-  const _FetchWebChapterInfoProvider._({
+  _FetchWebChapterInfoProvider._({
     required _FetchWebChapterInfoFamily super.from,
     required SourceHandler super.argument,
   }) : super(
@@ -69,7 +69,7 @@ String _$_fetchWebChapterInfoHash() =>
 
 final class _FetchWebChapterInfoFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<WebReaderData>, SourceHandler> {
-  const _FetchWebChapterInfoFamily._()
+  _FetchWebChapterInfoFamily._()
     : super(
         retry: noRetry,
         name: r'_fetchWebChapterInfoProvider',
@@ -86,7 +86,7 @@ final class _FetchWebChapterInfoFamily extends $Family
 }
 
 @ProviderFor(_getPages)
-const _getPagesProvider = _GetPagesFamily._();
+final _getPagesProvider = _GetPagesFamily._();
 
 final class _GetPagesProvider
     extends
@@ -96,7 +96,7 @@ final class _GetPagesProvider
           FutureOr<List<ReaderPage>>
         >
     with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {
-  const _GetPagesProvider._({
+  _GetPagesProvider._({
     required _GetPagesFamily super.from,
     required dynamic super.argument,
   }) : super(
@@ -144,7 +144,7 @@ String _$_getPagesHash() => r'baf00fe9575de9570c73445277b0e4a8b8c6ace6';
 
 final class _GetPagesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, dynamic> {
-  const _GetPagesFamily._()
+  _GetPagesFamily._()
     : super(
         retry: noRetry,
         name: r'_getPagesProvider',
@@ -161,7 +161,7 @@ final class _GetPagesFamily extends $Family
 }
 
 @ProviderFor(_getSourcePages)
-const _getSourcePagesProvider = _GetSourcePagesFamily._();
+final _getSourcePagesProvider = _GetSourcePagesFamily._();
 
 final class _GetSourcePagesProvider
     extends
@@ -171,7 +171,7 @@ final class _GetSourcePagesProvider
           FutureOr<List<ReaderPage>>
         >
     with $FutureModifier<List<ReaderPage>>, $FutureProvider<List<ReaderPage>> {
-  const _GetSourcePagesProvider._({
+  _GetSourcePagesProvider._({
     required _GetSourcePagesFamily super.from,
     required (dynamic, SourceHandler) super.argument,
   }) : super(
@@ -223,7 +223,7 @@ final class _GetSourcePagesFamily extends $Family
           FutureOr<List<ReaderPage>>,
           (dynamic, SourceHandler)
         > {
-  const _GetSourcePagesFamily._()
+  _GetSourcePagesFamily._()
     : super(
         retry: noRetry,
         name: r'_getSourcePagesProvider',

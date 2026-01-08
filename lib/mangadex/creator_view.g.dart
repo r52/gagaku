@@ -10,7 +10,7 @@ part of 'creator_view.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(_fetchCreatorFromId)
-const _fetchCreatorFromIdProvider = _FetchCreatorFromIdFamily._();
+final _fetchCreatorFromIdProvider = _FetchCreatorFromIdFamily._();
 
 final class _FetchCreatorFromIdProvider
     extends
@@ -20,7 +20,7 @@ final class _FetchCreatorFromIdProvider
           FutureOr<CreatorType>
         >
     with $FutureModifier<CreatorType>, $FutureProvider<CreatorType> {
-  const _FetchCreatorFromIdProvider._({
+  _FetchCreatorFromIdProvider._({
     required _FetchCreatorFromIdFamily super.from,
     required String super.argument,
   }) : super(
@@ -69,7 +69,7 @@ String _$_fetchCreatorFromIdHash() =>
 
 final class _FetchCreatorFromIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<CreatorType>, String> {
-  const _FetchCreatorFromIdFamily._()
+  _FetchCreatorFromIdFamily._()
     : super(
         retry: noRetry,
         name: r'_fetchCreatorFromIdProvider',

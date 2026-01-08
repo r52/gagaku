@@ -355,6 +355,12 @@ Map<String, dynamic> _$OAuthPKCEResponseToJson(OAuthPKCEResponse instance) =>
       'type': instance.$type,
     };
 
+_SortingOption _$SortingOptionFromJson(Map<String, dynamic> json) =>
+    _SortingOption(id: json['id'] as String, label: json['label'] as String);
+
+Map<String, dynamic> _$SortingOptionToJson(_SortingOption instance) =>
+    <String, dynamic>{'id': instance.id, 'label': instance.label};
+
 _SearchQuery _$SearchQueryFromJson(Map<String, dynamic> json) => _SearchQuery(
   title: json['title'] as String,
   filters:

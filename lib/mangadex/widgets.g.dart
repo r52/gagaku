@@ -10,11 +10,11 @@ part of 'widgets.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(_MangaListView)
-const _mangaListViewProvider = _MangaListViewProvider._();
+final _mangaListViewProvider = _MangaListViewProvider._();
 
 final class _MangaListViewProvider
     extends $NotifierProvider<_MangaListView, MangaListView> {
-  const _MangaListViewProvider._()
+  _MangaListViewProvider._()
     : super(
         from: null,
         argument: null,
@@ -48,7 +48,6 @@ abstract class _$MangaListView extends $Notifier<MangaListView> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<MangaListView, MangaListView>;
     final element =
         ref.element
@@ -58,17 +57,17 @@ abstract class _$MangaListView extends $Notifier<MangaListView> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(readBorderTheme)
-const readBorderThemeProvider = ReadBorderThemeFamily._();
+final readBorderThemeProvider = ReadBorderThemeFamily._();
 
 final class ReadBorderThemeProvider
     extends $FunctionalProvider<BoxDecoration, BoxDecoration, BoxDecoration>
     with $Provider<BoxDecoration> {
-  const ReadBorderThemeProvider._({
+  ReadBorderThemeProvider._({
     required ReadBorderThemeFamily super.from,
     required (String, String) super.argument,
   }) : super(
@@ -79,7 +78,7 @@ final class ReadBorderThemeProvider
          $allTransitiveDependencies: null,
        );
 
-  static const $allTransitiveDependencies0 = themeProvider;
+  static final $allTransitiveDependencies0 = themeProvider;
 
   @override
   String debugGetCreateSourceHash() => _$readBorderThemeHash();
@@ -125,12 +124,12 @@ String _$readBorderThemeHash() => r'af9b9b235f3f1d51a702fa382c66086fb8869b1d';
 
 final class ReadBorderThemeFamily extends $Family
     with $FunctionalFamilyOverride<BoxDecoration, (String, String)> {
-  const ReadBorderThemeFamily._()
+  ReadBorderThemeFamily._()
     : super(
         retry: null,
         name: r'readBorderThemeProvider',
-        dependencies: const <ProviderOrFamily>[themeProvider],
-        $allTransitiveDependencies: const <ProviderOrFamily>[
+        dependencies: <ProviderOrFamily>[themeProvider],
+        $allTransitiveDependencies: <ProviderOrFamily>[
           ReadBorderThemeProvider.$allTransitiveDependencies0,
         ],
         isAutoDispose: true,
