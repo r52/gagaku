@@ -87,31 +87,27 @@ class GagakuData {
     );
 
     final blockerUri = Uri.parse(_blockers);
+    final hostsUri = Uri.parse(_knownHosts);
 
     try {
-      final response = await http.get(blockerUri);
+      final (blockerResp, hostsResp) = await (
+        http.get(blockerUri),
+        http.get(hostsUri),
+      ).wait;
 
-      if (response.statusCode != 200) {
+      if (blockerResp.statusCode != 200) {
         final err = "Failed to load $blockerUri";
         logger.e(err);
       } else {
         LineSplitter ls = LineSplitter();
-        blockers = ls.convert(response.body);
+        blockers = ls.convert(blockerResp.body);
       }
-    } catch (e) {
-      logger.e(e);
-    }
 
-    final hostsUri = Uri.parse(_knownHosts);
-
-    try {
-      final response = await http.get(hostsUri);
-
-      if (response.statusCode != 200) {
+      if (hostsResp.statusCode != 200) {
         final err = "Failed to load $hostsUri";
         logger.e(err);
       } else {
-        knownHosts = json.decode(response.body);
+        knownHosts = json.decode(hostsResp.body);
       }
     } catch (e) {
       logger.e(e);
