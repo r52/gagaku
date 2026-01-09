@@ -1033,7 +1033,7 @@ class ExtensionSource extends _$ExtensionSource {
 
       // Get tags
       final result = await controller.callAsyncJavaScript(
-        functionBody: "return await ${source.id}?.getSearchFilters();",
+        functionBody: "return await ${source.id}.getSearchFilters();",
       );
 
       if (result != null && result.value != null) {
@@ -1046,7 +1046,7 @@ class ExtensionSource extends _$ExtensionSource {
       final params = SearchQuery(title: "").toJson();
       final sortopts = await controller.callAsyncJavaScript(
         arguments: {'query': params},
-        functionBody: "return await ${source.id}?.getSortingOptions();",
+        functionBody: "return await ${source.id}.getSortingOptions?.();",
       );
 
       if (sortopts != null && sortopts.value != null) {
@@ -1055,7 +1055,9 @@ class ExtensionSource extends _$ExtensionSource {
       }
 
       logger.d("Extension ${source.name} ready");
-      completer.complete();
+      if (!completer.isCompleted) {
+        completer.complete();
+      }
     } catch (e) {
       logger.e('(${source.id}) Error during WebView load stop', error: e);
       completer.completeError(e);

@@ -225,8 +225,8 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
 
                     setState(() {
                       query = query != null
-                          ? query!.copyWith(title: term.toLowerCase())
-                          : SearchQuery(title: term.toLowerCase());
+                          ? query!.copyWith(title: term.trim().toLowerCase())
+                          : SearchQuery(title: term.trim().toLowerCase());
                     });
                     _pagingController.refresh();
                   },
@@ -286,8 +286,8 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
 
                 setState(() {
                   query = query != null
-                      ? query!.copyWith(title: term.toLowerCase())
-                      : SearchQuery(title: term.toLowerCase());
+                      ? query!.copyWith(title: term.trim().toLowerCase())
+                      : SearchQuery(title: term.trim().toLowerCase());
                 });
                 _pagingController.refresh();
               },
