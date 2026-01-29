@@ -8,17 +8,17 @@ on:
   workflow_dispatch:
     inputs:
       tagName:
-        description: 'Tag name'
+        description: "Tag name"
         type: string
-        default: ''
+        default: ""
         required: false
       doRelease:
-        description: 'Publish new release'
+        description: "Publish new release"
         type: boolean
         default: false
         required: false
       doDevPreview:
-        description: 'Publish new dev preview'
+        description: "Publish new dev preview"
         type: boolean
         default: false
         required: false
@@ -60,7 +60,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: "stable"
+          channel: "beta"
           cache: true
 
       - name: Set up Packages (Linux)

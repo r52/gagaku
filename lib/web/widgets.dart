@@ -164,7 +164,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
 
   final PagingController<dynamic, HistoryLink>? controller;
 
-  int? _findChildIndexCb(Key? key) {
+  int? _findItemIndexCb(Key? key) {
     final valueKey = key as ValueKey<String>;
     final val = items!.indexWhere((i) => i.url == valueKey.value);
     return val >= 0 ? val : null;
@@ -235,7 +235,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
           SliverList.separated(
             itemCount: items!.length,
             separatorBuilder: (_, _) => const SizedBox(height: 4.0),
-            findChildIndexCallback: _findChildIndexCb,
+            findItemIndexCallback: _findItemIndexCb,
             itemBuilder: (context, index) {
               final tr = context.t;
               final item = items![index];
@@ -298,7 +298,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
               crossAxisSpacing: 8,
               childAspectRatio: 0.7,
             ),
-            findChildIndexCallback: _findChildIndexCb,
+            findChildIndexCallback: _findItemIndexCb,
             itemBuilder: (context, index) {
               final item = items![index];
               return GridMangaItem(

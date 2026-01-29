@@ -607,7 +607,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
               ],
             ),
             SliverList.separated(
-              findChildIndexCallback: (key) {
+              findItemIndexCallback: (key) {
                 final valueKey = key as ValueKey<int>;
                 final val = manga.chapters.indexWhere(
                   (i) => i.hashCode == valueKey.value,

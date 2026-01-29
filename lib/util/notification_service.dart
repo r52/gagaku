@@ -43,12 +43,13 @@ class NotificationService {
     );
 
     await plugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (
-        NotificationResponse notificationResponse,
-      ) async {
-        debugPrint('Notification received: ${notificationResponse.payload}');
-      },
+      settings: initializationSettings,
+      onDidReceiveNotificationResponse:
+          (NotificationResponse notificationResponse) async {
+            debugPrint(
+              'Notification received: ${notificationResponse.payload}',
+            );
+          },
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
 
@@ -104,7 +105,12 @@ class NotificationService {
     );
 
     try {
-      await plugin.show(0, title, body, notificationDetails);
+      await plugin.show(
+        id: 0,
+        title: title,
+        body: body,
+        notificationDetails: notificationDetails,
+      );
     } catch (ex) {
       debugPrint('Error showing notification: $ex');
     }
