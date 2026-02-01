@@ -33,13 +33,16 @@ Gagaku does NOT feature:
 
 ## Building
 
-Install [Flutter](https://flutter.dev/) and all of its requirements for the platform(s) you wish to build for
+Install [Flutter](https://flutter.dev/) and all of its requirements for the platform(s) you wish to build for. Optionally install [Node.js](https://nodejs.org/) to build the extension host.
 
 ```bash
+# Build extension host (optional)
 cd extension/
 npm ci
 npm run deploy
 cd ..
+
+# Build the app
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 flutter build <windows/linux/apk etc>
