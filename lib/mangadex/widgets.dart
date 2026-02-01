@@ -72,7 +72,7 @@ BoxDecoration readBorderTheme(Ref ref, String mangaId, String chapterId) {
     bool? isRead = ref.watch(
       readChaptersProvider(me.id).select(
         (value) => switch (value) {
-          AsyncValue(value: final data?) =>
+          AsyncValue<Map<String, ReadChapterSet>>(value: final data?) =>
             data[mangaId]?.contains(chapterId) == true,
           _ => null,
         },
@@ -268,7 +268,7 @@ class MarkReadButton extends ConsumerWidget {
     bool? isRead = ref.watch(
       readChaptersProvider(me.id).select(
         (value) => switch (value) {
-          AsyncValue(value: final data?) =>
+          AsyncValue<Map<String, ReadChapterSet>>(value: final data?) =>
             data[manga.id]?.contains(chapter.id) == true,
           _ => null,
         },
@@ -841,7 +841,7 @@ class ChapterButtonWidget extends HookWidget {
         final comments = ref.watch(
           chapterStatsProvider.select(
             (value) => switch (value) {
-              AsyncValue(value: final data?)
+              AsyncValue<Map<String, ChapterStatistics>>(value: final data?)
                   when data.containsKey(chapter.id) =>
                 data[chapter.id]?.comments,
               _ => null,
@@ -1552,7 +1552,7 @@ class ChapterTitle extends ConsumerWidget {
       bool? isRead = ref.watch(
         readChaptersProvider(me.id).select(
           (value) => switch (value) {
-            AsyncValue(value: final data?) =>
+            AsyncValue<Map<String, ReadChapterSet>>(value: final data?) =>
               data[manga.id]?.contains(chapter.id) == true,
             _ => null,
           },
@@ -1632,7 +1632,8 @@ class MangaStatisticsRow extends HookConsumerWidget {
     final statsProvider = ref.watch(
       statisticsProvider.select(
         (map) => switch (map) {
-          AsyncValue(value: final stats?) when stats.containsKey(manga.id) =>
+          AsyncValue<Map<String, MangaStatistics>>(value: final stats?)
+              when stats.containsKey(manga.id) =>
             stats[manga.id],
           _ => null,
         },

@@ -504,7 +504,7 @@ class WebSourceInfo with _$WebSourceInfo {
     required this.name,
     required this.repo,
     this.baseUrl,
-    this.version = SupportedVersion.v0_8,
+    this.version = SupportedVersion.v0_9,
     required this.icon,
     this.capabilities = const [SourceIntents.mangaChapters],
   });
