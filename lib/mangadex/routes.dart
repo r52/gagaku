@@ -1,4 +1,4 @@
-// ignore_for_file: provider_dependencies
+// ignore_for_file: riverpod_lint/provider_dependencies
 part of 'package:gagaku/routes.dart';
 
 final GlobalKey<NavigatorState> mdshellNavigatorKey =

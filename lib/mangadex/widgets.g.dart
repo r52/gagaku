@@ -120,7 +120,7 @@ final class ReadBorderThemeProvider
   }
 }
 
-String _$readBorderThemeHash() => r'af9b9b235f3f1d51a702fa382c66086fb8869b1d';
+String _$readBorderThemeHash() => r'64725a66b413e38cfec7a966ce30e989bd8eed69';
 
 final class ReadBorderThemeFamily extends $Family
     with $FunctionalFamilyOverride<BoxDecoration, (String, String)> {

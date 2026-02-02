@@ -8,7 +8,7 @@ import 'package:http/io_client.dart';
 import 'package:http/retry.dart';
 
 const baseUserAgent =
-    'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.52 Mobile Safari/537.36';
+    'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.7559.110 Mobile Safari/537.36';
 
 String getUserAgent([bool useCustomUA = false]) {
   return useCustomUA ? GagakuData().gagakuUserAgent : baseUserAgent;

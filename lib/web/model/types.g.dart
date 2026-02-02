@@ -35,7 +35,7 @@ WebSourceInfo _$WebSourceInfoFromJson(Map<String, dynamic> json) =>
       baseUrl: json['baseUrl'] as String?,
       version:
           $enumDecodeNullable(_$SupportedVersionEnumMap, json['version']) ??
-          SupportedVersion.v0_8,
+          SupportedVersion.v0_9,
       icon: json['icon'] as String,
       capabilities:
           (json['capabilities'] as List<dynamic>?)

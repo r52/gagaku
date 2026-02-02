@@ -460,6 +460,9 @@ class TranslationsWebSourcesEn {
 
 	/// en: 'Save History?'
 	String get saveHistory => 'Save History?';
+
+	/// en: 'This extension requires CF bypass. It may not work correctly Try connecting to this page from a browser before installing this extension'
+	String get cfRequired => 'This extension requires CF bypass. It may not work correctly\nTry connecting to this page from a browser before installing this extension';
 }
 
 // Path: search
@@ -1865,6 +1868,7 @@ extension on Translations {
 			'webSources.searchWithExt' => 'Search with extensions',
 			'webSources.historyHere' => 'Your manga browsing history appears here',
 			'webSources.saveHistory' => 'Save History?',
+			'webSources.cfRequired' => 'This extension requires CF bypass. It may not work correctly\nTry connecting to this page from a browser before installing this extension',
 			'search.text' => 'Search',
 			'search.arg' => ({required Object arg}) => 'Search ${arg}',
 			'search.filters' => 'Search Filters',

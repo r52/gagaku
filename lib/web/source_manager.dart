@@ -84,7 +84,7 @@ class SourceManager extends HookConsumerWidget {
     final installed = ref.watch(
       installedSourcesProvider.select(
         (value) => switch (value) {
-          AsyncValue(value: final data?) => data,
+          AsyncValue<List<WebSourceInfo>>(value: final data?) => data,
           _ => <WebSourceInfo>[],
         },
       ),
@@ -123,11 +123,13 @@ class SourceManager extends HookConsumerWidget {
 
                       final capabilities = source.getCapabilities();
 
-                      final supportedSource =
-                          capabilities.firstWhereOrNull(
-                            (intent) => intent == SourceIntents.mangaChapters,
-                          ) !=
-                          null;
+                      final supportedSource = capabilities.contains(
+                        SourceIntents.mangaChapters,
+                      );
+
+                      final cfRequired = capabilities.contains(
+                        SourceIntents.cloudflareBypassRequired,
+                      );
 
                       if (isInstalled) {
                         orphaned.removeWhere(
@@ -144,6 +146,7 @@ class SourceManager extends HookConsumerWidget {
                           author: source.getAuthor(),
                           version: source.version,
                           badges: source.getBadges(),
+                          cfRequired: cfRequired,
                           trailing: supportedSource
                               ? Switch(
                                   activeTrackColor: Colors.green,
@@ -201,9 +204,19 @@ class SourceManager extends HookConsumerWidget {
                                     }
                                   },
                                 )
-                              : Tooltip(
-                                  message: tr.errors.unsupportedSource,
-                                  child: Icon(Icons.error),
+                              : Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 5.0,
+                                    right: 10.0,
+                                  ),
+                                  child: Tooltip(
+                                    message: tr.errors.unsupportedSource,
+                                    triggerMode: TooltipTriggerMode.tap,
+                                    child: Icon(
+                                      Icons.error,
+                                      color: theme.colorScheme.error,
+                                    ),
+                                  ),
                                 ),
                         ),
                       );
@@ -291,6 +304,7 @@ class _SourceItem extends StatelessWidget {
     required this.author,
     required this.version,
     required this.badges,
+    this.cfRequired = false,
     this.trailing,
   });
 
@@ -300,10 +314,12 @@ class _SourceItem extends StatelessWidget {
   final String author;
   final String version;
   final List<SourceBadge> badges;
+  final bool cfRequired;
   final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: SizedBox(
@@ -324,6 +340,15 @@ class _SourceItem extends StatelessWidget {
                 ),
               ),
             ),
+            if (cfRequired)
+              Padding(
+                padding: const EdgeInsets.only(top: 5.0, right: 5.0),
+                child: Tooltip(
+                  message: tr.webSources.cfRequired,
+                  triggerMode: TooltipTriggerMode.tap,
+                  child: Icon(Icons.warning),
+                ),
+              ),
             ?trailing,
           ],
         ),

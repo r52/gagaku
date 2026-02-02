@@ -93,7 +93,7 @@ export class MockRequestManager implements RequestManager {
   constructor(selectorRegistry: SelectorRegistry) {
     this.selectorRegistry = selectorRegistry
     this.registeredInterceptors = []
-    this.userAgent = 'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.52 Mobile Safari/537.36'
+    this.userAgent = 'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.7559.110 Mobile Safari/537.36'
   }
 
   registerInterceptor(

@@ -177,7 +177,8 @@
     "loadInstalledSourcesError": "Error loading installed sources",
     "searchWithExt": "Search with extensions",
     "historyHere": "Your manga browsing history appears here",
-    "saveHistory": "Save History?"
+    "saveHistory": "Save History?",
+    "cfRequired": "This extension requires CF bypass. It may not work correctly\nTry connecting to this page from a browser before installing this extension"
   },
   "search": {
     "text": "Search",
