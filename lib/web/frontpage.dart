@@ -109,34 +109,43 @@ class WebSourceFrontPage extends HookConsumerWidget {
       }
     }
 
-    return CustomScrollView(
-      controller: scrollController,
-      slivers: [
-        SliverAppBar(
-          automaticallyImplyLeading: false,
-          pinned: true,
-          title: Text(
-            tr.webSources.homepages,
-            style: CommonTextStyles.twentyfour,
+    return RefreshIndicator(
+      onRefresh: () async {
+        // Invalidate all loaded sources
+        ref.invalidate(extensionSourceProvider, asReload: true);
+        return;
+      },
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        scrollBehavior: const MouseTouchScrollBehavior(),
+        controller: scrollController,
+        slivers: [
+          SliverAppBar(
+            automaticallyImplyLeading: false,
+            pinned: true,
+            title: Text(
+              tr.webSources.homepages,
+              style: CommonTextStyles.twentyfour,
+            ),
           ),
-        ),
-        if (homepageSources.isEmpty)
-          SliverToBoxAdapter(
-            child: Center(child: Text(tr.webSources.noSourcesWarning)),
-          ),
-        if (homepageSources.isNotEmpty)
-          SliverList.builder(
-            itemCount: homepageSources.length,
-            itemBuilder: (context, index) {
-              final item = homepageSources[index];
+          if (homepageSources.isEmpty)
+            SliverToBoxAdapter(
+              child: Center(child: Text(tr.webSources.noSourcesWarning)),
+            ),
+          if (homepageSources.isNotEmpty)
+            SliverList.builder(
+              itemCount: homepageSources.length,
+              itemBuilder: (context, index) {
+                final item = homepageSources[index];
 
-              return _ExtensionHomeCard(
-                key: ValueKey(item.id),
-                extensionInfo: item,
-              );
-            },
-          ),
-      ],
+                return _ExtensionHomeCard(
+                  key: ValueKey(item.id),
+                  extensionInfo: item,
+                );
+              },
+            ),
+        ],
+      ),
     );
   }
 }

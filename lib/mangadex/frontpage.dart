@@ -231,23 +231,20 @@ class _FrontPageWidget extends HookConsumerWidget {
 
         return;
       },
-      child: ScrollConfiguration(
-        behavior: const MouseTouchScrollBehavior(),
-        child: CustomScrollView(
-          scrollBehavior: const MouseTouchScrollBehavior(),
-          controller: scrollController,
-          slivers: [
-            MangaDexSliverAppBar(controller: scrollController),
-            SliverList.separated(
-              itemCount: frontPageWidgets.length,
-              itemBuilder: (context, index) {
-                return frontPageWidgets[index];
-              },
-              separatorBuilder: (context, index) =>
-                  const SizedBox(height: 10.0),
-            ),
-          ],
-        ),
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        scrollBehavior: const MouseTouchScrollBehavior(),
+        controller: scrollController,
+        slivers: [
+          MangaDexSliverAppBar(controller: scrollController),
+          SliverList.separated(
+            itemCount: frontPageWidgets.length,
+            itemBuilder: (context, index) {
+              return frontPageWidgets[index];
+            },
+            separatorBuilder: (context, index) => const SizedBox(height: 10.0),
+          ),
+        ],
       ),
     );
   }
