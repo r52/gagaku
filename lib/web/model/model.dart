@@ -738,6 +738,8 @@ class ExtensionSource extends _$ExtensionSource {
   List<SortingOption>? _sortingOptions;
   final Map<String, SettingsForm> _forms = {};
 
+  Timer? _completeTimer;
+
   @override
   Future<WebSourceInfo> build(String sourceId) async {
     WebSourceInfo? source;
@@ -791,6 +793,12 @@ class ExtensionSource extends _$ExtensionSource {
       }
     }
 
+    _completeTimer = Timer(const Duration(seconds: 60), () async {
+      if (!completer.isCompleted) {
+        completer.completeError(Exception('$sourceId load timeout'));
+      }
+    });
+
     try {
       _view = HeadlessInAppWebView(
         initialUrlRequest: URLRequest(
@@ -826,12 +834,6 @@ class ExtensionSource extends _$ExtensionSource {
         onLoadStop: (controller, url) =>
             _onWebViewLoadStop(controller, url, source!, completer),
       );
-
-      Timer(const Duration(seconds: 60), () async {
-        if (!completer.isCompleted) {
-          completer.completeError(Exception('$sourceId load timeout'));
-        }
-      });
     } catch (e) {
       logger.w('Error creating extension view', error: e);
       completer.completeError(e);
@@ -842,9 +844,19 @@ class ExtensionSource extends _$ExtensionSource {
 
     ref.onDispose(() {
       _view?.dispose();
+      _completeTimer?.cancel();
+      _completeTimer = null;
+      _view = null;
+      _extensionBody = null;
+      _initialized = false;
+      _filters = null;
+      _sortingOptions = null;
+      _forms.clear();
     });
 
     _initialized = true;
+    _completeTimer?.cancel();
+    _completeTimer = null;
 
     return source;
   }
