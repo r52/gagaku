@@ -637,7 +637,7 @@ class DataProviderWhenWidget<T> extends ConsumerWidget {
 
         return errorlist;
       // ignore: riverpod_lint/async_value_nullable_pattern
-      case AsyncValue(value: final data?):
+      case AsyncValue(value: final data?, isLoading: false):
         return builder(context, data);
       case AsyncValue(:final progress):
         if (loadingBuilder != null) {
