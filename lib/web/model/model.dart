@@ -740,6 +740,8 @@ class ExtensionSource extends _$ExtensionSource {
 
   Timer? _completeTimer;
 
+  SortingOption? _currentSort;
+
   @override
   Future<WebSourceInfo> build(String sourceId) async {
     WebSourceInfo? source;
@@ -851,6 +853,7 @@ class ExtensionSource extends _$ExtensionSource {
       _initialized = false;
       _filters = null;
       _sortingOptions = null;
+      _currentSort = null;
       _forms.clear();
     });
 
@@ -1064,6 +1067,9 @@ class ExtensionSource extends _$ExtensionSource {
       if (sortopts != null && sortopts.value != null) {
         final ssec = sortopts.value as List<dynamic>;
         _sortingOptions = ssec.map((e) => SortingOption.fromJson(e)).toList();
+        _currentSort = (_sortingOptions != null && _sortingOptions!.isNotEmpty)
+            ? _sortingOptions!.first
+            : null;
       }
 
       logger.d("Extension ${source.name} ready");
@@ -1258,10 +1264,8 @@ return p;
 
     final params = query.toJson();
 
-    // TODO: support actual sorting options if they exist
-    final sortOp = (_sortingOptions != null && _sortingOptions!.isNotEmpty)
-        ? _sortingOptions!.first.toJson()
-        : null;
+    // If _sortingOptions is not null, sortOp cannot be null
+    final sortOp = _currentSort?.toJson();
 
     final result = await _controller?.callAsyncJavaScript(
       arguments: {'query': params, 'metadata': metadata, 'sortOp': sortOp},
@@ -1396,6 +1400,20 @@ return p;
     }
 
     return result;
+  }
+
+  SortingOption? getCurrentSort() {
+    return _currentSort;
+  }
+
+  void setCurrentSort(SortingOption? sort) async {
+    _currentSort = sort;
+  }
+
+  Future<List<SortingOption>?> getSortingOptions() async {
+    await future;
+    final options = _sortingOptions?.map((e) => e.copyWith()).toList();
+    return options;
   }
 
   Future<List<SearchFilter>?> getFilters() async {

@@ -66,6 +66,7 @@ class WebMangaListWidget extends HookConsumerWidget {
     this.noController = false,
     this.showToggle = true,
     this.isLoading = false,
+    this.trailingBeforeSlider,
   });
 
   final Widget? title;
@@ -77,6 +78,7 @@ class WebMangaListWidget extends HookConsumerWidget {
   final bool noController;
   final bool showToggle;
   final bool isLoading;
+  final Widget? trailingBeforeSlider;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -106,6 +108,7 @@ class WebMangaListWidget extends HookConsumerWidget {
                   children: [
                     ?title,
                     const Spacer(),
+                    ?trailingBeforeSlider,
                     const GridExtentSlider(),
                     if (showToggle)
                       SegmentedButton<WebMangaListView>(
