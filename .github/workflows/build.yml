@@ -37,9 +37,9 @@ jobs:
           - builder: android
             os: ubuntu-latest
             pkg: apk
-          - builder: linux
-            os: ubuntu-latest
-            pkg: linux
+          # - builder: linux
+          #   os: ubuntu-latest
+          #   pkg: linux
 
     name: Build Gagaku
     runs-on: ${{ matrix.os }}
