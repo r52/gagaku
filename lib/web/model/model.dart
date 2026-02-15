@@ -795,7 +795,7 @@ class ExtensionSource extends _$ExtensionSource {
       }
     }
 
-    _completeTimer = Timer(const Duration(seconds: 60), () async {
+    _completeTimer = Timer(const Duration(seconds: 60), () {
       if (!completer.isCompleted) {
         completer.completeError(Exception('$sourceId load timeout'));
       }
@@ -1406,7 +1406,7 @@ return p;
     return _currentSort;
   }
 
-  void setCurrentSort(SortingOption? sort) async {
+  void setCurrentSort(SortingOption? sort) {
     _currentSort = sort;
   }
 

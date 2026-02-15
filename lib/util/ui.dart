@@ -636,6 +636,7 @@ class DataProviderWhenWidget<T> extends ConsumerWidget {
         }
 
         return errorlist;
+      // Explicitly showing the spinner here even if there is previous data
       // ignore: riverpod_lint/async_value_nullable_pattern
       case AsyncValue(value: final data?, isLoading: false):
         return builder(context, data);
