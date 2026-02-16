@@ -186,54 +186,58 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
             },
           ),
         ),
-        trailingBeforeSlider: HookBuilder(
-          builder: (context) {
-            final results = useMemoized(
-              () => ref
-                  .read(extensionSourceProvider(source.id).notifier)
-                  .getSortingOptions(),
-              [source],
-            );
-            final future = useFuture(results);
+        extraRow: [
+          HookBuilder(
+            builder: (context) {
+              final results = useMemoized(
+                () => ref
+                    .read(extensionSourceProvider(source.id).notifier)
+                    .getSortingOptions(),
+                [source],
+              );
+              final future = useFuture(results);
 
-            if (future.hasError) {
-              return const Center(child: Icon(Icons.error));
-            }
+              if (future.hasError) {
+                return const Center(child: Icon(Icons.error));
+              }
 
-            if (future.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
+              if (future.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-            final options = future.data;
+              final options = future.data;
 
-            if (options == null) {
-              return const SizedBox.shrink();
-            }
+              if (options == null) {
+                return const SizedBox.shrink();
+              }
 
-            return DropdownMenu<SortingOption>(
-              initialSelection: ref
-                  .read(extensionSourceProvider(source.id).notifier)
-                  .getCurrentSort(),
-              width: 200,
-              requestFocusOnTap: false,
-              enableSearch: false,
-              enableFilter: false,
-              dropdownMenuEntries: options
-                  .map((opt) => DropdownMenuEntry(value: opt, label: opt.label))
-                  .toList(),
-              onSelected: (SortingOption? opt) {
-                if (opt != null) {
-                  setState(() {
-                    ref
-                        .read(extensionSourceProvider(source.id).notifier)
-                        .setCurrentSort(opt);
-                  });
-                  _pagingController.refresh();
-                }
-              },
-            );
-          },
-        ),
+              return DropdownMenu<SortingOption>(
+                initialSelection: ref
+                    .read(extensionSourceProvider(source.id).notifier)
+                    .getCurrentSort(),
+                width: 200,
+                requestFocusOnTap: false,
+                enableSearch: false,
+                enableFilter: false,
+                dropdownMenuEntries: options
+                    .map(
+                      (opt) => DropdownMenuEntry(value: opt, label: opt.label),
+                    )
+                    .toList(),
+                onSelected: (SortingOption? opt) {
+                  if (opt != null) {
+                    setState(() {
+                      ref
+                          .read(extensionSourceProvider(source.id).notifier)
+                          .setCurrentSort(opt);
+                    });
+                    _pagingController.refresh();
+                  }
+                },
+              );
+            },
+          ),
+        ],
         leading: [
           SliverAppBar(
             leading: const BackButton(),
