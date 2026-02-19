@@ -265,8 +265,16 @@ class MangaDexModel {
       httpClient: _dio.clone(),
       tokenStorage: MangaDexTokenStorage(),
       refreshToken: (token, httpClient) => refreshToken(token),
-      shouldRefresh: (response) {
-        return response?.statusCode == 401 || _token?.isExpired != false;
+      shouldRefreshBeforeRequest: (requestOptions, token) {
+        bool? isExpired;
+
+        final expiresAt = token?.expiresAt;
+        if (expiresAt != null) {
+          final now = DateTime.now();
+          isExpired = expiresAt.isBefore(now);
+        }
+
+        return isExpired != false;
       },
     );
 

@@ -6,28 +6,16 @@ class OIDAuthToken extends OAuth2Token {
     required super.accessToken,
     super.tokenType,
     super.refreshToken,
-    super.expiresIn,
     required this.idToken,
+    int? expiresIn,
     DateTime? expiresAt,
-  }) : _expiresAt =
-           expiresAt ??
-           (expiresIn != null
-               ? DateTime.now().add(Duration(seconds: expiresIn))
-               : null);
+  }) : super(
+         issuedAt: DateTime.now(),
+         expiresIn:
+             expiresIn ?? expiresAt?.difference(DateTime.now()).inSeconds,
+       );
 
   final String idToken;
-  final DateTime? _expiresAt;
-
-  Duration? get toExpiry => _expiresAt?.difference(DateTime.now());
-  bool? get isExpired {
-    final exp = toExpiry;
-
-    if (exp == null) {
-      return null;
-    }
-
-    return exp.inSeconds <= 0;
-  }
 
   factory OIDAuthToken.fromTokenResponse(TokenResponse resp) {
     if (resp.accessToken == null) {
