@@ -100,7 +100,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
 
       final results = await ref
           .read(extensionSourceProvider(source.id).notifier)
-          .searchManga(query!, (metadata == _firstSearch) ? null : metadata);
+          .searchManga(query!, (pageKey == _firstSearch) ? null : pageKey);
 
       final m = results.items.map(
         (e) => HistoryLink.fromSearchReultItem(source, e),
@@ -228,11 +228,10 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                     .toList(),
                 onSelected: (SortingOption? opt) {
                   if (opt != null) {
-                    setState(() {
-                      ref
-                          .read(extensionSourceProvider(source.id).notifier)
-                          .setCurrentSort(opt);
-                    });
+                    ref
+                        .read(extensionSourceProvider(source.id).notifier)
+                        .setCurrentSort(opt);
+                    setState(() {});
                     _pagingController.refresh();
                   }
                 },
