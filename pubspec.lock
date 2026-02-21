@@ -141,10 +141,10 @@ packages:
     dependency: transitive
     description:
       name: built_value
-      sha256: "7931c90b84bc573fef103548e354258ae4c9d28d140e41961df6843c5d60d4d8"
+      sha256: "6ae8a6435a8c6520c7077b107e77f1fb4ba7009633259a4d49a8afd8e7efc5e9"
       url: "https://pub.dev"
     source: hosted
-    version: "8.12.3"
+    version: "8.12.4"
   cached_network_image:
     dependency: "direct main"
     description:
@@ -650,18 +650,18 @@ packages:
     dependency: transitive
     description:
       name: fresh
-      sha256: "9f470afc054fb39f63cfaefe63201f1aeb1b9356c497e4179a1235e5661ba378"
+      sha256: "1ad8a94fca17b8f3c30054167be90e2251bc27e39c0227e3fd4c152f8f4ba4ba"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.6.0"
   fresh_dio:
     dependency: "direct main"
     description:
       name: fresh_dio
-      sha256: "513ee133f4baf5e8fba040097b59dde142ea61f2c95f08b34373038d5b68d064"
+      sha256: "5d7c158b3520971b4ade41fa05303060e6b74a430d7450e6d5c3ea105a76b067"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.5.1"
   frontend_server_client:
     dependency: transitive
     description:
@@ -1601,10 +1601,10 @@ packages:
     dependency: "direct main"
     description:
       name: uuid
-      sha256: a11b666489b1954e01d992f3d601b1804a33937b5a8fe677bd26b8a9f96f96e8
+      sha256: "1fef9e8e11e2991bb773070d4656b7bd5d850967a2456cfc83cf47925ba79489"
       url: "https://pub.dev"
     source: hosted
-    version: "4.5.2"
+    version: "4.5.3"
   vector_math:
     dependency: transitive
     description:
