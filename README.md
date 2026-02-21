@@ -14,6 +14,8 @@ Gagaku is currently a work-in-progress and many things may not work as intended 
 
 Gagaku is licensed under the MIT license.
 
+### [Downloads](https://github.com/r52/gagaku/releases)
+
 ## Features
 
 - MangaDex client
