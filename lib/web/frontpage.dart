@@ -14,6 +14,8 @@ import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 
+const _firstSearch = 0xDEADBEEF;
+
 class _ExtensionHomeCard extends ConsumerWidget {
   final WebSourceInfo extensionInfo;
 
@@ -109,34 +111,43 @@ class WebSourceFrontPage extends HookConsumerWidget {
       }
     }
 
-    return CustomScrollView(
-      controller: scrollController,
-      slivers: [
-        SliverAppBar(
-          automaticallyImplyLeading: false,
-          pinned: true,
-          title: Text(
-            tr.webSources.homepages,
-            style: CommonTextStyles.twentyfour,
+    return RefreshIndicator(
+      onRefresh: () async {
+        // Invalidate all loaded sources
+        ref.invalidate(extensionSourceProvider, asReload: true);
+        return;
+      },
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        scrollBehavior: const MouseTouchScrollBehavior(),
+        controller: scrollController,
+        slivers: [
+          SliverAppBar(
+            automaticallyImplyLeading: false,
+            pinned: true,
+            title: Text(
+              tr.webSources.homepages,
+              style: CommonTextStyles.twentyfour,
+            ),
           ),
-        ),
-        if (homepageSources.isEmpty)
-          SliverToBoxAdapter(
-            child: Center(child: Text(tr.webSources.noSourcesWarning)),
-          ),
-        if (homepageSources.isNotEmpty)
-          SliverList.builder(
-            itemCount: homepageSources.length,
-            itemBuilder: (context, index) {
-              final item = homepageSources[index];
+          if (homepageSources.isEmpty)
+            SliverToBoxAdapter(
+              child: Center(child: Text(tr.webSources.noSourcesWarning)),
+            ),
+          if (homepageSources.isNotEmpty)
+            SliverList.builder(
+              itemCount: homepageSources.length,
+              itemBuilder: (context, index) {
+                final item = homepageSources[index];
 
-              return _ExtensionHomeCard(
-                key: ValueKey(item.id),
-                extensionInfo: item,
-              );
-            },
-          ),
-      ],
+                return _ExtensionHomeCard(
+                  key: ValueKey(item.id),
+                  extensionInfo: item,
+                );
+              },
+            ),
+        ],
+      ),
     );
   }
 }
@@ -420,15 +431,18 @@ class _DiscoverSectionPage extends StatefulHookConsumerWidget {
 }
 
 class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
-  Map<String, dynamic>? metadata = {'page': 1};
+  dynamic metadata = _firstSearch;
 
   late final _pagingController = GagakuPagingController<dynamic, HistoryLink>(
     getNextPageKey: (state) =>
-        state.keys?.last == null ? {'page': 1} : metadata,
+        state.keys?.last == null ? _firstSearch : metadata,
     fetchPage: (pageKey) async {
       final results = await ref
           .read(extensionSourceProvider(widget.source.id).notifier)
-          .getDiscoverSectionItems(widget.section, metadata);
+          .getDiscoverSectionItems(
+            widget.section,
+            (pageKey == _firstSearch) ? null : pageKey,
+          );
 
       final m = results.items.map(
         (e) => HistoryLink.fromDiscoverySectionItem(widget.source, e),
@@ -440,7 +454,7 @@ class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
     },
     getIsLastPage: (_, _) => metadata == null,
     refresh: () async {
-      metadata = {'page': 1};
+      metadata = _firstSearch;
     },
   );
 

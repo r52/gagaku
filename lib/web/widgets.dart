@@ -66,6 +66,7 @@ class WebMangaListWidget extends HookConsumerWidget {
     this.noController = false,
     this.showToggle = true,
     this.isLoading = false,
+    this.extraRow,
   });
 
   final Widget? title;
@@ -77,6 +78,7 @@ class WebMangaListWidget extends HookConsumerWidget {
   final bool noController;
   final bool showToggle;
   final bool isLoading;
+  final List<Widget>? extraRow;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -136,6 +138,13 @@ class WebMangaListWidget extends HookConsumerWidget {
                 ),
               ),
             ),
+            if (extraRow != null)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0, bottom: 10.0),
+                  child: Row(children: extraRow!),
+                ),
+              ),
             ...children,
           ],
         ),

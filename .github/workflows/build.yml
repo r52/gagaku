@@ -29,17 +29,17 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        builder: [windows, linux, android]
+        builder: [windows, android]
         include:
           - builder: windows
             os: windows-latest
             pkg: windows
-          - builder: linux
-            os: ubuntu-latest
-            pkg: linux
           - builder: android
             os: ubuntu-latest
             pkg: apk
+          # - builder: linux
+          #   os: ubuntu-latest
+          #   pkg: linux
 
     name: Build Gagaku
     runs-on: ${{ matrix.os }}
@@ -60,7 +60,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: "beta"
+          channel: "stable"
           cache: true
 
       - name: Set up Packages (Linux)
@@ -82,6 +82,7 @@ jobs:
       #   run: |
       #     npm ci
       #     npm run deploy
+
       - name: Set up signing key
         if: matrix.builder == 'android'
         shell: bash

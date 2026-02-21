@@ -15,6 +15,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'search.g.dart';
 
+const _firstSearch = 0xDEADBEEF;
+
 @Riverpod(keepAlive: true)
 class _SearchHistory extends _$SearchHistory {
   @override
@@ -85,12 +87,12 @@ class ExtensionSearchWidget extends StatefulHookConsumerWidget {
 
 class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
   late WebSourceInfo source;
-  Map<String, dynamic>? metadata = {'page': 1};
+  dynamic metadata = _firstSearch;
   SearchQuery? query;
 
   late final _pagingController = GagakuPagingController<dynamic, HistoryLink>(
     getNextPageKey: (state) =>
-        state.keys?.last == null ? {'page': 1} : metadata,
+        state.keys?.last == null ? _firstSearch : metadata,
     fetchPage: (pageKey) async {
       if (query == null || query!.isEmpty) {
         return PageResultsMetaData([]);
@@ -98,7 +100,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
 
       final results = await ref
           .read(extensionSourceProvider(source.id).notifier)
-          .searchManga(query!, metadata);
+          .searchManga(query!, (pageKey == _firstSearch) ? null : pageKey);
 
       final m = results.items.map(
         (e) => HistoryLink.fromSearchReultItem(source, e),
@@ -110,7 +112,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
     },
     getIsLastPage: (_, _) => metadata == null,
     refresh: () async {
-      metadata = {'page': 1};
+      metadata = _firstSearch;
     },
   );
 
@@ -186,6 +188,57 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
             },
           ),
         ),
+        extraRow: [
+          HookBuilder(
+            builder: (context) {
+              final results = useMemoized(
+                () => ref
+                    .read(extensionSourceProvider(source.id).notifier)
+                    .getSortingOptions(),
+                [source],
+              );
+              final future = useFuture(results);
+
+              if (future.hasError) {
+                return const Center(child: Icon(Icons.error));
+              }
+
+              if (future.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final options = future.data;
+
+              if (options == null) {
+                return const SizedBox.shrink();
+              }
+
+              return DropdownMenu<SortingOption>(
+                initialSelection: ref
+                    .read(extensionSourceProvider(source.id).notifier)
+                    .getCurrentSort(),
+                width: 200,
+                requestFocusOnTap: false,
+                enableSearch: false,
+                enableFilter: false,
+                dropdownMenuEntries: options
+                    .map(
+                      (opt) => DropdownMenuEntry(value: opt, label: opt.label),
+                    )
+                    .toList(),
+                onSelected: (SortingOption? opt) {
+                  if (opt != null) {
+                    ref
+                        .read(extensionSourceProvider(source.id).notifier)
+                        .setCurrentSort(opt);
+                    setState(() {});
+                    _pagingController.refresh();
+                  }
+                },
+              );
+            },
+          ),
+        ],
         leading: [
           SliverAppBar(
             leading: const BackButton(),
