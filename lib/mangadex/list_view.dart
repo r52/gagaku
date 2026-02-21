@@ -111,7 +111,10 @@ class MangaDexListViewPage extends HookConsumerWidget {
                         backgroundColor: theme.colorScheme.surfaceContainer,
                       ),
                       onPressed: () {
-                        MangaDexEditListRoute(list: list).push(context);
+                        MangaDexEditListRoute(
+                          listId: list.id,
+                          list: list,
+                        ).push(context);
                       },
                       icon: const Icon(Icons.edit),
                       tooltip: t.ui.edit,

@@ -139,7 +139,9 @@ class MangaDexListsWidget extends HookConsumerWidget {
         label: Text(t.mangadex.newList),
         onPressed: () {
           final messenger = ScaffoldMessenger.of(context);
-          MangaDexEditListRoute().push<bool>(context).then((success) {
+          MangaDexEditListRoute(listId: 'new').push<bool>(context).then((
+            success,
+          ) {
             if (!context.mounted) return;
             if (success == true) {
               messenger
@@ -275,6 +277,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                 MenuItemButton(
                                   onPressed: () {
                                     MangaDexEditListRoute(
+                                      listId: item.id,
                                       list: item,
                                     ).push(context);
                                   },
@@ -411,6 +414,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                   MenuItemButton(
                                     onPressed: () {
                                       MangaDexEditListRoute(
+                                        listId: item.id,
                                         list: item,
                                       ).push(context);
                                     },
