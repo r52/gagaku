@@ -696,7 +696,7 @@ class _BackLinkedChapterButton extends ConsumerWidget {
 }
 
 @Dependencies([chipTextStyle, readBorderTheme])
-class ChapterFeedItem extends HookWidget {
+class ChapterFeedItem extends StatelessWidget {
   const ChapterFeedItem({super.key, required this.state});
 
   final ChapterFeedItemData state;
@@ -803,7 +803,7 @@ class _ChapterButtonCard extends ConsumerWidget {
 }
 
 @Dependencies([chipTextStyle, readBorderTheme])
-class ChapterButtonWidget extends HookWidget {
+class ChapterButtonWidget extends StatelessWidget {
   const ChapterButtonWidget({
     super.key,
     required this.chapter,
@@ -818,7 +818,6 @@ class ChapterButtonWidget extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
-    useAutomaticKeepAlive();
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     final isEndChapter =
@@ -915,68 +914,73 @@ class ChapterButtonWidget extends HookWidget {
     );
 
     final tile = screenSizeSmall
-        ? Table(
-            columnWidths: const <int, TableColumnWidth>{
-              0: FixedColumnWidth(24),
-              1: FlexColumnWidth(),
-            },
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            children: <TableRow>[
-              TableRow(children: <Widget>[markReadButton, title]),
-              TableRow(children: <Widget>[_groupIconB, groups]),
-              TableRow(
+        ? Column(
+            mainAxisSize: MainAxisSize.min,
                 children: [
-                  _personIconB,
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
+              Row(
+                children: [
+                  SizedBox(width: 24, child: markReadButton),
+                  Expanded(child: title),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(width: 24, child: _groupIconB),
+                  Expanded(child: groups),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(width: 24, child: _personIconB),
+                  Expanded(
+                    child: Row(
                     children: [
                       Expanded(
                         child: Row(children: [Flexible(child: userChip)]),
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
                         mainAxisSize: MainAxisSize.min,
                         spacing: 4.0,
                         children: [_scheduleIconB, pubtime],
                       ),
                     ],
                   ),
+                  ),
                 ],
               ),
             ],
           )
-        : Table(
-            columnWidths: const <int, TableColumnWidth>{
-              0: FixedColumnWidth(24),
-              1: FlexColumnWidth(),
-              2: FixedColumnWidth(24),
-              3: FixedColumnWidth(145),
-              4: FixedColumnWidth(60),
-            },
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            children: <TableRow>[
-              TableRow(
-                children: <Widget>[
-                  markReadButton,
-                  title,
-                  _scheduleIconB,
-                  Row(
+        : Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  SizedBox(width: 24, child: markReadButton),
+                  Expanded(child: title),
+                  SizedBox(width: 24, child: _scheduleIconB),
+                  SizedBox(
+                    width: 145,
+                    child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [const SizedBox(width: 2.0), pubtime],
                   ),
-                  const SizedBox.shrink(),
+                  ),
+                  const SizedBox(width: 60),
                 ],
               ),
-              TableRow(
-                children: <Widget>[
-                  _groupIconB,
-                  groups,
-                  _personIconB,
-                  Row(
+              Row(
+                children: [
+                  SizedBox(width: 24, child: _groupIconB),
+                  Expanded(child: groups),
+                  SizedBox(width: 24, child: _personIconB),
+                  SizedBox(
+                    width: 145,
+                    child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [Flexible(child: userChip)],
                   ),
-                  statsChipRow,
+                  ),
+                  SizedBox(width: 60, child: statsChipRow),
                 ],
               ),
             ],
@@ -1701,7 +1705,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
 }
 
 @Dependencies([chipTextStyle])
-class _GroupRow extends HookWidget {
+class _GroupRow extends StatelessWidget {
   final Chapter chapter;
 
   const _GroupRow({super.key, required this.chapter});

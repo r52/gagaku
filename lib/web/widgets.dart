@@ -626,7 +626,7 @@ class FavoritesButton extends HookWidget {
   }
 }
 
-class ChapterButtonWidget extends HookConsumerWidget {
+class ChapterButtonWidget extends ConsumerWidget {
   const ChapterButtonWidget({
     super.key,
     required this.data,
@@ -643,7 +643,6 @@ class ChapterButtonWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    useAutomaticKeepAlive();
     final theme = Theme.of(context);
     final chapterkey = data.name;
     final mangakey = handle.getKey();
@@ -741,39 +740,45 @@ class ChapterButtonWidget extends HookConsumerWidget {
       );
     }
 
-    final tile = Table(
-      columnWidths: const <int, TableColumnWidth>{
-        0: FixedColumnWidth(24),
-        1: FixedColumnWidth(6),
-        2: FlexColumnWidth(),
-        3: FixedColumnWidth(150),
-      },
-      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-      children: <TableRow>[
-        TableRow(
-          children: <Widget>[
-            markReadBtn,
-            const SizedBox.shrink(),
-            Text(title, style: textstyle),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [?language],
+    final tile = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            SizedBox(width: 24, child: markReadBtn),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                title,
+                style: textstyle,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            SizedBox(
+              width: 150,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [?language],
+              ),
             ),
           ],
         ),
-        TableRow(
-          children: <Widget>[
-            const Icon(Icons.group, size: 20),
-            const SizedBox.shrink(),
-            Text(groupText),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                const Icon(Icons.schedule, size: 20),
-                if (timestamp != null) Text(' $timestamp'),
-              ],
+        Row(
+          children: [
+            const SizedBox(width: 24, child: Icon(Icons.group, size: 20)),
+            const SizedBox(width: 6),
+            Expanded(child: Text(groupText, overflow: TextOverflow.ellipsis)),
+            SizedBox(
+              width: 150,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Icon(Icons.schedule, size: 20),
+                  if (timestamp != null) Text(' $timestamp'),
+                ],
+              ),
             ),
           ],
         ),
@@ -840,7 +845,7 @@ class _ChapterButtonCard extends ConsumerWidget {
   }
 }
 
-class ChapterFeedItem extends HookWidget {
+class ChapterFeedItem extends StatelessWidget {
   const ChapterFeedItem({super.key, required this.state});
 
   final UpdateFeedItem state;
