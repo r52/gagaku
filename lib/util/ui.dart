@@ -325,17 +325,31 @@ class IconTextChip extends ConsumerWidget {
       ),
     );
 
+    final borderRadius = const BorderRadius.all(Radius.circular(6.0));
+    final backgroundColor = color ?? theme.tertiaryContainer;
+
     if (onPressed != null) {
-      child = InkWell(onTap: onPressed, child: child);
+      return ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 24.0),
+        child: Material(
+          borderRadius: borderRadius,
+          color: backgroundColor,
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: borderRadius,
+            child: child,
+          ),
+        ),
+      );
     }
 
-    return ConstrainedBox(
+    return Container(
       constraints: const BoxConstraints(maxHeight: 24.0),
-      child: Material(
-        borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-        color: color ?? theme.tertiaryContainer,
-        child: child,
+      decoration: BoxDecoration(
+        borderRadius: borderRadius,
+        color: backgroundColor,
       ),
+      child: child,
     );
   }
 }

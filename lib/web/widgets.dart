@@ -435,24 +435,84 @@ class GridMangaItem extends HookConsumerWidget {
 
     String referer = refer[link.handle?.sourceId] ?? '';
 
-    final Widget cover = link.cover != null
-        ? CachedNetworkImage(
-            imageUrl: link.cover!,
-            httpHeaders: {'referer': referer, 'user-agent': baseUserAgent},
-            cacheManager: gagakuImageCache,
-            memCacheWidth: 256,
-            maxWidthDiskCache: 256,
-            width: 128.0,
-            progressIndicatorBuilder: (context, url, downloadProgress) =>
-                const Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-            fit: BoxFit.cover,
-          )
-        : const Icon(Icons.menu_book, size: 128.0);
+    final Widget cover = useMemoized(
+      () => link.cover != null
+          ? CachedNetworkImage(
+              imageUrl: link.cover!,
+              httpHeaders: {'referer': referer, 'user-agent': baseUserAgent},
+              cacheManager: gagakuImageCache,
+              memCacheWidth: 256,
+              maxWidthDiskCache: 256,
+              width: 128.0,
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  const Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+              fit: BoxFit.cover,
+            )
+          : const Icon(Icons.menu_book, size: 128.0),
+      [link.cover, referer],
+    );
 
-    final sourceIcon =
-        extIcons[link.handle?.sourceId] ??
-        Text(link.handle?.sourceId ?? '', style: CommonTextStyles.twelve);
+    final sourceIcon = useMemoized(
+      () => Align(
+        alignment: Alignment.bottomRight,
+        child:
+            extIcons[link.handle?.sourceId] ??
+            Text(link.handle?.sourceId ?? '', style: CommonTextStyles.twelve),
+      ),
+      [extIcons, link.handle?.sourceId],
+    );
+
+    final favButton = useMemoized(
+      () => showFavoriteButton
+          ? Align(
+              alignment: Alignment.topLeft,
+              child: FavoritesButton(link: link),
+            )
+          : null,
+      [showFavoriteButton, link],
+    );
+
+    final actionButton = useMemoized(() {
+      if (!showSearchButton && !showRemoveButton) return null;
+      return Align(
+        alignment: Alignment.topRight,
+        child: MenuAnchor(
+          builder: (context, controller, child) => IconButton(
+            style: Styles.squareIconButtonStyle(
+              backgroundColor: theme.colorScheme.surface.withAlpha(200),
+            ),
+            onPressed: () {
+              if (controller.isOpen) {
+                controller.close();
+              } else {
+                controller.open();
+              }
+            },
+            icon: child!,
+          ),
+          menuChildren: [
+            if (showSearchButton)
+              MenuItemButton(
+                onPressed: () => ExtensionSearchRoute(
+                  query: SearchQuery(title: link.title),
+                ).push(context),
+                leadingIcon: const Icon(Icons.search),
+                child: Text(tr.webSources.searchWithExt),
+              ),
+            if (showRemoveButton)
+              MenuItemButton(
+                onPressed: () async {
+                  WebHistoryManager().remove(link);
+                },
+                leadingIcon: Icon(Icons.delete, color: theme.colorScheme.error),
+                child: Text(tr.mangaActions.removeHistory),
+              ),
+          ],
+          child: const Icon(Icons.more_vert_outlined),
+        ),
+      );
+    }, [showSearchButton, showRemoveButton, link, tr, theme]);
 
     return InkWell(
       onTap: () async {
@@ -487,53 +547,9 @@ class GridMangaItem extends HookConsumerWidget {
             footer: GridAlbumTextBar(text: link.title),
             child: GridAlbumImage(gradient: gradient, child: cover),
           ),
-          Align(alignment: Alignment.bottomRight, child: sourceIcon),
-          if (showFavoriteButton)
-            Align(
-              alignment: Alignment.topLeft,
-              child: FavoritesButton(link: link),
-            ),
-          if (showSearchButton || showRemoveButton)
-            Align(
-              alignment: Alignment.topRight,
-              child: MenuAnchor(
-                builder: (context, controller, child) => IconButton(
-                  style: Styles.squareIconButtonStyle(
-                    backgroundColor: theme.colorScheme.surface.withAlpha(200),
-                  ),
-                  onPressed: () {
-                    if (controller.isOpen) {
-                      controller.close();
-                    } else {
-                      controller.open();
-                    }
-                  },
-                  icon: child!,
-                ),
-                menuChildren: [
-                  if (showSearchButton)
-                    MenuItemButton(
-                      onPressed: () => ExtensionSearchRoute(
-                        query: SearchQuery(title: link.title),
-                      ).push(context),
-                      leadingIcon: const Icon(Icons.search),
-                      child: Text(tr.webSources.searchWithExt),
-                    ),
-                  if (showRemoveButton)
-                    MenuItemButton(
-                      onPressed: () async {
-                        WebHistoryManager().remove(link);
-                      },
-                      leadingIcon: Icon(
-                        Icons.delete,
-                        color: theme.colorScheme.error,
-                      ),
-                      child: Text(tr.mangaActions.removeHistory),
-                    ),
-                ],
-                child: const Icon(Icons.more_vert_outlined),
-              ),
-            ),
+          sourceIcon,
+          ?favButton,
+          ?actionButton,
         ],
       ),
     );
@@ -554,20 +570,16 @@ class FavoritesButton extends HookWidget {
     final manager = useListenable(WebFavoritesManager());
     final favorites = manager.state;
 
-    final favStatus = useMemoized(() {
-      final favList = manager.getFavoritedListIdsOfLink(link);
-      return (list: favList, isFavorited: favList.isNotEmpty);
-    }, [favorites, link]);
+    final favList = manager.getFavoritedListIdsOfLink(link);
+    final isFavorited = favList.isNotEmpty;
 
-    final menuChildren = useMemoized(() {
-      if (favorites.isEmpty) return <Widget>[];
-
-      return [
+    final menuChildren = <Widget>[
+      if (favorites.isNotEmpty) ...[
         for (final cat in favorites)
           CheckboxListTile(
             controlAffinity: ListTileControlAffinity.leading,
             title: Text(cat.name),
-            value: favStatus.list.contains(cat.dbid),
+            value: favList.contains(cat.dbid),
             onChanged: (bool? value) async {
               if (value == true) {
                 manager.add(cat, link);
@@ -576,13 +588,13 @@ class FavoritesButton extends HookWidget {
               }
             },
           ),
-        if (favStatus.isFavorited)
+        if (isFavorited)
           MenuItemButton(
             onPressed: () => manager.removeFromAll(link),
             child: Text(tr.ui.clear),
           ),
-      ];
-    }, [favorites, favStatus, manager, link, tr]);
+      ],
+    ];
 
     return MenuAnchor(
       builder: (context, controller, child) {
@@ -609,6 +621,9 @@ class FavoritesButton extends HookWidget {
                         controller.open();
                       }
                     },
+                    customBorder: borderRadius == null
+                        ? const CircleBorder()
+                        : null,
                     child: child,
                   ),
           ),
@@ -618,8 +633,8 @@ class FavoritesButton extends HookWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Icon(
-          favStatus.isFavorited ? Icons.favorite : Icons.favorite_border,
-          color: favStatus.isFavorited ? theme.colorScheme.primary : null,
+          isFavorited ? Icons.favorite : Icons.favorite_border,
+          color: isFavorited ? theme.colorScheme.primary : null,
         ),
       ),
     );

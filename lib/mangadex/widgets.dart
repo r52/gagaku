@@ -818,6 +818,10 @@ class ChapterButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
+    final numFormatter = NumberFormat.compact(
+      locale: tr.$meta.locale.flutterLocale.toString(),
+    );
+
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     final isEndChapter =
@@ -851,6 +855,7 @@ class ChapterButtonWidget extends StatelessWidget {
         return CommentChip(
           key: ValueKey('CommentChip(${chapter.id})'),
           comments: comments,
+          formatter: numFormatter,
         );
       },
     );
@@ -916,7 +921,7 @@ class ChapterButtonWidget extends StatelessWidget {
     final tile = screenSizeSmall
         ? Column(
             mainAxisSize: MainAxisSize.min,
-                children: [
+            children: [
               Row(
                 children: [
                   SizedBox(width: 24, child: markReadButton),
@@ -934,17 +939,17 @@ class ChapterButtonWidget extends StatelessWidget {
                   SizedBox(width: 24, child: _personIconB),
                   Expanded(
                     child: Row(
-                    children: [
-                      Expanded(
-                        child: Row(children: [Flexible(child: userChip)]),
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: 4.0,
-                        children: [_scheduleIconB, pubtime],
-                      ),
-                    ],
-                  ),
+                      children: [
+                        Expanded(
+                          child: Row(children: [Flexible(child: userChip)]),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: 4.0,
+                          children: [_scheduleIconB, pubtime],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -961,9 +966,9 @@ class ChapterButtonWidget extends StatelessWidget {
                   SizedBox(
                     width: 145,
                     child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [const SizedBox(width: 2.0), pubtime],
-                  ),
+                      mainAxisSize: MainAxisSize.min,
+                      children: [const SizedBox(width: 2.0), pubtime],
+                    ),
                   ),
                   const SizedBox(width: 60),
                 ],
@@ -976,9 +981,9 @@ class ChapterButtonWidget extends StatelessWidget {
                   SizedBox(
                     width: 145,
                     child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [Flexible(child: userChip)],
-                  ),
+                      mainAxisSize: MainAxisSize.min,
+                      children: [Flexible(child: userChip)],
+                    ),
                   ),
                   SizedBox(width: 60, child: statsChipRow),
                 ],
@@ -1314,9 +1319,8 @@ class GridMangaItem extends HookConsumerWidget {
       aniController.drive(Styles.coverArtGradientTween),
     );
 
-    final image = GridAlbumImage(
-      gradient: gradient,
-      child: CachedNetworkImage(
+    final networkImage = useMemoized(
+      () => CachedNetworkImage(
         imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
         cacheManager: gagakuImageCache,
         width: 256.0,
@@ -1325,7 +1329,10 @@ class GridMangaItem extends HookConsumerWidget {
             const Center(child: CircularProgressIndicator()),
         errorWidget: (context, url, error) => const Icon(Icons.error),
       ),
+      [manga],
     );
+
+    final image = GridAlbumImage(gradient: gradient, child: networkImage);
 
     return InkWell(
       onTap: () async {
@@ -1376,7 +1383,7 @@ class GridMangaItem extends HookConsumerWidget {
 }
 
 @Dependencies([chipTextStyle])
-class GridMangaDetailedItem extends HookConsumerWidget {
+class GridMangaDetailedItem extends ConsumerWidget {
   const GridMangaDetailedItem({super.key, required this.manga, this.header});
 
   final Manga manga;
@@ -1466,7 +1473,7 @@ class GridMangaDetailedItem extends HookConsumerWidget {
 }
 
 @Dependencies([chipTextStyle])
-class _ListMangaItem extends HookConsumerWidget {
+class _ListMangaItem extends ConsumerWidget {
   const _ListMangaItem({super.key, required this.manga, this.header});
 
   final Manga manga;
@@ -1579,7 +1586,7 @@ class ChapterTitle extends ConsumerWidget {
 }
 
 @Dependencies([chipTextStyle])
-class MangaGenreRow extends HookWidget {
+class MangaGenreRow extends StatelessWidget {
   const MangaGenreRow({super.key, required this.manga});
 
   final Manga manga;
@@ -1587,31 +1594,29 @@ class MangaGenreRow extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
-    final contentTagChips = useMemoized(() {
-      return manga.attributes!.tags
-          .where((tag) => tag.attributes.group == TagGroup.content)
-          .map((e) => ContentChip(key: ValueKey(e.id), content: e));
-    }, [manga]);
+    final attributes = manga.attributes!;
 
-    final genreTagChips = useMemoized(() {
-      return manga.attributes!.tags
-          .where((tag) => tag.attributes.group != TagGroup.content)
-          .map(
-            (e) => IconTextChip(
-              key: ValueKey(e.id),
-              text: e.attributes.name.get(tr.$meta.locale.languageCode),
-              onPressed: () =>
-                  MangaDexTagViewRoute(tagId: e.id, tag: e).push(context),
-            ),
-          );
-    }, [manga]);
+    final contentTagChips = attributes.tags
+        .where((tag) => tag.attributes.group == TagGroup.content)
+        .map((e) => ContentChip(key: ValueKey(e.id), content: e));
+
+    final genreTagChips = attributes.tags
+        .where((tag) => tag.attributes.group != TagGroup.content)
+        .map(
+          (e) => IconTextChip(
+            key: ValueKey(e.id),
+            text: e.attributes.name.get(tr.$meta.locale.languageCode),
+            onPressed: () =>
+                MangaDexTagViewRoute(tagId: e.id, tag: e).push(context),
+          ),
+        );
 
     return Wrap(
       spacing: 4.0,
       runSpacing: 4.0,
       children: [
-        if (manga.attributes!.contentRating != ContentRating.safe)
-          ContentRatingChip(rating: manga.attributes!.contentRating),
+        if (attributes.contentRating != ContentRating.safe)
+          ContentRatingChip(rating: attributes.contentRating),
         ...contentTagChips,
         ...genreTagChips,
       ],
@@ -1688,6 +1693,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
             CommentChip(
               key: ValueKey('CommentChip(${manga.id})'),
               comments: comments,
+              formatter: numFormatter,
             ),
           ],
           _ => [IconTextChip(text: tr.ui.loadingDot)],
@@ -1767,24 +1773,18 @@ class _PubTime extends StatelessWidget {
 }
 
 @Dependencies([chipTextStyle])
-class CommentChip extends HookWidget {
+class CommentChip extends StatelessWidget {
   final StatisticsDetailsComments? comments;
+  final NumberFormat formatter;
 
-  const CommentChip({super.key, this.comments});
+  const CommentChip({super.key, this.comments, required this.formatter});
 
   @override
   Widget build(BuildContext context) {
-    final tr = context.t;
-    final numFormatter = useMemoized(() {
-      return NumberFormat.compact(
-        locale: tr.$meta.locale.flutterLocale.toString(),
-      );
-    }, [tr.$meta.locale]);
-
     return IconTextChip(
       icon: const Icon(Icons.chat_bubble_outline, size: 18),
       text: (comments != null)
-          ? numFormatter.format(comments!.repliesCount)
+          ? formatter.format(comments!.repliesCount)
           : 'N/A',
       onPressed: (comments != null)
           ? () async {
