@@ -778,9 +778,9 @@ class MangaDexModel {
     Map<String, dynamic> queryParams = {
       'limit': limit.toString(),
       'offset': offset.toString(),
-      'availableTranslatedLanguage[]': settings.translatedLanguages
-          .map(const LanguageConverter().toJson)
-          .toList(),
+      // 'availableTranslatedLanguage[]': settings.translatedLanguages
+      //     .map(const LanguageConverter().toJson)
+      //     .toList(),
       'originalLanguage[]': settings.originalLanguage
           .map(const LanguageConverter().toJson)
           .toList(),
