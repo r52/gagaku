@@ -235,25 +235,38 @@ class _MangaDexMangaViewWidgetState
       () => tabController.index,
     );
 
-    String? lastvolchap;
+    String? lastvolchap = useMemoized(
+      () {
+        String? chapStr;
 
-    if ((widget.manga.attributes!.lastVolume != null &&
-            widget.manga.attributes!.lastVolume!.isNotEmpty) ||
-        (widget.manga.attributes!.lastChapter != null &&
-            widget.manga.attributes!.lastChapter!.isNotEmpty)) {
-      lastvolchap = '';
+        if ((widget.manga.attributes!.lastVolume != null &&
+                widget.manga.attributes!.lastVolume!.isNotEmpty) ||
+            (widget.manga.attributes!.lastChapter != null &&
+                widget.manga.attributes!.lastChapter!.isNotEmpty)) {
+          chapStr = '';
 
-      if (widget.manga.attributes!.lastVolume != null &&
-          widget.manga.attributes!.lastVolume!.isNotEmpty) {
-        lastvolchap += 'Volume ${widget.manga.attributes!.lastVolume}';
-      }
+          if (widget.manga.attributes!.lastVolume != null &&
+              widget.manga.attributes!.lastVolume!.isNotEmpty) {
+            chapStr += tr.mangaView.volume(
+              n: widget.manga.attributes!.lastVolume!,
+            );
+          }
 
-      if (widget.manga.attributes!.lastChapter != null &&
-          widget.manga.attributes!.lastChapter!.isNotEmpty) {
-        lastvolchap +=
-            '${lastvolchap.isEmpty ? '' : ', '}Chapter ${widget.manga.attributes!.lastChapter!}';
-      }
-    }
+          if (widget.manga.attributes!.lastChapter != null &&
+              widget.manga.attributes!.lastChapter!.isNotEmpty) {
+            chapStr +=
+                '${chapStr.isEmpty ? '' : ', '}${tr.mangaView.chapter(n: widget.manga.attributes!.lastChapter!)}';
+          }
+        }
+
+        return chapStr;
+      },
+      [
+        widget.manga.attributes!.lastChapter,
+        widget.manga.attributes!.lastVolume,
+        tr.$meta.locale.languageCode,
+      ],
+    );
 
     final mangaTagChips = useMemoized<Map<TagGroup, List<Widget>>>(() {
       final map = widget.manga.attributes!.tags.groupListsBy(
@@ -274,24 +287,24 @@ class _MangaDexMangaViewWidgetState
               .toList(),
         );
       });
-    }, [widget.manga]);
+    }, [widget.manga, tr.$meta.locale.languageCode]);
 
-    final newListMutation = ref.watch(userListNewMutation(me?.id));
-
-    if (newListMutation is MutationError) {
-      Styles.showSnackBar(
-        messenger,
-        content: tr.mangadex.newListError(
-          error: (newListMutation as MutationError).error.toString(),
-        ),
-      );
-    } else if (newListMutation is MutationSuccess) {
-      Styles.showSnackBar(
-        messenger,
-        content: tr.mangadex.newListOk,
-        color: Colors.green,
-      );
-    }
+    ref.listen(userListNewMutation(me?.id), (_, next) {
+      if (next is MutationError) {
+        Styles.showSnackBar(
+          messenger,
+          content: tr.mangadex.newListError(
+            error: (next as MutationError).error.toString(),
+          ),
+        );
+      } else if (next is MutationSuccess) {
+        Styles.showSnackBar(
+          messenger,
+          content: tr.mangadex.newListOk,
+          color: Colors.green,
+        );
+      }
+    });
 
     final moreMenu = MenuAnchor(
       builder: (context, controller, child) => IconButton(
@@ -862,17 +875,18 @@ class _MangaDexMangaViewWidgetState
           },
           body: SafeArea(
             top: false,
-            bottom: false,
-            child: switch (_ViewType.values[tabview]) {
-              _ViewType.chapters => _MangaChaptersView(
+            bottom: true,
+            child: _UnpagedMangaViewBody(
+              controller: tabController,
+              chaptersView: _MangaChaptersView(
                 manga: widget.manga,
                 controller: _chapterController,
               ),
-              _ViewType.art => _MangaCoversView(
+              coversView: _MangaCoversView(
                 manga: widget.manga,
                 controller: _coverController,
               ),
-              _ViewType.related => MangaListWidget(
+              relatedView: MangaListWidget(
                 title: Text(
                   tr.mangaView.relatedTitles,
                   style: CommonTextStyles.twentyfour,
@@ -891,11 +905,35 @@ class _MangaDexMangaViewWidgetState
                   ),
                 ],
               ),
-            },
+            ),
           ),
         ),
       ),
     );
+  }
+}
+
+class _UnpagedMangaViewBody extends HookWidget {
+  const _UnpagedMangaViewBody({
+    required this.controller,
+    required this.chaptersView,
+    required this.coversView,
+    required this.relatedView,
+  });
+
+  final TabController controller;
+  final Widget chaptersView;
+  final Widget coversView;
+  final Widget relatedView;
+
+  @override
+  Widget build(BuildContext context) {
+    final tabview = useListenableSelector(controller, () => controller.index);
+    return switch (_ViewType.values[tabview]) {
+      _ViewType.chapters => chaptersView,
+      _ViewType.art => coversView,
+      _ViewType.related => relatedView,
+    };
   }
 }
 
@@ -1102,7 +1140,7 @@ class _ChapterListSliver extends HookConsumerWidget {
       }
 
       return items;
-    }, [state]);
+    }, [state, tr.$meta.locale.languageCode]);
 
     final newState = useMemoized(() {
       return PagingState<int, _ChapterListElement>(
