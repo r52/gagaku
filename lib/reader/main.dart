@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -59,6 +58,8 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
 
   late final List<PhotoViewScaleStateController> scaleStateController;
   late final List<PhotoViewController> viewController;
+
+  int _cacheScheduleToken = 0;
 
   @override
   void initState() {
@@ -156,10 +157,27 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     }
   }
 
+  void _scheduleCachePages(int precacheCount) {
+    final token = ++_cacheScheduleToken;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || token != _cacheScheduleToken) return;
+      cachePages(precacheCount);
+    });
+  }
+
   void setPageValue({required int page, required int precacheCount}) {
-    currentPage.value = page;
-    cachePages(precacheCount);
-    subtext.value = widget.subtitle ?? widget.pages[currentPage.value].sortKey;
+    if (page < 0 || page >= widget.pages.length) return;
+
+    if (currentPage.value != page) {
+      currentPage.value = page;
+    }
+
+    final nextSubtext = widget.subtitle ?? widget.pages[page].sortKey;
+    if (subtext.value != nextSubtext) {
+      subtext.value = nextSubtext;
+    }
+
+    _scheduleCachePages(precacheCount);
   }
 
   void jumpToPage(int page, {required ReaderFormat format}) {
@@ -348,43 +366,34 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
       return (settings.precacheCount > 9 || format == ReaderFormat.longstrip)
           ? pageCount
           : settings.precacheCount;
-    }, [settings, format]);
+    }, [settings.precacheCount, format, pageCount]);
 
     useEffect(() {
-      void pageCallback() {
-        if (pageController.page != null) {
-          Future.delayed(Duration.zero, () {
-            if (context.mounted) {
-              setPageValue(
-                page: pageController.page!.toInt(),
-                precacheCount: precacheCount(),
-              );
-            }
-          });
-        }
-      }
+      if (widget.pages.isEmpty) return null;
 
-      pageController.addListener(pageCallback);
-      return () => pageController.removeListener(pageCallback);
-    }, [pageController, settings]);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        setPageValue(page: currentPage.value, precacheCount: precacheCount());
+      });
+
+      return null;
+    }, [widget.pages.length, settings.precacheCount, format]);
 
     useEffect(() {
       void listPosCb() {
-        if (listController.isAttached && listController.visibleRange != null) {
-          final positions = listController.visibleRange;
-          final min = positions!.$1;
+        if (!listController.isAttached) return;
+        final range = listController.visibleRange;
+        if (range == null) return;
 
-          Future.delayed(Duration.zero, () {
-            if (context.mounted) {
-              setPageValue(page: min, precacheCount: precacheCount());
-            }
-          });
+        final min = range.$1;
+        if (min != currentPage.value) {
+          setPageValue(page: min, precacheCount: precacheCount());
         }
       }
 
       listController.addListener(listPosCb);
       return () => listController.removeListener(listPosCb);
-    }, [listController, settings]);
+    }, [listController, settings.precacheCount, format]);
 
     return Scaffold(
       extendBodyBehindAppBar: false,
@@ -716,7 +725,13 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
             backgroundDecoration: const BoxDecoration(color: Colors.black),
             pageController: pageController,
             onPageChanged: (int index) {
-              focusNode.requestFocus();
+              if (index != currentPage.value) {
+                setPageValue(page: index, precacheCount: precacheCount());
+              }
+
+              if (!focusNode.hasFocus) {
+                focusNode.requestFocus();
+              }
             },
             loadingBuilder: (context, event) => Center(
               child: SizedBox(
@@ -819,7 +834,7 @@ class ProgressIndicator extends HookWidget {
           onTap: () => onPageSelected(index),
         ),
       ),
-      [itemCount, color, onPageSelected],
+      [itemCount, progressColor, onPageSelected],
     );
 
     final children = useMemoized(
@@ -867,8 +882,9 @@ class _ProgressBarSection extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final page = useValueListenable(currentPage);
-    final isFilled = (index == 0 || page >= index);
+    final isFilled =
+        index == 0 ||
+        useListenableSelector(currentPage, () => currentPage.value >= index);
 
     return Expanded(
       child: Tooltip(
@@ -877,10 +893,10 @@ class _ProgressBarSection extends HookWidget {
           onTap: onTap,
           child: Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
+            child: SizedBox(
               height: height,
               width: double.infinity,
-              color: isFilled ? color : Colors.transparent,
+              child: ColoredBox(color: isFilled ? color : Colors.transparent),
             ),
           ),
         ),
@@ -904,24 +920,26 @@ class _LongStripView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pageCount = pages.length;
     final mediaSize = MediaQuery.sizeOf(context);
 
-    return SuperListView(
+    return SuperListView.builder(
       listController: listController,
       controller: scrollController,
-      cacheExtent: mediaSize.height * pageCount,
-      children: [
-        for (final page in pages)
-          Center(
-            key: ValueKey(page.id),
+      cacheExtent: mediaSize.height * 3,
+      itemCount: pages.length,
+      itemBuilder: (context, index) {
+        final page = pages[index];
+        return Center(
+          key: ValueKey(page.id),
+          child: RepaintBoundary(
             child: _LongStripPage(
               contextWidth: mediaSize.width,
               scale: scale,
               page: page,
             ),
           ),
-      ],
+        );
+      },
     );
   }
 }
