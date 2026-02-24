@@ -2373,7 +2373,7 @@ class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
   }
 
   Future<bool> set(MangaReadingStatus? status) async {
-    final me = await ref.readFuture(loggedUserProvider.future);
+    final me = await ref.readAsync(loggedUserProvider.future);
 
     if (me == null) {
       throw StateError('User not logged in');
@@ -2422,7 +2422,7 @@ class FollowingStatus extends _$FollowingStatus with AutoDisposeExpiryMix {
   }
 
   Future<bool> set(bool following) async {
-    final me = await ref.readFuture(loggedUserProvider.future);
+    final me = await ref.readAsync(loggedUserProvider.future);
 
     if (me == null) {
       throw StateError('User not logged in');

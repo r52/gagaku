@@ -841,7 +841,7 @@ final class ReadingStatusProvider
   }
 }
 
-String _$readingStatusHash() => r'78d76663556b421dc500308b42a32d079beba417';
+String _$readingStatusHash() => r'1bb7981672107353b2541655a469d88aca120aa0';
 
 final class ReadingStatusFamily extends $Family
     with
@@ -931,7 +931,7 @@ final class FollowingStatusProvider
   }
 }
 
-String _$followingStatusHash() => r'431485be4207365c3609295abe3c8af8214a00e4';
+String _$followingStatusHash() => r'50c209e7f4df45b51c349eed25486d0e9dc7f38b';
 
 final class FollowingStatusFamily extends $Family
     with

@@ -14,6 +14,7 @@ import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -62,7 +63,7 @@ BoxDecoration readBorderTheme(Ref ref, String mangaId, String chapterId) {
   final theme = ref.watch(themeProvider);
 
   final tileColor = theme.colorScheme.primaryContainer;
-  final me = ref.watch(loggedUserProvider).value;
+  final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
 
   Border border;
 
@@ -70,7 +71,7 @@ BoxDecoration readBorderTheme(Ref ref, String mangaId, String chapterId) {
     border = Border(left: BorderSide(color: tileColor, width: 4.0));
   } else {
     bool? isRead = ref.watch(
-      readChaptersProvider(me.id).select(
+      readChaptersProvider(me).select(
         (value) => switch (value) {
           AsyncValue<Map<String, ReadChapterSet>>(value: final data?) =>
             data[mangaId]?.contains(chapterId) == true,
@@ -257,7 +258,7 @@ class MarkReadButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final me = ref.watch(loggedUserProvider).value;
+    final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
 
     if (me == null) {
       return const SizedBox.shrink();
@@ -266,7 +267,7 @@ class MarkReadButton extends ConsumerWidget {
     final theme = Theme.of(context);
 
     bool? isRead = ref.watch(
-      readChaptersProvider(me.id).select(
+      readChaptersProvider(me).select(
         (value) => switch (value) {
           AsyncValue<Map<String, ReadChapterSet>>(value: final data?) =>
             data[manga.id]?.contains(chapter.id) == true,
@@ -284,9 +285,9 @@ class MarkReadButton extends ConsumerWidget {
       true || false => IconButton(
         onPressed: () async {
           bool set = !isRead;
-          readChaptersMutation(me.id).run(ref, (ref) async {
+          readChaptersMutation(me).run(ref, (ref) async {
             return await ref
-                .get(readChaptersProvider(me.id).notifier)
+                .get(readChaptersProvider(me).notifier)
                 .set(
                   manga,
                   read: set ? [chapter] : null,
@@ -384,7 +385,7 @@ class ChapterFeedWidget extends HookWidget {
                     final items = ChapterFeedItemData.toData(chapters, mangas);
 
                     return items;
-                  }, [state]);
+                  }, [chapters]);
 
                   final future = useFuture(builtItems);
 
@@ -477,8 +478,8 @@ class _InfiniteScrollFeedState
     getNextPageKey: (state) =>
         state.keys?.last != null ? state.keys!.last + widget.limit : 0,
     fetchPage: (pageKey) async {
-      final me = await ref.watch(loggedUserProvider.future);
-      final api = ref.watch(mangadexProvider);
+      final me = await ref.readAsync(loggedUserProvider.future);
+      final api = ref.read(mangadexProvider);
 
       final chapterlist = await api.fetchFeed(
         path: widget.path,
@@ -577,11 +578,11 @@ class _CoverButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final me = ref.watch(loggedUserProvider).value;
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     return TextButton(
       onPressed: () async {
+        final me = ref.read(loggedUserProvider).value;
         readChaptersMutation(me?.id).run(ref, (ref) async {
           return await ref.get(readChaptersProvider(me?.id).notifier).get([
             manga,
@@ -624,7 +625,6 @@ class MangaTitleButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final me = ref.watch(loggedUserProvider).value;
     final theme = Theme.of(context);
 
     return TextButton.icon(
@@ -636,6 +636,7 @@ class MangaTitleButton extends ConsumerWidget {
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {
+        final me = ref.read(loggedUserProvider).value;
         readChaptersMutation(me?.id).run(ref, (ref) async {
           return await ref.get(readChaptersProvider(me?.id).notifier).get([
             manga,
@@ -674,12 +675,11 @@ class _BackLinkedChapterButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final me = ref.watch(loggedUserProvider).value;
-
     return ChapterButtonWidget(
       chapter: chapter,
       manga: manga,
       onLinkPressed: (context) async {
+        final me = ref.read(loggedUserProvider).value;
         readChaptersMutation(me?.id).run(ref, (ref) async {
           return await ref.get(readChaptersProvider(me?.id).notifier).get([
             manga,
@@ -803,7 +803,7 @@ class _ChapterButtonCard extends ConsumerWidget {
 }
 
 @Dependencies([chipTextStyle, readBorderTheme])
-class ChapterButtonWidget extends StatelessWidget {
+class ChapterButtonWidget extends HookWidget {
   const ChapterButtonWidget({
     super.key,
     required this.chapter,
@@ -818,8 +818,11 @@ class ChapterButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
-    final numFormatter = NumberFormat.compact(
-      locale: tr.$meta.locale.flutterLocale.toString(),
+    final numFormatter = useMemoized(
+      () => NumberFormat.compact(
+        locale: tr.$meta.locale.flutterLocale.toString(),
+      ),
+      [tr.$meta.locale],
     );
 
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
@@ -930,13 +933,13 @@ class ChapterButtonWidget extends StatelessWidget {
               ),
               Row(
                 children: [
-                  SizedBox(width: 24, child: _groupIconB),
+                  const SizedBox(width: 24, child: _groupIconB),
                   Expanded(child: groups),
                 ],
               ),
               Row(
                 children: [
-                  SizedBox(width: 24, child: _personIconB),
+                  const SizedBox(width: 24, child: _personIconB),
                   Expanded(
                     child: Row(
                       children: [
@@ -962,7 +965,7 @@ class ChapterButtonWidget extends StatelessWidget {
                 children: [
                   SizedBox(width: 24, child: markReadButton),
                   Expanded(child: title),
-                  SizedBox(width: 24, child: _scheduleIconB),
+                  const SizedBox(width: 24, child: _scheduleIconB),
                   SizedBox(
                     width: 145,
                     child: Row(
@@ -975,9 +978,9 @@ class ChapterButtonWidget extends StatelessWidget {
               ),
               Row(
                 children: [
-                  SizedBox(width: 24, child: _groupIconB),
+                  const SizedBox(width: 24, child: _groupIconB),
                   Expanded(child: groups),
-                  SizedBox(width: 24, child: _personIconB),
+                  const SizedBox(width: 24, child: _personIconB),
                   SizedBox(
                     width: 145,
                     child: Row(
@@ -1311,31 +1314,28 @@ class GridMangaItem extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final me = ref.watch(loggedUserProvider).value;
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
-    final gradient = useAnimation(
-      aniController.drive(Styles.coverArtGradientTween),
+
+    final networkImage = CachedNetworkImage(
+      imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
+      cacheManager: gagakuImageCache,
+      width: 256.0,
+      fit: BoxFit.cover,
+      progressIndicatorBuilder: (context, url, downloadProgress) =>
+          const Center(child: CircularProgressIndicator()),
+      errorWidget: (context, url, error) => const Icon(Icons.error),
     );
 
-    final networkImage = useMemoized(
-      () => CachedNetworkImage(
-        imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
-        cacheManager: gagakuImageCache,
-        width: 256.0,
-        fit: BoxFit.cover,
-        progressIndicatorBuilder: (context, url, downloadProgress) =>
-            const Center(child: CircularProgressIndicator()),
-        errorWidget: (context, url, error) => const Icon(Icons.error),
-      ),
-      [manga],
+    final image = GridAlbumImage(
+      animation: aniController.drive(Styles.coverArtGradientTween),
+      child: networkImage,
     );
-
-    final image = GridAlbumImage(gradient: gradient, child: networkImage);
 
     return InkWell(
       onTap: () async {
+        final me = ref.read(loggedUserProvider).value;
         readChaptersMutation(me?.id).run(ref, (ref) async {
           return await ref.get(readChaptersProvider(me?.id).notifier).get([
             manga,
@@ -1391,7 +1391,6 @@ class GridMangaDetailedItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final me = ref.watch(loggedUserProvider).value;
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     return Card(
@@ -1408,6 +1407,7 @@ class GridMangaDetailedItem extends ConsumerWidget {
                 children: [
                   TextButton(
                     onPressed: () async {
+                      final me = ref.read(loggedUserProvider).value;
                       readChaptersMutation(me?.id).run(ref, (ref) async {
                         return await ref
                             .get(readChaptersProvider(me?.id).notifier)
@@ -1481,8 +1481,6 @@ class _ListMangaItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final me = ref.watch(loggedUserProvider).value;
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -1491,6 +1489,7 @@ class _ListMangaItem extends ConsumerWidget {
           children: [
             TextButton(
               onPressed: () async {
+                final me = ref.read(loggedUserProvider).value;
                 readChaptersMutation(me?.id).run(ref, (ref) async {
                   return await ref
                       .get(readChaptersProvider(me?.id).notifier)
@@ -1553,7 +1552,7 @@ class ChapterTitle extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final me = ref.watch(loggedUserProvider).value;
+    final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
 
     TextStyle textstyle;
 
@@ -1561,7 +1560,7 @@ class ChapterTitle extends ConsumerWidget {
       textstyle = TextStyle(color: theme.colorScheme.onPrimaryContainer);
     } else {
       bool? isRead = ref.watch(
-        readChaptersProvider(me.id).select(
+        readChaptersProvider(me).select(
           (value) => switch (value) {
             AsyncValue<Map<String, ReadChapterSet>>(value: final data?) =>
               data[manga.id]?.contains(chapter.id) == true,
@@ -1648,16 +1647,6 @@ class MangaStatisticsRow extends HookConsumerWidget {
         },
       ),
     );
-
-    // Redundancy
-    useEffect(() {
-      Future.delayed(Duration.zero, () async {
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get([manga]);
-        });
-      });
-      return null;
-    }, []);
 
     final numFormatter = useMemoized(() {
       return NumberFormat.compact(
@@ -1749,7 +1738,7 @@ class _GroupRow extends StatelessWidget {
   }
 }
 
-class _PubTime extends StatelessWidget {
+class _PubTime extends HookWidget {
   final DateTime time;
 
   const _PubTime({super.key, required this.time});
@@ -1763,7 +1752,10 @@ class _PubTime extends StatelessWidget {
     final lang = tr.$meta.locale.languageCode;
     //final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
 
-    final pubtime = timeago.format(time, locale: lang);
+    final pubtime = useMemoized(() => timeago.format(time, locale: lang), [
+      time,
+      lang,
+    ]);
 
     return Text(
       pubtime,

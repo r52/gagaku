@@ -1235,13 +1235,10 @@ class _CoverArtItem extends HookWidget {
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
-    final gradient = useAnimation(
-      aniController.drive(Styles.coverArtGradientTween),
-    );
     final url = manga.getUrlFromCover(cover);
 
     final image = GridAlbumImage(
-      gradient: gradient,
+      animation: aniController.drive(Styles.coverArtGradientTween),
       child: CachedNetworkImage(
         imageUrl: url.quality(quality: CoverArtQuality.medium),
         cacheManager: gagakuImageCache,

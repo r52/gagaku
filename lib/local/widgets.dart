@@ -121,12 +121,9 @@ class _GridLibraryItem extends HookWidget {
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
-    final gradient = useAnimation(
-      aniController.drive(Styles.coverArtGradientTween),
-    );
 
     final image = GridAlbumImage(
-      gradient: gradient,
+      animation: aniController.drive(Styles.coverArtGradientTween),
       child: item.thumbnail != null
           ? Image.file(File(item.thumbnail!), width: 256.0, fit: BoxFit.cover)
           : Icon(item.isReadable ? Icons.menu_book : Icons.folder, size: 128.0),

@@ -182,7 +182,6 @@ class WebMangaListViewSliver extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final extIcons = ref.watch(_extensionIconProvider);
-    final api = ref.watch(proxyProvider);
     WebMangaListView view = items != null
         ? ref.watch(_mangaListViewProvider)
         : WebMangaListView.grid;
@@ -278,6 +277,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                 textColor: theme.colorScheme.onSurface,
                 onTap: () async {
                   final tr = context.t;
+                  final api = ref.read(proxyProvider);
                   final messenger = ScaffoldMessenger.of(context);
                   final result = await api.handleLink(item);
 
@@ -355,6 +355,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                     textColor: theme.colorScheme.onSurface,
                     onTap: () async {
                       final tr = context.t;
+                      final api = ref.read(proxyProvider);
                       final messenger = ScaffoldMessenger.of(context);
                       final result = await api.handleLink(item);
 
@@ -428,91 +429,86 @@ class GridMangaItem extends HookConsumerWidget {
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
-    final gradient = useAnimation(
-      aniController.drive(Styles.coverArtGradientTween),
-    );
     final theme = Theme.of(context);
 
     String referer = refer[link.handle?.sourceId] ?? '';
 
-    final Widget cover = useMemoized(
-      () => link.cover != null
-          ? CachedNetworkImage(
-              imageUrl: link.cover!,
-              httpHeaders: {'referer': referer, 'user-agent': baseUserAgent},
-              cacheManager: gagakuImageCache,
-              memCacheWidth: 256,
-              maxWidthDiskCache: 256,
-              width: 128.0,
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  const Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-              fit: BoxFit.cover,
-            )
-          : const Icon(Icons.menu_book, size: 128.0),
-      [link.cover, referer],
+    final Widget cover = link.cover != null
+        ? CachedNetworkImage(
+            imageUrl: link.cover!,
+            httpHeaders: {'referer': referer, 'user-agent': baseUserAgent},
+            cacheManager: gagakuImageCache,
+            memCacheWidth: 256,
+            maxWidthDiskCache: 256,
+            width: 128.0,
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                const Center(child: CircularProgressIndicator()),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+            fit: BoxFit.cover,
+          )
+        : const Icon(Icons.menu_book, size: 128.0);
+
+    final sourceIcon = Align(
+      alignment: Alignment.bottomRight,
+      child:
+          extIcons[link.handle?.sourceId] ??
+          Text(link.handle?.sourceId ?? '', style: CommonTextStyles.twelve),
     );
 
-    final sourceIcon = useMemoized(
-      () => Align(
-        alignment: Alignment.bottomRight,
-        child:
-            extIcons[link.handle?.sourceId] ??
-            Text(link.handle?.sourceId ?? '', style: CommonTextStyles.twelve),
-      ),
-      [extIcons, link.handle?.sourceId],
-    );
+    final favButton = showFavoriteButton
+        ? Align(
+            alignment: Alignment.topLeft,
+            child: FavoritesButton(link: link),
+          )
+        : null;
 
-    final favButton = useMemoized(
-      () => showFavoriteButton
-          ? Align(
-              alignment: Alignment.topLeft,
-              child: FavoritesButton(link: link),
-            )
-          : null,
-      [showFavoriteButton, link],
-    );
-
-    final actionButton = useMemoized(() {
-      if (!showSearchButton && !showRemoveButton) return null;
-      return Align(
-        alignment: Alignment.topRight,
-        child: MenuAnchor(
-          builder: (context, controller, child) => IconButton(
-            style: Styles.squareIconButtonStyle(
-              backgroundColor: theme.colorScheme.surface.withAlpha(200),
-            ),
-            onPressed: () {
-              if (controller.isOpen) {
-                controller.close();
-              } else {
-                controller.open();
-              }
-            },
-            icon: child!,
-          ),
-          menuChildren: [
-            if (showSearchButton)
-              MenuItemButton(
-                onPressed: () => ExtensionSearchRoute(
-                  query: SearchQuery(title: link.title),
-                ).push(context),
-                leadingIcon: const Icon(Icons.search),
-                child: Text(tr.webSources.searchWithExt),
-              ),
-            if (showRemoveButton)
-              MenuItemButton(
-                onPressed: () async {
-                  WebHistoryManager().remove(link);
+    final actionButton = (!showSearchButton && !showRemoveButton)
+        ? null
+        : Align(
+            alignment: Alignment.topRight,
+            child: MenuAnchor(
+              builder: (context, controller, child) => IconButton(
+                style: Styles.squareIconButtonStyle(
+                  backgroundColor: theme.colorScheme.surface.withAlpha(200),
+                ),
+                onPressed: () {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
                 },
-                leadingIcon: Icon(Icons.delete, color: theme.colorScheme.error),
-                child: Text(tr.mangaActions.removeHistory),
+                icon: child!,
               ),
-          ],
-          child: const Icon(Icons.more_vert_outlined),
-        ),
-      );
-    }, [showSearchButton, showRemoveButton, link, tr, theme]);
+              menuChildren: [
+                if (showSearchButton)
+                  MenuItemButton(
+                    onPressed: () => ExtensionSearchRoute(
+                      query: SearchQuery(title: link.title),
+                    ).push(context),
+                    leadingIcon: const Icon(Icons.search),
+                    child: Text(tr.webSources.searchWithExt),
+                  ),
+                if (showRemoveButton)
+                  MenuItemButton(
+                    onPressed: () async {
+                      WebHistoryManager().remove(link);
+                    },
+                    leadingIcon: Icon(
+                      Icons.delete,
+                      color: theme.colorScheme.error,
+                    ),
+                    child: Text(tr.mangaActions.removeHistory),
+                  ),
+              ],
+              child: const Icon(Icons.more_vert_outlined),
+            ),
+          );
+
+    final image = GridAlbumImage(
+      animation: aniController.drive(Styles.coverArtGradientTween),
+      child: cover,
+    );
 
     return InkWell(
       onTap: () async {
@@ -545,7 +541,7 @@ class GridMangaItem extends HookConsumerWidget {
         children: [
           GridTile(
             footer: GridAlbumTextBar(text: link.title),
-            child: GridAlbumImage(gradient: gradient, child: cover),
+            child: image,
           ),
           sourceIcon,
           ?favButton,
@@ -641,7 +637,7 @@ class FavoritesButton extends HookWidget {
   }
 }
 
-class ChapterButtonWidget extends ConsumerWidget {
+class ChapterButtonWidget extends HookConsumerWidget {
   const ChapterButtonWidget({
     super.key,
     required this.data,
@@ -683,13 +679,14 @@ class ChapterButtonWidget extends ConsumerWidget {
     final lang = tr.$meta.locale.languageCode;
     //final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
 
-    String? timestamp;
-
-    if (data.chapter.lastUpdated != null) {
-      timestamp = timeago.format(data.chapter.lastUpdated!, locale: lang);
-    } else if (data.chapter.releaseDate != null) {
-      timestamp = timeago.format(data.chapter.releaseDate!, locale: lang);
-    }
+    final timestamp = useMemoized(() {
+      if (data.chapter.lastUpdated != null) {
+        return timeago.format(data.chapter.lastUpdated!, locale: lang);
+      } else if (data.chapter.releaseDate != null) {
+        return timeago.format(data.chapter.releaseDate!, locale: lang);
+      }
+      return null;
+    }, [data.chapter.lastUpdated, data.chapter.releaseDate, lang]);
 
     final language = sourceValue is Chapter
         ? CountryFlag(flag: sourceValue.langCode, size: 12)
@@ -945,11 +942,11 @@ class _CoverButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final api = ref.watch(proxyProvider);
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     return TextButton(
       onPressed: () async {
+        final api = ref.read(proxyProvider);
         final messenger = ScaffoldMessenger.of(context);
         final result = await api.handleLink(link);
 
@@ -1000,7 +997,6 @@ class _MangaTitle extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final api = ref.watch(proxyProvider);
     final theme = Theme.of(context);
 
     return TextButton.icon(
@@ -1013,6 +1009,7 @@ class _MangaTitle extends ConsumerWidget {
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {
+        final api = ref.read(proxyProvider);
         final messenger = ScaffoldMessenger.of(context);
         final result = await api.handleLink(link);
 
