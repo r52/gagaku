@@ -316,10 +316,7 @@ class ChapterFeedWidget extends HookWidget {
                   // It will instantly return the new state without ever unmounting the list.
                   final newState = useMemoized(() {
                     final items = chapters != null
-                        ? ChapterFeedItemData.toData(
-                            chapters,
-                            mangaCache.values.toList(),
-                          )
+                        ? ChapterFeedItemData.toData(chapters, mangaCache)
                         : <ChapterFeedItemData>[];
 
                     return PagingState<int, ChapterFeedItemData>(

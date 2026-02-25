@@ -973,19 +973,17 @@ class ChapterFeedItemData {
 
   static List<ChapterFeedItemData> toData(
     List<Chapter> chapters,
-    List<Manga> mangas,
+    Map<String, Manga> mangas,
   ) {
-    final mangaMap = Map<String, Manga>.fromIterable(mangas, key: (e) => e.id);
-
     // Craft feed items
     final dlist = chapters.fold(<ChapterFeedItemData>[], (list, chapter) {
       final mid = chapter.manga.id;
-      if (mangaMap.containsKey(mid)) {
+      if (mangas.containsKey(mid)) {
         ChapterFeedItemData? item;
         if (list.isNotEmpty && list.last.mangaId == mid) {
           item = list.last;
         } else {
-          item = ChapterFeedItemData(manga: mangaMap[mid]!);
+          item = ChapterFeedItemData(manga: mangas[mid]!);
           list.add(item);
         }
 
