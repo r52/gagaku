@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:async/async.dart';
 import 'package:dio/dio.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:gagaku/util/authentication.dart';
@@ -600,27 +601,38 @@ class MangaDexModel {
         'includes[]': ['scanlation_group', 'user'],
       };
 
+      final futures = <Future<void>>[];
+
       while (end < fetch.length) {
         start = end;
         end += min(fetch.length - start, MangaDexEndpoints.breakLimit);
 
-        queryParams['ids[]'] = fetch.getRange(start, end);
+        final chunkParams = Map<String, dynamic>.from(queryParams);
+        chunkParams['ids[]'] = fetch.getRange(start, end);
 
         final uri = MangaDexEndpoints.api.replace(
           path: MangaDexEndpoints.chapter,
-          queryParameters: queryParams,
+          queryParameters: chunkParams,
         );
 
-        final response = await _dio.getUri(uri);
+        futures.add(
+          _dio.getUri(uri).then((response) async {
+            if (response.statusCode == 200) {
+              final result = MDEntityList.fromJson(response.data);
+              await _cache.putAllAPIResolved(result.data);
+            } else {
+              throw createException("fetchChapters() failed.", response);
+            }
+          }),
+        );
+      }
 
-        if (response.statusCode == 200) {
-          final result = MDEntityList.fromJson(response.data);
+      final results = await Result.captureAll(futures);
 
-          // Cache the data
-          await _cache.putAllAPIResolved(result.data);
-        } else {
-          // Throw if failure
-          throw createException("fetchChapters() failed.", response);
+      for (final result in results) {
+        if (result.isError) {
+          // Log the partial failure, but allow the successful chunks to proceed
+          logger.w("A chunk failed to fetch", error: result.asError!.error);
         }
       }
     }
@@ -655,27 +667,38 @@ class MangaDexModel {
     if (fetch.isNotEmpty) {
       int start = 0, end = 0;
 
+      final futures = <Future<void>>[];
+
       while (end < fetch.length) {
         start = end;
         end += min(fetch.length - start, limit);
 
-        queryParams['ids[]'] = fetch.getRange(start, end);
+        final chunkParams = Map<String, dynamic>.from(queryParams);
+        chunkParams['ids[]'] = fetch.getRange(start, end);
 
         final uri = MangaDexEndpoints.api.replace(
           path: MangaDexEndpoints.manga,
-          queryParameters: queryParams,
+          queryParameters: chunkParams,
         );
 
-        final response = await _dio.getUri(uri);
+        futures.add(
+          _dio.getUri(uri).then((response) async {
+            if (response.statusCode == 200) {
+              final result = MDEntityList.fromJson(response.data);
+              await _cache.putAllAPIResolved(result.data);
+            } else {
+              throw createException("fetchMangaById() failed.", response);
+            }
+          }),
+        );
+      }
 
-        if (response.statusCode == 200) {
-          final mangalist = MDEntityList.fromJson(response.data);
+      final results = await Result.captureAll(futures);
 
-          // Cache the data
-          await _cache.putAllAPIResolved(mangalist.data);
-        } else {
-          // Throw if failure
-          throw createException("fetchManga(ids) failed.", response);
+      for (final result in results) {
+        if (result.isError) {
+          // Log the partial failure, but allow the successful chunks to proceed
+          logger.w("A chunk failed to fetch", error: result.asError!.error);
         }
       }
     }
@@ -1353,27 +1376,38 @@ class MangaDexModel {
         'limit': MangaDexEndpoints.breakLimit.toString(),
       };
 
+      final futures = <Future<void>>[];
+
       while (end < fetch.length) {
         start = end;
         end += min(fetch.length - start, MangaDexEndpoints.breakLimit);
 
-        queryParams['ids[]'] = fetch.getRange(start, end);
+        final chunkParams = Map<String, dynamic>.from(queryParams);
+        chunkParams['ids[]'] = fetch.getRange(start, end);
 
         final uri = MangaDexEndpoints.api.replace(
           path: MangaDexEndpoints.group,
-          queryParameters: queryParams,
+          queryParameters: chunkParams,
         );
 
-        final response = await _dio.getUri(uri);
+        futures.add(
+          _dio.getUri(uri).then((response) async {
+            if (response.statusCode == 200) {
+              final result = MDEntityList.fromJson(response.data);
+              await _cache.putAllAPIResolved(result.data);
+            } else {
+              throw createException("fetchGroups() failed.", response);
+            }
+          }),
+        );
+      }
 
-        if (response.statusCode == 200) {
-          final result = MDEntityList.fromJson(response.data);
+      final results = await Result.captureAll(futures);
 
-          // Cache the data
-          await _cache.putAllAPIResolved(result.data);
-        } else {
-          // Throw if failure
-          throw createException("fetchGroups() failed.", response);
+      for (final result in results) {
+        if (result.isError) {
+          // Log the partial failure, but allow the successful chunks to proceed
+          logger.w("A chunk failed to fetch", error: result.asError!.error);
         }
       }
     }
@@ -1409,27 +1443,38 @@ class MangaDexModel {
           'limit': MangaDexEndpoints.breakLimit.toString(),
         };
 
+        final futures = <Future<void>>[];
+
         while (end < fetch.length) {
           start = end;
           end += min(fetch.length - start, MangaDexEndpoints.breakLimit);
 
-          queryParams['ids[]'] = fetch.getRange(start, end);
+          final chunkParams = Map<String, dynamic>.from(queryParams);
+          chunkParams['ids[]'] = fetch.getRange(start, end);
 
           final uri = MangaDexEndpoints.api.replace(
             path: MangaDexEndpoints.creator,
-            queryParameters: queryParams,
+            queryParameters: chunkParams,
           );
 
-          final response = await _dio.getUri(uri);
+          futures.add(
+            _dio.getUri(uri).then((response) async {
+              if (response.statusCode == 200) {
+                final result = MDEntityList.fromJson(response.data);
+                await _cache.putAllAPIResolved(result.data);
+              } else {
+                throw createException("fetchCreators() failed.", response);
+              }
+            }),
+          );
+        }
 
-          if (response.statusCode == 200) {
-            final result = MDEntityList.fromJson(response.data);
+        final results = await Result.captureAll(futures);
 
-            // Cache the data
-            await _cache.putAllAPIResolved(result.data);
-          } else {
-            // Throw if failure
-            throw createException("fetchCreators() failed.", response);
+        for (final result in results) {
+          if (result.isError) {
+            // Log the partial failure, but allow the successful chunks to proceed
+            logger.w("A chunk failed to fetch", error: result.asError!.error);
           }
         }
       }
