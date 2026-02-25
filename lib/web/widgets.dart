@@ -756,9 +756,9 @@ class ChapterButtonWidget extends HookConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
+          spacing: 6.0,
           children: [
             SizedBox(width: 24, child: markReadBtn),
-            const SizedBox(width: 6),
             Expanded(
               child: Text(
                 title,
@@ -766,20 +766,17 @@ class ChapterButtonWidget extends HookConsumerWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            SizedBox(
-              width: 150,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [?language],
+            if (language != null)
+              SizedBox(
+                width: 150,
+                child: Align(alignment: Alignment.centerRight, child: language),
               ),
-            ),
           ],
         ),
         Row(
+          spacing: 6.0,
           children: [
             const SizedBox(width: 24, child: Icon(Icons.group, size: 20)),
-            const SizedBox(width: 6),
             Expanded(child: Text(groupText, overflow: TextOverflow.ellipsis)),
             SizedBox(
               width: 150,
@@ -797,45 +794,26 @@ class ChapterButtonWidget extends HookConsumerWidget {
       ],
     );
 
-    return InkWell(
-      onTap: () => route.push(context),
-      child: _ChapterButtonCard(
-        key: ValueKey('_ChapterButtonCard($chapterkey)'),
-        mangaKey: mangakey,
-        chapterKey: chapterkey,
-        child: tile,
+    return RepaintBoundary(
+      child: InkWell(
+        onTap: () => route.push(context),
+        child: _ChapterButtonCard(isRead: isRead, child: tile),
       ),
     );
   }
 }
 
-class _ChapterButtonCard extends ConsumerWidget {
-  final String chapterKey;
-  final String mangaKey;
+class _ChapterButtonCard extends StatelessWidget {
+  final bool isRead;
   final Widget child;
 
-  const _ChapterButtonCard({
-    super.key,
-    required this.chapterKey,
-    required this.mangaKey,
-    required this.child,
-  });
+  const _ChapterButtonCard({required this.isRead, required this.child});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
     final tileColor = theme.colorScheme.primaryContainer;
-
-    final isRead = ref.watch(
-      webReadMarkersProvider.select(
-        (value) => switch (value) {
-          AsyncValue(value: final db?) =>
-            db.markers[mangaKey]?.contains(chapterKey) ?? false,
-          _ => false,
-        },
-      ),
-    );
 
     return Ink(
       padding: EdgeInsets.symmetric(
@@ -846,10 +824,7 @@ class _ChapterButtonCard extends ConsumerWidget {
         borderRadius: const BorderRadius.all(Radius.circular(4)),
         color: tileColor,
         border: Border(
-          left: BorderSide(
-            color: isRead == true ? tileColor : Colors.blue,
-            width: 4.0,
-          ),
+          left: BorderSide(color: isRead ? tileColor : Colors.blue, width: 4.0),
         ),
       ),
       child: child,
@@ -876,59 +851,61 @@ class ChapterFeedItem extends StatelessWidget {
       link: state.link,
     );
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: screenSizeSmall
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  titleBtn,
-                  const Divider(height: 4.0),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      coverBtn,
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 4.0,
-                          children: [
-                            for (final item in state.manga.chapters.take(3))
-                              ChapterButtonWidget(
-                                data: item,
-                                manga: state.manga,
-                                handle: state.link.handle!,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              )
-            : Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  coverBtn,
-                  Expanded(
-                    child: Column(
+    return RepaintBoundary(
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: screenSizeSmall
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleBtn,
+                    const Divider(height: 4.0),
+                    Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 4.0,
                       children: [
-                        titleBtn,
-                        const Divider(height: 10.0),
-                        for (final item in state.manga.chapters.take(3))
-                          ChapterButtonWidget(
-                            data: item,
-                            manga: state.manga,
-                            handle: state.link.handle!,
+                        coverBtn,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 4.0,
+                            children: [
+                              for (final item in state.manga.chapters.take(3))
+                                ChapterButtonWidget(
+                                  data: item,
+                                  manga: state.manga,
+                                  handle: state.link.handle!,
+                                ),
+                            ],
                           ),
+                        ),
                       ],
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    coverBtn,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 4.0,
+                        children: [
+                          titleBtn,
+                          const Divider(height: 10.0),
+                          for (final item in state.manga.chapters.take(3))
+                            ChapterButtonWidget(
+                              data: item,
+                              manga: state.manga,
+                              handle: state.link.handle!,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }

@@ -212,29 +212,20 @@ class MangaProviderCarousel extends StatelessWidget {
   }
 }
 
-class MarkReadButton extends ConsumerWidget {
-  const MarkReadButton({
-    super.key,
-    required this.chapter,
-    required this.manga,
-    required this.meId,
-    required this.readStatus,
-  });
+class MarkReadButton extends StatelessWidget {
+  const MarkReadButton({super.key, required this.readStatus, this.onMarkRead});
 
-  final Chapter chapter;
-  final Manga manga;
-  final String? meId;
   final bool? readStatus;
+  final Future<void> Function(bool)? onMarkRead;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final tr = context.t;
+    final theme = Theme.of(context);
 
-    if (meId == null) {
+    if (onMarkRead == null) {
       return const SizedBox.shrink();
     }
-
-    final theme = Theme.of(context);
 
     return switch (readStatus) {
       null => const SizedBox(
@@ -243,18 +234,7 @@ class MarkReadButton extends ConsumerWidget {
         child: CircularProgressIndicator(),
       ),
       true || false => IconButton(
-        onPressed: () async {
-          bool set = !readStatus!;
-          readChaptersMutation(meId).run(ref, (ref) async {
-            return await ref
-                .get(readChaptersProvider(meId).notifier)
-                .set(
-                  manga,
-                  read: set ? [chapter] : null,
-                  unread: !set ? [chapter] : null,
-                );
-          });
-        },
+        onPressed: () => onMarkRead!(!readStatus!),
         padding: EdgeInsets.zero,
         splashRadius: 15,
         iconSize: 20,
@@ -281,6 +261,7 @@ class ChapterFeedWidget extends HookWidget {
   const ChapterFeedWidget({
     super.key,
     required this.controller,
+    required this.mangaCache,
     required this.onRefresh,
     this.title,
     this.scrollController,
@@ -293,6 +274,7 @@ class ChapterFeedWidget extends HookWidget {
   final ScrollController? scrollController;
   final String? restorationId;
   final List<Widget> leading;
+  final Map<String, Manga> mangaCache;
 
   final PagingController<int, Chapter> controller;
 
@@ -326,46 +308,33 @@ class ChapterFeedWidget extends HookWidget {
               ),
             PagingListener(
               controller: controller,
-              builder: (context, state, fetchNextPage) => HookConsumer(
-                builder: (context, ref, child) {
-                  final api = ref.watch(mangadexProvider);
+              builder: (context, state, fetchNextPage) => HookBuilder(
+                builder: (context) {
                   final chapters = state.items;
 
-                  final builtItems = useMemoized(() async {
-                    if (chapters == null) {
-                      return null;
-                    }
-
-                    final mangaIds = chapters.map((e) => e.manga.id).toSet();
-                    final mangas = await api.fetchMangaById(
-                      ids: mangaIds,
-                      limit: MangaDexEndpoints.breakLimit,
-                    );
-
-                    final items = ChapterFeedItemData.toData(chapters, mangas);
-
-                    return items;
-                  }, [chapters]);
-
-                  final future = useFuture(builtItems);
-
+                  // Because this is now 100% synchronous, using [state] is perfectly safe.
+                  // It will instantly return the new state without ever unmounting the list.
                   final newState = useMemoized(() {
+                    final items = chapters != null
+                        ? ChapterFeedItemData.toData(
+                            chapters,
+                            mangaCache.values.toList(),
+                          )
+                        : <ChapterFeedItemData>[];
+
                     return PagingState<int, ChapterFeedItemData>(
-                      error: state.error ?? future.error,
-                      pages: state.keys == null || !future.hasData
+                      error: state.error,
+                      pages: state.keys == null
                           ? null
                           : List.generate(
                               state.keys!.length,
-                              (i) => i == 0 ? future.data! : [],
+                              (i) => i == 0 ? items : [],
                             ),
-                      keys: future.hasData ? state.keys : null,
+                      keys: state.keys,
                       hasNextPage: state.hasNextPage,
-                      isLoading:
-                          future.connectionState == ConnectionState.waiting ||
-                          !future.hasData ||
-                          state.isLoading,
+                      isLoading: state.isLoading,
                     );
-                  }, [future, state]);
+                  }, [state]);
 
                   return PagedSuperSliverList(
                     state: newState,
@@ -434,6 +403,8 @@ class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
 
 class _InfiniteScrollFeedState
     extends ConsumerState<InfiniteScrollChapterFeedWidget> {
+  final Map<String, Manga> _mangaCache = {};
+
   late final _pagingController = GagakuPagingController<int, Chapter>(
     getNextPageKey: (state) =>
         state.keys?.last != null ? state.keys!.last + widget.limit : 0,
@@ -459,6 +430,10 @@ class _InfiniteScrollFeedState
         limit: MangaDexEndpoints.breakLimit,
       );
 
+      for (final m in mangas) {
+        _mangaCache[m.id] = m;
+      }
+
       try {
         await (
           statisticsMutation.run(ref, (ref) async {
@@ -480,6 +455,7 @@ class _InfiniteScrollFeedState
       return PageResultsMetaData(chapters, chapterlist.total);
     },
     refresh: () async {
+      _mangaCache.clear();
       final api = ref.watch(mangadexProvider);
       await api.invalidateAll(
         widget.entity == null
@@ -522,6 +498,7 @@ class _InfiniteScrollFeedState
   Widget build(BuildContext context) {
     return ChapterFeedWidget(
       controller: _pagingController,
+      mangaCache: _mangaCache,
       onRefresh: () async => _pagingController.refresh(),
       title: widget.title,
       scrollController: widget.scrollController,
@@ -532,7 +509,7 @@ class _InfiniteScrollFeedState
 }
 
 class _CoverButton extends ConsumerWidget {
-  const _CoverButton({super.key, required this.manga});
+  const _CoverButton({required this.manga});
 
   final Manga manga;
 
@@ -608,12 +585,7 @@ class MangaTitleButton extends ConsumerWidget {
         });
         MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context);
       },
-      icon: CountryFlag(
-        key: ValueKey(
-          'CountryFlag(${manga.attributes!.originalLanguage.code})',
-        ),
-        flag: manga.attributes!.originalLanguage.flag,
-      ),
+      icon: CountryFlag(flag: manga.attributes!.originalLanguage.flag),
       label: Text(
         manga.attributes!.title.get('en'),
         overflow: TextOverflow.ellipsis,
@@ -628,22 +600,31 @@ class _BackLinkedChapterButton extends ConsumerWidget {
     super.key,
     required this.chapter,
     required this.manga,
-    this.meId,
+    this.readStatus,
+    this.comments,
+    this.isLoggedIn = false,
     this.numFormatter,
+    this.onMarkRead,
   });
 
   final Chapter chapter;
   final Manga manga;
-  final String? meId;
+  final bool? readStatus;
+  final StatisticsDetailsComments? comments;
+  final bool isLoggedIn;
   final NumberFormat? numFormatter;
+  final Future<void> Function(bool)? onMarkRead;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ChapterButtonWidget(
       chapter: chapter,
       manga: manga,
-      meId: meId,
+      readStatus: readStatus,
+      comments: comments,
+      isLoggedIn: isLoggedIn,
       numFormatter: numFormatter,
+      onMarkRead: onMarkRead,
       onLinkPressed: (context) async {
         final me = ref.read(loggedUserProvider).value;
         readChaptersMutation(me?.id).run(ref, (ref) async {
@@ -681,16 +662,12 @@ class ChapterFeedItem extends HookConsumerWidget {
     );
 
     final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
+    final readData = me == null ? null : ref.watch(readChaptersProvider(me));
+    final statsData = ref.watch(chapterStatsProvider);
 
-    final titleBtn = MangaTitleButton(
-      key: ValueKey('_MangaTitle(${state.manga.id})'),
-      manga: state.manga,
-    );
+    final titleBtn = MangaTitleButton(manga: state.manga);
 
-    final coverBtn = _CoverButton(
-      key: ValueKey('_CoverButton(${state.manga.id})'),
-      manga: state.manga,
-    );
+    final coverBtn = _CoverButton(manga: state.manga);
 
     final chaptersCount = state.chapters.length;
     final visibleChapters = state.chapters.take(visibleCount.value);
@@ -702,8 +679,30 @@ class ChapterFeedItem extends HookConsumerWidget {
           key: ValueKey(chapter.id),
           chapter: chapter,
           manga: state.manga,
-          meId: me,
+          readStatus: switch (readData) {
+            AsyncData(value: final data) =>
+              data[state.manga.id]?.contains(chapter.id) == true,
+            _ => null,
+          },
+          comments: switch (statsData) {
+            AsyncData(value: final data) => data[chapter.id]?.comments,
+            _ => null,
+          },
+          isLoggedIn: me != null,
           numFormatter: numFormatter,
+          onMarkRead: me == null
+              ? null
+              : (setRead) async {
+                  readChaptersMutation(me).run(ref, (ref) async {
+                    return await ref
+                        .get(readChaptersProvider(me).notifier)
+                        .set(
+                          state.manga,
+                          read: setRead ? [chapter] : null,
+                          unread: !setRead ? [chapter] : null,
+                        );
+                  });
+                },
         ),
       if (remaining > 0)
         Center(
@@ -715,47 +714,49 @@ class ChapterFeedItem extends HookConsumerWidget {
         ),
     ];
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: screenSizeSmall
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  titleBtn,
-                  const Divider(height: 4.0),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      coverBtn,
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 4.0,
-                          children: chapterButtons,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              )
-            : Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  coverBtn,
-                  Expanded(
-                    child: Column(
+    return RepaintBoundary(
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: screenSizeSmall
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleBtn,
+                    const Divider(height: 4.0),
+                    Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 4.0,
                       children: [
-                        titleBtn,
-                        const Divider(height: 10.0),
-                        ...chapterButtons,
+                        coverBtn,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 4.0,
+                            children: chapterButtons,
+                          ),
+                        ),
                       ],
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    coverBtn,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 4.0,
+                        children: [
+                          titleBtn,
+                          const Divider(height: 10.0),
+                          ...chapterButtons,
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }
@@ -765,16 +766,15 @@ class _ChapterButtonCard extends StatelessWidget {
   final Chapter chapter;
   final Manga manga;
   final Widget child;
-  final String? meId;
   final bool? readStatus;
+  final bool isLoggedIn;
 
   const _ChapterButtonCard({
-    super.key,
     required this.chapter,
     required this.manga,
     required this.child,
-    this.meId,
     this.readStatus,
+    this.isLoggedIn = false,
   });
 
   @override
@@ -784,7 +784,7 @@ class _ChapterButtonCard extends StatelessWidget {
     final tileColor = theme.colorScheme.primaryContainer;
 
     Border border;
-    if (meId == null) {
+    if (!isLoggedIn) {
       border = Border(left: BorderSide(color: tileColor, width: 4.0));
     } else {
       border = Border(
@@ -813,45 +813,34 @@ class _ChapterButtonCard extends StatelessWidget {
 }
 
 @Dependencies([chipTextStyle])
-class ChapterButtonWidget extends HookConsumerWidget {
+class ChapterButtonWidget extends StatelessWidget {
   const ChapterButtonWidget({
     super.key,
     required this.chapter,
     required this.manga,
     this.onLinkPressed,
-    this.meId,
+    this.readStatus,
+    this.comments,
+    this.isLoggedIn = false,
     this.numFormatter,
+    this.onMarkRead,
   });
 
   final Chapter chapter;
   final Manga manga;
   final CtxCallback? onLinkPressed;
-  final String? meId;
+  final bool? readStatus;
+  final StatisticsDetailsComments? comments;
+  final bool isLoggedIn;
   final NumberFormat? numFormatter;
+  final Future<void> Function(bool)? onMarkRead;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final tr = context.t;
     final formatter =
         numFormatter ??
-        useMemoized(
-          () => NumberFormat.compact(
-            locale: tr.$meta.locale.flutterLocale.toString(),
-          ),
-          [tr.$meta.locale],
-        );
-
-    final readStatus = meId == null
-        ? null
-        : ref.watch(
-            readChaptersProvider(meId!).select(
-              (value) => switch (value) {
-                AsyncValue<Map<String, ReadChapterSet>>(value: final data?) =>
-                  data[manga.id]?.contains(chapter.id) == true,
-                _ => null,
-              },
-            ),
-          );
+        NumberFormat.compact(locale: tr.$meta.locale.flutterLocale.toString());
 
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
@@ -863,64 +852,28 @@ class ChapterButtonWidget extends HookConsumerWidget {
 
     final user = chapter.uploadUser;
     final userChip = IconTextChip(
-      key: ValueKey(user?.id),
       icon: isOfficialPub ? _checkIconB : null,
       text: !isOfficialPub
           ? (user?.attributes?.username.crop() ?? '')
           : tr.mangadex.officialPub,
     );
 
-    final statsChip = Consumer(
-      builder: (context, ref, child) {
-        final comments = ref.watch(
-          chapterStatsProvider.select(
-            (value) => switch (value) {
-              AsyncValue<Map<String, ChapterStatistics>>(value: final data?)
-                  when data.containsKey(chapter.id) =>
-                data[chapter.id]?.comments,
-              _ => null,
-            },
-          ),
-        );
+    final statsChip = CommentChip(comments: comments, formatter: formatter);
 
-        return CommentChip(
-          key: ValueKey('CommentChip(${chapter.id})'),
-          comments: comments,
-          formatter: formatter!,
-        );
-      },
-    );
-
-    final statsChipRow = Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      mainAxisSize: MainAxisSize.min,
-      children: [Flexible(child: statsChip)],
-    );
-
-    final pubtime = _PubTime(
-      key: ValueKey(chapter.attributes.publishAt.millisecondsSinceEpoch),
-      time: chapter.attributes.publishAt,
-    );
+    final pubtime = _PubTime(time: chapter.attributes.publishAt);
 
     final markReadButton = MarkReadButton(
-      key: ValueKey('MarkReadButton(${chapter.id})'),
-      chapter: chapter,
-      manga: manga,
-      meId: meId,
       readStatus: readStatus,
+      onMarkRead: onMarkRead,
     );
 
     final title = Row(
-      mainAxisSize: MainAxisSize.min,
       spacing: 6.0,
       children: [
+        // This gap is to deliberate leave space between
+        // the markReadButton and the flag
         const SizedBox.shrink(),
-        CountryFlag(
-          key: ValueKey(
-            'CountryFlag(${chapter.attributes.translatedLanguage.code})',
-          ),
-          flag: chapter.attributes.translatedLanguage.flag,
-        ),
+        CountryFlag(flag: chapter.attributes.translatedLanguage.flag),
         if (isOfficialPub) _openIconB,
         Expanded(
           child: Row(
@@ -928,30 +881,21 @@ class ChapterButtonWidget extends HookConsumerWidget {
             children: [
               Flexible(
                 child: ChapterTitle(
-                  key: ValueKey('ChapterTitle(${chapter.id})'),
                   chapter: chapter,
                   manga: manga,
-                  meId: meId,
                   readStatus: readStatus,
+                  isLoggedIn: isLoggedIn,
                 ),
               ),
-              if (isEndChapter)
-                IconTextChip(
-                  key: ValueKey('END'),
-                  color: Colors.blue,
-                  text: 'END',
-                ),
+              if (isEndChapter) IconTextChip(color: Colors.blue, text: 'END'),
             ],
           ),
         ),
-        if (screenSizeSmall) statsChipRow,
+        if (screenSizeSmall) statsChip,
       ],
     );
 
-    final groups = _GroupRow(
-      key: ValueKey('_GroupRow(${chapter.id})'),
-      chapter: chapter,
-    );
+    final groups = _GroupRow(chapter: chapter);
 
     final tile = screenSizeSmall
         ? Column(
@@ -976,13 +920,15 @@ class ChapterButtonWidget extends HookConsumerWidget {
                     child: Row(
                       children: [
                         Expanded(
-                          child: Row(children: [Flexible(child: userChip)]),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: userChip,
+                          ),
                         ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          spacing: 4.0,
-                          children: [_scheduleIconB, pubtime],
-                        ),
+                        const SizedBox(width: 4.0),
+                        _scheduleIconB,
+                        const SizedBox(width: 4.0),
+                        pubtime,
                       ],
                     ),
                   ),
@@ -1000,9 +946,9 @@ class ChapterButtonWidget extends HookConsumerWidget {
                   const SizedBox(width: 24, child: _scheduleIconB),
                   SizedBox(
                     width: 145,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [const SizedBox(width: 2.0), pubtime],
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 2.0),
+                      child: pubtime,
                     ),
                   ),
                   const SizedBox(width: 60),
@@ -1015,37 +961,44 @@ class ChapterButtonWidget extends HookConsumerWidget {
                   const SizedBox(width: 24, child: _personIconB),
                   SizedBox(
                     width: 145,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [Flexible(child: userChip)],
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: userChip,
                     ),
                   ),
-                  SizedBox(width: 60, child: statsChipRow),
+                  SizedBox(
+                    width: 60,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: statsChip,
+                    ),
+                  ),
                 ],
               ),
             ],
           );
 
-    return InkWell(
-      onTap: () {
-        MangaDexReaderRoute(
-          chapterId: chapter.id,
-          $extra: ReaderData(
-            title: chapter.title,
-            chapter: chapter,
-            manga: manga,
-            link: manga.attributes!.title.get('en'),
-            onLinkPressed: onLinkPressed,
-          ),
-        ).push(context);
-      },
-      child: _ChapterButtonCard(
-        key: ValueKey('_ChapterButtonCard(${chapter.id})'),
-        manga: manga,
-        chapter: chapter,
-        meId: meId,
-        readStatus: readStatus,
-        child: tile,
+    return RepaintBoundary(
+      child: InkWell(
+        onTap: () {
+          MangaDexReaderRoute(
+            chapterId: chapter.id,
+            $extra: ReaderData(
+              title: chapter.title,
+              chapter: chapter,
+              manga: manga,
+              link: manga.attributes!.title.get('en'),
+              onLinkPressed: onLinkPressed,
+            ),
+          ).push(context);
+        },
+        child: _ChapterButtonCard(
+          manga: manga,
+          chapter: chapter,
+          readStatus: readStatus,
+          isLoggedIn: isLoggedIn,
+          child: tile,
+        ),
       ),
     );
   }
@@ -1580,15 +1533,15 @@ class _ListMangaItem extends ConsumerWidget {
 class ChapterTitle extends StatelessWidget {
   final Chapter chapter;
   final Manga manga;
-  final String? meId;
   final bool? readStatus;
+  final bool isLoggedIn;
 
   const ChapterTitle({
     super.key,
     required this.chapter,
     required this.manga,
-    this.meId,
     this.readStatus,
+    this.isLoggedIn = false,
   });
 
   @override
@@ -1597,7 +1550,7 @@ class ChapterTitle extends StatelessWidget {
 
     TextStyle textstyle;
 
-    if (meId == null) {
+    if (!isLoggedIn) {
       textstyle = TextStyle(color: theme.colorScheme.onPrimaryContainer);
     } else {
       textstyle = TextStyle(
@@ -1692,7 +1645,6 @@ class MangaStatisticsRow extends HookConsumerWidget {
         ...switch (statsProvider) {
           MangaStatistics(:final rating, :final follows, :final comments) => [
             IconTextChip(
-              key: ValueKey('_RatingChip(${manga.id})'),
               icon: const Icon(
                 Icons.star_border,
                 color: Colors.amber,
@@ -1706,21 +1658,15 @@ class MangaStatisticsRow extends HookConsumerWidget {
               ),
             ),
             IconTextChip(
-              key: ValueKey('_FollowsChip(${manga.id})'),
               icon: const Icon(Icons.bookmark_outline, size: 18),
               text: numFormatter.format(follows),
             ),
-            CommentChip(
-              key: ValueKey('CommentChip(${manga.id})'),
-              comments: comments,
-              formatter: numFormatter,
-            ),
+            CommentChip(comments: comments, formatter: numFormatter),
           ],
           _ => [IconTextChip(text: tr.ui.loadingDot)],
         },
         const SizedBox.shrink(),
         MangaStatusChip(
-          key: ValueKey('MangaStatusChip(${manga.id})'),
           status: manga.attributes!.status,
           year: manga.attributes!.year,
           short: shortStatus,
@@ -1734,7 +1680,7 @@ class MangaStatisticsRow extends HookConsumerWidget {
 class _GroupRow extends StatelessWidget {
   final Chapter chapter;
 
-  const _GroupRow({super.key, required this.chapter});
+  const _GroupRow({required this.chapter});
 
   @override
   Widget build(BuildContext context) {
@@ -1746,7 +1692,6 @@ class _GroupRow extends StatelessWidget {
       chips.add(
         Flexible(
           child: IconTextChip(
-            key: ValueKey(g.id),
             icon: isOfficialPub ? _circleIconB : null,
             text: g.attributes.name,
             onPressed: () {
@@ -1758,11 +1703,7 @@ class _GroupRow extends StatelessWidget {
     }
 
     if (chips.isEmpty) {
-      chips.add(
-        Flexible(
-          child: IconTextChip(key: const ValueKey('nogroup'), text: 'No Group'),
-        ),
-      );
+      chips.add(Flexible(child: IconTextChip(text: 'No Group')));
     }
 
     return Row(mainAxisSize: MainAxisSize.min, spacing: 6.0, children: chips);
@@ -1772,7 +1713,7 @@ class _GroupRow extends StatelessWidget {
 class _PubTime extends HookWidget {
   final DateTime time;
 
-  const _PubTime({super.key, required this.time});
+  const _PubTime({required this.time});
 
   @override
   Widget build(BuildContext context) {

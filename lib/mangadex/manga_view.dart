@@ -1052,6 +1052,8 @@ class _ChapterListSliver extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
+    final readData = me == null ? null : ref.watch(readChaptersProvider(me));
+    final statsData = ref.watch(chapterStatsProvider);
     final numFormatter = useMemoized(
       () => NumberFormat.compact(
         locale: tr.$meta.locale.flutterLocale.toString(),
@@ -1176,13 +1178,39 @@ class _ChapterListSliver extends HookConsumerWidget {
             );
           }
 
+          final isRead = switch (readData) {
+            AsyncData(value: final data) =>
+              data[manga.id]?.contains(item.chapter!.id) == true,
+            _ => null,
+          };
+
+          final comments = switch (statsData) {
+            AsyncData(value: final data) => data[item.chapter!.id]?.comments,
+            _ => null,
+          };
+
           // is chapter beyond this point
           final chapbtn = ChapterButtonWidget(
             key: ValueKey(item.chapter!.id),
             chapter: item.chapter!,
             manga: manga,
-            meId: me,
+            readStatus: isRead,
+            comments: comments,
+            isLoggedIn: me != null,
             numFormatter: numFormatter,
+            onMarkRead: me == null
+                ? null
+                : (setRead) async {
+                    readChaptersMutation(me).run(ref, (ref) async {
+                      return await ref
+                          .get(readChaptersProvider(me).notifier)
+                          .set(
+                            manga,
+                            read: setRead ? [item.chapter!] : null,
+                            unread: !setRead ? [item.chapter!] : null,
+                          );
+                    });
+                  },
           );
 
           if (item.isIndented) {
@@ -1212,7 +1240,6 @@ class _ChapterListHeader extends HookWidget {
   Widget build(BuildContext context) {
     useAutomaticKeepAlive();
     return Padding(
-      key: ValueKey(key),
       padding: const EdgeInsets.all(6.0),
       child: Text(
         text,
