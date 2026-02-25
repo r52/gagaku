@@ -21,6 +21,7 @@ import 'package:gagaku/web/model/types.dart' show SearchQuery;
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
@@ -60,7 +61,7 @@ Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
   return manga.first;
 }
 
-@Dependencies([readBorderTheme, chipTextStyle])
+@Dependencies([chipTextStyle])
 class MangaDexMangaViewPage extends ConsumerWidget {
   const MangaDexMangaViewPage({super.key, required this.mangaId, this.manga});
 
@@ -88,7 +89,7 @@ class MangaDexMangaViewPage extends ConsumerWidget {
   }
 }
 
-@Dependencies([readBorderTheme, chipTextStyle])
+@Dependencies([chipTextStyle])
 class MangaDexMangaViewWidget extends StatefulHookConsumerWidget {
   const MangaDexMangaViewWidget({super.key, required this.manga});
 
@@ -937,7 +938,7 @@ class _UnpagedMangaViewBody extends HookWidget {
   }
 }
 
-@Dependencies([readBorderTheme, chipTextStyle])
+@Dependencies([chipTextStyle])
 class _MangaChaptersView extends StatelessWidget {
   const _MangaChaptersView({required this.manga, required this.controller});
 
@@ -1033,7 +1034,7 @@ class _ChapterListElement {
   final bool isIndented;
 }
 
-@Dependencies([readBorderTheme, chipTextStyle])
+@Dependencies([chipTextStyle])
 class _ChapterListSliver extends HookConsumerWidget {
   const _ChapterListSliver({
     required this.state,
@@ -1050,7 +1051,13 @@ class _ChapterListSliver extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final me = ref.watch(loggedUserProvider).value;
+    final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
+    final numFormatter = useMemoized(
+      () => NumberFormat.compact(
+        locale: tr.$meta.locale.flutterLocale.toString(),
+      ),
+      [tr.$meta.locale],
+    );
     // final sort = ref.watch(mangaChaptersListSortProvider);
     // final sortfunc = sort == ListSort.ascending
     //     ? compareNatural
@@ -1061,10 +1068,8 @@ class _ChapterListSliver extends HookConsumerWidget {
     // Redundancy
     useEffect(() {
       Future.delayed(Duration.zero, () async {
-        await readChaptersMutation(me?.id).run(ref, (ref) async {
-          return await ref.get(readChaptersProvider(me?.id).notifier).get([
-            manga,
-          ]);
+        await readChaptersMutation(me).run(ref, (ref) async {
+          return await ref.get(readChaptersProvider(me).notifier).get([manga]);
         });
       });
       return null;
@@ -1176,6 +1181,8 @@ class _ChapterListSliver extends HookConsumerWidget {
             key: ValueKey(item.chapter!.id),
             chapter: item.chapter!,
             manga: manga,
+            meId: me,
+            numFormatter: numFormatter,
           );
 
           if (item.isIndented) {

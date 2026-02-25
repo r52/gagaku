@@ -29,7 +29,7 @@ class _SearchHistory extends _$SearchHistory {
       state = cb(state);
 }
 
-@Dependencies([chipTextStyle, readBorderTheme])
+@Dependencies([chipTextStyle])
 class MangaDexSearchPage extends StatefulHookConsumerWidget {
   const MangaDexSearchPage({
     super.key,

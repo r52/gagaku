@@ -12,7 +12,7 @@ import 'package:riverpod_annotation/experimental/scope.dart';
 
 enum _FeedViewType { chapters, manga }
 
-@Dependencies([readBorderTheme, chipTextStyle])
+@Dependencies([chipTextStyle])
 class MangaDexChapterFeedPage extends StatelessWidget {
   const MangaDexChapterFeedPage({super.key, this.controller});
 
@@ -26,7 +26,7 @@ class MangaDexChapterFeedPage extends StatelessWidget {
   }
 }
 
-@Dependencies([readBorderTheme, chipTextStyle])
+@Dependencies([chipTextStyle])
 class MangaDexChapterFeedWidget extends HookWidget {
   const MangaDexChapterFeedWidget({super.key, this.controller});
   final ScrollController? controller;

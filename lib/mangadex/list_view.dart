@@ -15,7 +15,7 @@ import 'package:riverpod_annotation/experimental/scope.dart';
 
 enum _ViewType { titles, feed }
 
-@Dependencies([chipTextStyle, readBorderTheme])
+@Dependencies([chipTextStyle])
 class MangaDexListViewPage extends HookConsumerWidget {
   const MangaDexListViewPage({super.key, required this.listId});
 

@@ -7,7 +7,7 @@ import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 
-@Dependencies([readBorderTheme, chipTextStyle])
+@Dependencies([chipTextStyle])
 class MangaDexGlobalFeedPage extends HookWidget {
   const MangaDexGlobalFeedPage({super.key});
 

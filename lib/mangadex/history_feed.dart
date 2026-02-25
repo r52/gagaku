@@ -11,9 +11,7 @@ import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 
-
-
-@Dependencies([readBorderTheme, chipTextStyle])
+@Dependencies([chipTextStyle])
 class MangaDexHistoryFeedPage extends StatefulHookConsumerWidget {
   const MangaDexHistoryFeedPage({super.key, this.controller});
 

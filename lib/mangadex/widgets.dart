@@ -58,43 +58,6 @@ const _openIconS = Icon(Icons.open_in_new, size: 15.0);
 const _scheduleIconB = Icon(Icons.schedule, size: 20.0);
 const _scheduleIconS = Icon(Icons.schedule, size: 15.0);
 
-@Riverpod(dependencies: [theme])
-BoxDecoration readBorderTheme(Ref ref, String mangaId, String chapterId) {
-  final theme = ref.watch(themeProvider);
-
-  final tileColor = theme.colorScheme.primaryContainer;
-  final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
-
-  Border border;
-
-  if (me == null) {
-    border = Border(left: BorderSide(color: tileColor, width: 4.0));
-  } else {
-    bool? isRead = ref.watch(
-      readChaptersProvider(me).select(
-        (value) => switch (value) {
-          AsyncValue<Map<String, ReadChapterSet>>(value: final data?) =>
-            data[mangaId]?.contains(chapterId) == true,
-          _ => null,
-        },
-      ),
-    );
-
-    border = Border(
-      left: BorderSide(
-        color: isRead == true ? tileColor : Colors.blue,
-        width: 4.0,
-      ),
-    );
-  }
-
-  return BoxDecoration(
-    borderRadius: const BorderRadius.all(Radius.circular(4)),
-    color: tileColor,
-    border: border,
-  );
-}
-
 class MangaDexSliverAppBar extends StatelessWidget {
   const MangaDexSliverAppBar({super.key, this.controller, this.title});
 
@@ -250,33 +213,30 @@ class MangaProviderCarousel extends StatelessWidget {
 }
 
 class MarkReadButton extends ConsumerWidget {
-  const MarkReadButton({super.key, required this.chapter, required this.manga});
+  const MarkReadButton({
+    super.key,
+    required this.chapter,
+    required this.manga,
+    required this.meId,
+    required this.readStatus,
+  });
 
   final Chapter chapter;
   final Manga manga;
+  final String? meId;
+  final bool? readStatus;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
 
-    if (me == null) {
+    if (meId == null) {
       return const SizedBox.shrink();
     }
 
     final theme = Theme.of(context);
 
-    bool? isRead = ref.watch(
-      readChaptersProvider(me).select(
-        (value) => switch (value) {
-          AsyncValue<Map<String, ReadChapterSet>>(value: final data?) =>
-            data[manga.id]?.contains(chapter.id) == true,
-          _ => null,
-        },
-      ),
-    );
-
-    return switch (isRead) {
+    return switch (readStatus) {
       null => const SizedBox(
         width: 20,
         height: 20,
@@ -284,10 +244,10 @@ class MarkReadButton extends ConsumerWidget {
       ),
       true || false => IconButton(
         onPressed: () async {
-          bool set = !isRead;
-          readChaptersMutation(me).run(ref, (ref) async {
+          bool set = !readStatus!;
+          readChaptersMutation(meId).run(ref, (ref) async {
             return await ref
-                .get(readChaptersProvider(me).notifier)
+                .get(readChaptersProvider(meId).notifier)
                 .set(
                   manga,
                   read: set ? [chapter] : null,
@@ -299,9 +259,9 @@ class MarkReadButton extends ConsumerWidget {
         splashRadius: 15,
         iconSize: 20,
         tooltip: tr.mangaView.markAs(
-          arg: isRead == true ? tr.mangaView.unread : tr.mangaView.read,
+          arg: readStatus == true ? tr.mangaView.unread : tr.mangaView.read,
         ),
-        icon: isRead == true
+        icon: readStatus == true
             ? Icon(Icons.visibility_off, color: theme.disabledColor)
             : Icon(Icons.visibility, color: theme.primaryIconTheme.color),
         constraints: const BoxConstraints(
@@ -316,7 +276,7 @@ class MarkReadButton extends ConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle, readBorderTheme])
+@Dependencies([chipTextStyle])
 class ChapterFeedWidget extends HookWidget {
   const ChapterFeedWidget({
     super.key,
@@ -437,7 +397,7 @@ class ChapterFeedWidget extends HookWidget {
   }
 }
 
-@Dependencies([readBorderTheme, chipTextStyle])
+@Dependencies([chipTextStyle])
 class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
   const InfiniteScrollChapterFeedWidget({
     super.key,
@@ -662,22 +622,28 @@ class MangaTitleButton extends ConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle, readBorderTheme])
+@Dependencies([chipTextStyle])
 class _BackLinkedChapterButton extends ConsumerWidget {
   const _BackLinkedChapterButton({
     super.key,
     required this.chapter,
     required this.manga,
+    this.meId,
+    this.numFormatter,
   });
 
   final Chapter chapter;
   final Manga manga;
+  final String? meId;
+  final NumberFormat? numFormatter;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ChapterButtonWidget(
       chapter: chapter,
       manga: manga,
+      meId: meId,
+      numFormatter: numFormatter,
       onLinkPressed: (context) async {
         final me = ref.read(loggedUserProvider).value;
         readChaptersMutation(me?.id).run(ref, (ref) async {
@@ -695,15 +661,26 @@ class _BackLinkedChapterButton extends ConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle, readBorderTheme])
-class ChapterFeedItem extends StatelessWidget {
+@Dependencies([chipTextStyle])
+class ChapterFeedItem extends HookConsumerWidget {
   const ChapterFeedItem({super.key, required this.state});
 
   final ChapterFeedItemData state;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
+    final visibleCount = useState(3);
+    final tr = context.t;
+
+    final numFormatter = useMemoized(
+      () => NumberFormat.compact(
+        locale: tr.$meta.locale.flutterLocale.toString(),
+      ),
+      [tr.$meta.locale],
+    );
+
+    final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
 
     final titleBtn = MangaTitleButton(
       key: ValueKey('_MangaTitle(${state.manga.id})'),
@@ -714,6 +691,29 @@ class ChapterFeedItem extends StatelessWidget {
       key: ValueKey('_CoverButton(${state.manga.id})'),
       manga: state.manga,
     );
+
+    final chaptersCount = state.chapters.length;
+    final visibleChapters = state.chapters.take(visibleCount.value);
+    final remaining = chaptersCount - visibleCount.value;
+
+    final chapterButtons = <Widget>[
+      for (final chapter in visibleChapters)
+        _BackLinkedChapterButton(
+          key: ValueKey(chapter.id),
+          chapter: chapter,
+          manga: state.manga,
+          meId: me,
+          numFormatter: numFormatter,
+        ),
+      if (remaining > 0)
+        Center(
+          child: TextButton.icon(
+            onPressed: () => visibleCount.value += 10,
+            icon: const Icon(Icons.expand_more),
+            label: Text('$remaining'),
+          ),
+        ),
+    ];
 
     return Card(
       child: Padding(
@@ -732,14 +732,7 @@ class ChapterFeedItem extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           spacing: 4.0,
-                          children: [
-                            for (final chapter in state.chapters)
-                              _BackLinkedChapterButton(
-                                key: ValueKey(chapter.id),
-                                chapter: chapter,
-                                manga: state.manga,
-                              ),
-                          ],
+                          children: chapterButtons,
                         ),
                       ),
                     ],
@@ -757,12 +750,7 @@ class ChapterFeedItem extends StatelessWidget {
                       children: [
                         titleBtn,
                         const Divider(height: 10.0),
-                        for (final chapter in state.chapters)
-                          _BackLinkedChapterButton(
-                            key: ValueKey(chapter.id),
-                            chapter: chapter,
-                            manga: state.manga,
-                          ),
+                        ...chapterButtons,
                       ],
                     ),
                   ),
@@ -773,23 +761,45 @@ class ChapterFeedItem extends StatelessWidget {
   }
 }
 
-@Dependencies([readBorderTheme])
-class _ChapterButtonCard extends ConsumerWidget {
+class _ChapterButtonCard extends StatelessWidget {
   final Chapter chapter;
   final Manga manga;
   final Widget child;
+  final String? meId;
+  final bool? readStatus;
 
   const _ChapterButtonCard({
     super.key,
     required this.chapter,
     required this.manga,
     required this.child,
+    this.meId,
+    this.readStatus,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final decoration = ref.watch(readBorderThemeProvider(manga.id, chapter.id));
+    final theme = Theme.of(context);
+    final tileColor = theme.colorScheme.primaryContainer;
+
+    Border border;
+    if (meId == null) {
+      border = Border(left: BorderSide(color: tileColor, width: 4.0));
+    } else {
+      border = Border(
+        left: BorderSide(
+          color: readStatus == true ? tileColor : Colors.blue,
+          width: 4.0,
+        ),
+      );
+    }
+
+    final decoration = BoxDecoration(
+      borderRadius: const BorderRadius.all(Radius.circular(4)),
+      color: tileColor,
+      border: border,
+    );
 
     return Ink(
       padding: EdgeInsets.symmetric(
@@ -802,28 +812,46 @@ class _ChapterButtonCard extends ConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle, readBorderTheme])
-class ChapterButtonWidget extends HookWidget {
+@Dependencies([chipTextStyle])
+class ChapterButtonWidget extends HookConsumerWidget {
   const ChapterButtonWidget({
     super.key,
     required this.chapter,
     required this.manga,
     this.onLinkPressed,
+    this.meId,
+    this.numFormatter,
   });
 
   final Chapter chapter;
   final Manga manga;
   final CtxCallback? onLinkPressed;
+  final String? meId;
+  final NumberFormat? numFormatter;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final numFormatter = useMemoized(
-      () => NumberFormat.compact(
-        locale: tr.$meta.locale.flutterLocale.toString(),
-      ),
-      [tr.$meta.locale],
-    );
+    final formatter =
+        numFormatter ??
+        useMemoized(
+          () => NumberFormat.compact(
+            locale: tr.$meta.locale.flutterLocale.toString(),
+          ),
+          [tr.$meta.locale],
+        );
+
+    final readStatus = meId == null
+        ? null
+        : ref.watch(
+            readChaptersProvider(meId!).select(
+              (value) => switch (value) {
+                AsyncValue<Map<String, ReadChapterSet>>(value: final data?) =>
+                  data[manga.id]?.contains(chapter.id) == true,
+                _ => null,
+              },
+            ),
+          );
 
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
@@ -858,7 +886,7 @@ class ChapterButtonWidget extends HookWidget {
         return CommentChip(
           key: ValueKey('CommentChip(${chapter.id})'),
           comments: comments,
-          formatter: numFormatter,
+          formatter: formatter!,
         );
       },
     );
@@ -878,6 +906,8 @@ class ChapterButtonWidget extends HookWidget {
       key: ValueKey('MarkReadButton(${chapter.id})'),
       chapter: chapter,
       manga: manga,
+      meId: meId,
+      readStatus: readStatus,
     );
 
     final title = Row(
@@ -901,6 +931,8 @@ class ChapterButtonWidget extends HookWidget {
                   key: ValueKey('ChapterTitle(${chapter.id})'),
                   chapter: chapter,
                   manga: manga,
+                  meId: meId,
+                  readStatus: readStatus,
                 ),
               ),
               if (isEndChapter)
@@ -1011,6 +1043,8 @@ class ChapterButtonWidget extends HookWidget {
         key: ValueKey('_ChapterButtonCard(${chapter.id})'),
         manga: manga,
         chapter: chapter,
+        meId: meId,
+        readStatus: readStatus,
         child: tile,
       ),
     );
@@ -1543,34 +1577,31 @@ class _ListMangaItem extends ConsumerWidget {
   }
 }
 
-class ChapterTitle extends ConsumerWidget {
+class ChapterTitle extends StatelessWidget {
   final Chapter chapter;
   final Manga manga;
+  final String? meId;
+  final bool? readStatus;
 
-  const ChapterTitle({super.key, required this.chapter, required this.manga});
+  const ChapterTitle({
+    super.key,
+    required this.chapter,
+    required this.manga,
+    this.meId,
+    this.readStatus,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
 
     TextStyle textstyle;
 
-    if (me == null) {
+    if (meId == null) {
       textstyle = TextStyle(color: theme.colorScheme.onPrimaryContainer);
     } else {
-      bool? isRead = ref.watch(
-        readChaptersProvider(me).select(
-          (value) => switch (value) {
-            AsyncValue<Map<String, ReadChapterSet>>(value: final data?) =>
-              data[manga.id]?.contains(chapter.id) == true,
-            _ => null,
-          },
-        ),
-      );
-
       textstyle = TextStyle(
-        color: (isRead == true
+        color: (readStatus == true
             ? theme.disabledColor
             : theme.colorScheme.onPrimaryContainer),
       );

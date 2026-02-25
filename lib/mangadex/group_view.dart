@@ -26,7 +26,7 @@ Future<Group> _fetchGroupFromId(Ref ref, String groupId) async {
   return group.first;
 }
 
-@Dependencies([chipTextStyle, readBorderTheme])
+@Dependencies([chipTextStyle])
 class MangaDexGroupViewPage extends StatelessWidget {
   const MangaDexGroupViewPage({super.key, required this.groupId, this.group});
 
@@ -49,7 +49,7 @@ class MangaDexGroupViewPage extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle, readBorderTheme])
+@Dependencies([chipTextStyle])
 class MangaDexGroupViewWidget extends HookConsumerWidget {
   const MangaDexGroupViewWidget({super.key, required this.group});
 
@@ -240,7 +240,7 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle, readBorderTheme])
+@Dependencies([chipTextStyle])
 class _GroupTitlesTab extends ConsumerStatefulWidget {
   const _GroupTitlesTab({
     super.key,
