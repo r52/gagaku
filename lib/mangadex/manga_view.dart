@@ -778,15 +778,17 @@ class _MangaDexMangaViewWidgetState
 
                                 final allRead = chapters != null
                                     ? ref.watch(
-                                        readChaptersProvider(me.id).select(
+                                        mangaReadChaptersProvider(
+                                          widget.manga,
+                                        ).select(
                                           (value) => switch (value) {
-                                            AsyncValue(value: final data?) =>
-                                              data[widget.manga.id]
-                                                      ?.containsAll(
-                                                        chapters.map(
-                                                          (e) => e.id,
-                                                        ),
-                                                      ) ==
+                                            AsyncValue(
+                                              value: final data,
+                                              hasValue: true,
+                                            ) =>
+                                              data?.containsAll(
+                                                    chapters.map((e) => e.id),
+                                                  ) ==
                                                   true,
                                             _ => false,
                                           },
@@ -1052,7 +1054,7 @@ class _ChapterListSliver extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
-    final readData = me == null ? null : ref.watch(readChaptersProvider(me));
+    final readData = ref.watch(mangaReadChaptersProvider(manga));
     final statsData = ref.watch(chapterStatsProvider);
     final numFormatter = useMemoized(
       () => NumberFormat.compact(
@@ -1066,16 +1068,6 @@ class _ChapterListSliver extends HookConsumerWidget {
     //     : (a, b) {
     //         return compareNatural(b, a);
     //       };
-
-    // Redundancy
-    useEffect(() {
-      Future.delayed(Duration.zero, () async {
-        await readChaptersMutation(me).run(ref, (ref) async {
-          return await ref.get(readChaptersProvider(me).notifier).get([manga]);
-        });
-      });
-      return null;
-    }, [manga, me]);
 
     final chapters = state.items;
 
@@ -1179,8 +1171,8 @@ class _ChapterListSliver extends HookConsumerWidget {
           }
 
           final isRead = switch (readData) {
-            AsyncData(value: final data) =>
-              data[manga.id]?.contains(item.chapter!.id) == true,
+            AsyncData(value: final data?) => data.contains(item.chapter!.id),
+            AsyncData(value: null) => false,
             _ => null,
           };
 

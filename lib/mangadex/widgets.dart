@@ -505,30 +505,18 @@ class _InfiniteScrollFeedState
   }
 }
 
-class _CoverButton extends ConsumerWidget {
+class _CoverButton extends StatelessWidget {
   const _CoverButton({required this.manga});
 
   final Manga manga;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     return TextButton(
-      onPressed: () async {
-        final me = ref.read(loggedUserProvider).value;
-        readChaptersMutation(me?.id).run(ref, (ref) async {
-          return await ref.get(readChaptersProvider(me?.id).notifier).get([
-            manga,
-          ]);
-        });
-
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get([manga]);
-        });
-
-        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context);
-      },
+      onPressed: () =>
+          MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context),
       style: TextButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
       ),
@@ -552,13 +540,13 @@ class _CoverButton extends ConsumerWidget {
   }
 }
 
-class MangaTitleButton extends ConsumerWidget {
+class MangaTitleButton extends StatelessWidget {
   final Manga manga;
 
   const MangaTitleButton({super.key, required this.manga});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return TextButton.icon(
@@ -569,19 +557,8 @@ class MangaTitleButton extends ConsumerWidget {
         textStyle: CommonTextStyles.sixteenBold,
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
-      onPressed: () async {
-        final me = ref.read(loggedUserProvider).value;
-        readChaptersMutation(me?.id).run(ref, (ref) async {
-          return await ref.get(readChaptersProvider(me?.id).notifier).get([
-            manga,
-          ]);
-        });
-
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get([manga]);
-        });
-        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context);
-      },
+      onPressed: () =>
+          MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context),
       icon: CountryFlag(flag: manga.attributes!.originalLanguage.flag),
       label: Text(
         manga.attributes!.title.get('en'),
@@ -592,7 +569,7 @@ class MangaTitleButton extends ConsumerWidget {
 }
 
 @Dependencies([chipTextStyle])
-class _BackLinkedChapterButton extends ConsumerWidget {
+class _BackLinkedChapterButton extends StatelessWidget {
   const _BackLinkedChapterButton({
     super.key,
     required this.chapter,
@@ -613,7 +590,7 @@ class _BackLinkedChapterButton extends ConsumerWidget {
   final Future<void> Function(bool)? onMarkRead;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return ChapterButtonWidget(
       chapter: chapter,
       manga: manga,
@@ -622,19 +599,8 @@ class _BackLinkedChapterButton extends ConsumerWidget {
       isLoggedIn: isLoggedIn,
       numFormatter: numFormatter,
       onMarkRead: onMarkRead,
-      onLinkPressed: (context) async {
-        final me = ref.read(loggedUserProvider).value;
-        readChaptersMutation(me?.id).run(ref, (ref) async {
-          return await ref.get(readChaptersProvider(me?.id).notifier).get([
-            manga,
-          ]);
-        });
-
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get([manga]);
-        });
-        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context);
-      },
+      onLinkPressed: (context) =>
+          MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context),
     );
   }
 }
@@ -659,7 +625,7 @@ class ChapterFeedItem extends HookConsumerWidget {
     );
 
     final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
-    final readData = me == null ? null : ref.watch(readChaptersProvider(me));
+    final readData = ref.watch(mangaReadChaptersProvider(state.manga));
     final statsData = ref.watch(chapterStatsProvider);
 
     final titleBtn = MangaTitleButton(manga: state.manga);
@@ -677,8 +643,8 @@ class ChapterFeedItem extends HookConsumerWidget {
           chapter: chapter,
           manga: state.manga,
           readStatus: switch (readData) {
-            AsyncData(value: final data) =>
-              data[state.manga.id]?.contains(chapter.id) == true,
+            AsyncData(value: final data?) => data.contains(chapter.id),
+            AsyncData(value: null) => false,
             _ => null,
           },
           comments: switch (statsData) {
@@ -1280,7 +1246,7 @@ class MangaListViewSliver extends ConsumerWidget {
   }
 }
 
-class GridMangaItem extends HookConsumerWidget {
+class GridMangaItem extends HookWidget {
   const GridMangaItem({
     super.key,
     required this.manga,
@@ -1297,7 +1263,7 @@ class GridMangaItem extends HookConsumerWidget {
   final String? header;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
@@ -1318,19 +1284,8 @@ class GridMangaItem extends HookConsumerWidget {
     );
 
     return InkWell(
-      onTap: () async {
-        final me = ref.read(loggedUserProvider).value;
-        readChaptersMutation(me?.id).run(ref, (ref) async {
-          return await ref.get(readChaptersProvider(me?.id).notifier).get([
-            manga,
-          ]);
-        });
-
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get([manga]);
-        });
-        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context);
-      },
+      onTap: () =>
+          MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context),
       onHover: (hovering) {
         if (hovering) {
           aniController.forward();
@@ -1367,14 +1322,14 @@ class GridMangaItem extends HookConsumerWidget {
 }
 
 @Dependencies([chipTextStyle])
-class GridMangaDetailedItem extends ConsumerWidget {
+class GridMangaDetailedItem extends StatelessWidget {
   const GridMangaDetailedItem({super.key, required this.manga, this.header});
 
   final Manga manga;
   final String? header;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     return Card(
@@ -1390,24 +1345,10 @@ class GridMangaDetailedItem extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextButton(
-                    onPressed: () async {
-                      final me = ref.read(loggedUserProvider).value;
-                      readChaptersMutation(me?.id).run(ref, (ref) async {
-                        return await ref
-                            .get(readChaptersProvider(me?.id).notifier)
-                            .get([manga]);
-                      });
-
-                      statisticsMutation.run(ref, (ref) async {
-                        return await ref.get(statisticsProvider.notifier).get([
-                          manga,
-                        ]);
-                      });
-                      MangaDexMangaViewRoute(
-                        mangaId: manga.id,
-                        manga: manga,
-                      ).push(context);
-                    },
+                    onPressed: () => MangaDexMangaViewRoute(
+                      mangaId: manga.id,
+                      manga: manga,
+                    ).push(context),
                     child: CachedNetworkImage(
                       imageUrl: manga.getFirstCoverUrl(
                         quality: CoverArtQuality.small,
@@ -1457,14 +1398,14 @@ class GridMangaDetailedItem extends ConsumerWidget {
 }
 
 @Dependencies([chipTextStyle])
-class _ListMangaItem extends ConsumerWidget {
+class _ListMangaItem extends StatelessWidget {
   const _ListMangaItem({super.key, required this.manga, this.header});
 
   final Manga manga;
   final String? header;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -1472,24 +1413,10 @@ class _ListMangaItem extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextButton(
-              onPressed: () async {
-                final me = ref.read(loggedUserProvider).value;
-                readChaptersMutation(me?.id).run(ref, (ref) async {
-                  return await ref
-                      .get(readChaptersProvider(me?.id).notifier)
-                      .get([manga]);
-                });
-
-                statisticsMutation.run(ref, (ref) async {
-                  return await ref.get(statisticsProvider.notifier).get([
-                    manga,
-                  ]);
-                });
-                MangaDexMangaViewRoute(
-                  mangaId: manga.id,
-                  manga: manga,
-                ).push(context);
-              },
+              onPressed: () => MangaDexMangaViewRoute(
+                mangaId: manga.id,
+                manga: manga,
+              ).push(context),
               child: CachedNetworkImage(
                 imageUrl: manga.getFirstCoverUrl(
                   quality: CoverArtQuality.small,
@@ -1619,11 +1546,9 @@ class MangaStatisticsRow extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final statsProvider = ref.watch(
-      statisticsProvider.select(
-        (map) => switch (map) {
-          AsyncValue<Map<String, MangaStatistics>>(value: final stats?)
-              when stats.containsKey(manga.id) =>
-            stats[manga.id],
+      mangaStatisticsProvider(manga).select(
+        (data) => switch (data) {
+          AsyncValue<MangaStatistics>(value: final stats?) => stats,
           _ => null,
         },
       ),

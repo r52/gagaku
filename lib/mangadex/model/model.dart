@@ -1890,6 +1890,12 @@ class ReadChapters extends _$ReadChapters {
 
     final api = ref.watch(mangadexProvider);
     final map = await api.fetchReadChapters(mangas);
+
+    // Ensure all requested mangas have an entry in the map
+    for (final m in mangas) {
+      map.putIfAbsent(m.id, () => ReadChapterSet(m.id, {}));
+    }
+
     return map;
   }
 
@@ -1921,7 +1927,7 @@ class ReadChapters extends _$ReadChapters {
     final map = await _fetchReadChapters(mg);
     state = AsyncData({...oldstate, ...map});
 
-    return map;
+    return state.value!;
   }
 
   /// Sets a list of chapters for a manga read or unread
@@ -1972,6 +1978,22 @@ class ReadChapters extends _$ReadChapters {
 }
 
 final readChaptersMutation = Mutation<ReadChaptersMap>();
+
+@riverpod
+Future<ReadChapterSet?> mangaReadChapters(Ref ref, Manga manga) async {
+  final me = await ref.watch(loggedUserProvider.future);
+  if (me == null) return null;
+
+  final globalCache = await ref.watch(readChaptersProvider(me.id).future);
+
+  if (globalCache.containsKey(manga.id) &&
+      globalCache[manga.id]?.isExpired != true) {
+    return globalCache[manga.id];
+  }
+
+  final map = await ref.read(readChaptersProvider(me.id).notifier).get([manga]);
+  return map[manga.id];
+}
 
 @riverpod
 class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
@@ -2293,21 +2315,39 @@ class Statistics extends _$Statistics {
   /// Fetch statistics for the provided list of mangas
   Future<Map<String, MangaStatistics>> get(Iterable<Manga> mangas) async {
     final oldstate = await future;
-    final mg = mangas.where((m) => !oldstate.containsKey(m.id));
 
-    if (mg.isEmpty) {
-      // No change
-      return oldstate;
-    }
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final mg = mangas.where((m) => !oldstate.containsKey(m.id));
 
-    final map = await _fetchStatistics(mg);
-    state = AsyncData({...oldstate, ...map});
+      if (mg.isEmpty) {
+        // No change
+        return oldstate;
+      }
 
-    return map;
+      final map = await _fetchStatistics(mg);
+      return {...oldstate, ...map};
+    });
+
+    return state.value!;
   }
 }
 
 final statisticsMutation = Mutation<Map<String, MangaStatistics>>();
+
+@riverpod
+Future<MangaStatistics> mangaStatistics(Ref ref, Manga manga) async {
+  // Makes the assumption that globalCache[manga.id] should never
+  // be null after get(). And should be true unless the server is broken
+  final globalCache = await ref.watch(statisticsProvider.future);
+
+  if (globalCache.containsKey(manga.id)) {
+    return globalCache[manga.id]!;
+  }
+
+  final map = await ref.read(statisticsProvider.notifier).get([manga]);
+  return map[manga.id]!;
+}
 
 @Riverpod(keepAlive: true)
 class ChapterStats extends _$ChapterStats {
