@@ -11,9 +11,7 @@ import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 
-
-
-@Dependencies([readBorderTheme, chipTextStyle])
+@Dependencies([chipTextStyle])
 class MangaDexHistoryFeedPage extends StatefulHookConsumerWidget {
   const MangaDexHistoryFeedPage({super.key, this.controller});
 
@@ -25,6 +23,8 @@ class MangaDexHistoryFeedPage extends StatefulHookConsumerWidget {
 }
 
 class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
+  final Map<String, Manga> _mangaCache = {};
+
   late final _pagingController = GagakuPagingController<int, Chapter>(
     getNextPageKey: (state) => state.keys?.last ?? 0,
     fetchPage: (pageKey) async {
@@ -38,6 +38,10 @@ class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
         ids: mangaIds,
         limit: MangaDexEndpoints.breakLimit,
       );
+
+      for (final m in mangas) {
+        _mangaCache[m.id] = m;
+      }
 
       try {
         await (
@@ -60,6 +64,7 @@ class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
       return PageResultsMetaData(chapters.toList());
     },
     refresh: () async {
+      _mangaCache.clear();
       ref.invalidate(mangaDexHistoryProvider);
     },
     getIsLastPage: (_, _) => true,
@@ -81,6 +86,7 @@ class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
 
     return ChapterFeedWidget(
       controller: _pagingController,
+      mangaCache: _mangaCache,
       onRefresh: () async => _pagingController.refresh(),
       title: t.mangadex.localHistory,
       scrollController: scrollController,

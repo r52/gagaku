@@ -14,6 +14,7 @@ import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -56,43 +57,6 @@ const _openIconB = Icon(Icons.open_in_new, size: 20.0);
 const _openIconS = Icon(Icons.open_in_new, size: 15.0);
 const _scheduleIconB = Icon(Icons.schedule, size: 20.0);
 const _scheduleIconS = Icon(Icons.schedule, size: 15.0);
-
-@Riverpod(dependencies: [theme])
-BoxDecoration readBorderTheme(Ref ref, String mangaId, String chapterId) {
-  final theme = ref.watch(themeProvider);
-
-  final tileColor = theme.colorScheme.primaryContainer;
-  final me = ref.watch(loggedUserProvider).value;
-
-  Border border;
-
-  if (me == null) {
-    border = Border(left: BorderSide(color: tileColor, width: 4.0));
-  } else {
-    bool? isRead = ref.watch(
-      readChaptersProvider(me.id).select(
-        (value) => switch (value) {
-          AsyncValue<Map<String, ReadChapterSet>>(value: final data?) =>
-            data[mangaId]?.contains(chapterId) == true,
-          _ => null,
-        },
-      ),
-    );
-
-    border = Border(
-      left: BorderSide(
-        color: isRead == true ? tileColor : Colors.blue,
-        width: 4.0,
-      ),
-    );
-  }
-
-  return BoxDecoration(
-    borderRadius: const BorderRadius.all(Radius.circular(4)),
-    color: tileColor,
-    border: border,
-  );
-}
 
 class MangaDexSliverAppBar extends StatelessWidget {
   const MangaDexSliverAppBar({super.key, this.controller, this.title});
@@ -248,59 +212,36 @@ class MangaProviderCarousel extends StatelessWidget {
   }
 }
 
-class MarkReadButton extends ConsumerWidget {
-  const MarkReadButton({super.key, required this.chapter, required this.manga});
+class MarkReadButton extends StatelessWidget {
+  const MarkReadButton({super.key, required this.readStatus, this.onMarkRead});
 
-  final Chapter chapter;
-  final Manga manga;
+  final bool? readStatus;
+  final Future<void> Function(bool)? onMarkRead;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final tr = context.t;
-    final me = ref.watch(loggedUserProvider).value;
+    final theme = Theme.of(context);
 
-    if (me == null) {
+    if (onMarkRead == null) {
       return const SizedBox.shrink();
     }
 
-    final theme = Theme.of(context);
-
-    bool? isRead = ref.watch(
-      readChaptersProvider(me.id).select(
-        (value) => switch (value) {
-          AsyncValue<Map<String, ReadChapterSet>>(value: final data?) =>
-            data[manga.id]?.contains(chapter.id) == true,
-          _ => null,
-        },
-      ),
-    );
-
-    return switch (isRead) {
+    return switch (readStatus) {
       null => const SizedBox(
         width: 20,
         height: 20,
         child: CircularProgressIndicator(),
       ),
       true || false => IconButton(
-        onPressed: () async {
-          bool set = !isRead;
-          readChaptersMutation(me.id).run(ref, (ref) async {
-            return await ref
-                .get(readChaptersProvider(me.id).notifier)
-                .set(
-                  manga,
-                  read: set ? [chapter] : null,
-                  unread: !set ? [chapter] : null,
-                );
-          });
-        },
+        onPressed: () => onMarkRead!(!readStatus!),
         padding: EdgeInsets.zero,
         splashRadius: 15,
         iconSize: 20,
         tooltip: tr.mangaView.markAs(
-          arg: isRead == true ? tr.mangaView.unread : tr.mangaView.read,
+          arg: readStatus == true ? tr.mangaView.unread : tr.mangaView.read,
         ),
-        icon: isRead == true
+        icon: readStatus == true
             ? Icon(Icons.visibility_off, color: theme.disabledColor)
             : Icon(Icons.visibility, color: theme.primaryIconTheme.color),
         constraints: const BoxConstraints(
@@ -315,11 +256,12 @@ class MarkReadButton extends ConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle, readBorderTheme])
+@Dependencies([chipTextStyle])
 class ChapterFeedWidget extends HookWidget {
   const ChapterFeedWidget({
     super.key,
     required this.controller,
+    required this.mangaCache,
     required this.onRefresh,
     this.title,
     this.scrollController,
@@ -332,6 +274,7 @@ class ChapterFeedWidget extends HookWidget {
   final ScrollController? scrollController;
   final String? restorationId;
   final List<Widget> leading;
+  final Map<String, Manga> mangaCache;
 
   final PagingController<int, Chapter> controller;
 
@@ -365,46 +308,30 @@ class ChapterFeedWidget extends HookWidget {
               ),
             PagingListener(
               controller: controller,
-              builder: (context, state, fetchNextPage) => HookConsumer(
-                builder: (context, ref, child) {
-                  final api = ref.watch(mangadexProvider);
+              builder: (context, state, fetchNextPage) => HookBuilder(
+                builder: (context) {
                   final chapters = state.items;
 
-                  final builtItems = useMemoized(() async {
-                    if (chapters == null) {
-                      return null;
-                    }
-
-                    final mangaIds = chapters.map((e) => e.manga.id).toSet();
-                    final mangas = await api.fetchMangaById(
-                      ids: mangaIds,
-                      limit: MangaDexEndpoints.breakLimit,
-                    );
-
-                    final items = ChapterFeedItemData.toData(chapters, mangas);
-
-                    return items;
-                  }, [state]);
-
-                  final future = useFuture(builtItems);
-
+                  // Because this is now 100% synchronous, using [state] is perfectly safe.
+                  // It will instantly return the new state without ever unmounting the list.
                   final newState = useMemoized(() {
+                    final items = chapters != null
+                        ? ChapterFeedItemData.toData(chapters, mangaCache)
+                        : <ChapterFeedItemData>[];
+
                     return PagingState<int, ChapterFeedItemData>(
-                      error: state.error ?? future.error,
-                      pages: state.keys == null || !future.hasData
+                      error: state.error,
+                      pages: state.keys == null
                           ? null
                           : List.generate(
                               state.keys!.length,
-                              (i) => i == 0 ? future.data! : [],
+                              (i) => i == 0 ? items : [],
                             ),
-                      keys: future.hasData ? state.keys : null,
+                      keys: state.keys,
                       hasNextPage: state.hasNextPage,
-                      isLoading:
-                          future.connectionState == ConnectionState.waiting ||
-                          !future.hasData ||
-                          state.isLoading,
+                      isLoading: state.isLoading,
                     );
-                  }, [future, state]);
+                  }, [state]);
 
                   return PagedSuperSliverList(
                     state: newState,
@@ -436,7 +363,7 @@ class ChapterFeedWidget extends HookWidget {
   }
 }
 
-@Dependencies([readBorderTheme, chipTextStyle])
+@Dependencies([chipTextStyle])
 class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
   const InfiniteScrollChapterFeedWidget({
     super.key,
@@ -473,12 +400,14 @@ class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
 
 class _InfiniteScrollFeedState
     extends ConsumerState<InfiniteScrollChapterFeedWidget> {
+  final Map<String, Manga> _mangaCache = {};
+
   late final _pagingController = GagakuPagingController<int, Chapter>(
     getNextPageKey: (state) =>
         state.keys?.last != null ? state.keys!.last + widget.limit : 0,
     fetchPage: (pageKey) async {
-      final me = await ref.watch(loggedUserProvider.future);
-      final api = ref.watch(mangadexProvider);
+      final me = await ref.readAsync(loggedUserProvider.future);
+      final api = ref.read(mangadexProvider);
 
       final chapterlist = await api.fetchFeed(
         path: widget.path,
@@ -497,6 +426,10 @@ class _InfiniteScrollFeedState
         ids: mangaIds,
         limit: MangaDexEndpoints.breakLimit,
       );
+
+      for (final m in mangas) {
+        _mangaCache[m.id] = m;
+      }
 
       try {
         await (
@@ -519,6 +452,7 @@ class _InfiniteScrollFeedState
       return PageResultsMetaData(chapters, chapterlist.total);
     },
     refresh: () async {
+      _mangaCache.clear();
       final api = ref.watch(mangadexProvider);
       await api.invalidateAll(
         widget.entity == null
@@ -561,6 +495,7 @@ class _InfiniteScrollFeedState
   Widget build(BuildContext context) {
     return ChapterFeedWidget(
       controller: _pagingController,
+      mangaCache: _mangaCache,
       onRefresh: () async => _pagingController.refresh(),
       title: widget.title,
       scrollController: widget.scrollController,
@@ -570,30 +505,18 @@ class _InfiniteScrollFeedState
   }
 }
 
-class _CoverButton extends ConsumerWidget {
-  const _CoverButton({super.key, required this.manga});
+class _CoverButton extends StatelessWidget {
+  const _CoverButton({required this.manga});
 
   final Manga manga;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final me = ref.watch(loggedUserProvider).value;
+  Widget build(BuildContext context) {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     return TextButton(
-      onPressed: () async {
-        readChaptersMutation(me?.id).run(ref, (ref) async {
-          return await ref.get(readChaptersProvider(me?.id).notifier).get([
-            manga,
-          ]);
-        });
-
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get([manga]);
-        });
-
-        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context);
-      },
+      onPressed: () =>
+          MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context),
       style: TextButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
       ),
@@ -617,14 +540,13 @@ class _CoverButton extends ConsumerWidget {
   }
 }
 
-class MangaTitleButton extends ConsumerWidget {
+class MangaTitleButton extends StatelessWidget {
   final Manga manga;
 
   const MangaTitleButton({super.key, required this.manga});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final me = ref.watch(loggedUserProvider).value;
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return TextButton.icon(
@@ -635,24 +557,9 @@ class MangaTitleButton extends ConsumerWidget {
         textStyle: CommonTextStyles.sixteenBold,
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
-      onPressed: () async {
-        readChaptersMutation(me?.id).run(ref, (ref) async {
-          return await ref.get(readChaptersProvider(me?.id).notifier).get([
-            manga,
-          ]);
-        });
-
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get([manga]);
-        });
-        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context);
-      },
-      icon: CountryFlag(
-        key: ValueKey(
-          'CountryFlag(${manga.attributes!.originalLanguage.code})',
-        ),
-        flag: manga.attributes!.originalLanguage.flag,
-      ),
+      onPressed: () =>
+          MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context),
+      icon: CountryFlag(flag: manga.attributes!.originalLanguage.flag),
       label: Text(
         manga.attributes!.title.get('en'),
         overflow: TextOverflow.ellipsis,
@@ -661,135 +568,201 @@ class MangaTitleButton extends ConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle, readBorderTheme])
-class _BackLinkedChapterButton extends ConsumerWidget {
+@Dependencies([chipTextStyle])
+class _BackLinkedChapterButton extends StatelessWidget {
   const _BackLinkedChapterButton({
     super.key,
     required this.chapter,
     required this.manga,
+    this.readStatus,
+    this.comments,
+    this.isLoggedIn = false,
+    this.numFormatter,
+    this.onMarkRead,
   });
 
   final Chapter chapter;
   final Manga manga;
+  final bool? readStatus;
+  final StatisticsDetailsComments? comments;
+  final bool isLoggedIn;
+  final NumberFormat? numFormatter;
+  final Future<void> Function(bool)? onMarkRead;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final me = ref.watch(loggedUserProvider).value;
-
+  Widget build(BuildContext context) {
     return ChapterButtonWidget(
       chapter: chapter,
       manga: manga,
-      onLinkPressed: (context) async {
-        readChaptersMutation(me?.id).run(ref, (ref) async {
-          return await ref.get(readChaptersProvider(me?.id).notifier).get([
-            manga,
-          ]);
-        });
-
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get([manga]);
-        });
-        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context);
-      },
+      readStatus: readStatus,
+      comments: comments,
+      isLoggedIn: isLoggedIn,
+      numFormatter: numFormatter,
+      onMarkRead: onMarkRead,
+      onLinkPressed: (context) =>
+          MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context),
     );
   }
 }
 
-@Dependencies([chipTextStyle, readBorderTheme])
-class ChapterFeedItem extends HookWidget {
+@Dependencies([chipTextStyle])
+class ChapterFeedItem extends HookConsumerWidget {
   const ChapterFeedItem({super.key, required this.state});
 
   final ChapterFeedItemData state;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
+    final visibleCount = useState(3);
+    final tr = context.t;
 
-    final titleBtn = MangaTitleButton(
-      key: ValueKey('_MangaTitle(${state.manga.id})'),
-      manga: state.manga,
+    final numFormatter = useMemoized(
+      () => NumberFormat.compact(
+        locale: tr.$meta.locale.flutterLocale.toString(),
+      ),
+      [tr.$meta.locale],
     );
 
-    final coverBtn = _CoverButton(
-      key: ValueKey('_CoverButton(${state.manga.id})'),
-      manga: state.manga,
-    );
+    final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
+    final readData = ref.watch(mangaReadChaptersProvider(state.manga));
+    final statsData = ref.watch(chapterStatsProvider);
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: screenSizeSmall
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  titleBtn,
-                  const Divider(height: 4.0),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      coverBtn,
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 4.0,
-                          children: [
-                            for (final chapter in state.chapters)
-                              _BackLinkedChapterButton(
-                                key: ValueKey(chapter.id),
-                                chapter: chapter,
-                                manga: state.manga,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              )
-            : Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  coverBtn,
-                  Expanded(
-                    child: Column(
+    final titleBtn = MangaTitleButton(manga: state.manga);
+
+    final coverBtn = _CoverButton(manga: state.manga);
+
+    final chaptersCount = state.chapters.length;
+    final visibleChapters = state.chapters.take(visibleCount.value);
+    final remaining = chaptersCount - visibleCount.value;
+
+    final chapterButtons = <Widget>[
+      for (final chapter in visibleChapters)
+        _BackLinkedChapterButton(
+          key: ValueKey(chapter.id),
+          chapter: chapter,
+          manga: state.manga,
+          readStatus: switch (readData) {
+            AsyncData(value: final data?) => data.contains(chapter.id),
+            AsyncData(value: null) => false,
+            _ => null,
+          },
+          comments: switch (statsData) {
+            AsyncData(value: final data) => data[chapter.id]?.comments,
+            _ => null,
+          },
+          isLoggedIn: me != null,
+          numFormatter: numFormatter,
+          onMarkRead: me == null
+              ? null
+              : (setRead) async {
+                  readChaptersMutation(me).run(ref, (ref) async {
+                    return await ref
+                        .get(readChaptersProvider(me).notifier)
+                        .set(
+                          state.manga,
+                          read: setRead ? [chapter] : null,
+                          unread: !setRead ? [chapter] : null,
+                        );
+                  });
+                },
+        ),
+      if (remaining > 0)
+        Center(
+          child: TextButton.icon(
+            onPressed: () => visibleCount.value += 10,
+            icon: const Icon(Icons.expand_more),
+            label: Text('$remaining'),
+          ),
+        ),
+    ];
+
+    return RepaintBoundary(
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: screenSizeSmall
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleBtn,
+                    const Divider(height: 4.0),
+                    Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 4.0,
                       children: [
-                        titleBtn,
-                        const Divider(height: 10.0),
-                        for (final chapter in state.chapters)
-                          _BackLinkedChapterButton(
-                            key: ValueKey(chapter.id),
-                            chapter: chapter,
-                            manga: state.manga,
+                        coverBtn,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 4.0,
+                            children: chapterButtons,
                           ),
+                        ),
                       ],
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    coverBtn,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 4.0,
+                        children: [
+                          titleBtn,
+                          const Divider(height: 10.0),
+                          ...chapterButtons,
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }
 }
 
-@Dependencies([readBorderTheme])
-class _ChapterButtonCard extends ConsumerWidget {
+class _ChapterButtonCard extends StatelessWidget {
   final Chapter chapter;
   final Manga manga;
   final Widget child;
+  final bool? readStatus;
+  final bool isLoggedIn;
 
   const _ChapterButtonCard({
-    super.key,
     required this.chapter,
     required this.manga,
     required this.child,
+    this.readStatus,
+    this.isLoggedIn = false,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
-    final decoration = ref.watch(readBorderThemeProvider(manga.id, chapter.id));
+    final theme = Theme.of(context);
+    final tileColor = theme.colorScheme.primaryContainer;
+
+    Border border;
+    if (!isLoggedIn) {
+      border = Border(left: BorderSide(color: tileColor, width: 4.0));
+    } else {
+      border = Border(
+        left: BorderSide(
+          color: readStatus == true ? tileColor : Colors.blue,
+          width: 4.0,
+        ),
+      );
+    }
+
+    final decoration = BoxDecoration(
+      borderRadius: const BorderRadius.all(Radius.circular(4)),
+      color: tileColor,
+      border: border,
+    );
 
     return Ink(
       padding: EdgeInsets.symmetric(
@@ -802,23 +775,36 @@ class _ChapterButtonCard extends ConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle, readBorderTheme])
-class ChapterButtonWidget extends HookWidget {
+@Dependencies([chipTextStyle])
+class ChapterButtonWidget extends StatelessWidget {
   const ChapterButtonWidget({
     super.key,
     required this.chapter,
     required this.manga,
     this.onLinkPressed,
+    this.readStatus,
+    this.comments,
+    this.isLoggedIn = false,
+    this.numFormatter,
+    this.onMarkRead,
   });
 
   final Chapter chapter;
   final Manga manga;
   final CtxCallback? onLinkPressed;
+  final bool? readStatus;
+  final StatisticsDetailsComments? comments;
+  final bool isLoggedIn;
+  final NumberFormat? numFormatter;
+  final Future<void> Function(bool)? onMarkRead;
 
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
-    useAutomaticKeepAlive();
+    final formatter =
+        numFormatter ??
+        NumberFormat.compact(locale: tr.$meta.locale.flutterLocale.toString());
+
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     final isEndChapter =
@@ -829,61 +815,28 @@ class ChapterButtonWidget extends HookWidget {
 
     final user = chapter.uploadUser;
     final userChip = IconTextChip(
-      key: ValueKey(user?.id),
       icon: isOfficialPub ? _checkIconB : null,
       text: !isOfficialPub
           ? (user?.attributes?.username.crop() ?? '')
           : tr.mangadex.officialPub,
     );
 
-    final statsChip = Consumer(
-      builder: (context, ref, child) {
-        final comments = ref.watch(
-          chapterStatsProvider.select(
-            (value) => switch (value) {
-              AsyncValue<Map<String, ChapterStatistics>>(value: final data?)
-                  when data.containsKey(chapter.id) =>
-                data[chapter.id]?.comments,
-              _ => null,
-            },
-          ),
-        );
+    final statsChip = CommentChip(comments: comments, formatter: formatter);
 
-        return CommentChip(
-          key: ValueKey('CommentChip(${chapter.id})'),
-          comments: comments,
-        );
-      },
-    );
-
-    final statsChipRow = Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      mainAxisSize: MainAxisSize.min,
-      children: [Flexible(child: statsChip)],
-    );
-
-    final pubtime = _PubTime(
-      key: ValueKey(chapter.attributes.publishAt.millisecondsSinceEpoch),
-      time: chapter.attributes.publishAt,
-    );
+    final pubtime = _PubTime(time: chapter.attributes.publishAt);
 
     final markReadButton = MarkReadButton(
-      key: ValueKey('MarkReadButton(${chapter.id})'),
-      chapter: chapter,
-      manga: manga,
+      readStatus: readStatus,
+      onMarkRead: onMarkRead,
     );
 
     final title = Row(
-      mainAxisSize: MainAxisSize.min,
       spacing: 6.0,
       children: [
+        // This gap is to deliberate leave space between
+        // the markReadButton and the flag
         const SizedBox.shrink(),
-        CountryFlag(
-          key: ValueKey(
-            'CountryFlag(${chapter.attributes.translatedLanguage.code})',
-          ),
-          flag: chapter.attributes.translatedLanguage.flag,
-        ),
+        CountryFlag(flag: chapter.attributes.translatedLanguage.flag),
         if (isOfficialPub) _openIconB,
         Expanded(
           child: Row(
@@ -891,115 +844,124 @@ class ChapterButtonWidget extends HookWidget {
             children: [
               Flexible(
                 child: ChapterTitle(
-                  key: ValueKey('ChapterTitle(${chapter.id})'),
                   chapter: chapter,
                   manga: manga,
+                  readStatus: readStatus,
+                  isLoggedIn: isLoggedIn,
                 ),
               ),
-              if (isEndChapter)
-                IconTextChip(
-                  key: ValueKey('END'),
-                  color: Colors.blue,
-                  text: 'END',
-                ),
+              if (isEndChapter) IconTextChip(color: Colors.blue, text: 'END'),
             ],
           ),
         ),
-        if (screenSizeSmall) statsChipRow,
+        if (screenSizeSmall) statsChip,
       ],
     );
 
-    final groups = _GroupRow(
-      key: ValueKey('_GroupRow(${chapter.id})'),
-      chapter: chapter,
-    );
+    final groups = _GroupRow(chapter: chapter);
 
     final tile = screenSizeSmall
-        ? Table(
-            columnWidths: const <int, TableColumnWidth>{
-              0: FixedColumnWidth(24),
-              1: FlexColumnWidth(),
-            },
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            children: <TableRow>[
-              TableRow(children: <Widget>[markReadButton, title]),
-              TableRow(children: <Widget>[_groupIconB, groups]),
-              TableRow(
+        ? Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
                 children: [
-                  _personIconB,
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(
-                        child: Row(children: [Flexible(child: userChip)]),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: 4.0,
-                        children: [_scheduleIconB, pubtime],
-                      ),
-                    ],
+                  SizedBox(width: 24, child: markReadButton),
+                  Expanded(child: title),
+                ],
+              ),
+              Row(
+                children: [
+                  const SizedBox(width: 24, child: _groupIconB),
+                  Expanded(child: groups),
+                ],
+              ),
+              Row(
+                children: [
+                  const SizedBox(width: 24, child: _personIconB),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: userChip,
+                          ),
+                        ),
+                        const SizedBox(width: 4.0),
+                        _scheduleIconB,
+                        const SizedBox(width: 4.0),
+                        pubtime,
+                      ],
+                    ),
                   ),
                 ],
               ),
             ],
           )
-        : Table(
-            columnWidths: const <int, TableColumnWidth>{
-              0: FixedColumnWidth(24),
-              1: FlexColumnWidth(),
-              2: FixedColumnWidth(24),
-              3: FixedColumnWidth(145),
-              4: FixedColumnWidth(60),
-            },
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            children: <TableRow>[
-              TableRow(
-                children: <Widget>[
-                  markReadButton,
-                  title,
-                  _scheduleIconB,
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [const SizedBox(width: 2.0), pubtime],
+        : Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  SizedBox(width: 24, child: markReadButton),
+                  Expanded(child: title),
+                  const SizedBox(width: 24, child: _scheduleIconB),
+                  SizedBox(
+                    width: 145,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 2.0),
+                      child: pubtime,
+                    ),
                   ),
-                  const SizedBox.shrink(),
+                  const SizedBox(width: 60),
                 ],
               ),
-              TableRow(
-                children: <Widget>[
-                  _groupIconB,
-                  groups,
-                  _personIconB,
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [Flexible(child: userChip)],
+              Row(
+                children: [
+                  const SizedBox(width: 24, child: _groupIconB),
+                  Expanded(child: groups),
+                  const SizedBox(width: 24, child: _personIconB),
+                  SizedBox(
+                    width: 145,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: userChip,
+                    ),
                   ),
-                  statsChipRow,
+                  SizedBox(
+                    width: 60,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: statsChip,
+                    ),
+                  ),
                 ],
               ),
             ],
           );
 
-    return InkWell(
-      onTap: () {
-        MangaDexReaderRoute(
-          chapterId: chapter.id,
-          $extra: ReaderData(
-            title: chapter.title,
-            chapter: chapter,
-            manga: manga,
-            link: manga.attributes!.title.get('en'),
-            onLinkPressed: onLinkPressed,
-          ),
-        ).push(context);
-      },
-      child: _ChapterButtonCard(
-        key: ValueKey('_ChapterButtonCard(${chapter.id})'),
-        manga: manga,
-        chapter: chapter,
-        child: tile,
+    return RepaintBoundary(
+      child: InkWell(
+        onTap: () {
+          MangaDexReaderRoute(
+            chapterId: chapter.id,
+            $extra: ReaderData(
+              title: chapter.title,
+              chapter: chapter,
+              manga: manga,
+              link: manga.attributes!.title.get('en'),
+              onLinkPressed: onLinkPressed,
+            ),
+          ).push(context);
+        },
+        child: _ChapterButtonCard(
+          manga: manga,
+          chapter: chapter,
+          readStatus: readStatus,
+          isLoggedIn: isLoggedIn,
+          child: tile,
+        ),
       ),
     );
   }
@@ -1284,7 +1246,7 @@ class MangaListViewSliver extends ConsumerWidget {
   }
 }
 
-class GridMangaItem extends HookConsumerWidget {
+class GridMangaItem extends HookWidget {
   const GridMangaItem({
     super.key,
     required this.manga,
@@ -1301,41 +1263,29 @@ class GridMangaItem extends HookConsumerWidget {
   final String? header;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final me = ref.watch(loggedUserProvider).value;
+  Widget build(BuildContext context) {
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
-    final gradient = useAnimation(
-      aniController.drive(Styles.coverArtGradientTween),
+
+    final networkImage = CachedNetworkImage(
+      imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
+      cacheManager: gagakuImageCache,
+      width: 256.0,
+      fit: BoxFit.cover,
+      progressIndicatorBuilder: (context, url, downloadProgress) =>
+          const Center(child: CircularProgressIndicator()),
+      errorWidget: (context, url, error) => const Icon(Icons.error),
     );
 
     final image = GridAlbumImage(
-      gradient: gradient,
-      child: CachedNetworkImage(
-        imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
-        cacheManager: gagakuImageCache,
-        width: 256.0,
-        fit: BoxFit.cover,
-        progressIndicatorBuilder: (context, url, downloadProgress) =>
-            const Center(child: CircularProgressIndicator()),
-        errorWidget: (context, url, error) => const Icon(Icons.error),
-      ),
+      animation: aniController.drive(Styles.coverArtGradientTween),
+      child: networkImage,
     );
 
     return InkWell(
-      onTap: () async {
-        readChaptersMutation(me?.id).run(ref, (ref) async {
-          return await ref.get(readChaptersProvider(me?.id).notifier).get([
-            manga,
-          ]);
-        });
-
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get([manga]);
-        });
-        MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context);
-      },
+      onTap: () =>
+          MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context),
       onHover: (hovering) {
         if (hovering) {
           aniController.forward();
@@ -1372,15 +1322,14 @@ class GridMangaItem extends HookConsumerWidget {
 }
 
 @Dependencies([chipTextStyle])
-class GridMangaDetailedItem extends HookConsumerWidget {
+class GridMangaDetailedItem extends StatelessWidget {
   const GridMangaDetailedItem({super.key, required this.manga, this.header});
 
   final Manga manga;
   final String? header;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final me = ref.watch(loggedUserProvider).value;
+  Widget build(BuildContext context) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     return Card(
@@ -1396,23 +1345,10 @@ class GridMangaDetailedItem extends HookConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextButton(
-                    onPressed: () async {
-                      readChaptersMutation(me?.id).run(ref, (ref) async {
-                        return await ref
-                            .get(readChaptersProvider(me?.id).notifier)
-                            .get([manga]);
-                      });
-
-                      statisticsMutation.run(ref, (ref) async {
-                        return await ref.get(statisticsProvider.notifier).get([
-                          manga,
-                        ]);
-                      });
-                      MangaDexMangaViewRoute(
-                        mangaId: manga.id,
-                        manga: manga,
-                      ).push(context);
-                    },
+                    onPressed: () => MangaDexMangaViewRoute(
+                      mangaId: manga.id,
+                      manga: manga,
+                    ).push(context),
                     child: CachedNetworkImage(
                       imageUrl: manga.getFirstCoverUrl(
                         quality: CoverArtQuality.small,
@@ -1462,16 +1398,14 @@ class GridMangaDetailedItem extends HookConsumerWidget {
 }
 
 @Dependencies([chipTextStyle])
-class _ListMangaItem extends HookConsumerWidget {
+class _ListMangaItem extends StatelessWidget {
   const _ListMangaItem({super.key, required this.manga, this.header});
 
   final Manga manga;
   final String? header;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final me = ref.watch(loggedUserProvider).value;
-
+  Widget build(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -1479,23 +1413,10 @@ class _ListMangaItem extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextButton(
-              onPressed: () async {
-                readChaptersMutation(me?.id).run(ref, (ref) async {
-                  return await ref
-                      .get(readChaptersProvider(me?.id).notifier)
-                      .get([manga]);
-                });
-
-                statisticsMutation.run(ref, (ref) async {
-                  return await ref.get(statisticsProvider.notifier).get([
-                    manga,
-                  ]);
-                });
-                MangaDexMangaViewRoute(
-                  mangaId: manga.id,
-                  manga: manga,
-                ).push(context);
-              },
+              onPressed: () => MangaDexMangaViewRoute(
+                mangaId: manga.id,
+                manga: manga,
+              ).push(context),
               child: CachedNetworkImage(
                 imageUrl: manga.getFirstCoverUrl(
                   quality: CoverArtQuality.small,
@@ -1533,34 +1454,31 @@ class _ListMangaItem extends HookConsumerWidget {
   }
 }
 
-class ChapterTitle extends ConsumerWidget {
+class ChapterTitle extends StatelessWidget {
   final Chapter chapter;
   final Manga manga;
+  final bool? readStatus;
+  final bool isLoggedIn;
 
-  const ChapterTitle({super.key, required this.chapter, required this.manga});
+  const ChapterTitle({
+    super.key,
+    required this.chapter,
+    required this.manga,
+    this.readStatus,
+    this.isLoggedIn = false,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final me = ref.watch(loggedUserProvider).value;
 
     TextStyle textstyle;
 
-    if (me == null) {
+    if (!isLoggedIn) {
       textstyle = TextStyle(color: theme.colorScheme.onPrimaryContainer);
     } else {
-      bool? isRead = ref.watch(
-        readChaptersProvider(me.id).select(
-          (value) => switch (value) {
-            AsyncValue<Map<String, ReadChapterSet>>(value: final data?) =>
-              data[manga.id]?.contains(chapter.id) == true,
-            _ => null,
-          },
-        ),
-      );
-
       textstyle = TextStyle(
-        color: (isRead == true
+        color: (readStatus == true
             ? theme.disabledColor
             : theme.colorScheme.onPrimaryContainer),
       );
@@ -1575,7 +1493,7 @@ class ChapterTitle extends ConsumerWidget {
 }
 
 @Dependencies([chipTextStyle])
-class MangaGenreRow extends HookWidget {
+class MangaGenreRow extends StatelessWidget {
   const MangaGenreRow({super.key, required this.manga});
 
   final Manga manga;
@@ -1583,31 +1501,29 @@ class MangaGenreRow extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
-    final contentTagChips = useMemoized(() {
-      return manga.attributes!.tags
-          .where((tag) => tag.attributes.group == TagGroup.content)
-          .map((e) => ContentChip(key: ValueKey(e.id), content: e));
-    }, [manga]);
+    final attributes = manga.attributes!;
 
-    final genreTagChips = useMemoized(() {
-      return manga.attributes!.tags
-          .where((tag) => tag.attributes.group != TagGroup.content)
-          .map(
-            (e) => IconTextChip(
-              key: ValueKey(e.id),
-              text: e.attributes.name.get(tr.$meta.locale.languageCode),
-              onPressed: () =>
-                  MangaDexTagViewRoute(tagId: e.id, tag: e).push(context),
-            ),
-          );
-    }, [manga]);
+    final contentTagChips = attributes.tags
+        .where((tag) => tag.attributes.group == TagGroup.content)
+        .map((e) => ContentChip(key: ValueKey(e.id), content: e));
+
+    final genreTagChips = attributes.tags
+        .where((tag) => tag.attributes.group != TagGroup.content)
+        .map(
+          (e) => IconTextChip(
+            key: ValueKey(e.id),
+            text: e.attributes.name.get(tr.$meta.locale.languageCode),
+            onPressed: () =>
+                MangaDexTagViewRoute(tagId: e.id, tag: e).push(context),
+          ),
+        );
 
     return Wrap(
       spacing: 4.0,
       runSpacing: 4.0,
       children: [
-        if (manga.attributes!.contentRating != ContentRating.safe)
-          ContentRatingChip(rating: manga.attributes!.contentRating),
+        if (attributes.contentRating != ContentRating.safe)
+          ContentRatingChip(rating: attributes.contentRating),
         ...contentTagChips,
         ...genreTagChips,
       ],
@@ -1630,25 +1546,13 @@ class MangaStatisticsRow extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final statsProvider = ref.watch(
-      statisticsProvider.select(
-        (map) => switch (map) {
-          AsyncValue<Map<String, MangaStatistics>>(value: final stats?)
-              when stats.containsKey(manga.id) =>
-            stats[manga.id],
+      mangaStatisticsProvider(manga).select(
+        (data) => switch (data) {
+          AsyncValue<MangaStatistics>(value: final stats?) => stats,
           _ => null,
         },
       ),
     );
-
-    // Redundancy
-    useEffect(() {
-      Future.delayed(Duration.zero, () async {
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get([manga]);
-        });
-      });
-      return null;
-    }, []);
 
     final numFormatter = useMemoized(() {
       return NumberFormat.compact(
@@ -1663,7 +1567,6 @@ class MangaStatisticsRow extends HookConsumerWidget {
         ...switch (statsProvider) {
           MangaStatistics(:final rating, :final follows, :final comments) => [
             IconTextChip(
-              key: ValueKey('_RatingChip(${manga.id})'),
               icon: const Icon(
                 Icons.star_border,
                 color: Colors.amber,
@@ -1677,20 +1580,15 @@ class MangaStatisticsRow extends HookConsumerWidget {
               ),
             ),
             IconTextChip(
-              key: ValueKey('_FollowsChip(${manga.id})'),
               icon: const Icon(Icons.bookmark_outline, size: 18),
               text: numFormatter.format(follows),
             ),
-            CommentChip(
-              key: ValueKey('CommentChip(${manga.id})'),
-              comments: comments,
-            ),
+            CommentChip(comments: comments, formatter: numFormatter),
           ],
           _ => [IconTextChip(text: tr.ui.loadingDot)],
         },
         const SizedBox.shrink(),
         MangaStatusChip(
-          key: ValueKey('MangaStatusChip(${manga.id})'),
           status: manga.attributes!.status,
           year: manga.attributes!.year,
           short: shortStatus,
@@ -1701,10 +1599,10 @@ class MangaStatisticsRow extends HookConsumerWidget {
 }
 
 @Dependencies([chipTextStyle])
-class _GroupRow extends HookWidget {
+class _GroupRow extends StatelessWidget {
   final Chapter chapter;
 
-  const _GroupRow({super.key, required this.chapter});
+  const _GroupRow({required this.chapter});
 
   @override
   Widget build(BuildContext context) {
@@ -1716,7 +1614,6 @@ class _GroupRow extends HookWidget {
       chips.add(
         Flexible(
           child: IconTextChip(
-            key: ValueKey(g.id),
             icon: isOfficialPub ? _circleIconB : null,
             text: g.attributes.name,
             onPressed: () {
@@ -1728,21 +1625,17 @@ class _GroupRow extends HookWidget {
     }
 
     if (chips.isEmpty) {
-      chips.add(
-        Flexible(
-          child: IconTextChip(key: const ValueKey('nogroup'), text: 'No Group'),
-        ),
-      );
+      chips.add(Flexible(child: IconTextChip(text: 'No Group')));
     }
 
     return Row(mainAxisSize: MainAxisSize.min, spacing: 6.0, children: chips);
   }
 }
 
-class _PubTime extends StatelessWidget {
+class _PubTime extends HookWidget {
   final DateTime time;
 
-  const _PubTime({super.key, required this.time});
+  const _PubTime({required this.time});
 
   @override
   Widget build(BuildContext context) {
@@ -1753,7 +1646,10 @@ class _PubTime extends StatelessWidget {
     final lang = tr.$meta.locale.languageCode;
     //final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
 
-    final pubtime = timeago.format(time, locale: lang);
+    final pubtime = useMemoized(() => timeago.format(time, locale: lang), [
+      time,
+      lang,
+    ]);
 
     return Text(
       pubtime,
@@ -1763,24 +1659,18 @@ class _PubTime extends StatelessWidget {
 }
 
 @Dependencies([chipTextStyle])
-class CommentChip extends HookWidget {
+class CommentChip extends StatelessWidget {
   final StatisticsDetailsComments? comments;
+  final NumberFormat formatter;
 
-  const CommentChip({super.key, this.comments});
+  const CommentChip({super.key, this.comments, required this.formatter});
 
   @override
   Widget build(BuildContext context) {
-    final tr = context.t;
-    final numFormatter = useMemoized(() {
-      return NumberFormat.compact(
-        locale: tr.$meta.locale.flutterLocale.toString(),
-      );
-    }, [tr.$meta.locale]);
-
     return IconTextChip(
       icon: const Icon(Icons.chat_bubble_outline, size: 18),
       text: (comments != null)
-          ? numFormatter.format(comments!.repliesCount)
+          ? formatter.format(comments!.repliesCount)
           : 'N/A',
       onPressed: (comments != null)
           ? () async {

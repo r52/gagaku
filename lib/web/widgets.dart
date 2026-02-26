@@ -182,7 +182,6 @@ class WebMangaListViewSliver extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final extIcons = ref.watch(_extensionIconProvider);
-    final api = ref.watch(proxyProvider);
     WebMangaListView view = items != null
         ? ref.watch(_mangaListViewProvider)
         : WebMangaListView.grid;
@@ -278,6 +277,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                 textColor: theme.colorScheme.onSurface,
                 onTap: () async {
                   final tr = context.t;
+                  final api = ref.read(proxyProvider);
                   final messenger = ScaffoldMessenger.of(context);
                   final result = await api.handleLink(item);
 
@@ -355,6 +355,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                     textColor: theme.colorScheme.onSurface,
                     onTap: () async {
                       final tr = context.t;
+                      final api = ref.read(proxyProvider);
                       final messenger = ScaffoldMessenger.of(context);
                       final result = await api.handleLink(item);
 
@@ -428,9 +429,6 @@ class GridMangaItem extends HookConsumerWidget {
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
-    final gradient = useAnimation(
-      aniController.drive(Styles.coverArtGradientTween),
-    );
     final theme = Theme.of(context);
 
     String referer = refer[link.handle?.sourceId] ?? '';
@@ -450,9 +448,67 @@ class GridMangaItem extends HookConsumerWidget {
           )
         : const Icon(Icons.menu_book, size: 128.0);
 
-    final sourceIcon =
-        extIcons[link.handle?.sourceId] ??
-        Text(link.handle?.sourceId ?? '', style: CommonTextStyles.twelve);
+    final sourceIcon = Align(
+      alignment: Alignment.bottomRight,
+      child:
+          extIcons[link.handle?.sourceId] ??
+          Text(link.handle?.sourceId ?? '', style: CommonTextStyles.twelve),
+    );
+
+    final favButton = showFavoriteButton
+        ? Align(
+            alignment: Alignment.topLeft,
+            child: FavoritesButton(link: link),
+          )
+        : null;
+
+    final actionButton = (!showSearchButton && !showRemoveButton)
+        ? null
+        : Align(
+            alignment: Alignment.topRight,
+            child: MenuAnchor(
+              builder: (context, controller, child) => IconButton(
+                style: Styles.squareIconButtonStyle(
+                  backgroundColor: theme.colorScheme.surface.withAlpha(200),
+                ),
+                onPressed: () {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
+                },
+                icon: child!,
+              ),
+              menuChildren: [
+                if (showSearchButton)
+                  MenuItemButton(
+                    onPressed: () => ExtensionSearchRoute(
+                      query: SearchQuery(title: link.title),
+                    ).push(context),
+                    leadingIcon: const Icon(Icons.search),
+                    child: Text(tr.webSources.searchWithExt),
+                  ),
+                if (showRemoveButton)
+                  MenuItemButton(
+                    onPressed: () async {
+                      WebHistoryManager().remove(link);
+                    },
+                    leadingIcon: Icon(
+                      Icons.delete,
+                      color: theme.colorScheme.error,
+                    ),
+                    child: Text(tr.mangaActions.removeHistory),
+                  ),
+              ],
+              child: const Icon(Icons.more_vert_outlined),
+            ),
+          );
+
+    final image = GridAlbumImage(
+      animation: aniController.drive(Styles.coverArtGradientTween),
+      child: cover,
+    );
 
     return InkWell(
       onTap: () async {
@@ -485,55 +541,11 @@ class GridMangaItem extends HookConsumerWidget {
         children: [
           GridTile(
             footer: GridAlbumTextBar(text: link.title),
-            child: GridAlbumImage(gradient: gradient, child: cover),
+            child: image,
           ),
-          Align(alignment: Alignment.bottomRight, child: sourceIcon),
-          if (showFavoriteButton)
-            Align(
-              alignment: Alignment.topLeft,
-              child: FavoritesButton(link: link),
-            ),
-          if (showSearchButton || showRemoveButton)
-            Align(
-              alignment: Alignment.topRight,
-              child: MenuAnchor(
-                builder: (context, controller, child) => IconButton(
-                  style: Styles.squareIconButtonStyle(
-                    backgroundColor: theme.colorScheme.surface.withAlpha(200),
-                  ),
-                  onPressed: () {
-                    if (controller.isOpen) {
-                      controller.close();
-                    } else {
-                      controller.open();
-                    }
-                  },
-                  icon: child!,
-                ),
-                menuChildren: [
-                  if (showSearchButton)
-                    MenuItemButton(
-                      onPressed: () => ExtensionSearchRoute(
-                        query: SearchQuery(title: link.title),
-                      ).push(context),
-                      leadingIcon: const Icon(Icons.search),
-                      child: Text(tr.webSources.searchWithExt),
-                    ),
-                  if (showRemoveButton)
-                    MenuItemButton(
-                      onPressed: () async {
-                        WebHistoryManager().remove(link);
-                      },
-                      leadingIcon: Icon(
-                        Icons.delete,
-                        color: theme.colorScheme.error,
-                      ),
-                      child: Text(tr.mangaActions.removeHistory),
-                    ),
-                ],
-                child: const Icon(Icons.more_vert_outlined),
-              ),
-            ),
+          sourceIcon,
+          ?favButton,
+          ?actionButton,
         ],
       ),
     );
@@ -554,20 +566,16 @@ class FavoritesButton extends HookWidget {
     final manager = useListenable(WebFavoritesManager());
     final favorites = manager.state;
 
-    final favStatus = useMemoized(() {
-      final favList = manager.getFavoritedListIdsOfLink(link);
-      return (list: favList, isFavorited: favList.isNotEmpty);
-    }, [favorites, link]);
+    final favList = manager.getFavoritedListIdsOfLink(link);
+    final isFavorited = favList.isNotEmpty;
 
-    final menuChildren = useMemoized(() {
-      if (favorites.isEmpty) return <Widget>[];
-
-      return [
+    final menuChildren = <Widget>[
+      if (favorites.isNotEmpty) ...[
         for (final cat in favorites)
           CheckboxListTile(
             controlAffinity: ListTileControlAffinity.leading,
             title: Text(cat.name),
-            value: favStatus.list.contains(cat.dbid),
+            value: favList.contains(cat.dbid),
             onChanged: (bool? value) async {
               if (value == true) {
                 manager.add(cat, link);
@@ -576,13 +584,13 @@ class FavoritesButton extends HookWidget {
               }
             },
           ),
-        if (favStatus.isFavorited)
+        if (isFavorited)
           MenuItemButton(
             onPressed: () => manager.removeFromAll(link),
             child: Text(tr.ui.clear),
           ),
-      ];
-    }, [favorites, favStatus, manager, link, tr]);
+      ],
+    ];
 
     return MenuAnchor(
       builder: (context, controller, child) {
@@ -609,6 +617,9 @@ class FavoritesButton extends HookWidget {
                         controller.open();
                       }
                     },
+                    customBorder: borderRadius == null
+                        ? const CircleBorder()
+                        : null,
                     child: child,
                   ),
           ),
@@ -618,8 +629,8 @@ class FavoritesButton extends HookWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Icon(
-          favStatus.isFavorited ? Icons.favorite : Icons.favorite_border,
-          color: favStatus.isFavorited ? theme.colorScheme.primary : null,
+          isFavorited ? Icons.favorite : Icons.favorite_border,
+          color: isFavorited ? theme.colorScheme.primary : null,
         ),
       ),
     );
@@ -643,7 +654,6 @@ class ChapterButtonWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    useAutomaticKeepAlive();
     final theme = Theme.of(context);
     final chapterkey = data.name;
     final mangakey = handle.getKey();
@@ -669,13 +679,14 @@ class ChapterButtonWidget extends HookConsumerWidget {
     final lang = tr.$meta.locale.languageCode;
     //final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
 
-    String? timestamp;
-
-    if (data.chapter.lastUpdated != null) {
-      timestamp = timeago.format(data.chapter.lastUpdated!, locale: lang);
-    } else if (data.chapter.releaseDate != null) {
-      timestamp = timeago.format(data.chapter.releaseDate!, locale: lang);
-    }
+    final timestamp = useMemoized(() {
+      if (data.chapter.lastUpdated != null) {
+        return timeago.format(data.chapter.lastUpdated!, locale: lang);
+      } else if (data.chapter.releaseDate != null) {
+        return timeago.format(data.chapter.releaseDate!, locale: lang);
+      }
+      return null;
+    }, [data.chapter.lastUpdated, data.chapter.releaseDate, lang]);
 
     final language = sourceValue is Chapter
         ? CountryFlag(flag: sourceValue.langCode, size: 12)
@@ -741,84 +752,68 @@ class ChapterButtonWidget extends HookConsumerWidget {
       );
     }
 
-    final tile = Table(
-      columnWidths: const <int, TableColumnWidth>{
-        0: FixedColumnWidth(24),
-        1: FixedColumnWidth(6),
-        2: FlexColumnWidth(),
-        3: FixedColumnWidth(150),
-      },
-      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-      children: <TableRow>[
-        TableRow(
-          children: <Widget>[
-            markReadBtn,
-            const SizedBox.shrink(),
-            Text(title, style: textstyle),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [?language],
+    final tile = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          spacing: 6.0,
+          children: [
+            SizedBox(width: 24, child: markReadBtn),
+            Expanded(
+              child: Text(
+                title,
+                style: textstyle,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
+            if (language != null)
+              SizedBox(
+                width: 150,
+                child: Align(alignment: Alignment.centerRight, child: language),
+              ),
           ],
         ),
-        TableRow(
-          children: <Widget>[
-            const Icon(Icons.group, size: 20),
-            const SizedBox.shrink(),
-            Text(groupText),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                const Icon(Icons.schedule, size: 20),
-                if (timestamp != null) Text(' $timestamp'),
-              ],
+        Row(
+          spacing: 6.0,
+          children: [
+            const SizedBox(width: 24, child: Icon(Icons.group, size: 20)),
+            Expanded(child: Text(groupText, overflow: TextOverflow.ellipsis)),
+            SizedBox(
+              width: 150,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Icon(Icons.schedule, size: 20),
+                  if (timestamp != null) Text(' $timestamp'),
+                ],
+              ),
             ),
           ],
         ),
       ],
     );
 
-    return InkWell(
-      onTap: () => route.push(context),
-      child: _ChapterButtonCard(
-        key: ValueKey('_ChapterButtonCard($chapterkey)'),
-        mangaKey: mangakey,
-        chapterKey: chapterkey,
-        child: tile,
+    return RepaintBoundary(
+      child: InkWell(
+        onTap: () => route.push(context),
+        child: _ChapterButtonCard(isRead: isRead, child: tile),
       ),
     );
   }
 }
 
-class _ChapterButtonCard extends ConsumerWidget {
-  final String chapterKey;
-  final String mangaKey;
+class _ChapterButtonCard extends StatelessWidget {
+  final bool isRead;
   final Widget child;
 
-  const _ChapterButtonCard({
-    super.key,
-    required this.chapterKey,
-    required this.mangaKey,
-    required this.child,
-  });
+  const _ChapterButtonCard({required this.isRead, required this.child});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
     final tileColor = theme.colorScheme.primaryContainer;
-
-    final isRead = ref.watch(
-      webReadMarkersProvider.select(
-        (value) => switch (value) {
-          AsyncValue(value: final db?) =>
-            db.markers[mangaKey]?.contains(chapterKey) ?? false,
-          _ => false,
-        },
-      ),
-    );
 
     return Ink(
       padding: EdgeInsets.symmetric(
@@ -829,10 +824,7 @@ class _ChapterButtonCard extends ConsumerWidget {
         borderRadius: const BorderRadius.all(Radius.circular(4)),
         color: tileColor,
         border: Border(
-          left: BorderSide(
-            color: isRead == true ? tileColor : Colors.blue,
-            width: 4.0,
-          ),
+          left: BorderSide(color: isRead ? tileColor : Colors.blue, width: 4.0),
         ),
       ),
       child: child,
@@ -840,7 +832,7 @@ class _ChapterButtonCard extends ConsumerWidget {
   }
 }
 
-class ChapterFeedItem extends HookWidget {
+class ChapterFeedItem extends StatelessWidget {
   const ChapterFeedItem({super.key, required this.state});
 
   final UpdateFeedItem state;
@@ -859,59 +851,61 @@ class ChapterFeedItem extends HookWidget {
       link: state.link,
     );
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: screenSizeSmall
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  titleBtn,
-                  const Divider(height: 4.0),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      coverBtn,
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 4.0,
-                          children: [
-                            for (final item in state.manga.chapters.take(3))
-                              ChapterButtonWidget(
-                                data: item,
-                                manga: state.manga,
-                                handle: state.link.handle!,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              )
-            : Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  coverBtn,
-                  Expanded(
-                    child: Column(
+    return RepaintBoundary(
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: screenSizeSmall
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleBtn,
+                    const Divider(height: 4.0),
+                    Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 4.0,
                       children: [
-                        titleBtn,
-                        const Divider(height: 10.0),
-                        for (final item in state.manga.chapters.take(3))
-                          ChapterButtonWidget(
-                            data: item,
-                            manga: state.manga,
-                            handle: state.link.handle!,
+                        coverBtn,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 4.0,
+                            children: [
+                              for (final item in state.manga.chapters.take(3))
+                                ChapterButtonWidget(
+                                  data: item,
+                                  manga: state.manga,
+                                  handle: state.link.handle!,
+                                ),
+                            ],
                           ),
+                        ),
                       ],
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    coverBtn,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 4.0,
+                        children: [
+                          titleBtn,
+                          const Divider(height: 10.0),
+                          for (final item in state.manga.chapters.take(3))
+                            ChapterButtonWidget(
+                              data: item,
+                              manga: state.manga,
+                              handle: state.link.handle!,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }
@@ -925,11 +919,11 @@ class _CoverButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final api = ref.watch(proxyProvider);
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     return TextButton(
       onPressed: () async {
+        final api = ref.read(proxyProvider);
         final messenger = ScaffoldMessenger.of(context);
         final result = await api.handleLink(link);
 
@@ -980,7 +974,6 @@ class _MangaTitle extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final api = ref.watch(proxyProvider);
     final theme = Theme.of(context);
 
     return TextButton.icon(
@@ -993,6 +986,7 @@ class _MangaTitle extends ConsumerWidget {
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {
+        final api = ref.read(proxyProvider);
         final messenger = ScaffoldMessenger.of(context);
         final result = await api.handleLink(link);
 

@@ -21,6 +21,7 @@ import 'package:gagaku/web/model/types.dart' show SearchQuery;
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
@@ -60,7 +61,7 @@ Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
   return manga.first;
 }
 
-@Dependencies([readBorderTheme, chipTextStyle])
+@Dependencies([chipTextStyle])
 class MangaDexMangaViewPage extends ConsumerWidget {
   const MangaDexMangaViewPage({super.key, required this.mangaId, this.manga});
 
@@ -88,7 +89,7 @@ class MangaDexMangaViewPage extends ConsumerWidget {
   }
 }
 
-@Dependencies([readBorderTheme, chipTextStyle])
+@Dependencies([chipTextStyle])
 class MangaDexMangaViewWidget extends StatefulHookConsumerWidget {
   const MangaDexMangaViewWidget({super.key, required this.manga});
 
@@ -235,25 +236,38 @@ class _MangaDexMangaViewWidgetState
       () => tabController.index,
     );
 
-    String? lastvolchap;
+    String? lastvolchap = useMemoized(
+      () {
+        String? chapStr;
 
-    if ((widget.manga.attributes!.lastVolume != null &&
-            widget.manga.attributes!.lastVolume!.isNotEmpty) ||
-        (widget.manga.attributes!.lastChapter != null &&
-            widget.manga.attributes!.lastChapter!.isNotEmpty)) {
-      lastvolchap = '';
+        if ((widget.manga.attributes!.lastVolume != null &&
+                widget.manga.attributes!.lastVolume!.isNotEmpty) ||
+            (widget.manga.attributes!.lastChapter != null &&
+                widget.manga.attributes!.lastChapter!.isNotEmpty)) {
+          chapStr = '';
 
-      if (widget.manga.attributes!.lastVolume != null &&
-          widget.manga.attributes!.lastVolume!.isNotEmpty) {
-        lastvolchap += 'Volume ${widget.manga.attributes!.lastVolume}';
-      }
+          if (widget.manga.attributes!.lastVolume != null &&
+              widget.manga.attributes!.lastVolume!.isNotEmpty) {
+            chapStr += tr.mangaView.volume(
+              n: widget.manga.attributes!.lastVolume!,
+            );
+          }
 
-      if (widget.manga.attributes!.lastChapter != null &&
-          widget.manga.attributes!.lastChapter!.isNotEmpty) {
-        lastvolchap +=
-            '${lastvolchap.isEmpty ? '' : ', '}Chapter ${widget.manga.attributes!.lastChapter!}';
-      }
-    }
+          if (widget.manga.attributes!.lastChapter != null &&
+              widget.manga.attributes!.lastChapter!.isNotEmpty) {
+            chapStr +=
+                '${chapStr.isEmpty ? '' : ', '}${tr.mangaView.chapter(n: widget.manga.attributes!.lastChapter!)}';
+          }
+        }
+
+        return chapStr;
+      },
+      [
+        widget.manga.attributes!.lastChapter,
+        widget.manga.attributes!.lastVolume,
+        tr.$meta.locale.languageCode,
+      ],
+    );
 
     final mangaTagChips = useMemoized<Map<TagGroup, List<Widget>>>(() {
       final map = widget.manga.attributes!.tags.groupListsBy(
@@ -274,24 +288,24 @@ class _MangaDexMangaViewWidgetState
               .toList(),
         );
       });
-    }, [widget.manga]);
+    }, [widget.manga, tr.$meta.locale.languageCode]);
 
-    final newListMutation = ref.watch(userListNewMutation(me?.id));
-
-    if (newListMutation is MutationError) {
-      Styles.showSnackBar(
-        messenger,
-        content: tr.mangadex.newListError(
-          error: (newListMutation as MutationError).error.toString(),
-        ),
-      );
-    } else if (newListMutation is MutationSuccess) {
-      Styles.showSnackBar(
-        messenger,
-        content: tr.mangadex.newListOk,
-        color: Colors.green,
-      );
-    }
+    ref.listen(userListNewMutation(me?.id), (_, next) {
+      if (next is MutationError) {
+        Styles.showSnackBar(
+          messenger,
+          content: tr.mangadex.newListError(
+            error: (next as MutationError).error.toString(),
+          ),
+        );
+      } else if (next is MutationSuccess) {
+        Styles.showSnackBar(
+          messenger,
+          content: tr.mangadex.newListOk,
+          color: Colors.green,
+        );
+      }
+    });
 
     final moreMenu = MenuAnchor(
       builder: (context, controller, child) => IconButton(
@@ -764,15 +778,17 @@ class _MangaDexMangaViewWidgetState
 
                                 final allRead = chapters != null
                                     ? ref.watch(
-                                        readChaptersProvider(me.id).select(
+                                        mangaReadChaptersProvider(
+                                          widget.manga,
+                                        ).select(
                                           (value) => switch (value) {
-                                            AsyncValue(value: final data?) =>
-                                              data[widget.manga.id]
-                                                      ?.containsAll(
-                                                        chapters.map(
-                                                          (e) => e.id,
-                                                        ),
-                                                      ) ==
+                                            AsyncValue(
+                                              value: final data,
+                                              hasValue: true,
+                                            ) =>
+                                              data?.containsAll(
+                                                    chapters.map((e) => e.id),
+                                                  ) ==
                                                   true,
                                             _ => false,
                                           },
@@ -862,17 +878,18 @@ class _MangaDexMangaViewWidgetState
           },
           body: SafeArea(
             top: false,
-            bottom: false,
-            child: switch (_ViewType.values[tabview]) {
-              _ViewType.chapters => _MangaChaptersView(
+            bottom: true,
+            child: _UnpagedMangaViewBody(
+              controller: tabController,
+              chaptersView: _MangaChaptersView(
                 manga: widget.manga,
                 controller: _chapterController,
               ),
-              _ViewType.art => _MangaCoversView(
+              coversView: _MangaCoversView(
                 manga: widget.manga,
                 controller: _coverController,
               ),
-              _ViewType.related => MangaListWidget(
+              relatedView: MangaListWidget(
                 title: Text(
                   tr.mangaView.relatedTitles,
                   style: CommonTextStyles.twentyfour,
@@ -891,7 +908,7 @@ class _MangaDexMangaViewWidgetState
                   ),
                 ],
               ),
-            },
+            ),
           ),
         ),
       ),
@@ -899,7 +916,31 @@ class _MangaDexMangaViewWidgetState
   }
 }
 
-@Dependencies([readBorderTheme, chipTextStyle])
+class _UnpagedMangaViewBody extends HookWidget {
+  const _UnpagedMangaViewBody({
+    required this.controller,
+    required this.chaptersView,
+    required this.coversView,
+    required this.relatedView,
+  });
+
+  final TabController controller;
+  final Widget chaptersView;
+  final Widget coversView;
+  final Widget relatedView;
+
+  @override
+  Widget build(BuildContext context) {
+    final tabview = useListenableSelector(controller, () => controller.index);
+    return switch (_ViewType.values[tabview]) {
+      _ViewType.chapters => chaptersView,
+      _ViewType.art => coversView,
+      _ViewType.related => relatedView,
+    };
+  }
+}
+
+@Dependencies([chipTextStyle])
 class _MangaChaptersView extends StatelessWidget {
   const _MangaChaptersView({required this.manga, required this.controller});
 
@@ -995,7 +1036,7 @@ class _ChapterListElement {
   final bool isIndented;
 }
 
-@Dependencies([readBorderTheme, chipTextStyle])
+@Dependencies([chipTextStyle])
 class _ChapterListSliver extends HookConsumerWidget {
   const _ChapterListSliver({
     required this.state,
@@ -1012,25 +1053,21 @@ class _ChapterListSliver extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final me = ref.watch(loggedUserProvider).value;
+    final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
+    final readData = ref.watch(mangaReadChaptersProvider(manga));
+    final statsData = ref.watch(chapterStatsProvider);
+    final numFormatter = useMemoized(
+      () => NumberFormat.compact(
+        locale: tr.$meta.locale.flutterLocale.toString(),
+      ),
+      [tr.$meta.locale],
+    );
     // final sort = ref.watch(mangaChaptersListSortProvider);
     // final sortfunc = sort == ListSort.ascending
     //     ? compareNatural
     //     : (a, b) {
     //         return compareNatural(b, a);
     //       };
-
-    // Redundancy
-    useEffect(() {
-      Future.delayed(Duration.zero, () async {
-        await readChaptersMutation(me?.id).run(ref, (ref) async {
-          return await ref.get(readChaptersProvider(me?.id).notifier).get([
-            manga,
-          ]);
-        });
-      });
-      return null;
-    }, [manga, me]);
 
     final chapters = state.items;
 
@@ -1102,7 +1139,7 @@ class _ChapterListSliver extends HookConsumerWidget {
       }
 
       return items;
-    }, [state]);
+    }, [state, tr.$meta.locale.languageCode]);
 
     final newState = useMemoized(() {
       return PagingState<int, _ChapterListElement>(
@@ -1133,11 +1170,39 @@ class _ChapterListSliver extends HookConsumerWidget {
             );
           }
 
+          final isRead = switch (readData) {
+            AsyncData(value: final data?) => data.contains(item.chapter!.id),
+            AsyncData(value: null) => false,
+            _ => null,
+          };
+
+          final comments = switch (statsData) {
+            AsyncData(value: final data) => data[item.chapter!.id]?.comments,
+            _ => null,
+          };
+
           // is chapter beyond this point
           final chapbtn = ChapterButtonWidget(
             key: ValueKey(item.chapter!.id),
             chapter: item.chapter!,
             manga: manga,
+            readStatus: isRead,
+            comments: comments,
+            isLoggedIn: me != null,
+            numFormatter: numFormatter,
+            onMarkRead: me == null
+                ? null
+                : (setRead) async {
+                    readChaptersMutation(me).run(ref, (ref) async {
+                      return await ref
+                          .get(readChaptersProvider(me).notifier)
+                          .set(
+                            manga,
+                            read: setRead ? [item.chapter!] : null,
+                            unread: !setRead ? [item.chapter!] : null,
+                          );
+                    });
+                  },
           );
 
           if (item.isIndented) {
@@ -1167,7 +1232,6 @@ class _ChapterListHeader extends HookWidget {
   Widget build(BuildContext context) {
     useAutomaticKeepAlive();
     return Padding(
-      key: ValueKey(key),
       padding: const EdgeInsets.all(6.0),
       child: Text(
         text,
@@ -1197,13 +1261,10 @@ class _CoverArtItem extends HookWidget {
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
-    final gradient = useAnimation(
-      aniController.drive(Styles.coverArtGradientTween),
-    );
     final url = manga.getUrlFromCover(cover);
 
     final image = GridAlbumImage(
-      gradient: gradient,
+      animation: aniController.drive(Styles.coverArtGradientTween),
       child: CachedNetworkImage(
         imageUrl: url.quality(quality: CoverArtQuality.medium),
         cacheManager: gagakuImageCache,

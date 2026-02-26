@@ -12,7 +12,7 @@ import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 
-@Dependencies([chipTextStyle, readBorderTheme])
+@Dependencies([chipTextStyle])
 class MangaDexRecentFeedPage extends StatefulHookConsumerWidget {
   const MangaDexRecentFeedPage({super.key, this.controller});
 

@@ -144,7 +144,7 @@ final class ReadChaptersProvider
   }
 }
 
-String _$readChaptersHash() => r'162e6b6a6de0c6ccee87196034d5aa543e8c1bbc';
+String _$readChaptersHash() => r'b4d935af216865bf7fae46e11aa4f98f809e913a';
 
 final class ReadChaptersFamily extends $Family
     with
@@ -190,6 +190,81 @@ abstract class _$ReadChapters extends $AsyncNotifier<ReadChaptersMap> {
             >;
     element.handleCreate(ref, () => build(_$args));
   }
+}
+
+@ProviderFor(mangaReadChapters)
+final mangaReadChaptersProvider = MangaReadChaptersFamily._();
+
+final class MangaReadChaptersProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<ReadChapterSet?>,
+          ReadChapterSet?,
+          FutureOr<ReadChapterSet?>
+        >
+    with $FutureModifier<ReadChapterSet?>, $FutureProvider<ReadChapterSet?> {
+  MangaReadChaptersProvider._({
+    required MangaReadChaptersFamily super.from,
+    required Manga super.argument,
+  }) : super(
+         retry: null,
+         name: r'mangaReadChaptersProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$mangaReadChaptersHash();
+
+  @override
+  String toString() {
+    return r'mangaReadChaptersProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<ReadChapterSet?> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<ReadChapterSet?> create(Ref ref) {
+    final argument = this.argument as Manga;
+    return mangaReadChapters(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is MangaReadChaptersProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$mangaReadChaptersHash() => r'bd30b176e1c5ad7e34d9504222b9c90d64a3eded';
+
+final class MangaReadChaptersFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<ReadChapterSet?>, Manga> {
+  MangaReadChaptersFamily._()
+    : super(
+        retry: null,
+        name: r'mangaReadChaptersProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  MangaReadChaptersProvider call(Manga manga) =>
+      MangaReadChaptersProvider._(argument: manga, from: this);
+
+  @override
+  String toString() => r'mangaReadChaptersProvider';
 }
 
 @ProviderFor(UserLibrary)
@@ -628,7 +703,7 @@ final class StatisticsProvider
   Statistics create() => Statistics();
 }
 
-String _$statisticsHash() => r'4fe2227af78ec4cb5b188c17df7eed900d8d6f9e';
+String _$statisticsHash() => r'263fcd74d0dfe6ecfe2c906508863ed724c43489';
 
 abstract class _$Statistics
     extends $AsyncNotifier<Map<String, MangaStatistics>> {
@@ -655,6 +730,81 @@ abstract class _$Statistics
             >;
     element.handleCreate(ref, build);
   }
+}
+
+@ProviderFor(mangaStatistics)
+final mangaStatisticsProvider = MangaStatisticsFamily._();
+
+final class MangaStatisticsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<MangaStatistics>,
+          MangaStatistics,
+          FutureOr<MangaStatistics>
+        >
+    with $FutureModifier<MangaStatistics>, $FutureProvider<MangaStatistics> {
+  MangaStatisticsProvider._({
+    required MangaStatisticsFamily super.from,
+    required Manga super.argument,
+  }) : super(
+         retry: null,
+         name: r'mangaStatisticsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$mangaStatisticsHash();
+
+  @override
+  String toString() {
+    return r'mangaStatisticsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<MangaStatistics> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<MangaStatistics> create(Ref ref) {
+    final argument = this.argument as Manga;
+    return mangaStatistics(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is MangaStatisticsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$mangaStatisticsHash() => r'85f095879af719ed506a0b58e3895197db304241';
+
+final class MangaStatisticsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<MangaStatistics>, Manga> {
+  MangaStatisticsFamily._()
+    : super(
+        retry: null,
+        name: r'mangaStatisticsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  MangaStatisticsProvider call(Manga manga) =>
+      MangaStatisticsProvider._(argument: manga, from: this);
+
+  @override
+  String toString() => r'mangaStatisticsProvider';
 }
 
 @ProviderFor(ChapterStats)
@@ -841,7 +991,7 @@ final class ReadingStatusProvider
   }
 }
 
-String _$readingStatusHash() => r'78d76663556b421dc500308b42a32d079beba417';
+String _$readingStatusHash() => r'1bb7981672107353b2541655a469d88aca120aa0';
 
 final class ReadingStatusFamily extends $Family
     with
@@ -931,7 +1081,7 @@ final class FollowingStatusProvider
   }
 }
 
-String _$followingStatusHash() => r'431485be4207365c3609295abe3c8af8214a00e4';
+String _$followingStatusHash() => r'50c209e7f4df45b51c349eed25486d0e9dc7f38b';
 
 final class FollowingStatusFamily extends $Family
     with

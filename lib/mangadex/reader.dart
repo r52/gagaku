@@ -6,6 +6,7 @@ import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/model/types.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
@@ -88,8 +89,6 @@ class MangaDexReaderPage extends ConsumerWidget {
       );
     }
 
-    final me = ref.watch(loggedUserProvider).value;
-
     return DataProviderWhenWidget(
       provider: _fetchChapterDataProvider(chapterId),
       errorBuilder: (context, child, _, _) => Scaffold(body: child),
@@ -98,18 +97,8 @@ class MangaDexReaderPage extends ConsumerWidget {
         manga: data.manga,
         title: data.title,
         link: data.manga.attributes!.title.get('en'),
-        onLinkPressed: (context) async {
-          readChaptersMutation(me?.id).run(ref, (ref) async {
-            return await ref.get(readChaptersProvider(me?.id).notifier).get([
-              data.manga,
-            ]);
-          });
-
-          statisticsMutation.run(ref, (ref) async {
-            return await ref.get(statisticsProvider.notifier).get([data.manga]);
-          });
-          context.go('/title/${data.manga.id}', extra: data.manga);
-        },
+        onLinkPressed: (context) =>
+            context.go('/title/${data.manga.id}', extra: data.manga),
       ),
     );
   }
@@ -142,16 +131,11 @@ class MangaDexReaderWidget extends HookConsumerWidget {
         final me = await ref.watch(loggedUserProvider.future);
 
         if (me != null) {
-          // One more redundant read here for direct-linked chapters
-          readChaptersMutation(me.id).run(ref, (ref) async {
-            return await ref.get(readChaptersProvider(me.id).notifier).get([
-              manga,
-            ]);
-          });
+          final readData = await ref.readAsync(
+            mangaReadChaptersProvider(manga).future,
+          );
 
-          final readData = await ref.read(readChaptersProvider(me.id).future);
-
-          if (readData[manga.id]?.contains(chapter.id) != true) {
+          if (readData?.contains(chapter.id) != true) {
             readChaptersMutation(me.id).run(ref, (ref) async {
               return await ref
                   .get(readChaptersProvider(me.id).notifier)

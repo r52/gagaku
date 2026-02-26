@@ -6,9 +6,15 @@ import 'package:gagaku/model/model.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'package:http/retry.dart';
+import 'package:pool/pool.dart';
 
 const baseUserAgent =
     'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.7559.110 Mobile Safari/537.36';
+
+const _maxConcurrentRequests = 5;
+const _minRequestInterval = Duration(milliseconds: 200);
+final _nextRequestTimes = <String, int>{};
+final _pools = <String, Pool>{};
 
 String getUserAgent([bool useCustomUA = false]) {
   return useCustomUA ? GagakuData().gagakuUserAgent : baseUserAgent;
@@ -31,14 +37,25 @@ http.Client _createHttpClient([bool useCustomUA = false]) {
   return IOClient(HttpClient()..userAgent = userAgent);
 }
 
+Future<void> _staggerRequest(String host) async {
+  final now = DateTime.now().millisecondsSinceEpoch;
+  var targetTime = _nextRequestTimes[host] ?? now;
+
+  if (targetTime < now) {
+    targetTime = now;
+  }
+
+  _nextRequestTimes[host] = targetTime + _minRequestInterval.inMilliseconds;
+
+  final waitTime = targetTime - now;
+
+  if (waitTime > 0) {
+    await Future.delayed(Duration(milliseconds: waitTime));
+  }
+}
+
 class RateLimitedClient extends http.BaseClient {
-  static const _maxConcurrentRequests = 5;
-  static const _buffer = Duration(milliseconds: 500);
-  static const _rateLimit = Duration(milliseconds: 250);
-
   final http.Client _baseClient;
-
-  final _pendingCalls = <String, List<String>>{};
 
   RateLimitedClient({bool useCustomUA = false})
     : _baseClient = RetryClient(
@@ -52,44 +69,24 @@ class RateLimitedClient extends http.BaseClient {
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
     final host = request.url.host;
+    await _staggerRequest(host);
 
-    if (!_pendingCalls.containsKey(host)) {
-      _pendingCalls[host] = [];
-    }
+    final pool = _pools.putIfAbsent(host, () => Pool(_maxConcurrentRequests));
+    return pool.withResource(() async {
+      return await _baseClient.send(request);
+    });
+  }
 
-    if (_pendingCalls[host]!.length >= _maxConcurrentRequests) {
-      // logger.d(
-      //   'RateLimit: Max concurrent requests reached for host: $host. Waiting...',
-      // );
-      while (_pendingCalls[host]!.length >= _maxConcurrentRequests) {
-        await Future.delayed(_buffer);
-      }
-    }
-
-    final numPending = _pendingCalls[host]!.length;
-    _pendingCalls[host]!.add(request.toString());
-    // logger.d('RateLimit: PendingCalls[$host] = ${_pendingCalls[host]!.length}');
-
-    final wait = _rateLimit * numPending;
-    await Future.delayed(wait);
-
-    final response = await _baseClient.send(request);
-
-    _pendingCalls[host]!.remove(request.toString());
-    // logger.d(
-    //   'RateLimit: PendingCalls[$host] = ${_pendingCalls[host]!.length}',
-    // );
-
-    return response;
+  @override
+  void close() {
+    _baseClient.close();
   }
 }
 
-class RateLimitingInterceptor extends QueuedInterceptor {
-  static const _maxConcurrentRequests = 5;
-  static const _buffer = Duration(milliseconds: 500);
-  static const _rateLimit = Duration(milliseconds: 250);
+class RateLimitingInterceptor extends Interceptor {
+  final _heldResources = <RequestOptions, PoolResource>{};
 
-  final _pendingCalls = <String, List<String>>{};
+  RateLimitingInterceptor();
 
   @override
   Future<void> onRequest(
@@ -97,41 +94,29 @@ class RateLimitingInterceptor extends QueuedInterceptor {
     RequestInterceptorHandler handler,
   ) async {
     final host = options.uri.host;
+    await _staggerRequest(host);
 
-    if (!_pendingCalls.containsKey(host)) {
-      _pendingCalls[host] = [];
-    }
-
-    if (_pendingCalls[host]!.length >= _maxConcurrentRequests) {
-      while (_pendingCalls[host]!.length >= _maxConcurrentRequests) {
-        await Future.delayed(_buffer);
-      }
-    }
-
-    final numPending = _pendingCalls[host]!.length;
-    _pendingCalls[host]!.add(options.uri.toString());
-
-    final wait = _rateLimit * numPending;
-    await Future.delayed(wait);
+    final pool = _pools.putIfAbsent(host, () => Pool(_maxConcurrentRequests));
+    final resource = await pool.request();
+    _heldResources[options] = resource;
 
     handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    final host = response.requestOptions.uri.host;
-
-    _pendingCalls[host]!.remove(response.requestOptions.uri.toString());
-
+    _releaseResource(response.requestOptions);
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    final host = err.requestOptions.uri.host;
-
-    _pendingCalls[host]!.remove(err.requestOptions.uri.toString());
-
+    _releaseResource(err.requestOptions);
     handler.next(err);
+  }
+
+  void _releaseResource(RequestOptions options) {
+    final resource = _heldResources.remove(options);
+    resource?.release();
   }
 }

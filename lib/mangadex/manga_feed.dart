@@ -8,7 +8,7 @@ import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 
-@Dependencies([chipTextStyle, readBorderTheme])
+@Dependencies([chipTextStyle])
 class MangaDexMangaFeed extends ConsumerStatefulWidget {
   const MangaDexMangaFeed({
     super.key,

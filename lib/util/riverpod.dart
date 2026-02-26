@@ -151,6 +151,17 @@ extension WidgetRefWorkaround on WidgetRef {
       invalidate(provider, asReload: asReload);
     }
   }
+
+  // https://github.com/rrousselGit/riverpod/issues/3745
+  Future<T> readAsync<T>(ProviderListenable<Future<T>> listenable) async {
+    final sub = listenManual(listenable, (_, _) {});
+
+    try {
+      return await sub.read();
+    } finally {
+      sub.close();
+    }
+  }
 }
 
 extension RefWorkaround on Ref {
@@ -163,16 +174,14 @@ extension RefWorkaround on Ref {
     }
   }
 
-  T readFuture<T>(ProviderListenable<T> listenable) {
-    T result;
+  // https://github.com/rrousselGit/riverpod/issues/3745
+  Future<T> readAsync<T>(ProviderListenable<Future<T>> listenable) async {
     final sub = listen(listenable, (_, _) {});
 
     try {
-      result = sub.read();
+      return await sub.read();
     } finally {
       sub.close();
     }
-
-    return result;
   }
 }

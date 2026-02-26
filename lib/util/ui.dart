@@ -72,30 +72,34 @@ class GridExtentSlider extends ConsumerWidget {
 class GridAlbumImage extends StatelessWidget {
   const GridAlbumImage({
     super.key,
-    required this.gradient,
+    required this.animation,
     required this.child,
   });
 
-  final AlignmentGeometry gradient;
+  final Animation<AlignmentGeometry> animation;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      clipBehavior: Clip.hardEdge,
-      decoration: const ShapeDecoration(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(4.0)),
-        ),
+    return ClipRRect(
+      borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+      child: AnimatedBuilder(
+        animation: animation,
+        builder: (context, child) {
+          return DecoratedBox(
+            position: DecorationPosition.foreground,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: animation.value,
+                colors: const [Colors.black87, Colors.transparent],
+              ),
+            ),
+            child: child,
+          );
+        },
+        child: child,
       ),
-      foregroundDecoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.bottomCenter,
-          end: gradient,
-          colors: const [Colors.black87, Colors.transparent],
-        ),
-      ),
-      child: child,
     );
   }
 }
@@ -325,17 +329,31 @@ class IconTextChip extends ConsumerWidget {
       ),
     );
 
+    final borderRadius = const BorderRadius.all(Radius.circular(6.0));
+    final backgroundColor = color ?? theme.tertiaryContainer;
+
     if (onPressed != null) {
-      child = InkWell(onTap: onPressed, child: child);
+      return ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 24.0),
+        child: Material(
+          borderRadius: borderRadius,
+          color: backgroundColor,
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: borderRadius,
+            child: child,
+          ),
+        ),
+      );
     }
 
-    return ConstrainedBox(
+    return Container(
       constraints: const BoxConstraints(maxHeight: 24.0),
-      child: Material(
-        borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-        color: color ?? theme.tertiaryContainer,
-        child: child,
+      decoration: BoxDecoration(
+        borderRadius: borderRadius,
+        color: backgroundColor,
       ),
+      child: child,
     );
   }
 }

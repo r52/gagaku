@@ -23,7 +23,7 @@ Future<CreatorType> _fetchCreatorFromId(Ref ref, String creatorId) async {
   return creator.first;
 }
 
-@Dependencies([chipTextStyle, readBorderTheme])
+@Dependencies([chipTextStyle])
 class MangaDexCreatorViewPage extends StatelessWidget {
   const MangaDexCreatorViewPage({
     super.key,
@@ -50,7 +50,7 @@ class MangaDexCreatorViewPage extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle, readBorderTheme])
+@Dependencies([chipTextStyle])
 class MangaDexCreatorViewWidget extends StatefulHookConsumerWidget {
   const MangaDexCreatorViewWidget({super.key, required this.creator});
 

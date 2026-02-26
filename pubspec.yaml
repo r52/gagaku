@@ -89,6 +89,8 @@ dependencies:
   objectbox: ^5.0.0
   objectbox_flutter_libs: any
   go_router: ^17.0.0
+  async: ^2.13.0
+  pool: ^1.5.2
 
 dev_dependencies:
   flutter_test:

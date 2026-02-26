@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:async/async.dart';
 import 'package:dio/dio.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:gagaku/util/authentication.dart';
@@ -600,27 +601,38 @@ class MangaDexModel {
         'includes[]': ['scanlation_group', 'user'],
       };
 
+      final futures = <Future<void>>[];
+
       while (end < fetch.length) {
         start = end;
         end += min(fetch.length - start, MangaDexEndpoints.breakLimit);
 
-        queryParams['ids[]'] = fetch.getRange(start, end);
+        final chunkParams = Map<String, dynamic>.from(queryParams);
+        chunkParams['ids[]'] = fetch.getRange(start, end);
 
         final uri = MangaDexEndpoints.api.replace(
           path: MangaDexEndpoints.chapter,
-          queryParameters: queryParams,
+          queryParameters: chunkParams,
         );
 
-        final response = await _dio.getUri(uri);
+        futures.add(
+          _dio.getUri(uri).then((response) async {
+            if (response.statusCode == 200) {
+              final result = MDEntityList.fromJson(response.data);
+              await _cache.putAllAPIResolved(result.data);
+            } else {
+              throw createException("fetchChapters() failed.", response);
+            }
+          }),
+        );
+      }
 
-        if (response.statusCode == 200) {
-          final result = MDEntityList.fromJson(response.data);
+      final results = await Result.captureAll(futures);
 
-          // Cache the data
-          await _cache.putAllAPIResolved(result.data);
-        } else {
-          // Throw if failure
-          throw createException("fetchChapters() failed.", response);
+      for (final result in results) {
+        if (result.isError) {
+          // Log the partial failure, but allow the successful chunks to proceed
+          logger.w("A chunk failed to fetch", error: result.asError!.error);
         }
       }
     }
@@ -655,27 +667,38 @@ class MangaDexModel {
     if (fetch.isNotEmpty) {
       int start = 0, end = 0;
 
+      final futures = <Future<void>>[];
+
       while (end < fetch.length) {
         start = end;
         end += min(fetch.length - start, limit);
 
-        queryParams['ids[]'] = fetch.getRange(start, end);
+        final chunkParams = Map<String, dynamic>.from(queryParams);
+        chunkParams['ids[]'] = fetch.getRange(start, end);
 
         final uri = MangaDexEndpoints.api.replace(
           path: MangaDexEndpoints.manga,
-          queryParameters: queryParams,
+          queryParameters: chunkParams,
         );
 
-        final response = await _dio.getUri(uri);
+        futures.add(
+          _dio.getUri(uri).then((response) async {
+            if (response.statusCode == 200) {
+              final result = MDEntityList.fromJson(response.data);
+              await _cache.putAllAPIResolved(result.data);
+            } else {
+              throw createException("fetchMangaById() failed.", response);
+            }
+          }),
+        );
+      }
 
-        if (response.statusCode == 200) {
-          final mangalist = MDEntityList.fromJson(response.data);
+      final results = await Result.captureAll(futures);
 
-          // Cache the data
-          await _cache.putAllAPIResolved(mangalist.data);
-        } else {
-          // Throw if failure
-          throw createException("fetchManga(ids) failed.", response);
+      for (final result in results) {
+        if (result.isError) {
+          // Log the partial failure, but allow the successful chunks to proceed
+          logger.w("A chunk failed to fetch", error: result.asError!.error);
         }
       }
     }
@@ -778,9 +801,9 @@ class MangaDexModel {
     Map<String, dynamic> queryParams = {
       'limit': limit.toString(),
       'offset': offset.toString(),
-      'availableTranslatedLanguage[]': settings.translatedLanguages
-          .map(const LanguageConverter().toJson)
-          .toList(),
+      // 'availableTranslatedLanguage[]': settings.translatedLanguages
+      //     .map(const LanguageConverter().toJson)
+      //     .toList(),
       'originalLanguage[]': settings.originalLanguage
           .map(const LanguageConverter().toJson)
           .toList(),
@@ -1353,27 +1376,38 @@ class MangaDexModel {
         'limit': MangaDexEndpoints.breakLimit.toString(),
       };
 
+      final futures = <Future<void>>[];
+
       while (end < fetch.length) {
         start = end;
         end += min(fetch.length - start, MangaDexEndpoints.breakLimit);
 
-        queryParams['ids[]'] = fetch.getRange(start, end);
+        final chunkParams = Map<String, dynamic>.from(queryParams);
+        chunkParams['ids[]'] = fetch.getRange(start, end);
 
         final uri = MangaDexEndpoints.api.replace(
           path: MangaDexEndpoints.group,
-          queryParameters: queryParams,
+          queryParameters: chunkParams,
         );
 
-        final response = await _dio.getUri(uri);
+        futures.add(
+          _dio.getUri(uri).then((response) async {
+            if (response.statusCode == 200) {
+              final result = MDEntityList.fromJson(response.data);
+              await _cache.putAllAPIResolved(result.data);
+            } else {
+              throw createException("fetchGroups() failed.", response);
+            }
+          }),
+        );
+      }
 
-        if (response.statusCode == 200) {
-          final result = MDEntityList.fromJson(response.data);
+      final results = await Result.captureAll(futures);
 
-          // Cache the data
-          await _cache.putAllAPIResolved(result.data);
-        } else {
-          // Throw if failure
-          throw createException("fetchGroups() failed.", response);
+      for (final result in results) {
+        if (result.isError) {
+          // Log the partial failure, but allow the successful chunks to proceed
+          logger.w("A chunk failed to fetch", error: result.asError!.error);
         }
       }
     }
@@ -1409,27 +1443,38 @@ class MangaDexModel {
           'limit': MangaDexEndpoints.breakLimit.toString(),
         };
 
+        final futures = <Future<void>>[];
+
         while (end < fetch.length) {
           start = end;
           end += min(fetch.length - start, MangaDexEndpoints.breakLimit);
 
-          queryParams['ids[]'] = fetch.getRange(start, end);
+          final chunkParams = Map<String, dynamic>.from(queryParams);
+          chunkParams['ids[]'] = fetch.getRange(start, end);
 
           final uri = MangaDexEndpoints.api.replace(
             path: MangaDexEndpoints.creator,
-            queryParameters: queryParams,
+            queryParameters: chunkParams,
           );
 
-          final response = await _dio.getUri(uri);
+          futures.add(
+            _dio.getUri(uri).then((response) async {
+              if (response.statusCode == 200) {
+                final result = MDEntityList.fromJson(response.data);
+                await _cache.putAllAPIResolved(result.data);
+              } else {
+                throw createException("fetchCreators() failed.", response);
+              }
+            }),
+          );
+        }
 
-          if (response.statusCode == 200) {
-            final result = MDEntityList.fromJson(response.data);
+        final results = await Result.captureAll(futures);
 
-            // Cache the data
-            await _cache.putAllAPIResolved(result.data);
-          } else {
-            // Throw if failure
-            throw createException("fetchCreators() failed.", response);
+        for (final result in results) {
+          if (result.isError) {
+            // Log the partial failure, but allow the successful chunks to proceed
+            logger.w("A chunk failed to fetch", error: result.asError!.error);
           }
         }
       }
@@ -1845,6 +1890,12 @@ class ReadChapters extends _$ReadChapters {
 
     final api = ref.watch(mangadexProvider);
     final map = await api.fetchReadChapters(mangas);
+
+    // Ensure all requested mangas have an entry in the map
+    for (final m in mangas) {
+      map.putIfAbsent(m.id, () => ReadChapterSet(m.id, {}));
+    }
+
     return map;
   }
 
@@ -1876,7 +1927,7 @@ class ReadChapters extends _$ReadChapters {
     final map = await _fetchReadChapters(mg);
     state = AsyncData({...oldstate, ...map});
 
-    return map;
+    return state.value!;
   }
 
   /// Sets a list of chapters for a manga read or unread
@@ -1927,6 +1978,22 @@ class ReadChapters extends _$ReadChapters {
 }
 
 final readChaptersMutation = Mutation<ReadChaptersMap>();
+
+@riverpod
+Future<ReadChapterSet?> mangaReadChapters(Ref ref, Manga manga) async {
+  final me = await ref.watch(loggedUserProvider.future);
+  if (me == null) return null;
+
+  final globalCache = await ref.watch(readChaptersProvider(me.id).future);
+
+  if (globalCache.containsKey(manga.id) &&
+      globalCache[manga.id]?.isExpired != true) {
+    return globalCache[manga.id];
+  }
+
+  final map = await ref.read(readChaptersProvider(me.id).notifier).get([manga]);
+  return map[manga.id];
+}
 
 @riverpod
 class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
@@ -2248,21 +2315,39 @@ class Statistics extends _$Statistics {
   /// Fetch statistics for the provided list of mangas
   Future<Map<String, MangaStatistics>> get(Iterable<Manga> mangas) async {
     final oldstate = await future;
-    final mg = mangas.where((m) => !oldstate.containsKey(m.id));
 
-    if (mg.isEmpty) {
-      // No change
-      return oldstate;
-    }
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final mg = mangas.where((m) => !oldstate.containsKey(m.id));
 
-    final map = await _fetchStatistics(mg);
-    state = AsyncData({...oldstate, ...map});
+      if (mg.isEmpty) {
+        // No change
+        return oldstate;
+      }
 
-    return map;
+      final map = await _fetchStatistics(mg);
+      return {...oldstate, ...map};
+    });
+
+    return state.value!;
   }
 }
 
 final statisticsMutation = Mutation<Map<String, MangaStatistics>>();
+
+@riverpod
+Future<MangaStatistics> mangaStatistics(Ref ref, Manga manga) async {
+  // Makes the assumption that globalCache[manga.id] should never
+  // be null after get(). And should be true unless the server is broken
+  final globalCache = await ref.watch(statisticsProvider.future);
+
+  if (globalCache.containsKey(manga.id)) {
+    return globalCache[manga.id]!;
+  }
+
+  final map = await ref.read(statisticsProvider.notifier).get([manga]);
+  return map[manga.id]!;
+}
 
 @Riverpod(keepAlive: true)
 class ChapterStats extends _$ChapterStats {
@@ -2373,7 +2458,7 @@ class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
   }
 
   Future<bool> set(MangaReadingStatus? status) async {
-    final me = await ref.readFuture(loggedUserProvider.future);
+    final me = await ref.readAsync(loggedUserProvider.future);
 
     if (me == null) {
       throw StateError('User not logged in');
@@ -2422,7 +2507,7 @@ class FollowingStatus extends _$FollowingStatus with AutoDisposeExpiryMix {
   }
 
   Future<bool> set(bool following) async {
-    final me = await ref.readFuture(loggedUserProvider.future);
+    final me = await ref.readAsync(loggedUserProvider.future);
 
     if (me == null) {
       throw StateError('User not logged in');
