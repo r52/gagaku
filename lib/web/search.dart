@@ -649,20 +649,6 @@ class _ExtensionFilterWidgetState
         final tr = context.t;
         final nav = Navigator.of(context);
 
-        if (extFilters == null) {
-          return Scaffold(
-            appBar: AppBar(
-              leading: BackButton(
-                onPressed: () {
-                  nav.pop(null);
-                },
-              ),
-              title: Text(tr.search.filters),
-            ),
-            body: Center(child: Text(tr.webSources.source.noTagsWarning)),
-          );
-        }
-
         return Scaffold(
           appBar: AppBar(
             leading: BackButton(
@@ -671,58 +657,62 @@ class _ExtensionFilterWidgetState
               },
             ),
             title: Text(tr.search.filters),
-            actions: [
-              OverflowBar(
-                spacing: 8.0,
-                children: [
-                  Tooltip(
-                    message: tr.search.resetFilters,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        fil.value = [];
-                      },
-                      icon: const Icon(Icons.clear_all),
-                      label: Text(tr.search.resetFilters),
+            actions: extFilters == null
+                ? null
+                : [
+                    OverflowBar(
+                      spacing: 8.0,
+                      children: [
+                        Tooltip(
+                          message: tr.search.resetFilters,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              fil.value = [];
+                            },
+                            icon: const Icon(Icons.clear_all),
+                            label: Text(tr.search.resetFilters),
+                          ),
+                        ),
+                        Tooltip(
+                          message: tr.search.applyFilters,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              nav.pop(fil.value);
+                            },
+                            icon: const Icon(Icons.filter_list),
+                            label: Text(tr.search.applyFilters),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Tooltip(
-                    message: tr.search.applyFilters,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        nav.pop(fil.value);
-                      },
-                      icon: const Icon(Icons.filter_list),
-                      label: Text(tr.search.applyFilters),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
           ),
-          body: HookBuilder(
-            builder: (context) {
-              final expanded = useState(
-                List.generate(extFilters.length, (idx) => false),
-              );
+          body: extFilters == null
+              ? Center(child: Text(tr.webSources.source.noTagsWarning))
+              : HookBuilder(
+                  builder: (context) {
+                    final expanded = useState(
+                      List.generate(extFilters.length, (idx) => false),
+                    );
 
-              final panelItems = [
-                for (final (idx, f) in extFilters.indexed)
-                  _buildFilterPanel(f, expanded.value[idx]),
-              ];
+                    final panelItems = [
+                      for (final (idx, f) in extFilters.indexed)
+                        _buildFilterPanel(f, expanded.value[idx]),
+                    ];
 
-              return SafeArea(
-                child: SingleChildScrollView(
-                  child: ExpansionPanelList(
-                    expansionCallback: (panelIndex, isExpanded) {
-                      expanded.value[panelIndex] = isExpanded;
-                      expanded.value = [...expanded.value];
-                    },
-                    children: panelItems,
-                  ),
+                    return SafeArea(
+                      child: SingleChildScrollView(
+                        child: ExpansionPanelList(
+                          expansionCallback: (panelIndex, isExpanded) {
+                            expanded.value[panelIndex] = isExpanded;
+                            expanded.value = [...expanded.value];
+                          },
+                          children: panelItems,
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         );
       },
     );

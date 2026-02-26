@@ -39,207 +39,210 @@ class MangaDexListViewPage extends HookConsumerWidget {
 
     final customFeedInfo = MangaDexFeeds.customListFeed;
 
+    PreferredSizeWidget? appBar;
+    Widget body;
+    Widget? bottomNavigationBar;
+
     switch (listProvider) {
       case AsyncValue(:final error?, :final stackTrace?):
-        return Scaffold(
-          appBar: AppBar(),
-          body: RefreshIndicator(
-            onRefresh: () async {
-              await api.invalidateCacheItem(listId);
-              return ref.refresh(listSourceProvider(listId).future);
-            },
-            child: ErrorList(
-              error: error,
-              stackTrace: stackTrace,
-              message: "_fetchListFromIdProvider($listId) failed",
-            ),
+        appBar = AppBar();
+        body = RefreshIndicator(
+          onRefresh: () async {
+            await api.invalidateCacheItem(listId);
+            return ref.refresh(listSourceProvider(listId).future);
+          },
+          child: ErrorList(
+            error: error,
+            stackTrace: stackTrace,
+            message: "_fetchListFromIdProvider($listId) failed",
           ),
         );
       case AsyncValue(hasValue: true, value: final list) when list != null:
-        return Scaffold(
-          appBar: AppBar(
-            leading: const BackButton(),
-            flexibleSpace: GestureDetector(
-              onTap: () {
-                controllers[view.value.index].animateTo(
-                  0.0,
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeInOut,
-                );
-              },
-              child: TitleFlexBar(title: list.attributes.name),
-            ),
-            actions: [
-              OverflowBar(
-                spacing: 8.0,
-                children: [
-                  Consumer(
-                    builder: (context, ref, child) {
-                      final followedLists = ref
-                          .watch(followedListsProvider(me?.id))
-                          .value;
+        appBar = AppBar(
+          leading: const BackButton(),
+          flexibleSpace: GestureDetector(
+            onTap: () {
+              controllers[view.value.index].animateTo(
+                0.0,
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOut,
+              );
+            },
+            child: TitleFlexBar(title: list.attributes.name),
+          ),
+          actions: [
+            OverflowBar(
+              spacing: 8.0,
+              children: [
+                Consumer(
+                  builder: (context, ref, child) {
+                    final followedLists = ref
+                        .watch(followedListsProvider(me?.id))
+                        .value;
 
-                      final idx = followedLists?.indexWhere(
-                        (e) => e.id == list.id,
-                      );
+                    final idx = followedLists?.indexWhere(
+                      (e) => e.id == list.id,
+                    );
 
-                      if (idx == null) {
-                        return const SizedBox.shrink();
-                      }
+                    if (idx == null) {
+                      return const SizedBox.shrink();
+                    }
 
-                      return IconButton(
-                        style: Styles.squareIconButtonStyle(
-                          backgroundColor: theme.colorScheme.surfaceContainer,
-                        ),
-                        onPressed: () =>
-                            followedListMutation(me?.id).run(ref, (ref) async {
-                              return await ref
-                                  .get(followedListsProvider(me?.id).notifier)
-                                  .setFollow(list, idx == -1);
-                            }),
-                        icon: Icon(
-                          idx == -1 ? Icons.bookmark_border : Icons.bookmark,
-                          color: idx == -1 ? null : theme.colorScheme.primary,
-                        ),
-                        tooltip: idx == -1 ? t.ui.follow : t.ui.unfollow,
-                      );
-                    },
-                  ),
-                  if (list.user != null && me != null && list.user!.id == me.id)
-                    IconButton(
+                    return IconButton(
                       style: Styles.squareIconButtonStyle(
                         backgroundColor: theme.colorScheme.surfaceContainer,
                       ),
-                      onPressed: () {
-                        MangaDexEditListRoute(
-                          listId: list.id,
-                          list: list,
-                        ).push(context);
-                      },
-                      icon: const Icon(Icons.edit),
-                      tooltip: t.ui.edit,
-                    ),
-                  const SizedBox.shrink(),
-                ],
-              ),
-            ],
-          ),
-          body: Center(
-            child: PageTransitionSwitcher(
-              transitionBuilder: (child, animation, secondaryAnimation) {
-                return SharedAxisTransition(
-                  animation: animation,
-                  secondaryAnimation: secondaryAnimation,
-                  transitionType: SharedAxisTransitionType.horizontal,
-                  child: child,
-                );
-              },
-              child: switch (view.value) {
-                _ViewType.titles => HookConsumer(
-                  key: const Key('/list?tab=titles'),
-                  builder: (context, ref, child) {
-                    final refresh = useState(UniqueKey());
-                    final currentPage = useValueNotifier(0);
-
-                    return RefreshIndicator(
-                      onRefresh: () async {
-                        await api.invalidateCacheItem(listId);
-                        refresh.value = UniqueKey();
-                        return ref.refresh(listSourceProvider(listId).future);
-                      },
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: HookConsumer(
-                              builder: (context, ref, child) {
-                                final page = useValueListenable(currentPage);
-                                final data = useMemoized(
-                                  () => getMangaListByPage(ref, list.set, page),
-                                  [list.set, page, refresh.value],
-                                );
-                                final future = useFuture(data);
-
-                                return MangaListWidget(
-                                  title: Text(
-                                    '${t.titles} (${list.set.length})',
-                                    style: CommonTextStyles.twentyfour,
-                                  ),
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  controller: controllers[0],
-                                  future: future,
-                                  children: [
-                                    if (future.hasData)
-                                      MangaListViewSliver(items: future.data),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                          HookBuilder(
-                            builder: (context) {
-                              final _ = useValueListenable(currentPage);
-                              return NumberPaginator(
-                                numberPages: max(
-                                  (list.set.length /
-                                          MangaDexEndpoints.searchLimit)
-                                      .ceil(),
-                                  1,
-                                ),
-                                onPageChange: (int index) {
-                                  controllers[0].jumpTo(0.0);
-                                  currentPage.value = index;
-                                },
-                              );
-                            },
-                          ),
-                        ],
+                      onPressed: () =>
+                          followedListMutation(me?.id).run(ref, (ref) async {
+                            return await ref
+                                .get(followedListsProvider(me?.id).notifier)
+                                .setFollow(list, idx == -1);
+                          }),
+                      icon: Icon(
+                        idx == -1 ? Icons.bookmark_border : Icons.bookmark,
+                        color: idx == -1 ? null : theme.colorScheme.primary,
                       ),
+                      tooltip: idx == -1 ? t.ui.follow : t.ui.unfollow,
                     );
                   },
                 ),
-                _ViewType.feed => InfiniteScrollChapterFeedWidget(
-                  key: const Key('/list?tab=feed'),
-                  feedKey: customFeedInfo.key,
-                  limit: customFeedInfo.limit,
-                  path: customFeedInfo.path!.replaceFirst('{id}', list.id),
-                  entity: list,
-                  title: t.mangadex.listFeed,
-                  scrollController: controllers[1],
-                  restorationId: 'list_feed_offset',
-                ),
-              },
+                if (list.user != null && me != null && list.user!.id == me.id)
+                  IconButton(
+                    style: Styles.squareIconButtonStyle(
+                      backgroundColor: theme.colorScheme.surfaceContainer,
+                    ),
+                    onPressed: () {
+                      MangaDexEditListRoute(
+                        listId: list.id,
+                        list: list,
+                      ).push(context);
+                    },
+                    icon: const Icon(Icons.edit),
+                    tooltip: t.ui.edit,
+                  ),
+                const SizedBox.shrink(),
+              ],
             ),
-          ),
-          bottomNavigationBar: NavigationBar(
-            height: 60,
-            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-            destinations: bottomNavigationBarItems,
-            selectedIndex: view.value.index,
-            onDestinationSelected: (index) {
-              final currTab = view.value;
+          ],
+        );
+        body = Center(
+          child: PageTransitionSwitcher(
+            transitionBuilder: (child, animation, secondaryAnimation) {
+              return SharedAxisTransition(
+                animation: animation,
+                secondaryAnimation: secondaryAnimation,
+                transitionType: SharedAxisTransitionType.horizontal,
+                child: child,
+              );
+            },
+            child: switch (view.value) {
+              _ViewType.titles => HookConsumer(
+                key: const Key('/list?tab=titles'),
+                builder: (context, ref, child) {
+                  final refresh = useState(UniqueKey());
+                  final currentPage = useValueNotifier(0);
 
-              if (currTab == _ViewType.values[index]) {
-                // Scroll to top if on the same tab
-                controllers[index].animateTo(
-                  0.0,
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeInOut,
-                );
-              } else {
-                // Switch tab
-                view.value = _ViewType.values[index];
-              }
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      await api.invalidateCacheItem(listId);
+                      refresh.value = UniqueKey();
+                      return ref.refresh(listSourceProvider(listId).future);
+                    },
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: HookConsumer(
+                            builder: (context, ref, child) {
+                              final page = useValueListenable(currentPage);
+                              final data = useMemoized(
+                                () => getMangaListByPage(ref, list.set, page),
+                                [list.set, page, refresh.value],
+                              );
+                              final future = useFuture(data);
+
+                              return MangaListWidget(
+                                title: Text(
+                                  '${t.titles} (${list.set.length})',
+                                  style: CommonTextStyles.twentyfour,
+                                ),
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                controller: controllers[0],
+                                future: future,
+                                children: [
+                                  if (future.hasData)
+                                    MangaListViewSliver(items: future.data),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                        HookBuilder(
+                          builder: (context) {
+                            final _ = useValueListenable(currentPage);
+                            return NumberPaginator(
+                              numberPages: max(
+                                (list.set.length /
+                                        MangaDexEndpoints.searchLimit)
+                                    .ceil(),
+                                1,
+                              ),
+                              onPageChange: (int index) {
+                                controllers[0].jumpTo(0.0);
+                                currentPage.value = index;
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              _ViewType.feed => InfiniteScrollChapterFeedWidget(
+                key: const Key('/list?tab=feed'),
+                feedKey: customFeedInfo.key,
+                limit: customFeedInfo.limit,
+                path: customFeedInfo.path!.replaceFirst('{id}', list.id),
+                entity: list,
+                title: t.mangadex.listFeed,
+                scrollController: controllers[1],
+                restorationId: 'list_feed_offset',
+              ),
             },
           ),
         );
-      case AsyncValue(hasValue: true, value: final list) when list == null:
-        return Scaffold(
-          appBar: AppBar(),
-          body: Center(child: Text(t.mangadex.listNotExistError(id: listId))),
+        bottomNavigationBar = NavigationBar(
+          height: 60,
+          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+          destinations: bottomNavigationBarItems,
+          selectedIndex: view.value.index,
+          onDestinationSelected: (index) {
+            final currTab = view.value;
+
+            if (currTab == _ViewType.values[index]) {
+              // Scroll to top if on the same tab
+              controllers[index].animateTo(
+                0.0,
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOut,
+              );
+            } else {
+              // Switch tab
+              view.value = _ViewType.values[index];
+            }
+          },
         );
+      case AsyncValue(hasValue: true, value: final list) when list == null:
+        appBar = AppBar();
+        body = Center(child: Text(t.mangadex.listNotExistError(id: listId)));
       case AsyncValue(:final progress):
-        return Scaffold(body: ListSpinner(progress: progress?.toDouble()));
+        body = ListSpinner(progress: progress?.toDouble());
     }
+
+    return Scaffold(
+      appBar: appBar,
+      body: body,
+      bottomNavigationBar: bottomNavigationBar,
+    );
   }
 }
