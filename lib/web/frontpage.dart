@@ -153,7 +153,14 @@ class ExtensionHomePage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: getExtensionFromIdProvider(sourceId),
-      errorBuilder: (context, child, _, _) => Scaffold(body: child),
+      loadingBuilder: (context, progress) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: Center(child: CircularProgressIndicator(value: progress?.toDouble())),
+      ),
+      errorBuilder: (context, child, _, _) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: child,
+      ),
       builder: (context, data) {
         return ExtensionHomeWidget(source: data);
       },

@@ -157,6 +157,10 @@ class ProxyWebSourceReaderPage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchWebChapterInfoProvider(handle),
+      loadingBuilder: (context, progress) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: Center(child: CircularProgressIndicator(value: progress?.toDouble())),
+      ),
       errorBuilder: (context, child, _, _) => Scaffold(
         appBar: AppBar(leading: const BackButton()),
         body: child,
@@ -209,6 +213,10 @@ class ExtensionReaderPage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchWebChapterInfoProvider(handle),
+      loadingBuilder: (context, progress) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: Center(child: CircularProgressIndicator(value: progress?.toDouble())),
+      ),
       errorBuilder: (context, child, _, _) => Scaffold(
         appBar: AppBar(leading: const BackButton()),
         body: child,
@@ -274,6 +282,10 @@ class WebSourceReaderWidget extends HookConsumerWidget {
       provider: handle.type == SourceType.proxy
           ? _getPagesProvider(source)
           : _getSourcePagesProvider(source, handle),
+      loadingBuilder: (context, progress) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: Center(child: CircularProgressIndicator(value: progress?.toDouble())),
+      ),
       errorBuilder: (context, child, _, _) => Scaffold(
         appBar: AppBar(leading: const BackButton()),
         body: child,

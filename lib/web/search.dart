@@ -45,7 +45,14 @@ class ExtensionSearchPage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: installedSourcesProvider,
-      errorBuilder: (context, child, _, _) => Scaffold(body: child),
+      loadingBuilder: (context, progress) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: Center(child: CircularProgressIndicator(value: progress?.toDouble())),
+      ),
+      errorBuilder: (context, child, _, _) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: child,
+      ),
       builder: (context, extensions) {
         final firstSearchable = extensions.firstWhereOrNull(
           (ext) => ext.hasCapability(SourceIntents.mangaSearch),
@@ -630,6 +637,14 @@ class _ExtensionFilterWidgetState
             .getFilters();
       },
       keys: [widget.source],
+      loadingBuilder: (context) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      errorBuilder: (context, error, stackTrace) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: Center(child: Icon(Icons.error)),
+      ),
       builder: (context, extFilters) {
         final tr = context.t;
         final nav = Navigator.of(context);
