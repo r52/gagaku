@@ -271,60 +271,6 @@ abstract class _$ExtensionSource extends $AsyncNotifier<WebSourceInfo> {
   }
 }
 
-@ProviderFor(ExtensionInfoList)
-final extensionInfoListProvider = ExtensionInfoListProvider._();
-
-final class ExtensionInfoListProvider
-    extends
-        $AsyncNotifierProvider<ExtensionInfoList, Map<String, WebSourceInfo>> {
-  ExtensionInfoListProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'extensionInfoListProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$extensionInfoListHash();
-
-  @$internal
-  @override
-  ExtensionInfoList create() => ExtensionInfoList();
-}
-
-String _$extensionInfoListHash() => r'5450a457cad1e9211abd092e3a12fdea12901a9f';
-
-abstract class _$ExtensionInfoList
-    extends $AsyncNotifier<Map<String, WebSourceInfo>> {
-  FutureOr<Map<String, WebSourceInfo>> build();
-  @$mustCallSuper
-  @override
-  void runBuild() {
-    final ref =
-        this.ref
-            as $Ref<
-              AsyncValue<Map<String, WebSourceInfo>>,
-              Map<String, WebSourceInfo>
-            >;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<
-                AsyncValue<Map<String, WebSourceInfo>>,
-                Map<String, WebSourceInfo>
-              >,
-              AsyncValue<Map<String, WebSourceInfo>>,
-              Object?,
-              Object?
-            >;
-    element.handleCreate(ref, build);
-  }
-}
-
 @ProviderFor(getExtensionFromId)
 final getExtensionFromIdProvider = GetExtensionFromIdFamily._();
 
@@ -381,7 +327,7 @@ final class GetExtensionFromIdProvider
 }
 
 String _$getExtensionFromIdHash() =>
-    r'083cb64dc1d406d1a5a26ecf5fa4de16a7a9dced';
+    r'830e21e505424a30da753500077aada70301ee94';
 
 final class GetExtensionFromIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<WebSourceInfo>, String> {

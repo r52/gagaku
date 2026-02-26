@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -43,10 +44,10 @@ class ExtensionSearchPage extends StatelessWidget {
     }
 
     return DataProviderWhenWidget(
-      provider: extensionInfoListProvider,
+      provider: installedSourcesProvider,
       errorBuilder: (context, child, _, _) => Scaffold(body: child),
       builder: (context, extensions) {
-        final firstSearchable = extensions.values.firstWhereOrNull(
+        final firstSearchable = extensions.firstWhereOrNull(
           (ext) => ext.hasCapability(SourceIntents.mangaSearch),
         );
 
@@ -98,6 +99,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
         return PageResultsMetaData([]);
       }
 
+      await ref.readAsync(extensionSourceProvider(source.id).future);
       final results = await ref
           .read(extensionSourceProvider(source.id).notifier)
           .searchManga(query!, (pageKey == _firstSearch) ? null : pageKey);
@@ -148,7 +150,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
         physics: const AlwaysScrollableScrollPhysics(),
         showToggle: false,
         title: DataProviderWhenWidget(
-          provider: extensionInfoListProvider,
+          provider: installedSourcesProvider,
           errorBuilder: (context, defaultChild, error, stacktrace) => Tooltip(
             message: tr.webSources.loadInstalledSourcesError,
             child: Icon(Icons.error),
@@ -157,12 +159,19 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
             builder: (context) {
               final searchExtensions = useMemoized(
                 () => Map.fromEntries(
-                  extensions.entries.where(
-                    (e) => e.value.hasCapability(SourceIntents.mangaSearch),
-                  ),
+                  extensions
+                      .where((e) => e.hasCapability(SourceIntents.mangaSearch))
+                      .map((e) => MapEntry(e.id, e)),
                 ),
                 [extensions],
               );
+
+              useEffect(() {
+                for (final ext in searchExtensions.values) {
+                  ref.read(extensionSourceProvider(ext.id));
+                }
+                return null;
+              }, [searchExtensions]);
 
               return DropdownMenu<WebSourceInfo>(
                 initialSelection: searchExtensions[source.id],
@@ -191,12 +200,12 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
         extraRow: [
           HookBuilder(
             builder: (context) {
-              final results = useMemoized(
-                () => ref
+              final results = useMemoized(() async {
+                await ref.readAsync(extensionSourceProvider(source.id).future);
+                return ref
                     .read(extensionSourceProvider(source.id).notifier)
-                    .getSortingOptions(),
-                [source],
-              );
+                    .getSortingOptions();
+              }, [source]);
               final future = useFuture(results);
 
               if (future.hasError) {
@@ -614,9 +623,12 @@ class _ExtensionFilterWidgetState
   @override
   Widget build(BuildContext context) {
     return SimpleFutureBuilder(
-      futureBuilder: () => ref
-          .read(extensionSourceProvider(widget.source.id).notifier)
-          .getFilters(),
+      futureBuilder: () async {
+        await ref.readAsync(extensionSourceProvider(widget.source.id).future);
+        return ref
+            .read(extensionSourceProvider(widget.source.id).notifier)
+            .getFilters();
+      },
       keys: [widget.source],
       builder: (context, extFilters) {
         final tr = context.t;

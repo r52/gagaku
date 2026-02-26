@@ -13,6 +13,7 @@ import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/http.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/model.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/types.dart';
@@ -179,7 +180,7 @@ class ProxyHandler {
     WebSourceInfo? src;
 
     try {
-      src = await ref.read(extensionSourceProvider(srcId).future);
+      src = await ref.readAsync(extensionSourceProvider(srcId).future);
     } catch (e) {
       logger.w('extensionSourceProvider($srcId) failed');
       src = null;
@@ -296,6 +297,7 @@ class ProxyHandler {
           return manga;
         }
 
+        await ref.readAsync(extensionSourceProvider(handle.sourceId).future);
         manga = await ref
             .read(extensionSourceProvider(handle.sourceId).notifier)
             .getManga(handle.location);
@@ -1424,34 +1426,16 @@ return p;
   }
 }
 
-@riverpod
-class ExtensionInfoList extends _$ExtensionInfoList {
-  @override
-  Future<Map<String, WebSourceInfo>> build() async {
-    final installed = await ref.watch(installedSourcesProvider.future);
-
-    final list = await Future.wait(
-      installed.map((i) => ref.watch(extensionSourceProvider(i.id).future)),
-    );
-
-    final map = <String, WebSourceInfo>{for (var e in list) e.id: e};
-
-    return map;
-  }
-}
-
 @Riverpod(retry: noRetry)
 Future<WebSourceInfo> getExtensionFromId(Ref ref, String sourceId) async {
-  final sources = await ref.watch(extensionInfoListProvider.future);
-
-  if (sources.containsKey(sourceId)) {
-    return sources[sourceId]!;
+  try {
+    return await ref.watch(extensionSourceProvider(sourceId).future);
+  } catch (e) {
+    throw UnknownSourceException(
+      message: 'Invalid missing/source',
+      sourceId: sourceId,
+    );
   }
-
-  throw UnknownSourceException(
-    message: 'Invalid missing/source',
-    sourceId: sourceId,
-  );
 }
 
 class SettingsForm with ChangeNotifier {

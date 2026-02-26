@@ -43,7 +43,22 @@ class WebSourceHistoryPage extends HookConsumerWidget {
     final stream = useStream(query);
 
     // Pre-initialize sources
-    final _ = ref.watch(extensionInfoListProvider);
+    useEffect(() {
+      if (stream.data != null) {
+        final sourceIds = stream.data!
+            .map(
+              (e) => e.handle?.type == SourceType.source
+                  ? e.handle?.sourceId
+                  : null,
+            )
+            .whereType<String>()
+            .toSet();
+        for (final id in sourceIds) {
+          ref.read(extensionSourceProvider(id));
+        }
+      }
+      return null;
+    }, [stream.data]);
 
     final saveHistoryRow = Row(
       mainAxisSize: MainAxisSize.min,

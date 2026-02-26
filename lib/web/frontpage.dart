@@ -25,58 +25,44 @@ class _ExtensionHomeCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final nav = Navigator.of(context);
     final tr = context.t;
+    final source = extensionInfo;
 
-    return DataProviderWhenWidget(
-      provider: extensionSourceProvider(extensionInfo.id),
-      errorBuilder: (context, defaultChild, error, stacktrace) {
-        return Card(
-          child: ListTile(
-            title: Text(tr.webSources.sourceUnavailable(id: extensionInfo.id)),
-            enabled: false,
-            subtitle: Text('$error'),
-          ),
-        );
-      },
-      builder: (BuildContext context, source) {
-        return Card(
-          child: ListTile(
-            leading: source.icon.isNotEmpty
-                ? Image.network(source.icon, width: 36, height: 36)
-                : const Icon(Icons.rss_feed),
-            title: Text(source.name),
-            onTap: source.hasCapability(SourceIntents.discoverSections)
-                ? () => ExtensionHomeRoute(
-                    sourceId: source.id,
-                    source: source,
-                  ).push(context)
-                : null,
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (source.hasCapability(SourceIntents.settingsUI))
-                  IconButton(
-                    icon: const Icon(Icons.settings),
-                    onPressed: () => nav.push(
-                      SlideTransitionRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                            ExtensionSettingsPage(source: source),
-                      ),
-                    ),
-                    tooltip: tr.webSources.source.settings,
+    return Card(
+      child: ListTile(
+        leading: source.icon.isNotEmpty
+            ? Image.network(source.icon, width: 36, height: 36)
+            : const Icon(Icons.rss_feed),
+        title: Text(source.name),
+        onTap: source.hasCapability(SourceIntents.discoverSections)
+            ? () => ExtensionHomeRoute(
+                sourceId: source.id,
+                source: source,
+              ).push(context)
+            : null,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (source.hasCapability(SourceIntents.settingsUI))
+              IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () => nav.push(
+                  SlideTransitionRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        ExtensionSettingsPage(source: source),
                   ),
-                if (source.hasCapability(SourceIntents.mangaSearch))
-                  IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () => ExtensionSearchRoute(
-                      initialSource: source,
-                    ).push(context),
-                    tooltip: tr.search.arg(arg: source.name),
-                  ),
-              ],
-            ),
-          ),
-        );
-      },
+                ),
+                tooltip: tr.webSources.source.settings,
+              ),
+            if (source.hasCapability(SourceIntents.mangaSearch))
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () =>
+                    ExtensionSearchRoute(initialSource: source).push(context),
+                tooltip: tr.search.arg(arg: source.name),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

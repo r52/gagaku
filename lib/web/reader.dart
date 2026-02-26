@@ -6,6 +6,7 @@ import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/http.dart' show baseUserAgent;
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -92,6 +93,7 @@ Future<List<ReaderPage>> _getSourcePages(
   final sourceId = handle.sourceId;
 
   final refer = ref.watch(extensionReferrerProvider);
+  await ref.readAsync(extensionSourceProvider(sourceId).future);
   links = await ref
       .read(extensionSourceProvider(sourceId).notifier)
       .getChapterPages(chapter as Chapter);
