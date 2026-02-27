@@ -650,18 +650,18 @@ packages:
     dependency: transitive
     description:
       name: fresh
-      sha256: "1ad8a94fca17b8f3c30054167be90e2251bc27e39c0227e3fd4c152f8f4ba4ba"
+      sha256: "2fe5ddb4ffac9da905e1c4c44256b87b2f826bc5941e344af637ade61bfa95a6"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.0"
+    version: "0.6.1"
   fresh_dio:
     dependency: "direct main"
     description:
       name: fresh_dio
-      sha256: "5d7c158b3520971b4ade41fa05303060e6b74a430d7450e6d5c3ea105a76b067"
+      sha256: ac86867f2015e9f6d80051bb95144597cb7ae9029cfe17d5c7179538a7cfa7ad
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.1"
+    version: "0.6.0"
   frontend_server_client:
     dependency: transitive
     description:
