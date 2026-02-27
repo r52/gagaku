@@ -77,6 +77,12 @@ class WebSourceHomePage extends HookConsumerWidget {
             children: [
               IconButton(
                 color: theme.colorScheme.onPrimaryContainer,
+                icon: const Icon(Icons.search),
+                onPressed: () => ExtensionSearchRoute().push(context),
+                tooltip: tr.webSources.sourceSearch,
+              ),
+              IconButton(
+                color: theme.colorScheme.onPrimaryContainer,
                 onPressed: () => openLinkDialog(context, api),
                 icon: const Icon(Icons.open_in_browser),
                 tooltip: tr.webSources.openLink,
