@@ -759,7 +759,6 @@ class ExtensionSource extends _$ExtensionSource {
       }
 
       final sourceFile = switch (source.version) {
-        SupportedVersion.v0_8 => 'source.js',
         SupportedVersion.v0_9 => 'index.js',
       };
 
@@ -1014,8 +1013,6 @@ class ExtensionSource extends _$ExtensionSource {
       final sourceId = source.id;
 
       final initScript = switch (source.version) {
-        SupportedVersion.v0_8 =>
-          "var ${source.id} = window.CompatWrapper({registerHomeSectionsInInitialise: true}, new window.Sources['${source.id}'](window.cheerio));",
         SupportedVersion.v0_9 =>
           "var ${source.id} = window.source.${source.id};",
       };
