@@ -6,6 +6,7 @@ import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/http.dart' show baseUserAgent;
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -92,6 +93,7 @@ Future<List<ReaderPage>> _getSourcePages(
   final sourceId = handle.sourceId;
 
   final refer = ref.watch(extensionReferrerProvider);
+  await ref.readAsync(extensionSourceProvider(sourceId).future);
   links = await ref
       .read(extensionSourceProvider(sourceId).notifier)
       .getChapterPages(chapter as Chapter);
@@ -155,6 +157,10 @@ class ProxyWebSourceReaderPage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchWebChapterInfoProvider(handle),
+      loadingBuilder: (context, progress) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: Center(child: CircularProgressIndicator(value: progress?.toDouble())),
+      ),
       errorBuilder: (context, child, _, _) => Scaffold(
         appBar: AppBar(leading: const BackButton()),
         body: child,
@@ -207,6 +213,10 @@ class ExtensionReaderPage extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchWebChapterInfoProvider(handle),
+      loadingBuilder: (context, progress) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: Center(child: CircularProgressIndicator(value: progress?.toDouble())),
+      ),
       errorBuilder: (context, child, _, _) => Scaffold(
         appBar: AppBar(leading: const BackButton()),
         body: child,
@@ -272,6 +282,10 @@ class WebSourceReaderWidget extends HookConsumerWidget {
       provider: handle.type == SourceType.proxy
           ? _getPagesProvider(source)
           : _getSourcePagesProvider(source, handle),
+      loadingBuilder: (context, progress) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: Center(child: CircularProgressIndicator(value: progress?.toDouble())),
+      ),
       errorBuilder: (context, child, _, _) => Scaffold(
         appBar: AppBar(leading: const BackButton()),
         body: child,

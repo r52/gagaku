@@ -37,9 +37,6 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
     );
     final filterController = useTextEditingController();
 
-    // Pre-initialize sources
-    final _ = ref.watch(extensionInfoListProvider);
-
     return NestedScrollView(
       scrollBehavior: const MouseTouchScrollBehavior(),
       controller: scrollController,
@@ -88,7 +85,7 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
   }
 }
 
-class WebSourceFavoriteTab extends HookWidget {
+class WebSourceFavoriteTab extends HookConsumerWidget {
   const WebSourceFavoriteTab({
     super.key,
     required this.category,
@@ -103,7 +100,7 @@ class WebSourceFavoriteTab extends HookWidget {
   static const _displayLimit = 32;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final pageController = useNumberPaginatorController();
     final currentPage = useValueListenable(pageController);
@@ -132,6 +129,20 @@ class WebSourceFavoriteTab extends HookWidget {
     }, [debouncedFilterText, category.id]);
     final stream = useStream(query);
     final items = stream.data ?? [];
+
+    useEffect(() {
+      final sourceIds = items
+          .map(
+            (e) =>
+                e.handle?.type == SourceType.source ? e.handle?.sourceId : null,
+          )
+          .whereType<String>()
+          .toSet();
+      for (final id in sourceIds) {
+        ref.read(extensionSourceProvider(id));
+      }
+      return null;
+    }, [items]);
 
     final pagedItems = useMemoized(() {
       int start = pageController.currentPage * _displayLimit;

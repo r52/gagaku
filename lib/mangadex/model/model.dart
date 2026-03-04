@@ -267,15 +267,17 @@ class MangaDexModel {
       tokenStorage: MangaDexTokenStorage(),
       refreshToken: (token, httpClient) => refreshToken(token),
       shouldRefreshBeforeRequest: (requestOptions, token) {
-        bool? isExpired;
-
-        final expiresAt = token?.expiresAt;
-        if (expiresAt != null) {
-          final now = DateTime.now();
-          isExpired = expiresAt.isBefore(now);
+        if (token == null) {
+          return false;
         }
 
-        return isExpired != false;
+        final expiresAt = token.expiresAt;
+        if (expiresAt == null) {
+          // Freshly read tokens needs to be refreshed
+          return true;
+        }
+
+        return expiresAt.difference(DateTime.now()).inSeconds < 30;
       },
     );
 

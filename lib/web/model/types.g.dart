@@ -57,10 +57,7 @@ Map<String, dynamic> _$WebSourceInfoToJson(WebSourceInfo instance) =>
           .toList(),
     };
 
-const _$SupportedVersionEnumMap = {
-  SupportedVersion.v0_8: 'v0_8',
-  SupportedVersion.v0_9: 'v0_9',
-};
+const _$SupportedVersionEnumMap = {SupportedVersion.v0_9: 'v0_9'};
 
 RepoInfo _$RepoInfoFromJson(Map<String, dynamic> json) =>
     RepoInfo(name: json['name'] as String, url: json['url'] as String);
@@ -183,16 +180,6 @@ _ImgurPage _$ImgurPageFromJson(Map<String, dynamic> json) => _ImgurPage(
 Map<String, dynamic> _$ImgurPageToJson(_ImgurPage instance) =>
     <String, dynamic>{'description': instance.description, 'src': instance.src};
 
-_Badge08 _$Badge08FromJson(Map<String, dynamic> json) => _Badge08(
-  text: json['text'] as String,
-  type: const BadgeColorParser().fromJson(json['type']),
-);
-
-Map<String, dynamic> _$Badge08ToJson(_Badge08 instance) => <String, dynamic>{
-  'text': instance.text,
-  'type': const BadgeColorParser().toJson(instance.type),
-};
-
 _SourceBadge _$SourceBadgeFromJson(Map<String, dynamic> json) => _SourceBadge(
   label: json['label'] as String,
   textColor: json['textColor'] as String,
@@ -220,46 +207,6 @@ Map<String, dynamic> _$SourceDeveloperToJson(_SourceDeveloper instance) =>
       'github': instance.github,
     };
 
-SourceVersion08 _$SourceVersion08FromJson(Map<String, dynamic> json) =>
-    SourceVersion08(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      author: json['author'] as String,
-      desc: json['desc'] as String,
-      website: json['website'] as String?,
-      contentRating: $enumDecode(_$ContentRatingEnumMap, json['contentRating']),
-      version: json['version'] as String,
-      icon: json['icon'] as String,
-      tags: (json['tags'] as List<dynamic>?)
-          ?.map((e) => Badge08.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      websiteBaseURL: json['websiteBaseURL'] as String,
-      intents: (json['intents'] as num?)?.toInt(),
-      $type: json['runtimeType'] as String?,
-    );
-
-Map<String, dynamic> _$SourceVersion08ToJson(SourceVersion08 instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'author': instance.author,
-      'desc': instance.desc,
-      'website': instance.website,
-      'contentRating': _$ContentRatingEnumMap[instance.contentRating]!,
-      'version': instance.version,
-      'icon': instance.icon,
-      'tags': instance.tags?.map((e) => e.toJson()).toList(),
-      'websiteBaseURL': instance.websiteBaseURL,
-      'intents': instance.intents,
-      'runtimeType': instance.$type,
-    };
-
-const _$ContentRatingEnumMap = {
-  ContentRating.EVERYONE: 'EVERYONE',
-  ContentRating.MATURE: 'MATURE',
-  ContentRating.ADULT: 'ADULT',
-};
-
 SourceVersion09 _$SourceVersion09FromJson(
   Map<String, dynamic> json,
 ) => SourceVersion09(
@@ -277,7 +224,6 @@ SourceVersion09 _$SourceVersion09FromJson(
       .map((e) => SourceDeveloper.fromJson(e as Map<String, dynamic>))
       .toList(),
   capabilities: const SourceIntentOrListParser().fromJson(json['capabilities']),
-  $type: json['runtimeType'] as String?,
 );
 
 Map<String, dynamic> _$SourceVersion09ToJson(
@@ -295,7 +241,6 @@ Map<String, dynamic> _$SourceVersion09ToJson(
   'capabilities': const SourceIntentOrListParser().toJson(
     instance.capabilities,
   ),
-  'runtimeType': instance.$type,
 };
 
 _BuiltWith _$BuiltWithFromJson(Map<String, dynamic> json) => _BuiltWith(

@@ -3,13 +3,11 @@
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/reader/main.dart' show CtxCallback;
 import 'package:gagaku/util/freezed.dart';
-import 'package:gagaku/util/util.dart';
 import 'package:uuid/uuid.dart';
 
 // Needed for builder
@@ -598,7 +596,6 @@ class WebSourceInfo with _$WebSourceInfo {
 }
 
 enum SupportedVersion {
-  v0_8('0.8'),
   v0_9('1.0.0');
 
   final String version;
@@ -659,29 +656,6 @@ class SourceIntentOrListParser
       intents.map((e) => e.flag).toList();
 }
 
-class BadgeColorParser implements JsonConverter<BadgeColor, dynamic> {
-  const BadgeColorParser();
-
-  @override
-  BadgeColor fromJson(dynamic type) =>
-      type == 'default' ? BadgeColor.def : BadgeColor.values.byName(type);
-
-  @override
-  dynamic toJson(BadgeColor color) =>
-      color == BadgeColor.def ? 'default' : color.name;
-}
-
-@freezed
-abstract class Badge08 with _$Badge08 {
-  const factory Badge08({
-    required String text,
-    @BadgeColorParser() required BadgeColor type,
-  }) = _Badge08;
-
-  factory Badge08.fromJson(Map<String, dynamic> json) =>
-      _$Badge08FromJson(json);
-}
-
 @freezed
 abstract class SourceBadge with _$SourceBadge {
   const factory SourceBadge({
@@ -692,23 +666,6 @@ abstract class SourceBadge with _$SourceBadge {
 
   factory SourceBadge.fromJson(Map<String, dynamic> json) =>
       _$SourceBadgeFromJson(json);
-
-  factory SourceBadge.fromBadge08(Badge08 badge) => SourceBadge(
-    label: badge.text,
-    textColor: '#000000',
-    backgroundColor: badge.type.color.toHex(),
-  );
-}
-
-enum BadgeColor {
-  def(Colors.blue),
-  success(Colors.green),
-  info(Colors.grey),
-  warning(Color.fromARGB(255, 230, 162, 60)),
-  danger(Color.fromARGB(255, 245, 108, 108));
-
-  final Color color;
-  const BadgeColor(this.color);
 }
 
 @freezed
@@ -726,20 +683,6 @@ abstract class SourceDeveloper with _$SourceDeveloper {
 @freezed
 sealed class SourceVersion with _$SourceVersion {
   const SourceVersion._();
-
-  const factory SourceVersion.zero_eight({
-    required String id,
-    required String name,
-    required String author,
-    required String desc,
-    String? website,
-    required ContentRating contentRating,
-    required String version,
-    required String icon,
-    List<Badge08>? tags,
-    required String websiteBaseURL,
-    int? intents,
-  }) = SourceVersion08;
 
   const factory SourceVersion.zero_nine({
     required String id,
@@ -759,46 +702,30 @@ sealed class SourceVersion with _$SourceVersion {
 
   String getDescription() {
     return switch (this) {
-      SourceVersion08(:final desc) => desc,
       SourceVersion09(:final description) => description,
     };
   }
 
   String getAuthor() {
     return switch (this) {
-      SourceVersion08(:final author) => author,
       SourceVersion09(:final developers) => developers.first.name,
     };
   }
 
   List<SourceBadge> getBadges() {
     return switch (this) {
-      SourceVersion08(:final tags) =>
-        tags == null
-            ? []
-            : tags.map((e) => SourceBadge.fromBadge08(e)).toList(),
       SourceVersion09(:final badges) => badges,
     };
   }
 
   List<SourceIntents> getCapabilities() {
     return switch (this) {
-      SourceVersion08(:final intents) =>
-        intents == null
-            ? []
-            : SourceIntents.values.fold([], (list, intent) {
-                if ((intents & intent.flag) == intent.flag) {
-                  list.add(intent);
-                }
-                return list;
-              }),
       SourceVersion09(:final capabilities) => capabilities,
     };
   }
 
   String getIconPath() {
     return switch (this) {
-      SourceVersion08() => '$id/includes/$icon',
       SourceVersion09() => '$id/static/$icon',
     };
   }
@@ -815,7 +742,6 @@ sealed class SourceVersion with _$SourceVersion {
     RegExp exp = RegExp(r'((https:\/\/)?\w+\.\w+)');
 
     String? result = switch (this) {
-      SourceVersion08(:final websiteBaseURL) => websiteBaseURL,
       SourceVersion09(:final description) => exp.firstMatch(description)?[0],
     };
 

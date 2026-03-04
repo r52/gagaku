@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -43,10 +44,17 @@ class ExtensionSearchPage extends StatelessWidget {
     }
 
     return DataProviderWhenWidget(
-      provider: extensionInfoListProvider,
-      errorBuilder: (context, child, _, _) => Scaffold(body: child),
+      provider: installedSourcesProvider,
+      loadingBuilder: (context, progress) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: Center(child: CircularProgressIndicator(value: progress?.toDouble())),
+      ),
+      errorBuilder: (context, child, _, _) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: child,
+      ),
       builder: (context, extensions) {
-        final firstSearchable = extensions.values.firstWhereOrNull(
+        final firstSearchable = extensions.firstWhereOrNull(
           (ext) => ext.hasCapability(SourceIntents.mangaSearch),
         );
 
@@ -98,6 +106,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
         return PageResultsMetaData([]);
       }
 
+      await ref.readAsync(extensionSourceProvider(source.id).future);
       final results = await ref
           .read(extensionSourceProvider(source.id).notifier)
           .searchManga(query!, (pageKey == _firstSearch) ? null : pageKey);
@@ -148,7 +157,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
         physics: const AlwaysScrollableScrollPhysics(),
         showToggle: false,
         title: DataProviderWhenWidget(
-          provider: extensionInfoListProvider,
+          provider: installedSourcesProvider,
           errorBuilder: (context, defaultChild, error, stacktrace) => Tooltip(
             message: tr.webSources.loadInstalledSourcesError,
             child: Icon(Icons.error),
@@ -157,12 +166,19 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
             builder: (context) {
               final searchExtensions = useMemoized(
                 () => Map.fromEntries(
-                  extensions.entries.where(
-                    (e) => e.value.hasCapability(SourceIntents.mangaSearch),
-                  ),
+                  extensions
+                      .where((e) => e.hasCapability(SourceIntents.mangaSearch))
+                      .map((e) => MapEntry(e.id, e)),
                 ),
                 [extensions],
               );
+
+              useEffect(() {
+                for (final ext in searchExtensions.values) {
+                  ref.read(extensionSourceProvider(ext.id));
+                }
+                return null;
+              }, [searchExtensions]);
 
               return DropdownMenu<WebSourceInfo>(
                 initialSelection: searchExtensions[source.id],
@@ -191,12 +207,12 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
         extraRow: [
           HookBuilder(
             builder: (context) {
-              final results = useMemoized(
-                () => ref
+              final results = useMemoized(() async {
+                await ref.readAsync(extensionSourceProvider(source.id).future);
+                return ref
                     .read(extensionSourceProvider(source.id).notifier)
-                    .getSortingOptions(),
-                [source],
-              );
+                    .getSortingOptions();
+              }, [source]);
               final future = useFuture(results);
 
               if (future.hasError) {
@@ -614,27 +630,24 @@ class _ExtensionFilterWidgetState
   @override
   Widget build(BuildContext context) {
     return SimpleFutureBuilder(
-      futureBuilder: () => ref
-          .read(extensionSourceProvider(widget.source.id).notifier)
-          .getFilters(),
+      futureBuilder: () async {
+        await ref.readAsync(extensionSourceProvider(widget.source.id).future);
+        return ref
+            .read(extensionSourceProvider(widget.source.id).notifier)
+            .getFilters();
+      },
       keys: [widget.source],
+      loadingBuilder: (context) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      errorBuilder: (context, error, stackTrace) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: Center(child: Icon(Icons.error)),
+      ),
       builder: (context, extFilters) {
         final tr = context.t;
         final nav = Navigator.of(context);
-
-        if (extFilters == null) {
-          return Scaffold(
-            appBar: AppBar(
-              leading: BackButton(
-                onPressed: () {
-                  nav.pop(null);
-                },
-              ),
-              title: Text(tr.search.filters),
-            ),
-            body: Center(child: Text(tr.webSources.source.noTagsWarning)),
-          );
-        }
 
         return Scaffold(
           appBar: AppBar(
@@ -644,58 +657,62 @@ class _ExtensionFilterWidgetState
               },
             ),
             title: Text(tr.search.filters),
-            actions: [
-              OverflowBar(
-                spacing: 8.0,
-                children: [
-                  Tooltip(
-                    message: tr.search.resetFilters,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        fil.value = [];
-                      },
-                      icon: const Icon(Icons.clear_all),
-                      label: Text(tr.search.resetFilters),
+            actions: extFilters == null
+                ? null
+                : [
+                    OverflowBar(
+                      spacing: 8.0,
+                      children: [
+                        Tooltip(
+                          message: tr.search.resetFilters,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              fil.value = [];
+                            },
+                            icon: const Icon(Icons.clear_all),
+                            label: Text(tr.search.resetFilters),
+                          ),
+                        ),
+                        Tooltip(
+                          message: tr.search.applyFilters,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              nav.pop(fil.value);
+                            },
+                            icon: const Icon(Icons.filter_list),
+                            label: Text(tr.search.applyFilters),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Tooltip(
-                    message: tr.search.applyFilters,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        nav.pop(fil.value);
-                      },
-                      icon: const Icon(Icons.filter_list),
-                      label: Text(tr.search.applyFilters),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
           ),
-          body: HookBuilder(
-            builder: (context) {
-              final expanded = useState(
-                List.generate(extFilters.length, (idx) => false),
-              );
+          body: extFilters == null
+              ? Center(child: Text(tr.webSources.source.noTagsWarning))
+              : HookBuilder(
+                  builder: (context) {
+                    final expanded = useState(
+                      List.generate(extFilters.length, (idx) => false),
+                    );
 
-              final panelItems = [
-                for (final (idx, f) in extFilters.indexed)
-                  _buildFilterPanel(f, expanded.value[idx]),
-              ];
+                    final panelItems = [
+                      for (final (idx, f) in extFilters.indexed)
+                        _buildFilterPanel(f, expanded.value[idx]),
+                    ];
 
-              return SafeArea(
-                child: SingleChildScrollView(
-                  child: ExpansionPanelList(
-                    expansionCallback: (panelIndex, isExpanded) {
-                      expanded.value[panelIndex] = isExpanded;
-                      expanded.value = [...expanded.value];
-                    },
-                    children: panelItems,
-                  ),
+                    return SafeArea(
+                      child: SingleChildScrollView(
+                        child: ExpansionPanelList(
+                          expansionCallback: (panelIndex, isExpanded) {
+                            expanded.value[panelIndex] = isExpanded;
+                            expanded.value = [...expanded.value];
+                          },
+                          children: panelItems,
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         );
       },
     );

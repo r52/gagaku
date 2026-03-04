@@ -77,7 +77,12 @@ class MangaDexMangaViewPage extends ConsumerWidget {
 
     return DataProviderWhenWidget(
       provider: _fetchMangaFromIdProvider(mangaId),
+      loadingBuilder: (context, progress) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: Center(child: CircularProgressIndicator(value: progress?.toDouble())),
+      ),
       errorBuilder: (context, child, _, _) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
         body: RefreshIndicator(
           onRefresh: () async =>
               ref.refresh(_fetchMangaFromIdProvider(mangaId).future),

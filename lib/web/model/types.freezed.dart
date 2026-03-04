@@ -1098,143 +1098,6 @@ as List<SourceIntents>,
 
 
 /// @nodoc
-mixin _$Badge08 {
-
- String get text;@BadgeColorParser() BadgeColor get type;
-/// Create a copy of Badge08
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$Badge08CopyWith<Badge08> get copyWith => _$Badge08CopyWithImpl<Badge08>(this as Badge08, _$identity);
-
-  /// Serializes this Badge08 to a JSON map.
-  Map<String, dynamic> toJson();
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Badge08&&(identical(other.text, text) || other.text == text)&&(identical(other.type, type) || other.type == type));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,text,type);
-
-@override
-String toString() {
-  return 'Badge08(text: $text, type: $type)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $Badge08CopyWith<$Res>  {
-  factory $Badge08CopyWith(Badge08 value, $Res Function(Badge08) _then) = _$Badge08CopyWithImpl;
-@useResult
-$Res call({
- String text,@BadgeColorParser() BadgeColor type
-});
-
-
-
-
-}
-/// @nodoc
-class _$Badge08CopyWithImpl<$Res>
-    implements $Badge08CopyWith<$Res> {
-  _$Badge08CopyWithImpl(this._self, this._then);
-
-  final Badge08 _self;
-  final $Res Function(Badge08) _then;
-
-/// Create a copy of Badge08
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? text = null,Object? type = null,}) {
-  return _then(_self.copyWith(
-text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
-as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as BadgeColor,
-  ));
-}
-
-}
-
-
-
-/// @nodoc
-@JsonSerializable()
-
-class _Badge08 implements Badge08 {
-  const _Badge08({required this.text, @BadgeColorParser() required this.type});
-  factory _Badge08.fromJson(Map<String, dynamic> json) => _$Badge08FromJson(json);
-
-@override final  String text;
-@override@BadgeColorParser() final  BadgeColor type;
-
-/// Create a copy of Badge08
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$Badge08CopyWith<_Badge08> get copyWith => __$Badge08CopyWithImpl<_Badge08>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$Badge08ToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Badge08&&(identical(other.text, text) || other.text == text)&&(identical(other.type, type) || other.type == type));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,text,type);
-
-@override
-String toString() {
-  return 'Badge08(text: $text, type: $type)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$Badge08CopyWith<$Res> implements $Badge08CopyWith<$Res> {
-  factory _$Badge08CopyWith(_Badge08 value, $Res Function(_Badge08) _then) = __$Badge08CopyWithImpl;
-@override @useResult
-$Res call({
- String text,@BadgeColorParser() BadgeColor type
-});
-
-
-
-
-}
-/// @nodoc
-class __$Badge08CopyWithImpl<$Res>
-    implements _$Badge08CopyWith<$Res> {
-  __$Badge08CopyWithImpl(this._self, this._then);
-
-  final _Badge08 _self;
-  final $Res Function(_Badge08) _then;
-
-/// Create a copy of Badge08
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? text = null,Object? type = null,}) {
-  return _then(_Badge08(
-text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
-as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as BadgeColor,
-  ));
-}
-
-
-}
-
-
-/// @nodoc
 mixin _$SourceBadge {
 
  String get label; String get textColor; String get backgroundColor;
@@ -1516,31 +1379,15 @@ as String?,
 SourceVersion _$SourceVersionFromJson(
   Map<String, dynamic> json
 ) {
-        switch (json['runtimeType']) {
-                  case 'zero_eight':
-          return SourceVersion08.fromJson(
-            json
-          );
-                case 'zero_nine':
-          return SourceVersion09.fromJson(
-            json
-          );
-        
-          default:
-            throw CheckedFromJsonException(
-  json,
-  'runtimeType',
-  'SourceVersion',
-  'Invalid union type "${json['runtimeType']}"!'
-);
-        }
-      
+    return SourceVersion09.fromJson(
+      json
+    );
 }
 
 /// @nodoc
 mixin _$SourceVersion {
 
- String get id; String get name;@ContentRatingParser() ContentRating get contentRating; String get version; String get icon;
+ String get id; String get name; String get description; String get version; String get icon; String? get language;@ContentRatingParser() ContentRating get contentRating; List<SourceBadge> get badges; List<SourceDeveloper> get developers;@SourceIntentOrListParser() List<SourceIntents> get capabilities;
 /// Create a copy of SourceVersion
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1553,16 +1400,16 @@ $SourceVersionCopyWith<SourceVersion> get copyWith => _$SourceVersionCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceVersion&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceVersion&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.language, language) || other.language == language)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&const DeepCollectionEquality().equals(other.badges, badges)&&const DeepCollectionEquality().equals(other.developers, developers)&&const DeepCollectionEquality().equals(other.capabilities, capabilities));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,contentRating,version,icon);
+int get hashCode => Object.hash(runtimeType,id,name,description,version,icon,language,contentRating,const DeepCollectionEquality().hash(badges),const DeepCollectionEquality().hash(developers),const DeepCollectionEquality().hash(capabilities));
 
 @override
 String toString() {
-  return 'SourceVersion(id: $id, name: $name, contentRating: $contentRating, version: $version, icon: $icon)';
+  return 'SourceVersion(id: $id, name: $name, description: $description, version: $version, icon: $icon, language: $language, contentRating: $contentRating, badges: $badges, developers: $developers, capabilities: $capabilities)';
 }
 
 
@@ -1573,7 +1420,7 @@ abstract mixin class $SourceVersionCopyWith<$Res>  {
   factory $SourceVersionCopyWith(SourceVersion value, $Res Function(SourceVersion) _then) = _$SourceVersionCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, ContentRating contentRating, String version, String icon
+ String id, String name, String description, String version, String icon, String? language,@ContentRatingParser() ContentRating contentRating, List<SourceBadge> badges, List<SourceDeveloper> developers,@SourceIntentOrListParser() List<SourceIntents> capabilities
 });
 
 
@@ -1590,160 +1437,60 @@ class _$SourceVersionCopyWithImpl<$Res>
 
 /// Create a copy of SourceVersion
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? contentRating = null,Object? version = null,Object? icon = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? version = null,Object? icon = null,Object? language = freezed,Object? contentRating = null,Object? badges = null,Object? developers = null,Object? capabilities = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,contentRating: null == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
-as ContentRating,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
+as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
 as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
-}
-
-
-
-/// @nodoc
-@JsonSerializable()
-
-class SourceVersion08 extends SourceVersion {
-  const SourceVersion08({required this.id, required this.name, required this.author, required this.desc, this.website, required this.contentRating, required this.version, required this.icon, final  List<Badge08>? tags, required this.websiteBaseURL, this.intents, final  String? $type}): _tags = tags,$type = $type ?? 'zero_eight',super._();
-  factory SourceVersion08.fromJson(Map<String, dynamic> json) => _$SourceVersion08FromJson(json);
-
-@override final  String id;
-@override final  String name;
- final  String author;
- final  String desc;
- final  String? website;
-@override final  ContentRating contentRating;
-@override final  String version;
-@override final  String icon;
- final  List<Badge08>? _tags;
- List<Badge08>? get tags {
-  final value = _tags;
-  if (value == null) return null;
-  if (_tags is EqualUnmodifiableListView) return _tags;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(value);
-}
-
- final  String websiteBaseURL;
- final  int? intents;
-
-@JsonKey(name: 'runtimeType')
-final String $type;
-
-
-/// Create a copy of SourceVersion
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$SourceVersion08CopyWith<SourceVersion08> get copyWith => _$SourceVersion08CopyWithImpl<SourceVersion08>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$SourceVersion08ToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceVersion08&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.author, author) || other.author == author)&&(identical(other.desc, desc) || other.desc == desc)&&(identical(other.website, website) || other.website == website)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&const DeepCollectionEquality().equals(other._tags, _tags)&&(identical(other.websiteBaseURL, websiteBaseURL) || other.websiteBaseURL == websiteBaseURL)&&(identical(other.intents, intents) || other.intents == intents));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,name,author,desc,website,contentRating,version,icon,const DeepCollectionEquality().hash(_tags),websiteBaseURL,intents);
-
-@override
-String toString() {
-  return 'SourceVersion.zero_eight(id: $id, name: $name, author: $author, desc: $desc, website: $website, contentRating: $contentRating, version: $version, icon: $icon, tags: $tags, websiteBaseURL: $websiteBaseURL, intents: $intents)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $SourceVersion08CopyWith<$Res> implements $SourceVersionCopyWith<$Res> {
-  factory $SourceVersion08CopyWith(SourceVersion08 value, $Res Function(SourceVersion08) _then) = _$SourceVersion08CopyWithImpl;
-@override @useResult
-$Res call({
- String id, String name, String author, String desc, String? website, ContentRating contentRating, String version, String icon, List<Badge08>? tags, String websiteBaseURL, int? intents
-});
-
-
-
-
-}
-/// @nodoc
-class _$SourceVersion08CopyWithImpl<$Res>
-    implements $SourceVersion08CopyWith<$Res> {
-  _$SourceVersion08CopyWithImpl(this._self, this._then);
-
-  final SourceVersion08 _self;
-  final $Res Function(SourceVersion08) _then;
-
-/// Create a copy of SourceVersion
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? author = null,Object? desc = null,Object? website = freezed,Object? contentRating = null,Object? version = null,Object? icon = null,Object? tags = freezed,Object? websiteBaseURL = null,Object? intents = freezed,}) {
-  return _then(SourceVersion08(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
-as String,desc: null == desc ? _self.desc : desc // ignore: cast_nullable_to_non_nullable
-as String,website: freezed == website ? _self.website : website // ignore: cast_nullable_to_non_nullable
+as String,language: freezed == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
 as String?,contentRating: null == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
-as ContentRating,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
-as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
-as String,tags: freezed == tags ? _self._tags : tags // ignore: cast_nullable_to_non_nullable
-as List<Badge08>?,websiteBaseURL: null == websiteBaseURL ? _self.websiteBaseURL : websiteBaseURL // ignore: cast_nullable_to_non_nullable
-as String,intents: freezed == intents ? _self.intents : intents // ignore: cast_nullable_to_non_nullable
-as int?,
+as ContentRating,badges: null == badges ? _self.badges : badges // ignore: cast_nullable_to_non_nullable
+as List<SourceBadge>,developers: null == developers ? _self.developers : developers // ignore: cast_nullable_to_non_nullable
+as List<SourceDeveloper>,capabilities: null == capabilities ? _self.capabilities : capabilities // ignore: cast_nullable_to_non_nullable
+as List<SourceIntents>,
   ));
 }
 
-
 }
+
+
 
 /// @nodoc
 @JsonSerializable()
 
 class SourceVersion09 extends SourceVersion {
-  const SourceVersion09({required this.id, required this.name, required this.description, required this.version, required this.icon, this.language, @ContentRatingParser() required this.contentRating, required final  List<SourceBadge> badges, required final  List<SourceDeveloper> developers, @SourceIntentOrListParser() required final  List<SourceIntents> capabilities, final  String? $type}): _badges = badges,_developers = developers,_capabilities = capabilities,$type = $type ?? 'zero_nine',super._();
+  const SourceVersion09({required this.id, required this.name, required this.description, required this.version, required this.icon, this.language, @ContentRatingParser() required this.contentRating, required final  List<SourceBadge> badges, required final  List<SourceDeveloper> developers, @SourceIntentOrListParser() required final  List<SourceIntents> capabilities}): _badges = badges,_developers = developers,_capabilities = capabilities,super._();
   factory SourceVersion09.fromJson(Map<String, dynamic> json) => _$SourceVersion09FromJson(json);
 
 @override final  String id;
 @override final  String name;
- final  String description;
+@override final  String description;
 @override final  String version;
 @override final  String icon;
- final  String? language;
+@override final  String? language;
 @override@ContentRatingParser() final  ContentRating contentRating;
  final  List<SourceBadge> _badges;
- List<SourceBadge> get badges {
+@override List<SourceBadge> get badges {
   if (_badges is EqualUnmodifiableListView) return _badges;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_badges);
 }
 
  final  List<SourceDeveloper> _developers;
- List<SourceDeveloper> get developers {
+@override List<SourceDeveloper> get developers {
   if (_developers is EqualUnmodifiableListView) return _developers;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_developers);
 }
 
  final  List<SourceIntents> _capabilities;
-@SourceIntentOrListParser() List<SourceIntents> get capabilities {
+@override@SourceIntentOrListParser() List<SourceIntents> get capabilities {
   if (_capabilities is EqualUnmodifiableListView) return _capabilities;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_capabilities);
 }
-
-
-@JsonKey(name: 'runtimeType')
-final String $type;
 
 
 /// Create a copy of SourceVersion

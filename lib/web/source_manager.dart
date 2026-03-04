@@ -33,7 +33,6 @@ class SourceManager extends HookConsumerWidget {
       try {
         final data = Versioning.fromJson(json.decode(response.body));
 
-        // TODO still support 0.8?
         if (data.builtWith.types.startsWith(SupportedVersion.v0_9.version) &&
             data.sources.isNotEmpty) {
           final version = SupportedVersion.values.firstWhere(
@@ -42,9 +41,9 @@ class SourceManager extends HookConsumerWidget {
 
           final sources = data.sources
               .map(
-                (e) => version == SupportedVersion.v0_8
-                    ? SourceVersion08.fromJson(e)
-                    : SourceVersion09.fromJson(e),
+                (e) => switch (version) {
+                  SupportedVersion.v0_9 => SourceVersion09.fromJson(e),
+                }
               )
               .toList();
 
