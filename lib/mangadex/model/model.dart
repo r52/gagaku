@@ -271,14 +271,13 @@ class MangaDexModel {
           return false;
         }
 
-        bool? isExpired;
-
         final expiresAt = token.expiresAt;
-        if (expiresAt != null) {
-          isExpired = expiresAt.difference(DateTime.now()).inSeconds < 30;
+        if (expiresAt == null) {
+          // Freshly read tokens needs to be refreshed
+          return true;
         }
 
-        return isExpired != false;
+        return expiresAt.difference(DateTime.now()).inSeconds < 30;
       },
     );
 
