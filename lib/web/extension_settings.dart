@@ -142,7 +142,6 @@ class FormItemDelegateBuilder extends StatelessWidget {
         return InputRowBuilder(
           source: source,
           element: element as InputRowElement,
-          secure: false,
         );
       case ButtonRowElement():
         return ButtonRowBuilder(
@@ -375,12 +374,10 @@ class InputRowBuilder extends HookConsumerWidget {
     super.key,
     required this.source,
     required this.element,
-    this.secure = false,
   });
 
   final WebSourceInfo source;
   final InputRowElement element;
-  final bool secure;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -417,7 +414,7 @@ class InputRowBuilder extends HookConsumerWidget {
             return TextFormField(
               controller: controller,
               decoration: const InputDecoration(filled: true),
-              obscureText: secure,
+              obscureText: element.isSecureEntry == true,
             );
           },
         );
@@ -551,7 +548,7 @@ class StepperRowBuilder extends HookConsumerWidget {
   }
 }
 
-class LabelRowBuilder extends StatelessWidget {
+class LabelRowBuilder extends ConsumerWidget {
   const LabelRowBuilder({
     super.key,
     required this.source,
@@ -562,7 +559,7 @@ class LabelRowBuilder extends StatelessWidget {
   final LabelRowElement element;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (element.isHidden) {
       return const SizedBox.shrink();
     }
@@ -571,6 +568,13 @@ class LabelRowBuilder extends StatelessWidget {
       child: ListTile(
         title: Text(element.title),
         subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
+        onTap: element.onSelect != null
+            ? () {
+                ref
+                    .read(extensionSourceProvider(source.id).notifier)
+                    .callBinding(element.onSelect!);
+              }
+            : null,
       ),
     );
   }
