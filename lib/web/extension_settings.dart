@@ -244,7 +244,7 @@ class SelectRowBuilder extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final data = useState(element.value);
+    final data = useState([...element.value]);
 
     return SettingCardWidget(
       title: Text(element.title),
