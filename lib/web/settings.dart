@@ -479,7 +479,7 @@ class UpdateCategoryDialog extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
-    final selected = useState(preselected);
+    final selected = useState([...preselected]);
 
     return AlertDialog(
       title: Text(tr.webSources.settings.categoriesToUpdate),
