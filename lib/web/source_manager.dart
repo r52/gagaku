@@ -11,6 +11,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/repo_list.dart';
 import 'package:gagaku/web/settings.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -273,6 +274,17 @@ class SourceManager extends HookConsumerWidget {
       appBar: AppBar(
         flexibleSpace: TitleFlexBar(title: tr.webSources.source.manager),
         actions: [
+          IconButton(
+            color: theme.colorScheme.onPrimaryContainer,
+            onPressed: () => nav.push(
+              SlideTransitionRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const RepoListManager(),
+              ),
+            ),
+            icon: const Icon(Icons.library_add),
+            tooltip: tr.ui.manage,
+          ),
           IconButton(
             color: theme.colorScheme.onPrimaryContainer,
             onPressed: () {

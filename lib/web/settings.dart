@@ -8,7 +8,6 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
-import 'package:gagaku/web/repo_list.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class WebSourceSettingsRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
@@ -88,27 +87,6 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
-            SettingCardWidget(
-              title: Text(tr.webSources.settings.repos, style: titleStyle),
-              subtitle: Text(tr.webSources.settings.reposDesc),
-              builder: (context) {
-                return Center(
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      nav.push(
-                        SlideTransitionRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  const RepoListManager(),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.library_add),
-                    label: Text(tr.ui.manage),
-                  ),
-                );
-              },
-            ),
             SettingCardWidget(
               title: Text(tr.webSources.settings.categories, style: titleStyle),
               subtitle: Text(tr.webSources.settings.categoriesDesc),
