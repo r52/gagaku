@@ -44,7 +44,7 @@ class SourceManager extends HookConsumerWidget {
               .map(
                 (e) => switch (version) {
                   SupportedVersion.v0_9 => SourceVersion09.fromJson(e),
-                }
+                },
               )
               .toList();
 
@@ -276,14 +276,17 @@ class SourceManager extends HookConsumerWidget {
         actions: [
           IconButton(
             color: theme.colorScheme.onPrimaryContainer,
-            onPressed: () => nav.push(
-              SlideTransitionRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    const RepoListManager(),
-              ),
-            ),
+            onPressed: () async {
+              await nav.push(
+                SlideTransitionRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const RepoListManager(),
+                ),
+              );
+              forceRefresh.value += 1;
+            },
             icon: const Icon(Icons.library_add),
-            tooltip: tr.ui.manage,
+            tooltip: tr.webSources.repo.manage,
           ),
           IconButton(
             color: theme.colorScheme.onPrimaryContainer,
