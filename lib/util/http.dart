@@ -9,7 +9,7 @@ import 'package:http/retry.dart';
 import 'package:pool/pool.dart';
 
 const baseUserAgent =
-    'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.7559.110 Mobile Safari/537.36';
+    'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.7680.120 Mobile Safari/537.36';
 
 const _maxConcurrentRequests = 5;
 const _minRequestInterval = Duration(milliseconds: 200);
