@@ -32,6 +32,29 @@ class _HttpOverrides extends HttpOverrides {
 }
 
 void main() async {
+  final appdir = await getApplicationSupportDirectory();
+
+  if (kReleaseMode) {
+    Logger.level = Level.warning;
+  }
+
+  logger = Logger(
+    filter: kReleaseMode ? ProductionFilter() : null,
+    printer: PrettyPrinter(
+      colors: false,
+      dateTimeFormat: DateTimeFormat.onlyTime,
+      excludeBox: {Level.trace: true, Level.debug: true, Level.info: true},
+    ),
+    output: DeviceContext.isDesktop()
+        ? (kReleaseMode
+              ? FileOutput(file: File(p.join(appdir.path, 'gagaku.log')))
+              : MultiOutput([
+                  FileOutput(file: File(p.join(appdir.path, 'gagaku.log'))),
+                  ConsoleOutput(),
+                ]))
+        : null,
+  );
+
   HttpOverrides.global = _HttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
   LocaleSettings.useDeviceLocale();
@@ -57,29 +80,6 @@ void main() async {
   final gdat = GagakuData();
   await gdat.initData();
   await gdat.initGagakuBoxes();
-
-  final appdir = await getApplicationSupportDirectory();
-
-  if (kReleaseMode) {
-    Logger.level = Level.warning;
-  }
-
-  logger = Logger(
-    filter: kReleaseMode ? ProductionFilter() : null,
-    printer: PrettyPrinter(
-      colors: false,
-      dateTimeFormat: DateTimeFormat.onlyTime,
-      excludeBox: {Level.trace: true, Level.debug: true, Level.info: true},
-    ),
-    output: DeviceContext.isDesktop()
-        ? (kReleaseMode
-              ? FileOutput(file: File(p.join(appdir.path, 'gagaku.log')))
-              : MultiOutput([
-                  FileOutput(file: File(p.join(appdir.path, 'gagaku.log'))),
-                  ConsoleOutput(),
-                ]))
-        : null,
-  );
 
   runApp(ProviderScope(child: TranslationProvider(child: App())));
 }
