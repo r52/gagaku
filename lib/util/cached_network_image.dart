@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/http.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:http/http.dart' as http;
@@ -28,7 +29,9 @@ class ExtensionHttpClient extends http.BaseClient {
       newRequest.headers.addAll(extraHeaders);
     }
 
-    // Use Chrome 146 User Agent values dynamically (Mar 2026 release cycle)
+    final gdat = GagakuData();
+
+    // Use dynamically extracted User Agent data natively or fall back to Mar 2026 chrome strings
     newRequest.headers.putIfAbsent(
       'accept',
       () => 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
@@ -36,10 +39,18 @@ class ExtensionHttpClient extends http.BaseClient {
     newRequest.headers.putIfAbsent('accept-language', () => 'en-US,en;q=0.9');
     newRequest.headers.putIfAbsent(
       'sec-ch-ua',
-      () => '"Google Chrome";v="146", "Chromium";v="146", "Not_A Brand";v="24"',
+      () =>
+          gdat.dynamicSecChUa ??
+          '"Google Chrome";v="146", "Chromium";v="146", "Not_A Brand";v="24"',
     );
-    newRequest.headers.putIfAbsent('sec-ch-ua-mobile', () => '?1');
-    newRequest.headers.putIfAbsent('sec-ch-ua-platform', () => '"Android"');
+    newRequest.headers.putIfAbsent(
+      'sec-ch-ua-mobile',
+      () => gdat.dynamicSecChUaMobile ?? '?1',
+    );
+    newRequest.headers.putIfAbsent(
+      'sec-ch-ua-platform',
+      () => gdat.dynamicSecChUaPlatform ?? '"Android"',
+    );
     newRequest.headers.putIfAbsent('sec-fetch-dest', () => 'image');
     newRequest.headers.putIfAbsent('sec-fetch-mode', () => 'no-cors');
     newRequest.headers.putIfAbsent('sec-fetch-site', () => 'cross-site');
