@@ -83,9 +83,14 @@ class WebSourceHomePage extends HookConsumerWidget {
               ),
               IconButton(
                 color: theme.colorScheme.onPrimaryContainer,
-                onPressed: () => openLinkDialog(context, api),
-                icon: const Icon(Icons.open_in_browser),
-                tooltip: tr.webSources.openLink,
+                onPressed: () => nav.push(
+                  SlideTransitionRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const SourceManager(),
+                  ),
+                ),
+                icon: const Icon(Icons.collections_bookmark),
+                tooltip: tr.webSources.source.manager,
               ),
               MenuAnchor(
                 builder: (context, controller, child) => IconButton(
@@ -138,14 +143,9 @@ class WebSourceHomePage extends HookConsumerWidget {
                     child: Text(tr.webSources.resetAllRead),
                   ),
                   MenuItemButton(
-                    onPressed: () => nav.push(
-                      SlideTransitionRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                            const SourceManager(),
-                      ),
-                    ),
-                    leadingIcon: const Icon(Icons.collections_bookmark),
-                    child: Text(tr.webSources.source.manager),
+                    onPressed: () => openLinkDialog(context, api),
+                    leadingIcon: const Icon(Icons.open_in_browser),
+                    child: Text(tr.webSources.openLink),
                   ),
                   MenuItemButton(
                     onPressed: () => nav.push(WebSourceSettingsRouteBuilder()),
