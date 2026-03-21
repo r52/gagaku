@@ -1885,6 +1885,10 @@ class MangaChaptersListSort extends _$MangaChaptersListSort {
 
 @Riverpod(keepAlive: true)
 class ReadChapters extends _$ReadChapters {
+  Completer<ReadChaptersMap>? _batchCompleter;
+  Timer? _batchTimer;
+  final Set<Manga> _batchQueue = {};
+
   Future<ReadChaptersMap> _fetchReadChapters(Iterable<Manga> mangas) async {
     if (mangas.isEmpty) {
       return {};
@@ -1923,13 +1927,34 @@ class ReadChapters extends _$ReadChapters {
 
     if (mg.isEmpty) {
       // No change
-      return {};
+      return oldstate;
     }
 
-    final map = await _fetchReadChapters(mg);
-    state = AsyncData({...oldstate, ...map});
+    _batchQueue.addAll(mg);
 
-    return state.value!;
+    if (_batchTimer == null) {
+      _batchCompleter = Completer<ReadChaptersMap>();
+      _batchTimer = Timer(const Duration(milliseconds: 50), () async {
+        final currentBatch = _batchQueue.toList();
+        final completer = _batchCompleter!;
+
+        _batchQueue.clear();
+        _batchCompleter = null;
+        _batchTimer = null;
+
+        try {
+          final map = await _fetchReadChapters(currentBatch);
+          final currentState = await future;
+          state = AsyncData({...currentState, ...map});
+
+          completer.complete(state.value!);
+        } catch (e, st) {
+          completer.completeError(e, st);
+        }
+      });
+    }
+
+    return _batchCompleter!.future;
   }
 
   /// Sets a list of chapters for a manga read or unread

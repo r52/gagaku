@@ -11,6 +11,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/repo_list.dart';
 import 'package:gagaku/web/settings.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -43,7 +44,7 @@ class SourceManager extends HookConsumerWidget {
               .map(
                 (e) => switch (version) {
                   SupportedVersion.v0_9 => SourceVersion09.fromJson(e),
-                }
+                },
               )
               .toList();
 
@@ -273,6 +274,20 @@ class SourceManager extends HookConsumerWidget {
       appBar: AppBar(
         flexibleSpace: TitleFlexBar(title: tr.webSources.source.manager),
         actions: [
+          IconButton(
+            color: theme.colorScheme.onPrimaryContainer,
+            onPressed: () async {
+              await nav.push(
+                SlideTransitionRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const RepoListManager(),
+                ),
+              );
+              forceRefresh.value += 1;
+            },
+            icon: const Icon(Icons.library_add),
+            tooltip: tr.webSources.repo.manage,
+          ),
           IconButton(
             color: theme.colorScheme.onPrimaryContainer,
             onPressed: () {

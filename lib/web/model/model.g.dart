@@ -56,6 +56,89 @@ final class ExtensionReferrerProvider
 
 String _$extensionReferrerHash() => r'13ddbba7059d5caf3026b45cc998d2b1595b8f20';
 
+@ProviderFor(sourceHeaders)
+final sourceHeadersProvider = SourceHeadersFamily._();
+
+final class SourceHeadersProvider
+    extends
+        $FunctionalProvider<
+          Map<String, String>,
+          Map<String, String>,
+          Map<String, String>
+        >
+    with $Provider<Map<String, String>> {
+  SourceHeadersProvider._({
+    required SourceHeadersFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'sourceHeadersProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$sourceHeadersHash();
+
+  @override
+  String toString() {
+    return r'sourceHeadersProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<Map<String, String>> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  Map<String, String> create(Ref ref) {
+    final argument = this.argument as String;
+    return sourceHeaders(ref, argument);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Map<String, String>>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SourceHeadersProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$sourceHeadersHash() => r'd3cc264b6b6f149bb0192f0198687f9aad51a332';
+
+final class SourceHeadersFamily extends $Family
+    with $FunctionalFamilyOverride<Map<String, String>, String> {
+  SourceHeadersFamily._()
+    : super(
+        retry: null,
+        name: r'sourceHeadersProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  SourceHeadersProvider call(String sourceId) =>
+      SourceHeadersProvider._(argument: sourceId, from: this);
+
+  @override
+  String toString() => r'sourceHeadersProvider';
+}
+
 @ProviderFor(proxy)
 final proxyProvider = ProxyProvider._();
 
@@ -223,7 +306,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'6d12caec9ac5535bcae993727ba84da14715cfb0';
+String _$extensionSourceHash() => r'd61d5a5a91d8dfdce896b60b83a9a263d5aabe08';
 
 final class ExtensionSourceFamily extends $Family
     with

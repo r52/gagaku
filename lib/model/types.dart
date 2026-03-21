@@ -88,4 +88,10 @@ final timeagoLocalesMap = <String, LookupMessages>{
   'zh_CN': ZhCnMessages(),
 };
 
-final timeagoLocaleList = ['en', 'en_short', 'es', 'es_short', ...timeagoLocalesMap.keys];
+final timeagoLocaleList = [
+  'en',
+  'en_short',
+  'es',
+  'es_short',
+  ...timeagoLocalesMap.keys,
+];

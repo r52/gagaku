@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -8,7 +8,6 @@ import 'package:gagaku/model/config.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
-import 'package:gagaku/util/http.dart' show baseUserAgent;
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -423,36 +422,43 @@ class GridMangaItem extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final extIcons = ref.watch(_extensionIconProvider);
-    final refer = ref.watch(extensionReferrerProvider);
 
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
     final theme = Theme.of(context);
 
-    String referer = refer[link.handle?.sourceId] ?? '';
+    final sourceId = link.handle?.sourceId ?? '';
+    final extIcons = ref.watch(_extensionIconProvider);
+    final headers = ref.watch(sourceHeadersProvider(sourceId));
+    final imageCache = ref.watch(extensionImageCacheProvider);
+
+    final Widget sourceIconWidget =
+        extIcons[sourceId] ?? Text(sourceId, style: CommonTextStyles.twelve);
 
     final Widget cover = link.cover != null
         ? CachedNetworkImage(
             imageUrl: link.cover!,
-            httpHeaders: {'referer': referer, 'user-agent': baseUserAgent},
-            cacheManager: gagakuImageCache,
+            httpHeaders: headers,
+            cacheManager: imageCache,
             memCacheWidth: 256,
             maxWidthDiskCache: 256,
             width: 128.0,
             progressIndicatorBuilder: (context, url, downloadProgress) =>
                 const Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
+            errorBuilder: (context, error, stacktrace) {
+              return Tooltip(
+                message: error.toString(),
+                child: const Icon(Icons.error),
+              );
+            },
             fit: BoxFit.cover,
           )
         : const Icon(Icons.menu_book, size: 128.0);
 
     final sourceIcon = Align(
       alignment: Alignment.bottomRight,
-      child:
-          extIcons[link.handle?.sourceId] ??
-          Text(link.handle?.sourceId ?? '', style: CommonTextStyles.twelve),
+      child: sourceIconWidget,
     );
 
     final favButton = showFavoriteButton
@@ -919,7 +925,10 @@ class _CoverButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
+    final sourceId = link.handle?.sourceId ?? '';
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
+    final headers = ref.watch(sourceHeadersProvider(sourceId));
+    final imageCache = ref.watch(extensionImageCacheProvider);
 
     return TextButton(
       onPressed: () async {
@@ -946,7 +955,8 @@ class _CoverButton extends ConsumerWidget {
       ),
       child: CachedNetworkImage(
         imageUrl: link.cover!,
-        cacheManager: gagakuImageCache,
+        httpHeaders: headers,
+        cacheManager: imageCache,
         memCacheWidth: 256,
         maxWidthDiskCache: 256,
         imageBuilder: (context, imageProvider) => DecoratedBox(
@@ -959,7 +969,12 @@ class _CoverButton extends ConsumerWidget {
         height: screenSizeSmall ? 91.0 : 182.0,
         progressIndicatorBuilder: (context, url, downloadProgress) =>
             const Center(child: CircularProgressIndicator()),
-        errorWidget: (context, url, error) => const Icon(Icons.error),
+        errorBuilder: (context, error, stacktrace) {
+          return Tooltip(
+            message: error.toString(),
+            child: const Icon(Icons.error),
+          );
+        },
         fit: BoxFit.cover,
       ),
     );

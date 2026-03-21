@@ -1,6 +1,6 @@
 // ignore_for_file: unused_element
 import 'package:animations/animations.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -505,14 +505,15 @@ class _InfiniteScrollFeedState
   }
 }
 
-class _CoverButton extends StatelessWidget {
+class _CoverButton extends ConsumerWidget {
   const _CoverButton({required this.manga});
 
   final Manga manga;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
+    final imageCache = ref.watch(extensionImageCacheProvider);
 
     return TextButton(
       onPressed: () =>
@@ -521,8 +522,8 @@ class _CoverButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
       ),
       child: CachedNetworkImage(
+        cacheManager: imageCache,
         imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.small),
-        cacheManager: gagakuImageCache,
         imageBuilder: (context, imageProvider) => DecoratedBox(
           decoration: BoxDecoration(
             image: DecorationImage(image: imageProvider),
@@ -533,7 +534,12 @@ class _CoverButton extends StatelessWidget {
         height: screenSizeSmall ? 91.0 : 182.0,
         progressIndicatorBuilder: (context, url, downloadProgress) =>
             const Center(child: CircularProgressIndicator()),
-        errorWidget: (context, url, error) => const Icon(Icons.error),
+        errorBuilder: (context, error, stacktrace) {
+          return Tooltip(
+            message: error.toString(),
+            child: const Icon(Icons.error),
+          );
+        },
         fit: BoxFit.cover,
       ),
     );
@@ -1246,7 +1252,7 @@ class MangaListViewSliver extends ConsumerWidget {
   }
 }
 
-class GridMangaItem extends HookWidget {
+class GridMangaItem extends HookConsumerWidget {
   const GridMangaItem({
     super.key,
     required this.manga,
@@ -1263,19 +1269,25 @@ class GridMangaItem extends HookWidget {
   final String? header;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
+    final imageCache = ref.watch(extensionImageCacheProvider);
 
     final networkImage = CachedNetworkImage(
+      cacheManager: imageCache,
       imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
-      cacheManager: gagakuImageCache,
       width: 256.0,
       fit: BoxFit.cover,
       progressIndicatorBuilder: (context, url, downloadProgress) =>
           const Center(child: CircularProgressIndicator()),
-      errorWidget: (context, url, error) => const Icon(Icons.error),
+      errorBuilder: (context, error, stacktrace) {
+        return Tooltip(
+          message: error.toString(),
+          child: const Icon(Icons.error),
+        );
+      },
     );
 
     final image = GridAlbumImage(
@@ -1322,15 +1334,16 @@ class GridMangaItem extends HookWidget {
 }
 
 @Dependencies([chipTextStyle])
-class GridMangaDetailedItem extends StatelessWidget {
+class GridMangaDetailedItem extends ConsumerWidget {
   const GridMangaDetailedItem({super.key, required this.manga, this.header});
 
   final Manga manga;
   final String? header;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
+    final imageCache = ref.watch(extensionImageCacheProvider);
 
     return Card(
       child: Padding(
@@ -1350,16 +1363,20 @@ class GridMangaDetailedItem extends StatelessWidget {
                       manga: manga,
                     ).push(context),
                     child: CachedNetworkImage(
+                      cacheManager: imageCache,
                       imageUrl: manga.getFirstCoverUrl(
                         quality: CoverArtQuality.small,
                       ),
-                      cacheManager: gagakuImageCache,
                       width: screenSizeSmall ? 80.0 : 128.0,
                       progressIndicatorBuilder:
                           (context, url, downloadProgress) =>
                               const Center(child: CircularProgressIndicator()),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error),
+                      errorBuilder: (context, error, stacktrace) {
+                        return Tooltip(
+                          message: error.toString(),
+                          child: const Icon(Icons.error),
+                        );
+                      },
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -1398,14 +1415,16 @@ class GridMangaDetailedItem extends StatelessWidget {
 }
 
 @Dependencies([chipTextStyle])
-class _ListMangaItem extends StatelessWidget {
+class _ListMangaItem extends ConsumerWidget {
   const _ListMangaItem({super.key, required this.manga, this.header});
 
   final Manga manga;
   final String? header;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final imageCache = ref.watch(extensionImageCacheProvider);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -1418,14 +1437,19 @@ class _ListMangaItem extends StatelessWidget {
                 manga: manga,
               ).push(context),
               child: CachedNetworkImage(
+                cacheManager: imageCache,
                 imageUrl: manga.getFirstCoverUrl(
                   quality: CoverArtQuality.small,
                 ),
-                cacheManager: gagakuImageCache,
                 width: 80.0,
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
                     const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
+                errorBuilder: (context, error, stacktrace) {
+                  return Tooltip(
+                    message: error.toString(),
+                    child: const Icon(Icons.error),
+                  );
+                },
                 fit: BoxFit.cover,
               ),
             ),

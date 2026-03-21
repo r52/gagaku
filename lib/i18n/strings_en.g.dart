@@ -1404,12 +1404,6 @@ class TranslationsWebSourcesSettingsEn {
 
 	// Translations
 
-	/// en: 'Repos'
-	String get repos => 'Repos';
-
-	/// en: 'Configure source repos'
-	String get reposDesc => 'Configure source repos';
-
 	/// en: 'Favorite Categories'
 	String get categories => 'Favorite Categories';
 
@@ -1470,8 +1464,8 @@ class TranslationsWebSourcesRepoEn {
 
 	// Translations
 
-	/// en: 'Repo List'
-	String get list => 'Repo List';
+	/// en: 'Manage Repos'
+	String get manage => 'Manage Repos';
 
 	/// en: 'Add New Repo'
 	String get newRepo => '${_root.ui.addNew} Repo';
@@ -1810,8 +1804,6 @@ extension on Translations {
 			'webSources.openLink' => 'Open Link',
 			'webSources.supportedUrl.text' => 'Supported URLs',
 			'webSources.supportedUrl.arg' => ({required Object arg}) => '${_root.webSources.supportedUrl.text}:${arg}',
-			'webSources.settings.repos' => 'Repos',
-			'webSources.settings.reposDesc' => 'Configure source repos',
 			'webSources.settings.categories' => 'Favorite Categories',
 			'webSources.settings.categoriesDesc' => 'Set up favourite list categories',
 			'webSources.settings.newCategory' => '${_root.ui.addNew} Category',
@@ -1829,7 +1821,7 @@ extension on Translations {
 			'webSources.settings.clearAllWarning' => 'Are you sure you want to delete all extension settings?',
 			'webSources.settings.clearSettings' => 'Clear Settings',
 			'webSources.settings.clearSuccess' => 'Settings Cleared',
-			'webSources.repo.list' => 'Repo List',
+			'webSources.repo.manage' => 'Manage Repos',
 			'webSources.repo.newRepo' => '${_root.ui.addNew} Repo',
 			'webSources.repo.browser' => 'View in browser',
 			'webSources.repo.add' => '${_root.ui.add} Repo',

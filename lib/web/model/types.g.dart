@@ -658,6 +658,7 @@ LabelRowElement _$LabelRowElementFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String,
       subtitle: json['subtitle'] as String?,
       value: json['value'] as String?,
+      onSelect: json['onSelect'] as String?,
       $type: json['type'] as String?,
     );
 
@@ -668,6 +669,7 @@ Map<String, dynamic> _$LabelRowElementToJson(LabelRowElement instance) =>
       'title': instance.title,
       'subtitle': instance.subtitle,
       'value': instance.value,
+      'onSelect': instance.onSelect,
       'type': instance.$type,
     };
 
@@ -677,6 +679,7 @@ InputRowElement _$InputRowElementFromJson(Map<String, dynamic> json) =>
       isHidden: json['isHidden'] as bool,
       title: json['title'] as String,
       value: json['value'] as String,
+      isSecureEntry: json['isSecureEntry'] as bool?,
       onValueChange: json['onValueChange'] as String,
       $type: json['type'] as String?,
     );
@@ -687,6 +690,7 @@ Map<String, dynamic> _$InputRowElementToJson(InputRowElement instance) =>
       'isHidden': instance.isHidden,
       'title': instance.title,
       'value': instance.value,
+      'isSecureEntry': instance.isSecureEntry,
       'onValueChange': instance.onValueChange,
       'type': instance.$type,
     };

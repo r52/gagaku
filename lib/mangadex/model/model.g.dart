@@ -144,7 +144,7 @@ final class ReadChaptersProvider
   }
 }
 
-String _$readChaptersHash() => r'b4d935af216865bf7fae46e11aa4f98f809e913a';
+String _$readChaptersHash() => r'7dfd8fca31cfa380377332229b68e9d0e56ee668';
 
 final class ReadChaptersFamily extends $Family
     with

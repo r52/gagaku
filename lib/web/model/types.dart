@@ -1115,6 +1115,7 @@ sealed class FormItemElement with _$FormItemElement {
     required String title,
     String? subtitle,
     String? value,
+    SelectorID? onSelect, // () => Promise<void>
   }) = LabelRowElement;
 
   const factory FormItemElement.inputRow({
@@ -1122,6 +1123,7 @@ sealed class FormItemElement with _$FormItemElement {
     required bool isHidden,
     required String title,
     required String value,
+    bool? isSecureEntry,
     required SelectorID onValueChange, // (value: string) => Promise<void>
   }) = InputRowElement;
 

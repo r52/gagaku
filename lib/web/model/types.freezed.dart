@@ -4719,7 +4719,7 @@ as String,
 @JsonSerializable()
 
 class LabelRowElement implements FormItemElement {
-  const LabelRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, this.value, final  String? $type}): $type = $type ?? 'labelRow';
+  const LabelRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, this.value, this.onSelect, final  String? $type}): $type = $type ?? 'labelRow';
   factory LabelRowElement.fromJson(Map<String, dynamic> json) => _$LabelRowElementFromJson(json);
 
 @override final  String id;
@@ -4727,6 +4727,7 @@ class LabelRowElement implements FormItemElement {
 @override final  String title;
  final  String? subtitle;
  final  String? value;
+ final  SelectorID? onSelect;
 
 @JsonKey(name: 'type')
 final String $type;
@@ -4745,16 +4746,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LabelRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.value, value) || other.value == value));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LabelRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.value, value) || other.value == value)&&(identical(other.onSelect, onSelect) || other.onSelect == onSelect));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title,subtitle,value);
+int get hashCode => Object.hash(runtimeType,id,isHidden,title,subtitle,value,onSelect);
 
 @override
 String toString() {
-  return 'FormItemElement.labelRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value)';
+  return 'FormItemElement.labelRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, onSelect: $onSelect)';
 }
 
 
@@ -4765,7 +4766,7 @@ abstract mixin class $LabelRowElementCopyWith<$Res> implements $FormItemElementC
   factory $LabelRowElementCopyWith(LabelRowElement value, $Res Function(LabelRowElement) _then) = _$LabelRowElementCopyWithImpl;
 @override @useResult
 $Res call({
- String id, bool isHidden, String title, String? subtitle, String? value
+ String id, bool isHidden, String title, String? subtitle, String? value, SelectorID? onSelect
 });
 
 
@@ -4782,14 +4783,15 @@ class _$LabelRowElementCopyWithImpl<$Res>
 
 /// Create a copy of FormItemElement
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? subtitle = freezed,Object? value = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? subtitle = freezed,Object? value = freezed,Object? onSelect = freezed,}) {
   return _then(LabelRowElement(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
 as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
 as String?,value: freezed == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,onSelect: freezed == onSelect ? _self.onSelect : onSelect // ignore: cast_nullable_to_non_nullable
+as SelectorID?,
   ));
 }
 
@@ -4800,13 +4802,14 @@ as String?,
 @JsonSerializable()
 
 class InputRowElement implements FormItemElement {
-  const InputRowElement({required this.id, required this.isHidden, required this.title, required this.value, required this.onValueChange, final  String? $type}): $type = $type ?? 'inputRow';
+  const InputRowElement({required this.id, required this.isHidden, required this.title, required this.value, this.isSecureEntry, required this.onValueChange, final  String? $type}): $type = $type ?? 'inputRow';
   factory InputRowElement.fromJson(Map<String, dynamic> json) => _$InputRowElementFromJson(json);
 
 @override final  String id;
 @override final  bool isHidden;
 @override final  String title;
  final  String value;
+ final  bool? isSecureEntry;
  final  SelectorID onValueChange;
 
 @JsonKey(name: 'type')
@@ -4826,16 +4829,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InputRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.value, value) || other.value == value)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InputRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.value, value) || other.value == value)&&(identical(other.isSecureEntry, isSecureEntry) || other.isSecureEntry == isSecureEntry)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title,value,onValueChange);
+int get hashCode => Object.hash(runtimeType,id,isHidden,title,value,isSecureEntry,onValueChange);
 
 @override
 String toString() {
-  return 'FormItemElement.inputRow(id: $id, isHidden: $isHidden, title: $title, value: $value, onValueChange: $onValueChange)';
+  return 'FormItemElement.inputRow(id: $id, isHidden: $isHidden, title: $title, value: $value, isSecureEntry: $isSecureEntry, onValueChange: $onValueChange)';
 }
 
 
@@ -4846,7 +4849,7 @@ abstract mixin class $InputRowElementCopyWith<$Res> implements $FormItemElementC
   factory $InputRowElementCopyWith(InputRowElement value, $Res Function(InputRowElement) _then) = _$InputRowElementCopyWithImpl;
 @override @useResult
 $Res call({
- String id, bool isHidden, String title, String value, SelectorID onValueChange
+ String id, bool isHidden, String title, String value, bool? isSecureEntry, SelectorID onValueChange
 });
 
 
@@ -4863,13 +4866,14 @@ class _$InputRowElementCopyWithImpl<$Res>
 
 /// Create a copy of FormItemElement
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? value = null,Object? onValueChange = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? value = null,Object? isSecureEntry = freezed,Object? onValueChange = null,}) {
   return _then(InputRowElement(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
 as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
-as String,onValueChange: null == onValueChange ? _self.onValueChange : onValueChange // ignore: cast_nullable_to_non_nullable
+as String,isSecureEntry: freezed == isSecureEntry ? _self.isSecureEntry : isSecureEntry // ignore: cast_nullable_to_non_nullable
+as bool?,onValueChange: null == onValueChange ? _self.onValueChange : onValueChange // ignore: cast_nullable_to_non_nullable
 as SelectorID,
   ));
 }

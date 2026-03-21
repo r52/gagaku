@@ -115,8 +115,6 @@
       "arg": "@:{webSources.supportedUrl.text}:$arg"
     },
     "settings": {
-      "repos": "Repos",
-      "reposDesc": "Configure source repos",
       "categories": "Favorite Categories",
       "categoriesDesc": "Set up favourite list categories",
       "newCategory": "@:ui.addNew Category",
@@ -136,7 +134,7 @@
       "clearSuccess": "Settings Cleared"
     },
     "repo": {
-      "list": "Repo List",
+      "manage": "Manage Repos",
       "newRepo": "@:ui.addNew Repo",
       "browser": "View in browser",
       "add": "@:ui.add Repo",

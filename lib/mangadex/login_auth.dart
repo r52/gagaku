@@ -21,8 +21,8 @@ class MangaDexLoginWidget extends StatelessWidget {
 
         return Center(
           child: ElevatedButton.icon(
-            onPressed:
-                () => {} /*ref.read(authControlProvider.notifier).login()*/,
+            onPressed: () =>
+                {} /*ref.read(authControlProvider.notifier).login()*/,
             label: Text(t.mangadex.login),
             icon: const Icon(Icons.https),
           ),

@@ -87,14 +87,12 @@ LocalLibraryItem? findLibraryItem(
     return curr;
   }
 
-  final children =
-      curr.children
-          .where(
-            (element) =>
-                old.type == element.type &&
-                old.isReadable == element.isReadable,
-          )
-          .toList();
+  final children = curr.children
+      .where(
+        (element) =>
+            old.type == element.type && old.isReadable == element.isReadable,
+      )
+      .toList();
 
   if (children.isNotEmpty) {
     final result = children.binarySearch(old, _libraryCompare[sort]!);
@@ -156,10 +154,9 @@ class LocalLibrary extends _$LocalLibrary {
 
     final entities = await dir.list().toList();
     final files = entities.whereType<File>();
-    final name =
-        (dir.uri.pathSegments.length - 2 >= 0)
-            ? dir.uri.pathSegments.elementAt(dir.uri.pathSegments.length - 2)
-            : dir.path;
+    final name = (dir.uri.pathSegments.length - 2 >= 0)
+        ? dir.uri.pathSegments.elementAt(dir.uri.pathSegments.length - 2)
+        : dir.path;
 
     final stats = dir.statSync();
 

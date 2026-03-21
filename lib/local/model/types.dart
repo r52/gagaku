@@ -1,4 +1,1 @@
-enum ArchiveType {
-  zip,
-  tar,
-}
+enum ArchiveType { zip, tar }

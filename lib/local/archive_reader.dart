@@ -23,8 +23,8 @@ class ArchiveReaderRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
     this.link,
     this.onLinkPressed,
   }) : super(
-         pageBuilder:
-             (context, animation, secondaryAnimation) => ArchiveReaderWidget(
+         pageBuilder: (context, animation, secondaryAnimation) =>
+             ArchiveReaderWidget(
                path: path,
                title: title,
                link: link,
@@ -125,11 +125,10 @@ class ArchiveReaderWidget extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _getArchivePagesProvider(path),
-      errorBuilder:
-          (context, child, _, _) => Scaffold(
-            appBar: AppBar(leading: const BackButton()),
-            body: child,
-          ),
+      errorBuilder: (context, child, _, _) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: child,
+      ),
       builder: (context, pages) {
         if (pages.isEmpty) {
           return Scaffold(

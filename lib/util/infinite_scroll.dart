@@ -135,9 +135,9 @@ class PagedSuperSliverList<PageKeyType, ItemType> extends StatelessWidget {
         : (itemExtent != null)
         ? SliverFixedExtentList(delegate: delegate, itemExtent: itemExtent)
         : SliverPrototypeExtentList(
-          delegate: delegate,
-          prototypeItem: prototypeItem!,
-        );
+            delegate: delegate,
+            prototypeItem: prototypeItem!,
+          );
   }
 
   SliverChildBuilderDelegate _buildSliverDelegate(
@@ -148,25 +148,25 @@ class PagedSuperSliverList<PageKeyType, ItemType> extends StatelessWidget {
     final separatorBuilder = _separatorBuilder;
     return separatorBuilder == null
         ? AppendedFindingSliverChildBuilderDelegate(
-          builder: itemBuilder,
-          childCount: itemCount,
-          appendixBuilder: statusIndicatorBuilder,
-          findChildIndexCallback: findChildIndexCallback,
-          addAutomaticKeepAlives: addAutomaticKeepAlives,
-          addRepaintBoundaries: addRepaintBoundaries,
-          addSemanticIndexes: addSemanticIndexes,
-          semanticIndexCallback: semanticIndexCallback,
-        )
+            builder: itemBuilder,
+            childCount: itemCount,
+            appendixBuilder: statusIndicatorBuilder,
+            findChildIndexCallback: findChildIndexCallback,
+            addAutomaticKeepAlives: addAutomaticKeepAlives,
+            addRepaintBoundaries: addRepaintBoundaries,
+            addSemanticIndexes: addSemanticIndexes,
+            semanticIndexCallback: semanticIndexCallback,
+          )
         : AppendedFindingSliverChildBuilderDelegate.separated(
-          builder: itemBuilder,
-          childCount: itemCount,
-          appendixBuilder: statusIndicatorBuilder,
-          separatorBuilder: separatorBuilder,
-          findChildIndexCallback: findChildIndexCallback,
-          addAutomaticKeepAlives: addAutomaticKeepAlives,
-          addRepaintBoundaries: addRepaintBoundaries,
-          addSemanticIndexes: addSemanticIndexes,
-        );
+            builder: itemBuilder,
+            childCount: itemCount,
+            appendixBuilder: statusIndicatorBuilder,
+            separatorBuilder: separatorBuilder,
+            findChildIndexCallback: findChildIndexCallback,
+            addAutomaticKeepAlives: addAutomaticKeepAlives,
+            addRepaintBoundaries: addRepaintBoundaries,
+            addSemanticIndexes: addSemanticIndexes,
+          );
   }
 }
 
@@ -190,11 +190,11 @@ class AppendedFindingSliverChildBuilderDelegate
          appendixBuilder == null
              ? builder
              : (context, index) {
-               if (index == childCount) {
-                 return appendixBuilder(context);
-               }
-               return builder(context, index);
-             },
+                 if (index == childCount) {
+                   return appendixBuilder(context);
+                 }
+                 return builder(context, index);
+               },
          findChildIndexCallback: findChildIndexCallback,
          childCount: appendixBuilder == null ? childCount : childCount + 1,
          addAutomaticKeepAlives: addAutomaticKeepAlives,
@@ -320,13 +320,12 @@ class GagakuPagingController<PageKeyType, ItemType>
         data = fetchResult;
       }
 
-      final isLastPage =
-          _getIsLastPage != null
-              ? _getIsLastPage(state, data)
-              : (data.total != null
-                  ? ((state.items?.length ?? 0) + data.results.length >=
+      final isLastPage = _getIsLastPage != null
+          ? _getIsLastPage(state, data)
+          : (data.total != null
+                ? ((state.items?.length ?? 0) + data.results.length >=
                       data.total!)
-                  : data.results.isEmpty);
+                : data.results.isEmpty);
 
       // Update our state in case it was modified during the fetch operation.
       // This beaks atomicity, but is necessary to allow users to modify the state during a fetch.

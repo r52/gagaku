@@ -93,7 +93,9 @@ class MangaDexReaderPage extends ConsumerWidget {
       provider: _fetchChapterDataProvider(chapterId),
       loadingBuilder: (context, progress) => Scaffold(
         appBar: AppBar(leading: const BackButton()),
-        body: Center(child: CircularProgressIndicator(value: progress?.toDouble())),
+        body: Center(
+          child: CircularProgressIndicator(value: progress?.toDouble()),
+        ),
       ),
       errorBuilder: (context, child, _, _) => Scaffold(
         appBar: AppBar(leading: const BackButton()),
@@ -163,7 +165,9 @@ class MangaDexReaderWidget extends HookConsumerWidget {
       provider: _fetchChapterPagesProvider(chapter),
       loadingBuilder: (context, progress) => Scaffold(
         appBar: AppBar(leading: const BackButton()),
-        body: Center(child: CircularProgressIndicator(value: progress?.toDouble())),
+        body: Center(
+          child: CircularProgressIndicator(value: progress?.toDouble()),
+        ),
       ),
       errorBuilder: (context, child, _, _) => Scaffold(
         appBar: AppBar(leading: const BackButton()),
