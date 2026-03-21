@@ -23,8 +23,8 @@ class DirectoryReaderRouteBuilder<T> extends SlideTransitionRouteBuilder<T> {
     this.link,
     this.onLinkPressed,
   }) : super(
-         pageBuilder:
-             (context, animation, secondaryAnimation) => DirectoryReaderWidget(
+         pageBuilder: (context, animation, secondaryAnimation) =>
+             DirectoryReaderWidget(
                path: path,
                title: title,
                link: link,
@@ -40,16 +40,15 @@ Future<List<ReaderPage>> _getDirectoryPages(Ref ref, String path) async {
   final entities = await dir.list().toList();
   final files = entities.whereType<File>();
 
-  final pageFiles =
-      files
-          .where(
-            (element) =>
-                element.path.endsWith('.png') ||
-                element.path.endsWith('.jpg') ||
-                element.path.endsWith('.jpeg') ||
-                (formats.avif && element.path.endsWith(".avif")),
-          )
-          .toList();
+  final pageFiles = files
+      .where(
+        (element) =>
+            element.path.endsWith('.png') ||
+            element.path.endsWith('.jpg') ||
+            element.path.endsWith('.jpeg') ||
+            (formats.avif && element.path.endsWith(".avif")),
+      )
+      .toList();
 
   pageFiles.sort(
     (a, b) => compareNatural(a.uri.pathSegments.last, b.uri.pathSegments.last),
@@ -100,11 +99,10 @@ class DirectoryReaderWidget extends StatelessWidget {
 
     return DataProviderWhenWidget(
       provider: _getDirectoryPagesProvider(path),
-      errorBuilder:
-          (context, child, _, _) => Scaffold(
-            appBar: AppBar(leading: const BackButton()),
-            body: child,
-          ),
+      errorBuilder: (context, child, _, _) => Scaffold(
+        appBar: AppBar(leading: const BackButton()),
+        body: child,
+      ),
       builder: (context, pages) {
         if (pages.isEmpty) {
           return Scaffold(

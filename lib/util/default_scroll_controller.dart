@@ -41,8 +41,8 @@ class DefaultScrollController extends InheritedWidget {
   /// Returns true if this DefaultScrollController is configured to be
   /// automatically inherited.
   static bool shouldInherit(BuildContext context, Axis scrollDirection) {
-    final DefaultScrollController? result =
-        context.findAncestorWidgetOfExactType<DefaultScrollController>();
+    final DefaultScrollController? result = context
+        .findAncestorWidgetOfExactType<DefaultScrollController>();
     if (result == null) {
       return false;
     }
@@ -64,8 +64,8 @@ class DefaultScrollController extends InheritedWidget {
   /// * [DefaultScrollController.of], which is similar to this method, but
   ///   asserts if no [DefaultScrollController] ancestor is found.
   static ScrollController? maybeOf(BuildContext context, String path) {
-    final DefaultScrollController? result =
-        context.dependOnInheritedWidgetOfExactType<DefaultScrollController>();
+    final DefaultScrollController? result = context
+        .dependOnInheritedWidgetOfExactType<DefaultScrollController>();
     return result?.controllers?.get(path);
   }
 
