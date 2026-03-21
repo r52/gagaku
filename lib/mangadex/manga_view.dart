@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -426,10 +426,10 @@ class _MangaDexMangaViewWidgetState
                     fit: StackFit.passthrough,
                     children: [
                       CachedNetworkImage(
+                        cacheManager: ref.watch(extensionImageCacheProvider),
                         imageUrl: widget.manga.getFirstCoverUrl(
                           quality: CoverArtQuality.medium,
                         ),
-                        cacheManager: gagakuImageCache,
                         colorBlendMode: BlendMode.modulate,
                         color: Colors.grey,
                         fit: BoxFit.cover,
@@ -437,8 +437,12 @@ class _MangaDexMangaViewWidgetState
                             (context, url, downloadProgress) => const Center(
                               child: CircularProgressIndicator(),
                             ),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
+                        errorBuilder: (context, error, stacktrace) {
+                          return Tooltip(
+                            message: error.toString(),
+                            child: const Icon(Icons.error),
+                          );
+                        },
                       ),
                       Align(
                         alignment: Alignment.bottomLeft,
@@ -1248,7 +1252,7 @@ class _ChapterListHeader extends HookWidget {
   }
 }
 
-class _CoverArtItem extends HookWidget {
+class _CoverArtItem extends HookConsumerWidget {
   const _CoverArtItem({
     super.key,
     required this.cover,
@@ -1263,22 +1267,28 @@ class _CoverArtItem extends HookWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final aniController = useAnimationController(
       duration: const Duration(milliseconds: 100),
     );
     final url = manga.getUrlFromCover(cover);
+    final imageCache = ref.watch(extensionImageCacheProvider);
 
     final image = GridAlbumImage(
       animation: aniController.drive(Styles.coverArtGradientTween),
       child: CachedNetworkImage(
         imageUrl: url.quality(quality: CoverArtQuality.medium),
-        cacheManager: gagakuImageCache,
+        cacheManager: imageCache,
         width: 256.0,
         progressIndicatorBuilder: (context, url, downloadProgress) =>
             const Center(child: CircularProgressIndicator()),
-        errorWidget: (context, url, error) => const Icon(Icons.error),
+        errorBuilder: (context, error, stacktrace) {
+          return Tooltip(
+            message: error.toString(),
+            child: const Icon(Icons.error),
+          );
+        },
         fit: BoxFit.cover,
       ),
     );
@@ -1310,7 +1320,7 @@ class _CoverArtItem extends HookWidget {
   }
 }
 
-class _CoverArtPagedOverlay extends HookWidget {
+class _CoverArtPagedOverlay extends HookConsumerWidget {
   const _CoverArtPagedOverlay({
     required this.index,
     required this.items,
@@ -1322,8 +1332,10 @@ class _CoverArtPagedOverlay extends HookWidget {
   final Manga manga;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final controller = usePageController(initialPage: index);
+    final imageCache = ref.watch(extensionImageCacheProvider);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -1356,8 +1368,8 @@ class _CoverArtPagedOverlay extends HookWidget {
                   Navigator.pop(context);
                 },
                 child: CachedNetworkImage(
+                  cacheManager: imageCache,
                   imageUrl: url,
-                  cacheManager: gagakuImageCache,
                   imageBuilder: (context, imageProvider) {
                     return PhotoView(
                       backgroundDecoration: const BoxDecoration(
@@ -1372,7 +1384,12 @@ class _CoverArtPagedOverlay extends HookWidget {
                   fit: BoxFit.contain,
                   progressIndicatorBuilder: (context, url, downloadProgress) =>
                       const Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                  errorBuilder: (context, error, stacktrace) {
+                    return Tooltip(
+                      message: error.toString(),
+                      child: const Icon(Icons.error),
+                    );
+                  },
                 ),
               ),
             ),

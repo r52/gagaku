@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -7,9 +7,8 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.dart';
-import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/exception.dart';
-import 'package:gagaku/util/http.dart' show baseUserAgent;
+import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
@@ -132,7 +131,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
         },
       ),
     );
-    final refer = ref.watch(extensionReferrerProvider);
+    final headers = ref.watch(sourceHeadersProvider(handle.sourceId));
+    final imageCache = ref.watch(extensionImageCacheProvider);
     final api = ref.watch(proxyProvider);
     final theme = Theme.of(context);
 
@@ -146,8 +146,6 @@ class WebMangaViewWidget extends HookConsumerWidget {
     final shareUrl = useFuture(shareUrlFuture);
 
     final extdata = manga.data;
-
-    String referer = refer[handle.sourceId] ?? '';
 
     useEffect(() {
       if (cfg.preserveHistory) {
@@ -228,11 +226,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
                   children: [
                     CachedNetworkImage(
                       imageUrl: manga.cover,
-                      httpHeaders: {
-                        'referer': referer,
-                        'user-agent': baseUserAgent,
-                      },
-                      cacheManager: gagakuImageCache,
+                      httpHeaders: headers,
+                      cacheManager: imageCache,
                       memCacheWidth: 256,
                       maxWidthDiskCache: 256,
                       colorBlendMode: BlendMode.modulate,
@@ -241,8 +236,12 @@ class WebMangaViewWidget extends HookConsumerWidget {
                       progressIndicatorBuilder:
                           (context, url, downloadProgress) =>
                               const Center(child: CircularProgressIndicator()),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error),
+                      errorBuilder: (context, error, stacktrace) {
+                        return Tooltip(
+                          message: error.toString(),
+                          child: const Icon(Icons.error),
+                        );
+                      },
                     ),
                     Align(
                       alignment: Alignment.bottomRight,

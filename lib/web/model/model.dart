@@ -84,6 +84,24 @@ Map<String, String> extensionReferrer(Ref ref) {
   return UnmodifiableMapView(refer);
 }
 
+@riverpod
+Map<String, String> sourceHeaders(Ref ref, String sourceId) {
+  final referrers = ref.watch(extensionReferrerProvider);
+  final baseReferrer = referrers[sourceId] ?? '';
+
+  final headers = <String, String>{'user-agent': baseUserAgent};
+
+  if (sourceId != 'gist') {
+    headers['x-source-id'] = sourceId;
+  }
+
+  if (baseReferrer.isNotEmpty) {
+    headers['referer'] = baseReferrer;
+  }
+
+  return headers;
+}
+
 @Riverpod(keepAlive: true)
 ProxyHandler proxy(Ref ref) {
   return ProxyHandler(ref);
@@ -739,6 +757,7 @@ class ExtensionSource extends _$ExtensionSource {
   List<SearchFilter>? _filters;
   List<SortingOption>? _sortingOptions;
   final Map<String, SettingsForm> _forms = {};
+  List<Cookie>? _cookies;
 
   Timer? _completeTimer;
 
@@ -1071,6 +1090,47 @@ class ExtensionSource extends _$ExtensionSource {
             : null;
       }
 
+      if (url != null) {
+        CookieManager cookieManager = CookieManager.instance();
+        List<Cookie> cookies = await cookieManager.getCookies(
+          url: WebUri.uri(url),
+          webViewController: controller,
+        );
+        logger.d("cookies for ${url.toString()}:");
+
+        bool hasCf = false;
+        for (final cookie in cookies) {
+          logger.d("cookie: ${cookie.name} = ${cookie.value}");
+          if (cookie.name == 'cf_clearance') {
+            hasCf = true;
+          }
+        }
+
+        _cookies = cookies;
+
+        if (source.hasCapability(SourceIntents.cloudflareBypassRequired) &&
+            hasCf) {
+          logger.d("Setting Cloudflare bypass cookies for ${source.id}");
+          final jscook = cookies.map((e) => e.toJson()).toList();
+          await controller.callAsyncJavaScript(
+            arguments: {'cookies': jscook},
+            functionBody:
+                """
+var jc = cookies.map((e) => {
+  return {
+    name: e.name,
+    value: e.value,
+    domain: e.domain,
+    path: e.path,
+    expires: new Date(e.expiresDate * 1000)
+  };
+});
+await ${source.id}.saveCloudflareBypassCookies(jc);
+                """,
+          );
+        }
+      }
+
       logger.d("Extension ${source.name} ready");
       if (!completer.isCompleted) {
         completer.complete();
@@ -1392,7 +1452,7 @@ return p;
 
     try {
       result = await _controller?.evaluateJavascript(
-        source: "$sourceId?.getMangaShareUrl('$mangaId')",
+        source: "$sourceId.getMangaShareUrl?.('$mangaId')",
       );
     } catch (e) {
       return null;
@@ -1420,6 +1480,11 @@ return p;
 
     final filters = _filters?.map((e) => e.copyWith()).toList();
     return filters;
+  }
+
+  Future<List<Cookie>?> getCookies() async {
+    await future;
+    return _cookies;
   }
 }
 
