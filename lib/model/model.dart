@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/version.dart';
@@ -74,6 +75,9 @@ class GagakuData {
   // Default user agent
   final String gagakuUserAgent = '$kPackageName/$kPackageVersion';
 
+  // Dynamic user agent fetched from Webview
+  String? dynamicUserAgent;
+
   List<String> blockers = [];
   Map<String, dynamic> knownHosts = {};
 
@@ -81,10 +85,38 @@ class GagakuData {
     return _instance;
   }
 
+  Future<void> _fetchDynamicUserAgent() async {
+    HeadlessInAppWebView? headlessWebView;
+
+    headlessWebView = HeadlessInAppWebView(
+      initialUrlRequest: URLRequest(url: WebUri('about:blank')),
+      onLoadStop: (controller, url) async {
+        try {
+          final ua = await controller.evaluateJavascript(
+            source: 'navigator.userAgent',
+          );
+          if (ua is String && ua.isNotEmpty) {
+            dynamicUserAgent = ua;
+            logger.d("Fetched dynamic user agent: $dynamicUserAgent");
+          }
+        } catch (e) {
+          logger.e("Failed to evaluate user agent script", error: e);
+        } finally {
+          headlessWebView?.dispose();
+        }
+      },
+    );
+
+    await headlessWebView.run();
+  }
+
   Future<void> initData() async {
     extensionHost = await rootBundle.loadString(
       'assets/extensionhost/bundle.js',
     );
+
+    // Fire and forget finding the dynamic agent so we do not block runApp
+    _fetchDynamicUserAgent();
 
     final blockerUri = Uri.parse(_blockers);
     final hostsUri = Uri.parse(_knownHosts);

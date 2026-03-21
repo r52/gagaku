@@ -17,7 +17,8 @@ final _nextRequestTimes = <String, int>{};
 final _pools = <String, Pool>{};
 
 String getUserAgent([bool useCustomUA = false]) {
-  return useCustomUA ? GagakuData().gagakuUserAgent : baseUserAgent;
+  if (useCustomUA) return GagakuData().gagakuUserAgent;
+  return GagakuData().dynamicUserAgent ?? baseUserAgent;
 }
 
 CronetEngine createCronetEngine(String userAgent) => CronetEngine.build(
