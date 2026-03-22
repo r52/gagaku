@@ -32,6 +32,28 @@ class _HttpOverrides extends HttpOverrides {
 }
 
 void main() async {
+  HttpOverrides.global = _HttpOverrides();
+  WidgetsFlutterBinding.ensureInitialized();
+  LocaleSettings.useDeviceLocale();
+
+  PlatformInAppWebViewController.debugLoggingSettings.excludeFilter.add(
+    RegExp(r"onConsoleMessage"),
+  );
+
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
+  }
+
+  await InAppWebViewController.setJavaScriptBridgeName('gagaku');
+
+  timeagoLocalesMap.forEach((locale, lookupMessages) {
+    timeago.setLocaleMessages(locale, lookupMessages);
+  });
+
+  await Hive.initFlutter();
+  Hive.registerAdapter(CacheEntryAdapter());
+  await Hive.openLazyBox<CacheEntry>(gagakuCache);
+
   final appdir = await getApplicationSupportDirectory();
 
   if (kReleaseMode) {
@@ -54,28 +76,6 @@ void main() async {
                 ]))
         : null,
   );
-
-  HttpOverrides.global = _HttpOverrides();
-  WidgetsFlutterBinding.ensureInitialized();
-  LocaleSettings.useDeviceLocale();
-
-  PlatformInAppWebViewController.debugLoggingSettings.excludeFilter.add(
-    RegExp(r"onConsoleMessage"),
-  );
-
-  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-    await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
-  }
-
-  await InAppWebViewController.setJavaScriptBridgeName('gagaku');
-
-  timeagoLocalesMap.forEach((locale, lookupMessages) {
-    timeago.setLocaleMessages(locale, lookupMessages);
-  });
-
-  await Hive.initFlutter();
-  Hive.registerAdapter(CacheEntryAdapter());
-  await Hive.openLazyBox<CacheEntry>(gagakuCache);
 
   final gdat = GagakuData();
   await gdat.initData();
