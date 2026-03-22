@@ -89,7 +89,7 @@ Map<String, String> sourceHeaders(Ref ref, String sourceId) {
   final referrers = ref.watch(extensionReferrerProvider);
   final baseReferrer = referrers[sourceId] ?? '';
 
-  final headers = <String, String>{'user-agent': baseUserAgent};
+  final headers = <String, String>{'user-agent': getUserAgent()};
 
   if (sourceId != 'gist') {
     headers['x-source-id'] = sourceId;
