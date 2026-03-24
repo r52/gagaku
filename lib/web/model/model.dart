@@ -20,7 +20,6 @@ import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:native_dio_adapter/native_dio_adapter.dart' hide URLRequest;
-import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
@@ -730,8 +729,6 @@ class WebReadMarkers extends _$WebReadMarkers {
     return db;
   }
 }
-
-final webReadMarkerMutation = Mutation<ReadMarkersDB>();
 
 @riverpod
 Stream<List<WebSourceInfo>> installedSources(Ref ref) async* {

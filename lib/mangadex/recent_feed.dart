@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
@@ -55,8 +56,8 @@ class _MangaDexRecentFeedPageState
       final newItems = list.data.cast<Manga>();
 
       try {
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get(newItems);
+        ref.run((tsx) async {
+          return await tsx.get(statisticsProvider.notifier).get(newItems);
         });
       } catch (e) {
         logger.e(e, error: e);

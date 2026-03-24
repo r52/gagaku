@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/common.dart';
 import 'package:gagaku/mangadex/model/model.dart';
@@ -92,12 +93,11 @@ class MangaDexListViewPage extends HookConsumerWidget {
                       style: Styles.squareIconButtonStyle(
                         backgroundColor: theme.colorScheme.surfaceContainer,
                       ),
-                      onPressed: () =>
-                          followedListMutation(me?.id).run(ref, (ref) async {
-                            return await ref
-                                .get(followedListsProvider(me?.id).notifier)
-                                .setFollow(list, idx == -1);
-                          }),
+                      onPressed: () => ref.run((tsx) async {
+                        return await tsx
+                            .get(followedListsProvider(me?.id).notifier)
+                            .setFollow(list, idx == -1);
+                      }),
                       icon: Icon(
                         idx == -1 ? Icons.bookmark_border : Icons.bookmark,
                         color: idx == -1 ? null : theme.colorScheme.primary,

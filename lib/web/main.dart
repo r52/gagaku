@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -132,8 +133,8 @@ class WebSourceHomePage extends HookConsumerWidget {
                       );
 
                       if (result == true) {
-                        webReadMarkerMutation.run(ref, (ref) async {
-                          return await ref
+                        ref.run((tsx) async {
+                          return await tsx
                               .get(webReadMarkersProvider.notifier)
                               .clear();
                         });

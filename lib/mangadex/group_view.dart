@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/config.dart';
@@ -202,8 +203,8 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                 );
               }
 
-              mdConfigSaveMutation.run(ref, (ref) async {
-                return ref.get(mdConfigProvider.notifier).save(cfg.value);
+              ref.run((tsx) async {
+                return tsx.get(mdConfigProvider.notifier).save(cfg.value);
               });
             },
             icon: const Icon(Icons.block),
@@ -283,8 +284,8 @@ class __GroupTitlesTabState extends ConsumerState<_GroupTitlesTab> {
       final newItems = list.data.cast<Manga>();
 
       try {
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get(newItems);
+        ref.run((tsx) async {
+          return await tsx.get(statisticsProvider.notifier).get(newItems);
         });
       } catch (e) {
         logger.e(e, error: e);

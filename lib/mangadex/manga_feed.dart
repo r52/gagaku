@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
@@ -49,8 +50,8 @@ class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
       );
 
       try {
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get(mangas);
+        ref.run((tsx) async {
+          return await tsx.get(statisticsProvider.notifier).get(mangas);
         });
       } catch (e) {
         logger.e(e, error: e);

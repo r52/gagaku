@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
@@ -48,8 +49,8 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                   icon: const Icon(Icons.save),
                   label: Text(tr.saveSettings),
                   onPressed: () {
-                    mdConfigSaveMutation.run(ref, (ref) async {
-                      return ref
+                    ref.run((tsx) async {
+                      return tsx
                           .get(mdConfigProvider.notifier)
                           .save(config.value);
                     });

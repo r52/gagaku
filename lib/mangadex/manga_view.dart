@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:gagaku/util/riverpod.dart';
 
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:collection/collection.dart';
@@ -50,11 +51,11 @@ Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
   );
 
   await (
-    statisticsMutation.run(ref, (ref) async {
-      return await ref.get(statisticsProvider.notifier).get(manga);
+    ref.run((tsx) async {
+      return await tsx.get(statisticsProvider.notifier).get(manga);
     }),
-    readChaptersMutation(me?.id).run(ref, (ref) async {
-      return await ref.get(readChaptersProvider(me?.id).notifier).get(manga);
+    ref.run((tsx) async {
+      return await tsx.get(readChaptersProvider(me?.id).notifier).get(manga);
     }),
   ).wait;
 
@@ -132,8 +133,8 @@ class _MangaDexMangaViewWidgetState
       final chapters = chapterlist.data.cast<Chapter>();
 
       try {
-        chapterStatsMutation.run(ref, (ref) async {
-          return await ref.get(chapterStatsProvider.notifier).get(chapters);
+        ref.run((tsx) async {
+          return await tsx.get(chapterStatsProvider.notifier).get(chapters);
         });
       } catch (e) {
         logger.e(e, error: e);
@@ -200,11 +201,11 @@ class _MangaDexMangaViewWidgetState
 
       try {
         await (
-          statisticsMutation.run(ref, (ref) async {
-            return await ref.get(statisticsProvider.notifier).get(mangas);
+          ref.run((tsx) async {
+            return await tsx.get(statisticsProvider.notifier).get(mangas);
           }),
-          readChaptersMutation(me?.id).run(ref, (ref) async {
-            return await ref
+          ref.run((tsx) async {
+            return await tsx
                 .get(readChaptersProvider(me?.id).notifier)
                 .get(mangas);
           }),
@@ -857,10 +858,8 @@ class _MangaDexMangaViewWidgetState
                                     );
 
                                     if (chapters != null && result == true) {
-                                      readChaptersMutation(me.id).run(ref, (
-                                        ref,
-                                      ) async {
-                                        return await ref
+                                      ref.run((tsx) async {
+                                        return await tsx
                                             .get(
                                               readChaptersProvider(
                                                 me.id,
@@ -1204,8 +1203,8 @@ class _ChapterListSliver extends HookConsumerWidget {
             onMarkRead: me == null
                 ? null
                 : (setRead) async {
-                    readChaptersMutation(me).run(ref, (ref) async {
-                      return await ref
+                    ref.run((tsx) async {
+                      return await tsx
                           .get(readChaptersProvider(me).notifier)
                           .set(
                             manga,

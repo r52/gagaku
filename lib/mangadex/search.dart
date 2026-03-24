@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:gagaku/util/riverpod.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -72,8 +73,8 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
 
       if (manga.isNotEmpty) {
         try {
-          statisticsMutation.run(ref, (ref) async {
-            return await ref.get(statisticsProvider.notifier).get(manga);
+          ref.run((tsx) async {
+            return await tsx.get(statisticsProvider.notifier).get(manga);
           });
         } catch (e) {
           logger.e(e, error: e);

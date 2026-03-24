@@ -991,7 +991,7 @@ final class ReadingStatusProvider
   }
 }
 
-String _$readingStatusHash() => r'1bb7981672107353b2541655a469d88aca120aa0';
+String _$readingStatusHash() => r'f22028d84f6dbddd11f45002d902bb74efce5201';
 
 final class ReadingStatusFamily extends $Family
     with
@@ -1153,7 +1153,7 @@ final class MangaDexHistoryProvider
   MangaDexHistory create() => MangaDexHistory();
 }
 
-String _$mangaDexHistoryHash() => r'69a7136e00bba032eb52913de7e66d3bc8429d49';
+String _$mangaDexHistoryHash() => r'f53a33c95e663c7c440b47c01f3c74036b08630c';
 
 abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
   FutureOr<Queue<Chapter>> build();

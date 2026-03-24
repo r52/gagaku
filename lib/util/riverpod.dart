@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:meta/meta.dart';
+import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod/misc.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:gagaku/log.dart';
@@ -183,5 +184,12 @@ extension RefWorkaround on Ref {
     } finally {
       sub.close();
     }
+  }
+}
+
+extension MutationTargetExtension on MutationTarget {
+  Future<R> run<R>(Future<R> Function(MutationTransaction tsx) cb) {
+    final mut = Mutation<R>();
+    return mut.run(this, cb);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:animations/animations.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -46,8 +47,8 @@ class GridExtentSlider extends ConsumerWidget {
               gridAlbumExtent: GridAlbumExtent.values.elementAt(value.toInt()),
             );
 
-            gagakuConfigSaveMutation.run(ref, (ref) async {
-              return ref.get(gagakuSettingsProvider.notifier).save(c);
+            ref.run((tsx) async {
+              return tsx.get(gagakuSettingsProvider.notifier).save(c);
             });
           },
         ),

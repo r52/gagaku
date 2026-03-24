@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
-import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'config.freezed.dart';
@@ -46,5 +45,3 @@ class LocalConfig extends _$LocalConfig {
     return update;
   }
 }
-
-final localConfigSaveMutation = Mutation<LocalLibConfig>();

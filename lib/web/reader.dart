@@ -271,8 +271,8 @@ class WebSourceReaderWidget extends HookConsumerWidget {
 
       timer.value = Timer(const Duration(milliseconds: 2000), () async {
         if (readKey != null) {
-          webReadMarkerMutation.run(ref, (ref) async {
-            return await ref
+          ref.run((tsx) async {
+            return await tsx
                 .get(webReadMarkersProvider.notifier)
                 .set(handle.getKey(), readKey!, true);
           });

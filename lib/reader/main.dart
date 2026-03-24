@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:gagaku/util/riverpod.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -99,8 +100,8 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
   }
 
   void _saveSetting(ReaderConfig updated) {
-    readerConfigSaveMutation.run(ref, (ref) async {
-      return ref.get(readerSettingsProvider.notifier).save(updated);
+    ref.run((tsx) async {
+      return tsx.get(readerSettingsProvider.notifier).save(updated);
     });
   }
 

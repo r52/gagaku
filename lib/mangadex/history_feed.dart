@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
@@ -45,16 +46,16 @@ class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
 
       try {
         await (
-          statisticsMutation.run(ref, (ref) async {
-            return await ref.get(statisticsProvider.notifier).get(mangas);
+          ref.run((tsx) async {
+            return await tsx.get(statisticsProvider.notifier).get(mangas);
           }),
-          readChaptersMutation(me?.id).run(ref, (ref) async {
-            return await ref
+          ref.run((tsx) async {
+            return await tsx
                 .get(readChaptersProvider(me?.id).notifier)
                 .get(mangas);
           }),
-          chapterStatsMutation.run(ref, (ref) async {
-            return await ref.get(chapterStatsProvider.notifier).get(chapters);
+          ref.run((tsx) async {
+            return await tsx.get(chapterStatsProvider.notifier).get(chapters);
           }),
         ).wait;
       } catch (e) {

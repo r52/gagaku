@@ -1,4 +1,5 @@
 import 'package:file_picker/file_picker.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -42,8 +43,8 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
                   icon: const Icon(Icons.save),
                   label: Text(saveSettings),
                   onPressed: () {
-                    localConfigSaveMutation.run(ref, (ref) async {
-                      return ref
+                    ref.run((tsx) async {
+                      return tsx
                           .get(localConfigProvider.notifier)
                           .save(config.value);
                     });

@@ -2004,8 +2004,6 @@ class ReadChapters extends _$ReadChapters {
   }
 }
 
-final readChaptersMutation = Mutation<ReadChaptersMap>();
-
 @riverpod
 Future<ReadChapterSet?> mangaReadChapters(Ref ref, Manga manga) async {
   final me = await ref.watch(loggedUserProvider.future);
@@ -2067,8 +2065,6 @@ class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
     ref.invalidateSelf();
   }
 }
-
-final userLibraryMutation = Mutation<Map<String, MangaReadingStatus>>();
 
 @riverpod
 class UserLists extends _$UserLists
@@ -2254,7 +2250,6 @@ class FollowedLists extends _$FollowedLists
   }
 }
 
-final followedListMutation = Mutation<bool>();
 final followedListNextPageMutation = Mutation<List<CustomList>>();
 
 Future<List<Manga>> getMangaListByPage(
@@ -2273,8 +2268,8 @@ Future<List<Manga>> getMangaListByPage(
     ids: range,
   );
 
-  statisticsMutation.run(ref, (ref) async {
-    return await ref.get(statisticsProvider.notifier).get(mangas);
+  ref.run((tsx) async {
+    return await tsx.get(statisticsProvider.notifier).get(mangas);
   });
 
   return mangas;
@@ -2360,8 +2355,6 @@ class Statistics extends _$Statistics {
   }
 }
 
-final statisticsMutation = Mutation<Map<String, MangaStatistics>>();
-
 @riverpod
 Future<MangaStatistics> mangaStatistics(Ref ref, Manga manga) async {
   // Makes the assumption that globalCache[manga.id] should never
@@ -2412,8 +2405,6 @@ class ChapterStats extends _$ChapterStats {
     return map;
   }
 }
-
-final chapterStatsMutation = Mutation<Map<String, ChapterStatistics>>();
 
 @riverpod
 class Ratings extends _$Ratings with AutoDisposeExpiryMix {
@@ -2499,8 +2490,8 @@ class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
     bool success = await api.setMangaReadingStatus(manga, resolved);
     if (success) {
       if (ref.exists(userLibraryProvider(me.id))) {
-        userLibraryMutation(me.id).run(ref, (ref) async {
-          return await ref
+        ref.run((tsx) async {
+          return await tsx
               .get(userLibraryProvider(me.id).notifier)
               .set(manga, resolved);
         });
@@ -2590,8 +2581,8 @@ class MangaDexHistory extends _$MangaDexHistory {
 
     final chapters = await api.fetchChapters(uuids);
 
-    chapterStatsMutation.run(ref, (ref) async {
-      return await ref.get(chapterStatsProvider.notifier).get(chapters);
+    ref.run((tsx) async {
+      return await tsx.get(chapterStatsProvider.notifier).get(chapters);
     });
 
     return Queue.of(chapters);
@@ -2627,8 +2618,6 @@ class MangaDexHistory extends _$MangaDexHistory {
     return chapter;
   }
 }
-
-final mangadexHistoryMutation = Mutation<Chapter>();
 
 @Riverpod(keepAlive: true)
 class LoggedUser extends _$LoggedUser {
