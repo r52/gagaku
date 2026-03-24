@@ -977,7 +977,7 @@ class _MangaChaptersView extends StatelessWidget {
   }
 }
 
-class _MangaCoversView extends StatelessWidget {
+class _MangaCoversView extends HookWidget {
   const _MangaCoversView({required this.manga, required this.controller});
 
   final Manga manga;
@@ -985,43 +985,159 @@ class _MangaCoversView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
+    final state = useValueListenable(controller);
+
+    final selectedLocales = useState<Set<String?>?>(null);
+
+    final discoveredLocales = useMemoized(() {
+      final items = state.items;
+      if (items == null) return <String?>{};
+      return items.map((e) => e.attributes?.locale).toSet();
+    }, [state.items]);
+
+    useEffect(() {
+      if (selectedLocales.value == null &&
+          state.items != null &&
+          state.items!.isNotEmpty) {
+        final originalLang = manga.attributes?.originalLanguage.code;
+        if (discoveredLocales.contains(originalLang)) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            selectedLocales.value = {originalLang};
+          });
+        } else {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            selectedLocales.value = {};
+          });
+        }
+      }
+      return null;
+    }, [state.items, discoveredLocales, manga]);
+
+    final currentSelected = selectedLocales.value ?? {};
+
+    final filteredState = useMemoized(() {
+      if (state.pages == null) return state;
+      if (currentSelected.isEmpty) return state;
+
+      final newPages = state.pages!.map((page) {
+        return page.where((item) {
+          return currentSelected.contains(item.attributes?.locale);
+        }).toList();
+      }).toList();
+
+      return PagingState<int, CoverArt>(
+        error: state.error,
+        pages: newPages,
+        keys: state.keys,
+        hasNextPage: state.hasNextPage,
+        isLoading: state.isLoading,
+      );
+    }, [state, currentSelected]);
+
+    useEffect(() {
+      if (filteredState.items != null &&
+          filteredState.items!.length < 10 &&
+          filteredState.hasNextPage &&
+          !filteredState.isLoading) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          controller.fetchNextPage();
+        });
+      }
+      return null;
+    }, [filteredState]);
+
     return CustomScrollView(
       slivers: [
-        PagingListener(
-          controller: controller,
-          builder: (context, state, fetchNextPage) {
-            return PagedSliverGrid(
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 256,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-                childAspectRatio: 0.7,
-              ),
-              state: state,
-              fetchNextPage: fetchNextPage,
-              builderDelegate: PagedChildBuilderDelegate<CoverArt>(
-                animateTransitions: true,
-                itemBuilder: (context, item, index) => _CoverArtItem(
-                  key: ValueKey(item.id),
-                  cover: item,
-                  manga: manga,
-                  page: index,
-                  onTap: () async {
-                    Navigator.push(
-                      context,
-                      TransparentOverlay(
-                        builder: (context) => _CoverArtPagedOverlay(
-                          index: index,
-                          manga: manga,
-                          items: state.items!,
-                        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
+            child: Row(
+              children: [
+                MenuAnchor(
+                  menuChildren: discoveredLocales.map((loc) {
+                    final isSelected = currentSelected.contains(loc);
+                    final lang = Languages.get(loc ?? 'NULL');
+                    final label = tr[lang.label]?.toString() ?? tr.ui.unknown;
+
+                    return CheckboxMenuButton(
+                      value: isSelected,
+                      onChanged: (bool? checked) {
+                        final newSet = Set<String?>.from(currentSelected);
+                        if (checked == true) {
+                          newSet.add(loc);
+                        } else {
+                          newSet.remove(loc);
+                        }
+                        selectedLocales.value = newSet;
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (loc != null && lang != Language.other) ...[
+                            CountryFlag(flag: lang.flag),
+                            const SizedBox(width: 8),
+                          ],
+                          Text(label),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  builder: (context, menu, child) {
+                    return ActionChip(
+                      avatar: const Icon(Icons.translate, size: 16),
+                      onPressed: () {
+                        if (menu.isOpen) {
+                          menu.close();
+                        } else {
+                          menu.open();
+                        }
+                      },
+                      label: Text(
+                        currentSelected.isEmpty
+                            ? tr.ui.allLocales
+                            : tr.ui.selected(count: currentSelected.length),
                       ),
                     );
                   },
                 ),
-              ),
-            );
-          },
+              ],
+            ),
+          ),
+        ),
+        PagedSliverGrid(
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 256,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 0.7,
+          ),
+          state: filteredState,
+          fetchNextPage: controller.fetchNextPage,
+          builderDelegate: PagedChildBuilderDelegate<CoverArt>(
+            animateTransitions: true,
+            itemBuilder: (context, item, index) => _CoverArtItem(
+              key: ValueKey(item.id),
+              cover: item,
+              manga: manga,
+              page: index,
+              onTap: () async {
+                Navigator.push(
+                  context,
+                  TransparentOverlay(
+                    builder: (context) => _CoverArtPagedOverlay(
+                      index: index,
+                      manga: manga,
+                      items: filteredState.items!,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
       ],
     );
