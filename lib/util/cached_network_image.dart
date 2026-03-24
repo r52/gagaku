@@ -4,6 +4,7 @@ import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/http.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -163,6 +164,7 @@ class ExtensionHttpClient extends http.BaseClient {
       }
 
       if (sourceId != null && sourceId.isNotEmpty && sourceId != 'gist') {
+        await _ref.readAsync(extensionSourceProvider(sourceId).future);
         final cookies = await _ref
             .read(extensionSourceProvider(sourceId).notifier)
             .getCookies();
