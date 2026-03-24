@@ -1779,9 +1779,8 @@ class _UserListsMenu extends ConsumerWidget {
       menuChildren: [
         if (userLists != null)
           for (final list in userLists)
-            CheckboxListTile(
-              controlAffinity: ListTileControlAffinity.leading,
-              title: Text(list.attributes.name),
+            CheckboxMenuButton(
+              closeOnActivate: false,
               value: list.set.contains(manga.id),
               onChanged: (bool? value) async {
                 userListModifyMutation(me?.id).run(ref, (ref) async {
@@ -1790,6 +1789,7 @@ class _UserListsMenu extends ConsumerWidget {
                       .updateList(list, manga, value == true);
                 });
               },
+              child: Text(list.attributes.name),
             ),
         MenuItemButton(
           child: Text(tr.mangadex.createNewListBtn),

@@ -302,9 +302,8 @@ class SelectRowBuilder extends HookConsumerWidget {
                   ),
                   menuChildren: [
                     for (final option in element.options)
-                      CheckboxListTile(
-                        controlAffinity: ListTileControlAffinity.leading,
-                        title: Text(option.title),
+                      CheckboxMenuButton(
+                        closeOnActivate: false,
                         value: data.value.contains(option.id),
                         onChanged: (bool? value) async {
                           if (value == true) {
@@ -325,6 +324,7 @@ class SelectRowBuilder extends HookConsumerWidget {
                               .read(extensionSourceProvider(source.id).notifier)
                               .callBinding(element.onValueChange, [data.value]);
                         },
+                        child: Text(option.title),
                       ),
                   ],
                   child: Column(

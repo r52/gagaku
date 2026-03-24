@@ -579,9 +579,8 @@ class FavoritesButton extends HookWidget {
     final menuChildren = <Widget>[
       if (favorites.isNotEmpty) ...[
         for (final cat in favorites)
-          CheckboxListTile(
-            controlAffinity: ListTileControlAffinity.leading,
-            title: Text(cat.name),
+          CheckboxMenuButton(
+            closeOnActivate: false,
             value: favList.contains(cat.dbid),
             onChanged: (bool? value) async {
               if (value == true) {
@@ -590,6 +589,7 @@ class FavoritesButton extends HookWidget {
                 manager.remove(cat, link);
               }
             },
+            child: Text(cat.name),
           ),
         if (isFavorited)
           MenuItemButton(
