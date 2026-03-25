@@ -113,9 +113,12 @@ class _MangaDexMangaViewWidgetState
   static const chapterInfo = MangaDexFeeds.mangaChapters;
   static const coverInfo = MangaDexFeeds.mangaCovers;
 
-  late final _chapterController = GagakuPagingController<int, Chapter>(
-    getNextPageKey: (state) =>
-        state.keys?.last != null ? state.keys!.last + chapterInfo.limit : 0,
+  late final _chapterManager = OffsetPagingManager<Chapter>(
+    limit: chapterInfo.limit,
+  );
+
+  late final _chapterController = PagingController<int, Chapter>(
+    getNextPageKey: _chapterManager.getNextPageKey,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final sort = ref.watch(mangaChaptersListSortProvider);
@@ -130,6 +133,8 @@ class _MangaDexMangaViewWidgetState
         ignoreOriginalLanguage: true,
       );
 
+      _chapterManager.totalItems = chapterlist.total;
+
       final chapters = chapterlist.data.cast<Chapter>();
 
       try {
@@ -140,30 +145,27 @@ class _MangaDexMangaViewWidgetState
         logger.e(e, error: e);
       }
 
-      return PageResultsMetaData(chapters, chapterlist.total);
-    },
-    refresh: () async {
-      final api = ref.watch(mangadexProvider);
-      await api.invalidateAll('${chapterInfo.key}(${widget.manga.id}');
+      return chapters;
     },
   );
 
-  late final _coverController = GagakuPagingController<int, CoverArt>(
-    getNextPageKey: (state) =>
-        state.keys?.last != null ? state.keys!.last + coverInfo.limit : 0,
+  late final _coverManager = OffsetPagingManager<CoverArt>(
+    limit: coverInfo.limit,
+  );
+
+  late final _coverController = PagingController<int, CoverArt>(
+    getNextPageKey: _coverManager.getNextPageKey,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final covers = await api.getCoverList(widget.manga, offset: pageKey);
 
-      return PageResultsMetaData(covers.data.cast<CoverArt>(), covers.total);
-    },
-    refresh: () async {
-      final api = ref.watch(mangadexProvider);
-      await api.invalidateAll('${coverInfo.key}(${widget.manga.id}');
+      _coverManager.totalItems = covers.total;
+
+      return covers.data.cast<CoverArt>();
     },
   );
 
-  late final _relatedController = GagakuPagingController<int, Manga>(
+  late final _relatedController = PagingController<int, Manga>(
     getNextPageKey: (state) {
       if (widget.manga.relatedMangas.isEmpty) {
         return null;
@@ -184,11 +186,11 @@ class _MangaDexMangaViewWidgetState
       final related = widget.manga.relatedMangas;
 
       if (related.isEmpty) {
-        return PageResultsMetaData([]);
+        return [];
       }
 
-      final me = await ref.watch(loggedUserProvider.future);
-      final api = ref.watch(mangadexProvider);
+      final me = await ref.readAsync(loggedUserProvider.future);
+      final api = ref.read(mangadexProvider);
       final ids = related.map((e) => e.id).toList();
       final page = ids.getRange(
         pageKey,
@@ -214,7 +216,7 @@ class _MangaDexMangaViewWidgetState
         logger.e(e, error: e);
       }
 
-      return PageResultsMetaData(mangas, widget.manga.relatedMangas.length);
+      return mangas;
     },
   );
 
@@ -376,8 +378,16 @@ class _MangaDexMangaViewWidgetState
 
           switch (_ViewType.values[tabview]) {
             case _ViewType.chapters:
+              _chapterManager.reset();
+              await ref
+                  .read(mangadexProvider)
+                  .invalidateAll('${chapterInfo.key}(${widget.manga.id}');
               return _chapterController.refresh();
             case _ViewType.art:
+              _coverManager.reset();
+              await ref
+                  .read(mangadexProvider)
+                  .invalidateAll('${coverInfo.key}(${widget.manga.id}');
               return _coverController.refresh();
             case _ViewType.related:
               return _relatedController.refresh();

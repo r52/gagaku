@@ -1,3 +1,4 @@
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -5,7 +6,6 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/model/common.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
-import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/extension_settings.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -428,9 +428,13 @@ class _DiscoverSectionPage extends StatefulHookConsumerWidget {
 class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
   dynamic metadata = _firstSearch;
 
-  late final _pagingController = GagakuPagingController<dynamic, HistoryLink>(
-    getNextPageKey: (state) =>
-        state.keys?.last == null ? _firstSearch : metadata,
+  late final _pagingController = PagingController<dynamic, HistoryLink>(
+    getNextPageKey: (state) {
+      if (state.keys != null && state.keys!.isNotEmpty && metadata == null) {
+        return null; // end of list
+      }
+      return state.keys?.last == null ? _firstSearch : metadata;
+    },
     fetchPage: (pageKey) async {
       final results = await ref
           .read(extensionSourceProvider(widget.source.id).notifier)
@@ -445,11 +449,7 @@ class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
 
       metadata = results.metadata;
 
-      return PageResultsMetaData(m.toList());
-    },
-    getIsLastPage: (_, _) => metadata == null,
-    refresh: () async {
-      metadata = _firstSearch;
+      return m.toList();
     },
   );
 
@@ -478,7 +478,10 @@ class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
         leading: const BackButton(),
       ),
       body: RefreshIndicator(
-        onRefresh: () async => _pagingController.refresh(),
+        onRefresh: () async {
+          metadata = _firstSearch;
+          _pagingController.refresh();
+        },
         child: WebMangaListWidget(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: controller,

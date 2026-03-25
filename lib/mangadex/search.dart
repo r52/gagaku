@@ -1,3 +1,4 @@
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'dart:async';
 import 'package:gagaku/util/riverpod.dart';
 
@@ -55,9 +56,15 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
       widget.parameters ??
       const MangaSearchParameters(query: '', filter: MangaFilters());
 
-  late final _pagingController = GagakuPagingController<int, Manga>(
-    getNextPageKey: (state) =>
-        state.keys?.last != null ? state.keys!.last + info.limit : 0,
+  late final _pagingManager = OffsetPagingManager<Manga>(limit: info.limit);
+
+  void _refresh() {
+    _pagingManager.reset();
+    _pagingController.refresh();
+  }
+
+  late final _pagingController = PagingController<int, Manga>(
+    getNextPageKey: _pagingManager.getNextPageKey,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final filter = _searchParameters;
@@ -68,6 +75,8 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
         filter: filter.filter,
         offset: pageKey,
       );
+
+      _pagingManager.totalItems = results.total;
 
       final manga = results.data.cast<Manga>();
 
@@ -81,7 +90,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
         }
       }
 
-      return PageResultsMetaData(manga, results.total);
+      return manga;
     },
   );
 
@@ -155,7 +164,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                                 filter: result,
                               );
 
-                              _pagingController.refresh();
+                              _refresh();
                             });
                           }
                         },
@@ -190,7 +199,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                         filter: filter.filter,
                       );
 
-                      _pagingController.refresh();
+                      _refresh();
                     });
                   },
                 );
@@ -215,7 +224,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                     filter: filter.filter,
                   );
 
-                  _pagingController.refresh();
+                  _refresh();
                 });
               },
               suggestionsBuilder:
@@ -250,7 +259,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                                   filter: filter.filter,
                                 );
 
-                                _pagingController.refresh();
+                                _refresh();
                               });
                             },
                           ),
@@ -286,7 +295,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                         filter: filter.filter.copyWith(order: order),
                       );
 
-                      _pagingController.refresh();
+                      _refresh();
                     });
                   }
                 },
