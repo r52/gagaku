@@ -850,6 +850,32 @@ class ExtensionSource extends _$ExtensionSource {
         onWebViewCreated: (controller) {
           _setupJavaScriptHandlers(controller, sourceId);
         },
+        onReceivedError: (controller, request, error) {
+          if (request.isForMainFrame == true) {
+            controller.stopLoading();
+            if (!completer.isCompleted) {
+              final ex = Exception(
+                "Source startup failed. Main frame encountered error: ${error.description}",
+              );
+              completer.completeError(ex);
+            }
+          }
+        },
+        onReceivedHttpError: (controller, request, response) {
+          if (request.isForMainFrame == true) {
+            final int code = response.statusCode ?? 0;
+            // 503/403 are occasionally expected during CloudFlare challenge processing
+            if (code == 404 || (code >= 500 && code != 503)) {
+              controller.stopLoading();
+              if (!completer.isCompleted) {
+                final ex = Exception(
+                  "Source startup failed. Main frame received HTTP $code",
+                );
+                completer.completeError(ex);
+              }
+            }
+          }
+        },
         onLoadStop: (controller, url) =>
             _onWebViewLoadStop(controller, url, source!, completer),
       );
