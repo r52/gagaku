@@ -24,7 +24,7 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final scrollController =
-        DefaultScrollController.maybeOf(context, 'WebSourceFavoritesPage') ??
+        DefaultScrollController.maybeOf(context) ??
         controller ??
         useScrollController();
 

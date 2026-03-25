@@ -41,7 +41,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
     final messenger = ScaffoldMessenger.of(context);
     final theme = Theme.of(context);
     final scrollController =
-        DefaultScrollController.maybeOf(context, 'MangaDexListsPage') ??
+        DefaultScrollController.maybeOf(context) ??
         controller ??
         useScrollController();
     final view = useState(_ListViewType.self);

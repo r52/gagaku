@@ -25,7 +25,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
     final cfg = ref.watch(webConfigProvider);
 
     final scrollController =
-        DefaultScrollController.maybeOf(context, 'WebSourceHistoryPage') ??
+        DefaultScrollController.maybeOf(context) ??
         controller ??
         useScrollController();
     // final historyProvider = ref.watch(webSourceHistoryProvider);

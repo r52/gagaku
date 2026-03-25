@@ -259,7 +259,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
     final api = ref.watch(proxyProvider);
     final t = context.t;
     final scrollController =
-        DefaultScrollController.maybeOf(context, 'WebSourceUpdatesPage') ??
+        DefaultScrollController.maybeOf(context) ??
         widget.controller ??
         useScrollController();
 

@@ -76,7 +76,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final scrollController =
-        DefaultScrollController.maybeOf(context, 'WebSourceFrontPage') ??
+        DefaultScrollController.maybeOf(context) ??
         controller ??
         useScrollController();
 

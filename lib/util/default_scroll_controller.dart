@@ -9,26 +9,18 @@ library;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-typedef DefaultScrollControllerSet = Map<String, ScrollController>;
-
-extension DefaultScrollControllerExt on DefaultScrollControllerSet {
-  ScrollController? get(String path) {
-    return containsKey(path) ? this[path] : null;
-  }
-}
-
 /// Associates a [ScrollController] with a subtree.
 class DefaultScrollController extends InheritedWidget {
   /// Creates a widget that associates a [ScrollController] with a subtree.
   const DefaultScrollController({
     super.key,
-    required DefaultScrollControllerSet this.controllers,
+    required ScrollController this.controller,
     required super.child,
   });
 
   /// Creates a subtree without an associated [ScrollController].
   const DefaultScrollController.none({super.key, required super.child})
-    : controllers = null;
+    : controller = null;
 
   /// The [ScrollController] associated with the subtree.
   ///
@@ -36,7 +28,7 @@ class DefaultScrollController extends InheritedWidget {
   ///
   ///  * [ScrollView.controller], which discusses the purpose of specifying a
   ///    scroll controller.
-  final DefaultScrollControllerSet? controllers;
+  final ScrollController? controller;
 
   /// Returns true if this DefaultScrollController is configured to be
   /// automatically inherited.
@@ -63,10 +55,10 @@ class DefaultScrollController extends InheritedWidget {
   ///
   /// * [DefaultScrollController.of], which is similar to this method, but
   ///   asserts if no [DefaultScrollController] ancestor is found.
-  static ScrollController? maybeOf(BuildContext context, String path) {
+  static ScrollController? maybeOf(BuildContext context) {
     final DefaultScrollController? result = context
         .dependOnInheritedWidgetOfExactType<DefaultScrollController>();
-    return result?.controllers?.get(path);
+    return result?.controller;
   }
 
   /// Returns the [ScrollController] most closely associated with the given
@@ -82,8 +74,8 @@ class DefaultScrollController extends InheritedWidget {
   ///
   /// * [DefaultScrollController.maybeOf], which is similar to this method, but
   ///   returns null if no [DefaultScrollController] ancestor is found.
-  static ScrollController of(BuildContext context, String path) {
-    final ScrollController? controller = maybeOf(context, path);
+  static ScrollController of(BuildContext context) {
+    final ScrollController? controller = maybeOf(context);
     assert(() {
       if (controller == null) {
         throw FlutterError(
@@ -104,16 +96,16 @@ class DefaultScrollController extends InheritedWidget {
 
   @override
   bool updateShouldNotify(DefaultScrollController oldWidget) =>
-      controllers != oldWidget.controllers;
+      controller != oldWidget.controller;
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties.add(
-      DiagnosticsProperty<DefaultScrollControllerSet>(
-        'controllers',
-        controllers,
-        ifNull: 'no controllers',
+      DiagnosticsProperty<ScrollController>(
+        'controller',
+        controller,
+        ifNull: 'no controller',
         showName: false,
       ),
     );

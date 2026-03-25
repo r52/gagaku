@@ -71,7 +71,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
     final t = context.t;
     final me = ref.watch(loggedUserProvider).value;
     final scrollController =
-        DefaultScrollController.maybeOf(context, 'MangaDexLibraryPage') ??
+        DefaultScrollController.maybeOf(context) ??
         controller ??
         useScrollController();
     final statuses = useMemoized(

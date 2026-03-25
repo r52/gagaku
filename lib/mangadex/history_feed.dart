@@ -76,7 +76,7 @@ class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
   Widget build(BuildContext context) {
     final t = context.t;
     final scrollController =
-        DefaultScrollController.maybeOf(context, 'MangaDexHistoryFeedPage') ??
+        DefaultScrollController.maybeOf(context) ??
         widget.controller ??
         useScrollController();
 
