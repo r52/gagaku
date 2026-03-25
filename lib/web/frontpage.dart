@@ -26,20 +26,22 @@ class _ExtensionHomeCard extends ConsumerWidget {
     final nav = Navigator.of(context);
     final tr = context.t;
     final source = extensionInfo;
+    final state = ref.watch(extensionSourceProvider(source.id));
+    final theme = Theme.of(context);
 
-    return Card(
-      child: ListTile(
-        leading: source.icon.isNotEmpty
-            ? Image.network(source.icon, width: 36, height: 36)
-            : const Icon(Icons.rss_feed),
-        title: Text(source.name),
-        onTap: source.hasCapability(SourceIntents.discoverSections)
+    Widget? subtitle;
+    Widget? trailing;
+    VoidCallback? onTap;
+
+    switch (state) {
+      case AsyncData():
+        onTap = source.hasCapability(SourceIntents.discoverSections)
             ? () => ExtensionHomeRoute(
                 sourceId: source.id,
                 source: source,
               ).push(context)
-            : null,
-        trailing: Row(
+            : null;
+        trailing = Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (source.hasCapability(SourceIntents.settingsUI))
@@ -61,7 +63,80 @@ class _ExtensionHomeCard extends ConsumerWidget {
                 tooltip: tr.search.arg(arg: source.name),
               ),
           ],
-        ),
+        );
+      case AsyncLoading():
+        subtitle = const Align(
+          alignment: Alignment.centerLeft,
+          child: SizedBox(
+            width: 100,
+            height: 2,
+            child: LinearProgressIndicator(
+              borderRadius: BorderRadius.all(Radius.circular(2)),
+            ),
+          ),
+        );
+        trailing = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (source.hasCapability(SourceIntents.settingsUI))
+              IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () => nav.push(
+                  SlideTransitionRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        ExtensionSettingsPage(source: source),
+                  ),
+                ),
+                tooltip: tr.webSources.source.settings,
+              ),
+            if (source.hasCapability(SourceIntents.mangaSearch))
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: null,
+                tooltip: tr.search.arg(arg: source.name),
+              ),
+          ],
+        );
+      case AsyncError(:final error):
+        subtitle = Text(
+          error.toString(),
+          style: TextStyle(color: theme.colorScheme.error),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        );
+        trailing = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (source.hasCapability(SourceIntents.settingsUI))
+              IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () => nav.push(
+                  SlideTransitionRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        ExtensionSettingsPage(source: source),
+                  ),
+                ),
+                tooltip: tr.webSources.source.settings,
+              ),
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () =>
+                  ref.invalidate(extensionSourceProvider(source.id)),
+              tooltip: tr.ui.retry,
+            ),
+          ],
+        );
+    }
+
+    return Card(
+      child: ListTile(
+        leading: source.icon.isNotEmpty
+            ? Image.network(source.icon, width: 36, height: 36)
+            : const Icon(Icons.rss_feed),
+        title: Text(source.name),
+        subtitle: subtitle,
+        onTap: onTap,
+        trailing: trailing,
       ),
     );
   }
