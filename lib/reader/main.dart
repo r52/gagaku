@@ -57,23 +57,24 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
   final ListController listController = ListController();
   final PageController pageController = PageController(initialPage: 0);
 
-  late final List<PhotoViewScaleStateController> scaleStateController;
-  late final List<PhotoViewController> viewController;
+  final Map<int, PhotoViewScaleStateController> _scaleControllers = {};
+  final Map<int, PhotoViewController> _viewControllers = {};
 
   int _cacheScheduleToken = 0;
 
+  PhotoViewController _getViewController(int index) {
+    return _viewControllers.putIfAbsent(index, () => PhotoViewController());
+  }
+
+  PhotoViewScaleStateController _getScaleController(int index) {
+    return _scaleControllers.putIfAbsent(
+      index,
+      () => PhotoViewScaleStateController(),
+    );
+  }
+
   @override
   void initState() {
-    scaleStateController = List<PhotoViewScaleStateController>.generate(
-      widget.pages.length,
-      (index) => PhotoViewScaleStateController(),
-    );
-
-    viewController = List<PhotoViewController>.generate(
-      widget.pages.length,
-      (index) => PhotoViewController(),
-    );
-
     super.initState();
     subtext.value =
         widget.subtitle ??
@@ -88,11 +89,11 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     listController.dispose();
     pageController.dispose();
 
-    for (final controller in scaleStateController) {
+    for (final controller in _scaleControllers.values) {
       controller.dispose();
     }
 
-    for (final controller in viewController) {
+    for (final controller in _viewControllers.values) {
       controller.dispose();
     }
 
@@ -303,8 +304,9 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     switch (settings.direction) {
       case ReaderDirection.leftToRight:
       case ReaderDirection.rightToLeft:
-        viewController[currentPage.value].position =
-            viewController[currentPage.value].position + Offset(0.0, offset);
+        final currentController = _getViewController(currentPage.value);
+        currentController.position =
+            currentController.position + Offset(0.0, offset);
         break;
     }
 
@@ -341,8 +343,9 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     switch (settings.direction) {
       case ReaderDirection.leftToRight:
       case ReaderDirection.rightToLeft:
-        viewController[currentPage.value].position =
-            viewController[currentPage.value].position - Offset(0.0, offset);
+        final currentController = _getViewController(currentPage.value);
+        currentController.position =
+            currentController.position - Offset(0.0, offset);
         break;
     }
 
@@ -547,9 +550,11 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                           );
                         }
                       : () {
-                          scaleStateController[currentPage.value]
-                              .scaleState = defaultScaleStateCycle(
-                            scaleStateController[currentPage.value].scaleState,
+                          final currentController = _getScaleController(
+                            currentPage.value,
+                          );
+                          currentController.scaleState = defaultScaleStateCycle(
+                            currentController.scaleState,
                           );
                         },
                 ),
@@ -750,8 +755,8 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
               return PhotoViewGalleryPageOptions(
                 heroAttributes: PhotoViewHeroAttributes(tag: page.id),
                 imageProvider: page.provider,
-                controller: viewController[index],
-                scaleStateController: scaleStateController[index],
+                controller: _getViewController(index),
+                scaleStateController: _getScaleController(index),
                 minScale: PhotoViewComputedScale.contained * 1.0,
                 maxScale: PhotoViewComputedScale.covered * 5.0,
                 initialScale: PhotoViewComputedScale.contained,
