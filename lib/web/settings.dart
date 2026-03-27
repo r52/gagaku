@@ -185,10 +185,12 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                       );
 
                       if (result == true) {
-                        ref.read(extensionStateProvider.notifier).clearAll();
-                        ref
-                            .read(extensionSecureStateProvider.notifier)
-                            .clearAll();
+                        await ref.run((tsx) async {
+                          tsx.get(extensionStateProvider.notifier).clearAll();
+                          tsx
+                              .get(extensionSecureStateProvider.notifier)
+                              .clearAll();
+                        });
                         if (!context.mounted) return;
                         ScaffoldMessenger.of(context)
                           ..removeCurrentSnackBar()

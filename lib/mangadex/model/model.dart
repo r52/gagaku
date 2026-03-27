@@ -2285,13 +2285,17 @@ class ListSource extends _$ListSource {
     if (list != null) {
       final me = await ref.watch(loggedUserProvider.future);
       if (me != null) {
-        if (ref.exists(userListsProvider(me.id))) {
-          ref.read(userListsProvider(me.id).notifier).replaceList(list);
-        }
+        await ref.run((tsx) async {
+          if (ref.exists(userListsProvider(me.id))) {
+            await tsx.get(userListsProvider(me.id).notifier).replaceList(list);
+          }
 
-        if (ref.exists(followedListsProvider(me.id))) {
-          ref.read(followedListsProvider(me.id).notifier).replaceList(list);
-        }
+          if (ref.exists(followedListsProvider(me.id))) {
+            await tsx
+                .get(followedListsProvider(me.id).notifier)
+                .replaceList(list);
+          }
+        });
       }
     }
 
