@@ -154,11 +154,12 @@ class MangaDexListViewPage extends HookConsumerWidget {
                           child: HookConsumer(
                             builder: (context, ref, child) {
                               final page = useValueListenable(currentPage);
-                              final data = useMemoized(
-                                () => getMangaListByPage(ref, list.set, page),
-                                [list.set, page, refresh.value],
+                              final future = useMangaListFetcher(
+                                ref,
+                                list.set,
+                                page,
+                                [refresh.value],
                               );
-                              final future = useFuture(data);
 
                               return MangaListWidget(
                                 title: Text(

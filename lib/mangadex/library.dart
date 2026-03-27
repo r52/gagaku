@@ -10,7 +10,6 @@ import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
-import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
@@ -28,22 +27,6 @@ class LibraryViewType extends _$LibraryViewType {
   MangaReadingStatus update(
     MangaReadingStatus Function(MangaReadingStatus state) cb,
   ) => state = cb(state);
-}
-
-@Riverpod(retry: noRetry)
-Future<List<String>> _getLibraryListByType(
-  Ref ref,
-  MangaReadingStatus type,
-) async {
-  final me = await ref.watch(loggedUserProvider.future);
-  final library = await ref.watch(userLibraryProvider(me?.id).future);
-
-  final results = library.entries
-      .where((element) => element.value == type)
-      .map((e) => e.key)
-      .toList();
-
-  return results;
 }
 
 @Dependencies([chipTextStyle])
@@ -132,77 +115,87 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                 return RefreshIndicator(
                   key: ValueKey('LibraryTab(${me?.id}, $type)'),
                   onRefresh: () async {
-                    ref.read(userLibraryProvider(me?.id).notifier).clear();
-                    return ref.refresh(
-                      _getLibraryListByTypeProvider(type).future,
-                    );
+                    await ref
+                        .read(userLibraryProvider(me?.id).notifier)
+                        .clear();
+                    return ref.refresh(userLibraryProvider(me?.id).future);
                   },
                   child: DataProviderWhenWidget(
-                    provider: _getLibraryListByTypeProvider(type),
-                    builder: (context, list) => Column(
-                      children: [
-                        Expanded(
-                          child: HookConsumer(
-                            builder: (context, ref, child) {
-                              final page = useValueListenable(currentPage);
-                              final data = useMemoized(
-                                () => getMangaListByPage(ref, list, page),
-                                [list, page],
-                              );
-                              final future = useFuture(data);
+                    provider: userLibraryProvider(me?.id).select(
+                      (data) => data.whenData(
+                        (library) => library.entries
+                            .where((element) => element.value == type)
+                            .map((e) => e.key)
+                            .toList(),
+                      ),
+                    ),
+                    builder: (context, list) {
+                      return Column(
+                        children: [
+                          Expanded(
+                            child: HookConsumer(
+                              builder: (context, ref, child) {
+                                final page = useValueListenable(currentPage);
+                                final future = useMangaListFetcher(
+                                  ref,
+                                  list,
+                                  page,
+                                );
 
-                              return MangaListWidget(
-                                title: Text(
-                                  t.num_manga(n: list.length),
-                                  style: CommonTextStyles.twentyfour,
-                                ),
-                                scrollBehavior: MouseTouchScrollBehavior()
-                                    .copyWith(scrollbars: false),
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                noController: true,
-                                future: future,
-                                leading: [
-                                  SliverOverlapInjector(
-                                    handle:
-                                        NestedScrollView.sliverOverlapAbsorberHandleFor(
-                                          context,
-                                        ),
+                                return MangaListWidget(
+                                  title: Text(
+                                    t.num_manga(n: list.length),
+                                    style: CommonTextStyles.twentyfour,
                                   ),
-                                ],
-                                children: [
-                                  if (future.hasData &&
-                                      (future.data == null ||
-                                          future.data!.isEmpty))
-                                    SliverToBoxAdapter(
-                                      child: Center(
-                                        child: Text(t.errors.notitles),
-                                      ),
+                                  scrollBehavior: MouseTouchScrollBehavior()
+                                      .copyWith(scrollbars: false),
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  noController: true,
+                                  future: future,
+                                  leading: [
+                                    SliverOverlapInjector(
+                                      handle:
+                                          NestedScrollView.sliverOverlapAbsorberHandleFor(
+                                            context,
+                                          ),
                                     ),
-                                  if (future.hasData && future.data != null)
-                                    MangaListViewSliver(items: future.data),
-                                ],
+                                  ],
+                                  children: [
+                                    if (future.hasData &&
+                                        (future.data == null ||
+                                            future.data!.isEmpty))
+                                      SliverToBoxAdapter(
+                                        child: Center(
+                                          child: Text(t.errors.notitles),
+                                        ),
+                                      ),
+                                    if (future.hasData && future.data != null)
+                                      MangaListViewSliver(items: future.data),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                          HookBuilder(
+                            builder: (context) {
+                              final _ = useValueListenable(currentPage);
+                              return NumberPaginator(
+                                numberPages: max(
+                                  (list.length / MangaDexEndpoints.searchLimit)
+                                      .ceil(),
+                                  1,
+                                ),
+                                onPageChange: (int index) {
+                                  scrollController.jumpTo(0.0);
+                                  currentPage.value = index;
+                                },
                               );
                             },
                           ),
-                        ),
-                        HookBuilder(
-                          builder: (context) {
-                            final _ = useValueListenable(currentPage);
-                            return NumberPaginator(
-                              numberPages: max(
-                                (list.length / MangaDexEndpoints.searchLimit)
-                                    .ceil(),
-                                1,
-                              ),
-                              onPageChange: (int index) {
-                                scrollController.jumpTo(0.0);
-                                currentPage.value = index;
-                              },
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                        ],
+                      );
+                    },
                   ),
                 );
               },

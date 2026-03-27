@@ -272,11 +272,11 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                   child: HookConsumer(
                     builder: (context, ref, child) {
                       final page = useValueListenable(currentPage);
-                      final data = useMemoized(
-                        () => getMangaListByPage(ref, selected.state, page),
-                        [selected.state, page],
+                      final future = useMangaListFetcher(
+                        ref,
+                        selected.state,
+                        page,
                       );
-                      final future = useFuture(data);
 
                       return MangaListWidget(
                         title: Text(

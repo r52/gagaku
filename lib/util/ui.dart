@@ -629,7 +629,7 @@ class DataProviderWhenWidget<T> extends ConsumerWidget {
     this.loadingWidget,
   });
 
-  final Refreshable<AsyncValue<T>> provider;
+  final ProviderListenable<AsyncValue<T>> provider;
   final AsyncValue<T>? initialData;
   final DataBuilder<T> builder;
   final ErrorWrapperBuilder? errorBuilder;

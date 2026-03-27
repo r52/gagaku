@@ -977,6 +977,21 @@ class ChapterButtonWidget extends StatelessWidget {
   }
 }
 
+AsyncSnapshot<List<Manga>> useMangaListFetcher(
+  WidgetRef ref,
+  Iterable<String> list,
+  int page, [
+  List<Object?> keys = const <Object>[],
+]) {
+  return useFuture(
+    useMemoized(() => getMangaListByPage(ref, list, page), [
+      list,
+      page,
+      ...keys,
+    ]),
+  );
+}
+
 class MangaListWidget extends HookConsumerWidget {
   const MangaListWidget({
     super.key,
