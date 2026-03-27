@@ -711,7 +711,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                 minScale: PhotoViewComputedScale.contained * 1.0,
                 maxScale: PhotoViewComputedScale.covered * 5.0,
                 initialScale: PhotoViewComputedScale.contained,
-                basePosition: Alignment.topCenter,
+                basePosition: Alignment.center,
                 onTapUp: (context, details, value) {
                   focusNode.requestFocus();
 
