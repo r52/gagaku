@@ -570,6 +570,12 @@ class TranslationsReaderEn {
 
 	/// en: 'Page Preload'
 	String get precacheCount => 'Page Preload';
+
+	/// en: 'Go to page'
+	String get gotoPage => 'Go to page';
+
+	/// en: 'Page ${current} of ${total}'
+	String pageCount({required Object current, required Object total}) => 'Page ${current} of ${total}';
 }
 
 // Path: mangadex
@@ -1911,6 +1917,8 @@ extension on Translations {
 			'reader.swipeGestures' => 'Swipe Gestures',
 			'reader.clickToTurn' => 'Click/Tap to Turn Page',
 			'reader.precacheCount' => 'Page Preload',
+			'reader.gotoPage' => 'Go to page',
+			'reader.pageCount' => ({required Object current, required Object total}) => 'Page ${current} of ${total}',
 			'mangadex.home' => 'Home',
 			'mangadex.myFeed' => 'My Feed',
 			'mangadex.myLists' => 'My Lists',

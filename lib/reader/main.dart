@@ -1,6 +1,8 @@
 import 'dart:math';
+import 'dart:ui';
 import 'package:gagaku/util/riverpod.dart';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -485,62 +487,6 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                       ),
                     ),
                   ),
-                HookBuilder(
-                  builder: (context) {
-                    final page = useValueListenable(currentPage);
-                    final pagesDropDown = useMemoized(
-                      () => List<DropdownMenuEntry<int>>.generate(
-                        pageCount,
-                        (int index) => DropdownMenuEntry<int>(
-                          value: index,
-                          label: (index + 1).toString(),
-                        ),
-                      ),
-                      [pageCount],
-                    );
-
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 10.0,
-                      children: [
-                        OutlinedButton(
-                          onPressed: (page > 0)
-                              ? () => jumpToPreviousPage(format: format)
-                              : null,
-                          child: const Icon(Icons.arrow_back_ios_new),
-                        ),
-                        DropdownMenu<int>(
-                          initialSelection: page,
-                          width: 80.0,
-                          enableFilter: false,
-                          enableSearch: false,
-                          requestFocusOnTap: false,
-                          inputDecorationTheme: InputDecorationTheme(
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                width: 2.0,
-                                color: theme.colorScheme.inversePrimary,
-                              ),
-                            ),
-                          ),
-                          onSelected: (int? index) {
-                            if (index != null) {
-                              jumpToPage(index, format: format);
-                            }
-                          },
-                          dropdownMenuEntries: pagesDropDown,
-                        ),
-                        OutlinedButton(
-                          onPressed: (page < pageCount - 1)
-                              ? () => jumpToNextPage(format: format)
-                              : null,
-                          child: const Icon(Icons.arrow_forward_ios),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                const Divider(),
                 Text(tr.reader.settings, style: CommonTextStyles.twentyBold),
                 Wrap(
                   alignment: WrapAlignment.center,
@@ -560,10 +506,10 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                       ),
                   ],
                 ),
-                ActionChip(
-                  avatar: Icon(Icons.fit_screen, color: theme.iconTheme.color),
-                  label: Text(tr.reader.togglePageSize),
-                  onPressed: (format == ReaderFormat.longstrip)
+                ListTile(
+                  leading: const Icon(Icons.fit_screen),
+                  title: Text(tr.reader.togglePageSize),
+                  onTap: (format == ReaderFormat.longstrip)
                       ? () {
                           longStripScale.value = toggleLongStripScale(
                             longStripScale.value,
@@ -598,49 +544,31 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                       ),
                   ],
                 ),
-                ActionChip(
-                  avatar: Icon(
-                    settings.showProgressBar
-                        ? Icons.donut_small
-                        : Icons.donut_small_outlined,
-                    color: theme.iconTheme.color,
-                  ),
-                  label: Text(tr.reader.progressBar),
-                  onPressed: () => _saveSetting(
-                    settings.copyWith(
-                      showProgressBar: !settings.showProgressBar,
-                    ),
-                  ),
+                SwitchListTile(
+                  secondary: const Icon(Icons.donut_small),
+                  title: Text(tr.reader.progressBar),
+                  value: settings.showProgressBar,
+                  onChanged: (value) =>
+                      _saveSetting(settings.copyWith(showProgressBar: value)),
                 ),
-                ActionChip(
-                  avatar: Icon(
-                    Icons.swipe,
-                    color: settings.swipeGestures
-                        ? theme.iconTheme.color
-                        : theme.disabledColor,
-                  ),
-                  label: Text(tr.reader.swipeGestures),
-                  onPressed: (format == ReaderFormat.longstrip)
+                SwitchListTile(
+                  secondary: const Icon(Icons.swipe),
+                  title: Text(tr.reader.swipeGestures),
+                  value: settings.swipeGestures,
+                  onChanged: (format == ReaderFormat.longstrip)
                       ? null
-                      : () => _saveSetting(
-                          settings.copyWith(
-                            swipeGestures: !settings.swipeGestures,
-                          ),
+                      : (value) => _saveSetting(
+                          settings.copyWith(swipeGestures: value),
                         ),
                 ),
-                ActionChip(
-                  avatar: Icon(
-                    Icons.mouse,
-                    color: settings.clickToTurn
-                        ? theme.iconTheme.color
-                        : theme.disabledColor,
-                  ),
-                  label: Text(tr.reader.clickToTurn),
-                  onPressed: (format == ReaderFormat.longstrip)
+                SwitchListTile(
+                  secondary: const Icon(Icons.mouse),
+                  title: Text(tr.reader.clickToTurn),
+                  value: settings.clickToTurn,
+                  onChanged: (format == ReaderFormat.longstrip)
                       ? null
-                      : () => _saveSetting(
-                          settings.copyWith(clickToTurn: !settings.clickToTurn),
-                        ),
+                      : (value) =>
+                            _saveSetting(settings.copyWith(clickToTurn: value)),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -818,18 +746,24 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
           ? AnimatedSlide(
               offset: showUI.value ? Offset.zero : const Offset(0, 1),
               duration: const Duration(milliseconds: 200),
-              child: ProgressIndicator(
+              child: ReaderProgressIndicator(
                 reverse:
                     (format != ReaderFormat.longstrip) &&
                     settings.direction == ReaderDirection.rightToLeft,
                 currentPage: currentPage,
                 itemCount: pageCount,
-                onPageSelected: (index) => animateToPage(
-                  index,
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeInOut,
-                  format: format,
-                ),
+                onPageSelected: (index, isDrag) {
+                  if (isDrag) {
+                    jumpToPage(index, format: format);
+                  } else {
+                    animateToPage(
+                      index,
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeInOut,
+                      format: format,
+                    );
+                  }
+                },
               ),
             )
           : null,
@@ -837,8 +771,8 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
   }
 }
 
-class ProgressIndicator extends HookWidget {
-  const ProgressIndicator({
+class ReaderProgressIndicator extends HookWidget {
+  const ReaderProgressIndicator({
     super.key,
     required this.currentPage,
     required this.itemCount,
@@ -849,7 +783,7 @@ class ProgressIndicator extends HookWidget {
 
   final ValueNotifier<int> currentPage;
   final int itemCount;
-  final ValueChanged<int> onPageSelected;
+  final void Function(int, bool) onPageSelected;
   final Color? color;
   final bool reverse;
 
@@ -857,7 +791,9 @@ class ProgressIndicator extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progressColor = color ?? Theme.of(context).colorScheme.primary;
+    final theme = Theme.of(context);
+    final tr = context.t;
+    final progressColor = color ?? theme.colorScheme.primary;
 
     final sections = useMemoized(
       () => List<Widget>.generate(
@@ -868,11 +804,9 @@ class ProgressIndicator extends HookWidget {
           currentPage: currentPage,
           color: progressColor,
           height: _barHeight,
-          tooltip: (index + 1).toString(),
-          onTap: () => onPageSelected(index),
         ),
       ),
-      [itemCount, progressColor, onPageSelected],
+      [itemCount, progressColor],
     );
 
     final children = useMemoized(
@@ -880,21 +814,128 @@ class ProgressIndicator extends HookWidget {
       [sections, reverse],
     );
 
-    return ConstrainedBox(
-      constraints: BoxConstraints.loose(const Size.fromHeight(30)),
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-            stops: [0.0, 0.6],
-            colors: [Color.fromARGB(255, 0, 0, 0), Colors.transparent],
+    void handleTapOrDrag(Offset localPosition, double totalWidth, bool isDrag) {
+      if (totalWidth <= 0) return;
+      double dx = localPosition.dx;
+      if (reverse) dx = totalWidth - dx;
+      final int index = ((dx / totalWidth) * itemCount)
+          .clamp(0, itemCount - 1)
+          .floor();
+      onPageSelected(index, isDrag);
+    }
+
+    final page = useValueListenable(currentPage);
+
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          stops: [0.0, 1.0],
+          colors: [Color.fromARGB(200, 0, 0, 0), Colors.transparent],
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface.withAlpha(217),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      enableDrag: false,
+                      backgroundColor: theme.colorScheme.surface,
+                      builder: (context) {
+                        return SizedBox(
+                          height: 250,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  tr.reader.gotoPage,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: ScrollConfiguration(
+                                  behavior: ScrollConfiguration.of(context)
+                                      .copyWith(
+                                        dragDevices: {
+                                          PointerDeviceKind.mouse,
+                                          PointerDeviceKind.touch,
+                                          PointerDeviceKind.trackpad,
+                                        },
+                                      ),
+                                  child: CupertinoPicker(
+                                    scrollController:
+                                        FixedExtentScrollController(
+                                          initialItem: page,
+                                        ),
+                                    itemExtent: 40,
+                                    onSelectedItemChanged: (index) {
+                                      onPageSelected(index, false);
+                                    },
+                                    children: List.generate(itemCount, (index) {
+                                      return Center(
+                                        child: Text('${index + 1}'),
+                                      );
+                                    }),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: Text(
+                    tr.reader.pageCount(current: page + 1, total: itemCount),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: children,
-        ),
+          const SizedBox(height: 8.0),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTapDown: (details) => handleTapOrDrag(
+                  details.localPosition,
+                  constraints.maxWidth,
+                  false,
+                ),
+                onHorizontalDragUpdate: (details) => handleTapOrDrag(
+                  details.localPosition,
+                  constraints.maxWidth,
+                  true,
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints.loose(const Size.fromHeight(30)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: children,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -907,16 +948,12 @@ class _ProgressBarSection extends HookWidget {
     required this.currentPage,
     required this.color,
     required this.height,
-    required this.tooltip,
-    required this.onTap,
   });
 
   final int index;
   final ValueNotifier<int> currentPage;
   final Color color;
   final double height;
-  final String tooltip;
-  final GestureTapCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -925,18 +962,12 @@ class _ProgressBarSection extends HookWidget {
         useListenableSelector(currentPage, () => currentPage.value >= index);
 
     return Expanded(
-      child: Tooltip(
-        message: tooltip,
-        child: InkWell(
-          onTap: onTap,
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: SizedBox(
-              height: height,
-              width: double.infinity,
-              child: ColoredBox(color: isFilled ? color : Colors.transparent),
-            ),
-          ),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: SizedBox(
+          height: height,
+          width: double.infinity,
+          child: ColoredBox(color: isFilled ? color : Colors.transparent),
         ),
       ),
     );
