@@ -179,6 +179,19 @@ class GagakuData {
           headlessWebView?.dispose();
         }
       },
+      onReceivedError: (controller, request, error) {
+        logger.e(
+          'Failed to get dynamic user agent: ${error.description}',
+          error: error,
+        );
+        headlessWebView?.dispose();
+      },
+      onReceivedHttpError: (controller, request, errorResponse) {
+        logger.e(
+          'Failed to get dynamic user agent with status: ${errorResponse.statusCode}',
+        );
+        headlessWebView?.dispose();
+      },
     );
 
     await headlessWebView.run();
