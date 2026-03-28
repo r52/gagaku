@@ -376,6 +376,15 @@ class _MangaDexMangaViewWidgetState
             ref.invalidate(readingStatusProvider(widget.manga));
           }
 
+          final me = ref.read(loggedUserProvider).value;
+          if (me != null) {
+            await ref.run((tsx) async {
+              await tsx
+                  .get(readChaptersProvider(me.id).notifier)
+                  .invalidate(widget.manga);
+            });
+          }
+
           switch (_ViewType.values[tabview]) {
             case _ViewType.chapters:
               _chapterManager.reset();

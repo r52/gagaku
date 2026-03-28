@@ -2002,6 +2002,16 @@ class ReadChapters extends _$ReadChapters {
 
     return oldstate;
   }
+
+  /// Invalidate the read chapters of a specific manga
+  Future<void> invalidate(Manga manga) async {
+    final oldstate = await future;
+
+    if (oldstate.containsKey(manga.id)) {
+      oldstate.remove(manga.id);
+      state = AsyncData({...oldstate});
+    }
+  }
 }
 
 @riverpod
