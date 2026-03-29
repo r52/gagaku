@@ -145,16 +145,16 @@ class MangaDexReaderWidget extends HookConsumerWidget {
           );
 
           if (readData?.contains(chapter.id) != true) {
-            readChaptersMutation(me.id).run(ref, (ref) async {
-              return await ref
+            ref.run((tsx) async {
+              return await tsx
                   .get(readChaptersProvider(me.id).notifier)
                   .set(manga, read: [chapter]);
             });
           }
         }
 
-        mangadexHistoryMutation.run(ref, (ref) async {
-          return await ref.get(mangaDexHistoryProvider.notifier).add(chapter);
+        ref.run((tsx) async {
+          return await tsx.get(mangaDexHistoryProvider.notifier).add(chapter);
         });
       });
 

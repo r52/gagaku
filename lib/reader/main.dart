@@ -1,5 +1,8 @@
 import 'dart:math';
+import 'dart:ui';
+import 'package:gagaku/util/riverpod.dart';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -56,23 +59,24 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
   final ListController listController = ListController();
   final PageController pageController = PageController(initialPage: 0);
 
-  late final List<PhotoViewScaleStateController> scaleStateController;
-  late final List<PhotoViewController> viewController;
+  final Map<int, PhotoViewScaleStateController> _scaleControllers = {};
+  final Map<int, PhotoViewController> _viewControllers = {};
 
   int _cacheScheduleToken = 0;
 
+  PhotoViewController _getViewController(int index) {
+    return _viewControllers.putIfAbsent(index, () => PhotoViewController());
+  }
+
+  PhotoViewScaleStateController _getScaleController(int index) {
+    return _scaleControllers.putIfAbsent(
+      index,
+      () => PhotoViewScaleStateController(),
+    );
+  }
+
   @override
   void initState() {
-    scaleStateController = List<PhotoViewScaleStateController>.generate(
-      widget.pages.length,
-      (index) => PhotoViewScaleStateController(),
-    );
-
-    viewController = List<PhotoViewController>.generate(
-      widget.pages.length,
-      (index) => PhotoViewController(),
-    );
-
     super.initState();
     subtext.value =
         widget.subtitle ??
@@ -87,11 +91,11 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     listController.dispose();
     pageController.dispose();
 
-    for (final controller in scaleStateController) {
+    for (final controller in _scaleControllers.values) {
       controller.dispose();
     }
 
-    for (final controller in viewController) {
+    for (final controller in _viewControllers.values) {
       controller.dispose();
     }
 
@@ -99,8 +103,8 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
   }
 
   void _saveSetting(ReaderConfig updated) {
-    readerConfigSaveMutation.run(ref, (ref) async {
-      return ref.get(readerSettingsProvider.notifier).save(updated);
+    ref.run((tsx) async {
+      return tsx.get(readerSettingsProvider.notifier).save(updated);
     });
   }
 
@@ -302,8 +306,9 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     switch (settings.direction) {
       case ReaderDirection.leftToRight:
       case ReaderDirection.rightToLeft:
-        viewController[currentPage.value].position =
-            viewController[currentPage.value].position + Offset(0.0, offset);
+        final currentController = _getViewController(currentPage.value);
+        currentController.position =
+            currentController.position + Offset(0.0, offset);
         break;
     }
 
@@ -340,8 +345,9 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     switch (settings.direction) {
       case ReaderDirection.leftToRight:
       case ReaderDirection.rightToLeft:
-        viewController[currentPage.value].position =
-            viewController[currentPage.value].position - Offset(0.0, offset);
+        final currentController = _getViewController(currentPage.value);
+        currentController.position =
+            currentController.position - Offset(0.0, offset);
         break;
     }
 
@@ -350,6 +356,23 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final showUI = useState(false);
+
+    useEffect(() {
+      if (showUI.value) {
+        SystemChrome.setEnabledSystemUIMode(
+          SystemUiMode.manual,
+          overlays: SystemUiOverlay.values,
+        );
+      } else {
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+      }
+      return () => SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: SystemUiOverlay.values,
+      );
+    }, [showUI.value]);
+
     final tr = context.t;
     final pageCount = widget.pages.length;
     final focusNode = useFocusNode();
@@ -396,34 +419,37 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     }, [listController, settings.precacheCount, format]);
 
     return Scaffold(
-      extendBodyBehindAppBar: false,
-      appBar: AppBar(
-        leading: const BackButton(),
-        title: ListTile(
-          title: Text(
-            widget.title,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          subtitle: HookBuilder(
-            builder: (_) {
-              final value = useValueListenable(subtext);
-              if (value == null) {
-                return const SizedBox.shrink();
-              }
+      extendBodyBehindAppBar: true,
+      appBar: SlidingAppBar(
+        visible: showUI.value,
+        child: AppBar(
+          leading: const BackButton(),
+          title: ListTile(
+            title: Text(
+              widget.title,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: HookBuilder(
+              builder: (_) {
+                final value = useValueListenable(subtext);
+                if (value == null) {
+                  return const SizedBox.shrink();
+                }
 
-              return Text(value);
-            },
-          ),
-        ),
-        actions: [
-          Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () => Scaffold.of(context).openEndDrawer(),
-              tooltip: tr.reader.settings,
+                return Text(value);
+              },
             ),
           ),
-        ],
+          actions: [
+            Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () => Scaffold.of(context).openEndDrawer(),
+                tooltip: tr.reader.settings,
+              ),
+            ),
+          ],
+        ),
       ),
       endDrawer: Drawer(
         width: 320,
@@ -461,62 +487,6 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                       ),
                     ),
                   ),
-                HookBuilder(
-                  builder: (context) {
-                    final page = useValueListenable(currentPage);
-                    final pagesDropDown = useMemoized(
-                      () => List<DropdownMenuEntry<int>>.generate(
-                        pageCount,
-                        (int index) => DropdownMenuEntry<int>(
-                          value: index,
-                          label: (index + 1).toString(),
-                        ),
-                      ),
-                      [pageCount],
-                    );
-
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 10.0,
-                      children: [
-                        OutlinedButton(
-                          onPressed: (page > 0)
-                              ? () => jumpToPreviousPage(format: format)
-                              : null,
-                          child: const Icon(Icons.arrow_back_ios_new),
-                        ),
-                        DropdownMenu<int>(
-                          initialSelection: page,
-                          width: 80.0,
-                          enableFilter: false,
-                          enableSearch: false,
-                          requestFocusOnTap: false,
-                          inputDecorationTheme: InputDecorationTheme(
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                width: 2.0,
-                                color: theme.colorScheme.inversePrimary,
-                              ),
-                            ),
-                          ),
-                          onSelected: (int? index) {
-                            if (index != null) {
-                              jumpToPage(index, format: format);
-                            }
-                          },
-                          dropdownMenuEntries: pagesDropDown,
-                        ),
-                        OutlinedButton(
-                          onPressed: (page < pageCount - 1)
-                              ? () => jumpToNextPage(format: format)
-                              : null,
-                          child: const Icon(Icons.arrow_forward_ios),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                const Divider(),
                 Text(tr.reader.settings, style: CommonTextStyles.twentyBold),
                 Wrap(
                   alignment: WrapAlignment.center,
@@ -536,19 +506,21 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                       ),
                   ],
                 ),
-                ActionChip(
-                  avatar: Icon(Icons.fit_screen, color: theme.iconTheme.color),
-                  label: Text(tr.reader.togglePageSize),
-                  onPressed: (format == ReaderFormat.longstrip)
+                ListTile(
+                  leading: const Icon(Icons.fit_screen),
+                  title: Text(tr.reader.togglePageSize),
+                  onTap: (format == ReaderFormat.longstrip)
                       ? () {
                           longStripScale.value = toggleLongStripScale(
                             longStripScale.value,
                           );
                         }
                       : () {
-                          scaleStateController[currentPage.value]
-                              .scaleState = defaultScaleStateCycle(
-                            scaleStateController[currentPage.value].scaleState,
+                          final currentController = _getScaleController(
+                            currentPage.value,
+                          );
+                          currentController.scaleState = defaultScaleStateCycle(
+                            currentController.scaleState,
                           );
                         },
                 ),
@@ -572,49 +544,31 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                       ),
                   ],
                 ),
-                ActionChip(
-                  avatar: Icon(
-                    settings.showProgressBar
-                        ? Icons.donut_small
-                        : Icons.donut_small_outlined,
-                    color: theme.iconTheme.color,
-                  ),
-                  label: Text(tr.reader.progressBar),
-                  onPressed: () => _saveSetting(
-                    settings.copyWith(
-                      showProgressBar: !settings.showProgressBar,
-                    ),
-                  ),
+                SwitchListTile(
+                  secondary: const Icon(Icons.donut_small),
+                  title: Text(tr.reader.progressBar),
+                  value: settings.showProgressBar,
+                  onChanged: (value) =>
+                      _saveSetting(settings.copyWith(showProgressBar: value)),
                 ),
-                ActionChip(
-                  avatar: Icon(
-                    Icons.swipe,
-                    color: settings.swipeGestures
-                        ? theme.iconTheme.color
-                        : theme.disabledColor,
-                  ),
-                  label: Text(tr.reader.swipeGestures),
-                  onPressed: (format == ReaderFormat.longstrip)
+                SwitchListTile(
+                  secondary: const Icon(Icons.swipe),
+                  title: Text(tr.reader.swipeGestures),
+                  value: settings.swipeGestures,
+                  onChanged: (format == ReaderFormat.longstrip)
                       ? null
-                      : () => _saveSetting(
-                          settings.copyWith(
-                            swipeGestures: !settings.swipeGestures,
-                          ),
+                      : (value) => _saveSetting(
+                          settings.copyWith(swipeGestures: value),
                         ),
                 ),
-                ActionChip(
-                  avatar: Icon(
-                    Icons.mouse,
-                    color: settings.clickToTurn
-                        ? theme.iconTheme.color
-                        : theme.disabledColor,
-                  ),
-                  label: Text(tr.reader.clickToTurn),
-                  onPressed: (format == ReaderFormat.longstrip)
+                SwitchListTile(
+                  secondary: const Icon(Icons.mouse),
+                  title: Text(tr.reader.clickToTurn),
+                  value: settings.clickToTurn,
+                  onChanged: (format == ReaderFormat.longstrip)
                       ? null
-                      : () => _saveSetting(
-                          settings.copyWith(clickToTurn: !settings.clickToTurn),
-                        ),
+                      : (value) =>
+                            _saveSetting(settings.copyWith(clickToTurn: value)),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -715,6 +669,9 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
             scrollController: scrollController,
             pages: widget.pages,
             scale: longStripScale,
+            onCenterTap: () {
+              showUI.value = !showUI.value;
+            },
           ),
           _ => PhotoViewGallery.builder(
             allowImplicitScrolling: true,
@@ -749,28 +706,33 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
               return PhotoViewGalleryPageOptions(
                 heroAttributes: PhotoViewHeroAttributes(tag: page.id),
                 imageProvider: page.provider,
-                controller: viewController[index],
-                scaleStateController: scaleStateController[index],
+                controller: _getViewController(index),
+                scaleStateController: _getScaleController(index),
                 minScale: PhotoViewComputedScale.contained * 1.0,
                 maxScale: PhotoViewComputedScale.covered * 5.0,
                 initialScale: PhotoViewComputedScale.contained,
-                basePosition: Alignment.topCenter,
-                onTapUp: settings.clickToTurn
-                    ? (context, details, value) {
-                        focusNode.requestFocus();
+                basePosition: Alignment.center,
+                onTapUp: (context, details, value) {
+                  focusNode.requestFocus();
 
-                        final taploc = details.localPosition.dx;
-                        final viewport = context.size!.width;
+                  final taploc = details.localPosition.dx;
+                  final viewport = context.size!.width;
+                  final tapmargin = viewport / 2.5;
 
-                        final tapmargin = viewport / 2.5;
+                  // Tap in the middle 20% (from 40% to 60%, or depending on tapmargin)
+                  if (taploc > tapmargin && taploc < viewport - tapmargin) {
+                    showUI.value = !showUI.value;
+                    return;
+                  }
 
-                        if (taploc < tapmargin) {
-                          onTapLeft(settings: settings, format: format);
-                        } else if (taploc > viewport - tapmargin) {
-                          onTapRight(settings: settings, format: format);
-                        }
-                      }
-                    : null,
+                  if (settings.clickToTurn) {
+                    if (taploc <= tapmargin) {
+                      onTapLeft(settings: settings, format: format);
+                    } else if (taploc >= viewport - tapmargin) {
+                      onTapRight(settings: settings, format: format);
+                    }
+                  }
+                },
               );
             },
           ),
@@ -781,17 +743,27 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
       // https://github.com/flutter/flutter/pull/122445
       extendBody: true,
       bottomNavigationBar: settings.showProgressBar
-          ? ProgressIndicator(
-              reverse:
-                  (format != ReaderFormat.longstrip) &&
-                  settings.direction == ReaderDirection.rightToLeft,
-              currentPage: currentPage,
-              itemCount: pageCount,
-              onPageSelected: (index) => animateToPage(
-                index,
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeInOut,
-                format: format,
+          ? AnimatedSlide(
+              offset: showUI.value ? Offset.zero : const Offset(0, 1),
+              duration: const Duration(milliseconds: 200),
+              child: ReaderProgressIndicator(
+                reverse:
+                    (format != ReaderFormat.longstrip) &&
+                    settings.direction == ReaderDirection.rightToLeft,
+                currentPage: currentPage,
+                itemCount: pageCount,
+                onPageSelected: (index, isDrag) {
+                  if (isDrag) {
+                    jumpToPage(index, format: format);
+                  } else {
+                    animateToPage(
+                      index,
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeInOut,
+                      format: format,
+                    );
+                  }
+                },
               ),
             )
           : null,
@@ -799,8 +771,8 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
   }
 }
 
-class ProgressIndicator extends HookWidget {
-  const ProgressIndicator({
+class ReaderProgressIndicator extends HookWidget {
+  const ReaderProgressIndicator({
     super.key,
     required this.currentPage,
     required this.itemCount,
@@ -811,7 +783,7 @@ class ProgressIndicator extends HookWidget {
 
   final ValueNotifier<int> currentPage;
   final int itemCount;
-  final ValueChanged<int> onPageSelected;
+  final void Function(int, bool) onPageSelected;
   final Color? color;
   final bool reverse;
 
@@ -819,7 +791,9 @@ class ProgressIndicator extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progressColor = color ?? Theme.of(context).colorScheme.primary;
+    final theme = Theme.of(context);
+    final tr = context.t;
+    final progressColor = color ?? theme.colorScheme.primary;
 
     final sections = useMemoized(
       () => List<Widget>.generate(
@@ -830,11 +804,9 @@ class ProgressIndicator extends HookWidget {
           currentPage: currentPage,
           color: progressColor,
           height: _barHeight,
-          tooltip: (index + 1).toString(),
-          onTap: () => onPageSelected(index),
         ),
       ),
-      [itemCount, progressColor, onPageSelected],
+      [itemCount, progressColor],
     );
 
     final children = useMemoized(
@@ -842,21 +814,128 @@ class ProgressIndicator extends HookWidget {
       [sections, reverse],
     );
 
-    return ConstrainedBox(
-      constraints: BoxConstraints.loose(const Size.fromHeight(30)),
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-            stops: [0.0, 0.6],
-            colors: [Color.fromARGB(255, 0, 0, 0), Colors.transparent],
+    void handleTapOrDrag(Offset localPosition, double totalWidth, bool isDrag) {
+      if (totalWidth <= 0) return;
+      double dx = localPosition.dx;
+      if (reverse) dx = totalWidth - dx;
+      final int index = ((dx / totalWidth) * itemCount)
+          .clamp(0, itemCount - 1)
+          .floor();
+      onPageSelected(index, isDrag);
+    }
+
+    final page = useValueListenable(currentPage);
+
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          stops: [0.0, 1.0],
+          colors: [Color.fromARGB(200, 0, 0, 0), Colors.transparent],
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface.withAlpha(217),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      enableDrag: false,
+                      backgroundColor: theme.colorScheme.surface,
+                      builder: (context) {
+                        return SizedBox(
+                          height: 250,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  tr.reader.gotoPage,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: ScrollConfiguration(
+                                  behavior: ScrollConfiguration.of(context)
+                                      .copyWith(
+                                        dragDevices: {
+                                          PointerDeviceKind.mouse,
+                                          PointerDeviceKind.touch,
+                                          PointerDeviceKind.trackpad,
+                                        },
+                                      ),
+                                  child: CupertinoPicker(
+                                    scrollController:
+                                        FixedExtentScrollController(
+                                          initialItem: page,
+                                        ),
+                                    itemExtent: 40,
+                                    onSelectedItemChanged: (index) {
+                                      onPageSelected(index, false);
+                                    },
+                                    children: List.generate(itemCount, (index) {
+                                      return Center(
+                                        child: Text('${index + 1}'),
+                                      );
+                                    }),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: Text(
+                    tr.reader.pageCount(current: page + 1, total: itemCount),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: children,
-        ),
+          const SizedBox(height: 8.0),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTapDown: (details) => handleTapOrDrag(
+                  details.localPosition,
+                  constraints.maxWidth,
+                  false,
+                ),
+                onHorizontalDragUpdate: (details) => handleTapOrDrag(
+                  details.localPosition,
+                  constraints.maxWidth,
+                  true,
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints.loose(const Size.fromHeight(30)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: children,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -869,16 +948,12 @@ class _ProgressBarSection extends HookWidget {
     required this.currentPage,
     required this.color,
     required this.height,
-    required this.tooltip,
-    required this.onTap,
   });
 
   final int index;
   final ValueNotifier<int> currentPage;
   final Color color;
   final double height;
-  final String tooltip;
-  final GestureTapCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -887,18 +962,12 @@ class _ProgressBarSection extends HookWidget {
         useListenableSelector(currentPage, () => currentPage.value >= index);
 
     return Expanded(
-      child: Tooltip(
-        message: tooltip,
-        child: InkWell(
-          onTap: onTap,
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: SizedBox(
-              height: height,
-              width: double.infinity,
-              child: ColoredBox(color: isFilled ? color : Colors.transparent),
-            ),
-          ),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: SizedBox(
+          height: height,
+          width: double.infinity,
+          child: ColoredBox(color: isFilled ? color : Colors.transparent),
         ),
       ),
     );
@@ -910,36 +979,50 @@ class _LongStripView extends StatelessWidget {
   final ScrollController? scrollController;
   final List<ReaderPage> pages;
   final ValueNotifier<LongStripScale> scale;
+  final VoidCallback? onCenterTap;
 
   const _LongStripView({
     this.listController,
     this.scrollController,
     required this.pages,
     required this.scale,
+    this.onCenterTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final mediaSize = MediaQuery.sizeOf(context);
 
-    return SuperListView.builder(
-      listController: listController,
-      controller: scrollController,
-      cacheExtent: mediaSize.height * 3,
-      itemCount: pages.length,
-      itemBuilder: (context, index) {
-        final page = pages[index];
-        return Center(
-          key: ValueKey(page.id),
-          child: RepaintBoundary(
-            child: _LongStripPage(
-              contextWidth: mediaSize.width,
-              scale: scale,
-              page: page,
-            ),
-          ),
-        );
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTapUp: (details) {
+        final taploc = details.localPosition.dx;
+        final viewport = mediaSize.width;
+        final tapmargin = viewport / 2.5;
+
+        if (taploc > tapmargin && taploc < viewport - tapmargin) {
+          onCenterTap?.call();
+        }
       },
+      child: SuperListView.builder(
+        listController: listController,
+        controller: scrollController,
+        cacheExtent: mediaSize.height * 3,
+        itemCount: pages.length,
+        itemBuilder: (context, index) {
+          final page = pages[index];
+          return Center(
+            key: ValueKey(page.id),
+            child: RepaintBoundary(
+              child: _LongStripPage(
+                contextWidth: mediaSize.width,
+                scale: scale,
+                page: page,
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -979,6 +1062,25 @@ class _LongStripPage extends HookWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class SlidingAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final PreferredSizeWidget child;
+  final bool visible;
+
+  const SlidingAppBar({super.key, required this.child, required this.visible});
+
+  @override
+  Size get preferredSize => child.preferredSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSlide(
+      offset: visible ? Offset.zero : const Offset(0, -1),
+      duration: const Duration(milliseconds: 200),
+      child: child,
     );
   }
 }

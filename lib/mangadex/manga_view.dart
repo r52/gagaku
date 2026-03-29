@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:gagaku/util/riverpod.dart';
 
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:collection/collection.dart';
@@ -50,11 +51,11 @@ Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
   );
 
   await (
-    statisticsMutation.run(ref, (ref) async {
-      return await ref.get(statisticsProvider.notifier).get(manga);
+    ref.run((tsx) async {
+      return await tsx.get(statisticsProvider.notifier).get(manga);
     }),
-    readChaptersMutation(me?.id).run(ref, (ref) async {
-      return await ref.get(readChaptersProvider(me?.id).notifier).get(manga);
+    ref.run((tsx) async {
+      return await tsx.get(readChaptersProvider(me?.id).notifier).get(manga);
     }),
   ).wait;
 
@@ -112,9 +113,12 @@ class _MangaDexMangaViewWidgetState
   static const chapterInfo = MangaDexFeeds.mangaChapters;
   static const coverInfo = MangaDexFeeds.mangaCovers;
 
-  late final _chapterController = GagakuPagingController<int, Chapter>(
-    getNextPageKey: (state) =>
-        state.keys?.last != null ? state.keys!.last + chapterInfo.limit : 0,
+  late final _chapterManager = OffsetPagingManager<Chapter>(
+    limit: chapterInfo.limit,
+  );
+
+  late final _chapterController = PagingController<int, Chapter>(
+    getNextPageKey: _chapterManager.getNextPageKey,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final sort = ref.watch(mangaChaptersListSortProvider);
@@ -129,40 +133,39 @@ class _MangaDexMangaViewWidgetState
         ignoreOriginalLanguage: true,
       );
 
+      _chapterManager.totalItems = chapterlist.total;
+
       final chapters = chapterlist.data.cast<Chapter>();
 
       try {
-        chapterStatsMutation.run(ref, (ref) async {
-          return await ref.get(chapterStatsProvider.notifier).get(chapters);
+        ref.run((tsx) async {
+          return await tsx.get(chapterStatsProvider.notifier).get(chapters);
         });
       } catch (e) {
         logger.e(e, error: e);
       }
 
-      return PageResultsMetaData(chapters, chapterlist.total);
-    },
-    refresh: () async {
-      final api = ref.watch(mangadexProvider);
-      await api.invalidateAll('${chapterInfo.key}(${widget.manga.id}');
+      return chapters;
     },
   );
 
-  late final _coverController = GagakuPagingController<int, CoverArt>(
-    getNextPageKey: (state) =>
-        state.keys?.last != null ? state.keys!.last + coverInfo.limit : 0,
+  late final _coverManager = OffsetPagingManager<CoverArt>(
+    limit: coverInfo.limit,
+  );
+
+  late final _coverController = PagingController<int, CoverArt>(
+    getNextPageKey: _coverManager.getNextPageKey,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final covers = await api.getCoverList(widget.manga, offset: pageKey);
 
-      return PageResultsMetaData(covers.data.cast<CoverArt>(), covers.total);
-    },
-    refresh: () async {
-      final api = ref.watch(mangadexProvider);
-      await api.invalidateAll('${coverInfo.key}(${widget.manga.id}');
+      _coverManager.totalItems = covers.total;
+
+      return covers.data.cast<CoverArt>();
     },
   );
 
-  late final _relatedController = GagakuPagingController<int, Manga>(
+  late final _relatedController = PagingController<int, Manga>(
     getNextPageKey: (state) {
       if (widget.manga.relatedMangas.isEmpty) {
         return null;
@@ -183,11 +186,11 @@ class _MangaDexMangaViewWidgetState
       final related = widget.manga.relatedMangas;
 
       if (related.isEmpty) {
-        return PageResultsMetaData([]);
+        return [];
       }
 
-      final me = await ref.watch(loggedUserProvider.future);
-      final api = ref.watch(mangadexProvider);
+      final me = await ref.readAsync(loggedUserProvider.future);
+      final api = ref.read(mangadexProvider);
       final ids = related.map((e) => e.id).toList();
       final page = ids.getRange(
         pageKey,
@@ -200,11 +203,11 @@ class _MangaDexMangaViewWidgetState
 
       try {
         await (
-          statisticsMutation.run(ref, (ref) async {
-            return await ref.get(statisticsProvider.notifier).get(mangas);
+          ref.run((tsx) async {
+            return await tsx.get(statisticsProvider.notifier).get(mangas);
           }),
-          readChaptersMutation(me?.id).run(ref, (ref) async {
-            return await ref
+          ref.run((tsx) async {
+            return await tsx
                 .get(readChaptersProvider(me?.id).notifier)
                 .get(mangas);
           }),
@@ -213,7 +216,7 @@ class _MangaDexMangaViewWidgetState
         logger.e(e, error: e);
       }
 
-      return PageResultsMetaData(mangas, widget.manga.relatedMangas.length);
+      return mangas;
     },
   );
 
@@ -373,10 +376,27 @@ class _MangaDexMangaViewWidgetState
             ref.invalidate(readingStatusProvider(widget.manga));
           }
 
+          final me = ref.read(loggedUserProvider).value;
+          if (me != null) {
+            await ref.run((tsx) async {
+              await tsx
+                  .get(readChaptersProvider(me.id).notifier)
+                  .invalidate(widget.manga);
+            });
+          }
+
           switch (_ViewType.values[tabview]) {
             case _ViewType.chapters:
+              _chapterManager.reset();
+              await ref
+                  .read(mangadexProvider)
+                  .invalidateAll('${chapterInfo.key}(${widget.manga.id}');
               return _chapterController.refresh();
             case _ViewType.art:
+              _coverManager.reset();
+              await ref
+                  .read(mangadexProvider)
+                  .invalidateAll('${coverInfo.key}(${widget.manga.id}');
               return _coverController.refresh();
             case _ViewType.related:
               return _relatedController.refresh();
@@ -857,10 +877,8 @@ class _MangaDexMangaViewWidgetState
                                     );
 
                                     if (chapters != null && result == true) {
-                                      readChaptersMutation(me.id).run(ref, (
-                                        ref,
-                                      ) async {
-                                        return await ref
+                                      ref.run((tsx) async {
+                                        return await tsx
                                             .get(
                                               readChaptersProvider(
                                                 me.id,
@@ -978,7 +996,7 @@ class _MangaChaptersView extends StatelessWidget {
   }
 }
 
-class _MangaCoversView extends StatelessWidget {
+class _MangaCoversView extends HookWidget {
   const _MangaCoversView({required this.manga, required this.controller});
 
   final Manga manga;
@@ -986,43 +1004,159 @@ class _MangaCoversView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = context.t;
+    final state = useValueListenable(controller);
+
+    final selectedLocales = useState<Set<String?>?>(null);
+
+    final discoveredLocales = useMemoized(() {
+      final items = state.items;
+      if (items == null) return <String?>{};
+      return items.map((e) => e.attributes?.locale).toSet();
+    }, [state.items]);
+
+    useEffect(() {
+      if (selectedLocales.value == null &&
+          state.items != null &&
+          state.items!.isNotEmpty) {
+        final originalLang = manga.attributes?.originalLanguage.code;
+        if (discoveredLocales.contains(originalLang)) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            selectedLocales.value = {originalLang};
+          });
+        } else {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            selectedLocales.value = {};
+          });
+        }
+      }
+      return null;
+    }, [state.items, discoveredLocales, manga]);
+
+    final currentSelected = selectedLocales.value ?? {};
+
+    final filteredState = useMemoized(() {
+      if (state.pages == null) return state;
+      if (currentSelected.isEmpty) return state;
+
+      final newPages = state.pages!.map((page) {
+        return page.where((item) {
+          return currentSelected.contains(item.attributes?.locale);
+        }).toList();
+      }).toList();
+
+      return PagingState<int, CoverArt>(
+        error: state.error,
+        pages: newPages,
+        keys: state.keys,
+        hasNextPage: state.hasNextPage,
+        isLoading: state.isLoading,
+      );
+    }, [state, currentSelected]);
+
+    useEffect(() {
+      if (filteredState.items != null &&
+          filteredState.items!.length < 10 &&
+          filteredState.hasNextPage &&
+          !filteredState.isLoading) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          controller.fetchNextPage();
+        });
+      }
+      return null;
+    }, [filteredState]);
+
     return CustomScrollView(
       slivers: [
-        PagingListener(
-          controller: controller,
-          builder: (context, state, fetchNextPage) {
-            return PagedSliverGrid(
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 256,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-                childAspectRatio: 0.7,
-              ),
-              state: state,
-              fetchNextPage: fetchNextPage,
-              builderDelegate: PagedChildBuilderDelegate<CoverArt>(
-                animateTransitions: true,
-                itemBuilder: (context, item, index) => _CoverArtItem(
-                  key: ValueKey(item.id),
-                  cover: item,
-                  manga: manga,
-                  page: index,
-                  onTap: () async {
-                    Navigator.push(
-                      context,
-                      TransparentOverlay(
-                        builder: (context) => _CoverArtPagedOverlay(
-                          index: index,
-                          manga: manga,
-                          items: state.items!,
-                        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
+            child: Row(
+              children: [
+                MenuAnchor(
+                  menuChildren: discoveredLocales.map((loc) {
+                    final isSelected = currentSelected.contains(loc);
+                    final lang = Languages.get(loc ?? 'NULL');
+                    final label = tr[lang.label]?.toString() ?? tr.ui.unknown;
+
+                    return CheckboxMenuButton(
+                      value: isSelected,
+                      onChanged: (bool? checked) {
+                        final newSet = Set<String?>.from(currentSelected);
+                        if (checked == true) {
+                          newSet.add(loc);
+                        } else {
+                          newSet.remove(loc);
+                        }
+                        selectedLocales.value = newSet;
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (loc != null && lang != Language.other) ...[
+                            CountryFlag(flag: lang.flag),
+                            const SizedBox(width: 8),
+                          ],
+                          Text(label),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  builder: (context, menu, child) {
+                    return ActionChip(
+                      avatar: const Icon(Icons.translate, size: 16),
+                      onPressed: () {
+                        if (menu.isOpen) {
+                          menu.close();
+                        } else {
+                          menu.open();
+                        }
+                      },
+                      label: Text(
+                        currentSelected.isEmpty
+                            ? tr.ui.allLocales
+                            : tr.ui.selected(count: currentSelected.length),
                       ),
                     );
                   },
                 ),
-              ),
-            );
-          },
+              ],
+            ),
+          ),
+        ),
+        PagedSliverGrid(
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 256,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 0.7,
+          ),
+          state: filteredState,
+          fetchNextPage: controller.fetchNextPage,
+          builderDelegate: PagedChildBuilderDelegate<CoverArt>(
+            animateTransitions: true,
+            itemBuilder: (context, item, index) => _CoverArtItem(
+              key: ValueKey(item.id),
+              cover: item,
+              manga: manga,
+              page: index,
+              onTap: () async {
+                Navigator.push(
+                  context,
+                  TransparentOverlay(
+                    builder: (context) => _CoverArtPagedOverlay(
+                      index: index,
+                      manga: manga,
+                      items: filteredState.items!,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
       ],
     );
@@ -1204,8 +1338,8 @@ class _ChapterListSliver extends HookConsumerWidget {
             onMarkRead: me == null
                 ? null
                 : (setRead) async {
-                    readChaptersMutation(me).run(ref, (ref) async {
-                      return await ref
+                    ref.run((tsx) async {
+                      return await tsx
                           .get(readChaptersProvider(me).notifier)
                           .set(
                             manga,
@@ -1664,9 +1798,8 @@ class _UserListsMenu extends ConsumerWidget {
       menuChildren: [
         if (userLists != null)
           for (final list in userLists)
-            CheckboxListTile(
-              controlAffinity: ListTileControlAffinity.leading,
-              title: Text(list.attributes.name),
+            CheckboxMenuButton(
+              closeOnActivate: false,
               value: list.set.contains(manga.id),
               onChanged: (bool? value) async {
                 userListModifyMutation(me?.id).run(ref, (ref) async {
@@ -1675,6 +1808,7 @@ class _UserListsMenu extends ConsumerWidget {
                       .updateList(list, manga, value == true);
                 });
               },
+              child: Text(list.attributes.name),
             ),
         MenuItemButton(
           child: Text(tr.mangadex.createNewListBtn),

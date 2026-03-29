@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -43,16 +44,19 @@ class WebSourceHomePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final int selectedIndex = _calculateSelectedIndex(context);
     final tr = context.t;
-    final controllers = List.generate(4, (idx) => useScrollController());
-    final controllerSet = useMemoized(
-      () => {
-        'WebSourceFrontPage': controllers[0],
-        'WebSourceUpdatesPage': controllers[1],
-        'WebSourceFavoritesPage': controllers[2],
-        'WebSourceHistoryPage': controllers[3],
-      },
-      [controllers],
+    final controllers = useRef<Map<int, ScrollController>>({});
+    final activeController = controllers.value.putIfAbsent(
+      selectedIndex,
+      () => ScrollController(),
     );
+
+    useEffect(() {
+      return () {
+        for (final c in controllers.value.values) {
+          c.dispose();
+        }
+      };
+    }, []);
 
     final theme = Theme.of(context);
     final nav = Navigator.of(context);
@@ -63,7 +67,7 @@ class WebSourceHomePage extends HookConsumerWidget {
       appBar: AppBar(
         flexibleSpace: GestureDetector(
           onTap: () {
-            controllers[selectedIndex].animateTo(
+            activeController.animateTo(
               0.0,
               duration: const Duration(milliseconds: 1000),
               curve: Curves.easeOutCirc,
@@ -132,8 +136,8 @@ class WebSourceHomePage extends HookConsumerWidget {
                       );
 
                       if (result == true) {
-                        webReadMarkerMutation.run(ref, (ref) async {
-                          return await ref
+                        ref.run((tsx) async {
+                          return await tsx
                               .get(webReadMarkersProvider.notifier)
                               .clear();
                         });
@@ -161,7 +165,7 @@ class WebSourceHomePage extends HookConsumerWidget {
       drawer: const MainDrawer(),
       body: Center(
         child: DefaultScrollController(
-          controllers: controllerSet,
+          controller: activeController,
           child: child,
         ),
       ),
@@ -191,7 +195,7 @@ class WebSourceHomePage extends HookConsumerWidget {
         selectedIndex: selectedIndex,
         onDestinationSelected: (idx) {
           if (idx == selectedIndex) {
-            controllers[selectedIndex].animateTo(
+            activeController.animateTo(
               0.0,
               duration: const Duration(milliseconds: 1000),
               curve: Curves.easeOutCirc,

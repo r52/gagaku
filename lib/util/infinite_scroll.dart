@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -234,139 +233,25 @@ class AppendedFindingSliverChildBuilderDelegate
        );
 }
 
-class PageResultsMetaData<ItemType> {
-  const PageResultsMetaData(this.results, [this.total]);
+class OffsetPagingManager<ItemType> {
+  final int limit;
+  int? totalItems;
 
-  final List<ItemType> results;
-  final int? total;
-}
+  OffsetPagingManager({required this.limit});
 
-typedef MetadataFetchPageCallback<PageKeyType, ItemType> =
-    FutureOr<PageResultsMetaData<ItemType>> Function(PageKeyType pageKey);
+  int? getNextPageKey(PagingState<int, ItemType> state) {
+    if (state.keys == null || state.keys!.isEmpty) return 0;
 
-typedef PostGetLastPageCallback<PageKeyType, ItemType> =
-    bool Function(
-      PagingState<PageKeyType, ItemType> state,
-      PageResultsMetaData<ItemType> data,
-    );
+    final currentCount = state.items?.length ?? 0;
 
-class GagakuPagingController<PageKeyType, ItemType>
-    extends ValueNotifier<PagingState<PageKeyType, ItemType>>
-    implements PagingController<PageKeyType, ItemType> {
-  GagakuPagingController({
-    PagingState<PageKeyType, ItemType>? value,
-    required NextPageKeyCallback<PageKeyType, ItemType> getNextPageKey,
-    required MetadataFetchPageCallback<PageKeyType, ItemType> fetchPage,
-    RefreshCallback? refresh,
-    PostGetLastPageCallback<PageKeyType, ItemType>? getIsLastPage,
-  }) : _getNextPageKey = getNextPageKey,
-       _fetchPage = fetchPage,
-       _refresh = refresh,
-       _getIsLastPage = getIsLastPage,
-       super(value ?? PagingState<PageKeyType, ItemType>());
-
-  /// The function to get the next page key.
-  /// If this function returns `null`, it indicates that there are no more pages to load.
-  final NextPageKeyCallback<PageKeyType, ItemType> _getNextPageKey;
-
-  /// The function to fetch a page.
-  final MetadataFetchPageCallback<PageKeyType, ItemType> _fetchPage;
-
-  /// Keeps track of the current operation.
-  /// If the operation changes during its execution, the operation is cancelled.
-  ///
-  /// Instead of using this property directly, use [fetchNextPage], [refresh], or [cancel].
-  /// If you are extending this class, check and set this property before and after the fetch operation.
-  @override
-  @protected
-  @visibleForTesting
-  Object? operation;
-
-  final RefreshCallback? _refresh;
-  final PostGetLastPageCallback<PageKeyType, ItemType>? _getIsLastPage;
-
-  @override
-  void fetchNextPage() async {
-    // We are already loading a new page.
-    if (this.operation != null) return;
-
-    final operation = this.operation = Object();
-
-    value = value.copyWith(isLoading: true, error: null);
-
-    // we use a local copy of value,
-    // so that we only send one notification now and at the end of the method.
-    PagingState<PageKeyType, ItemType> state = value;
-
-    try {
-      // There are no more pages to load.
-      if (!state.hasNextPage) return;
-
-      final nextPageKey = _getNextPageKey(state);
-
-      // We are at the end of the list.
-      if (nextPageKey == null) {
-        state = state.copyWith(hasNextPage: false);
-        return;
-      }
-
-      final fetchResult = _fetchPage(nextPageKey);
-      PageResultsMetaData<ItemType> data;
-
-      // If the result is synchronous, we can directly assign it in the same tick.
-      if (fetchResult is Future) {
-        data = await fetchResult;
-      } else {
-        data = fetchResult;
-      }
-
-      final isLastPage = _getIsLastPage != null
-          ? _getIsLastPage(state, data)
-          : (data.total != null
-                ? ((state.items?.length ?? 0) + data.results.length >=
-                      data.total!)
-                : data.results.isEmpty);
-
-      // Update our state in case it was modified during the fetch operation.
-      // This beaks atomicity, but is necessary to allow users to modify the state during a fetch.
-      state = value;
-
-      state = state.copyWith(
-        pages: [...?state.pages, data.results],
-        keys: [...?state.keys, nextPageKey],
-        hasNextPage: !isLastPage,
-      );
-    } catch (error) {
-      state = state.copyWith(error: error);
-
-      if (error is! Exception) {
-        // Errors which are not exceptions indicate that something
-        // went unexpectedly wrong. These errors are rethrown
-        // so they can be logged and investigated.
-        rethrow;
-      }
-    } finally {
-      if (operation == this.operation) {
-        value = state.copyWith(isLoading: false);
-        this.operation = null;
-      }
-    }
-  }
-
-  @override
-  Future<void> refresh() async {
-    operation = null;
-
-    if (_refresh != null) {
-      await _refresh();
+    if (totalItems != null && currentCount >= totalItems!) {
+      return null;
     }
 
-    value = value.reset();
+    return state.keys!.last + limit;
   }
 
-  @override
-  void cancel() {
-    operation = null;
-    value = value.copyWith(isLoading: false);
+  void reset() {
+    totalItems = null;
   }
 }

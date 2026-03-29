@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/login_password.dart';
@@ -40,7 +41,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
     final messenger = ScaffoldMessenger.of(context);
     final theme = Theme.of(context);
     final scrollController =
-        DefaultScrollController.maybeOf(context, 'MangaDexListsPage') ??
+        DefaultScrollController.maybeOf(context) ??
         controller ??
         useScrollController();
     final view = useState(_ListViewType.self);
@@ -233,19 +234,15 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                     }
 
                                     return MenuItemButton(
-                                      onPressed: () =>
-                                          followedListMutation(me?.id).run(
-                                            ref,
-                                            (ref) async {
-                                              return await ref
-                                                  .get(
-                                                    followedListsProvider(
-                                                      me?.id,
-                                                    ).notifier,
-                                                  )
-                                                  .setFollow(item, idx == -1);
-                                            },
-                                          ),
+                                      onPressed: () => ref.run((tsx) async {
+                                        return await tsx
+                                            .get(
+                                              followedListsProvider(
+                                                me?.id,
+                                              ).notifier,
+                                            )
+                                            .setFollow(item, idx == -1);
+                                      }),
                                       child: Text(
                                         idx == -1 ? t.ui.follow : t.ui.unfollow,
                                       ),
@@ -369,10 +366,8 @@ class MangaDexListsWidget extends HookConsumerWidget {
                               menuChildren: [
                                 MenuItemButton(
                                   onPressed: () async {
-                                    followedListMutation(me?.id).run(ref, (
-                                      ref,
-                                    ) async {
-                                      return await ref
+                                    ref.run((tsx) async {
+                                      return await tsx
                                           .get(
                                             followedListsProvider(
                                               me?.id,

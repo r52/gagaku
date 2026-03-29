@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -67,8 +68,8 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                     favbox.putMany(favs.value);
                     favbox.removeMany(diff.map((e) => e.dbid).toList());
 
-                    webConfigSaveMutation.run(ref, (ref) async {
-                      return ref
+                    ref.run((tsx) async {
+                      return tsx
                           .get(webConfigProvider.notifier)
                           .saveWith(
                             categoriesToUpdate: config.value.categoriesToUpdate,
@@ -184,10 +185,12 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                       );
 
                       if (result == true) {
-                        ref.read(extensionStateProvider.notifier).clearAll();
-                        ref
-                            .read(extensionSecureStateProvider.notifier)
-                            .clearAll();
+                        await ref.run((tsx) async {
+                          tsx.get(extensionStateProvider.notifier).clearAll();
+                          tsx
+                              .get(extensionSecureStateProvider.notifier)
+                              .clearAll();
+                        });
                         if (!context.mounted) return;
                         ScaffoldMessenger.of(context)
                           ..removeCurrentSnackBar()

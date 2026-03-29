@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:objectbox/objectbox.dart';
-import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 
@@ -132,5 +131,3 @@ class MdConfig extends _$MdConfig {
     return update;
   }
 }
-
-final mdConfigSaveMutation = Mutation<MangaDexConfig>();

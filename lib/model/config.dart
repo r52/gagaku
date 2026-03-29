@@ -5,7 +5,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/model/types.dart';
 import 'package:objectbox/objectbox.dart';
-import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'config.freezed.dart';
@@ -125,5 +124,3 @@ class GagakuSettings extends _$GagakuSettings {
     return update;
   }
 }
-
-final gagakuConfigSaveMutation = Mutation<GagakuConfig>();

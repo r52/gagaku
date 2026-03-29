@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:gagaku/util/riverpod.dart';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -188,8 +189,8 @@ class AppSettingsPage extends HookConsumerWidget {
                     onSelected: (ThemeMode? value) {
                       if (value != null) {
                         final c = cfg.copyWith(themeMode: value);
-                        gagakuConfigSaveMutation.run(ref, (ref) async {
-                          return ref
+                        ref.run((tsx) async {
+                          return tsx
                               .get(gagakuSettingsProvider.notifier)
                               .save(c);
                         });
@@ -228,8 +229,8 @@ class AppSettingsPage extends HookConsumerWidget {
                     onSelected: (GagakuTheme? value) {
                       if (value != null) {
                         final c = cfg.copyWith(theme: value);
-                        gagakuConfigSaveMutation.run(ref, (ref) async {
-                          return ref
+                        ref.run((tsx) async {
+                          return tsx
                               .get(gagakuSettingsProvider.notifier)
                               .save(c);
                         });

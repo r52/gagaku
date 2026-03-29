@@ -36,22 +36,24 @@ class MangaDexHomePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = _calculateSelectedIndex(context);
     final t = context.t;
-    final controllers = List.generate(5, (_) => useScrollController());
-    final controllerSet = useMemoized(
-      () => {
-        'MangaDexFrontPage': controllers[0],
-        'MangaDexChapterFeedPage': controllers[1],
-        'MangaDexLibraryPage': controllers[2],
-        'MangaDexListsPage': controllers[3],
-        'MangaDexHistoryFeedPage': controllers[4],
-      },
-      [controllers],
+    final controllers = useRef<Map<int, ScrollController>>({});
+    final activeController = controllers.value.putIfAbsent(
+      selectedIndex,
+      () => ScrollController(),
     );
+
+    useEffect(() {
+      return () {
+        for (final c in controllers.value.values) {
+          c.dispose();
+        }
+      };
+    }, []);
 
     return Scaffold(
       restorationId: 'md_home_restore',
       drawer: const MainDrawer(),
-      body: DefaultScrollController(controllers: controllerSet, child: child),
+      body: DefaultScrollController(controller: activeController, child: child),
       bottomNavigationBar: NavigationBar(
         height: 60,
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
@@ -77,7 +79,7 @@ class MangaDexHomePage extends HookConsumerWidget {
         selectedIndex: selectedIndex,
         onDestinationSelected: (idx) {
           if (idx == selectedIndex) {
-            controllers[selectedIndex].animateTo(
+            activeController.animateTo(
               0.0,
               duration: const Duration(milliseconds: 1000),
               curve: Curves.easeOutCirc,

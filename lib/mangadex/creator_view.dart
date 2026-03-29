@@ -1,5 +1,7 @@
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
@@ -74,9 +76,10 @@ class _MangaDexCreatorViewWidgetState
     extends ConsumerState<MangaDexCreatorViewWidget> {
   static const info = MangaDexFeeds.creatorTitles;
 
-  late final _pagingController = GagakuPagingController<int, Manga>(
-    getNextPageKey: (state) =>
-        state.keys?.last != null ? state.keys!.last + info.limit : 0,
+  late final _pagingManager = OffsetPagingManager<Manga>(limit: info.limit);
+
+  late final _pagingController = PagingController<int, Manga>(
+    getNextPageKey: _pagingManager.getNextPageKey,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final list = await api.fetchMangaList(
@@ -86,21 +89,19 @@ class _MangaDexCreatorViewWidgetState
         entity: widget.creator,
       );
 
+      _pagingManager.totalItems = list.total;
+
       final newItems = list.data.cast<Manga>();
 
       try {
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get(newItems);
+        ref.run((tsx) async {
+          return await tsx.get(statisticsProvider.notifier).get(newItems);
         });
       } catch (e) {
         logger.e(e, error: e);
       }
 
-      return PageResultsMetaData(newItems, list.total);
-    },
-    refresh: () async {
-      final api = ref.watch(mangadexProvider);
-      await api.invalidateAll('${info.key}(${widget.creator.id}');
+      return newItems;
     },
   );
 
@@ -118,7 +119,12 @@ class _MangaDexCreatorViewWidgetState
 
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () async => _pagingController.refresh(),
+        onRefresh: () async {
+          _pagingManager.reset();
+          final api = ref.watch(mangadexProvider);
+          await api.invalidateAll('${info.key}(${widget.creator.id}');
+          return _pagingController.refresh();
+        },
         child: MangaListWidget(
           leading: [
             SliverAppBar(

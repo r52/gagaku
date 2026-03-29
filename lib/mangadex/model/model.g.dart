@@ -144,7 +144,7 @@ final class ReadChaptersProvider
   }
 }
 
-String _$readChaptersHash() => r'7dfd8fca31cfa380377332229b68e9d0e56ee668';
+String _$readChaptersHash() => r'33654ef31814fa02363110210e5c2dca0eff4b5d';
 
 final class ReadChaptersFamily extends $Family
     with
@@ -587,7 +587,7 @@ final class ListSourceProvider
   }
 }
 
-String _$listSourceHash() => r'd6b059c04284e56b5c818ebad91096b37d67ce4c';
+String _$listSourceHash() => r'fa3af4ce278d3a4407fefcdc4b1f2aaef8f91ef1';
 
 final class ListSourceFamily extends $Family
     with
@@ -991,7 +991,7 @@ final class ReadingStatusProvider
   }
 }
 
-String _$readingStatusHash() => r'1bb7981672107353b2541655a469d88aca120aa0';
+String _$readingStatusHash() => r'f22028d84f6dbddd11f45002d902bb74efce5201';
 
 final class ReadingStatusFamily extends $Family
     with
@@ -1153,7 +1153,7 @@ final class MangaDexHistoryProvider
   MangaDexHistory create() => MangaDexHistory();
 }
 
-String _$mangaDexHistoryHash() => r'69a7136e00bba032eb52913de7e66d3bc8429d49';
+String _$mangaDexHistoryHash() => r'f53a33c95e663c7c440b47c01f3c74036b08630c';
 
 abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
   FutureOr<Queue<Chapter>> build();

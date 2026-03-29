@@ -1,4 +1,5 @@
 import 'package:cached_network_image_ce/cached_network_image.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -339,8 +340,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
                             );
 
                             if (result == true) {
-                              webReadMarkerMutation.run(ref, (ref) async {
-                                return await ref
+                              ref.run((tsx) async {
+                                return await tsx
                                     .get(webReadMarkersProvider.notifier)
                                     .deleteKey(key);
                               });
@@ -591,8 +592,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
                               );
 
                               if (result == true) {
-                                webReadMarkerMutation.run(ref, (ref) async {
-                                  return await ref
+                                ref.run((tsx) async {
+                                  return await tsx
                                       .get(webReadMarkersProvider.notifier)
                                       .setBulk(
                                         mangakey,

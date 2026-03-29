@@ -5,7 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/util/exception.dart';
-import 'package:gagaku/util/http.dart' show baseUserAgent;
+import 'package:gagaku/util/http.dart' show getUserAgent;
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -105,7 +105,7 @@ Future<List<ReaderPage>> _getSourcePages(
         (e) => ReaderPage(
           provider: NetworkImage(
             e,
-            headers: {'referer': referer, 'user-agent': baseUserAgent},
+            headers: {'referer': referer, 'user-agent': getUserAgent()},
           ),
         ),
       )
@@ -271,8 +271,8 @@ class WebSourceReaderWidget extends HookConsumerWidget {
 
       timer.value = Timer(const Duration(milliseconds: 2000), () async {
         if (readKey != null) {
-          webReadMarkerMutation.run(ref, (ref) async {
-            return await ref
+          ref.run((tsx) async {
+            return await tsx
                 .get(webReadMarkersProvider.notifier)
                 .set(handle.getKey(), readKey!, true);
           });

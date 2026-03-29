@@ -1,4 +1,6 @@
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter/material.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
@@ -27,9 +29,10 @@ class MangaDexMangaFeed extends ConsumerStatefulWidget {
 class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
   static const info = MangaDexFeeds.latestChapters;
 
-  late final _pagingController = GagakuPagingController<int, Manga>(
-    getNextPageKey: (state) =>
-        state.keys?.last != null ? state.keys!.last + info.limit : 0,
+  late final _pagingManager = OffsetPagingManager<Manga>(limit: info.limit);
+
+  late final _pagingController = PagingController<int, Manga>(
+    getNextPageKey: _pagingManager.getNextPageKey,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
 
@@ -40,6 +43,8 @@ class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
         offset: pageKey,
       );
 
+      _pagingManager.totalItems = chapterlist.total;
+
       final chapters = chapterlist.data.cast<Chapter>();
 
       final mangaIds = chapters.map((e) => e.manga.id).toSet();
@@ -49,21 +54,15 @@ class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
       );
 
       try {
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get(mangas);
+        ref.run((tsx) async {
+          return await tsx.get(statisticsProvider.notifier).get(mangas);
         });
       } catch (e) {
         logger.e(e, error: e);
       }
 
-      return PageResultsMetaData(mangas, chapterlist.total);
+      return mangas;
     },
-    refresh: () async {
-      final api = ref.watch(mangadexProvider);
-      await api.invalidateAll(info.key);
-    },
-    getIsLastPage: (state, data) =>
-        (state.keys?.last ?? 0) + info.limit >= data.total!,
   );
 
   @override
@@ -76,7 +75,12 @@ class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
   Widget build(BuildContext context) {
     return Center(
       child: RefreshIndicator(
-        onRefresh: () async => _pagingController.refresh(),
+        onRefresh: () async {
+          _pagingManager.reset();
+          final api = ref.watch(mangadexProvider);
+          await api.invalidateAll(info.key);
+          return _pagingController.refresh();
+        },
         child: MangaListWidget(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: widget.controller,

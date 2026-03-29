@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/version.dart';
@@ -74,6 +75,12 @@ class GagakuData {
   // Default user agent
   final String gagakuUserAgent = '$kPackageName/$kPackageVersion';
 
+  // Dynamic user agent fetched from Webview
+  String? dynamicUserAgent;
+  String? dynamicSecChUa;
+  String? dynamicSecChUaMobile;
+  String? dynamicSecChUaPlatform;
+
   List<String> blockers = [];
   Map<String, dynamic> knownHosts = {};
 
@@ -81,10 +88,122 @@ class GagakuData {
     return _instance;
   }
 
+  Future<void> _fetchDynamicUserAgent() async {
+    HeadlessInAppWebView? headlessWebView;
+    bool fetched = false;
+
+    headlessWebView = HeadlessInAppWebView(
+      initialUrlRequest: URLRequest(url: WebUri("https://localhost/")),
+      initialSettings: InAppWebViewSettings(useShouldInterceptRequest: true),
+      shouldInterceptRequest: (controller, request) async {
+        if (request.url.toString() == "https://localhost/") {
+          final headers =
+              request.headers?.map(
+                (key, value) => MapEntry(key.toLowerCase(), value),
+              ) ??
+              {};
+          final ua = headers['user-agent'];
+
+          if (ua != null && ua.isNotEmpty) {
+            dynamicUserAgent = ua;
+            dynamicSecChUa = headers['sec-ch-ua'];
+            dynamicSecChUaMobile = headers['sec-ch-ua-mobile'];
+            dynamicSecChUaPlatform = headers['sec-ch-ua-platform'];
+            fetched = true;
+
+            logger.d("Fast fetched dynamic user agent: $dynamicUserAgent");
+            if (dynamicSecChUa != null) {
+              logger.d(
+                "Fast Client Hints - UA: $dynamicSecChUa, Mobile: $dynamicSecChUaMobile, Platform: $dynamicSecChUaPlatform",
+              );
+            }
+          }
+
+          return WebResourceResponse(
+            contentType: "text/html",
+            data: Uint8List.fromList([]),
+            statusCode: 200,
+            reasonPhrase: "OK",
+            headers: {"Content-Type": "text/html; charset=utf-8"},
+          );
+        }
+        return null;
+      },
+      onLoadStop: (controller, url) async {
+        if (fetched) {
+          headlessWebView?.dispose();
+          return;
+        }
+        try {
+          final jsSource = '''
+            (function() {
+              var result = {
+                userAgent: navigator.userAgent
+              };
+              
+              if (navigator.userAgentData) {
+                result.secChUa = navigator.userAgentData.brands
+                  .map(function(b) { return '"' + b.brand + '";v="' + b.version + '"'; })
+                  .join(', ');
+                result.secChUaMobile = navigator.userAgentData.mobile ? "?1" : "?0";
+                result.secChUaPlatform = '"' + navigator.userAgentData.platform + '"';
+              }
+              
+              return result;
+            })();
+          ''';
+
+          final uaResult = await controller.evaluateJavascript(
+            source: jsSource,
+          );
+
+          if (uaResult is Map) {
+            dynamicUserAgent = uaResult['userAgent']?.toString();
+
+            if (uaResult.containsKey('secChUa')) {
+              dynamicSecChUa = uaResult['secChUa']?.toString();
+              dynamicSecChUaMobile = uaResult['secChUaMobile']?.toString();
+              dynamicSecChUaPlatform = uaResult['secChUaPlatform']?.toString();
+            }
+
+            logger.d("Fetched dynamic user agent: $dynamicUserAgent");
+            if (dynamicSecChUa != null) {
+              logger.d(
+                "Client Hints - UA: $dynamicSecChUa, Mobile: $dynamicSecChUaMobile, Platform: $dynamicSecChUaPlatform",
+              );
+            }
+          }
+        } catch (e) {
+          logger.e("Failed to evaluate user agent script", error: e);
+        } finally {
+          headlessWebView?.dispose();
+        }
+      },
+      onReceivedError: (controller, request, error) {
+        logger.e(
+          'Failed to get dynamic user agent: ${error.description}',
+          error: error,
+        );
+        headlessWebView?.dispose();
+      },
+      onReceivedHttpError: (controller, request, errorResponse) {
+        logger.e(
+          'Failed to get dynamic user agent with status: ${errorResponse.statusCode}',
+        );
+        headlessWebView?.dispose();
+      },
+    );
+
+    await headlessWebView.run();
+  }
+
   Future<void> initData() async {
     extensionHost = await rootBundle.loadString(
       'assets/extensionhost/bundle.js',
     );
+
+    // Fire and forget finding the dynamic agent so we do not block runApp
+    _fetchDynamicUserAgent();
 
     final blockerUri = Uri.parse(_blockers);
     final hostsUri = Uri.parse(_knownHosts);

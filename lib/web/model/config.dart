@@ -6,7 +6,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart' show ExtensionStateDB_;
 import 'package:objectbox/objectbox.dart';
-import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'config.freezed.dart';
@@ -95,8 +94,6 @@ class WebConfig extends _$WebConfig {
     return update;
   }
 }
-
-final webConfigSaveMutation = Mutation<ExtensionConfig>();
 
 @Entity()
 class ExtensionStateDB {

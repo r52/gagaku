@@ -34,6 +34,10 @@
     "retry": "Retry",
     "irreversibleWarning": "NOTE: THIS ACTION IS IRREVERSIBLE",
     "filterItems": "Filter Items",
+    "filterLocales": "Filter Locales",
+    "allLocales": "All Locales",
+    "selected": "$count Selected",
+    "unknown": "Unknown",
     "sureContinue": "Are you sure you want to continue?"
   },
   "errors": {
@@ -229,7 +233,9 @@
     "progressBar": "Progress Bar",
     "swipeGestures": "Swipe Gestures",
     "clickToTurn": "Click/Tap to Turn Page",
-    "precacheCount": "Page Preload"
+    "precacheCount": "Page Preload",
+    "gotoPage": "Go to page",
+    "pageCount": "Page ${current} of ${total}"
   },
   "mangadex": {
     "home": "Home",

@@ -35,7 +35,7 @@ class MangaDexChapterFeedWidget extends HookWidget {
   Widget build(BuildContext context) {
     final tr = context.t;
     final scrollController =
-        DefaultScrollController.maybeOf(context, 'MangaDexChapterFeedPage') ??
+        DefaultScrollController.maybeOf(context) ??
         controller ??
         useScrollController();
     final view = useState(_FeedViewType.chapters);

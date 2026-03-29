@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
@@ -24,7 +25,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
     final cfg = ref.watch(webConfigProvider);
 
     final scrollController =
-        DefaultScrollController.maybeOf(context, 'WebSourceHistoryPage') ??
+        DefaultScrollController.maybeOf(context) ??
         controller ??
         useScrollController();
     // final historyProvider = ref.watch(webSourceHistoryProvider);
@@ -67,8 +68,8 @@ class WebSourceHistoryPage extends HookConsumerWidget {
         Switch(
           value: cfg.preserveHistory,
           onChanged: (bool value) {
-            webConfigSaveMutation.run(ref, (ref) async {
-              return ref
+            ref.run((tsx) async {
+              return tsx
                   .get(webConfigProvider.notifier)
                   .saveWith(preserveHistory: value);
             });

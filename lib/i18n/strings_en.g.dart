@@ -214,6 +214,18 @@ class TranslationsUiEn {
 	/// en: 'Filter Items'
 	String get filterItems => 'Filter Items';
 
+	/// en: 'Filter Locales'
+	String get filterLocales => 'Filter Locales';
+
+	/// en: 'All Locales'
+	String get allLocales => 'All Locales';
+
+	/// en: '$count Selected'
+	String selected({required Object count}) => '${count} Selected';
+
+	/// en: 'Unknown'
+	String get unknown => 'Unknown';
+
 	/// en: 'Are you sure you want to continue?'
 	String get sureContinue => 'Are you sure you want to continue?';
 }
@@ -558,6 +570,12 @@ class TranslationsReaderEn {
 
 	/// en: 'Page Preload'
 	String get precacheCount => 'Page Preload';
+
+	/// en: 'Go to page'
+	String get gotoPage => 'Go to page';
+
+	/// en: 'Page ${current} of ${total}'
+	String pageCount({required Object current, required Object total}) => 'Page ${current} of ${total}';
 }
 
 // Path: mangadex
@@ -1744,6 +1762,10 @@ extension on Translations {
 			'ui.retry' => 'Retry',
 			'ui.irreversibleWarning' => 'NOTE: THIS ACTION IS IRREVERSIBLE',
 			'ui.filterItems' => 'Filter Items',
+			'ui.filterLocales' => 'Filter Locales',
+			'ui.allLocales' => 'All Locales',
+			'ui.selected' => ({required Object count}) => '${count} Selected',
+			'ui.unknown' => 'Unknown',
 			'ui.sureContinue' => 'Are you sure you want to continue?',
 			'errors.noresults' => 'No results',
 			'errors.notitles' => 'No titles',
@@ -1895,6 +1917,8 @@ extension on Translations {
 			'reader.swipeGestures' => 'Swipe Gestures',
 			'reader.clickToTurn' => 'Click/Tap to Turn Page',
 			'reader.precacheCount' => 'Page Preload',
+			'reader.gotoPage' => 'Go to page',
+			'reader.pageCount' => ({required Object current, required Object total}) => 'Page ${current} of ${total}',
 			'mangadex.home' => 'Home',
 			'mangadex.myFeed' => 'My Feed',
 			'mangadex.myLists' => 'My Lists',

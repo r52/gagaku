@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
@@ -48,8 +49,8 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                   icon: const Icon(Icons.save),
                   label: Text(tr.saveSettings),
                   onPressed: () {
-                    mdConfigSaveMutation.run(ref, (ref) async {
-                      return ref
+                    ref.run((tsx) async {
+                      return tsx
                           .get(mdConfigProvider.notifier)
                           .save(config.value);
                     });
@@ -98,10 +99,9 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                     ),
                     menuChildren: [
                       for (final lang in Languages.languages)
-                        CheckboxListTile(
-                          controlAffinity: ListTileControlAffinity.leading,
-                          title: Text(tr[lang.label]),
-                          secondary: CountryFlag(flag: lang.flag, size: 15),
+                        CheckboxMenuButton(
+                          closeOnActivate: false,
+                          trailingIcon: CountryFlag(flag: lang.flag, size: 15),
                           value: config.value.translatedLanguages.contains(
                             lang,
                           ),
@@ -123,6 +123,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                               );
                             }
                           },
+                          child: Text(tr[lang.label]),
                         ),
                     ],
                     child: Column(
@@ -189,10 +190,9 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                     ),
                     menuChildren: [
                       for (final lang in Languages.languages)
-                        CheckboxListTile(
-                          controlAffinity: ListTileControlAffinity.leading,
-                          title: Text(tr[lang.label]),
-                          secondary: CountryFlag(flag: lang.flag, size: 15),
+                        CheckboxMenuButton(
+                          closeOnActivate: false,
+                          trailingIcon: CountryFlag(flag: lang.flag, size: 15),
                           value: config.value.originalLanguage.contains(lang),
                           onChanged: (bool? value) async {
                             if (value == true) {
@@ -210,6 +210,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                               );
                             }
                           },
+                          child: Text(tr[lang.label]),
                         ),
                     ],
                     child: Column(
@@ -275,9 +276,8 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                     ),
                     menuChildren: [
                       for (final content in ContentRating.values)
-                        CheckboxListTile(
-                          controlAffinity: ListTileControlAffinity.leading,
-                          title: Text(tr[content.label]),
+                        CheckboxMenuButton(
+                          closeOnActivate: false,
                           value: config.value.contentRating.contains(content),
                           onChanged: (bool? value) async {
                             if (value == true) {
@@ -295,6 +295,7 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                               );
                             }
                           },
+                          child: Text(tr[content.label]),
                         ),
                     ],
                     child: Column(

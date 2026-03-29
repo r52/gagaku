@@ -1,6 +1,8 @@
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/config.dart';
@@ -202,8 +204,8 @@ class MangaDexGroupViewWidget extends HookConsumerWidget {
                 );
               }
 
-              mdConfigSaveMutation.run(ref, (ref) async {
-                return ref.get(mdConfigProvider.notifier).save(cfg.value);
+              ref.run((tsx) async {
+                return tsx.get(mdConfigProvider.notifier).save(cfg.value);
               });
             },
             icon: const Icon(Icons.block),
@@ -268,9 +270,10 @@ class _GroupTitlesTab extends ConsumerStatefulWidget {
 class __GroupTitlesTabState extends ConsumerState<_GroupTitlesTab> {
   static const info = MangaDexFeeds.groupTitles;
 
-  late final _pagingController = GagakuPagingController<int, Manga>(
-    getNextPageKey: (state) =>
-        state.keys?.last != null ? state.keys!.last + info.limit : 0,
+  late final _pagingManager = OffsetPagingManager<Manga>(limit: info.limit);
+
+  late final _pagingController = PagingController<int, Manga>(
+    getNextPageKey: _pagingManager.getNextPageKey,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final list = await api.fetchMangaList(
@@ -280,21 +283,19 @@ class __GroupTitlesTabState extends ConsumerState<_GroupTitlesTab> {
         entity: widget.group,
       );
 
+      _pagingManager.totalItems = list.total;
+
       final newItems = list.data.cast<Manga>();
 
       try {
-        statisticsMutation.run(ref, (ref) async {
-          return await ref.get(statisticsProvider.notifier).get(newItems);
+        ref.run((tsx) async {
+          return await tsx.get(statisticsProvider.notifier).get(newItems);
         });
       } catch (e) {
         logger.e(e, error: e);
       }
 
-      return PageResultsMetaData(newItems, list.total);
-    },
-    refresh: () async {
-      final api = ref.watch(mangadexProvider);
-      await api.invalidateAll('${info.key}(${widget.group.id}');
+      return newItems;
     },
   );
 
@@ -308,7 +309,12 @@ class __GroupTitlesTabState extends ConsumerState<_GroupTitlesTab> {
   Widget build(BuildContext context) {
     final t = context.t;
     return RefreshIndicator(
-      onRefresh: () async => _pagingController.refresh(),
+      onRefresh: () async {
+        _pagingManager.reset();
+        final api = ref.watch(mangadexProvider);
+        await api.invalidateAll('${info.key}(${widget.group.id}');
+        return _pagingController.refresh();
+      },
       child: MangaListWidget(
         title: Text(t.mangadex.groupTitles, style: CommonTextStyles.twentyfour),
         physics: const AlwaysScrollableScrollPhysics(),

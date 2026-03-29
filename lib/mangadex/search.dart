@@ -1,4 +1,6 @@
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'dart:async';
+import 'package:gagaku/util/riverpod.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -54,9 +56,15 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
       widget.parameters ??
       const MangaSearchParameters(query: '', filter: MangaFilters());
 
-  late final _pagingController = GagakuPagingController<int, Manga>(
-    getNextPageKey: (state) =>
-        state.keys?.last != null ? state.keys!.last + info.limit : 0,
+  late final _pagingManager = OffsetPagingManager<Manga>(limit: info.limit);
+
+  void _refresh() {
+    _pagingManager.reset();
+    _pagingController.refresh();
+  }
+
+  late final _pagingController = PagingController<int, Manga>(
+    getNextPageKey: _pagingManager.getNextPageKey,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final filter = _searchParameters;
@@ -68,19 +76,21 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
         offset: pageKey,
       );
 
+      _pagingManager.totalItems = results.total;
+
       final manga = results.data.cast<Manga>();
 
       if (manga.isNotEmpty) {
         try {
-          statisticsMutation.run(ref, (ref) async {
-            return await ref.get(statisticsProvider.notifier).get(manga);
+          ref.run((tsx) async {
+            return await tsx.get(statisticsProvider.notifier).get(manga);
           });
         } catch (e) {
           logger.e(e, error: e);
         }
       }
 
-      return PageResultsMetaData(manga, results.total);
+      return manga;
     },
   );
 
@@ -154,7 +164,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                                 filter: result,
                               );
 
-                              _pagingController.refresh();
+                              _refresh();
                             });
                           }
                         },
@@ -189,7 +199,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                         filter: filter.filter,
                       );
 
-                      _pagingController.refresh();
+                      _refresh();
                     });
                   },
                 );
@@ -214,7 +224,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                     filter: filter.filter,
                   );
 
-                  _pagingController.refresh();
+                  _refresh();
                 });
               },
               suggestionsBuilder:
@@ -249,7 +259,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                                   filter: filter.filter,
                                 );
 
-                                _pagingController.refresh();
+                                _refresh();
                               });
                             },
                           ),
@@ -285,7 +295,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                         filter: filter.filter.copyWith(order: order),
                       );
 
-                      _pagingController.refresh();
+                      _refresh();
                     });
                   }
                 },

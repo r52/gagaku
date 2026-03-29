@@ -20,7 +20,6 @@ import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:native_dio_adapter/native_dio_adapter.dart' hide URLRequest;
-import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
@@ -89,7 +88,7 @@ Map<String, String> sourceHeaders(Ref ref, String sourceId) {
   final referrers = ref.watch(extensionReferrerProvider);
   final baseReferrer = referrers[sourceId] ?? '';
 
-  final headers = <String, String>{'user-agent': baseUserAgent};
+  final headers = <String, String>{'user-agent': getUserAgent()};
 
   if (sourceId != 'gist') {
     headers['x-source-id'] = sourceId;
@@ -731,8 +730,6 @@ class WebReadMarkers extends _$WebReadMarkers {
   }
 }
 
-final webReadMarkerMutation = Mutation<ReadMarkersDB>();
-
 @riverpod
 Stream<List<WebSourceInfo>> installedSources(Ref ref) async* {
   final box = GagakuData().store.box<WebSourceInfo>();
@@ -852,6 +849,32 @@ class ExtensionSource extends _$ExtensionSource {
         },
         onWebViewCreated: (controller) {
           _setupJavaScriptHandlers(controller, sourceId);
+        },
+        onReceivedError: (controller, request, error) {
+          if (request.isForMainFrame == true) {
+            controller.stopLoading();
+            if (!completer.isCompleted) {
+              final ex = Exception(
+                "Source startup failed. Main frame encountered error: ${error.description}",
+              );
+              completer.completeError(ex);
+            }
+          }
+        },
+        onReceivedHttpError: (controller, request, response) {
+          if (request.isForMainFrame == true) {
+            final int code = response.statusCode ?? 0;
+            // 503/403 are occasionally expected during CloudFlare challenge processing
+            if (code == 404 || (code >= 500 && code != 503)) {
+              controller.stopLoading();
+              if (!completer.isCompleted) {
+                final ex = Exception(
+                  "Source startup failed. Main frame received HTTP $code",
+                );
+                completer.completeError(ex);
+              }
+            }
+          }
         },
         onLoadStop: (controller, url) =>
             _onWebViewLoadStop(controller, url, source!, completer),

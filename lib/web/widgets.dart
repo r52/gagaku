@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'package:gagaku/util/riverpod.dart';
 
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -578,9 +579,8 @@ class FavoritesButton extends HookWidget {
     final menuChildren = <Widget>[
       if (favorites.isNotEmpty) ...[
         for (final cat in favorites)
-          CheckboxListTile(
-            controlAffinity: ListTileControlAffinity.leading,
-            title: Text(cat.name),
+          CheckboxMenuButton(
+            closeOnActivate: false,
             value: favList.contains(cat.dbid),
             onChanged: (bool? value) async {
               if (value == true) {
@@ -589,6 +589,7 @@ class FavoritesButton extends HookWidget {
                 manager.remove(cat, link);
               }
             },
+            child: Text(cat.name),
           ),
         if (isFavorited)
           MenuItemButton(
@@ -706,8 +707,8 @@ class ChapterButtonWidget extends HookConsumerWidget {
       onPressed: () async {
         bool set = !isRead;
 
-        webReadMarkerMutation.run(ref, (ref) async {
-          return await ref
+        ref.run((tsx) async {
+          return await tsx
               .get(webReadMarkersProvider.notifier)
               .set(mangakey, chapterkey, set);
         });

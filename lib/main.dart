@@ -54,10 +54,6 @@ void main() async {
   Hive.registerAdapter(CacheEntryAdapter());
   await Hive.openLazyBox<CacheEntry>(gagakuCache);
 
-  final gdat = GagakuData();
-  await gdat.initData();
-  await gdat.initGagakuBoxes();
-
   final appdir = await getApplicationSupportDirectory();
 
   if (kReleaseMode) {
@@ -80,6 +76,10 @@ void main() async {
                 ]))
         : null,
   );
+
+  final gdat = GagakuData();
+  await gdat.initData();
+  await gdat.initGagakuBoxes();
 
   runApp(ProviderScope(child: TranslationProvider(child: App())));
 }

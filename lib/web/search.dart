@@ -1,9 +1,9 @@
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/common.dart';
-import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -100,12 +100,21 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
   dynamic metadata = _firstSearch;
   SearchQuery? query;
 
-  late final _pagingController = GagakuPagingController<dynamic, HistoryLink>(
-    getNextPageKey: (state) =>
-        state.keys?.last == null ? _firstSearch : metadata,
+  void _refresh() {
+    metadata = _firstSearch;
+    _pagingController.refresh();
+  }
+
+  late final _pagingController = PagingController<dynamic, HistoryLink>(
+    getNextPageKey: (state) {
+      if (state.keys != null && state.keys!.isNotEmpty && metadata == null) {
+        return null; // end of list
+      }
+      return state.keys?.last == null ? _firstSearch : metadata;
+    },
     fetchPage: (pageKey) async {
       if (query == null || query!.isEmpty) {
-        return PageResultsMetaData([]);
+        return [];
       }
 
       await ref.readAsync(extensionSourceProvider(source.id).future);
@@ -119,11 +128,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
 
       metadata = results.metadata;
 
-      return PageResultsMetaData(m.toList());
-    },
-    getIsLastPage: (_, _) => metadata == null,
-    refresh: () async {
-      metadata = _firstSearch;
+      return m.toList();
     },
   );
 
@@ -199,7 +204,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                       source = opt;
                       query = query?.copyWith(filters: []);
                     });
-                    _pagingController.refresh();
+                    _refresh();
                   }
                 },
               );
@@ -250,7 +255,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                         .read(extensionSourceProvider(source.id).notifier)
                         .setCurrentSort(opt);
                     setState(() {});
-                    _pagingController.refresh();
+                    _refresh();
                   }
                 },
               );
@@ -299,7 +304,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                           ? query!.copyWith(title: term.trim().toLowerCase())
                           : SearchQuery(title: term.trim().toLowerCase());
                     });
-                    _pagingController.refresh();
+                    _refresh();
                   },
                   trailing: <Widget>[
                     Tooltip(
@@ -327,7 +332,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                                   ? query!.copyWith(filters: result)
                                   : SearchQuery(title: '', filters: result);
                             });
-                            _pagingController.refresh();
+                            _refresh();
                           }
                         },
                         color: (query == null || query!.filters.isEmpty)
@@ -360,7 +365,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                       ? query!.copyWith(title: term.trim().toLowerCase())
                       : SearchQuery(title: term.trim().toLowerCase());
                 });
-                _pagingController.refresh();
+                _refresh();
               },
               suggestionsBuilder:
                   (BuildContext context, SearchController controller) {
@@ -395,7 +400,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                                     ? query!.copyWith(title: term.toLowerCase())
                                     : SearchQuery(title: term.toLowerCase());
                               });
-                              _pagingController.refresh();
+                              _refresh();
                             },
                           ),
                         )
