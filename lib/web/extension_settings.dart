@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_spinbox/flutter_spinbox.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/web/model/extension_bridge.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
