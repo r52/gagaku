@@ -65,7 +65,7 @@ abstract class _$LibrarySortType extends $Notifier<LibrarySort> {
 final localLibraryProvider = LocalLibraryProvider._();
 
 final class LocalLibraryProvider
-    extends $AsyncNotifierProvider<LocalLibrary, LocalLibraryItem> {
+    extends $StreamNotifierProvider<LocalLibrary, LocalLibraryItem> {
   LocalLibraryProvider._()
     : super(
         from: null,
@@ -85,10 +85,10 @@ final class LocalLibraryProvider
   LocalLibrary create() => LocalLibrary();
 }
 
-String _$localLibraryHash() => r'e5304b940c79acd9ee306bed67941dd1f590840b';
+String _$localLibraryHash() => r'4e04b2245d92d8e078412c22d78a42dbea417e0b';
 
-abstract class _$LocalLibrary extends $AsyncNotifier<LocalLibraryItem> {
-  FutureOr<LocalLibraryItem> build();
+abstract class _$LocalLibrary extends $StreamNotifier<LocalLibraryItem> {
+  Stream<LocalLibraryItem> build();
   @$mustCallSuper
   @override
   void runBuild() {
