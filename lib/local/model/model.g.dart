@@ -85,7 +85,7 @@ final class LocalLibraryProvider
   LocalLibrary create() => LocalLibrary();
 }
 
-String _$localLibraryHash() => r'4e04b2245d92d8e078412c22d78a42dbea417e0b';
+String _$localLibraryHash() => r'ff96c1bb18bf90367d94195a23e8b8324c248c14';
 
 abstract class _$LocalLibrary extends $StreamNotifier<LocalLibraryItem> {
   Stream<LocalLibraryItem> build();

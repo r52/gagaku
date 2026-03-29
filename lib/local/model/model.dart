@@ -6,6 +6,7 @@ import 'dart:isolate';
 import 'package:collection/collection.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/local/model/archive_thumbnail_provider.dart';
 import 'package:gagaku/local/model/config.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -166,13 +167,13 @@ Future<LocalLibraryItem?> _processFileIsolate(
       lpath.endsWith('.zip') ||
       lpath.endsWith('.cbt') ||
       lpath.endsWith('.tar')) {
-    // TODO thumbnail for archives?
     return LocalLibraryItem(
       path: file.path,
       type: LibraryItemType.archive,
       modified: await file.lastModified(),
       name: file.uri.pathSegments.last,
       isReadable: true,
+      thumbnail: file.path,
       parent: parent,
     );
   }
@@ -347,6 +348,8 @@ class LocalLibrary extends _$LocalLibrary {
       if (lastItem.children.isEmpty) {
         lastItem.error = t.localLibrary.errors.emptyLibrary;
         yield lastItem;
+      } else {
+        triggerThumbnailGarbageCollection(lastItem);
       }
       return;
     }

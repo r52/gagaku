@@ -90,6 +90,7 @@ dependencies:
   async: ^2.13.0
   pool: ^1.5.2
   cached_network_image_ce: ^4.6.3
+  image: ^4.8.0
 
 dev_dependencies:
   flutter_test:
