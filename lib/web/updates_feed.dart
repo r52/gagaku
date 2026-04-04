@@ -54,7 +54,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
     final isMobile = DeviceContext.isMobile();
     final tr = context.t;
     final cache = ref.watch(cacheProvider);
-    final api = ref.watch(proxyProvider);
+    final api = ref.watch(webSourceBrokerProvider);
 
     if (await cache.exists(feedKey)) {
       logger.d('CacheManager: retrieving entry $feedKey');
@@ -256,7 +256,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
   @override
   Widget build(BuildContext context) {
     final messenger = ScaffoldMessenger.of(context);
-    final api = ref.watch(proxyProvider);
+    final api = ref.watch(webSourceBrokerProvider);
     final t = context.t;
     final scrollController =
         DefaultScrollController.maybeOf(context) ??

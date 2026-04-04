@@ -21,11 +21,11 @@ Future<WebReaderData> _fetchWebChapterInfo(
   Ref ref,
   SourceHandler handle,
 ) async {
-  final api = ref.watch(proxyProvider);
+  final api = ref.watch(webSourceBrokerProvider);
   final manga = await api.getMangaFromSource(handle);
 
   if (manga != null) {
-    WebHistoryManager().add(
+    api.syncAndLogHistory(
       HistoryLink(
         title: manga.title,
         url: handle.getURL(),
@@ -56,7 +56,7 @@ Future<List<ReaderPage>> _getPages(Ref ref, dynamic data) async {
   List<String> links;
 
   if (data is String && data.startsWith('/read/')) {
-    final api = ref.watch(proxyProvider);
+    final api = ref.watch(webSourceBrokerProvider);
     data = await api.getProxyAPI(data);
   }
 

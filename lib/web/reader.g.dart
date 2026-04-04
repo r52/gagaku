@@ -65,7 +65,7 @@ final class _FetchWebChapterInfoProvider
 }
 
 String _$_fetchWebChapterInfoHash() =>
-    r'5fd05e519ea421c4c6317a014452328c3ee3bc48';
+    r'b722225992e996830f367c14f2a08a9f4d30b879';
 
 final class _FetchWebChapterInfoFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<WebReaderData>, SourceHandler> {
@@ -140,7 +140,7 @@ final class _GetPagesProvider
   }
 }
 
-String _$_getPagesHash() => r'baf00fe9575de9570c73445277b0e4a8b8c6ace6';
+String _$_getPagesHash() => r'1c52150fc757ca675597728dac032870411f5988';
 
 final class _GetPagesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, dynamic> {

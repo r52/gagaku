@@ -12,7 +12,6 @@ import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
@@ -30,7 +29,7 @@ Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
   Ref ref,
   SourceHandler handle,
 ) async {
-  final api = ref.watch(proxyProvider);
+  final api = ref.watch(webSourceBrokerProvider);
   final manga = await api.getMangaFromSource(handle);
 
   if (manga != null) {
@@ -90,7 +89,7 @@ class WebMangaViewPage extends ConsumerWidget {
         body: Consumer(
           child: child,
           builder: (context, ref, child) {
-            final api = ref.watch(proxyProvider);
+            final api = ref.watch(webSourceBrokerProvider);
             return RefreshIndicator(
               onRefresh: () async {
                 await api.invalidateAll(hndl.getKey());
@@ -123,7 +122,6 @@ class WebMangaViewWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final cfg = ref.watch(webConfigProvider);
     final source = ref.watch(
       getExtensionFromIdProvider(handle.sourceId).select(
         (value) => switch (value) {
@@ -134,7 +132,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
     );
     final headers = ref.watch(sourceHeadersProvider(handle.sourceId));
     final imageCache = ref.watch(extensionImageCacheProvider);
-    final api = ref.watch(proxyProvider);
+    final api = ref.watch(webSourceBrokerProvider);
     final theme = Theme.of(context);
 
     // handle legacy share url
@@ -149,11 +147,9 @@ class WebMangaViewWidget extends HookConsumerWidget {
     final extdata = manga.data;
 
     useEffect(() {
-      if (cfg.preserveHistory) {
-        Future.delayed(Duration.zero, () async {
-          WebHistoryManager().add(link);
-        });
-      }
+      Future.delayed(Duration.zero, () async {
+        api.syncAndLogHistory(link);
+      });
       return null;
     }, []);
 

@@ -277,7 +277,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                 textColor: theme.colorScheme.onSurface,
                 onTap: () async {
                   final tr = context.t;
-                  final api = ref.read(proxyProvider);
+                  final api = ref.read(webSourceBrokerProvider);
                   final messenger = ScaffoldMessenger.of(context);
                   final result = await api.handleLink(item);
 
@@ -355,7 +355,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                     textColor: theme.colorScheme.onSurface,
                     onTap: () async {
                       final tr = context.t;
-                      final api = ref.read(proxyProvider);
+                      final api = ref.read(webSourceBrokerProvider);
                       final messenger = ScaffoldMessenger.of(context);
                       final result = await api.handleLink(item);
 
@@ -519,7 +519,7 @@ class GridMangaItem extends HookConsumerWidget {
 
     return InkWell(
       onTap: () async {
-        final api = ref.read(proxyProvider);
+        final api = ref.read(webSourceBrokerProvider);
         final messenger = ScaffoldMessenger.of(context);
         final result = await api.handleLink(link);
 
@@ -933,7 +933,7 @@ class _CoverButton extends ConsumerWidget {
 
     return TextButton(
       onPressed: () async {
-        final api = ref.read(proxyProvider);
+        final api = ref.read(webSourceBrokerProvider);
         final messenger = ScaffoldMessenger.of(context);
         final result = await api.handleLink(link);
 
@@ -1002,7 +1002,7 @@ class _MangaTitle extends ConsumerWidget {
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {
-        final api = ref.read(proxyProvider);
+        final api = ref.read(webSourceBrokerProvider);
         final messenger = ScaffoldMessenger.of(context);
         final result = await api.handleLink(link);
 

@@ -104,12 +104,12 @@ Map<String, String> sourceHeaders(Ref ref, String sourceId) {
 }
 
 @Riverpod(keepAlive: true)
-ProxyHandler proxy(Ref ref) {
-  return ProxyHandler(ref);
+WebSourceBroker webSourceBroker(Ref ref) {
+  return WebSourceBroker(ref);
 }
 
-class ProxyHandler {
-  ProxyHandler(this.ref) : _cache = ref.read(cacheProvider);
+class WebSourceBroker {
+  WebSourceBroker(this.ref) : _cache = ref.read(cacheProvider);
 
   final Ref ref;
   final CacheManager _cache;
@@ -147,6 +147,17 @@ class ProxyHandler {
     await _cache.invalidateAll(startsWith);
   }
 
+  void syncAndLogHistory(HistoryLink link) {
+    if (ref.read(webConfigProvider).preserveHistory) {
+      WebHistoryManager().add(link);
+    } else {
+      link.resolveDb();
+      if (link.dbid > 0) {
+        GagakuData().store.box<HistoryLink>().put(link);
+      }
+    }
+  }
+
   Future<HistoryLink> handleLink(HistoryLink link) async {
     if (link.handle != null) {
       return link;
@@ -161,7 +172,7 @@ class ProxyHandler {
 
     final updatedLink = link.copyWith(handle: handle);
 
-    WebHistoryManager().add(updatedLink);
+    syncAndLogHistory(updatedLink);
 
     return updatedLink;
   }
@@ -175,7 +186,7 @@ class ProxyHandler {
       chapter: '1',
     );
 
-    WebHistoryManager().add(
+    syncAndLogHistory(
       HistoryLink(
         title: uri.toString(),
         url: uri.toString(),
@@ -295,46 +306,35 @@ class ProxyHandler {
     return _handleExtensionUrl(uri);
   }
 
-  Future<WebManga?> _getCachedMangaOrNull(String key) async {
+  Future<WebManga?> _fetchWithCache(
+    String key,
+    Future<WebManga?> Function() fetcher,
+  ) async {
     if (await _cache.exists(key)) {
       logger.d('CacheManager: retrieving entry $key');
       return _cache.get<WebManga>(key, WebManga.fromJson);
     }
 
-    return null;
+    final manga = await fetcher();
+
+    if (manga != null) {
+      const expiry = Duration(days: 1);
+      logger.d('CacheManager: caching entry $key for ${expiry.toString()}');
+      _cache.put(key, json.encode(manga.toJson()), manga, true, expiry: expiry);
+    }
+
+    return manga;
   }
 
   Future<WebManga?> getMangaFromSource(SourceHandler handle) async {
     switch (handle.type) {
       case SourceType.source:
-        final key = handle.getKey();
-        WebManga? manga;
-
-        manga = await _getCachedMangaOrNull(key);
-
-        if (manga != null) {
-          return manga;
-        }
-
-        await ref.readAsync(extensionSourceProvider(handle.sourceId).future);
-        manga = await ref
-            .read(extensionSourceProvider(handle.sourceId).notifier)
-            .getManga(handle.location);
-
-        if (manga != null) {
-          const expiry = Duration(days: 1);
-
-          logger.d('CacheManager: caching entry $key for ${expiry.toString()}');
-          _cache.put(
-            key,
-            json.encode(manga.toJson()),
-            manga,
-            true,
-            expiry: expiry,
-          );
-        }
-
-        return manga;
+        return _fetchWithCache(handle.getKey(), () async {
+          await ref.readAsync(extensionSourceProvider(handle.sourceId).future);
+          return await ref
+              .read(extensionSourceProvider(handle.sourceId).notifier)
+              .getManga(handle.location);
+        });
 
       case SourceType.proxy:
         return await _getMangaFromProxy(handle);
@@ -342,33 +342,21 @@ class ProxyHandler {
   }
 
   Future<WebManga?> _getMangaFromProxy(SourceHandler handle) async {
-    final key = handle.getKey();
     final url = "$_cubariApiBase/${handle.sourceId}/series/${handle.location}/";
 
-    final cached = await _getCachedMangaOrNull(key);
+    return _fetchWithCache(handle.getKey(), () async {
+      final response = await _dio.getUri(Uri.parse(url));
 
-    if (cached != null) {
-      return cached;
-    }
+      if (response.statusCode == 200) {
+        return WebManga.fromJson(response.data);
+      }
 
-    final response = await _dio.getUri(Uri.parse(url));
+      logger.d(
+        "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.statusMessage}",
+      );
 
-    if (response.statusCode == 200) {
-      final manga = WebManga.fromJson(response.data);
-
-      const expiry = Duration(days: 1);
-
-      logger.d('CacheManager: caching entry $key for ${expiry.toString()}');
-      _cache.put(key, json.encode(manga.toJson()), manga, true, expiry: expiry);
-
-      return manga;
-    }
-
-    logger.d(
-      "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.statusMessage}",
-    );
-
-    return null;
+      return null;
+    });
   }
 
   Future<dynamic> getProxyAPI(String path) async {

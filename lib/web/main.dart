@@ -60,7 +60,7 @@ class WebSourceHomePage extends HookConsumerWidget {
 
     final theme = Theme.of(context);
     final nav = Navigator.of(context);
-    final api = ref.watch(proxyProvider);
+    final api = ref.watch(webSourceBrokerProvider);
 
     return Scaffold(
       restorationId: 'extension_home_restore',

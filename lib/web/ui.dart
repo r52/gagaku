@@ -4,7 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/web/model/model.dart';
 
-Future<void> openLinkDialog(BuildContext context, ProxyHandler api) async {
+Future<void> openLinkDialog(BuildContext context, WebSourceBroker api) async {
   final tr = context.t;
   final messenger = ScaffoldMessenger.of(context);
   final result = await showDialog<String>(

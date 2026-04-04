@@ -21,7 +21,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final api = ref.watch(proxyProvider);
+    final api = ref.watch(webSourceBrokerProvider);
     final cfg = ref.watch(webConfigProvider);
 
     final scrollController =
