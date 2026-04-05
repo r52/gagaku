@@ -38,13 +38,22 @@ Future<WebReaderData> _fetchWebChapterInfo(
     final chapter = manga.getChapter(handle.chapter!);
 
     if (chapter != null) {
-      return WebReaderData(
-        source: chapter.groups.entries.first.value,
-        title: chapter.getTitle(handle.chapter!),
-        link: manga.title,
-        handle: handle,
-        readKey: handle.chapter,
-      );
+      return switch (chapter) {
+        WebChapterItemCubari(:final entry) => WebReaderData(
+          source: entry.chapter.groups.entries.first.value,
+          title: chapter.title,
+          link: manga.title,
+          handle: handle,
+          readKey: handle.chapter,
+        ),
+        WebChapterItemExtension(chapter: final extChapter) => WebReaderData(
+          source: extChapter,
+          title: chapter.title,
+          link: manga.title,
+          handle: handle,
+          readKey: handle.chapter,
+        ),
+      };
     }
   }
 
@@ -55,7 +64,8 @@ Future<WebReaderData> _fetchWebChapterInfo(
 Future<List<ReaderPage>> _getPages(Ref ref, dynamic data) async {
   List<String> links;
 
-  if (data is String && data.startsWith('/read/')) {
+  if (data is String &&
+      (data.startsWith('/read/') || data.startsWith('/proxy/'))) {
     final api = ref.watch(webSourceBrokerProvider);
     data = await api.getProxyAPI(data);
   }

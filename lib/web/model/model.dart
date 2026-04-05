@@ -312,7 +312,12 @@ class WebSourceBroker {
   ) async {
     if (await _cache.exists(key)) {
       logger.d('CacheManager: retrieving entry $key');
-      return _cache.get<WebManga>(key, WebManga.fromJson);
+      try {
+        return _cache.get<WebManga>(key, WebManga.fromJson);
+      } catch (e) {
+        logger.w('Failed to decode cached WebManga for $key: $e');
+        // Fall through to re-fetch
+      }
     }
 
     final manga = await fetcher();
@@ -348,7 +353,9 @@ class WebSourceBroker {
       final response = await _dio.getUri(Uri.parse(url));
 
       if (response.statusCode == 200) {
-        return WebManga.fromJson(response.data);
+        final data = response.data;
+        data['source_type'] = 'cubari';
+        return WebManga.fromJson(data);
       }
 
       logger.d(

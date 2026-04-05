@@ -144,7 +144,10 @@ class WebMangaViewWidget extends HookConsumerWidget {
     );
     final shareUrl = useFuture(shareUrlFuture);
 
-    final extdata = manga.data;
+    final extdata = switch (manga) {
+      WebMangaCubari() => null,
+      WebMangaExtension(:final data) => data,
+    };
 
     useEffect(() {
       Future.delayed(Duration.zero, () async {
@@ -153,25 +156,31 @@ class WebMangaViewWidget extends HookConsumerWidget {
       return null;
     }, []);
 
-    final separators = useMemoized(
-      () => List.generate(manga.chapters.length, (index) {
-        final current = manga.chapters[index];
+    final separators = useMemoized(() {
+      final chapters = manga.chapters;
+      String getName(WebChapterItem c) => switch (c) {
+        WebChapterItemCubari(:final entry) => entry.name,
+        WebChapterItemExtension(:final chapter) => chapter.chapNum.toString(),
+      };
 
-        final prevName = (index > 0) ? manga.chapters[index - 1].name : null;
-        final nextName = (index < manga.chapters.length - 1)
-            ? manga.chapters[index + 1].name
+      return List.generate(chapters.length, (index) {
+        final currentName = getName(chapters[index]);
+
+        final prevName = (index > 0) ? getName(chapters[index - 1]) : null;
+        final nextName = (index < chapters.length - 1)
+            ? getName(chapters[index + 1])
             : null;
-        final afterNextName = (index < manga.chapters.length - 2)
-            ? manga.chapters[index + 2].name
+        final afterNextName = (index < chapters.length - 2)
+            ? getName(chapters[index + 2])
             : null;
 
-        final followsGroup = current.name == prevName;
-        final continuesGroup = current.name == nextName;
+        final followsGroup = currentName == prevName;
+        final continuesGroup = currentName == nextName;
         final isBeforeNewGroup =
             nextName != null &&
             afterNextName != null &&
             nextName == afterNextName &&
-            current.name != nextName;
+            currentName != nextName;
 
         if (!continuesGroup || isBeforeNewGroup) {
           final isStandalone = !followsGroup && !continuesGroup;
@@ -183,9 +192,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
         }
 
         return _ChapterDivider.none;
-      }),
-      [manga.chapters],
-    );
+      });
+    }, [manga]);
 
     return Scaffold(
       body: RefreshIndicator(
@@ -526,7 +534,13 @@ class WebMangaViewWidget extends HookConsumerWidget {
                       Consumer(
                         builder: (context, ref, child) {
                           final mangakey = handle.getKey();
-                          final chapterkeys = manga.chapters.map((e) => e.name);
+                          final chapterkeys = manga.chapters.map(
+                            (e) => switch (e) {
+                              WebChapterItemCubari(:final entry) => entry.name,
+                              WebChapterItemExtension(:final chapter) =>
+                                chapter.chapNum.toString(),
+                            },
+                          );
                           final allRead = ref.watch(
                             webReadMarkersProvider.select(
                               (value) => switch (value) {

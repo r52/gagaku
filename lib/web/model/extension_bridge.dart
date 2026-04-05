@@ -631,30 +631,11 @@ return p;
 
     final clist = chaps.value as List<dynamic>;
     final chapters = clist.map((e) => Chapter.fromJson(e)).toList();
-    final chapmap = chapters
-        .map(
-          (e) => ChapterEntry(
-            name: e.chapNum.toString(),
-            chapter: WebChapter(
-              title: e.title,
-              volume: e.volume?.toString(),
-              groups: {e.version ?? sourceId: e},
-              releaseDate: e.publishDate,
-            ),
-          ),
-        )
-        .toList();
-    chapmap.sort((a, b) => compareNatural(b.name, a.name));
-
-    final manga = WebManga(
-      title: smanga.mangaInfo.primaryTitle,
-      description: smanga.mangaInfo.synopsis,
-      artist: smanga.mangaInfo.artist ?? 'Unknown',
-      author: smanga.mangaInfo.author ?? 'Unknown',
-      cover: smanga.mangaInfo.thumbnailUrl,
-      chapters: chapmap,
-      data: smanga,
+    chapters.sort(
+      (a, b) => compareNatural(b.chapNum.toString(), a.chapNum.toString()),
     );
+
+    final manga = WebManga.extension(data: smanga, chaptersList: chapters);
 
     return manga;
   }

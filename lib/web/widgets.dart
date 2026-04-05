@@ -13,7 +13,6 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -653,7 +652,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
     this.onLinkPressed,
   });
 
-  final ChapterEntry data;
+  final WebChapterItem data;
   final WebManga manga;
   final SourceHandler handle;
   final CtxCallback? onLinkPressed;
@@ -662,7 +661,22 @@ class ChapterButtonWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final theme = Theme.of(context);
-    final chapterkey = data.name;
+
+    final title = data.title;
+    final date = data.date;
+    final (chapterkey, groupKey, sourceValue) = switch (data) {
+      WebChapterItemCubari(:final entry) => (
+        entry.name,
+        entry.chapter.groups.entries.first.key,
+        entry.chapter.groups.entries.first.value,
+      ),
+      WebChapterItemExtension(:final chapter) => (
+        chapter.chapNum.toString(),
+        chapter.version ?? handle.sourceId,
+        chapter,
+      ),
+    };
+
     final mangakey = handle.getKey();
 
     final isRead = ref.watch(
@@ -675,25 +689,18 @@ class ChapterButtonWidget extends HookConsumerWidget {
       ),
     );
 
-    final sourceValue = data.chapter.groups.entries.first.value;
-    String title = data.chapter.getTitle(chapterkey);
-    final groupKey = data.chapter.groups.entries.first.key;
+    final mangaGroups = manga.groups;
     final groupText =
-        manga.groups != null && manga.groups?.containsKey(groupKey) == true
-        ? manga.groups![groupKey]!
+        mangaGroups != null && mangaGroups.containsKey(groupKey) == true
+        ? mangaGroups[groupKey]!
         : groupKey;
 
     final lang = tr.$meta.locale.languageCode;
-    //final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
 
-    final timestamp = useMemoized(() {
-      if (data.chapter.lastUpdated != null) {
-        return timeago.format(data.chapter.lastUpdated!, locale: lang);
-      } else if (data.chapter.releaseDate != null) {
-        return timeago.format(data.chapter.releaseDate!, locale: lang);
-      }
-      return null;
-    }, [data.chapter.lastUpdated, data.chapter.releaseDate, lang]);
+    final timestamp = useMemoized(
+      () => date != null ? timeago.format(date, locale: lang) : null,
+      [date, lang],
+    );
 
     final language = sourceValue is Chapter
         ? CountryFlag(flag: sourceValue.langCode, size: 12)
@@ -743,21 +750,21 @@ class ChapterButtonWidget extends HookConsumerWidget {
       onLinkPressed: onLinkPressed,
     );
 
-    GoRouteData route = ProxyWebSourceReaderRoute(
-      proxy: handle.sourceId,
-      code: handle.location,
-      chapter: chapterkey,
-      $extra: readerData,
-    );
-
-    if (handle.type == SourceType.source) {
-      route = ExtensionReaderRoute(
+    final route = switch (data) {
+      WebChapterItemCubari() => ProxyWebSourceReaderRoute(
+        proxy: handle.sourceId,
+        code: handle.location,
+        chapter: chapterkey,
+        page: '1',
+        $extra: readerData,
+      ),
+      WebChapterItemExtension(:final chapter) => ExtensionReaderRoute(
         sourceId: handle.sourceId,
         mangaId: handle.location,
-        chapterId: (sourceValue as Chapter).chapterId,
+        chapterId: chapter.chapterId,
         $extra: readerData,
-      );
-    }
+      ),
+    };
 
     final tile = Column(
       mainAxisSize: MainAxisSize.min,

@@ -224,8 +224,8 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
 
     // 4. Sort manga list by latest chapter
     mangas.sort((a, b) {
-      final aLatestChapterTime = a.manga.chapters.first.chapter.releaseDate;
-      final bLatestChapterTime = b.manga.chapters.first.chapter.releaseDate;
+      final aLatestChapterTime = a.manga.chapters.first.date;
+      final bLatestChapterTime = b.manga.chapters.first.date;
 
       if (aLatestChapterTime == null) {
         return 1;
