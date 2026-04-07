@@ -1003,7 +1003,7 @@ class ReadChapterSet with ExpiringData {
   final String mangaId;
   final Set<String> _chapters;
 
-  static const _expiryDuration = Duration(minutes: 10);
+  static const _expiryDuration = Duration(minutes: 20);
 
   @override
   DateTime expiry = DateTime.now().add(_expiryDuration);
