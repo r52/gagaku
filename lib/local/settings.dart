@@ -80,9 +80,8 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
                               .request();
 
                           if (perms.isGranted) {
-                            String? selectedDirectory = await FilePicker
-                                .platform
-                                .getDirectoryPath();
+                            String? selectedDirectory =
+                                await FilePicker.getDirectoryPath();
 
                             if (selectedDirectory != null) {
                               config.value = config.value.copyWith(
