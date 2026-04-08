@@ -27,7 +27,6 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
     const titleStyle = CommonTextStyles.twentyBold;
     final tr = context.t;
     final nav = Navigator.of(context);
-    final theme = Theme.of(context);
     final cfg = ref.watch(mdConfigProvider);
     final config = useState(cfg.copyWith());
     final groupDataProvider = ref.watch(
@@ -73,86 +72,15 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
               ),
               subtitle: Text(tr.mangadex.settings.translatedLanguagesDesc),
               builder: (context) {
-                return Center(
-                  child: MenuAnchor(
-                    builder: (context, controller, child) => SizedBox(
-                      width: double.infinity,
-                      child: Material(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(6.0),
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            if (controller.isOpen) {
-                              controller.close();
-                            } else {
-                              controller.open();
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(6.0),
-                            child: child,
-                          ),
-                        ),
-                      ),
-                    ),
-                    menuChildren: [
-                      for (final lang in Languages.languages)
-                        CheckboxMenuButton(
-                          closeOnActivate: false,
-                          trailingIcon: CountryFlag(flag: lang.flag, size: 15),
-                          value: config.value.translatedLanguages.contains(
-                            lang,
-                          ),
-                          onChanged: (bool? value) async {
-                            if (value == true) {
-                              config.value = config.value.copyWith(
-                                translatedLanguages: {
-                                  ...config.value.translatedLanguages,
-                                  lang,
-                                },
-                              );
-                            } else {
-                              config.value = config.value.copyWith(
-                                translatedLanguages: config
-                                    .value
-                                    .translatedLanguages
-                                    .where((element) => element != lang)
-                                    .toSet(),
-                              );
-                            }
-                          },
-                          child: Text(tr[lang.label]),
-                        ),
-                    ],
-                    child: Column(
-                      children: [
-                        Wrap(
-                          spacing: 2.0,
-                          runSpacing: 2.0,
-                          children: [
-                            if (config.value.translatedLanguages.isEmpty)
-                              Text(tr.mangadex.settings.selectLanguages),
-                            for (final lang in config.value.translatedLanguages)
-                              ElevatedButton.icon(
-                                onPressed: () {
-                                  config.value = config.value.copyWith(
-                                    translatedLanguages: config
-                                        .value
-                                        .translatedLanguages
-                                        .where((element) => element != lang)
-                                        .toSet(),
-                                  );
-                                },
-                                icon: const Icon(Icons.close),
-                                label: Text(tr[lang.label]),
-                              ),
-                          ],
-                        ),
-                        const Icon(Icons.arrow_drop_down),
-                      ],
-                    ),
+                return MultiSelectMenuAnchor<Language>(
+                  items: Languages.languages,
+                  selected: config.value.translatedLanguages,
+                  labelFor: (lang) => tr[lang.label],
+                  trailingIconFor: (lang) =>
+                      CountryFlag(flag: lang.flag, size: 15),
+                  placeholder: tr.mangadex.settings.selectLanguages,
+                  onChanged: (updated) => config.value = config.value.copyWith(
+                    translatedLanguages: updated,
                   ),
                 );
               },
@@ -164,82 +92,15 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
               ),
               subtitle: Text(tr.mangadex.settings.originalLanguageDesc),
               builder: (context) {
-                return Center(
-                  child: MenuAnchor(
-                    builder: (context, controller, child) => SizedBox(
-                      width: double.infinity,
-                      child: Material(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(6.0),
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            if (controller.isOpen) {
-                              controller.close();
-                            } else {
-                              controller.open();
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(6.0),
-                            child: child,
-                          ),
-                        ),
-                      ),
-                    ),
-                    menuChildren: [
-                      for (final lang in Languages.languages)
-                        CheckboxMenuButton(
-                          closeOnActivate: false,
-                          trailingIcon: CountryFlag(flag: lang.flag, size: 15),
-                          value: config.value.originalLanguage.contains(lang),
-                          onChanged: (bool? value) async {
-                            if (value == true) {
-                              config.value = config.value.copyWith(
-                                originalLanguage: {
-                                  ...config.value.originalLanguage,
-                                  lang,
-                                },
-                              );
-                            } else {
-                              config.value = config.value.copyWith(
-                                originalLanguage: config.value.originalLanguage
-                                    .where((element) => element != lang)
-                                    .toSet(),
-                              );
-                            }
-                          },
-                          child: Text(tr[lang.label]),
-                        ),
-                    ],
-                    child: Column(
-                      children: [
-                        Wrap(
-                          spacing: 2.0,
-                          runSpacing: 2.0,
-                          children: [
-                            if (config.value.originalLanguage.isEmpty)
-                              Text(tr.mangadex.settings.selectLanguages),
-                            for (final lang in config.value.originalLanguage)
-                              ElevatedButton.icon(
-                                onPressed: () {
-                                  config.value = config.value.copyWith(
-                                    originalLanguage: config
-                                        .value
-                                        .originalLanguage
-                                        .where((element) => element != lang)
-                                        .toSet(),
-                                  );
-                                },
-                                icon: const Icon(Icons.close),
-                                label: Text(tr[lang.label]),
-                              ),
-                          ],
-                        ),
-                        const Icon(Icons.arrow_drop_down),
-                      ],
-                    ),
+                return MultiSelectMenuAnchor<Language>(
+                  items: Languages.languages,
+                  selected: config.value.originalLanguage,
+                  labelFor: (lang) => tr[lang.label],
+                  trailingIconFor: (lang) =>
+                      CountryFlag(flag: lang.flag, size: 15),
+                  placeholder: tr.mangadex.settings.selectLanguages,
+                  onChanged: (updated) => config.value = config.value.copyWith(
+                    originalLanguage: updated,
                   ),
                 );
               },
@@ -250,79 +111,13 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                 style: titleStyle,
               ),
               builder: (context) {
-                return Center(
-                  child: MenuAnchor(
-                    builder: (context, controller, child) => SizedBox(
-                      width: double.infinity,
-                      child: Material(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(6.0),
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            if (controller.isOpen) {
-                              controller.close();
-                            } else {
-                              controller.open();
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(6.0),
-                            child: child,
-                          ),
-                        ),
-                      ),
-                    ),
-                    menuChildren: [
-                      for (final content in ContentRating.values)
-                        CheckboxMenuButton(
-                          closeOnActivate: false,
-                          value: config.value.contentRating.contains(content),
-                          onChanged: (bool? value) async {
-                            if (value == true) {
-                              config.value = config.value.copyWith(
-                                contentRating: {
-                                  ...config.value.contentRating,
-                                  content,
-                                },
-                              );
-                            } else {
-                              config.value = config.value.copyWith(
-                                contentRating: config.value.contentRating
-                                    .where((element) => element != content)
-                                    .toSet(),
-                              );
-                            }
-                          },
-                          child: Text(tr[content.label]),
-                        ),
-                    ],
-                    child: Column(
-                      children: [
-                        Wrap(
-                          spacing: 2.0,
-                          runSpacing: 2.0,
-                          children: [
-                            if (config.value.contentRating.isEmpty)
-                              Text(tr.mangadex.settings.selectContentFilters),
-                            for (final content in config.value.contentRating)
-                              ElevatedButton.icon(
-                                onPressed: () {
-                                  config.value = config.value.copyWith(
-                                    contentRating: config.value.contentRating
-                                        .where((element) => element != content)
-                                        .toSet(),
-                                  );
-                                },
-                                icon: const Icon(Icons.close),
-                                label: Text(tr[content.label]),
-                              ),
-                          ],
-                        ),
-                        const Icon(Icons.arrow_drop_down),
-                      ],
-                    ),
+                return MultiSelectMenuAnchor<ContentRating>(
+                  items: ContentRating.values,
+                  selected: config.value.contentRating,
+                  labelFor: (content) => tr[content.label],
+                  placeholder: tr.mangadex.settings.selectContentFilters,
+                  onChanged: (updated) => config.value = config.value.copyWith(
+                    contentRating: updated,
                   ),
                 );
               },

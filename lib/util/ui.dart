@@ -517,6 +517,86 @@ class SettingCardWidget extends StatelessWidget {
   }
 }
 
+class MultiSelectMenuAnchor<T> extends StatelessWidget {
+  const MultiSelectMenuAnchor({
+    super.key,
+    required this.items,
+    required this.selected,
+    required this.labelFor,
+    required this.onChanged,
+    required this.placeholder,
+    this.trailingIconFor,
+  });
+
+  final Iterable<T> items;
+  final Set<T> selected;
+  final String Function(T) labelFor;
+  final Widget? Function(T)? trailingIconFor;
+  final void Function(Set<T>) onChanged;
+  final String placeholder;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: MenuAnchor(
+        builder: (context, controller, child) => SizedBox(
+          width: double.infinity,
+          child: Material(
+            color: theme.colorScheme.surfaceContainerHighest,
+            borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+            child: InkWell(
+              onTap: () {
+                if (controller.isOpen) {
+                  controller.close();
+                } else {
+                  controller.open();
+                }
+              },
+              child: Padding(padding: const EdgeInsets.all(6.0), child: child),
+            ),
+          ),
+        ),
+        menuChildren: [
+          for (final item in items)
+            CheckboxMenuButton(
+              closeOnActivate: false,
+              trailingIcon: trailingIconFor?.call(item),
+              value: selected.contains(item),
+              onChanged: (bool? value) {
+                if (value == true) {
+                  onChanged({...selected, item});
+                } else {
+                  onChanged(selected.where((e) => e != item).toSet());
+                }
+              },
+              child: Text(labelFor(item)),
+            ),
+        ],
+        child: Column(
+          children: [
+            Wrap(
+              spacing: 2.0,
+              runSpacing: 2.0,
+              children: [
+                if (selected.isEmpty) Text(placeholder),
+                for (final item in selected)
+                  ElevatedButton.icon(
+                    onPressed: () =>
+                        onChanged(selected.where((e) => e != item).toSet()),
+                    icon: const Icon(Icons.close),
+                    label: Text(labelFor(item)),
+                  ),
+              ],
+            ),
+            const Icon(Icons.arrow_drop_down),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class TitleFlexBar extends StatelessWidget {
   const TitleFlexBar({super.key, required this.title});
 
