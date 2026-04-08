@@ -717,7 +717,7 @@ $MangaAttributesCopyWith<$Res>? get attributes {
 /// @nodoc
 @JsonSerializable()
 
-class User extends MangaDexEntity with DiagnosticableTreeMixin {
+class User extends MangaDexEntity with DiagnosticableTreeMixin, UserOps {
   const User({required this.id, this.attributes, final  String? $type}): $type = $type ?? 'user',super._();
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
@@ -2900,7 +2900,7 @@ as String?,
 /// @nodoc
 mixin _$UserAttributes implements DiagnosticableTreeMixin {
 
- String get username;
+ String get username; String? get avatarFileName;
 /// Create a copy of UserAttributes
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2914,21 +2914,21 @@ $UserAttributesCopyWith<UserAttributes> get copyWith => _$UserAttributesCopyWith
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'UserAttributes'))
-    ..add(DiagnosticsProperty('username', username));
+    ..add(DiagnosticsProperty('username', username))..add(DiagnosticsProperty('avatarFileName', avatarFileName));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserAttributes&&(identical(other.username, username) || other.username == username));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserAttributes&&(identical(other.username, username) || other.username == username)&&(identical(other.avatarFileName, avatarFileName) || other.avatarFileName == avatarFileName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,username);
+int get hashCode => Object.hash(runtimeType,username,avatarFileName);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'UserAttributes(username: $username)';
+  return 'UserAttributes(username: $username, avatarFileName: $avatarFileName)';
 }
 
 
@@ -2939,7 +2939,7 @@ abstract mixin class $UserAttributesCopyWith<$Res>  {
   factory $UserAttributesCopyWith(UserAttributes value, $Res Function(UserAttributes) _then) = _$UserAttributesCopyWithImpl;
 @useResult
 $Res call({
- String username
+ String username, String? avatarFileName
 });
 
 
@@ -2956,10 +2956,11 @@ class _$UserAttributesCopyWithImpl<$Res>
 
 /// Create a copy of UserAttributes
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? username = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? username = null,Object? avatarFileName = freezed,}) {
   return _then(_self.copyWith(
 username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
-as String,
+as String,avatarFileName: freezed == avatarFileName ? _self.avatarFileName : avatarFileName // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -2971,10 +2972,11 @@ as String,
 @JsonSerializable()
 
 class _UserAttributes with DiagnosticableTreeMixin implements UserAttributes {
-  const _UserAttributes({required this.username});
+  const _UserAttributes({required this.username, this.avatarFileName});
   factory _UserAttributes.fromJson(Map<String, dynamic> json) => _$UserAttributesFromJson(json);
 
 @override final  String username;
+@override final  String? avatarFileName;
 
 /// Create a copy of UserAttributes
 /// with the given fields replaced by the non-null parameter values.
@@ -2990,21 +2992,21 @@ Map<String, dynamic> toJson() {
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'UserAttributes'))
-    ..add(DiagnosticsProperty('username', username));
+    ..add(DiagnosticsProperty('username', username))..add(DiagnosticsProperty('avatarFileName', avatarFileName));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserAttributes&&(identical(other.username, username) || other.username == username));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserAttributes&&(identical(other.username, username) || other.username == username)&&(identical(other.avatarFileName, avatarFileName) || other.avatarFileName == avatarFileName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,username);
+int get hashCode => Object.hash(runtimeType,username,avatarFileName);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'UserAttributes(username: $username)';
+  return 'UserAttributes(username: $username, avatarFileName: $avatarFileName)';
 }
 
 
@@ -3015,7 +3017,7 @@ abstract mixin class _$UserAttributesCopyWith<$Res> implements $UserAttributesCo
   factory _$UserAttributesCopyWith(_UserAttributes value, $Res Function(_UserAttributes) _then) = __$UserAttributesCopyWithImpl;
 @override @useResult
 $Res call({
- String username
+ String username, String? avatarFileName
 });
 
 
@@ -3032,10 +3034,11 @@ class __$UserAttributesCopyWithImpl<$Res>
 
 /// Create a copy of UserAttributes
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? username = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? username = null,Object? avatarFileName = freezed,}) {
   return _then(_UserAttributes(
 username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
-as String,
+as String,avatarFileName: freezed == avatarFileName ? _self.avatarFileName : avatarFileName // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

@@ -163,9 +163,23 @@ class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
               },
             ),
           ),
-          Consumer(
+          HookConsumer(
             builder: (context, ref, child) {
               final auth = ref.watch(loggedUserProvider);
+              final imageCache = ref.watch(extensionImageCacheProvider);
+              final me = auth.value;
+              final avatarUrl = me?.getUserAvatar(
+                quality: CoverArtQuality.small,
+              );
+              final avatarImageProvider = useMemoized(
+                () => avatarUrl != null
+                    ? CachedNetworkImageProvider(
+                        avatarUrl,
+                        cacheManager: imageCache,
+                      )
+                    : null,
+                [avatarUrl, imageCache],
+              );
 
               return switch (auth) {
                 AsyncValue(hasValue: true, value: final me) =>
@@ -179,7 +193,6 @@ class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
                         )
                       : MenuAnchor(
                           builder: (context, controller, child) => IconButton(
-                            color: theme.colorScheme.onPrimaryContainer,
                             onPressed: () {
                               if (controller.isOpen) {
                                 controller.close();
@@ -187,7 +200,11 @@ class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
                                 controller.open();
                               }
                             },
-                            icon: const Icon(Icons.person),
+                            icon: CircleAvatar(
+                              radius: 14,
+                              foregroundImage: avatarImageProvider,
+                              child: const Icon(Icons.person, size: 16),
+                            ),
                           ),
                           menuChildren: [
                             Center(
@@ -197,6 +214,7 @@ class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
                                   spacing: 10.0,
                                   children: [
                                     CircleAvatar(
+                                      foregroundImage: avatarImageProvider,
                                       child: const Icon(Icons.person),
                                     ),
                                     Text(

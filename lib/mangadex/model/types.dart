@@ -27,6 +27,9 @@ extension CoverArtUrlExt on CoverArtUrl {
       case CoverArtQuality.small:
         cv += '.256.jpg';
         break;
+      case CoverArtQuality.tiny:
+        cv += '.128.jpg';
+        break;
     }
 
     return cv;
@@ -90,7 +93,7 @@ enum TagGroup {
   String get label => name.capitalize();
 }
 
-enum CoverArtQuality { best, medium, small }
+enum CoverArtQuality { best, medium, small, tiny }
 
 enum FilterOrder {
   relevance_asc(MapEntry('order[relevance]', 'asc')),
@@ -389,6 +392,7 @@ sealed class MangaDexEntity with _$MangaDexEntity implements MangaDexUUID {
     MangaRelations? related,
   }) = Manga;
 
+  @With<UserOps>()
   const factory MangaDexEntity.user({
     required String id,
     UserAttributes? attributes,
@@ -684,6 +688,23 @@ mixin CustomListOps implements MangaDexUUID {
   }
 }
 
+mixin UserOps implements MangaDexUUID {
+  UserAttributes? get attributes;
+
+  CoverArtUrl? getUserAvatar({
+    CoverArtQuality quality = CoverArtQuality.small,
+  }) {
+    final filename = attributes?.avatarFileName;
+
+    if (filename == null) {
+      return null;
+    }
+
+    return 'https://uploads.mangadex.org/media/user/$id/avatar/$filename'
+        .quality(quality: quality);
+  }
+}
+
 @freezed
 abstract class MangaLinks with _$MangaLinks {
   const factory MangaLinks({String? raw, String? al, String? mu, String? mal}) =
@@ -764,7 +785,10 @@ abstract class CoverArtAttributes with _$CoverArtAttributes {
 
 @freezed
 abstract class UserAttributes with _$UserAttributes {
-  const factory UserAttributes({required String username}) = _UserAttributes;
+  const factory UserAttributes({
+    required String username,
+    String? avatarFileName,
+  }) = _UserAttributes;
 
   factory UserAttributes.fromJson(Map<String, dynamic> json) =>
       _$UserAttributesFromJson(json);
