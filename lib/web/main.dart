@@ -5,6 +5,7 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -49,15 +50,88 @@ class WebSourceHomePage extends HookConsumerWidget {
       };
     }, []);
 
+    final useRail = DeviceContext.useNavigationRail(context);
+    final extendRail = DeviceContext.extendNavigationRail(context);
+
+    void onDestination(int idx) {
+      if (idx == selectedIndex) {
+        activeController.animateTo(
+          0.0,
+          duration: const Duration(milliseconds: 1000),
+          curve: Curves.easeOutCirc,
+        );
+        return;
+      }
+      switch (idx) {
+        case 0:
+          const WebSourceFrontRoute().go(context);
+          break;
+        case 1:
+          const WebSourceUpdatesRoute().go(context);
+          break;
+        case 2:
+          const WebSourceFavoritesRoute().go(context);
+          break;
+        case 3:
+          const WebSourceHistoryRoute().go(context);
+          break;
+        default:
+          const WebSourceFrontRoute().go(context);
+      }
+    }
+
+    final destinations = [
+      NavigationRailDestination(
+        icon: Icon(Icons.home_outlined),
+        selectedIcon: Icon(Icons.home),
+        label: Text(tr.webSources.home),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.menu_book),
+        label: Text(tr.chapterFeed.latestUpdates),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.favorite_border),
+        selectedIcon: Icon(Icons.favorite),
+        label: Text(tr.webSources.favorites),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.history),
+        label: Text(tr.history.text),
+      ),
+    ];
+
+    if (useRail) {
+      return Scaffold(
+        restorationId: 'extension_home_restore',
+        drawer: const MainDrawer(),
+        body: Row(
+          children: [
+            NavigationRail(
+              selectedIndex: selectedIndex,
+              onDestinationSelected: onDestination,
+              extended: extendRail,
+              labelType: extendRail
+                  ? NavigationRailLabelType.none
+                  : NavigationRailLabelType.selected,
+              destinations: destinations,
+            ),
+            const VerticalDivider(thickness: 1, width: 1),
+            Expanded(
+              child: DefaultScrollController(
+                controller: activeController,
+                child: child,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       restorationId: 'extension_home_restore',
       drawer: const MainDrawer(),
-      body: Center(
-        child: DefaultScrollController(
-          controller: activeController,
-          child: child,
-        ),
-      ),
+      body: DefaultScrollController(controller: activeController, child: child),
       bottomNavigationBar: NavigationBar(
         height: 60,
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
@@ -82,32 +156,7 @@ class WebSourceHomePage extends HookConsumerWidget {
           ),
         ],
         selectedIndex: selectedIndex,
-        onDestinationSelected: (idx) {
-          if (idx == selectedIndex) {
-            activeController.animateTo(
-              0.0,
-              duration: const Duration(milliseconds: 1000),
-              curve: Curves.easeOutCirc,
-            );
-          } else {
-            switch (idx) {
-              case 0:
-                const WebSourceFrontRoute().go(context);
-                break;
-              case 1:
-                const WebSourceUpdatesRoute().go(context);
-                break;
-              case 2:
-                const WebSourceFavoritesRoute().go(context);
-                break;
-              case 3:
-                const WebSourceHistoryRoute().go(context);
-                break;
-              default:
-                const WebSourceFrontRoute().go(context);
-            }
-          }
-        },
+        onDestinationSelected: onDestination,
       ),
     );
   }
