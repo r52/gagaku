@@ -69,17 +69,6 @@ class MangaDexSliverAppBar extends StatelessWidget {
     final tr = context.t;
     final theme = Theme.of(context);
 
-    final flex = GestureDetector(
-      onTap: () {
-        controller?.animateTo(
-          0.0,
-          duration: const Duration(milliseconds: 1000),
-          curve: Curves.easeOutCirc,
-        );
-      },
-      child: TitleFlexBar(title: title ?? 'MangaDex'),
-    );
-
     final actions = <Widget>[
       OverflowBar(
         spacing: 8.0,
@@ -176,7 +165,20 @@ class MangaDexSliverAppBar extends StatelessWidget {
       ),
     ];
 
-    return SliverAppBar(floating: true, flexibleSpace: flex, actions: actions);
+    return SliverAppBar.medium(
+      pinned: true,
+      title: GestureDetector(
+        onTap: () {
+          controller?.animateTo(
+            0.0,
+            duration: const Duration(milliseconds: 1000),
+            curve: Curves.easeOutCirc,
+          );
+        },
+        child: Text(title ?? 'MangaDex'),
+      ),
+      actions: actions,
+    );
   }
 }
 

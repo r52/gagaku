@@ -127,12 +127,10 @@ class _MangaDexCreatorViewWidgetState
         },
         child: MangaListWidget(
           leading: [
-            SliverAppBar(
+            SliverAppBar.medium(
               pinned: true,
-              snap: false,
-              floating: false,
               leading: const BackButton(),
-              flexibleSpace: GestureDetector(
+              title: GestureDetector(
                 onTap: () {
                   scrollController.animateTo(
                     0.0,
@@ -140,7 +138,7 @@ class _MangaDexCreatorViewWidgetState
                     curve: Curves.easeInOut,
                   );
                 },
-                child: TitleFlexBar(title: widget.creator.attributes.name),
+                child: Text(widget.creator.attributes.name),
               ),
             ),
             SliverList.list(

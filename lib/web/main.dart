@@ -180,7 +180,7 @@ class WebSourceHomePage extends HookConsumerWidget {
           ),
           NavigationDestination(
             icon: Icon(Icons.menu_book),
-            label: t.chapterFeed.latestUpdates,
+            label: tr.chapterFeed.latestUpdates,
           ),
           NavigationDestination(
             icon: Icon(Icons.favorite_border),

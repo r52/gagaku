@@ -297,6 +297,14 @@ class ExtensionWebViewBridge {
       };
       await controller.evaluateJavascript(source: initScript);
 
+      final initRes = await controller.callAsyncJavaScript(
+        functionBody: "return typeof ${source.id} !== 'undefined';",
+      );
+
+      if (initRes == null || initRes.error != null || initRes.value != true) {
+        throw Exception("Source did not initialize correctly");
+      }
+
       if (_initialized) {
         return;
       }
