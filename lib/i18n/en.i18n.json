@@ -193,7 +193,8 @@
     "otherOptions": "Other Options",
     "inclusion": "Inclusion Mode",
     "exclusion": "Exclusion Mode",
-    "any": "Any"
+    "any": "Any",
+    "advancedSearch": "Advanced Search..."
   },
   "settings": "Settings",
   "arg_settings": "$arg @:settings",

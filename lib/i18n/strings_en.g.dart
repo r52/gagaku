@@ -517,6 +517,9 @@ class TranslationsSearchEn {
 
 	/// en: 'Any'
 	String get any => 'Any';
+
+	/// en: 'Advanced Search...'
+	String get advancedSearch => 'Advanced Search...';
 }
 
 // Path: theme
@@ -1894,6 +1897,7 @@ extension on Translations {
 			'search.inclusion' => 'Inclusion Mode',
 			'search.exclusion' => 'Exclusion Mode',
 			'search.any' => 'Any',
+			'search.advancedSearch' => 'Advanced Search...',
 			'settings' => 'Settings',
 			'arg_settings' => ({required Object arg}) => '${arg} ${_root.settings}',
 			'saveSettings' => 'Save Settings',

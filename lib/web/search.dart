@@ -8,26 +8,13 @@ import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/model/search_history.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-part 'search.g.dart';
 
 const _firstSearch = 0xDEADBEEF;
-
-@Riverpod(keepAlive: true)
-class _SearchHistory extends _$SearchHistory {
-  @override
-  List<String> build() => [];
-
-  @override
-  set state(List<String> newState) => super.state = newState;
-  List<String> update(List<String> Function(List<String> state) cb) =>
-      state = cb(state);
-}
 
 @Dependencies([chipTextStyle])
 class ExtensionSearchPage extends StatelessWidget {
@@ -286,11 +273,11 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                   onSubmitted: (value) {
                     final term = value.trim();
                     if (term.isNotEmpty) {
-                      final history = ref.read(_searchHistoryProvider);
-                      ref.read(_searchHistoryProvider.notifier).state = {
+                      final history = ref.read(searchHistoryProvider);
+                      ref.read(searchHistoryProvider.notifier).state = {
                         term,
                         ...history,
-                      }.take(5).toList();
+                      }.take(10).toList();
                     }
 
                     if (controller.isOpen) {
@@ -347,11 +334,11 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
               viewOnSubmitted: (value) {
                 final term = value.trim();
                 if (term.isNotEmpty) {
-                  final history = ref.read(_searchHistoryProvider);
-                  ref.read(_searchHistoryProvider.notifier).state = {
+                  final history = ref.read(searchHistoryProvider);
+                  ref.read(searchHistoryProvider.notifier).state = {
                     term,
                     ...history,
-                  }.take(5).toList();
+                  }.take(10).toList();
                 }
 
                 if (controller.isOpen) {
@@ -369,7 +356,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
               },
               suggestionsBuilder:
                   (BuildContext context, SearchController controller) {
-                    final history = ref.read(_searchHistoryProvider);
+                    final history = ref.read(searchHistoryProvider);
                     return history
                         .map(
                           (e) => ListTile(
@@ -378,15 +365,9 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                             onTap: () {
                               final term = e.trim();
                               if (term.isNotEmpty) {
-                                final history = ref.read(
-                                  _searchHistoryProvider,
-                                );
-                                ref
-                                    .read(_searchHistoryProvider.notifier)
-                                    .state = {
-                                  term,
-                                  ...history,
-                                }.take(5).toList();
+                                final history = ref.read(searchHistoryProvider);
+                                ref.read(searchHistoryProvider.notifier).state =
+                                    {term, ...history}.take(10).toList();
                               }
 
                               if (controller.isOpen) {

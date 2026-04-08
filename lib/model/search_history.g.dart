@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'search.dart';
+part of 'search_history.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,28 +9,28 @@ part of 'search.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(_SearchHistory)
-final _searchHistoryProvider = _SearchHistoryProvider._();
+@ProviderFor(SearchHistory)
+final searchHistoryProvider = SearchHistoryProvider._();
 
-final class _SearchHistoryProvider
-    extends $NotifierProvider<_SearchHistory, List<String>> {
-  _SearchHistoryProvider._()
+final class SearchHistoryProvider
+    extends $NotifierProvider<SearchHistory, List<String>> {
+  SearchHistoryProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'_searchHistoryProvider',
+        name: r'searchHistoryProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$_searchHistoryHash();
+  String debugGetCreateSourceHash() => _$searchHistoryHash();
 
   @$internal
   @override
-  _SearchHistory create() => _SearchHistory();
+  SearchHistory create() => SearchHistory();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(List<String> value) {
@@ -41,7 +41,7 @@ final class _SearchHistoryProvider
   }
 }
 
-String _$_searchHistoryHash() => r'03b2bdeb09ccc897e60e3e498de7f80aa8df9377';
+String _$searchHistoryHash() => r'1eb34891754a1bd0877220bf7b95d545611874ff';
 
 abstract class _$SearchHistory extends $Notifier<List<String>> {
   List<String> build();

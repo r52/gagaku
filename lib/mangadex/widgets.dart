@@ -7,6 +7,7 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/config.dart';
+import 'package:gagaku/model/search_history.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/mangadex/settings.dart';
@@ -58,12 +59,18 @@ const _openIconS = Icon(Icons.open_in_new, size: 15.0);
 const _scheduleIconB = Icon(Icons.schedule, size: 20.0);
 const _scheduleIconS = Icon(Icons.schedule, size: 15.0);
 
-class MangaDexSliverAppBar extends StatelessWidget {
+class MangaDexSliverAppBar extends ConsumerStatefulWidget {
   const MangaDexSliverAppBar({super.key, this.controller, this.title});
 
   final ScrollController? controller;
   final String? title;
 
+  @override
+  ConsumerState<MangaDexSliverAppBar> createState() =>
+      _MangaDexSliverAppBarState();
+}
+
+class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
@@ -73,11 +80,68 @@ class MangaDexSliverAppBar extends StatelessWidget {
       OverflowBar(
         spacing: 8.0,
         children: [
-          IconButton(
-            color: theme.colorScheme.onPrimaryContainer,
-            icon: const Icon(Icons.search),
-            onPressed: () => MangaDexSearchRoute().push(context),
-            tooltip: tr.search.arg(arg: 'MangaDex'),
+          SearchAnchor(
+            isFullScreen: false,
+            viewHintText: tr.search.arg(arg: 'MangaDex'),
+            viewConstraints: const BoxConstraints(
+              minWidth: 280,
+              maxHeight: 400,
+            ),
+            builder: (BuildContext ctx, SearchController ctl) => IconButton(
+              color: theme.colorScheme.onPrimaryContainer,
+              icon: const Icon(Icons.search),
+              tooltip: tr.search.arg(arg: 'MangaDex'),
+              onPressed: ctl.openView,
+            ),
+            viewOnSubmitted: (value) {
+              final term = value.trim();
+              if (term.isEmpty) return;
+              final history = ref.read(searchHistoryProvider);
+              ref.read(searchHistoryProvider.notifier).state = {
+                term,
+                ...history,
+              }.take(10).toList();
+              MangaDexSearchRoute(
+                $extra: MangaSearchParameters(
+                  query: term,
+                  filter: const MangaFilters(),
+                ),
+              ).push(context);
+            },
+            suggestionsBuilder: (BuildContext ctx, SearchController ctl) {
+              final history = ref.read(searchHistoryProvider);
+              return [
+                ...history.map(
+                  (term) => ListTile(
+                    titleAlignment: ListTileTitleAlignment.center,
+                    leading: const Icon(Icons.history),
+                    title: Text(term),
+                    onTap: () {
+                      final h = ref.read(searchHistoryProvider);
+                      ref.read(searchHistoryProvider.notifier).state = {
+                        term,
+                        ...h,
+                      }.take(10).toList();
+                      ctl.closeView(term);
+                      MangaDexSearchRoute(
+                        $extra: MangaSearchParameters(
+                          query: term,
+                          filter: const MangaFilters(),
+                        ),
+                      ).push(context);
+                    },
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.search),
+                  title: Text(tr.search.advancedSearch),
+                  onTap: () {
+                    ctl.closeView('');
+                    MangaDexSearchRoute().push(context);
+                  },
+                ),
+              ];
+            },
           ),
           Tooltip(
             message: tr.arg_settings(arg: 'MangaDex'),
@@ -169,13 +233,13 @@ class MangaDexSliverAppBar extends StatelessWidget {
       pinned: true,
       title: GestureDetector(
         onTap: () {
-          controller?.animateTo(
+          widget.controller?.animateTo(
             0.0,
             duration: const Duration(milliseconds: 1000),
             curve: Curves.easeOutCirc,
           );
         },
-        child: Text(title ?? 'MangaDex'),
+        child: Text(widget.title ?? 'MangaDex'),
       ),
       actions: actions,
     );
