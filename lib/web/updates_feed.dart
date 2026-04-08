@@ -266,7 +266,12 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
     final refresh = useState(UniqueKey());
     final results = useMemoized(() => _getFeedUpdates(), [refresh.value]);
     final future = useFuture(results);
-    final slivers = <Widget>[];
+    final slivers = <Widget>[
+      WebSourceSliverAppBar(
+        title: t.chapterFeed.latestUpdates,
+        controller: scrollController,
+      ),
+    ];
 
     if (future.hasError) {
       final error = future.error!;

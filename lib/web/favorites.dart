@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
@@ -14,7 +15,9 @@ import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([chipTextStyle])
 class WebSourceFavoritesPage extends HookConsumerWidget {
   const WebSourceFavoritesPage({super.key, this.controller});
 
@@ -42,6 +45,10 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
       controller: scrollController,
       headerSliverBuilder: (context, innerBoxIsScrolled) {
         return [
+          WebSourceSliverAppBar(
+            title: tr.webSources.favorites,
+            controller: scrollController,
+          ),
           SliverOverlapAbsorber(
             handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
             sliver: SliverAppBar(

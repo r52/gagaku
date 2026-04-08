@@ -1,22 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/i18n/strings.g.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
-import 'package:gagaku/util/ui.dart';
-import 'package:gagaku/web/model/model.dart';
-import 'package:gagaku/web/settings.dart';
-import 'package:gagaku/web/source_manager.dart';
-import 'package:gagaku/web/ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 
-@Dependencies([chipTextStyle])
 class WebSourceHomePage extends HookConsumerWidget {
   const WebSourceHomePage({super.key, required this.child});
 
@@ -58,110 +49,8 @@ class WebSourceHomePage extends HookConsumerWidget {
       };
     }, []);
 
-    final theme = Theme.of(context);
-    final nav = Navigator.of(context);
-    final api = ref.watch(webSourceBrokerProvider);
-
     return Scaffold(
       restorationId: 'extension_home_restore',
-      appBar: AppBar(
-        flexibleSpace: GestureDetector(
-          onTap: () {
-            activeController.animateTo(
-              0.0,
-              duration: const Duration(milliseconds: 1000),
-              curve: Curves.easeOutCirc,
-            );
-          },
-          child: TitleFlexBar(title: tr.webSources.text),
-        ),
-        actions: [
-          OverflowBar(
-            spacing: 0.0,
-            children: [
-              IconButton(
-                color: theme.colorScheme.onPrimaryContainer,
-                icon: const Icon(Icons.search),
-                onPressed: () => ExtensionSearchRoute().push(context),
-                tooltip: tr.webSources.sourceSearch,
-              ),
-              IconButton(
-                color: theme.colorScheme.onPrimaryContainer,
-                onPressed: () => nav.push(
-                  SlideTransitionRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const SourceManager(),
-                  ),
-                ),
-                icon: const Icon(Icons.collections_bookmark),
-                tooltip: tr.webSources.source.manager,
-              ),
-              MenuAnchor(
-                builder: (context, controller, child) => IconButton(
-                  color: theme.colorScheme.onPrimaryContainer,
-                  onPressed: () {
-                    if (controller.isOpen) {
-                      controller.close();
-                    } else {
-                      controller.open();
-                    }
-                  },
-                  icon: const Icon(Icons.more_vert),
-                ),
-                menuChildren: [
-                  MenuItemButton(
-                    onPressed: () async {
-                      final result = await showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text(tr.webSources.resetAllRead),
-                            content: Text(tr.webSources.resetAllReadWarning),
-                            actions: <Widget>[
-                              TextButton(
-                                child: Text(tr.ui.no),
-                                onPressed: () {
-                                  Navigator.of(context).pop(false);
-                                },
-                              ),
-                              ElevatedButton(
-                                child: Text(tr.ui.yes),
-                                onPressed: () {
-                                  Navigator.of(context).pop(true);
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-
-                      if (result == true) {
-                        ref.run((tsx) async {
-                          return await tsx
-                              .get(webReadMarkersProvider.notifier)
-                              .clear();
-                        });
-                      }
-                    },
-                    leadingIcon: const Icon(Icons.restore),
-                    child: Text(tr.webSources.resetAllRead),
-                  ),
-                  MenuItemButton(
-                    onPressed: () => openLinkDialog(context, api),
-                    leadingIcon: const Icon(Icons.open_in_browser),
-                    child: Text(tr.webSources.openLink),
-                  ),
-                  MenuItemButton(
-                    onPressed: () => nav.push(WebSourceSettingsRouteBuilder()),
-                    leadingIcon: const Icon(Icons.settings),
-                    child: Text(tr.arg_settings(arg: tr.webSources.text)),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
       drawer: const MainDrawer(),
       body: Center(
         child: DefaultScrollController(

@@ -5,6 +5,7 @@ import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/routes.dart';
@@ -13,8 +14,12 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:gagaku/web/settings.dart';
+import 'package:gagaku/web/source_manager.dart';
+import 'package:gagaku/web/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -51,6 +56,102 @@ class _MangaListView extends _$MangaListView {
   WebMangaListView update(
     WebMangaListView Function(WebMangaListView state) cb,
   ) => state = cb(state);
+}
+
+@Dependencies([chipTextStyle])
+class WebSourceSliverAppBar extends ConsumerWidget {
+  const WebSourceSliverAppBar({super.key, this.controller, this.title});
+
+  final ScrollController? controller;
+  final String? title;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
+    final nav = Navigator.of(context);
+    final api = ref.watch(webSourceBrokerProvider);
+
+    return SliverAppBar.medium(
+      pinned: true,
+      title: GestureDetector(
+        onTap: () => controller?.animateTo(
+          0.0,
+          duration: const Duration(milliseconds: 1000),
+          curve: Curves.easeOutCirc,
+        ),
+        child: Text(title ?? tr.webSources.text),
+      ),
+      actions: [
+        OverflowBar(
+          spacing: 0.0,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.search),
+              tooltip: tr.webSources.sourceSearch,
+              onPressed: () => ExtensionSearchRoute().push(context),
+            ),
+            IconButton(
+              icon: const Icon(Icons.collections_bookmark),
+              tooltip: tr.webSources.source.manager,
+              onPressed: () => nav.push(
+                SlideTransitionRouteBuilder(
+                  pageBuilder: (_, __, ___) => const SourceManager(),
+                ),
+              ),
+            ),
+            MenuAnchor(
+              builder: (context, controller, _) => IconButton(
+                icon: const Icon(Icons.more_vert),
+                onPressed: () =>
+                    controller.isOpen ? controller.close() : controller.open(),
+              ),
+              menuChildren: [
+                MenuItemButton(
+                  leadingIcon: const Icon(Icons.restore),
+                  onPressed: () async {
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: Text(tr.webSources.resetAllRead),
+                        content: Text(tr.webSources.resetAllReadWarning),
+                        actions: [
+                          TextButton(
+                            child: Text(tr.ui.no),
+                            onPressed: () => Navigator.of(context).pop(false),
+                          ),
+                          ElevatedButton(
+                            child: Text(tr.ui.yes),
+                            onPressed: () => Navigator.of(context).pop(true),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirmed == true) {
+                      ref.run(
+                        (tsx) async =>
+                            tsx.get(webReadMarkersProvider.notifier).clear(),
+                      );
+                    }
+                  },
+                  child: Text(tr.webSources.resetAllRead),
+                ),
+                MenuItemButton(
+                  leadingIcon: const Icon(Icons.open_in_browser),
+                  onPressed: () => openLinkDialog(context, api),
+                  child: Text(tr.webSources.openLink),
+                ),
+                MenuItemButton(
+                  leadingIcon: const Icon(Icons.settings),
+                  onPressed: () => nav.push(WebSourceSettingsRouteBuilder()),
+                  child: Text(tr.arg_settings(arg: tr.webSources.text)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 }
 
 class WebMangaListWidget extends HookConsumerWidget {

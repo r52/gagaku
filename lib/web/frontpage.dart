@@ -142,6 +142,7 @@ class _ExtensionHomeCard extends ConsumerWidget {
   }
 }
 
+@Dependencies([chipTextStyle])
 class WebSourceFrontPage extends HookConsumerWidget {
   const WebSourceFrontPage({super.key, this.controller});
 
@@ -183,6 +184,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
         scrollBehavior: const MouseTouchScrollBehavior(),
         controller: scrollController,
         slivers: [
+          WebSourceSliverAppBar(controller: scrollController),
           SliverAppBar(
             automaticallyImplyLeading: false,
             pinned: true,
