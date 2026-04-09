@@ -667,6 +667,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
                     chapterControlsWidget,
                     Expanded(
                       child: CustomScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
                         controller: chapterScrollController,
                         scrollBehavior: const MouseTouchScrollBehavior(),
                         slivers: [chapterSliver],
@@ -772,6 +773,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
             top: false,
             bottom: true,
             child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
               scrollBehavior: const MouseTouchScrollBehavior(),
               slivers: [chapterSliver],
             ),

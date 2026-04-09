@@ -430,6 +430,7 @@ class _MangaDexMangaViewWidgetState
       controller: _coverController,
     );
     final relatedView = MangaListWidget(
+      physics: const AlwaysScrollableScrollPhysics(),
       title: Text(
         tr.mangaView.relatedTitles,
         style: CommonTextStyles.twentyfour,
@@ -1207,6 +1208,7 @@ class _MangaChaptersView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       controller: scrollController,
       cacheExtent: MediaQuery.sizeOf(context).height,
       slivers: [
@@ -1296,6 +1298,7 @@ class _MangaCoversView extends HookWidget {
     }, [filteredState]);
 
     return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
