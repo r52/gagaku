@@ -228,6 +228,9 @@ class TranslationsUiEn {
 
 	/// en: 'Are you sure you want to continue?'
 	String get sureContinue => 'Are you sure you want to continue?';
+
+	/// en: 'Scroll to top'
+	String get scrollToTop => 'Scroll to top';
 }
 
 // Path: errors
@@ -1770,6 +1773,7 @@ extension on Translations {
 			'ui.selected' => ({required Object count}) => '${count} Selected',
 			'ui.unknown' => 'Unknown',
 			'ui.sureContinue' => 'Are you sure you want to continue?',
+			'ui.scrollToTop' => 'Scroll to top',
 			'errors.noresults' => 'No results',
 			'errors.notitles' => 'No titles',
 			'errors.nomanga' => 'No manga',

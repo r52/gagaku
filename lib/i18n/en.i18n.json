@@ -38,7 +38,8 @@
     "allLocales": "All Locales",
     "selected": "$count Selected",
     "unknown": "Unknown",
-    "sureContinue": "Are you sure you want to continue?"
+    "sureContinue": "Are you sure you want to continue?",
+    "scrollToTop": "Scroll to top"
   },
   "errors": {
     "noresults": "No results",

@@ -565,9 +565,9 @@ class MultiSelectMenuAnchor<T> extends StatelessWidget {
               value: selected.contains(item),
               onChanged: (bool? value) {
                 if (value == true) {
-                  onChanged({...selected, item});
+                  onChanged({...selected}..add(item));
                 } else {
-                  onChanged(selected.where((e) => e != item).toSet());
+                  onChanged({...selected}..remove(item));
                 }
               },
               child: Text(labelFor(item)),
@@ -582,8 +582,7 @@ class MultiSelectMenuAnchor<T> extends StatelessWidget {
                 if (selected.isEmpty) Text(placeholder),
                 for (final item in selected)
                   ElevatedButton.icon(
-                    onPressed: () =>
-                        onChanged(selected.where((e) => e != item).toSet()),
+                    onPressed: () => onChanged({...selected}..remove(item)),
                     icon: const Icon(Icons.close),
                     label: Text(labelFor(item)),
                   ),

@@ -365,43 +365,265 @@ class _MangaDexMangaViewWidgetState
       ],
     );
 
+    final isPhoneLandscape =
+        !DeviceContext.isPortraitMode(context) &&
+        DeviceContext.screenWidthSmall(context);
+    final bannerExpandedHeight = isPhoneLandscape ? 120.0 : 250.0;
+    final bannerTitleScale = isPhoneLandscape ? 1.5 : 2.0;
+    final useWideLayout = DeviceContext.useNavigationRail(context);
+    final leftWidth = (MediaQuery.sizeOf(context).width * 0.35).clamp(
+      240.0,
+      360.0,
+    );
+
+    Future<void> doRefresh() async {
+      if (ref.read(followingStatusProvider(widget.manga)).hasError) {
+        ref.invalidate(followingStatusProvider(widget.manga));
+      }
+
+      if (ref.read(readingStatusProvider(widget.manga)).hasError) {
+        ref.invalidate(readingStatusProvider(widget.manga));
+      }
+
+      final me = ref.read(loggedUserProvider).value;
+      if (me != null) {
+        await ref.run((tsx) async {
+          await tsx
+              .get(readChaptersProvider(me.id).notifier)
+              .invalidate(widget.manga);
+        });
+      }
+
+      switch (_ViewType.values[tabview]) {
+        case _ViewType.chapters:
+          _chapterManager.reset();
+          await ref
+              .read(mangadexProvider)
+              .invalidateAll('${chapterInfo.key}(${widget.manga.id}');
+          return _chapterController.refresh();
+        case _ViewType.art:
+          _coverManager.reset();
+          await ref
+              .read(mangadexProvider)
+              .invalidateAll('${coverInfo.key}(${widget.manga.id}');
+          return _coverController.refresh();
+        case _ViewType.related:
+          return _relatedController.refresh();
+      }
+    }
+
+    final chapterScrollController = useScrollController();
+    final chaptersView = _MangaChaptersView(
+      manga: widget.manga,
+      controller: _chapterController,
+    );
+    final chapterControlsBar = _ChapterControlsBar(
+      me: me,
+      manga: widget.manga,
+      chapterController: _chapterController,
+      onSortChanged: () => setState(() {
+        _chapterController.refresh();
+      }),
+    );
+    final coversView = _MangaCoversView(
+      manga: widget.manga,
+      controller: _coverController,
+    );
+    final relatedView = MangaListWidget(
+      title: Text(
+        tr.mangaView.relatedTitles,
+        style: CommonTextStyles.twentyfour,
+      ),
+      noController: true,
+      children: [
+        MangaListViewSliver(
+          controller: _relatedController,
+          headers: widget.manga.relatedMangas.fold({}, (
+            previousValue,
+            element,
+          ) {
+            previousValue?[element.id] = tr[element.related!.label];
+            return previousValue;
+          }),
+        ),
+      ],
+    );
+
+    final scrollToTopFab = ListenableBuilder(
+      listenable: chapterScrollController,
+      builder: (context, _) {
+        final visible =
+            chapterScrollController.hasClients &&
+            chapterScrollController.offset > 0 &&
+            _ViewType.values[tabview] == _ViewType.chapters;
+        return AnimatedScale(
+          scale: visible ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          child: IgnorePointer(
+            ignoring: !visible,
+            child: FloatingActionButton.small(
+              heroTag: null,
+              tooltip: tr.ui.scrollToTop,
+              onPressed: () => chapterScrollController.animateTo(
+                0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+              ),
+              child: const Icon(Icons.vertical_align_top),
+            ),
+          ),
+        );
+      },
+    );
+
+    // ── Wide layout (two-column) ──────────────────────────────────────────────
+    if (useWideLayout) {
+      final coverWidget = Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: AspectRatio(
+            aspectRatio: 2 / 3,
+            child: CachedNetworkImage(
+              cacheManager: ref.watch(extensionImageCacheProvider),
+              imageUrl: widget.manga.getFirstCoverUrl(
+                quality: CoverArtQuality.medium,
+              ),
+              fit: BoxFit.cover,
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  const Center(child: CircularProgressIndicator()),
+              errorBuilder: (context, error, stacktrace) => Tooltip(
+                message: error.toString(),
+                child: const Icon(Icons.error),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final metadataColumn = _MangaMetadataColumn(
+        manga: widget.manga,
+        tr: tr,
+        me: me,
+        mangaTagChips: mangaTagChips,
+        lastvolchap: lastvolchap,
+        theme: theme,
+        moreMenu: moreMenu,
+      );
+
+      final chaptersViewWide = _MangaChaptersView(
+        manga: widget.manga,
+        controller: _chapterController,
+        scrollController: chapterScrollController,
+      );
+
+      return Scaffold(
+        appBar: AppBar(
+          leading: const BackButton(),
+          title: Text(
+            widget.manga.attributes!.title.get(tr.$meta.locale.languageCode),
+          ),
+          actions: [
+            OverflowBar(
+              spacing: 6.0,
+              children: [
+                if (me != null)
+                  _FollowingStatusButton(
+                    key: ValueKey('_FollowingStatusButton(${widget.manga.id})'),
+                    manga: widget.manga,
+                  ),
+                if (me != null)
+                  _ReadingStatusDropdown(
+                    key: ValueKey('_ReadingStatusDropdown(${widget.manga.id})'),
+                    manga: widget.manga,
+                  ),
+                if (me != null)
+                  _RatingMenu(
+                    key: ValueKey('_RatingMenu(${widget.manga.id})'),
+                    manga: widget.manga,
+                  ),
+                if (me != null)
+                  _UserListsMenu(
+                    key: ValueKey('_UserListsMenu(${widget.manga.id})'),
+                    manga: widget.manga,
+                  ),
+                moreMenu,
+                const SizedBox(width: 2),
+              ],
+            ),
+          ],
+        ),
+        body: RefreshIndicator(
+          onRefresh: doRefresh,
+          notificationPredicate: (notification) {
+            return notification.depth == 0;
+          },
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: leftWidth,
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (_) => true,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        coverWidget,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: CountryFlag(
+                            flag:
+                                widget.manga.attributes!.originalLanguage.flag,
+                            size: 24,
+                          ),
+                        ),
+                        metadataColumn,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const VerticalDivider(thickness: 1, width: 1),
+              Expanded(
+                child: Column(
+                  children: [
+                    Material(
+                      elevation: 2,
+                      child: TabBar(
+                        controller: tabController,
+                        tabs: [
+                          Tab(text: tr.mangaView.chapters),
+                          Tab(text: tr.mangaView.art),
+                          if (hasRelated) Tab(text: tr.mangaView.related),
+                        ],
+                      ),
+                    ),
+                    if (_ViewType.values[tabview] == _ViewType.chapters)
+                      Material(elevation: 1, child: chapterControlsBar),
+                    Expanded(
+                      child: _UnpagedMangaViewBody(
+                        controller: tabController,
+                        chaptersView: chaptersViewWide,
+                        coversView: coversView,
+                        relatedView: relatedView,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: scrollToTopFab,
+      );
+    }
+
+    // ── Narrow layout (original) ──────────────────────────────────────────────
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () async {
-          if (ref.read(followingStatusProvider(widget.manga)).hasError) {
-            ref.invalidate(followingStatusProvider(widget.manga));
-          }
-
-          if (ref.read(readingStatusProvider(widget.manga)).hasError) {
-            ref.invalidate(readingStatusProvider(widget.manga));
-          }
-
-          final me = ref.read(loggedUserProvider).value;
-          if (me != null) {
-            await ref.run((tsx) async {
-              await tsx
-                  .get(readChaptersProvider(me.id).notifier)
-                  .invalidate(widget.manga);
-            });
-          }
-
-          switch (_ViewType.values[tabview]) {
-            case _ViewType.chapters:
-              _chapterManager.reset();
-              await ref
-                  .read(mangadexProvider)
-                  .invalidateAll('${chapterInfo.key}(${widget.manga.id}');
-              return _chapterController.refresh();
-            case _ViewType.art:
-              _coverManager.reset();
-              await ref
-                  .read(mangadexProvider)
-                  .invalidateAll('${coverInfo.key}(${widget.manga.id}');
-              return _coverController.refresh();
-            case _ViewType.related:
-              return _relatedController.refresh();
-          }
-        },
+        onRefresh: doRefresh,
         notificationPredicate: (notification) {
           // Depth 1 is the top of the NestedScrollView
           if (notification is OverscrollNotification &&
@@ -413,6 +635,7 @@ class _MangaDexMangaViewWidgetState
           return notification.depth == 0;
         },
         child: NestedScrollView(
+          controller: chapterScrollController,
           scrollBehavior: const MouseTouchScrollBehavior(),
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
@@ -421,11 +644,11 @@ class _MangaDexMangaViewWidgetState
                 snap: false,
                 floating: false,
                 forceElevated: innerBoxIsScrolled,
-                expandedHeight: 250.0,
+                expandedHeight: bannerExpandedHeight,
                 collapsedHeight: 100.0,
                 leading: const BackButton(),
                 flexibleSpace: FlexibleSpaceBar(
-                  expandedTitleScale: 2.0,
+                  expandedTitleScale: bannerTitleScale,
                   title: Text(
                     widget.manga.attributes!.title.get(
                       tr.$meta.locale.languageCode,
@@ -514,240 +737,14 @@ class _MangaDexMangaViewWidgetState
               ),
               SliverList.list(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: MangaGenreRow(
-                      key: ValueKey('MangaGenreRow(${widget.manga.id})'),
-                      manga: widget.manga,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: MangaStatisticsRow(
-                      key: ValueKey('MangaStatisticsRow(${widget.manga.id})'),
-                      manga: widget.manga,
-                      shortStatus: false,
-                    ),
-                  ),
-                  if (widget.manga.attributes!.altTitles.isNotEmpty)
-                    ExpansionTile(
-                      title: Text(tr.mangaView.altTitles),
-                      children: [
-                        for (final Map(entries: entry)
-                            in widget.manga.attributes!.altTitles)
-                          ExpansionTile(
-                            title: Text(
-                              tr[Languages.get(entry.first.key).label],
-                            ),
-                            children: [
-                              SizedBox(
-                                width: double.infinity,
-                                child: ListTile(
-                                  tileColor:
-                                      theme.colorScheme.surfaceContainerHighest,
-                                  title: Text(entry.first.value),
-                                  onTap: () =>
-                                      Clipboard.setData(
-                                        ClipboardData(text: entry.first.value),
-                                      ).then((_) {
-                                        if (!context.mounted) return;
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            showCloseIcon: true,
-                                            duration: const Duration(
-                                              milliseconds: 1000,
-                                            ),
-                                            content: Text(tr.ui.copyClipboard),
-                                          ),
-                                        );
-                                      }),
-                                  trailing: IconButton(
-                                    tooltip: tr.webSources.searchWithExt,
-                                    style: Styles.squareIconButtonStyle(
-                                      backgroundColor: theme.colorScheme.surface
-                                          .withAlpha(200),
-                                    ),
-                                    onPressed: () => ExtensionSearchRoute(
-                                      query: SearchQuery(
-                                        title: entry.first.value,
-                                      ),
-                                    ).push(context),
-                                    icon: const Icon(Icons.search),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
-                  if (widget.manga.attributes!.description.isNotEmpty)
-                    ExpansionTile(
-                      title: Text(tr.mangaView.synopsis),
-                      children: [
-                        for (final MapEntry(key: lang, value: desc)
-                            in widget.manga.attributes!.description.entries)
-                          ExpansionTile(
-                            title: Text(tr[Languages.get(lang).label]),
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(8),
-                                color:
-                                    theme.colorScheme.surfaceContainerHighest,
-                                child: MarkdownBody(
-                                  data: desc,
-                                  onTapLink: (text, url, title) async {
-                                    if (url != null) {
-                                      await Styles.tryLaunchUrl(context, url);
-                                    }
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
-                  ExpansionTile(
-                    title: Text(tr.mangaView.info),
-                    children: [
-                      if (widget.manga.author.isNotEmpty)
-                        MultiChildExpansionTile(
-                          title: tr.mangaView.author,
-                          children: [
-                            for (final author in widget.manga.author)
-                              ButtonChip(
-                                text: author.attributes.name,
-                                onPressed: () {
-                                  context.push('/author/${author.id}');
-                                },
-                              ),
-                          ],
-                        ),
-                      if (widget.manga.artist.isNotEmpty)
-                        MultiChildExpansionTile(
-                          title: tr.mangaView.artist,
-                          children: [
-                            for (final artist in widget.manga.artist)
-                              ButtonChip(
-                                text: artist.attributes.name,
-                                onPressed: () {
-                                  context.push('/author/${artist.id}');
-                                },
-                              ),
-                          ],
-                        ),
-                      if (widget.manga.attributes!.publicationDemographic !=
-                          null)
-                        ExpansionTile(
-                          title: Text(tr.mangaView.demographic),
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: IconTextChip(
-                                  text: widget
-                                      .manga
-                                      .attributes!
-                                      .publicationDemographic!
-                                      .label,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      if (mangaTagChips[TagGroup.genre] != null)
-                        MultiChildExpansionTile(
-                          title: tr.mangaView.genre,
-                          children: mangaTagChips[TagGroup.genre]!,
-                        ),
-                      if (mangaTagChips[TagGroup.theme] != null)
-                        MultiChildExpansionTile(
-                          title: tr.mangaView.theme,
-                          children: mangaTagChips[TagGroup.theme]!,
-                        ),
-                      if (mangaTagChips[TagGroup.format] != null)
-                        MultiChildExpansionTile(
-                          title: tr.mangaView.format,
-                          children: mangaTagChips[TagGroup.format]!,
-                        ),
-                      MultiChildExpansionTile(
-                        title: tr.mangaView.track,
-                        children: [
-                          if (widget.manga.attributes!.links?.raw != null)
-                            ButtonChip(
-                              onPressed: () async {
-                                final url =
-                                    widget.manga.attributes!.links!.raw!;
-
-                                await Styles.tryLaunchUrl(context, url);
-                              },
-                              text: tr.mangaView.officialRaw,
-                            ),
-                          if (widget.manga.attributes!.links?.mu != null)
-                            ButtonChip(
-                              onPressed: () async {
-                                final seriesnum = int.tryParse(
-                                  widget.manga.attributes!.links!.mu!,
-                                );
-                                var url =
-                                    'https://www.mangaupdates.com/series/${widget.manga.attributes!.links!.mu!}';
-
-                                if (seriesnum != null) {
-                                  url =
-                                      'https://www.mangaupdates.com/series.html?id=${widget.manga.attributes!.links!.mu!}';
-                                }
-
-                                await Styles.tryLaunchUrl(context, url);
-                              },
-                              text: 'MangaUpdates',
-                            ),
-                          if (widget.manga.attributes!.links?.al != null)
-                            ButtonChip(
-                              onPressed: () async {
-                                final url =
-                                    'https://anilist.co/manga/${widget.manga.attributes!.links!.al!}';
-                                await Styles.tryLaunchUrl(context, url);
-                              },
-                              text: 'AniList',
-                            ),
-                          if (widget.manga.attributes!.links?.mal != null)
-                            ButtonChip(
-                              onPressed: () async {
-                                final url =
-                                    'https://myanimelist.net/manga/${widget.manga.attributes!.links!.mal!}';
-                                await Styles.tryLaunchUrl(context, url);
-                              },
-                              text: 'MyAnimeList',
-                            ),
-                          ButtonChip(
-                            onPressed: () async {
-                              final route = GoRouterState.of(context).uri;
-                              await Styles.tryLaunchUrl(
-                                context,
-                                'http://mangadex.org${route.path}',
-                              );
-                            },
-                            text: tr.mangaView.openOn(arg: 'MangaDex'),
-                          ),
-                        ],
-                      ),
-                      if (lastvolchap != null)
-                        ExpansionTile(
-                          title: Text(tr.mangaView.finalChapter),
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(lastvolchap),
-                              ),
-                            ),
-                          ],
-                        ),
-                    ],
+                  _MangaMetadataColumn(
+                    manga: widget.manga,
+                    tr: tr,
+                    me: me,
+                    mangaTagChips: mangaTagChips,
+                    lastvolchap: lastvolchap,
+                    theme: theme,
+                    moreMenu: moreMenu,
                   ),
                   TabBar(
                     controller: tabController,
@@ -757,152 +754,16 @@ class _MangaDexMangaViewWidgetState
                       if (hasRelated) Tab(text: tr.mangaView.related),
                     ],
                   ),
-                  if (_ViewType.values[tabview] == _ViewType.chapters)
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Row(
-                        children: [
-                          Consumer(
-                            builder: (context, ref, child) {
-                              final sort = ref.watch(
-                                mangaChaptersListSortProvider,
-                              );
-                              return ElevatedButton(
-                                style: Styles.buttonStyle(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                  ),
-                                ),
-                                onPressed: () {
-                                  if (sort == ListSort.descending) {
-                                    ref
-                                            .read(
-                                              mangaChaptersListSortProvider
-                                                  .notifier,
-                                            )
-                                            .state =
-                                        ListSort.ascending;
-                                  } else {
-                                    ref
-                                            .read(
-                                              mangaChaptersListSortProvider
-                                                  .notifier,
-                                            )
-                                            .state =
-                                        ListSort.descending;
-                                  }
-
-                                  setState(() {
-                                    _chapterController.refresh();
-                                  });
-                                },
-                                child: Text(sort.name.capitalize()),
-                              );
-                            },
-                          ),
-                          const Spacer(),
-                          if (me != null)
-                            PagingListener(
-                              controller: _chapterController,
-                              builder: (context, state, fetchNextPage) {
-                                final chapters = state.items;
-
-                                final allRead = chapters != null
-                                    ? ref.watch(
-                                        mangaReadChaptersProvider(
-                                          widget.manga,
-                                        ).select(
-                                          (value) => switch (value) {
-                                            AsyncValue(
-                                              value: final data,
-                                              hasValue: true,
-                                            ) =>
-                                              data?.containsAll(
-                                                    chapters.map((e) => e.id),
-                                                  ) ==
-                                                  true,
-                                            _ => false,
-                                          },
-                                        ),
-                                      )
-                                    : false;
-
-                                final opt = allRead
-                                    ? tr.mangaView.unread
-                                    : tr.mangaView.read;
-
-                                return ElevatedButton(
-                                  style: Styles.buttonStyle(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0,
-                                    ),
-                                  ),
-                                  onPressed: () async {
-                                    final result = await showDialog<bool>(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        final nav = Navigator.of(context);
-                                        return AlertDialog(
-                                          title: Text(
-                                            tr.mangaView.markAllAs(arg: opt),
-                                          ),
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                tr.mangaView.markAllWarning(
-                                                  arg: opt,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          actions: <Widget>[
-                                            ElevatedButton(
-                                              child: Text(tr.ui.no),
-                                              onPressed: () {
-                                                nav.pop(false);
-                                              },
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                nav.pop(true);
-                                              },
-                                              child: Text(tr.ui.yes),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-
-                                    if (chapters != null && result == true) {
-                                      ref.run((tsx) async {
-                                        return await tsx
-                                            .get(
-                                              readChaptersProvider(
-                                                me.id,
-                                              ).notifier,
-                                            )
-                                            .set(
-                                              widget.manga,
-                                              read: !allRead ? chapters : null,
-                                              unread: allRead ? chapters : null,
-                                            );
-                                      });
-                                    }
-                                  },
-                                  child: Text(
-                                    tr.mangaView.markAllVisibleAs(arg: opt),
-                                  ),
-                                );
-                              },
-                            ),
-                        ],
-                      ),
-                    ),
                 ],
               ),
+              if (_ViewType.values[tabview] == _ViewType.chapters)
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _PinnedHeaderDelegate(
+                    child: Material(elevation: 1, child: chapterControlsBar),
+                    height: 64.0,
+                  ),
+                ),
             ];
           },
           body: SafeArea(
@@ -910,39 +771,36 @@ class _MangaDexMangaViewWidgetState
             bottom: true,
             child: _UnpagedMangaViewBody(
               controller: tabController,
-              chaptersView: _MangaChaptersView(
-                manga: widget.manga,
-                controller: _chapterController,
-              ),
-              coversView: _MangaCoversView(
-                manga: widget.manga,
-                controller: _coverController,
-              ),
-              relatedView: MangaListWidget(
-                title: Text(
-                  tr.mangaView.relatedTitles,
-                  style: CommonTextStyles.twentyfour,
-                ),
-                noController: true,
-                children: [
-                  MangaListViewSliver(
-                    controller: _relatedController,
-                    headers: widget.manga.relatedMangas.fold({}, (
-                      previousValue,
-                      element,
-                    ) {
-                      previousValue?[element.id] = tr[element.related!.label];
-                      return previousValue;
-                    }),
-                  ),
-                ],
-              ),
+              chaptersView: chaptersView,
+              coversView: coversView,
+              relatedView: relatedView,
             ),
           ),
         ),
       ),
+      floatingActionButton: scrollToTopFab,
     );
   }
+}
+
+class _PinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
+  const _PinnedHeaderDelegate({required this.child, required this.height});
+  final Widget child;
+  final double height;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) => child;
+  @override
+  double get maxExtent => height;
+  @override
+  double get minExtent => height;
+  @override
+  bool shouldRebuild(_PinnedHeaderDelegate old) =>
+      child != old.child || height != old.height;
 }
 
 class _UnpagedMangaViewBody extends HookWidget {
@@ -969,16 +827,387 @@ class _UnpagedMangaViewBody extends HookWidget {
   }
 }
 
+// Metadata section shown in the left panel (wide) or as a SliverList child (narrow).
+@Dependencies([chipTextStyle])
+class _MangaMetadataColumn extends StatelessWidget {
+  const _MangaMetadataColumn({
+    required this.manga,
+    required this.tr,
+    required this.me,
+    required this.mangaTagChips,
+    required this.lastvolchap,
+    required this.theme,
+    required this.moreMenu,
+  });
+
+  final Manga manga;
+  final Translations tr;
+  final User? me;
+  final Map<TagGroup, List<Widget>> mangaTagChips;
+  final String? lastvolchap;
+  final ThemeData theme;
+  final Widget moreMenu;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: MangaGenreRow(
+            key: ValueKey('MangaGenreRow(${manga.id})'),
+            manga: manga,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: MangaStatisticsRow(
+            key: ValueKey('MangaStatisticsRow(${manga.id})'),
+            manga: manga,
+            shortStatus: false,
+          ),
+        ),
+        if (manga.attributes!.altTitles.isNotEmpty)
+          ExpansionTile(
+            title: Text(tr.mangaView.altTitles),
+            children: [
+              for (final Map(entries: entry) in manga.attributes!.altTitles)
+                ExpansionTile(
+                  title: Text(tr[Languages.get(entry.first.key).label]),
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ListTile(
+                        tileColor: theme.colorScheme.surfaceContainerHighest,
+                        title: Text(entry.first.value),
+                        onTap: () =>
+                            Clipboard.setData(
+                              ClipboardData(text: entry.first.value),
+                            ).then((_) {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  showCloseIcon: true,
+                                  duration: const Duration(milliseconds: 1000),
+                                  content: Text(tr.ui.copyClipboard),
+                                ),
+                              );
+                            }),
+                        trailing: IconButton(
+                          tooltip: tr.webSources.searchWithExt,
+                          style: Styles.squareIconButtonStyle(
+                            backgroundColor: theme.colorScheme.surface
+                                .withAlpha(200),
+                          ),
+                          onPressed: () => ExtensionSearchRoute(
+                            query: SearchQuery(title: entry.first.value),
+                          ).push(context),
+                          icon: const Icon(Icons.search),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        if (manga.attributes!.description.isNotEmpty)
+          ExpansionTile(
+            title: Text(tr.mangaView.synopsis),
+            children: [
+              for (final MapEntry(key: lang, value: desc)
+                  in manga.attributes!.description.entries)
+                ExpansionTile(
+                  title: Text(tr[Languages.get(lang).label]),
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(8),
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      child: MarkdownBody(
+                        data: desc,
+                        onTapLink: (text, url, title) async {
+                          if (url != null) {
+                            await Styles.tryLaunchUrl(context, url);
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ExpansionTile(
+          title: Text(tr.mangaView.info),
+          children: [
+            if (manga.author.isNotEmpty)
+              MultiChildExpansionTile(
+                title: tr.mangaView.author,
+                children: [
+                  for (final author in manga.author)
+                    ButtonChip(
+                      text: author.attributes.name,
+                      onPressed: () => context.push('/author/${author.id}'),
+                    ),
+                ],
+              ),
+            if (manga.artist.isNotEmpty)
+              MultiChildExpansionTile(
+                title: tr.mangaView.artist,
+                children: [
+                  for (final artist in manga.artist)
+                    ButtonChip(
+                      text: artist.attributes.name,
+                      onPressed: () => context.push('/author/${artist.id}'),
+                    ),
+                ],
+              ),
+            if (manga.attributes!.publicationDemographic != null)
+              ExpansionTile(
+                title: Text(tr.mangaView.demographic),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconTextChip(
+                        text: manga.attributes!.publicationDemographic!.label,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            if (mangaTagChips[TagGroup.genre] != null)
+              MultiChildExpansionTile(
+                title: tr.mangaView.genre,
+                children: mangaTagChips[TagGroup.genre]!,
+              ),
+            if (mangaTagChips[TagGroup.theme] != null)
+              MultiChildExpansionTile(
+                title: tr.mangaView.theme,
+                children: mangaTagChips[TagGroup.theme]!,
+              ),
+            if (mangaTagChips[TagGroup.format] != null)
+              MultiChildExpansionTile(
+                title: tr.mangaView.format,
+                children: mangaTagChips[TagGroup.format]!,
+              ),
+            MultiChildExpansionTile(
+              title: tr.mangaView.track,
+              children: [
+                if (manga.attributes!.links?.raw != null)
+                  ButtonChip(
+                    onPressed: () async {
+                      await Styles.tryLaunchUrl(
+                        context,
+                        manga.attributes!.links!.raw!,
+                      );
+                    },
+                    text: tr.mangaView.officialRaw,
+                  ),
+                if (manga.attributes!.links?.mu != null)
+                  ButtonChip(
+                    onPressed: () async {
+                      final seriesnum = int.tryParse(
+                        manga.attributes!.links!.mu!,
+                      );
+                      var url =
+                          'https://www.mangaupdates.com/series/${manga.attributes!.links!.mu!}';
+                      if (seriesnum != null) {
+                        url =
+                            'https://www.mangaupdates.com/series.html?id=${manga.attributes!.links!.mu!}';
+                      }
+                      await Styles.tryLaunchUrl(context, url);
+                    },
+                    text: 'MangaUpdates',
+                  ),
+                if (manga.attributes!.links?.al != null)
+                  ButtonChip(
+                    onPressed: () async {
+                      await Styles.tryLaunchUrl(
+                        context,
+                        'https://anilist.co/manga/${manga.attributes!.links!.al!}',
+                      );
+                    },
+                    text: 'AniList',
+                  ),
+                if (manga.attributes!.links?.mal != null)
+                  ButtonChip(
+                    onPressed: () async {
+                      await Styles.tryLaunchUrl(
+                        context,
+                        'https://myanimelist.net/manga/${manga.attributes!.links!.mal!}',
+                      );
+                    },
+                    text: 'MyAnimeList',
+                  ),
+                ButtonChip(
+                  onPressed: () async {
+                    final route = GoRouterState.of(context).uri;
+                    await Styles.tryLaunchUrl(
+                      context,
+                      'http://mangadex.org${route.path}',
+                    );
+                  },
+                  text: tr.mangaView.openOn(arg: 'MangaDex'),
+                ),
+              ],
+            ),
+            if (lastvolchap != null)
+              ExpansionTile(
+                title: Text(tr.mangaView.finalChapter),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(lastvolchap!),
+                    ),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// Sort button + mark-all-visible row shown above the chapter list.
+class _ChapterControlsBar extends ConsumerWidget {
+  const _ChapterControlsBar({
+    required this.me,
+    required this.manga,
+    required this.chapterController,
+    required this.onSortChanged,
+  });
+
+  final User? me;
+  final Manga manga;
+  final PagingController<int, Chapter> chapterController;
+  final VoidCallback onSortChanged;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
+
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        children: [
+          Consumer(
+            builder: (context, ref, child) {
+              final sort = ref.watch(mangaChaptersListSortProvider);
+              return ElevatedButton(
+                style: Styles.buttonStyle(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                ),
+                onPressed: () {
+                  if (sort == ListSort.descending) {
+                    ref.read(mangaChaptersListSortProvider.notifier).state =
+                        ListSort.ascending;
+                  } else {
+                    ref.read(mangaChaptersListSortProvider.notifier).state =
+                        ListSort.descending;
+                  }
+                  onSortChanged();
+                },
+                child: Text(sort.name.capitalize()),
+              );
+            },
+          ),
+          const Spacer(),
+          if (me != null)
+            PagingListener(
+              controller: chapterController,
+              builder: (context, state, fetchNextPage) {
+                final chapters = state.items;
+
+                final allRead = chapters != null
+                    ? ref.watch(
+                        mangaReadChaptersProvider(manga).select(
+                          (value) => switch (value) {
+                            AsyncValue(value: final data, hasValue: true) =>
+                              data?.containsAll(chapters.map((e) => e.id)) ==
+                                  true,
+                            _ => false,
+                          },
+                        ),
+                      )
+                    : false;
+
+                final opt = allRead ? tr.mangaView.unread : tr.mangaView.read;
+
+                return ElevatedButton(
+                  style: Styles.buttonStyle(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  ),
+                  onPressed: () async {
+                    final result = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        final nav = Navigator.of(context);
+                        return AlertDialog(
+                          title: Text(tr.mangaView.markAllAs(arg: opt)),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(tr.mangaView.markAllWarning(arg: opt)),
+                            ],
+                          ),
+                          actions: <Widget>[
+                            ElevatedButton(
+                              child: Text(tr.ui.no),
+                              onPressed: () => nav.pop(false),
+                            ),
+                            TextButton(
+                              onPressed: () => nav.pop(true),
+                              child: Text(tr.ui.yes),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    if (chapters != null && result == true) {
+                      ref.run((tsx) async {
+                        return await tsx
+                            .get(readChaptersProvider(me!.id).notifier)
+                            .set(
+                              manga,
+                              read: !allRead ? chapters : null,
+                              unread: allRead ? chapters : null,
+                            );
+                      });
+                    }
+                  },
+                  child: Text(tr.mangaView.markAllVisibleAs(arg: opt)),
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 @Dependencies([chipTextStyle])
 class _MangaChaptersView extends StatelessWidget {
-  const _MangaChaptersView({required this.manga, required this.controller});
+  const _MangaChaptersView({
+    required this.manga,
+    required this.controller,
+    this.scrollController,
+  });
 
   final Manga manga;
   final PagingController<int, Chapter> controller;
+  final ScrollController? scrollController;
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
+      controller: scrollController,
       cacheExtent: MediaQuery.sizeOf(context).height,
       slivers: [
         PagingListener(
