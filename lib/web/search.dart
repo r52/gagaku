@@ -3,7 +3,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -12,11 +11,9 @@ import 'package:gagaku/model/search_history.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 
 const _firstSearch = 0xDEADBEEF;
 
-@Dependencies([chipTextStyle])
 class ExtensionSearchPage extends StatelessWidget {
   const ExtensionSearchPage({super.key, this.initialSource, this.query});
 
@@ -66,7 +63,6 @@ class ExtensionSearchPage extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class ExtensionSearchWidget extends StatefulHookConsumerWidget {
   const ExtensionSearchWidget({
     super.key,

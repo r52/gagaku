@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/model/search_history.dart';
 import 'package:gagaku/mangadex/model/model.dart';
@@ -22,7 +21,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:riverpod/misc.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -340,7 +338,6 @@ class MarkReadButton extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class ChapterFeedWidget extends HookWidget {
   const ChapterFeedWidget({
     super.key,
@@ -447,7 +444,6 @@ class ChapterFeedWidget extends HookWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
   const InfiniteScrollChapterFeedWidget({
     super.key,
@@ -662,7 +658,6 @@ class MangaTitleButton extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class _BackLinkedChapterButton extends StatelessWidget {
   const _BackLinkedChapterButton({
     super.key,
@@ -699,7 +694,6 @@ class _BackLinkedChapterButton extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class ChapterFeedItem extends HookConsumerWidget {
   const ChapterFeedItem({super.key, required this.state});
 
@@ -869,7 +863,6 @@ class _ChapterButtonCard extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class ChapterButtonWidget extends StatelessWidget {
   const ChapterButtonWidget({
     super.key,
@@ -1183,7 +1176,6 @@ class MangaListWidget extends HookConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class MangaListViewSliver extends ConsumerWidget {
   const MangaListViewSliver({
     super.key,
@@ -1436,7 +1428,6 @@ class GridMangaItem extends HookConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class GridMangaDetailedItem extends ConsumerWidget {
   const GridMangaDetailedItem({super.key, required this.manga, this.header});
 
@@ -1517,7 +1508,6 @@ class GridMangaDetailedItem extends ConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class _ListMangaItem extends ConsumerWidget {
   const _ListMangaItem({super.key, required this.manga, this.header});
 
@@ -1619,7 +1609,6 @@ class ChapterTitle extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class MangaGenreRow extends StatelessWidget {
   const MangaGenreRow({super.key, required this.manga});
 
@@ -1658,7 +1647,6 @@ class MangaGenreRow extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class MangaStatisticsRow extends HookConsumerWidget {
   const MangaStatisticsRow({
     super.key,
@@ -1725,7 +1713,6 @@ class MangaStatisticsRow extends HookConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class _GroupRow extends StatelessWidget {
   final Chapter chapter;
 
@@ -1785,7 +1772,6 @@ class _PubTime extends HookWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class CommentChip extends StatelessWidget {
   final StatisticsDetailsComments? comments;
   final NumberFormat formatter;
@@ -1811,7 +1797,6 @@ class CommentChip extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class MangaStatusChip extends StatelessWidget {
   const MangaStatusChip({
     super.key,
@@ -1844,7 +1829,6 @@ class MangaStatusChip extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class ContentRatingChip extends StatelessWidget {
   const ContentRatingChip({super.key, required this.rating});
 
@@ -1864,7 +1848,6 @@ class ContentRatingChip extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class ContentChip extends StatelessWidget {
   const ContentChip({super.key, required this.content});
 

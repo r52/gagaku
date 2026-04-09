@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
@@ -13,9 +12,7 @@ import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/ui.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 
-@Dependencies([chipTextStyle])
 class WebSourceHistoryPage extends HookConsumerWidget {
   const WebSourceHistoryPage({super.key, this.controller});
 

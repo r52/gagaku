@@ -6,7 +6,6 @@ import 'package:flutter/material.dart' hide Badge;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -16,9 +15,7 @@ import 'package:gagaku/web/settings.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:riverpod_annotation/experimental/scope.dart';
 
-@Dependencies([chipTextStyle])
 class SourceManager extends HookConsumerWidget {
   const SourceManager({super.key});
 
@@ -309,7 +306,6 @@ class SourceManager extends HookConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class _SourceItem extends StatelessWidget {
   const _SourceItem({
     required this.thumbnail,
@@ -371,7 +367,6 @@ class _SourceItem extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class _SourceDescription extends StatelessWidget {
   const _SourceDescription({
     required this.title,

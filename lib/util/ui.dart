@@ -10,7 +10,6 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:url_launcher/url_launcher.dart' show launchUrl;
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
@@ -245,8 +244,7 @@ class CountryFlag extends HookWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
-class ButtonChip extends ConsumerWidget {
+class ButtonChip extends StatelessWidget {
   const ButtonChip({
     super.key,
     this.icon,
@@ -263,9 +261,11 @@ class ButtonChip extends ConsumerWidget {
   final VoidCallback? onPressed;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textStyle = ref.watch(chipTextStyleProvider).merge(style);
+    final textStyle = TextStyle(
+      color: theme.colorScheme.onTertiaryContainer,
+    ).merge(style);
 
     final bstyle = Styles.buttonStyle(
       backgroundColor: color ?? theme.colorScheme.tertiaryContainer,
@@ -290,8 +290,7 @@ class ButtonChip extends ConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
-class IconTextChip extends ConsumerWidget {
+class IconTextChip extends StatelessWidget {
   const IconTextChip({
     super.key,
     this.icon,
@@ -308,9 +307,12 @@ class IconTextChip extends ConsumerWidget {
   final VoidCallback? onPressed;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final textStyle = ref.watch(chipTextStyleProvider).merge(style);
-    final theme = ColorScheme.of(context);
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textStyle = TextStyle(
+      color: colorScheme.onTertiaryContainer,
+    ).merge(style);
 
     Widget child = Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
@@ -331,7 +333,7 @@ class IconTextChip extends ConsumerWidget {
     );
 
     final borderRadius = const BorderRadius.all(Radius.circular(6.0));
-    final backgroundColor = color ?? theme.tertiaryContainer;
+    final backgroundColor = color ?? colorScheme.tertiaryContainer;
 
     if (onPressed != null) {
       return ConstrainedBox(
@@ -348,13 +350,15 @@ class IconTextChip extends ConsumerWidget {
       );
     }
 
-    return Container(
+    return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 24.0),
-      decoration: BoxDecoration(
-        borderRadius: borderRadius,
-        color: backgroundColor,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: borderRadius,
+          color: backgroundColor,
+        ),
+        child: child,
       ),
-      child: child,
     );
   }
 }

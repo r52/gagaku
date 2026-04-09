@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gagaku/i18n/strings.g.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/cache.dart';
@@ -150,19 +149,6 @@ class App extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
       restorationScopeId: 'app_root_restore',
-      builder: (context, child) {
-        final theme = Theme.of(context);
-
-        return ProviderScope(
-          overrides: [
-            themeProvider.overrideWithValue(theme),
-            chipTextStyleProvider.overrideWithValue(
-              TextStyle(color: theme.colorScheme.onTertiaryContainer),
-            ),
-          ],
-          child: child!,
-        );
-      },
     );
   }
 }

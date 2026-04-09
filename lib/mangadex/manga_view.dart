@@ -12,7 +12,6 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
@@ -25,7 +24,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:riverpod/experimental/mutation.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'manga_view.g.dart';
@@ -62,7 +60,6 @@ Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
   return manga.first;
 }
 
-@Dependencies([chipTextStyle])
 class MangaDexMangaViewPage extends ConsumerWidget {
   const MangaDexMangaViewPage({super.key, required this.mangaId, this.manga});
 
@@ -97,7 +94,6 @@ class MangaDexMangaViewPage extends ConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class MangaDexMangaViewWidget extends StatefulHookConsumerWidget {
   const MangaDexMangaViewWidget({super.key, required this.manga});
 
@@ -829,7 +825,6 @@ class _UnpagedMangaViewBody extends HookWidget {
 }
 
 // Metadata section shown in the left panel (wide) or as a SliverList child (narrow).
-@Dependencies([chipTextStyle])
 class _MangaMetadataColumn extends StatelessWidget {
   const _MangaMetadataColumn({
     required this.manga,
@@ -1193,7 +1188,6 @@ class _ChapterControlsBar extends ConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class _MangaChaptersView extends StatelessWidget {
   const _MangaChaptersView({
     required this.manga,
@@ -1413,7 +1407,6 @@ class _ChapterListElement {
   final bool isIndented;
 }
 
-@Dependencies([chipTextStyle])
 class _ChapterListSliver extends HookConsumerWidget {
   const _ChapterListSliver({
     required this.state,

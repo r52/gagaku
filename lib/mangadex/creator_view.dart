@@ -8,12 +8,10 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'creator_view.g.dart';
@@ -25,7 +23,6 @@ Future<CreatorType> _fetchCreatorFromId(Ref ref, String creatorId) async {
   return creator.first;
 }
 
-@Dependencies([chipTextStyle])
 class MangaDexCreatorViewPage extends StatelessWidget {
   const MangaDexCreatorViewPage({
     super.key,
@@ -61,7 +58,6 @@ class MangaDexCreatorViewPage extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class MangaDexCreatorViewWidget extends StatefulHookConsumerWidget {
   const MangaDexCreatorViewWidget({super.key, required this.creator});
 
@@ -224,7 +220,6 @@ class _MangaDexCreatorViewWidgetState
   }
 }
 
-@Dependencies([chipTextStyle])
 class _LinkChip extends StatelessWidget {
   final String text;
   final String url;
