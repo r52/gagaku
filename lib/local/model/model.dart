@@ -257,6 +257,7 @@ Future<void> _isolateWorker(_ScanArgs args) async {
   }
 
   final entities = await dir.list().toList();
+  final stopwatch = Stopwatch()..start();
 
   for (final e in entities) {
     if (e is File) {
@@ -276,10 +277,17 @@ Future<void> _isolateWorker(_ScanArgs args) async {
       }
     }
 
-    top.setSortType(args.currentSort);
-    args.sendPort.send(top);
+    // Throttle updates to avoid O(N^2) serialization spam over the SendPort
+    if (stopwatch.elapsedMilliseconds > 1000) {
+      top.setSortType(args.currentSort);
+      args.sendPort.send(top);
+      stopwatch.reset();
+    }
   }
 
+  // Ensure the final state is sent
+  top.setSortType(args.currentSort);
+  args.sendPort.send(top);
   args.sendPort.send(true);
 }
 

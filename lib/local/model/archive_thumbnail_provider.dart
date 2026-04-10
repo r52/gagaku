@@ -24,7 +24,7 @@ int extractArchiveHash(String archivePath, int modifiedMs) {
   return hash;
 }
 
-Future<String> _extractThumbnail(String archivePath, String destPath) async {
+Future<String?> _extractThumbnail(String archivePath, String destPath) async {
   final file = InputFileStream(archivePath);
   Archive archive;
   final lpath = archivePath.toLowerCase();
@@ -63,9 +63,10 @@ Future<String> _extractThumbnail(String archivePath, String destPath) async {
     final destFile = File(destPath);
     await destFile.parent.create(recursive: true);
     await destFile.writeAsBytes(jpgBytes);
+    return destPath;
   }
 
-  return destPath;
+  return null;
 }
 
 Future<String> sweepArchiveThumbnailsIsolate(Map<String, dynamic> args) async {
