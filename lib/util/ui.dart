@@ -205,6 +205,49 @@ class _KeepAliveImageState extends State<KeepAliveImage>
   }
 }
 
+class ScrollToTopFab extends StatelessWidget {
+  const ScrollToTopFab({
+    super.key,
+    required this.controller,
+    this.visibleCondition,
+  });
+
+  final ScrollController controller;
+  final bool Function()? visibleCondition;
+
+  @override
+  Widget build(BuildContext context) {
+    final tr = context.t;
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) {
+        final visible =
+            controller.hasClients &&
+            controller.offset > 0 &&
+            (visibleCondition?.call() ?? true);
+        return AnimatedScale(
+          scale: visible ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          child: IgnorePointer(
+            ignoring: !visible,
+            child: FloatingActionButton.small(
+              heroTag: null,
+              tooltip: tr.ui.scrollToTop,
+              onPressed: () => controller.animateTo(
+                0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+              ),
+              child: const Icon(Icons.vertical_align_top),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class MultiChildExpansionTile extends StatelessWidget {
   const MultiChildExpansionTile({
     super.key,
