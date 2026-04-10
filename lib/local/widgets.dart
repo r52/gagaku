@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/local/model/archive_thumbnail_provider.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/local/model/model.dart';
 import 'package:gagaku/util/ui.dart';
@@ -110,6 +111,47 @@ class LibraryListWidget extends ConsumerWidget {
   }
 }
 
+class _LocalLibraryItemThumbnail extends ConsumerWidget {
+  const _LocalLibraryItemThumbnail({required this.item});
+
+  final LocalLibraryItem item;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (item.thumbnail == null) {
+      return Icon(
+        item.isReadable ? Icons.menu_book : Icons.folder,
+        size: 128.0,
+      );
+    }
+
+    if (item.type != LibraryItemType.archive) {
+      return Image.file(
+        File(item.thumbnail!),
+        width: 256.0,
+        cacheWidth: 256,
+        fit: BoxFit.cover,
+      );
+    }
+
+    final asyncThumb = ref.watch(archiveThumbnailProvider(item));
+
+    return switch (asyncThumb) {
+      AsyncData(:final value) =>
+        value != null
+            ? Image.file(
+                File(value),
+                width: 256.0,
+                cacheWidth: 256,
+                fit: BoxFit.cover,
+              )
+            : const Icon(Icons.menu_book, size: 128.0),
+      AsyncError() => const Icon(Icons.error, size: 128.0),
+      _ => const Center(child: CircularProgressIndicator()),
+    };
+  }
+}
+
 class _GridLibraryItem extends HookWidget {
   const _GridLibraryItem({super.key, required this.item, this.onTap});
 
@@ -124,9 +166,7 @@ class _GridLibraryItem extends HookWidget {
 
     final image = GridAlbumImage(
       animation: aniController.drive(Styles.coverArtGradientTween),
-      child: item.thumbnail != null
-          ? Image.file(File(item.thumbnail!), width: 256.0, fit: BoxFit.cover)
-          : Icon(item.isReadable ? Icons.menu_book : Icons.folder, size: 128.0),
+      child: _LocalLibraryItemThumbnail(item: item),
     );
 
     return Tooltip(

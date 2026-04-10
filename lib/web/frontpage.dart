@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/ui.dart';
@@ -12,7 +11,6 @@ import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 
 const _firstSearch = 0xDEADBEEF;
 
@@ -183,6 +181,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
         scrollBehavior: const MouseTouchScrollBehavior(),
         controller: scrollController,
         slivers: [
+          WebSourceSliverAppBar(controller: scrollController),
           SliverAppBar(
             automaticallyImplyLeading: false,
             pinned: true,
@@ -213,7 +212,6 @@ class WebSourceFrontPage extends HookConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class ExtensionHomePage extends StatelessWidget {
   const ExtensionHomePage({super.key, required this.sourceId, this.source});
 
@@ -245,7 +243,6 @@ class ExtensionHomePage extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class ExtensionHomeWidget extends HookConsumerWidget {
   final WebSourceInfo source;
 
@@ -429,46 +426,6 @@ class ExtensionHomeWidget extends HookConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: GestureDetector(
-          onTap: () {
-            controller.animateTo(
-              0.0,
-              duration: const Duration(milliseconds: 1000),
-              curve: Curves.easeOutCirc,
-            );
-          },
-          child: TitleFlexBar(title: source.name),
-        ),
-        leading: const BackButton(),
-        actions: [
-          OverflowBar(
-            spacing: 0.0,
-            children: [
-              if (source.hasCapability(SourceIntents.mangaSearch))
-                IconButton(
-                  color: theme.colorScheme.onPrimaryContainer,
-                  icon: const Icon(Icons.search),
-                  onPressed: () =>
-                      ExtensionSearchRoute(initialSource: source).push(context),
-                  tooltip: tr.search.arg(arg: source.name),
-                ),
-              if (source.hasCapability(SourceIntents.settingsUI))
-                IconButton(
-                  color: theme.colorScheme.onPrimaryContainer,
-                  icon: const Icon(Icons.settings),
-                  onPressed: () => nav.push(
-                    SlideTransitionRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          ExtensionSettingsPage(source: source),
-                    ),
-                  ),
-                  tooltip: tr.webSources.source.settings,
-                ),
-            ],
-          ),
-        ],
-      ),
       body: RefreshIndicator(
         onRefresh: () {
           refresh.value++;
@@ -480,7 +437,48 @@ class ExtensionHomeWidget extends HookConsumerWidget {
             scrollBehavior: const MouseTouchScrollBehavior(),
             physics: const AlwaysScrollableScrollPhysics(),
             controller: controller,
-            slivers: slivers,
+            slivers: [
+              SliverAppBar.medium(
+                pinned: true,
+                leading: const BackButton(),
+                title: GestureDetector(
+                  onTap: () => controller.animateTo(
+                    0.0,
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.easeOutCirc,
+                  ),
+                  child: Text(source.name),
+                ),
+                actions: [
+                  OverflowBar(
+                    spacing: 0.0,
+                    children: [
+                      if (source.hasCapability(SourceIntents.mangaSearch))
+                        IconButton(
+                          icon: const Icon(Icons.search),
+                          onPressed: () => ExtensionSearchRoute(
+                            initialSource: source,
+                          ).push(context),
+                          tooltip: tr.search.arg(arg: source.name),
+                        ),
+                      if (source.hasCapability(SourceIntents.settingsUI))
+                        IconButton(
+                          icon: const Icon(Icons.settings),
+                          onPressed: () => nav.push(
+                            SlideTransitionRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      ExtensionSettingsPage(source: source),
+                            ),
+                          ),
+                          tooltip: tr.webSources.source.settings,
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+              ...slivers,
+            ],
           ),
         ),
       ),
@@ -488,7 +486,6 @@ class ExtensionHomeWidget extends HookConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class _DiscoverSectionPage extends StatefulHookConsumerWidget {
   const _DiscoverSectionPage({required this.source, required this.section});
 
@@ -539,19 +536,6 @@ class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
     final controller = useScrollController();
 
     return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: GestureDetector(
-          onTap: () {
-            controller.animateTo(
-              0.0,
-              duration: const Duration(milliseconds: 1000),
-              curve: Curves.easeOutCirc,
-            );
-          },
-          child: TitleFlexBar(title: widget.section.title),
-        ),
-        leading: const BackButton(),
-      ),
       body: RefreshIndicator(
         onRefresh: () async {
           metadata = _firstSearch;
@@ -561,6 +545,20 @@ class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
           physics: const AlwaysScrollableScrollPhysics(),
           controller: controller,
           showToggle: false,
+          leading: [
+            SliverAppBar.medium(
+              pinned: true,
+              leading: const BackButton(),
+              title: GestureDetector(
+                onTap: () => controller.animateTo(
+                  0.0,
+                  duration: const Duration(milliseconds: 1000),
+                  curve: Curves.easeOutCirc,
+                ),
+                child: Text(widget.section.title),
+              ),
+            ),
+          ],
           children: [
             WebMangaListViewSliver(
               controller: _pagingController,

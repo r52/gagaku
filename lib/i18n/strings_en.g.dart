@@ -228,6 +228,9 @@ class TranslationsUiEn {
 
 	/// en: 'Are you sure you want to continue?'
 	String get sureContinue => 'Are you sure you want to continue?';
+
+	/// en: 'Scroll to top'
+	String get scrollToTop => 'Scroll to top';
 }
 
 // Path: errors
@@ -517,6 +520,9 @@ class TranslationsSearchEn {
 
 	/// en: 'Any'
 	String get any => 'Any';
+
+	/// en: 'Advanced Search...'
+	String get advancedSearch => 'Advanced Search...';
 }
 
 // Path: theme
@@ -1767,6 +1773,7 @@ extension on Translations {
 			'ui.selected' => ({required Object count}) => '${count} Selected',
 			'ui.unknown' => 'Unknown',
 			'ui.sureContinue' => 'Are you sure you want to continue?',
+			'ui.scrollToTop' => 'Scroll to top',
 			'errors.noresults' => 'No results',
 			'errors.notitles' => 'No titles',
 			'errors.nomanga' => 'No manga',
@@ -1894,6 +1901,7 @@ extension on Translations {
 			'search.inclusion' => 'Inclusion Mode',
 			'search.exclusion' => 'Exclusion Mode',
 			'search.any' => 'Any',
+			'search.advancedSearch' => 'Advanced Search...',
 			'settings' => 'Settings',
 			'arg_settings' => ({required Object arg}) => '${arg} ${_root.settings}',
 			'saveSettings' => 'Save Settings',

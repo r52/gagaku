@@ -79,18 +79,6 @@ Map<String, dynamic> _$RepoDataToJson(RepoData instance) => <String, dynamic>{
   'version': _$SupportedVersionEnumMap[instance.version]!,
 };
 
-_ChapterEntry _$ChapterEntryFromJson(Map<String, dynamic> json) =>
-    _ChapterEntry(
-      name: json['name'] as String,
-      chapter: WebChapter.fromJson(json['chapter'] as Map<String, dynamic>),
-    );
-
-Map<String, dynamic> _$ChapterEntryToJson(_ChapterEntry instance) =>
-    <String, dynamic>{
-      'name': instance.name,
-      'chapter': instance.chapter.toJson(),
-    };
-
 _SourceHandler _$SourceHandlerFromJson(Map<String, dynamic> json) =>
     _SourceHandler(
       type: $enumDecode(_$SourceTypeEnumMap, json['type']),
@@ -124,44 +112,79 @@ Map<String, dynamic> _$UpdateFeedItemToJson(_UpdateFeedItem instance) =>
       'manga': instance.manga.toJson(),
     };
 
-_WebManga _$WebMangaFromJson(Map<String, dynamic> json) => _WebManga(
-  title: json['title'] as String,
-  description: json['description'] as String,
-  artist: json['artist'] as String,
-  author: json['author'] as String,
-  cover: json['cover'] as String,
-  groups: (json['groups'] as Map<String, dynamic>?)?.map(
-    (k, e) => MapEntry(k, e as String),
-  ),
-  chapters: const WebChapterSerializer().fromJson(json['chapters']),
-  data: json['data'] == null
-      ? null
-      : SourceManga.fromJson(json['data'] as Map<String, dynamic>),
-);
+_CubariChapterEntry _$CubariChapterEntryFromJson(Map<String, dynamic> json) =>
+    _CubariChapterEntry(
+      name: json['name'] as String,
+      chapter: CubariChapter.fromJson(json['chapter'] as Map<String, dynamic>),
+    );
 
-Map<String, dynamic> _$WebMangaToJson(_WebManga instance) => <String, dynamic>{
-  'title': instance.title,
-  'description': instance.description,
-  'artist': instance.artist,
-  'author': instance.author,
-  'cover': instance.cover,
-  'groups': instance.groups,
-  'chapters': const WebChapterSerializer().toJson(instance.chapters),
-  'data': instance.data?.toJson(),
-};
+Map<String, dynamic> _$CubariChapterEntryToJson(_CubariChapterEntry instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'chapter': instance.chapter.toJson(),
+    };
 
-_WebChapter _$WebChapterFromJson(Map<String, dynamic> json) => _WebChapter(
-  title: json['title'] as String?,
-  volume: json['volume'] as String?,
-  lastUpdated: const EpochTimestampSerializer().fromJson(json['last_updated']),
-  releaseDate: const MappedEpochTimestampSerializer().fromJson(
-    json['release_date'],
-  ),
-  groups: const ChapterGroupSerializer().fromJson(json['groups']),
-);
+WebMangaCubari _$WebMangaCubariFromJson(Map<String, dynamic> json) =>
+    WebMangaCubari(
+      title: json['title'] as String,
+      description: json['description'] as String,
+      artist: json['artist'] as String,
+      author: json['author'] as String,
+      cover: json['cover'] as String,
+      groups: (json['groups'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ),
+      cubariChapters: const CubariChapterListConverter().fromJson(
+        json['chapters'],
+      ),
+      $type: json['source_type'] as String?,
+    );
 
-Map<String, dynamic> _$WebChapterToJson(
-  _WebChapter instance,
+Map<String, dynamic> _$WebMangaCubariToJson(WebMangaCubari instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'description': instance.description,
+      'artist': instance.artist,
+      'author': instance.author,
+      'cover': instance.cover,
+      'groups': instance.groups,
+      'chapters': const CubariChapterListConverter().toJson(
+        instance.cubariChapters,
+      ),
+      'source_type': instance.$type,
+    };
+
+WebMangaExtension _$WebMangaExtensionFromJson(Map<String, dynamic> json) =>
+    WebMangaExtension(
+      data: SourceManga.fromJson(json['data'] as Map<String, dynamic>),
+      chaptersList: (json['chaptersList'] as List<dynamic>)
+          .map((e) => Chapter.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      $type: json['source_type'] as String?,
+    );
+
+Map<String, dynamic> _$WebMangaExtensionToJson(WebMangaExtension instance) =>
+    <String, dynamic>{
+      'data': instance.data.toJson(),
+      'chaptersList': instance.chaptersList.map((e) => e.toJson()).toList(),
+      'source_type': instance.$type,
+    };
+
+_CubariChapter _$CubariChapterFromJson(Map<String, dynamic> json) =>
+    _CubariChapter(
+      title: json['title'] as String?,
+      volume: json['volume'] as String?,
+      lastUpdated: const EpochTimestampSerializer().fromJson(
+        json['last_updated'],
+      ),
+      releaseDate: const MappedEpochTimestampSerializer().fromJson(
+        json['release_date'],
+      ),
+      groups: json['groups'] as Map<String, dynamic>,
+    );
+
+Map<String, dynamic> _$CubariChapterToJson(
+  _CubariChapter instance,
 ) => <String, dynamic>{
   'title': instance.title,
   'volume': instance.volume,
@@ -169,7 +192,7 @@ Map<String, dynamic> _$WebChapterToJson(
   'release_date': const MappedEpochTimestampSerializer().toJson(
     instance.releaseDate,
   ),
-  'groups': const ChapterGroupSerializer().toJson(instance.groups),
+  'groups': instance.groups,
 };
 
 _ImgurPage _$ImgurPageFromJson(Map<String, dynamic> json) => _ImgurPage(

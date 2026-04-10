@@ -3,11 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/model/common.dart';
-import 'package:gagaku/util/ui.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 
-@Dependencies([chipTextStyle])
 class MangaDexGlobalFeedPage extends HookWidget {
   const MangaDexGlobalFeedPage({super.key});
 
@@ -18,25 +14,26 @@ class MangaDexGlobalFeedPage extends HookWidget {
     final info = MangaDexFeeds.globalFeed;
 
     return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: GestureDetector(
-          onTap: () {
-            controller.animateTo(
-              0.0,
-              duration: const Duration(milliseconds: 1000),
-              curve: Curves.easeOutCirc,
-            );
-          },
-          child: TitleFlexBar(title: t.chapterFeed.latestUpdates),
-        ),
-        leading: const BackButton(),
-      ),
       body: InfiniteScrollChapterFeedWidget(
         feedKey: info.key,
         limit: info.limit,
         path: info.path!,
         scrollController: controller,
         restorationId: 'global_list_offset',
+        leading: [
+          SliverAppBar.medium(
+            pinned: true,
+            leading: const BackButton(),
+            title: GestureDetector(
+              onTap: () => controller.animateTo(
+                0.0,
+                duration: const Duration(milliseconds: 1000),
+                curve: Curves.easeOutCirc,
+              ),
+              child: Text(t.chapterFeed.latestUpdates),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -96,22 +96,6 @@ class WebFavoritesList {
   int get hashCode => Object.hash(runtimeType, id, name, list);
 }
 
-@freezed
-abstract class ChapterEntry with _$ChapterEntry {
-  const ChapterEntry._();
-
-  const factory ChapterEntry({
-    required String name,
-    required WebChapter chapter,
-  }) = _ChapterEntry;
-
-  factory ChapterEntry.fromJson(Map<String, dynamic> json) =>
-      _$ChapterEntryFromJson(json);
-
-  factory ChapterEntry.fromEntry(MapEntry<String, WebChapter> entry) =>
-      ChapterEntry(name: entry.key, chapter: entry.value);
-}
-
 enum SourceType { proxy, source }
 
 @unfreezed
@@ -349,19 +333,20 @@ class HistoryLink with _$HistoryLink {
   }
 }
 
-class WebChapterSerializer
-    implements JsonConverter<List<ChapterEntry>, dynamic> {
-  const WebChapterSerializer();
+class CubariChapterListConverter
+    implements JsonConverter<List<CubariChapterEntry>, dynamic> {
+  const CubariChapterListConverter();
 
   @override
-  List<ChapterEntry> fromJson(dynamic chapters) {
+  List<CubariChapterEntry> fromJson(dynamic chapters) {
     if (chapters is Map) {
       final map = (chapters as Map<String, dynamic>).map(
-        (k, e) => MapEntry(k, WebChapter.fromJson(e as Map<String, dynamic>)),
+        (k, e) =>
+            MapEntry(k, CubariChapter.fromJson(e as Map<String, dynamic>)),
       );
 
       final chapterlist = map.entries
-          .map((e) => ChapterEntry.fromEntry(e))
+          .map((e) => CubariChapterEntry.fromEntry(e))
           .toList();
       chapterlist.sort((a, b) => compareNatural(b.name, a.name));
 
@@ -370,7 +355,7 @@ class WebChapterSerializer
 
     if (chapters is List) {
       final chapterlist = (chapters)
-          .map((c) => ChapterEntry.fromJson(c))
+          .map((c) => CubariChapterEntry.fromJson(c))
           .toList();
 
       chapterlist.sort((a, b) => compareNatural(b.name, a.name));
@@ -381,106 +366,148 @@ class WebChapterSerializer
   }
 
   @override
-  dynamic toJson(List<ChapterEntry> chapters) {
+  dynamic toJson(List<CubariChapterEntry> chapters) {
     return chapters.map((c) => c.toJson()).toList();
   }
 }
 
-@unfreezed
-abstract class WebManga with _$WebManga {
-  WebManga._();
+@freezed
+abstract class CubariChapterEntry with _$CubariChapterEntry {
+  const CubariChapterEntry._();
 
-  factory WebManga({
+  const factory CubariChapterEntry({
+    required String name,
+    required CubariChapter chapter,
+  }) = _CubariChapterEntry;
+
+  factory CubariChapterEntry.fromJson(Map<String, dynamic> json) =>
+      _$CubariChapterEntryFromJson(json);
+
+  factory CubariChapterEntry.fromEntry(MapEntry<String, CubariChapter> entry) =>
+      CubariChapterEntry(name: entry.key, chapter: entry.value);
+}
+
+@freezed
+sealed class WebChapterItem with _$WebChapterItem {
+  const WebChapterItem._();
+
+  const factory WebChapterItem.cubari(CubariChapterEntry entry) =
+      WebChapterItemCubari;
+  const factory WebChapterItem.extension(Chapter chapter) =
+      WebChapterItemExtension;
+
+  DateTime? get date => switch (this) {
+    WebChapterItemCubari(:final entry) =>
+      entry.chapter.lastUpdated ?? entry.chapter.releaseDate,
+    WebChapterItemExtension(:final chapter) => chapter.publishDate,
+  };
+
+  String get title => switch (this) {
+    WebChapterItemCubari(:final entry) =>
+      (entry.chapter.title?.isNotEmpty == true &&
+              entry.chapter.title != entry.name)
+          ? '${entry.name}: ${entry.chapter.title}'
+          : entry.name,
+    WebChapterItemExtension(:final chapter) =>
+      (chapter.title?.isNotEmpty == true &&
+              chapter.title != chapter.chapNum.toString())
+          ? '${chapter.chapNum}: ${chapter.title}'
+          : chapter.chapNum.toString(),
+  };
+}
+
+@Freezed(unionKey: 'source_type')
+sealed class WebManga with _$WebManga {
+  const WebManga._();
+
+  @JsonSerializable(explicitToJson: true)
+  const factory WebManga.cubari({
     required String title,
     required String description,
     required String artist,
     required String author,
     required String cover,
     Map<String, String>? groups,
-    @WebChapterSerializer() required List<ChapterEntry> chapters,
-    SourceManga? data,
-  }) = _WebManga;
+    @JsonKey(name: 'chapters')
+    @CubariChapterListConverter()
+    required List<CubariChapterEntry> cubariChapters,
+  }) = WebMangaCubari;
+
+  @JsonSerializable(explicitToJson: true)
+  const factory WebManga.extension({
+    required SourceManga data,
+    required List<Chapter> chaptersList,
+  }) = WebMangaExtension;
 
   factory WebManga.fromJson(Map<String, dynamic> json) =>
       _$WebMangaFromJson(json);
 
-  WebChapter? getChapter(String chapter) {
-    return chapters.firstWhereOrNull((e) => chapter == e.name)?.chapter;
+  String get title => switch (this) {
+    WebMangaCubari(:final title) => title,
+    WebMangaExtension(:final data) => data.mangaInfo.primaryTitle,
+  };
+
+  String get cover => switch (this) {
+    WebMangaCubari(:final cover) => cover,
+    WebMangaExtension(:final data) => data.mangaInfo.thumbnailUrl,
+  };
+
+  String get author => switch (this) {
+    WebMangaCubari(:final author) => author,
+    WebMangaExtension(:final data) => data.mangaInfo.author ?? '',
+  };
+
+  String get artist => switch (this) {
+    WebMangaCubari(:final artist) => artist,
+    WebMangaExtension(:final data) => data.mangaInfo.artist ?? '',
+  };
+
+  String get description => switch (this) {
+    WebMangaCubari(:final description) => description,
+    WebMangaExtension(:final data) => data.mangaInfo.synopsis,
+  };
+
+  Map<String, String>? get groups => switch (this) {
+    WebMangaCubari(:final groups) => groups,
+    WebMangaExtension() => null,
+  };
+
+  /// Get chapters as a unified list interface
+  List<WebChapterItem> get chapters => switch (this) {
+    WebMangaCubari(:final cubariChapters) =>
+      cubariChapters.map((c) => WebChapterItem.cubari(c)).toList(),
+    WebMangaExtension(:final chaptersList) =>
+      chaptersList.map((c) => WebChapterItem.extension(c)).toList(),
+  };
+
+  /// Retrieve a specific chapter by identifier
+  WebChapterItem? getChapter(String id) {
+    switch (this) {
+      case WebMangaCubari(:final cubariChapters):
+        final match = cubariChapters.firstWhereOrNull((c) => c.name == id);
+        return match != null ? WebChapterItem.cubari(match) : null;
+      case WebMangaExtension(:final chaptersList):
+        final match = chaptersList.firstWhereOrNull((c) => c.chapterId == id);
+        return match != null ? WebChapterItem.extension(match) : null;
+    }
   }
 }
 
-class ChapterGroupSerializer
-    implements JsonConverter<Map<String, dynamic>, dynamic> {
-  const ChapterGroupSerializer();
-
-  @override
-  Map<String, dynamic> fromJson(dynamic groups) {
-    final map = groups as Map<String, dynamic>;
-
-    if (map.isNotEmpty) {
-      final entry = map.entries.first;
-      final content = entry.value;
-
-      if (content is Map &&
-          (content.containsKey('id') || content.containsKey('chapterId'))) {
-        map.updateAll((g, element) {
-          return Chapter.fromJson(element);
-        });
-      }
-    }
-
-    return map;
-  }
-
-  @override
-  dynamic toJson(Map<String, dynamic> groups) {
-    final map = {...groups};
-
-    if (map.isNotEmpty) {
-      final entry = map.entries.first;
-      final content = entry.value;
-
-      if (content is Chapter) {
-        map.updateAll((g, element) {
-          final processed = (element as Chapter).toJson();
-          return processed;
-        });
-      }
-    }
-
-    return map;
-  }
-}
-
-@Freezed(makeCollectionsUnmodifiable: false)
-abstract class WebChapter with _$WebChapter {
-  const WebChapter._();
+@freezed
+abstract class CubariChapter with _$CubariChapter {
+  const CubariChapter._();
 
   @JsonSerializable(fieldRename: FieldRename.snake)
-  const factory WebChapter({
+  const factory CubariChapter({
     String? title,
     String? volume,
     @EpochTimestampSerializer() DateTime? lastUpdated,
     @MappedEpochTimestampSerializer() DateTime? releaseDate,
-    @ChapterGroupSerializer() required Map<String, dynamic> groups,
-  }) = _WebChapter;
+    required Map<String, dynamic> groups,
+  }) = _CubariChapter;
 
-  factory WebChapter.fromJson(Map<String, dynamic> json) =>
-      _$WebChapterFromJson(json);
-
-  String getTitle(String index) {
-    if (index == title) {
-      return index;
-    }
-
-    String output = index;
-
-    if (title != null && title!.isNotEmpty) {
-      output += ': $title';
-    }
-
-    return output;
-  }
+  factory CubariChapter.fromJson(Map<String, dynamic> json) =>
+      _$CubariChapterFromJson(json);
 }
 
 @freezed

@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/model/config.dart';
+import 'package:gagaku/model/search_history.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/mangadex/settings.dart';
@@ -21,7 +21,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:riverpod/misc.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -58,37 +57,89 @@ const _openIconS = Icon(Icons.open_in_new, size: 15.0);
 const _scheduleIconB = Icon(Icons.schedule, size: 20.0);
 const _scheduleIconS = Icon(Icons.schedule, size: 15.0);
 
-class MangaDexSliverAppBar extends StatelessWidget {
+class MangaDexSliverAppBar extends ConsumerStatefulWidget {
   const MangaDexSliverAppBar({super.key, this.controller, this.title});
 
   final ScrollController? controller;
   final String? title;
 
   @override
+  ConsumerState<MangaDexSliverAppBar> createState() =>
+      _MangaDexSliverAppBarState();
+}
+
+class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
+  @override
   Widget build(BuildContext context) {
     final tr = context.t;
     final theme = Theme.of(context);
-
-    final flex = GestureDetector(
-      onTap: () {
-        controller?.animateTo(
-          0.0,
-          duration: const Duration(milliseconds: 1000),
-          curve: Curves.easeOutCirc,
-        );
-      },
-      child: TitleFlexBar(title: title ?? 'MangaDex'),
-    );
 
     final actions = <Widget>[
       OverflowBar(
         spacing: 8.0,
         children: [
-          IconButton(
-            color: theme.colorScheme.onPrimaryContainer,
-            icon: const Icon(Icons.search),
-            onPressed: () => MangaDexSearchRoute().push(context),
-            tooltip: tr.search.arg(arg: 'MangaDex'),
+          SearchAnchor(
+            isFullScreen: false,
+            viewHintText: tr.search.arg(arg: 'MangaDex'),
+            viewConstraints: const BoxConstraints(
+              minWidth: 280,
+              maxHeight: 400,
+            ),
+            builder: (BuildContext ctx, SearchController ctl) => IconButton(
+              color: theme.colorScheme.onPrimaryContainer,
+              icon: const Icon(Icons.search),
+              tooltip: tr.search.arg(arg: 'MangaDex'),
+              onPressed: ctl.openView,
+            ),
+            viewOnSubmitted: (value) {
+              final term = value.trim();
+              if (term.isEmpty) return;
+              final history = ref.read(searchHistoryProvider);
+              ref.read(searchHistoryProvider.notifier).state = {
+                term,
+                ...history,
+              }.take(10).toList();
+              MangaDexSearchRoute(
+                $extra: MangaSearchParameters(
+                  query: term,
+                  filter: const MangaFilters(),
+                ),
+              ).push(context);
+            },
+            suggestionsBuilder: (BuildContext ctx, SearchController ctl) {
+              final history = ref.read(searchHistoryProvider);
+              return [
+                ...history.map(
+                  (term) => ListTile(
+                    titleAlignment: ListTileTitleAlignment.center,
+                    leading: const Icon(Icons.history),
+                    title: Text(term),
+                    onTap: () {
+                      final h = ref.read(searchHistoryProvider);
+                      ref.read(searchHistoryProvider.notifier).state = {
+                        term,
+                        ...h,
+                      }.take(10).toList();
+                      ctl.closeView(term);
+                      MangaDexSearchRoute(
+                        $extra: MangaSearchParameters(
+                          query: term,
+                          filter: const MangaFilters(),
+                        ),
+                      ).push(context);
+                    },
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.search),
+                  title: Text(tr.search.advancedSearch),
+                  onTap: () {
+                    ctl.closeView('');
+                    MangaDexSearchRoute().push(context);
+                  },
+                ),
+              ];
+            },
           ),
           Tooltip(
             message: tr.arg_settings(arg: 'MangaDex'),
@@ -110,9 +161,23 @@ class MangaDexSliverAppBar extends StatelessWidget {
               },
             ),
           ),
-          Consumer(
+          HookConsumer(
             builder: (context, ref, child) {
               final auth = ref.watch(loggedUserProvider);
+              final imageCache = ref.watch(extensionImageCacheProvider);
+              final me = auth.value;
+              final avatarUrl = me?.getUserAvatar(
+                quality: CoverArtQuality.small,
+              );
+              final avatarImageProvider = useMemoized(
+                () => avatarUrl != null
+                    ? CachedNetworkImageProvider(
+                        avatarUrl,
+                        cacheManager: imageCache,
+                      )
+                    : null,
+                [avatarUrl, imageCache],
+              );
 
               return switch (auth) {
                 AsyncValue(hasValue: true, value: final me) =>
@@ -126,7 +191,6 @@ class MangaDexSliverAppBar extends StatelessWidget {
                         )
                       : MenuAnchor(
                           builder: (context, controller, child) => IconButton(
-                            color: theme.colorScheme.onPrimaryContainer,
                             onPressed: () {
                               if (controller.isOpen) {
                                 controller.close();
@@ -134,7 +198,11 @@ class MangaDexSliverAppBar extends StatelessWidget {
                                 controller.open();
                               }
                             },
-                            icon: const Icon(Icons.person),
+                            icon: CircleAvatar(
+                              radius: 14,
+                              foregroundImage: avatarImageProvider,
+                              child: const Icon(Icons.person, size: 16),
+                            ),
                           ),
                           menuChildren: [
                             Center(
@@ -144,6 +212,7 @@ class MangaDexSliverAppBar extends StatelessWidget {
                                   spacing: 10.0,
                                   children: [
                                     CircleAvatar(
+                                      foregroundImage: avatarImageProvider,
                                       child: const Icon(Icons.person),
                                     ),
                                     Text(
@@ -176,7 +245,20 @@ class MangaDexSliverAppBar extends StatelessWidget {
       ),
     ];
 
-    return SliverAppBar(floating: true, flexibleSpace: flex, actions: actions);
+    return SliverAppBar.medium(
+      pinned: true,
+      title: GestureDetector(
+        onTap: () {
+          widget.controller?.animateTo(
+            0.0,
+            duration: const Duration(milliseconds: 1000),
+            curve: Curves.easeOutCirc,
+          );
+        },
+        child: Text(widget.title ?? 'MangaDex'),
+      ),
+      actions: actions,
+    );
   }
 }
 
@@ -256,7 +338,6 @@ class MarkReadButton extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class ChapterFeedWidget extends HookWidget {
   const ChapterFeedWidget({
     super.key,
@@ -363,7 +444,6 @@ class ChapterFeedWidget extends HookWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
   const InfiniteScrollChapterFeedWidget({
     super.key,
@@ -578,7 +658,6 @@ class MangaTitleButton extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class _BackLinkedChapterButton extends StatelessWidget {
   const _BackLinkedChapterButton({
     super.key,
@@ -615,7 +694,6 @@ class _BackLinkedChapterButton extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class ChapterFeedItem extends HookConsumerWidget {
   const ChapterFeedItem({super.key, required this.state});
 
@@ -785,7 +863,6 @@ class _ChapterButtonCard extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class ChapterButtonWidget extends StatelessWidget {
   const ChapterButtonWidget({
     super.key,
@@ -1099,7 +1176,6 @@ class MangaListWidget extends HookConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class MangaListViewSliver extends ConsumerWidget {
   const MangaListViewSliver({
     super.key,
@@ -1352,7 +1428,6 @@ class GridMangaItem extends HookConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class GridMangaDetailedItem extends ConsumerWidget {
   const GridMangaDetailedItem({super.key, required this.manga, this.header});
 
@@ -1433,7 +1508,6 @@ class GridMangaDetailedItem extends ConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class _ListMangaItem extends ConsumerWidget {
   const _ListMangaItem({super.key, required this.manga, this.header});
 
@@ -1535,7 +1609,6 @@ class ChapterTitle extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class MangaGenreRow extends StatelessWidget {
   const MangaGenreRow({super.key, required this.manga});
 
@@ -1574,7 +1647,6 @@ class MangaGenreRow extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class MangaStatisticsRow extends HookConsumerWidget {
   const MangaStatisticsRow({
     super.key,
@@ -1641,7 +1713,6 @@ class MangaStatisticsRow extends HookConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class _GroupRow extends StatelessWidget {
   final Chapter chapter;
 
@@ -1701,7 +1772,6 @@ class _PubTime extends HookWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class CommentChip extends StatelessWidget {
   final StatisticsDetailsComments? comments;
   final NumberFormat formatter;
@@ -1727,7 +1797,6 @@ class CommentChip extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class MangaStatusChip extends StatelessWidget {
   const MangaStatusChip({
     super.key,
@@ -1760,7 +1829,6 @@ class MangaStatusChip extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class ContentRatingChip extends StatelessWidget {
   const ContentRatingChip({super.key, required this.rating});
 
@@ -1780,7 +1848,6 @@ class ContentRatingChip extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class ContentChip extends StatelessWidget {
   const ContentChip({super.key, required this.content});
 

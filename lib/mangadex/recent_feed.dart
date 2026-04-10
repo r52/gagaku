@@ -8,13 +8,9 @@ import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
-import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 
-@Dependencies([chipTextStyle])
 class MangaDexRecentFeedPage extends StatefulHookConsumerWidget {
   const MangaDexRecentFeedPage({super.key, this.controller});
 
@@ -83,19 +79,6 @@ class _MangaDexRecentFeedPageState
     final ctrler = widget.controller ?? useScrollController();
 
     return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: GestureDetector(
-          onTap: () {
-            ctrler.animateTo(
-              0.0,
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.easeInOut,
-            );
-          },
-          child: TitleFlexBar(title: tr.mangadex.recentlyAdded),
-        ),
-        leading: const BackButton(),
-      ),
       body: Center(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -107,6 +90,20 @@ class _MangaDexRecentFeedPageState
           child: MangaListWidget(
             physics: const AlwaysScrollableScrollPhysics(),
             controller: ctrler,
+            leading: [
+              SliverAppBar.medium(
+                pinned: true,
+                leading: const BackButton(),
+                title: GestureDetector(
+                  onTap: () => ctrler.animateTo(
+                    0.0,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut,
+                  ),
+                  child: Text(tr.mangadex.recentlyAdded),
+                ),
+              ),
+            ],
             children: [MangaListViewSliver(controller: _pagingController)],
           ),
         ),

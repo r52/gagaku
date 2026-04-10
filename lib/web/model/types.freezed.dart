@@ -69,161 +69,6 @@ as Map<String, Set<String>>,
 
 
 /// @nodoc
-mixin _$ChapterEntry {
-
- String get name; WebChapter get chapter;
-/// Create a copy of ChapterEntry
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$ChapterEntryCopyWith<ChapterEntry> get copyWith => _$ChapterEntryCopyWithImpl<ChapterEntry>(this as ChapterEntry, _$identity);
-
-  /// Serializes this ChapterEntry to a JSON map.
-  Map<String, dynamic> toJson();
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterEntry&&(identical(other.name, name) || other.name == name)&&(identical(other.chapter, chapter) || other.chapter == chapter));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,name,chapter);
-
-@override
-String toString() {
-  return 'ChapterEntry(name: $name, chapter: $chapter)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $ChapterEntryCopyWith<$Res>  {
-  factory $ChapterEntryCopyWith(ChapterEntry value, $Res Function(ChapterEntry) _then) = _$ChapterEntryCopyWithImpl;
-@useResult
-$Res call({
- String name, WebChapter chapter
-});
-
-
-$WebChapterCopyWith<$Res> get chapter;
-
-}
-/// @nodoc
-class _$ChapterEntryCopyWithImpl<$Res>
-    implements $ChapterEntryCopyWith<$Res> {
-  _$ChapterEntryCopyWithImpl(this._self, this._then);
-
-  final ChapterEntry _self;
-  final $Res Function(ChapterEntry) _then;
-
-/// Create a copy of ChapterEntry
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? chapter = null,}) {
-  return _then(_self.copyWith(
-name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,chapter: null == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
-as WebChapter,
-  ));
-}
-/// Create a copy of ChapterEntry
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$WebChapterCopyWith<$Res> get chapter {
-  
-  return $WebChapterCopyWith<$Res>(_self.chapter, (value) {
-    return _then(_self.copyWith(chapter: value));
-  });
-}
-}
-
-
-
-/// @nodoc
-@JsonSerializable()
-
-class _ChapterEntry extends ChapterEntry {
-  const _ChapterEntry({required this.name, required this.chapter}): super._();
-  factory _ChapterEntry.fromJson(Map<String, dynamic> json) => _$ChapterEntryFromJson(json);
-
-@override final  String name;
-@override final  WebChapter chapter;
-
-/// Create a copy of ChapterEntry
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$ChapterEntryCopyWith<_ChapterEntry> get copyWith => __$ChapterEntryCopyWithImpl<_ChapterEntry>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$ChapterEntryToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterEntry&&(identical(other.name, name) || other.name == name)&&(identical(other.chapter, chapter) || other.chapter == chapter));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,name,chapter);
-
-@override
-String toString() {
-  return 'ChapterEntry(name: $name, chapter: $chapter)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$ChapterEntryCopyWith<$Res> implements $ChapterEntryCopyWith<$Res> {
-  factory _$ChapterEntryCopyWith(_ChapterEntry value, $Res Function(_ChapterEntry) _then) = __$ChapterEntryCopyWithImpl;
-@override @useResult
-$Res call({
- String name, WebChapter chapter
-});
-
-
-@override $WebChapterCopyWith<$Res> get chapter;
-
-}
-/// @nodoc
-class __$ChapterEntryCopyWithImpl<$Res>
-    implements _$ChapterEntryCopyWith<$Res> {
-  __$ChapterEntryCopyWithImpl(this._self, this._then);
-
-  final _ChapterEntry _self;
-  final $Res Function(_ChapterEntry) _then;
-
-/// Create a copy of ChapterEntry
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? chapter = null,}) {
-  return _then(_ChapterEntry(
-name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,chapter: null == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
-as WebChapter,
-  ));
-}
-
-/// Create a copy of ChapterEntry
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$WebChapterCopyWith<$Res> get chapter {
-  
-  return $WebChapterCopyWith<$Res>(_self.chapter, (value) {
-    return _then(_self.copyWith(chapter: value));
-  });
-}
-}
-
-
-/// @nodoc
 mixin _$SourceHandler {
 
  SourceType get type; set type(SourceType value); String get sourceId; set sourceId(String value); String get location; set location(String value); String? get chapter; set chapter(String? value);
@@ -587,75 +432,73 @@ as DateTime?,
 
 
 /// @nodoc
-mixin _$WebManga {
+mixin _$CubariChapterEntry {
 
- String get title; set title(String value); String get description; set description(String value); String get artist; set artist(String value); String get author; set author(String value); String get cover; set cover(String value); Map<String, String>? get groups; set groups(Map<String, String>? value);@WebChapterSerializer() List<ChapterEntry> get chapters;@WebChapterSerializer() set chapters(List<ChapterEntry> value); SourceManga? get data; set data(SourceManga? value);
-/// Create a copy of WebManga
+ String get name; CubariChapter get chapter;
+/// Create a copy of CubariChapterEntry
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$WebMangaCopyWith<WebManga> get copyWith => _$WebMangaCopyWithImpl<WebManga>(this as WebManga, _$identity);
+$CubariChapterEntryCopyWith<CubariChapterEntry> get copyWith => _$CubariChapterEntryCopyWithImpl<CubariChapterEntry>(this as CubariChapterEntry, _$identity);
 
-  /// Serializes this WebManga to a JSON map.
+  /// Serializes this CubariChapterEntry to a JSON map.
   Map<String, dynamic> toJson();
 
 
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CubariChapterEntry&&(identical(other.name, name) || other.name == name)&&(identical(other.chapter, chapter) || other.chapter == chapter));
+}
 
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,name,chapter);
 
 @override
 String toString() {
-  return 'WebManga(title: $title, description: $description, artist: $artist, author: $author, cover: $cover, groups: $groups, chapters: $chapters, data: $data)';
+  return 'CubariChapterEntry(name: $name, chapter: $chapter)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $WebMangaCopyWith<$Res>  {
-  factory $WebMangaCopyWith(WebManga value, $Res Function(WebManga) _then) = _$WebMangaCopyWithImpl;
+abstract mixin class $CubariChapterEntryCopyWith<$Res>  {
+  factory $CubariChapterEntryCopyWith(CubariChapterEntry value, $Res Function(CubariChapterEntry) _then) = _$CubariChapterEntryCopyWithImpl;
 @useResult
 $Res call({
- String title, String description, String artist, String author, String cover, Map<String, String>? groups,@WebChapterSerializer() List<ChapterEntry> chapters, SourceManga? data
+ String name, CubariChapter chapter
 });
 
 
-$SourceMangaCopyWith<$Res>? get data;
+$CubariChapterCopyWith<$Res> get chapter;
 
 }
 /// @nodoc
-class _$WebMangaCopyWithImpl<$Res>
-    implements $WebMangaCopyWith<$Res> {
-  _$WebMangaCopyWithImpl(this._self, this._then);
+class _$CubariChapterEntryCopyWithImpl<$Res>
+    implements $CubariChapterEntryCopyWith<$Res> {
+  _$CubariChapterEntryCopyWithImpl(this._self, this._then);
 
-  final WebManga _self;
-  final $Res Function(WebManga) _then;
+  final CubariChapterEntry _self;
+  final $Res Function(CubariChapterEntry) _then;
 
-/// Create a copy of WebManga
+/// Create a copy of CubariChapterEntry
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? description = null,Object? artist = null,Object? author = null,Object? cover = null,Object? groups = freezed,Object? chapters = null,Object? data = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? chapter = null,}) {
   return _then(_self.copyWith(
-title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,artist: null == artist ? _self.artist : artist // ignore: cast_nullable_to_non_nullable
-as String,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
-as String,cover: null == cover ? _self.cover : cover // ignore: cast_nullable_to_non_nullable
-as String,groups: freezed == groups ? _self.groups : groups // ignore: cast_nullable_to_non_nullable
-as Map<String, String>?,chapters: null == chapters ? _self.chapters : chapters // ignore: cast_nullable_to_non_nullable
-as List<ChapterEntry>,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
-as SourceManga?,
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,chapter: null == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
+as CubariChapter,
   ));
 }
-/// Create a copy of WebManga
+/// Create a copy of CubariChapterEntry
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$SourceMangaCopyWith<$Res>? get data {
-    if (_self.data == null) {
-    return null;
-  }
-
-  return $SourceMangaCopyWith<$Res>(_self.data!, (value) {
-    return _then(_self.copyWith(data: value));
+$CubariChapterCopyWith<$Res> get chapter {
+  
+  return $CubariChapterCopyWith<$Res>(_self.chapter, (value) {
+    return _then(_self.copyWith(chapter: value));
   });
 }
 }
@@ -665,73 +508,495 @@ $SourceMangaCopyWith<$Res>? get data {
 /// @nodoc
 @JsonSerializable()
 
-class _WebManga extends WebManga {
-   _WebManga({required this.title, required this.description, required this.artist, required this.author, required this.cover, this.groups, @WebChapterSerializer() required this.chapters, this.data}): super._();
-  factory _WebManga.fromJson(Map<String, dynamic> json) => _$WebMangaFromJson(json);
+class _CubariChapterEntry extends CubariChapterEntry {
+  const _CubariChapterEntry({required this.name, required this.chapter}): super._();
+  factory _CubariChapterEntry.fromJson(Map<String, dynamic> json) => _$CubariChapterEntryFromJson(json);
 
-@override  String title;
-@override  String description;
-@override  String artist;
-@override  String author;
-@override  String cover;
-@override  Map<String, String>? groups;
-@override@WebChapterSerializer()  List<ChapterEntry> chapters;
-@override  SourceManga? data;
+@override final  String name;
+@override final  CubariChapter chapter;
 
-/// Create a copy of WebManga
+/// Create a copy of CubariChapterEntry
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$WebMangaCopyWith<_WebManga> get copyWith => __$WebMangaCopyWithImpl<_WebManga>(this, _$identity);
+_$CubariChapterEntryCopyWith<_CubariChapterEntry> get copyWith => __$CubariChapterEntryCopyWithImpl<_CubariChapterEntry>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$WebMangaToJson(this, );
+  return _$CubariChapterEntryToJson(this, );
 }
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CubariChapterEntry&&(identical(other.name, name) || other.name == name)&&(identical(other.chapter, chapter) || other.chapter == chapter));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,name,chapter);
+
+@override
+String toString() {
+  return 'CubariChapterEntry(name: $name, chapter: $chapter)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$CubariChapterEntryCopyWith<$Res> implements $CubariChapterEntryCopyWith<$Res> {
+  factory _$CubariChapterEntryCopyWith(_CubariChapterEntry value, $Res Function(_CubariChapterEntry) _then) = __$CubariChapterEntryCopyWithImpl;
+@override @useResult
+$Res call({
+ String name, CubariChapter chapter
+});
+
+
+@override $CubariChapterCopyWith<$Res> get chapter;
+
+}
+/// @nodoc
+class __$CubariChapterEntryCopyWithImpl<$Res>
+    implements _$CubariChapterEntryCopyWith<$Res> {
+  __$CubariChapterEntryCopyWithImpl(this._self, this._then);
+
+  final _CubariChapterEntry _self;
+  final $Res Function(_CubariChapterEntry) _then;
+
+/// Create a copy of CubariChapterEntry
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? chapter = null,}) {
+  return _then(_CubariChapterEntry(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,chapter: null == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
+as CubariChapter,
+  ));
+}
+
+/// Create a copy of CubariChapterEntry
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$CubariChapterCopyWith<$Res> get chapter {
+  
+  return $CubariChapterCopyWith<$Res>(_self.chapter, (value) {
+    return _then(_self.copyWith(chapter: value));
+  });
+}
+}
+
+/// @nodoc
+mixin _$WebChapterItem {
+
+
 
 
 
 @override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapterItem);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
 String toString() {
-  return 'WebManga(title: $title, description: $description, artist: $artist, author: $author, cover: $cover, groups: $groups, chapters: $chapters, data: $data)';
+  return 'WebChapterItem()';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$WebMangaCopyWith<$Res> implements $WebMangaCopyWith<$Res> {
-  factory _$WebMangaCopyWith(_WebManga value, $Res Function(_WebManga) _then) = __$WebMangaCopyWithImpl;
-@override @useResult
+class $WebChapterItemCopyWith<$Res>  {
+$WebChapterItemCopyWith(WebChapterItem _, $Res Function(WebChapterItem) __);
+}
+
+
+
+/// @nodoc
+
+
+class WebChapterItemCubari extends WebChapterItem {
+  const WebChapterItemCubari(this.entry): super._();
+  
+
+ final  CubariChapterEntry entry;
+
+/// Create a copy of WebChapterItem
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WebChapterItemCubariCopyWith<WebChapterItemCubari> get copyWith => _$WebChapterItemCubariCopyWithImpl<WebChapterItemCubari>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapterItemCubari&&(identical(other.entry, entry) || other.entry == entry));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,entry);
+
+@override
+String toString() {
+  return 'WebChapterItem.cubari(entry: $entry)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WebChapterItemCubariCopyWith<$Res> implements $WebChapterItemCopyWith<$Res> {
+  factory $WebChapterItemCubariCopyWith(WebChapterItemCubari value, $Res Function(WebChapterItemCubari) _then) = _$WebChapterItemCubariCopyWithImpl;
+@useResult
 $Res call({
- String title, String description, String artist, String author, String cover, Map<String, String>? groups,@WebChapterSerializer() List<ChapterEntry> chapters, SourceManga? data
+ CubariChapterEntry entry
 });
 
 
-@override $SourceMangaCopyWith<$Res>? get data;
+$CubariChapterEntryCopyWith<$Res> get entry;
 
 }
 /// @nodoc
-class __$WebMangaCopyWithImpl<$Res>
-    implements _$WebMangaCopyWith<$Res> {
-  __$WebMangaCopyWithImpl(this._self, this._then);
+class _$WebChapterItemCubariCopyWithImpl<$Res>
+    implements $WebChapterItemCubariCopyWith<$Res> {
+  _$WebChapterItemCubariCopyWithImpl(this._self, this._then);
 
-  final _WebManga _self;
-  final $Res Function(_WebManga) _then;
+  final WebChapterItemCubari _self;
+  final $Res Function(WebChapterItemCubari) _then;
+
+/// Create a copy of WebChapterItem
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? entry = null,}) {
+  return _then(WebChapterItemCubari(
+null == entry ? _self.entry : entry // ignore: cast_nullable_to_non_nullable
+as CubariChapterEntry,
+  ));
+}
+
+/// Create a copy of WebChapterItem
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$CubariChapterEntryCopyWith<$Res> get entry {
+  
+  return $CubariChapterEntryCopyWith<$Res>(_self.entry, (value) {
+    return _then(_self.copyWith(entry: value));
+  });
+}
+}
+
+/// @nodoc
+
+
+class WebChapterItemExtension extends WebChapterItem {
+  const WebChapterItemExtension(this.chapter): super._();
+  
+
+ final  Chapter chapter;
+
+/// Create a copy of WebChapterItem
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WebChapterItemExtensionCopyWith<WebChapterItemExtension> get copyWith => _$WebChapterItemExtensionCopyWithImpl<WebChapterItemExtension>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapterItemExtension&&(identical(other.chapter, chapter) || other.chapter == chapter));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,chapter);
+
+@override
+String toString() {
+  return 'WebChapterItem.extension(chapter: $chapter)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WebChapterItemExtensionCopyWith<$Res> implements $WebChapterItemCopyWith<$Res> {
+  factory $WebChapterItemExtensionCopyWith(WebChapterItemExtension value, $Res Function(WebChapterItemExtension) _then) = _$WebChapterItemExtensionCopyWithImpl;
+@useResult
+$Res call({
+ Chapter chapter
+});
+
+
+$ChapterCopyWith<$Res> get chapter;
+
+}
+/// @nodoc
+class _$WebChapterItemExtensionCopyWithImpl<$Res>
+    implements $WebChapterItemExtensionCopyWith<$Res> {
+  _$WebChapterItemExtensionCopyWithImpl(this._self, this._then);
+
+  final WebChapterItemExtension _self;
+  final $Res Function(WebChapterItemExtension) _then;
+
+/// Create a copy of WebChapterItem
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? chapter = null,}) {
+  return _then(WebChapterItemExtension(
+null == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
+as Chapter,
+  ));
+}
+
+/// Create a copy of WebChapterItem
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChapterCopyWith<$Res> get chapter {
+  
+  return $ChapterCopyWith<$Res>(_self.chapter, (value) {
+    return _then(_self.copyWith(chapter: value));
+  });
+}
+}
+
+WebManga _$WebMangaFromJson(
+  Map<String, dynamic> json
+) {
+        switch (json['source_type']) {
+                  case 'cubari':
+          return WebMangaCubari.fromJson(
+            json
+          );
+                case 'extension':
+          return WebMangaExtension.fromJson(
+            json
+          );
+        
+          default:
+            throw CheckedFromJsonException(
+  json,
+  'source_type',
+  'WebManga',
+  'Invalid union type "${json['source_type']}"!'
+);
+        }
+      
+}
+
+/// @nodoc
+mixin _$WebManga {
+
+
+
+  /// Serializes this WebManga to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebManga);
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'WebManga()';
+}
+
+
+}
+
+/// @nodoc
+class $WebMangaCopyWith<$Res>  {
+$WebMangaCopyWith(WebManga _, $Res Function(WebManga) __);
+}
+
+
+
+/// @nodoc
+
+@JsonSerializable(explicitToJson: true)
+class WebMangaCubari extends WebManga {
+  const WebMangaCubari({required this.title, required this.description, required this.artist, required this.author, required this.cover, final  Map<String, String>? groups, @JsonKey(name: 'chapters')@CubariChapterListConverter() required final  List<CubariChapterEntry> cubariChapters, final  String? $type}): _groups = groups,_cubariChapters = cubariChapters,$type = $type ?? 'cubari',super._();
+  factory WebMangaCubari.fromJson(Map<String, dynamic> json) => _$WebMangaCubariFromJson(json);
+
+ final  String title;
+ final  String description;
+ final  String artist;
+ final  String author;
+ final  String cover;
+ final  Map<String, String>? _groups;
+ Map<String, String>? get groups {
+  final value = _groups;
+  if (value == null) return null;
+  if (_groups is EqualUnmodifiableMapView) return _groups;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
+
+ final  List<CubariChapterEntry> _cubariChapters;
+@JsonKey(name: 'chapters')@CubariChapterListConverter() List<CubariChapterEntry> get cubariChapters {
+  if (_cubariChapters is EqualUnmodifiableListView) return _cubariChapters;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_cubariChapters);
+}
+
+
+@JsonKey(name: 'source_type')
+final String $type;
+
 
 /// Create a copy of WebManga
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? description = null,Object? artist = null,Object? author = null,Object? cover = null,Object? groups = freezed,Object? chapters = null,Object? data = freezed,}) {
-  return _then(_WebManga(
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WebMangaCubariCopyWith<WebMangaCubari> get copyWith => _$WebMangaCubariCopyWithImpl<WebMangaCubari>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$WebMangaCubariToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebMangaCubari&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.cover, cover) || other.cover == cover)&&const DeepCollectionEquality().equals(other._groups, _groups)&&const DeepCollectionEquality().equals(other._cubariChapters, _cubariChapters));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,title,description,artist,author,cover,const DeepCollectionEquality().hash(_groups),const DeepCollectionEquality().hash(_cubariChapters));
+
+@override
+String toString() {
+  return 'WebManga.cubari(title: $title, description: $description, artist: $artist, author: $author, cover: $cover, groups: $groups, cubariChapters: $cubariChapters)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WebMangaCubariCopyWith<$Res> implements $WebMangaCopyWith<$Res> {
+  factory $WebMangaCubariCopyWith(WebMangaCubari value, $Res Function(WebMangaCubari) _then) = _$WebMangaCubariCopyWithImpl;
+@useResult
+$Res call({
+ String title, String description, String artist, String author, String cover, Map<String, String>? groups,@JsonKey(name: 'chapters')@CubariChapterListConverter() List<CubariChapterEntry> cubariChapters
+});
+
+
+
+
+}
+/// @nodoc
+class _$WebMangaCubariCopyWithImpl<$Res>
+    implements $WebMangaCubariCopyWith<$Res> {
+  _$WebMangaCubariCopyWithImpl(this._self, this._then);
+
+  final WebMangaCubari _self;
+  final $Res Function(WebMangaCubari) _then;
+
+/// Create a copy of WebManga
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? title = null,Object? description = null,Object? artist = null,Object? author = null,Object? cover = null,Object? groups = freezed,Object? cubariChapters = null,}) {
+  return _then(WebMangaCubari(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,artist: null == artist ? _self.artist : artist // ignore: cast_nullable_to_non_nullable
 as String,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as String,cover: null == cover ? _self.cover : cover // ignore: cast_nullable_to_non_nullable
-as String,groups: freezed == groups ? _self.groups : groups // ignore: cast_nullable_to_non_nullable
-as Map<String, String>?,chapters: null == chapters ? _self.chapters : chapters // ignore: cast_nullable_to_non_nullable
-as List<ChapterEntry>,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
-as SourceManga?,
+as String,groups: freezed == groups ? _self._groups : groups // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,cubariChapters: null == cubariChapters ? _self._cubariChapters : cubariChapters // ignore: cast_nullable_to_non_nullable
+as List<CubariChapterEntry>,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+@JsonSerializable(explicitToJson: true)
+class WebMangaExtension extends WebManga {
+  const WebMangaExtension({required this.data, required final  List<Chapter> chaptersList, final  String? $type}): _chaptersList = chaptersList,$type = $type ?? 'extension',super._();
+  factory WebMangaExtension.fromJson(Map<String, dynamic> json) => _$WebMangaExtensionFromJson(json);
+
+ final  SourceManga data;
+ final  List<Chapter> _chaptersList;
+ List<Chapter> get chaptersList {
+  if (_chaptersList is EqualUnmodifiableListView) return _chaptersList;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_chaptersList);
+}
+
+
+@JsonKey(name: 'source_type')
+final String $type;
+
+
+/// Create a copy of WebManga
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WebMangaExtensionCopyWith<WebMangaExtension> get copyWith => _$WebMangaExtensionCopyWithImpl<WebMangaExtension>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$WebMangaExtensionToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebMangaExtension&&(identical(other.data, data) || other.data == data)&&const DeepCollectionEquality().equals(other._chaptersList, _chaptersList));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,data,const DeepCollectionEquality().hash(_chaptersList));
+
+@override
+String toString() {
+  return 'WebManga.extension(data: $data, chaptersList: $chaptersList)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WebMangaExtensionCopyWith<$Res> implements $WebMangaCopyWith<$Res> {
+  factory $WebMangaExtensionCopyWith(WebMangaExtension value, $Res Function(WebMangaExtension) _then) = _$WebMangaExtensionCopyWithImpl;
+@useResult
+$Res call({
+ SourceManga data, List<Chapter> chaptersList
+});
+
+
+$SourceMangaCopyWith<$Res> get data;
+
+}
+/// @nodoc
+class _$WebMangaExtensionCopyWithImpl<$Res>
+    implements $WebMangaExtensionCopyWith<$Res> {
+  _$WebMangaExtensionCopyWithImpl(this._self, this._then);
+
+  final WebMangaExtension _self;
+  final $Res Function(WebMangaExtension) _then;
+
+/// Create a copy of WebManga
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? data = null,Object? chaptersList = null,}) {
+  return _then(WebMangaExtension(
+data: null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
+as SourceManga,chaptersList: null == chaptersList ? _self._chaptersList : chaptersList // ignore: cast_nullable_to_non_nullable
+as List<Chapter>,
   ));
 }
 
@@ -739,12 +1004,9 @@ as SourceManga?,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$SourceMangaCopyWith<$Res>? get data {
-    if (_self.data == null) {
-    return null;
-  }
-
-  return $SourceMangaCopyWith<$Res>(_self.data!, (value) {
+$SourceMangaCopyWith<$Res> get data {
+  
+  return $SourceMangaCopyWith<$Res>(_self.data, (value) {
     return _then(_self.copyWith(data: value));
   });
 }
@@ -752,22 +1014,22 @@ $SourceMangaCopyWith<$Res>? get data {
 
 
 /// @nodoc
-mixin _$WebChapter {
+mixin _$CubariChapter {
 
- String? get title; String? get volume;@EpochTimestampSerializer() DateTime? get lastUpdated;@MappedEpochTimestampSerializer() DateTime? get releaseDate;@ChapterGroupSerializer() Map<String, dynamic> get groups;
-/// Create a copy of WebChapter
+ String? get title; String? get volume;@EpochTimestampSerializer() DateTime? get lastUpdated;@MappedEpochTimestampSerializer() DateTime? get releaseDate; Map<String, dynamic> get groups;
+/// Create a copy of CubariChapter
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$WebChapterCopyWith<WebChapter> get copyWith => _$WebChapterCopyWithImpl<WebChapter>(this as WebChapter, _$identity);
+$CubariChapterCopyWith<CubariChapter> get copyWith => _$CubariChapterCopyWithImpl<CubariChapter>(this as CubariChapter, _$identity);
 
-  /// Serializes this WebChapter to a JSON map.
+  /// Serializes this CubariChapter to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other.groups, groups));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CubariChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other.groups, groups));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -776,18 +1038,18 @@ int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate
 
 @override
 String toString() {
-  return 'WebChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups)';
+  return 'CubariChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $WebChapterCopyWith<$Res>  {
-  factory $WebChapterCopyWith(WebChapter value, $Res Function(WebChapter) _then) = _$WebChapterCopyWithImpl;
+abstract mixin class $CubariChapterCopyWith<$Res>  {
+  factory $CubariChapterCopyWith(CubariChapter value, $Res Function(CubariChapter) _then) = _$CubariChapterCopyWithImpl;
 @useResult
 $Res call({
- String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate,@ChapterGroupSerializer() Map<String, dynamic> groups
+ String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate, Map<String, dynamic> groups
 });
 
 
@@ -795,14 +1057,14 @@ $Res call({
 
 }
 /// @nodoc
-class _$WebChapterCopyWithImpl<$Res>
-    implements $WebChapterCopyWith<$Res> {
-  _$WebChapterCopyWithImpl(this._self, this._then);
+class _$CubariChapterCopyWithImpl<$Res>
+    implements $CubariChapterCopyWith<$Res> {
+  _$CubariChapterCopyWithImpl(this._self, this._then);
 
-  final WebChapter _self;
-  final $Res Function(WebChapter) _then;
+  final CubariChapter _self;
+  final $Res Function(CubariChapter) _then;
 
-/// Create a copy of WebChapter
+/// Create a copy of CubariChapter
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? title = freezed,Object? volume = freezed,Object? lastUpdated = freezed,Object? releaseDate = freezed,Object? groups = null,}) {
   return _then(_self.copyWith(
@@ -822,50 +1084,56 @@ as Map<String, dynamic>,
 /// @nodoc
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class _WebChapter extends WebChapter {
-  const _WebChapter({this.title, this.volume, @EpochTimestampSerializer() this.lastUpdated, @MappedEpochTimestampSerializer() this.releaseDate, @ChapterGroupSerializer() required this.groups}): super._();
-  factory _WebChapter.fromJson(Map<String, dynamic> json) => _$WebChapterFromJson(json);
+class _CubariChapter extends CubariChapter {
+  const _CubariChapter({this.title, this.volume, @EpochTimestampSerializer() this.lastUpdated, @MappedEpochTimestampSerializer() this.releaseDate, required final  Map<String, dynamic> groups}): _groups = groups,super._();
+  factory _CubariChapter.fromJson(Map<String, dynamic> json) => _$CubariChapterFromJson(json);
 
 @override final  String? title;
 @override final  String? volume;
 @override@EpochTimestampSerializer() final  DateTime? lastUpdated;
 @override@MappedEpochTimestampSerializer() final  DateTime? releaseDate;
-@override@ChapterGroupSerializer() final  Map<String, dynamic> groups;
+ final  Map<String, dynamic> _groups;
+@override Map<String, dynamic> get groups {
+  if (_groups is EqualUnmodifiableMapView) return _groups;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_groups);
+}
 
-/// Create a copy of WebChapter
+
+/// Create a copy of CubariChapter
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$WebChapterCopyWith<_WebChapter> get copyWith => __$WebChapterCopyWithImpl<_WebChapter>(this, _$identity);
+_$CubariChapterCopyWith<_CubariChapter> get copyWith => __$CubariChapterCopyWithImpl<_CubariChapter>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$WebChapterToJson(this, );
+  return _$CubariChapterToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other.groups, groups));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CubariChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other._groups, _groups));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(groups));
+int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(_groups));
 
 @override
 String toString() {
-  return 'WebChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups)';
+  return 'CubariChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$WebChapterCopyWith<$Res> implements $WebChapterCopyWith<$Res> {
-  factory _$WebChapterCopyWith(_WebChapter value, $Res Function(_WebChapter) _then) = __$WebChapterCopyWithImpl;
+abstract mixin class _$CubariChapterCopyWith<$Res> implements $CubariChapterCopyWith<$Res> {
+  factory _$CubariChapterCopyWith(_CubariChapter value, $Res Function(_CubariChapter) _then) = __$CubariChapterCopyWithImpl;
 @override @useResult
 $Res call({
- String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate,@ChapterGroupSerializer() Map<String, dynamic> groups
+ String? title, String? volume,@EpochTimestampSerializer() DateTime? lastUpdated,@MappedEpochTimestampSerializer() DateTime? releaseDate, Map<String, dynamic> groups
 });
 
 
@@ -873,22 +1141,22 @@ $Res call({
 
 }
 /// @nodoc
-class __$WebChapterCopyWithImpl<$Res>
-    implements _$WebChapterCopyWith<$Res> {
-  __$WebChapterCopyWithImpl(this._self, this._then);
+class __$CubariChapterCopyWithImpl<$Res>
+    implements _$CubariChapterCopyWith<$Res> {
+  __$CubariChapterCopyWithImpl(this._self, this._then);
 
-  final _WebChapter _self;
-  final $Res Function(_WebChapter) _then;
+  final _CubariChapter _self;
+  final $Res Function(_CubariChapter) _then;
 
-/// Create a copy of WebChapter
+/// Create a copy of CubariChapter
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? title = freezed,Object? volume = freezed,Object? lastUpdated = freezed,Object? releaseDate = freezed,Object? groups = null,}) {
-  return _then(_WebChapter(
+  return _then(_CubariChapter(
 title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,volume: freezed == volume ? _self.volume : volume // ignore: cast_nullable_to_non_nullable
 as String?,lastUpdated: freezed == lastUpdated ? _self.lastUpdated : lastUpdated // ignore: cast_nullable_to_non_nullable
 as DateTime?,releaseDate: freezed == releaseDate ? _self.releaseDate : releaseDate // ignore: cast_nullable_to_non_nullable
-as DateTime?,groups: null == groups ? _self.groups : groups // ignore: cast_nullable_to_non_nullable
+as DateTime?,groups: null == groups ? _self._groups : groups // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,
   ));
 }

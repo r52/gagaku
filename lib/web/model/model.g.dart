@@ -139,46 +139,47 @@ final class SourceHeadersFamily extends $Family
   String toString() => r'sourceHeadersProvider';
 }
 
-@ProviderFor(proxy)
-final proxyProvider = ProxyProvider._();
+@ProviderFor(webSourceBroker)
+final webSourceBrokerProvider = WebSourceBrokerProvider._();
 
-final class ProxyProvider
-    extends $FunctionalProvider<ProxyHandler, ProxyHandler, ProxyHandler>
-    with $Provider<ProxyHandler> {
-  ProxyProvider._()
+final class WebSourceBrokerProvider
+    extends
+        $FunctionalProvider<WebSourceBroker, WebSourceBroker, WebSourceBroker>
+    with $Provider<WebSourceBroker> {
+  WebSourceBrokerProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'proxyProvider',
+        name: r'webSourceBrokerProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$proxyHash();
+  String debugGetCreateSourceHash() => _$webSourceBrokerHash();
 
   @$internal
   @override
-  $ProviderElement<ProxyHandler> $createElement($ProviderPointer pointer) =>
+  $ProviderElement<WebSourceBroker> $createElement($ProviderPointer pointer) =>
       $ProviderElement(pointer);
 
   @override
-  ProxyHandler create(Ref ref) {
-    return proxy(ref);
+  WebSourceBroker create(Ref ref) {
+    return webSourceBroker(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(ProxyHandler value) {
+  Override overrideWithValue(WebSourceBroker value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<ProxyHandler>(value),
+      providerOverride: $SyncValueProvider<WebSourceBroker>(value),
     );
   }
 }
 
-String _$proxyHash() => r'8a4e90bb9775641c76f0be18ce9750786e3b2a4b';
+String _$webSourceBrokerHash() => r'587c0d0309a44162d76625ffe14361300f779d67';
 
 @ProviderFor(WebReadMarkers)
 final webReadMarkersProvider = WebReadMarkersProvider._();
@@ -306,7 +307,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'00d81737103504d61a12260dd8058c7b02a37e1d';
+String _$extensionSourceHash() => r'57ba30874194ab6da7eed8726e41b2280cc57168';
 
 final class ExtensionSourceFamily extends $Family
     with

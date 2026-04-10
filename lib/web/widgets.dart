@@ -13,7 +13,9 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
-import 'package:go_router/go_router.dart';
+import 'package:gagaku/web/settings.dart';
+import 'package:gagaku/web/source_manager.dart';
+import 'package:gagaku/web/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -52,6 +54,101 @@ class _MangaListView extends _$MangaListView {
   WebMangaListView update(
     WebMangaListView Function(WebMangaListView state) cb,
   ) => state = cb(state);
+}
+
+class WebSourceSliverAppBar extends ConsumerWidget {
+  const WebSourceSliverAppBar({super.key, this.controller, this.title});
+
+  final ScrollController? controller;
+  final String? title;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
+    final nav = Navigator.of(context);
+    final api = ref.watch(webSourceBrokerProvider);
+
+    return SliverAppBar.medium(
+      pinned: true,
+      title: GestureDetector(
+        onTap: () => controller?.animateTo(
+          0.0,
+          duration: const Duration(milliseconds: 1000),
+          curve: Curves.easeOutCirc,
+        ),
+        child: Text(title ?? tr.webSources.text),
+      ),
+      actions: [
+        OverflowBar(
+          spacing: 0.0,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.search),
+              tooltip: tr.webSources.sourceSearch,
+              onPressed: () => ExtensionSearchRoute().push(context),
+            ),
+            IconButton(
+              icon: const Icon(Icons.collections_bookmark),
+              tooltip: tr.webSources.source.manager,
+              onPressed: () => nav.push(
+                SlideTransitionRouteBuilder(
+                  pageBuilder: (_, _, _) => const SourceManager(),
+                ),
+              ),
+            ),
+            MenuAnchor(
+              builder: (context, controller, _) => IconButton(
+                icon: const Icon(Icons.more_vert),
+                onPressed: () =>
+                    controller.isOpen ? controller.close() : controller.open(),
+              ),
+              menuChildren: [
+                MenuItemButton(
+                  leadingIcon: const Icon(Icons.restore),
+                  onPressed: () async {
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: Text(tr.webSources.resetAllRead),
+                        content: Text(tr.webSources.resetAllReadWarning),
+                        actions: [
+                          TextButton(
+                            child: Text(tr.ui.no),
+                            onPressed: () => Navigator.of(context).pop(false),
+                          ),
+                          ElevatedButton(
+                            child: Text(tr.ui.yes),
+                            onPressed: () => Navigator.of(context).pop(true),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirmed == true) {
+                      ref.run(
+                        (tsx) async =>
+                            tsx.get(webReadMarkersProvider.notifier).clear(),
+                      );
+                    }
+                  },
+                  child: Text(tr.webSources.resetAllRead),
+                ),
+                MenuItemButton(
+                  leadingIcon: const Icon(Icons.open_in_browser),
+                  onPressed: () => openLinkDialog(context, api),
+                  child: Text(tr.webSources.openLink),
+                ),
+                MenuItemButton(
+                  leadingIcon: const Icon(Icons.settings),
+                  onPressed: () => nav.push(WebSourceSettingsRouteBuilder()),
+                  child: Text(tr.arg_settings(arg: tr.webSources.text)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 }
 
 class WebMangaListWidget extends HookConsumerWidget {
@@ -277,7 +374,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                 textColor: theme.colorScheme.onSurface,
                 onTap: () async {
                   final tr = context.t;
-                  final api = ref.read(proxyProvider);
+                  final api = ref.read(webSourceBrokerProvider);
                   final messenger = ScaffoldMessenger.of(context);
                   final result = await api.handleLink(item);
 
@@ -355,7 +452,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                     textColor: theme.colorScheme.onSurface,
                     onTap: () async {
                       final tr = context.t;
-                      final api = ref.read(proxyProvider);
+                      final api = ref.read(webSourceBrokerProvider);
                       final messenger = ScaffoldMessenger.of(context);
                       final result = await api.handleLink(item);
 
@@ -519,7 +616,7 @@ class GridMangaItem extends HookConsumerWidget {
 
     return InkWell(
       onTap: () async {
-        final api = ref.read(proxyProvider);
+        final api = ref.read(webSourceBrokerProvider);
         final messenger = ScaffoldMessenger.of(context);
         final result = await api.handleLink(link);
 
@@ -653,7 +750,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
     this.onLinkPressed,
   });
 
-  final ChapterEntry data;
+  final WebChapterItem data;
   final WebManga manga;
   final SourceHandler handle;
   final CtxCallback? onLinkPressed;
@@ -662,7 +759,22 @@ class ChapterButtonWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final theme = Theme.of(context);
-    final chapterkey = data.name;
+
+    final title = data.title;
+    final date = data.date;
+    final (chapterkey, groupKey, sourceValue) = switch (data) {
+      WebChapterItemCubari(:final entry) => (
+        entry.name,
+        entry.chapter.groups.entries.first.key,
+        entry.chapter.groups.entries.first.value,
+      ),
+      WebChapterItemExtension(:final chapter) => (
+        chapter.chapNum.toString(),
+        chapter.version ?? handle.sourceId,
+        chapter,
+      ),
+    };
+
     final mangakey = handle.getKey();
 
     final isRead = ref.watch(
@@ -675,25 +787,18 @@ class ChapterButtonWidget extends HookConsumerWidget {
       ),
     );
 
-    final sourceValue = data.chapter.groups.entries.first.value;
-    String title = data.chapter.getTitle(chapterkey);
-    final groupKey = data.chapter.groups.entries.first.key;
+    final mangaGroups = manga.groups;
     final groupText =
-        manga.groups != null && manga.groups?.containsKey(groupKey) == true
-        ? manga.groups![groupKey]!
+        mangaGroups != null && mangaGroups.containsKey(groupKey) == true
+        ? mangaGroups[groupKey]!
         : groupKey;
 
     final lang = tr.$meta.locale.languageCode;
-    //final locale = screenSizeSmall && timeagoLocaleList.contains('${lang}_short') ? '${lang}_short' : lang;
 
-    final timestamp = useMemoized(() {
-      if (data.chapter.lastUpdated != null) {
-        return timeago.format(data.chapter.lastUpdated!, locale: lang);
-      } else if (data.chapter.releaseDate != null) {
-        return timeago.format(data.chapter.releaseDate!, locale: lang);
-      }
-      return null;
-    }, [data.chapter.lastUpdated, data.chapter.releaseDate, lang]);
+    final timestamp = useMemoized(
+      () => date != null ? timeago.format(date, locale: lang) : null,
+      [date, lang],
+    );
 
     final language = sourceValue is Chapter
         ? CountryFlag(flag: sourceValue.langCode, size: 12)
@@ -743,21 +848,21 @@ class ChapterButtonWidget extends HookConsumerWidget {
       onLinkPressed: onLinkPressed,
     );
 
-    GoRouteData route = ProxyWebSourceReaderRoute(
-      proxy: handle.sourceId,
-      code: handle.location,
-      chapter: chapterkey,
-      $extra: readerData,
-    );
-
-    if (handle.type == SourceType.source) {
-      route = ExtensionReaderRoute(
+    final route = switch (data) {
+      WebChapterItemCubari() => ProxyWebSourceReaderRoute(
+        proxy: handle.sourceId,
+        code: handle.location,
+        chapter: chapterkey,
+        page: '1',
+        $extra: readerData,
+      ),
+      WebChapterItemExtension(:final chapter) => ExtensionReaderRoute(
         sourceId: handle.sourceId,
         mangaId: handle.location,
-        chapterId: (sourceValue as Chapter).chapterId,
+        chapterId: chapter.chapterId,
         $extra: readerData,
-      );
-    }
+      ),
+    };
 
     final tile = Column(
       mainAxisSize: MainAxisSize.min,
@@ -933,7 +1038,7 @@ class _CoverButton extends ConsumerWidget {
 
     return TextButton(
       onPressed: () async {
-        final api = ref.read(proxyProvider);
+        final api = ref.read(webSourceBrokerProvider);
         final messenger = ScaffoldMessenger.of(context);
         final result = await api.handleLink(link);
 
@@ -1002,7 +1107,7 @@ class _MangaTitle extends ConsumerWidget {
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
       ),
       onPressed: () async {
-        final api = ref.read(proxyProvider);
+        final api = ref.read(webSourceBrokerProvider);
         final messenger = ScaffoldMessenger.of(context);
         final result = await api.handleLink(link);
 

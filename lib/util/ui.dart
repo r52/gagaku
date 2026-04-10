@@ -10,7 +10,6 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:url_launcher/url_launcher.dart' show launchUrl;
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
@@ -206,6 +205,49 @@ class _KeepAliveImageState extends State<KeepAliveImage>
   }
 }
 
+class ScrollToTopFab extends StatelessWidget {
+  const ScrollToTopFab({
+    super.key,
+    required this.controller,
+    this.visibleCondition,
+  });
+
+  final ScrollController controller;
+  final bool Function()? visibleCondition;
+
+  @override
+  Widget build(BuildContext context) {
+    final tr = context.t;
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) {
+        final visible =
+            controller.hasClients &&
+            controller.offset > 0 &&
+            (visibleCondition?.call() ?? true);
+        return AnimatedScale(
+          scale: visible ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          child: IgnorePointer(
+            ignoring: !visible,
+            child: FloatingActionButton.small(
+              heroTag: null,
+              tooltip: tr.ui.scrollToTop,
+              onPressed: () => controller.animateTo(
+                0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+              ),
+              child: const Icon(Icons.vertical_align_top),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class MultiChildExpansionTile extends StatelessWidget {
   const MultiChildExpansionTile({
     super.key,
@@ -245,8 +287,7 @@ class CountryFlag extends HookWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
-class ButtonChip extends ConsumerWidget {
+class ButtonChip extends StatelessWidget {
   const ButtonChip({
     super.key,
     this.icon,
@@ -263,9 +304,11 @@ class ButtonChip extends ConsumerWidget {
   final VoidCallback? onPressed;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textStyle = ref.watch(chipTextStyleProvider).merge(style);
+    final textStyle = TextStyle(
+      color: theme.colorScheme.onTertiaryContainer,
+    ).merge(style);
 
     final bstyle = Styles.buttonStyle(
       backgroundColor: color ?? theme.colorScheme.tertiaryContainer,
@@ -290,8 +333,7 @@ class ButtonChip extends ConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
-class IconTextChip extends ConsumerWidget {
+class IconTextChip extends StatelessWidget {
   const IconTextChip({
     super.key,
     this.icon,
@@ -308,9 +350,12 @@ class IconTextChip extends ConsumerWidget {
   final VoidCallback? onPressed;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final textStyle = ref.watch(chipTextStyleProvider).merge(style);
-    final theme = ColorScheme.of(context);
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textStyle = TextStyle(
+      color: colorScheme.onTertiaryContainer,
+    ).merge(style);
 
     Widget child = Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
@@ -331,7 +376,7 @@ class IconTextChip extends ConsumerWidget {
     );
 
     final borderRadius = const BorderRadius.all(Radius.circular(6.0));
-    final backgroundColor = color ?? theme.tertiaryContainer;
+    final backgroundColor = color ?? colorScheme.tertiaryContainer;
 
     if (onPressed != null) {
       return ConstrainedBox(
@@ -348,13 +393,15 @@ class IconTextChip extends ConsumerWidget {
       );
     }
 
-    return Container(
+    return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 24.0),
-      decoration: BoxDecoration(
-        borderRadius: borderRadius,
-        color: backgroundColor,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: borderRadius,
+          color: backgroundColor,
+        ),
+        child: child,
       ),
-      child: child,
     );
   }
 }
@@ -510,6 +557,85 @@ class SettingCardWidget extends StatelessWidget {
               child: Column(spacing: 10.0, children: [title, ?subtitle]),
             ),
             Expanded(child: builder(context)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class MultiSelectMenuAnchor<T> extends StatelessWidget {
+  const MultiSelectMenuAnchor({
+    super.key,
+    required this.items,
+    required this.selected,
+    required this.labelFor,
+    required this.onChanged,
+    required this.placeholder,
+    this.trailingIconFor,
+  });
+
+  final Iterable<T> items;
+  final Set<T> selected;
+  final String Function(T) labelFor;
+  final Widget? Function(T)? trailingIconFor;
+  final void Function(Set<T>) onChanged;
+  final String placeholder;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: MenuAnchor(
+        builder: (context, controller, child) => SizedBox(
+          width: double.infinity,
+          child: Material(
+            color: theme.colorScheme.surfaceContainerHighest,
+            borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+            child: InkWell(
+              onTap: () {
+                if (controller.isOpen) {
+                  controller.close();
+                } else {
+                  controller.open();
+                }
+              },
+              child: Padding(padding: const EdgeInsets.all(6.0), child: child),
+            ),
+          ),
+        ),
+        menuChildren: [
+          for (final item in items)
+            CheckboxMenuButton(
+              closeOnActivate: false,
+              trailingIcon: trailingIconFor?.call(item),
+              value: selected.contains(item),
+              onChanged: (bool? value) {
+                if (value == true) {
+                  onChanged({...selected}..add(item));
+                } else {
+                  onChanged({...selected}..remove(item));
+                }
+              },
+              child: Text(labelFor(item)),
+            ),
+        ],
+        child: Column(
+          children: [
+            Wrap(
+              spacing: 2.0,
+              runSpacing: 2.0,
+              children: [
+                if (selected.isEmpty) Text(placeholder),
+                for (final item in selected)
+                  ElevatedButton.icon(
+                    onPressed: () => onChanged({...selected}..remove(item)),
+                    icon: const Icon(Icons.close),
+                    label: Text(labelFor(item)),
+                  ),
+              ],
+            ),
+            const Icon(Icons.arrow_drop_down),
           ],
         ),
       ),

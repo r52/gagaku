@@ -45,7 +45,7 @@ class AppSettingsPage extends HookConsumerWidget {
     final outputdata = await const GagakuBackupDataV2().write(output);
 
     if (!context.mounted) return null;
-    final result = await FilePicker.platform.saveFile(
+    final result = await FilePicker.saveFile(
       dialogTitle: context.t.backup.data,
       fileName:
           'gagaku_backup-${DateFormat('yyyy-MM-dd-kk_mm').format(DateTime.now())}.json',
@@ -95,7 +95,7 @@ class AppSettingsPage extends HookConsumerWidget {
       return null;
     }
 
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json'],
       withData: true,
@@ -430,9 +430,8 @@ class AppSettingsPage extends HookConsumerWidget {
                               .request();
 
                           if (perms.isGranted) {
-                            String? selectedDirectory = await FilePicker
-                                .platform
-                                .getDirectoryPath();
+                            String? selectedDirectory =
+                                await FilePicker.getDirectoryPath();
 
                             if (selectedDirectory != null) {
                               await gbox.put(

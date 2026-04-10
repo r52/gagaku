@@ -5,6 +5,7 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -50,6 +51,90 @@ class MangaDexHomePage extends HookConsumerWidget {
       };
     }, []);
 
+    final useRail = DeviceContext.useNavigationRail(context);
+    final extendRail = DeviceContext.extendNavigationRail(context);
+
+    void onDestination(int idx) {
+      if (idx == selectedIndex) {
+        activeController.animateTo(
+          0.0,
+          duration: const Duration(milliseconds: 1000),
+          curve: Curves.easeOutCirc,
+        );
+        return;
+      }
+      switch (idx) {
+        case 0:
+          const MangaDexFrontRoute().go(context);
+          break;
+        case 1:
+          const MangaDexChapterFeedRoute().go(context);
+          break;
+        case 2:
+          const MangaDexLibraryRoute().go(context);
+          break;
+        case 3:
+          const MangaDexListsRoute().go(context);
+          break;
+        case 4:
+          const MangaDexHistoryFeedRoute().go(context);
+          break;
+        default:
+          const MangaDexFrontRoute().go(context);
+          break;
+      }
+    }
+
+    final destinations = [
+      NavigationRailDestination(
+        icon: const Icon(Icons.home),
+        label: Text(t.mangadex.home),
+      ),
+      NavigationRailDestination(
+        icon: const Icon(Icons.menu_book),
+        label: Text(t.mangadex.myFeed),
+      ),
+      NavigationRailDestination(
+        icon: const Icon(Icons.collections),
+        label: Text(t.library),
+      ),
+      NavigationRailDestination(
+        icon: const Icon(Icons.list),
+        label: Text(t.mangadex.myLists),
+      ),
+      NavigationRailDestination(
+        icon: const Icon(Icons.history),
+        label: Text(t.history.text),
+      ),
+    ];
+
+    if (useRail) {
+      return Scaffold(
+        restorationId: 'md_home_restore',
+        drawer: const MainDrawer(),
+        body: Row(
+          children: [
+            NavigationRail(
+              selectedIndex: selectedIndex,
+              onDestinationSelected: onDestination,
+              extended: extendRail,
+              labelType: extendRail
+                  ? NavigationRailLabelType.none
+                  : NavigationRailLabelType.selected,
+              destinations: destinations,
+            ),
+            const VerticalDivider(thickness: 1, width: 1),
+            Expanded(
+              child: DefaultScrollController(
+                controller: activeController,
+                child: child,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       restorationId: 'md_home_restore',
       drawer: const MainDrawer(),
@@ -77,36 +162,7 @@ class MangaDexHomePage extends HookConsumerWidget {
           ),
         ],
         selectedIndex: selectedIndex,
-        onDestinationSelected: (idx) {
-          if (idx == selectedIndex) {
-            activeController.animateTo(
-              0.0,
-              duration: const Duration(milliseconds: 1000),
-              curve: Curves.easeOutCirc,
-            );
-          } else {
-            switch (idx) {
-              case 0:
-                const MangaDexFrontRoute().go(context);
-                break;
-              case 1:
-                const MangaDexChapterFeedRoute().go(context);
-                break;
-              case 2:
-                const MangaDexLibraryRoute().go(context);
-                break;
-              case 3:
-                const MangaDexListsRoute().go(context);
-                break;
-              case 4:
-                const MangaDexHistoryFeedRoute().go(context);
-                break;
-              default:
-                const MangaDexFrontRoute().go(context);
-                break;
-            }
-          }
-        },
+        onDestinationSelected: onDestination,
       ),
     );
   }

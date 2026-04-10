@@ -21,7 +21,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final api = ref.watch(proxyProvider);
+    final api = ref.watch(webSourceBrokerProvider);
     final cfg = ref.watch(webConfigProvider);
 
     final scrollController =
@@ -79,36 +79,52 @@ class WebSourceHistoryPage extends HookConsumerWidget {
       ],
     );
 
+    final appBar = WebSourceSliverAppBar(
+      title: tr.history.text,
+      controller: scrollController,
+    );
+
     return switch (stream.connectionState) {
       // AsyncValue(value: final history?) when history.list.isEmpty =>
       ConnectionState.active when stream.data == null || stream.data!.isEmpty =>
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 10.0,
-            children: [
-              saveHistoryRow,
-              Text(tr.webSources.historyHere),
-              ElevatedButton.icon(
-                onPressed: () => openLinkDialog(context, api),
-                icon: const Icon(Icons.link),
-                label: Text(tr.webSources.openLink),
-              ),
-              Tooltip(
-                message: tr.webSources.supportedUrl.arg(
-                  arg: '\ncubari.moe\nimgur.com',
-                ),
-                padding: EdgeInsets.all(6),
-                triggerMode: TooltipTriggerMode.tap,
-                child: Wrap(
+        CustomScrollView(
+          controller: scrollController,
+          scrollBehavior: const MouseTouchScrollBehavior(),
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            appBar,
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 10.0,
                   children: [
-                    Text(tr.webSources.supportedUrl.text),
-                    Icon(Icons.help, size: 20),
+                    saveHistoryRow,
+                    Text(tr.webSources.historyHere),
+                    ElevatedButton.icon(
+                      onPressed: () => openLinkDialog(context, api),
+                      icon: const Icon(Icons.link),
+                      label: Text(tr.webSources.openLink),
+                    ),
+                    Tooltip(
+                      message: tr.webSources.supportedUrl.arg(
+                        arg: '\ncubari.moe\nimgur.com',
+                      ),
+                      padding: EdgeInsets.all(6),
+                      triggerMode: TooltipTriggerMode.tap,
+                      child: Wrap(
+                        children: [
+                          Text(tr.webSources.supportedUrl.text),
+                          Icon(Icons.help, size: 20),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       // AsyncValue(value: final history?) =>
       ConnectionState.active when stream.hasError == false =>
@@ -117,10 +133,10 @@ class WebSourceHistoryPage extends HookConsumerWidget {
           controller: scrollController,
           title: saveHistoryRow,
           leading: [
+            appBar,
             SliverAppBar(
               automaticallyImplyLeading: false,
               pinned: true,
-              title: Text(tr.history.text, style: CommonTextStyles.twentyfour),
               actions: [
                 ElevatedButton.icon(
                   style: Styles.buttonStyle(),
@@ -169,11 +185,27 @@ class WebSourceHistoryPage extends HookConsumerWidget {
           ],
         ),
       // AsyncValue(:final error?, :final stackTrace?) =>
-      _ when stream.hasError => ErrorList(
-        error: stream.error!,
-        stackTrace: stream.stackTrace!,
+      _ when stream.hasError => CustomScrollView(
+        controller: scrollController,
+        slivers: [
+          appBar,
+          SliverFillRemaining(
+            child: ErrorList(
+              error: stream.error!,
+              stackTrace: stream.stackTrace!,
+            ),
+          ),
+        ],
       ),
-      _ => const Center(child: CircularProgressIndicator()),
+      _ => CustomScrollView(
+        controller: scrollController,
+        slivers: [
+          appBar,
+          const SliverFillRemaining(
+            child: Center(child: CircularProgressIndicator()),
+          ),
+        ],
+      ),
     };
   }
 }

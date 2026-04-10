@@ -42,6 +42,10 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
       controller: scrollController,
       headerSliverBuilder: (context, innerBoxIsScrolled) {
         return [
+          WebSourceSliverAppBar(
+            title: tr.webSources.favorites,
+            controller: scrollController,
+          ),
           SliverOverlapAbsorber(
             handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
             sliver: SliverAppBar(

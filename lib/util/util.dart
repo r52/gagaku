@@ -77,6 +77,17 @@ class DeviceContext {
     return MediaQuery.sizeOf(context).width <= 600;
   }
 
+  /// Returns true when the screen is wide enough (> 600dp) to use a side
+  /// [NavigationRail] instead of a bottom [NavigationBar].
+  /// Strictly greater-than keeps this the perfect complement of [screenWidthSmall].
+  static bool useNavigationRail(BuildContext context) =>
+      MediaQuery.sizeOf(context).width > 600;
+
+  /// Returns true when the [NavigationRail] should be shown in extended mode
+  /// (labels always visible inline, >= 1240dp).
+  static bool extendNavigationRail(BuildContext context) =>
+      MediaQuery.sizeOf(context).width >= 1240;
+
   static bool isPortraitMode(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     return size.height > size.width;

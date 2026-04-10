@@ -396,10 +396,16 @@ Map<String, dynamic> _$CoverArtAttributesToJson(_CoverArtAttributes instance) =>
     };
 
 _UserAttributes _$UserAttributesFromJson(Map<String, dynamic> json) =>
-    _UserAttributes(username: json['username'] as String);
+    _UserAttributes(
+      username: json['username'] as String,
+      avatarFileName: json['avatarFileName'] as String?,
+    );
 
 Map<String, dynamic> _$UserAttributesToJson(_UserAttributes instance) =>
-    <String, dynamic>{'username': instance.username};
+    <String, dynamic>{
+      'username': instance.username,
+      'avatarFileName': instance.avatarFileName,
+    };
 
 _AuthorAttributes _$AuthorAttributesFromJson(Map<String, dynamic> json) =>
     _AuthorAttributes(

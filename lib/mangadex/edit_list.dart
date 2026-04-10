@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
@@ -14,9 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
 import 'package:riverpod/experimental/mutation.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 
-@Dependencies([chipTextStyle])
 class QueriedMangaDexEditListScreen extends ConsumerWidget {
   const QueriedMangaDexEditListScreen({super.key, required this.listId});
 
@@ -45,12 +42,10 @@ class QueriedMangaDexEditListScreen extends ConsumerWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class MangaDexCreateListScreen extends MangaDexEditListScreen {
   const MangaDexCreateListScreen({super.key}) : super();
 }
 
-@Dependencies([chipTextStyle])
 class MangaDexEditListScreen extends HookConsumerWidget {
   const MangaDexEditListScreen({super.key, this.listId, this.list});
 

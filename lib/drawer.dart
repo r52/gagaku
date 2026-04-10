@@ -1,8 +1,12 @@
+import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/mangadex/model/model.dart';
+import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.dart';
+import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/version.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -59,6 +63,9 @@ class MainDrawer extends ConsumerWidget {
     final t = context.t;
     final theme = Theme.of(context);
     final index = _calculateSelectedIndex(context);
+    final me = ref.watch(loggedUserProvider).value;
+    final imageCache = ref.watch(extensionImageCacheProvider);
+    final avatarUrl = me?.getUserAvatar(quality: CoverArtQuality.small);
     const appicon = CircleAvatar(
       foregroundImage: AssetImage('assets/icon.png'),
     );
@@ -71,25 +78,63 @@ class MainDrawer extends ConsumerWidget {
       children: [
         DrawerHeader(
           decoration: BoxDecoration(color: theme.colorScheme.primaryContainer),
-          child: const Center(
-            child: Column(
-              children: [
-                appicon,
-                Text(
-                  'Gagaku',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    shadows: <Shadow>[
-                      Shadow(
-                        offset: Offset(1.0, 1.0),
-                        color: Color.fromARGB(255, 0, 0, 0),
-                      ),
-                    ],
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: me != null
+                ? Center(
+                    key: const ValueKey('user'),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          foregroundImage: avatarUrl != null
+                              ? CachedNetworkImageProvider(
+                                  avatarUrl,
+                                  cacheManager: imageCache,
+                                )
+                              : null,
+                          child: const Icon(Icons.person, size: 30),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          me.attributes?.username ?? '',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            shadows: <Shadow>[
+                              Shadow(
+                                offset: Offset(1.0, 1.0),
+                                color: Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Center(
+                    key: const ValueKey('branding'),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        appicon,
+                        const Text(
+                          'Gagaku',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            shadows: <Shadow>[
+                              Shadow(
+                                offset: Offset(1.0, 1.0),
+                                color: Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
           ),
         ),
         const NavigationDrawerDestination(

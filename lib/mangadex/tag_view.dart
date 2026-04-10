@@ -7,7 +7,6 @@ import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
@@ -15,7 +14,6 @@ import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:number_paginator/number_paginator.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'tag_view.g.dart';
@@ -86,7 +84,6 @@ Future<List<Manga>> _recentlyAdded(Ref ref, Tag tag) async {
   return manga.data.cast<Manga>();
 }
 
-@Dependencies([chipTextStyle])
 class MangaDexTagViewPage extends StatelessWidget {
   const MangaDexTagViewPage({super.key, required this.tagId, this.tag});
 
@@ -119,7 +116,6 @@ class MangaDexTagViewPage extends StatelessWidget {
   }
 }
 
-@Dependencies([chipTextStyle])
 class MangaDexTagViewWidget extends HookConsumerWidget {
   const MangaDexTagViewWidget({super.key, required this.tag});
 
@@ -174,21 +170,6 @@ class MangaDexTagViewWidget extends HookConsumerWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        leading: const BackButton(),
-        flexibleSpace: GestureDetector(
-          onTap: () {
-            scrollController.animateTo(
-              0.0,
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.easeInOut,
-            );
-          },
-          child: TitleFlexBar(
-            title: tag.attributes.name.get(tr.$meta.locale.languageCode),
-          ),
-        ),
-      ),
       body: Center(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -210,6 +191,20 @@ class MangaDexTagViewWidget extends HookConsumerWidget {
               future: popularFuture,
               title: Text(tr.mangadex.byPopularity, style: style),
               leading: [
+                SliverAppBar.medium(
+                  pinned: true,
+                  leading: const BackButton(),
+                  title: GestureDetector(
+                    onTap: () => scrollController.animateTo(
+                      0.0,
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeInOut,
+                    ),
+                    child: Text(
+                      tag.attributes.name.get(tr.$meta.locale.languageCode),
+                    ),
+                  ),
+                ),
                 SliverList.separated(
                   itemCount: widgets.length,
                   itemBuilder: (context, index) {

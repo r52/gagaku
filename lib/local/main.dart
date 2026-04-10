@@ -18,7 +18,7 @@ class LocalLibraryHomeScreen extends StatelessWidget {
   const LocalLibraryHomeScreen({super.key});
 
   Future<PlatformFile?> _pickMangaArchive() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['cbz', 'zip', 'cbt', 'tar'],
     );

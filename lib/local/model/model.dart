@@ -1,10 +1,12 @@
 // ignore_for_file: constant_identifier_names
 
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:collection/collection.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/local/model/archive_thumbnail_provider.dart';
 import 'package:gagaku/local/model/config.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -143,113 +145,174 @@ class LocalLibraryItem {
   }
 }
 
-@Riverpod(keepAlive: true)
-class LocalLibrary extends _$LocalLibrary {
-  Future<LocalLibraryItem?> _processDirectory(
-    Directory dir,
-    LocalLibraryItem? parent,
-  ) async {
-    final formats = await ref.watch(supportedFormatsProvider.future);
-    final currentSort = ref.read(librarySortTypeProvider);
+class _ScanArgs {
+  const _ScanArgs({
+    required this.libDir,
+    required this.formats,
+    required this.currentSort,
+    required this.sendPort,
+  });
+  final String libDir;
+  final FormatInfo formats;
+  final LibrarySort currentSort;
+  final SendPort sendPort;
+}
 
-    final entities = await dir.list().toList();
-    final files = entities.whereType<File>();
-    final name = (dir.uri.pathSegments.length - 2 >= 0)
-        ? dir.uri.pathSegments.elementAt(dir.uri.pathSegments.length - 2)
-        : dir.path;
-
-    final stats = dir.statSync();
-
-    final res = LocalLibraryItem(
-      path: dir.path,
-      name: name,
-      modified: stats.modified,
-      type: LibraryItemType.directory,
+Future<LocalLibraryItem?> _processFileIsolate(
+  File file,
+  LocalLibraryItem? parent,
+) async {
+  final lpath = file.path.toLowerCase();
+  if (lpath.endsWith('.cbz') ||
+      lpath.endsWith('.zip') ||
+      lpath.endsWith('.cbt') ||
+      lpath.endsWith('.tar')) {
+    return LocalLibraryItem(
+      path: file.path,
+      type: LibraryItemType.archive,
+      modified: await file.lastModified(),
+      name: file.uri.pathSegments.last,
+      isReadable: true,
+      thumbnail: file.path,
       parent: parent,
     );
+  }
+  return null;
+}
 
-    final isReadable =
-        files.isNotEmpty &&
-        files.every(
-          (element) =>
-              element.path.endsWith(".jpg") ||
-              element.path.endsWith(".png") ||
-              element.path.endsWith(".jpeg") ||
-              (formats.avif && element.path.endsWith(".avif")),
-        );
+Future<LocalLibraryItem?> _processDirectoryIsolate(
+  Directory dir,
+  LocalLibraryItem? parent,
+  FormatInfo formats,
+  LibrarySort currentSort,
+) async {
+  final entities = await dir.list().toList();
+  final files = entities.whereType<File>();
+  final name = (dir.uri.pathSegments.length - 2 >= 0)
+      ? dir.uri.pathSegments.elementAt(dir.uri.pathSegments.length - 2)
+      : dir.path;
 
-    res.isReadable = isReadable;
+  final stats = dir.statSync();
 
-    if (res.isReadable) {
-      res.thumbnail = files.first.path;
-      return res;
-    }
+  final res = LocalLibraryItem(
+    path: dir.path,
+    name: name,
+    modified: stats.modified,
+    type: LibraryItemType.directory,
+    parent: parent,
+  );
 
-    for (final e in files) {
-      final p = await _processFile(e, res);
-      if (p != null) {
-        res.children.add(p);
-      }
-    }
+  final imageFiles = files.where((element) {
+    final lowerPath = element.path.toLowerCase();
+    return lowerPath.endsWith(".jpg") ||
+        lowerPath.endsWith(".png") ||
+        lowerPath.endsWith(".jpeg") ||
+        lowerPath.endsWith(".webp") ||
+        (formats.avif && lowerPath.endsWith(".avif"));
+  }).toList();
 
-    final dirs = entities.whereType<Directory>();
-    for (final e in dirs) {
-      final p = await _processDirectory(e, res);
-      if (p != null) {
-        res.children.add(p);
-      }
-    }
+  res.isReadable = imageFiles.isNotEmpty;
 
-    res.setSortType(currentSort);
-
-    if (res.children.isNotEmpty) {
-      return res;
-    }
-
-    return null;
+  if (res.isReadable) {
+    res.thumbnail = imageFiles.first.path;
+    return res;
   }
 
-  Future<LocalLibraryItem?> _processFile(
-    File file,
-    LocalLibraryItem? parent,
-  ) async {
-    if (file.path.endsWith('.cbz') ||
-        file.path.endsWith('.zip') ||
-        file.path.endsWith('.cbt') ||
-        file.path.endsWith('.tar')) {
-      // TODO thumbnail for archives?
-      return LocalLibraryItem(
-        path: file.path,
-        type: LibraryItemType.archive,
-        modified: await file.lastModified(),
-        name: file.uri.pathSegments.last,
-        isReadable: true,
-        parent: parent,
+  for (final e in files) {
+    final p = await _processFileIsolate(e, res);
+    if (p != null) {
+      res.children.add(p);
+    }
+  }
+
+  final dirs = entities.whereType<Directory>();
+  for (final e in dirs) {
+    final p = await _processDirectoryIsolate(e, res, formats, currentSort);
+    if (p != null) {
+      res.children.add(p);
+    }
+  }
+
+  res.setSortType(currentSort);
+
+  if (res.children.isNotEmpty) {
+    return res;
+  }
+
+  return null;
+}
+
+Future<void> _isolateWorker(_ScanArgs args) async {
+  final top = LocalLibraryItem(
+    path: args.libDir,
+    type: LibraryItemType.directory,
+    modified: DateTime.now(),
+  );
+
+  final dir = Directory(args.libDir);
+  if (!dir.existsSync()) {
+    args.sendPort.send(top);
+    args.sendPort.send(true);
+    return;
+  }
+
+  final entities = await dir.list().toList();
+  final stopwatch = Stopwatch()..start();
+
+  for (final e in entities) {
+    if (e is File) {
+      final p = await _processFileIsolate(e, top);
+      if (p != null) {
+        top.children.add(p);
+      }
+    } else if (e is Directory) {
+      final p = await _processDirectoryIsolate(
+        e,
+        top,
+        args.formats,
+        args.currentSort,
       );
+      if (p != null) {
+        top.children.add(p);
+      }
     }
 
-    return null;
+    // Throttle updates to avoid O(N^2) serialization spam over the SendPort
+    if (stopwatch.elapsedMilliseconds > 1000) {
+      top.setSortType(args.currentSort);
+      args.sendPort.send(top);
+      stopwatch.reset();
+    }
   }
 
-  Future<LocalLibraryItem> _scanLibrary() async {
+  // Ensure the final state is sent
+  top.setSortType(args.currentSort);
+  args.sendPort.send(top);
+  args.sendPort.send(true);
+}
+
+@Riverpod(keepAlive: true)
+class LocalLibrary extends _$LocalLibrary {
+  Stream<LocalLibraryItem> _scanLibrary() async* {
     final libDir = ref.watch(
       localConfigProvider.select((c) => c.libraryDirectory),
     );
     final currentSort = ref.read(librarySortTypeProvider);
+    final formats = await ref.watch(supportedFormatsProvider.future);
 
     final perms = await Permission.manageExternalStorage.request();
 
     if (perms.isDenied) {
-      return LocalLibraryItem(
+      yield LocalLibraryItem(
         path: '',
         type: LibraryItemType.directory,
         modified: DateTime.now(),
         error: t.localLibrary.errors.permissionDenied,
       );
+      return;
     }
 
     if (libDir.isNotEmpty) {
-      state = const AsyncValue.loading(progress: 0);
       final top = LocalLibraryItem(
         path: libDir,
         type: LibraryItemType.directory,
@@ -257,37 +320,49 @@ class LocalLibrary extends _$LocalLibrary {
       );
 
       final dir = Directory(libDir);
-      final entities = await dir.list().toList();
-
-      for (final (idx, e) in entities.indexed) {
-        if (e is File) {
-          final p = await _processFile(e, top);
-          if (p != null) {
-            top.children.add(p);
-          }
-        } else if (e is Directory) {
-          final p = await _processDirectory(e, top);
-          if (p != null) {
-            top.children.add(p);
-          }
-        }
-
-        // otherwise skip
-        state = AsyncValue.loading(progress: (idx + 1) / entities.length);
-      }
-
-      top.setSortType(currentSort);
-
-      state = const AsyncValue.loading(progress: 1);
-
-      if (top.children.isEmpty) {
+      if (!dir.existsSync()) {
         top.error = t.localLibrary.errors.emptyLibrary;
+        yield top;
+        return;
       }
 
-      return top;
+      yield top;
+
+      final receivePort = ReceivePort();
+      await Isolate.spawn(
+        _isolateWorker,
+        _ScanArgs(
+          libDir: libDir,
+          formats: formats,
+          currentSort: currentSort,
+          sendPort: receivePort.sendPort,
+        ),
+      );
+
+      LocalLibraryItem? lastItem;
+
+      await for (final message in receivePort) {
+        if (message is LocalLibraryItem) {
+          lastItem = message;
+          yield lastItem;
+        } else if (message == true) {
+          receivePort.close();
+          break;
+        }
+      }
+
+      lastItem ??= top;
+
+      if (lastItem.children.isEmpty) {
+        lastItem.error = t.localLibrary.errors.emptyLibrary;
+        yield lastItem;
+      } else {
+        triggerThumbnailGarbageCollection(lastItem);
+      }
+      return;
     }
 
-    return LocalLibraryItem(
+    yield LocalLibraryItem(
       path: '',
       type: LibraryItemType.directory,
       modified: DateTime.now(),
@@ -296,15 +371,12 @@ class LocalLibrary extends _$LocalLibrary {
   }
 
   @override
-  Future<LocalLibraryItem> build() async {
-    return _scanLibrary();
+  Stream<LocalLibraryItem> build() async* {
+    yield* _scanLibrary();
   }
 
   Future<void> rescan() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      return _scanLibrary();
-    });
+    ref.invalidateSelf();
   }
 }
 

@@ -9,29 +9,13 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/model/search_history.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'search.g.dart';
-
-@Riverpod(keepAlive: true)
-class _SearchHistory extends _$SearchHistory {
-  @override
-  List<String> build() => [];
-
-  @override
-  set state(List<String> newState) => super.state = newState;
-  List<String> update(List<String> Function(List<String> state) cb) =>
-      state = cb(state);
-}
-
-@Dependencies([chipTextStyle])
 class MangaDexSearchPage extends StatefulHookConsumerWidget {
   const MangaDexSearchPage({
     super.key,
@@ -184,11 +168,11 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                   onSubmitted: (value) {
                     final term = value.trim();
                     if (term.isNotEmpty) {
-                      final history = ref.read(_searchHistoryProvider);
-                      ref.read(_searchHistoryProvider.notifier).state = {
+                      final history = ref.read(searchHistoryProvider);
+                      ref.read(searchHistoryProvider.notifier).state = {
                         term,
                         ...history,
-                      }.take(5).toList();
+                      }.take(10).toList();
                     }
 
                     unfocusSearchBar();
@@ -207,11 +191,11 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
               viewOnSubmitted: (value) {
                 final term = value.trim();
                 if (term.isNotEmpty) {
-                  final history = ref.read(_searchHistoryProvider);
-                  ref.read(_searchHistoryProvider.notifier).state = {
+                  final history = ref.read(searchHistoryProvider);
+                  ref.read(searchHistoryProvider.notifier).state = {
                     term,
                     ...history,
-                  }.take(5).toList();
+                  }.take(10).toList();
                 }
 
                 controller.closeView(term);
@@ -229,7 +213,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
               },
               suggestionsBuilder:
                   (BuildContext context, SearchController controller) {
-                    final history = ref.read(_searchHistoryProvider);
+                    final history = ref.read(searchHistoryProvider);
                     return history
                         .map(
                           (e) => ListTile(
@@ -238,15 +222,9 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                             onTap: () {
                               final term = e.trim();
                               if (term.isNotEmpty) {
-                                final history = ref.read(
-                                  _searchHistoryProvider,
-                                );
-                                ref
-                                    .read(_searchHistoryProvider.notifier)
-                                    .state = {
-                                  term,
-                                  ...history,
-                                }.take(5).toList();
+                                final history = ref.read(searchHistoryProvider);
+                                ref.read(searchHistoryProvider.notifier).state =
+                                    {term, ...history}.take(10).toList();
                               }
 
                               controller.closeView(term);

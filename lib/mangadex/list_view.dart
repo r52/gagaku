@@ -5,18 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/i18n/strings.g.dart';
-import 'package:gagaku/model/common.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:number_paginator/number_paginator.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 
 enum _ViewType { titles, feed }
 
-@Dependencies([chipTextStyle])
 class MangaDexListViewPage extends HookConsumerWidget {
   const MangaDexListViewPage({super.key, required this.listId});
 
