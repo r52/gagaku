@@ -1003,10 +1003,10 @@ packages:
     description:
       path: "."
       ref: password
-      resolved-ref: c281763e48b4266c9c3db0d5ecd7f3ae5e51e30d
+      resolved-ref: "40062eb4f94a8c326f47340f5bc5b27dd784329f"
       url: "https://github.com/r52/openid_client.git"
     source: git
-    version: "0.4.9+2"
+    version: "0.4.10"
   package_config:
     dependency: transitive
     description:
