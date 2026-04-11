@@ -59,19 +59,18 @@ const _openIconS = Icon(Icons.open_in_new, size: 15.0);
 const _scheduleIconB = Icon(Icons.schedule, size: 20.0);
 const _scheduleIconS = Icon(Icons.schedule, size: 15.0);
 
-class MangaDexSliverAppBar extends ConsumerStatefulWidget {
-  const MangaDexSliverAppBar({super.key, this.controller, this.title});
-
-  final ScrollController? controller;
-  final String? title;
+class _MangaDexSearchAnchor extends ConsumerStatefulWidget {
+  const _MangaDexSearchAnchor();
 
   @override
-  ConsumerState<MangaDexSliverAppBar> createState() =>
-      _MangaDexSliverAppBarState();
+  ConsumerState<_MangaDexSearchAnchor> createState() =>
+      _MangaDexSearchAnchorState();
 }
 
-class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
+class _MangaDexSearchAnchorState extends ConsumerState<_MangaDexSearchAnchor> {
   Timer? _debounceTimer;
+  String? _lastSearchQuery;
+  Completer<Iterable<Widget>>? _completer;
 
   @override
   void dispose() {
@@ -84,144 +83,196 @@ class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
     final tr = context.t;
     final theme = Theme.of(context);
 
+    return SearchAnchor(
+      isFullScreen: false,
+      viewHintText: tr.search.arg(arg: 'MangaDex'),
+      viewConstraints: const BoxConstraints(
+        minWidth: 360,
+        maxWidth: 800,
+        maxHeight: 600,
+      ),
+      builder: (BuildContext ctx, SearchController ctl) => IconButton(
+        color: theme.colorScheme.onPrimaryContainer,
+        icon: const Icon(Icons.search),
+        tooltip: tr.search.arg(arg: 'MangaDex'),
+        onPressed: ctl.openView,
+      ),
+      viewOnSubmitted: (value) {
+        final term = value.trim();
+        if (term.isEmpty) return;
+        final history = ref.read(searchHistoryProvider);
+        ref.read(searchHistoryProvider.notifier).state = {
+          term,
+          ...history,
+        }.take(10).toList();
+        MangaDexSearchRoute(
+          $extra: MangaSearchParameters(
+            query: term,
+            filter: const MangaFilters(),
+          ),
+        ).push(context);
+      },
+      suggestionsBuilder: (BuildContext ctx, SearchController ctl) async {
+        final term = ctl.text.trim();
+
+        if (term.isEmpty) {
+          _debounceTimer?.cancel();
+          _lastSearchQuery = null;
+          _completer = null;
+          final history = ref.read(searchHistoryProvider);
+          return [
+            ...history.map(
+              (hterm) => ListTile(
+                titleAlignment: ListTileTitleAlignment.center,
+                leading: const Icon(Icons.history),
+                title: Text(hterm),
+                onTap: () {
+                  final h = ref.read(searchHistoryProvider);
+                  ref.read(searchHistoryProvider.notifier).state = {
+                    hterm,
+                    ...h,
+                  }.take(10).toList();
+                  ctl.closeView(hterm);
+                  MangaDexSearchRoute(
+                    $extra: MangaSearchParameters(
+                      query: hterm,
+                      filter: const MangaFilters(),
+                    ),
+                  ).push(context);
+                },
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.search),
+              title: Text(tr.search.advancedSearch),
+              onTap: () {
+                ctl.closeView('');
+                MangaDexSearchRoute().push(context);
+              },
+            ),
+          ];
+        }
+
+        if (term == _lastSearchQuery && _completer != null) {
+          return _completer!.future;
+        }
+
+        _lastSearchQuery = term;
+        _debounceTimer?.cancel();
+        final completer = Completer<Iterable<Widget>>();
+        _completer = completer;
+
+        _debounceTimer = Timer(const Duration(milliseconds: 750), () async {
+          try {
+            final api = ref.read(mangadexProvider);
+            final results = await api.searchManga(
+              term,
+              limit: 5,
+              filter: const MangaFilters(),
+            );
+
+            // Abort if superseded or unmounted before stats fetch to prevent extra API calls
+            if (term != _lastSearchQuery || !mounted) {
+              if (!completer.isCompleted) completer.complete(const []);
+              return;
+            }
+
+            final mangaList = results.data.cast<Manga>();
+            if (mangaList.isNotEmpty) {
+              try {
+                await ref.run((tsx) async {
+                  return await tsx
+                      .get(statisticsProvider.notifier)
+                      .get(mangaList);
+                });
+              } catch (e) {
+                logger.e(e, error: e);
+              }
+            }
+
+            // Re-verify after stats fetch
+            if (term != _lastSearchQuery || !mounted) {
+              if (!completer.isCompleted) completer.complete(const []);
+              return;
+            }
+
+            final widgets = <Widget>[
+              ...mangaList.map(
+                (m) => _ListMangaItem(manga: m, showGenres: false),
+              ),
+              ListTile(
+                leading: const Icon(Icons.search),
+                title: Text(tr.search.advanced_for(arg: term)),
+                onTap: () {
+                  final h = ref.read(searchHistoryProvider);
+                  ref.read(searchHistoryProvider.notifier).state = {
+                    term,
+                    ...h,
+                  }.take(10).toList();
+                  ctl.closeView(term);
+                  MangaDexSearchRoute(
+                    $extra: MangaSearchParameters(
+                      query: term,
+                      filter: const MangaFilters(),
+                    ),
+                  ).push(context);
+                },
+              ),
+            ];
+            if (!completer.isCompleted) completer.complete(widgets);
+          } catch (e, stackTrace) {
+            logger.e(
+              'Error during quick search',
+              error: e,
+              stackTrace: stackTrace,
+            );
+            if (!completer.isCompleted) {
+              completer.complete([
+                ListTile(
+                  leading: const Icon(Icons.search),
+                  title: Text(tr.search.advanced_for(arg: term)),
+                  onTap: () {
+                    final h = ref.read(searchHistoryProvider);
+                    ref.read(searchHistoryProvider.notifier).state = {
+                      term,
+                      ...h,
+                    }.take(10).toList();
+                    ctl.closeView(term);
+                    MangaDexSearchRoute(
+                      $extra: MangaSearchParameters(
+                        query: term,
+                        filter: const MangaFilters(),
+                      ),
+                    ).push(context);
+                  },
+                ),
+              ]);
+            }
+          }
+        });
+
+        return completer.future;
+      },
+    );
+  }
+}
+
+class MangaDexSliverAppBar extends StatelessWidget {
+  const MangaDexSliverAppBar({super.key, this.controller, this.title});
+
+  final ScrollController? controller;
+  final String? title;
+
+  @override
+  Widget build(BuildContext context) {
+    final tr = context.t;
+    final theme = Theme.of(context);
+
     final actions = <Widget>[
       OverflowBar(
         spacing: 8.0,
         children: [
-          SearchAnchor(
-            isFullScreen: false,
-            viewHintText: tr.search.arg(arg: 'MangaDex'),
-            viewConstraints: const BoxConstraints(
-              minWidth: 360,
-              maxWidth: 800,
-              maxHeight: 600,
-            ),
-            builder: (BuildContext ctx, SearchController ctl) => IconButton(
-              color: theme.colorScheme.onPrimaryContainer,
-              icon: const Icon(Icons.search),
-              tooltip: tr.search.arg(arg: 'MangaDex'),
-              onPressed: ctl.openView,
-            ),
-            viewOnSubmitted: (value) {
-              final term = value.trim();
-              if (term.isEmpty) return;
-              final history = ref.read(searchHistoryProvider);
-              ref.read(searchHistoryProvider.notifier).state = {
-                term,
-                ...history,
-              }.take(10).toList();
-              MangaDexSearchRoute(
-                $extra: MangaSearchParameters(
-                  query: term,
-                  filter: const MangaFilters(),
-                ),
-              ).push(context);
-            },
-            suggestionsBuilder: (BuildContext ctx, SearchController ctl) async {
-              _debounceTimer?.cancel();
-              final term = ctl.text.trim();
-
-              if (term.isEmpty) {
-                final history = ref.read(searchHistoryProvider);
-                return [
-                  ...history.map(
-                    (hterm) => ListTile(
-                      titleAlignment: ListTileTitleAlignment.center,
-                      leading: const Icon(Icons.history),
-                      title: Text(hterm),
-                      onTap: () {
-                        final h = ref.read(searchHistoryProvider);
-                        ref.read(searchHistoryProvider.notifier).state = {
-                          hterm,
-                          ...h,
-                        }.take(10).toList();
-                        ctl.closeView(hterm);
-                        MangaDexSearchRoute(
-                          $extra: MangaSearchParameters(
-                            query: hterm,
-                            filter: const MangaFilters(),
-                          ),
-                        ).push(context);
-                      },
-                    ),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.search),
-                    title: Text(tr.search.advancedSearch),
-                    onTap: () {
-                      ctl.closeView('');
-                      MangaDexSearchRoute().push(context);
-                    },
-                  ),
-                ];
-              }
-
-              final completer = Completer<Iterable<Widget>>();
-
-              _debounceTimer = Timer(
-                const Duration(milliseconds: 750),
-                () async {
-                  try {
-                    final api = ref.read(mangadexProvider);
-                    final results = await api.searchManga(
-                      term,
-                      limit: 5,
-                      filter: const MangaFilters(),
-                    );
-                    final mangaList = results.data.cast<Manga>();
-
-                    final widgets = <Widget>[
-                      ...mangaList.map(
-                        (m) => _ListMangaItem(manga: m, showGenres: false),
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.search),
-                        title: Text(tr.search.advanced_for(arg: term)),
-                        onTap: () {
-                          final h = ref.read(searchHistoryProvider);
-                          ref.read(searchHistoryProvider.notifier).state = {
-                            term,
-                            ...h,
-                          }.take(10).toList();
-                          ctl.closeView(term);
-                          MangaDexSearchRoute(
-                            $extra: MangaSearchParameters(
-                              query: term,
-                              filter: const MangaFilters(),
-                            ),
-                          ).push(context);
-                        },
-                      ),
-                    ];
-                    completer.complete(widgets);
-                  } catch (e) {
-                    completer.complete([
-                      ListTile(
-                        leading: const Icon(Icons.search),
-                        title: Text(tr.search.advanced_for(arg: term)),
-                        onTap: () {
-                          final h = ref.read(searchHistoryProvider);
-                          ref.read(searchHistoryProvider.notifier).state = {
-                            term,
-                            ...h,
-                          }.take(10).toList();
-                          ctl.closeView(term);
-                          MangaDexSearchRoute(
-                            $extra: MangaSearchParameters(
-                              query: term,
-                              filter: const MangaFilters(),
-                            ),
-                          ).push(context);
-                        },
-                      ),
-                    ]);
-                  }
-                },
-              );
-
-              return completer.future;
-            },
-          ),
+          const _MangaDexSearchAnchor(),
           Tooltip(
             message: tr.arg_settings(arg: 'MangaDex'),
             child: OpenContainer<bool>(
@@ -330,13 +381,13 @@ class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
       pinned: true,
       title: GestureDetector(
         onTap: () {
-          widget.controller?.animateTo(
+          controller?.animateTo(
             0.0,
             duration: const Duration(milliseconds: 1000),
             curve: Curves.easeOutCirc,
           );
         },
-        child: Text(widget.title ?? 'MangaDex'),
+        child: Text(title ?? 'MangaDex'),
       ),
       actions: actions,
     );
