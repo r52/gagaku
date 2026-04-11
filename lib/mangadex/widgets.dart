@@ -118,6 +118,9 @@ class _MangaDexSearchAnchorState extends ConsumerState<_MangaDexSearchAnchor> {
         if (term.isEmpty) {
           _debounceTimer?.cancel();
           _lastSearchQuery = null;
+          if (_completer != null && !_completer!.isCompleted) {
+            _completer!.complete(const []);
+          }
           _completer = null;
           final history = ref.read(searchHistoryProvider);
           return [
@@ -159,10 +162,17 @@ class _MangaDexSearchAnchorState extends ConsumerState<_MangaDexSearchAnchor> {
 
         _lastSearchQuery = term;
         _debounceTimer?.cancel();
+        if (_completer != null && !_completer!.isCompleted) {
+          _completer!.complete(const []);
+        }
         final completer = Completer<Iterable<Widget>>();
         _completer = completer;
 
-        _debounceTimer = Timer(const Duration(milliseconds: 750), () async {
+        _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
+          if (!mounted) {
+            if (!completer.isCompleted) completer.complete(const []);
+            return;
+          }
           try {
             final api = ref.read(mangadexProvider);
             final results = await api.searchManga(
@@ -178,7 +188,7 @@ class _MangaDexSearchAnchorState extends ConsumerState<_MangaDexSearchAnchor> {
             }
 
             final mangaList = results.data.cast<Manga>();
-            if (mangaList.isNotEmpty) {
+            if (mangaList.isNotEmpty && mounted) {
               try {
                 await ref.run((tsx) async {
                   return await tsx
@@ -1673,7 +1683,7 @@ class _ListMangaItem extends ConsumerWidget {
         borderRadius: BorderRadius.all(Radius.circular(4.0)),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6.0),
+        padding: const EdgeInsets.only(top: 6.0, bottom: 6.0, right: 8.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
