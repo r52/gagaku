@@ -118,8 +118,10 @@ class _ExtensionHomeCard extends ConsumerWidget {
               ),
             IconButton(
               icon: const Icon(Icons.refresh),
-              onPressed: () =>
-                  ref.invalidate(extensionSourceProvider(source.id)),
+              onPressed: () => ref.invalidate(
+                extensionSourceProvider(source.id),
+                asReload: true,
+              ),
               tooltip: tr.ui.retry,
             ),
           ],
