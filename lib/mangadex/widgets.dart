@@ -1,4 +1,6 @@
 // ignore_for_file: unused_element
+import 'dart:async';
+
 import 'package:animations/animations.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +71,14 @@ class MangaDexSliverAppBar extends ConsumerStatefulWidget {
 }
 
 class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
+  Timer? _debounceTimer;
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
@@ -82,8 +92,9 @@ class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
             isFullScreen: false,
             viewHintText: tr.search.arg(arg: 'MangaDex'),
             viewConstraints: const BoxConstraints(
-              minWidth: 280,
-              maxHeight: 400,
+              minWidth: 360,
+              maxWidth: 800,
+              maxHeight: 600,
             ),
             builder: (BuildContext ctx, SearchController ctl) => IconButton(
               color: theme.colorScheme.onPrimaryContainer,
@@ -106,39 +117,109 @@ class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
                 ),
               ).push(context);
             },
-            suggestionsBuilder: (BuildContext ctx, SearchController ctl) {
-              final history = ref.read(searchHistoryProvider);
-              return [
-                ...history.map(
-                  (term) => ListTile(
-                    titleAlignment: ListTileTitleAlignment.center,
-                    leading: const Icon(Icons.history),
-                    title: Text(term),
+            suggestionsBuilder: (BuildContext ctx, SearchController ctl) async {
+              _debounceTimer?.cancel();
+              final term = ctl.text.trim();
+
+              if (term.isEmpty) {
+                final history = ref.read(searchHistoryProvider);
+                return [
+                  ...history.map(
+                    (hterm) => ListTile(
+                      titleAlignment: ListTileTitleAlignment.center,
+                      leading: const Icon(Icons.history),
+                      title: Text(hterm),
+                      onTap: () {
+                        final h = ref.read(searchHistoryProvider);
+                        ref.read(searchHistoryProvider.notifier).state = {
+                          hterm,
+                          ...h,
+                        }.take(10).toList();
+                        ctl.closeView(hterm);
+                        MangaDexSearchRoute(
+                          $extra: MangaSearchParameters(
+                            query: hterm,
+                            filter: const MangaFilters(),
+                          ),
+                        ).push(context);
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.search),
+                    title: Text(tr.search.advancedSearch),
                     onTap: () {
-                      final h = ref.read(searchHistoryProvider);
-                      ref.read(searchHistoryProvider.notifier).state = {
-                        term,
-                        ...h,
-                      }.take(10).toList();
-                      ctl.closeView(term);
-                      MangaDexSearchRoute(
-                        $extra: MangaSearchParameters(
-                          query: term,
-                          filter: const MangaFilters(),
-                        ),
-                      ).push(context);
+                      ctl.closeView('');
+                      MangaDexSearchRoute().push(context);
                     },
                   ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.search),
-                  title: Text(tr.search.advancedSearch),
-                  onTap: () {
-                    ctl.closeView('');
-                    MangaDexSearchRoute().push(context);
-                  },
-                ),
-              ];
+                ];
+              }
+
+              final completer = Completer<Iterable<Widget>>();
+
+              _debounceTimer = Timer(
+                const Duration(milliseconds: 750),
+                () async {
+                  try {
+                    final api = ref.read(mangadexProvider);
+                    final results = await api.searchManga(
+                      term,
+                      limit: 5,
+                      filter: const MangaFilters(),
+                    );
+                    final mangaList = results.data.cast<Manga>();
+
+                    final widgets = <Widget>[
+                      ...mangaList.map(
+                        (m) => _ListMangaItem(manga: m, showGenres: false),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.search),
+                        title: Text(tr.search.advanced_for(arg: term)),
+                        onTap: () {
+                          final h = ref.read(searchHistoryProvider);
+                          ref.read(searchHistoryProvider.notifier).state = {
+                            term,
+                            ...h,
+                          }.take(10).toList();
+                          ctl.closeView(term);
+                          MangaDexSearchRoute(
+                            $extra: MangaSearchParameters(
+                              query: term,
+                              filter: const MangaFilters(),
+                            ),
+                          ).push(context);
+                        },
+                      ),
+                    ];
+                    completer.complete(widgets);
+                  } catch (e) {
+                    completer.complete([
+                      ListTile(
+                        leading: const Icon(Icons.search),
+                        title: Text(tr.search.advanced_for(arg: term)),
+                        onTap: () {
+                          final h = ref.read(searchHistoryProvider);
+                          ref.read(searchHistoryProvider.notifier).state = {
+                            term,
+                            ...h,
+                          }.take(10).toList();
+                          ctl.closeView(term);
+                          MangaDexSearchRoute(
+                            $extra: MangaSearchParameters(
+                              query: term,
+                              filter: const MangaFilters(),
+                            ),
+                          ).push(context);
+                        },
+                      ),
+                    ]);
+                  }
+                },
+              );
+
+              return completer.future;
             },
           ),
           Tooltip(
@@ -641,11 +722,13 @@ class MangaTitleButton extends StatelessWidget {
 
     return TextButton.icon(
       style: TextButton.styleFrom(
+        padding: EdgeInsets.zero,
         alignment: Alignment.centerLeft,
         minimumSize: const Size(0.0, 24.0),
         foregroundColor: theme.colorScheme.onSurface,
         textStyle: CommonTextStyles.sixteenBold,
         visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       onPressed: () =>
           MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context),
@@ -1440,6 +1523,9 @@ class GridMangaDetailedItem extends ConsumerWidget {
     final imageCache = ref.watch(extensionImageCacheProvider);
 
     return Card(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(4.0)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -1451,7 +1537,10 @@ class GridMangaDetailedItem extends ConsumerWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextButton(
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.only(right: 8.0),
+                    ),
                     onPressed: () => MangaDexMangaViewRoute(
                       mangaId: manga.id,
                       manga: manga,
@@ -1509,22 +1598,34 @@ class GridMangaDetailedItem extends ConsumerWidget {
 }
 
 class _ListMangaItem extends ConsumerWidget {
-  const _ListMangaItem({super.key, required this.manga, this.header});
+  const _ListMangaItem({
+    super.key,
+    required this.manga,
+    this.header,
+    this.showGenres = true,
+  });
 
   final Manga manga;
   final String? header;
+  final bool showGenres;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final imageCache = ref.watch(extensionImageCacheProvider);
 
     return Card(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(4.0)),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(vertical: 6.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              ),
               onPressed: () => MangaDexMangaViewRoute(
                 mangaId: manga.id,
                 manga: manga,
@@ -1534,7 +1635,7 @@ class _ListMangaItem extends ConsumerWidget {
                 imageUrl: manga.getFirstCoverUrl(
                   quality: CoverArtQuality.small,
                 ),
-                width: 80.0,
+                width: 60.0,
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
                     const Center(child: CircularProgressIndicator()),
                 errorBuilder: (context, error, stacktrace) {
@@ -1549,14 +1650,15 @@ class _ListMangaItem extends ConsumerWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 10.0,
+                spacing: 8.0,
                 children: [
                   MangaTitleButton(manga: manga),
                   if (header != null) IconTextChip(text: header!),
-                  MangaGenreRow(
-                    key: ValueKey('MangaGenreRow(${manga.id})'),
-                    manga: manga,
-                  ),
+                  if (showGenres)
+                    MangaGenreRow(
+                      key: ValueKey('MangaGenreRow(${manga.id})'),
+                      manga: manga,
+                    ),
                   MangaStatisticsRow(
                     key: ValueKey('MangaStatisticsRow(${manga.id})'),
                     manga: manga,
