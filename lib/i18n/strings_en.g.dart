@@ -523,6 +523,9 @@ class TranslationsSearchEn {
 
 	/// en: 'Advanced Search...'
 	String get advancedSearch => 'Advanced Search...';
+
+	/// en: 'Advanced search for '$arg'...'
+	String advanced_for({required Object arg}) => 'Advanced search for \'${arg}\'...';
 }
 
 // Path: theme
@@ -1902,6 +1905,7 @@ extension on Translations {
 			'search.exclusion' => 'Exclusion Mode',
 			'search.any' => 'Any',
 			'search.advancedSearch' => 'Advanced Search...',
+			'search.advanced_for' => ({required Object arg}) => 'Advanced search for \'${arg}\'...',
 			'settings' => 'Settings',
 			'arg_settings' => ({required Object arg}) => '${arg} ${_root.settings}',
 			'saveSettings' => 'Save Settings',

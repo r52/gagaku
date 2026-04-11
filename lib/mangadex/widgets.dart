@@ -1,4 +1,6 @@
 // ignore_for_file: unused_element
+import 'dart:async';
+
 import 'package:animations/animations.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -57,18 +59,220 @@ const _openIconS = Icon(Icons.open_in_new, size: 15.0);
 const _scheduleIconB = Icon(Icons.schedule, size: 20.0);
 const _scheduleIconS = Icon(Icons.schedule, size: 15.0);
 
-class MangaDexSliverAppBar extends ConsumerStatefulWidget {
+class _MangaDexSearchAnchor extends ConsumerStatefulWidget {
+  const _MangaDexSearchAnchor();
+
+  @override
+  ConsumerState<_MangaDexSearchAnchor> createState() =>
+      _MangaDexSearchAnchorState();
+}
+
+class _MangaDexSearchAnchorState extends ConsumerState<_MangaDexSearchAnchor> {
+  Timer? _debounceTimer;
+  String? _lastSearchQuery;
+  Completer<Iterable<Widget>>? _completer;
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tr = context.t;
+    final theme = Theme.of(context);
+
+    return SearchAnchor(
+      isFullScreen: false,
+      viewHintText: tr.search.arg(arg: 'MangaDex'),
+      viewConstraints: const BoxConstraints(
+        minWidth: 360,
+        maxWidth: 800,
+        maxHeight: 600,
+      ),
+      builder: (BuildContext ctx, SearchController ctl) => IconButton(
+        color: theme.colorScheme.onPrimaryContainer,
+        icon: const Icon(Icons.search),
+        tooltip: tr.search.arg(arg: 'MangaDex'),
+        onPressed: ctl.openView,
+      ),
+      viewOnSubmitted: (value) {
+        final term = value.trim();
+        if (term.isEmpty) return;
+        final history = ref.read(searchHistoryProvider);
+        ref.read(searchHistoryProvider.notifier).state = {
+          term,
+          ...history,
+        }.take(10).toList();
+        MangaDexSearchRoute(
+          $extra: MangaSearchParameters(
+            query: term,
+            filter: const MangaFilters(),
+          ),
+        ).push(context);
+      },
+      suggestionsBuilder: (BuildContext ctx, SearchController ctl) async {
+        final term = ctl.text.trim();
+
+        if (term.isEmpty) {
+          _debounceTimer?.cancel();
+          _lastSearchQuery = null;
+          if (_completer != null && !_completer!.isCompleted) {
+            _completer!.complete(const []);
+          }
+          _completer = null;
+          final history = ref.read(searchHistoryProvider);
+          return [
+            ...history.map(
+              (hterm) => ListTile(
+                titleAlignment: ListTileTitleAlignment.center,
+                leading: const Icon(Icons.history),
+                title: Text(hterm),
+                onTap: () {
+                  final h = ref.read(searchHistoryProvider);
+                  ref.read(searchHistoryProvider.notifier).state = {
+                    hterm,
+                    ...h,
+                  }.take(10).toList();
+                  ctl.closeView(hterm);
+                  MangaDexSearchRoute(
+                    $extra: MangaSearchParameters(
+                      query: hterm,
+                      filter: const MangaFilters(),
+                    ),
+                  ).push(context);
+                },
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.search),
+              title: Text(tr.search.advancedSearch),
+              onTap: () {
+                ctl.closeView('');
+                MangaDexSearchRoute().push(context);
+              },
+            ),
+          ];
+        }
+
+        if (term == _lastSearchQuery && _completer != null) {
+          return _completer!.future;
+        }
+
+        _lastSearchQuery = term;
+        _debounceTimer?.cancel();
+        if (_completer != null && !_completer!.isCompleted) {
+          _completer!.complete(const []);
+        }
+        final completer = Completer<Iterable<Widget>>();
+        _completer = completer;
+
+        _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
+          if (!mounted) {
+            if (!completer.isCompleted) completer.complete(const []);
+            return;
+          }
+          try {
+            final api = ref.read(mangadexProvider);
+            final results = await api.searchManga(
+              term,
+              limit: 5,
+              filter: const MangaFilters(),
+            );
+
+            // Abort if superseded or unmounted before stats fetch to prevent extra API calls
+            if (term != _lastSearchQuery || !mounted) {
+              if (!completer.isCompleted) completer.complete(const []);
+              return;
+            }
+
+            final mangaList = results.data.cast<Manga>();
+            if (mangaList.isNotEmpty && mounted) {
+              try {
+                await ref.run((tsx) async {
+                  return await tsx
+                      .get(statisticsProvider.notifier)
+                      .get(mangaList);
+                });
+              } catch (e) {
+                logger.e(e, error: e);
+              }
+            }
+
+            // Re-verify after stats fetch
+            if (term != _lastSearchQuery || !mounted) {
+              if (!completer.isCompleted) completer.complete(const []);
+              return;
+            }
+
+            final widgets = <Widget>[
+              ...mangaList.map(
+                (m) => _ListMangaItem(manga: m, showGenres: false),
+              ),
+              ListTile(
+                leading: const Icon(Icons.search),
+                title: Text(tr.search.advanced_for(arg: term)),
+                onTap: () {
+                  final h = ref.read(searchHistoryProvider);
+                  ref.read(searchHistoryProvider.notifier).state = {
+                    term,
+                    ...h,
+                  }.take(10).toList();
+                  ctl.closeView(term);
+                  MangaDexSearchRoute(
+                    $extra: MangaSearchParameters(
+                      query: term,
+                      filter: const MangaFilters(),
+                    ),
+                  ).push(context);
+                },
+              ),
+            ];
+            if (!completer.isCompleted) completer.complete(widgets);
+          } catch (e, stackTrace) {
+            logger.e(
+              'Error during quick search',
+              error: e,
+              stackTrace: stackTrace,
+            );
+            if (!completer.isCompleted) {
+              completer.complete([
+                ListTile(
+                  leading: const Icon(Icons.search),
+                  title: Text(tr.search.advanced_for(arg: term)),
+                  onTap: () {
+                    final h = ref.read(searchHistoryProvider);
+                    ref.read(searchHistoryProvider.notifier).state = {
+                      term,
+                      ...h,
+                    }.take(10).toList();
+                    ctl.closeView(term);
+                    MangaDexSearchRoute(
+                      $extra: MangaSearchParameters(
+                        query: term,
+                        filter: const MangaFilters(),
+                      ),
+                    ).push(context);
+                  },
+                ),
+              ]);
+            }
+          }
+        });
+
+        return completer.future;
+      },
+    );
+  }
+}
+
+class MangaDexSliverAppBar extends StatelessWidget {
   const MangaDexSliverAppBar({super.key, this.controller, this.title});
 
   final ScrollController? controller;
   final String? title;
 
-  @override
-  ConsumerState<MangaDexSliverAppBar> createState() =>
-      _MangaDexSliverAppBarState();
-}
-
-class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
@@ -78,69 +282,7 @@ class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
       OverflowBar(
         spacing: 8.0,
         children: [
-          SearchAnchor(
-            isFullScreen: false,
-            viewHintText: tr.search.arg(arg: 'MangaDex'),
-            viewConstraints: const BoxConstraints(
-              minWidth: 280,
-              maxHeight: 400,
-            ),
-            builder: (BuildContext ctx, SearchController ctl) => IconButton(
-              color: theme.colorScheme.onPrimaryContainer,
-              icon: const Icon(Icons.search),
-              tooltip: tr.search.arg(arg: 'MangaDex'),
-              onPressed: ctl.openView,
-            ),
-            viewOnSubmitted: (value) {
-              final term = value.trim();
-              if (term.isEmpty) return;
-              final history = ref.read(searchHistoryProvider);
-              ref.read(searchHistoryProvider.notifier).state = {
-                term,
-                ...history,
-              }.take(10).toList();
-              MangaDexSearchRoute(
-                $extra: MangaSearchParameters(
-                  query: term,
-                  filter: const MangaFilters(),
-                ),
-              ).push(context);
-            },
-            suggestionsBuilder: (BuildContext ctx, SearchController ctl) {
-              final history = ref.read(searchHistoryProvider);
-              return [
-                ...history.map(
-                  (term) => ListTile(
-                    titleAlignment: ListTileTitleAlignment.center,
-                    leading: const Icon(Icons.history),
-                    title: Text(term),
-                    onTap: () {
-                      final h = ref.read(searchHistoryProvider);
-                      ref.read(searchHistoryProvider.notifier).state = {
-                        term,
-                        ...h,
-                      }.take(10).toList();
-                      ctl.closeView(term);
-                      MangaDexSearchRoute(
-                        $extra: MangaSearchParameters(
-                          query: term,
-                          filter: const MangaFilters(),
-                        ),
-                      ).push(context);
-                    },
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.search),
-                  title: Text(tr.search.advancedSearch),
-                  onTap: () {
-                    ctl.closeView('');
-                    MangaDexSearchRoute().push(context);
-                  },
-                ),
-              ];
-            },
-          ),
+          const _MangaDexSearchAnchor(),
           Tooltip(
             message: tr.arg_settings(arg: 'MangaDex'),
             child: OpenContainer<bool>(
@@ -249,13 +391,13 @@ class _MangaDexSliverAppBarState extends ConsumerState<MangaDexSliverAppBar> {
       pinned: true,
       title: GestureDetector(
         onTap: () {
-          widget.controller?.animateTo(
+          controller?.animateTo(
             0.0,
             duration: const Duration(milliseconds: 1000),
             curve: Curves.easeOutCirc,
           );
         },
-        child: Text(widget.title ?? 'MangaDex'),
+        child: Text(title ?? 'MangaDex'),
       ),
       actions: actions,
     );
@@ -599,11 +741,16 @@ class _CoverButton extends ConsumerWidget {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final imageCache = ref.watch(extensionImageCacheProvider);
 
-    return TextButton(
+    return ElevatedButton(
       onPressed: () =>
           MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context),
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.only(
+          top: 1.0,
+          bottom: 1.0,
+          left: 0.0,
+          right: 6.0,
+        ),
       ),
       child: CachedNetworkImage(
         cacheManager: imageCache,
@@ -641,11 +788,12 @@ class MangaTitleButton extends StatelessWidget {
 
     return TextButton.icon(
       style: TextButton.styleFrom(
+        padding: EdgeInsets.zero,
         alignment: Alignment.centerLeft,
         minimumSize: const Size(0.0, 24.0),
         foregroundColor: theme.colorScheme.onSurface,
         textStyle: CommonTextStyles.sixteenBold,
-        visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       onPressed: () =>
           MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context),
@@ -1440,6 +1588,9 @@ class GridMangaDetailedItem extends ConsumerWidget {
     final imageCache = ref.watch(extensionImageCacheProvider);
 
     return Card(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(4.0)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -1451,7 +1602,10 @@ class GridMangaDetailedItem extends ConsumerWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextButton(
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.only(right: 8.0),
+                    ),
                     onPressed: () => MangaDexMangaViewRoute(
                       mangaId: manga.id,
                       manga: manga,
@@ -1509,22 +1663,34 @@ class GridMangaDetailedItem extends ConsumerWidget {
 }
 
 class _ListMangaItem extends ConsumerWidget {
-  const _ListMangaItem({super.key, required this.manga, this.header});
+  const _ListMangaItem({
+    super.key,
+    required this.manga,
+    this.header,
+    this.showGenres = true,
+  });
 
   final Manga manga;
   final String? header;
+  final bool showGenres;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final imageCache = ref.watch(extensionImageCacheProvider);
 
     return Card(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(4.0)),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(top: 6.0, bottom: 6.0, right: 8.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              ),
               onPressed: () => MangaDexMangaViewRoute(
                 mangaId: manga.id,
                 manga: manga,
@@ -1534,7 +1700,7 @@ class _ListMangaItem extends ConsumerWidget {
                 imageUrl: manga.getFirstCoverUrl(
                   quality: CoverArtQuality.small,
                 ),
-                width: 80.0,
+                width: 60.0,
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
                     const Center(child: CircularProgressIndicator()),
                 errorBuilder: (context, error, stacktrace) {
@@ -1549,14 +1715,15 @@ class _ListMangaItem extends ConsumerWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 10.0,
+                spacing: 8.0,
                 children: [
                   MangaTitleButton(manga: manga),
                   if (header != null) IconTextChip(text: header!),
-                  MangaGenreRow(
-                    key: ValueKey('MangaGenreRow(${manga.id})'),
-                    manga: manga,
-                  ),
+                  if (showGenres)
+                    MangaGenreRow(
+                      key: ValueKey('MangaGenreRow(${manga.id})'),
+                      manga: manga,
+                    ),
                   MangaStatisticsRow(
                     key: ValueKey('MangaStatisticsRow(${manga.id})'),
                     manga: manga,

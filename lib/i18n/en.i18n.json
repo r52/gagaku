@@ -195,7 +195,8 @@
     "inclusion": "Inclusion Mode",
     "exclusion": "Exclusion Mode",
     "any": "Any",
-    "advancedSearch": "Advanced Search..."
+    "advancedSearch": "Advanced Search...",
+    "advanced_for": "Advanced search for '$arg'..."
   },
   "settings": "Settings",
   "arg_settings": "$arg @:settings",

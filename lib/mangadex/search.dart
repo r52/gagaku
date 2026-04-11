@@ -29,8 +29,7 @@ class MangaDexSearchPage extends StatefulHookConsumerWidget {
   final MangaSearchParameters? parameters;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _MangaDexSearchPageState();
+  ConsumerState<MangaDexSearchPage> createState() => _MangaDexSearchPageState();
 }
 
 class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
