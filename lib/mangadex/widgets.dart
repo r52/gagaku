@@ -680,11 +680,16 @@ class _CoverButton extends ConsumerWidget {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final imageCache = ref.watch(extensionImageCacheProvider);
 
-    return TextButton(
+    return ElevatedButton(
       onPressed: () =>
           MangaDexMangaViewRoute(mangaId: manga.id, manga: manga).push(context),
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.only(
+          top: 1.0,
+          bottom: 1.0,
+          left: 0.0,
+          right: 6.0,
+        ),
       ),
       child: CachedNetworkImage(
         cacheManager: imageCache,
@@ -727,7 +732,6 @@ class MangaTitleButton extends StatelessWidget {
         minimumSize: const Size(0.0, 24.0),
         foregroundColor: theme.colorScheme.onSurface,
         textStyle: CommonTextStyles.sixteenBold,
-        visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       onPressed: () =>

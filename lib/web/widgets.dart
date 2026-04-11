@@ -1036,7 +1036,7 @@ class _CoverButton extends ConsumerWidget {
     final headers = ref.watch(sourceHeadersProvider(sourceId));
     final imageCache = ref.watch(extensionImageCacheProvider);
 
-    return TextButton(
+    return ElevatedButton(
       onPressed: () async {
         final api = ref.read(webSourceBrokerProvider);
         final messenger = ScaffoldMessenger.of(context);
@@ -1056,8 +1056,13 @@ class _CoverButton extends ConsumerWidget {
           openWebSource(context, result.handle!);
         }
       },
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.only(
+          top: 1.0,
+          bottom: 1.0,
+          left: 0.0,
+          right: 6.0,
+        ),
       ),
       child: CachedNetworkImage(
         imageUrl: link.cover!,
@@ -1099,12 +1104,13 @@ class _MangaTitle extends ConsumerWidget {
 
     return TextButton.icon(
       style: TextButton.styleFrom(
+        padding: EdgeInsets.zero,
         alignment: Alignment.centerLeft,
         minimumSize: const Size(0.0, 24.0),
         shape: const RoundedRectangleBorder(),
         foregroundColor: theme.colorScheme.onSurface,
         textStyle: CommonTextStyles.sixteenBold,
-        visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       onPressed: () async {
         final api = ref.read(webSourceBrokerProvider);
