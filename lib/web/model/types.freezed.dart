@@ -1969,9 +1969,146 @@ as String,
 
 
 /// @nodoc
+mixin _$RepositoryDescription {
+
+ String get name; String? get description;
+/// Create a copy of RepositoryDescription
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$RepositoryDescriptionCopyWith<RepositoryDescription> get copyWith => _$RepositoryDescriptionCopyWithImpl<RepositoryDescription>(this as RepositoryDescription, _$identity);
+
+  /// Serializes this RepositoryDescription to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RepositoryDescription&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,name,description);
+
+@override
+String toString() {
+  return 'RepositoryDescription(name: $name, description: $description)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $RepositoryDescriptionCopyWith<$Res>  {
+  factory $RepositoryDescriptionCopyWith(RepositoryDescription value, $Res Function(RepositoryDescription) _then) = _$RepositoryDescriptionCopyWithImpl;
+@useResult
+$Res call({
+ String name, String? description
+});
+
+
+
+
+}
+/// @nodoc
+class _$RepositoryDescriptionCopyWithImpl<$Res>
+    implements $RepositoryDescriptionCopyWith<$Res> {
+  _$RepositoryDescriptionCopyWithImpl(this._self, this._then);
+
+  final RepositoryDescription _self;
+  final $Res Function(RepositoryDescription) _then;
+
+/// Create a copy of RepositoryDescription
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? description = freezed,}) {
+  return _then(_self.copyWith(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _RepositoryDescription implements RepositoryDescription {
+  const _RepositoryDescription({required this.name, this.description});
+  factory _RepositoryDescription.fromJson(Map<String, dynamic> json) => _$RepositoryDescriptionFromJson(json);
+
+@override final  String name;
+@override final  String? description;
+
+/// Create a copy of RepositoryDescription
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$RepositoryDescriptionCopyWith<_RepositoryDescription> get copyWith => __$RepositoryDescriptionCopyWithImpl<_RepositoryDescription>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$RepositoryDescriptionToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RepositoryDescription&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,name,description);
+
+@override
+String toString() {
+  return 'RepositoryDescription(name: $name, description: $description)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$RepositoryDescriptionCopyWith<$Res> implements $RepositoryDescriptionCopyWith<$Res> {
+  factory _$RepositoryDescriptionCopyWith(_RepositoryDescription value, $Res Function(_RepositoryDescription) _then) = __$RepositoryDescriptionCopyWithImpl;
+@override @useResult
+$Res call({
+ String name, String? description
+});
+
+
+
+
+}
+/// @nodoc
+class __$RepositoryDescriptionCopyWithImpl<$Res>
+    implements _$RepositoryDescriptionCopyWith<$Res> {
+  __$RepositoryDescriptionCopyWithImpl(this._self, this._then);
+
+  final _RepositoryDescription _self;
+  final $Res Function(_RepositoryDescription) _then;
+
+/// Create a copy of RepositoryDescription
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? description = freezed,}) {
+  return _then(_RepositoryDescription(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$Versioning {
 
- String get buildTime; List<dynamic> get sources; BuiltWith get builtWith;
+ String get buildTime; List<dynamic> get sources; BuiltWith get builtWith; RepositoryDescription? get repository;
 /// Create a copy of Versioning
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1984,16 +2121,16 @@ $VersioningCopyWith<Versioning> get copyWith => _$VersioningCopyWithImpl<Version
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Versioning&&(identical(other.buildTime, buildTime) || other.buildTime == buildTime)&&const DeepCollectionEquality().equals(other.sources, sources)&&(identical(other.builtWith, builtWith) || other.builtWith == builtWith));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Versioning&&(identical(other.buildTime, buildTime) || other.buildTime == buildTime)&&const DeepCollectionEquality().equals(other.sources, sources)&&(identical(other.builtWith, builtWith) || other.builtWith == builtWith)&&(identical(other.repository, repository) || other.repository == repository));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,buildTime,const DeepCollectionEquality().hash(sources),builtWith);
+int get hashCode => Object.hash(runtimeType,buildTime,const DeepCollectionEquality().hash(sources),builtWith,repository);
 
 @override
 String toString() {
-  return 'Versioning(buildTime: $buildTime, sources: $sources, builtWith: $builtWith)';
+  return 'Versioning(buildTime: $buildTime, sources: $sources, builtWith: $builtWith, repository: $repository)';
 }
 
 
@@ -2004,11 +2141,11 @@ abstract mixin class $VersioningCopyWith<$Res>  {
   factory $VersioningCopyWith(Versioning value, $Res Function(Versioning) _then) = _$VersioningCopyWithImpl;
 @useResult
 $Res call({
- String buildTime, List<dynamic> sources, BuiltWith builtWith
+ String buildTime, List<dynamic> sources, BuiltWith builtWith, RepositoryDescription? repository
 });
 
 
-$BuiltWithCopyWith<$Res> get builtWith;
+$BuiltWithCopyWith<$Res> get builtWith;$RepositoryDescriptionCopyWith<$Res>? get repository;
 
 }
 /// @nodoc
@@ -2021,12 +2158,13 @@ class _$VersioningCopyWithImpl<$Res>
 
 /// Create a copy of Versioning
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? buildTime = null,Object? sources = null,Object? builtWith = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? buildTime = null,Object? sources = null,Object? builtWith = null,Object? repository = freezed,}) {
   return _then(_self.copyWith(
 buildTime: null == buildTime ? _self.buildTime : buildTime // ignore: cast_nullable_to_non_nullable
 as String,sources: null == sources ? _self.sources : sources // ignore: cast_nullable_to_non_nullable
 as List<dynamic>,builtWith: null == builtWith ? _self.builtWith : builtWith // ignore: cast_nullable_to_non_nullable
-as BuiltWith,
+as BuiltWith,repository: freezed == repository ? _self.repository : repository // ignore: cast_nullable_to_non_nullable
+as RepositoryDescription?,
   ));
 }
 /// Create a copy of Versioning
@@ -2038,6 +2176,18 @@ $BuiltWithCopyWith<$Res> get builtWith {
   return $BuiltWithCopyWith<$Res>(_self.builtWith, (value) {
     return _then(_self.copyWith(builtWith: value));
   });
+}/// Create a copy of Versioning
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$RepositoryDescriptionCopyWith<$Res>? get repository {
+    if (_self.repository == null) {
+    return null;
+  }
+
+  return $RepositoryDescriptionCopyWith<$Res>(_self.repository!, (value) {
+    return _then(_self.copyWith(repository: value));
+  });
 }
 }
 
@@ -2047,7 +2197,7 @@ $BuiltWithCopyWith<$Res> get builtWith {
 @JsonSerializable()
 
 class _Versioning implements Versioning {
-  const _Versioning({required this.buildTime, required final  List<dynamic> sources, required this.builtWith}): _sources = sources;
+  const _Versioning({required this.buildTime, required final  List<dynamic> sources, required this.builtWith, this.repository}): _sources = sources;
   factory _Versioning.fromJson(Map<String, dynamic> json) => _$VersioningFromJson(json);
 
 @override final  String buildTime;
@@ -2059,6 +2209,7 @@ class _Versioning implements Versioning {
 }
 
 @override final  BuiltWith builtWith;
+@override final  RepositoryDescription? repository;
 
 /// Create a copy of Versioning
 /// with the given fields replaced by the non-null parameter values.
@@ -2073,16 +2224,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Versioning&&(identical(other.buildTime, buildTime) || other.buildTime == buildTime)&&const DeepCollectionEquality().equals(other._sources, _sources)&&(identical(other.builtWith, builtWith) || other.builtWith == builtWith));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Versioning&&(identical(other.buildTime, buildTime) || other.buildTime == buildTime)&&const DeepCollectionEquality().equals(other._sources, _sources)&&(identical(other.builtWith, builtWith) || other.builtWith == builtWith)&&(identical(other.repository, repository) || other.repository == repository));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,buildTime,const DeepCollectionEquality().hash(_sources),builtWith);
+int get hashCode => Object.hash(runtimeType,buildTime,const DeepCollectionEquality().hash(_sources),builtWith,repository);
 
 @override
 String toString() {
-  return 'Versioning(buildTime: $buildTime, sources: $sources, builtWith: $builtWith)';
+  return 'Versioning(buildTime: $buildTime, sources: $sources, builtWith: $builtWith, repository: $repository)';
 }
 
 
@@ -2093,11 +2244,11 @@ abstract mixin class _$VersioningCopyWith<$Res> implements $VersioningCopyWith<$
   factory _$VersioningCopyWith(_Versioning value, $Res Function(_Versioning) _then) = __$VersioningCopyWithImpl;
 @override @useResult
 $Res call({
- String buildTime, List<dynamic> sources, BuiltWith builtWith
+ String buildTime, List<dynamic> sources, BuiltWith builtWith, RepositoryDescription? repository
 });
 
 
-@override $BuiltWithCopyWith<$Res> get builtWith;
+@override $BuiltWithCopyWith<$Res> get builtWith;@override $RepositoryDescriptionCopyWith<$Res>? get repository;
 
 }
 /// @nodoc
@@ -2110,12 +2261,13 @@ class __$VersioningCopyWithImpl<$Res>
 
 /// Create a copy of Versioning
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? buildTime = null,Object? sources = null,Object? builtWith = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? buildTime = null,Object? sources = null,Object? builtWith = null,Object? repository = freezed,}) {
   return _then(_Versioning(
 buildTime: null == buildTime ? _self.buildTime : buildTime // ignore: cast_nullable_to_non_nullable
 as String,sources: null == sources ? _self._sources : sources // ignore: cast_nullable_to_non_nullable
 as List<dynamic>,builtWith: null == builtWith ? _self.builtWith : builtWith // ignore: cast_nullable_to_non_nullable
-as BuiltWith,
+as BuiltWith,repository: freezed == repository ? _self.repository : repository // ignore: cast_nullable_to_non_nullable
+as RepositoryDescription?,
   ));
 }
 
@@ -2127,6 +2279,18 @@ $BuiltWithCopyWith<$Res> get builtWith {
   
   return $BuiltWithCopyWith<$Res>(_self.builtWith, (value) {
     return _then(_self.copyWith(builtWith: value));
+  });
+}/// Create a copy of Versioning
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$RepositoryDescriptionCopyWith<$Res>? get repository {
+    if (_self.repository == null) {
+    return null;
+  }
+
+  return $RepositoryDescriptionCopyWith<$Res>(_self.repository!, (value) {
+    return _then(_self.copyWith(repository: value));
   });
 }
 }

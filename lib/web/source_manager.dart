@@ -599,3 +599,196 @@ class _SourceDescription extends StatelessWidget {
     );
   }
 }
+
+class InstallExtensionsDialog extends HookConsumerWidget {
+  const InstallExtensionsDialog({super.key, required this.data});
+
+  final String data;
+
+  Future<Map<SourceVersion, RepoData>> fetchRequested() async {
+    final list = <SourceVersion, RepoData>{};
+
+    try {
+      final decodedData = utf8.decode(base64Decode(data));
+      final List<dynamic> request = json.decode(decodedData);
+
+      for (final item in request) {
+        if (item is! List || item.length < 2) continue;
+        final extensionId = item[0].toString();
+        final repoUrl = item[1].toString();
+
+        final uri = Uri.parse('$repoUrl/versioning.json');
+        final response = await http.get(uri);
+
+        try {
+          final bodyData = Versioning.fromJson(json.decode(response.body));
+
+          if (bodyData.builtWith.types.startsWith(
+                SupportedVersion.v0_9.version,
+              ) &&
+              bodyData.sources.isNotEmpty) {
+            final version = SupportedVersion.values.firstWhere(
+              (v) => bodyData.builtWith.types.startsWith(v.version),
+            );
+
+            final sources = bodyData.sources.map(
+              (e) => switch (version) {
+                SupportedVersion.v0_9 => SourceVersion09.fromJson(e),
+              },
+            );
+
+            final source = sources.firstWhereOrNull((s) => s.id == extensionId);
+
+            if (source != null) {
+              list[source] = RepoData.fromInfo(
+                RepoInfo(
+                  name: bodyData.repository?.name ?? repoUrl,
+                  url: repoUrl,
+                ),
+                version,
+              );
+            }
+          }
+        } catch (e) {
+          logger.w('Error parsing $repoUrl/versioning.json', error: e);
+        }
+      }
+    } catch (e) {
+      logger.w('Error parsing installExtensions data', error: e);
+    }
+
+    return list;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
+    final nav = Navigator.of(context);
+    final theme = Theme.of(context);
+
+    final futureData = useMemoized(fetchRequested);
+    final snapshot = useFuture(futureData);
+
+    final sourcesBox = GagakuData().store.box<WebSourceInfo>();
+    // We get installed synchronously as the router push wouldn't be updating DB immediately
+    final installedList = useMemoized(() => sourcesBox.getAll());
+    final repoBox = GagakuData().store.box<RepoInfo>();
+    final installedRepos = useMemoized(() => repoBox.getAll());
+
+    return AlertDialog(
+      title: Text(tr.webSources.source.install.title),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(tr.webSources.source.install.warning),
+            const SizedBox(height: 16),
+            if (snapshot.connectionState == ConnectionState.waiting)
+              const Center(child: CircularProgressIndicator())
+            else if (snapshot.hasError ||
+                !snapshot.hasData ||
+                snapshot.data!.isEmpty)
+              Text(tr.errors.generic)
+            else
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    final entry = snapshot.data!.entries.elementAt(index);
+                    final source = entry.key;
+                    final repo = entry.value;
+
+                    final isInstalled = installedList.any(
+                      (e) => e.id == source.id,
+                    );
+
+                    final icon = '${repo.url}/${source.getIconPath()}';
+
+                    return ListTile(
+                      leading: Image.network(
+                        icon,
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                        errorBuilder: (c, e, s) =>
+                            const Icon(Icons.extension, size: 40),
+                      ),
+                      title: Text(
+                        source.name,
+                        style: isInstalled
+                            ? TextStyle(
+                                color: theme.textTheme.bodyMedium?.color
+                                    ?.withValues(alpha: 0.5),
+                              )
+                            : null,
+                      ),
+                      subtitle: isInstalled
+                          ? Text(
+                              tr.webSources.source.install.alreadyInstalled,
+                              style: TextStyle(
+                                color: theme.textTheme.bodySmall?.color
+                                    ?.withValues(alpha: 0.5),
+                              ),
+                            )
+                          : Text('by ${source.getAuthor()}'),
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => nav.pop(null), child: Text(tr.ui.cancel)),
+        ElevatedButton(
+          onPressed: snapshot.hasData && snapshot.data!.isNotEmpty
+              ? () {
+                  final dataToInstall = <WebSourceInfo>[];
+                  final reposToInstall = <RepoInfo>[];
+
+                  for (final entry in snapshot.data!.entries) {
+                    final source = entry.key;
+                    final repo = entry.value;
+
+                    if (installedList.any((e) => e.id == source.id)) continue;
+
+                    dataToInstall.add(
+                      WebSourceInfo(
+                        id: source.id,
+                        name: source.name,
+                        repo: repo.url,
+                        baseUrl: source.getBaseUrl(),
+                        version: repo.version,
+                        icon: '${repo.url}/${source.getIconPath()}',
+                        capabilities: source.getCapabilities(),
+                      ),
+                    );
+
+                    if (!installedRepos.any((r) => r.url == repo.url) &&
+                        !reposToInstall.any((r) => r.url == repo.url)) {
+                      reposToInstall.add(
+                        RepoInfo(name: repo.name, url: repo.url),
+                      );
+                    }
+                  }
+
+                  if (reposToInstall.isNotEmpty) {
+                    repoBox.putMany(reposToInstall);
+                  }
+
+                  if (dataToInstall.isNotEmpty) {
+                    sourcesBox.putMany(dataToInstall);
+                  }
+
+                  nav.pop(dataToInstall.length);
+                }
+              : null,
+          child: Text(tr.ui.add),
+        ),
+      ],
+    );
+  }
+}

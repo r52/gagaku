@@ -790,11 +790,23 @@ abstract class BuiltWith with _$BuiltWith {
 }
 
 @freezed
+abstract class RepositoryDescription with _$RepositoryDescription {
+  const factory RepositoryDescription({
+    required String name,
+    String? description,
+  }) = _RepositoryDescription;
+
+  factory RepositoryDescription.fromJson(Map<String, dynamic> json) =>
+      _$RepositoryDescriptionFromJson(json);
+}
+
+@freezed
 abstract class Versioning with _$Versioning {
   const factory Versioning({
     required String buildTime,
     required List<dynamic> sources,
     required BuiltWith builtWith,
+    RepositoryDescription? repository,
   }) = _Versioning;
 
   factory Versioning.fromJson(Map<String, dynamic> json) =>

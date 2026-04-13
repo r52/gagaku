@@ -50,6 +50,7 @@ abstract class GagakuRoute {
   static const proxyChapter = '/read/:proxy/:code/:chapter/:page';
   static const extensionChapter = '/read-chapter/:sourceId/:mangaId/:chapterId';
   static const extensionAddRepo = '/extensions/addrepo';
+  static const extensionInstall = '/extensions/install';
 
   static const config = '/config';
 }

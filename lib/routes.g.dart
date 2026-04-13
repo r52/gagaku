@@ -34,6 +34,7 @@ List<RouteBase> get $appRoutes => [
   $extensionReaderRoute,
   $extensionSearchRoute,
   $addRepoRoute,
+  $installExtensionsRoute,
 ];
 
 RouteBase get $appSettingsRoute =>
@@ -1165,6 +1166,37 @@ mixin $AddRepoRoute on GoRouteData {
   String get location => GoRouteData.$location(
     '/extensions/addrepo',
     queryParams: {'name': _self.name, 'url': _self.url},
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $installExtensionsRoute => GoRouteData.$route(
+  path: '/extensions/install',
+  factory: $InstallExtensionsRoute._fromState,
+);
+
+mixin $InstallExtensionsRoute on GoRouteData {
+  static InstallExtensionsRoute _fromState(GoRouterState state) =>
+      InstallExtensionsRoute(data: state.uri.queryParameters['data']!);
+
+  InstallExtensionsRoute get _self => this as InstallExtensionsRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/extensions/install',
+    queryParams: {'data': _self.data},
   );
 
   @override
