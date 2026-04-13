@@ -19,8 +19,8 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0
 
 environment:
-  sdk: "^3.10.0"
-  flutter: ">=3.40.0"
+  sdk: "^3.11.0"
+  flutter: ">=3.41.6"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -54,11 +54,7 @@ dependencies:
   photo_view: ^0.15.0
   riverpod: ^3.2.0
   riverpod_annotation: ^4.0.0
-  timeago:
-    git:
-      url: https://github.com/andresaraujo/timeago.dart
-      path: packages/timeago
-      ref: c23ec0f
+  timeago: ^3.7.1
   url_launcher: ^6.1.10
   number_paginator: ^1.0.0
   collection: ^1.19.0

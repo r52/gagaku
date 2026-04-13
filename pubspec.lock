@@ -1439,12 +1439,11 @@ packages:
   timeago:
     dependency: "direct main"
     description:
-      path: "packages/timeago"
-      ref: c23ec0f
-      resolved-ref: c23ec0f8a4d51b88e2aa23611cc2785dfbe52f34
-      url: "https://github.com/andresaraujo/timeago.dart"
-    source: git
-    version: "3.7.0"
+      name: timeago
+      sha256: b05159406a97e1cbb2b9ee4faa9fb096fe0e2dfcd8b08fcd2a00553450d3422e
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.7.1"
   timezone:
     dependency: transitive
     description:
@@ -1654,5 +1653,5 @@ packages:
     source: hosted
     version: "2.2.4"
 sdks:
-  dart: ">=3.10.3 <4.0.0"
-  flutter: ">=3.40.0"
+  dart: ">=3.11.0 <4.0.0"
+  flutter: ">=3.41.6"
