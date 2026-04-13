@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@paperback/types": "^1.0.0-alpha.64",
+    "@types/node": "^25.6.0",
     "entities": "^7.0.0",
     "ts-loader": "^9.5.2",
     "typescript": "^5.9.3",
