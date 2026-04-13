@@ -807,6 +807,16 @@ class _WebMangaNarrowLayout extends ConsumerWidget {
           await api.invalidateAll(handle.getKey());
           return ref.refresh(_fetchWebMangaInfoProvider(handle).future);
         },
+        notificationPredicate: (notification) {
+          // Depth 1 is the top of the NestedScrollView
+          if (notification is OverscrollNotification &&
+              notification.velocity == 0.0 &&
+              notification.overscroll < 0.0) {
+            return notification.depth == 1;
+          }
+
+          return notification.depth == 0;
+        },
         child: NestedScrollView(
           controller: chapterScrollController,
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
