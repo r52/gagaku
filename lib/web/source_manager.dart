@@ -69,8 +69,8 @@ class SourceManager extends HookConsumerWidget {
     final theme = Theme.of(context);
     final nav = Navigator.of(context);
     final forceRefresh = useState(0);
-    final searchQuery = useState('');
     final searchController = useTextEditingController();
+    final searchValue = useValueListenable(searchController);
 
     final repoBox = GagakuData().store.box<RepoInfo>();
     final repoNamesByUrl = useMemoized(
@@ -93,8 +93,8 @@ class SourceManager extends HookConsumerWidget {
       ),
     );
 
-    final isSearching = searchQuery.value.isNotEmpty;
-    final query = searchQuery.value.toLowerCase();
+    final isSearching = searchValue.text.isNotEmpty;
+    final query = searchValue.text.toLowerCase();
 
     // Filter available repos
     final filteredAvailable = <RepoData, List<SourceVersion>>{};
@@ -108,7 +108,6 @@ class SourceManager extends HookConsumerWidget {
                   .where(
                     (s) =>
                         s.name.toLowerCase().contains(query) ||
-                        s.getAuthor().toLowerCase().contains(query) ||
                         s.getDescription().toLowerCase().contains(query),
                   )
                   .toList();
@@ -165,10 +164,7 @@ class SourceManager extends HookConsumerWidget {
                 suffixIcon: isSearching
                     ? IconButton(
                         icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          searchController.clear();
-                          searchQuery.value = '';
-                        },
+                        onPressed: searchController.clear,
                       )
                     : null,
                 border: OutlineInputBorder(
@@ -178,7 +174,6 @@ class SourceManager extends HookConsumerWidget {
                 filled: true,
                 isDense: true,
               ),
-              onChanged: (v) => searchQuery.value = v,
             ),
           ),
         ),
