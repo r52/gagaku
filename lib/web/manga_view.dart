@@ -127,22 +127,6 @@ class WebMangaViewWidget extends HookConsumerWidget {
     );
     final api = ref.watch(webSourceBrokerProvider);
 
-    // handle legacy share url
-    final shareUrlFuture = useMemoized(
-      () => handle.sourceId == 'gist'
-          ? null
-          : ref
-                .read(extensionSourceProvider(handle.sourceId).notifier)
-                .getMangaURL(handle.location),
-      [handle],
-    );
-    final shareUrl = useFuture(shareUrlFuture);
-
-    final extdata = switch (manga) {
-      WebMangaCubari() => null,
-      WebMangaExtension(:final data) => data,
-    };
-
     useEffect(() {
       Future.delayed(Duration.zero, () async {
         api.syncAndLogHistory(link);
@@ -161,8 +145,6 @@ class WebMangaViewWidget extends HookConsumerWidget {
         handle: handle,
         link: link,
         source: source,
-        extdata: extdata,
-        shareUrl: shareUrl.data,
         chapterScrollController: chapterScrollController,
       );
     } else {
@@ -171,8 +153,6 @@ class WebMangaViewWidget extends HookConsumerWidget {
         handle: handle,
         link: link,
         source: source,
-        extdata: extdata,
-        shareUrl: shareUrl.data,
         chapterScrollController: chapterScrollController,
       );
     }
@@ -300,21 +280,22 @@ class _WebMetadataList extends StatelessWidget {
   const _WebMetadataList({
     required this.manga,
     required this.handle,
-    required this.extdata,
     required this.source,
-    required this.shareUrl,
   });
 
   final WebManga manga;
   final SourceHandler handle;
-  final SourceManga? extdata;
   final WebSourceInfo? source;
-  final String? shareUrl;
 
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
     final theme = Theme.of(context);
+
+    final extdata = switch (manga) {
+      WebMangaCubari() => null,
+      WebMangaExtension(:final data) => data,
+    };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -322,13 +303,13 @@ class _WebMetadataList extends StatelessWidget {
         if (extdata != null)
           Padding(
             padding: const EdgeInsets.all(8),
-            child: MangaStatisticsRow(manga: extdata!),
+            child: MangaStatisticsRow(manga: extdata),
           ),
-        if (extdata != null && extdata!.mangaInfo.secondaryTitles.isNotEmpty)
+        if (extdata != null && extdata.mangaInfo.secondaryTitles.isNotEmpty)
           ExpansionTile(
             title: Text(tr.mangaView.altTitles),
             children: [
-              for (final alttitle in extdata!.mangaInfo.secondaryTitles)
+              for (final alttitle in extdata.mangaInfo.secondaryTitles)
                 SizedBox(
                   width: double.infinity,
                   child: ListTile(
@@ -395,7 +376,7 @@ class _WebMetadataList extends StatelessWidget {
             ),
             if (extdata != null)
               for (final tagsec
-                  in (extdata!.mangaInfo.tagGroups ?? <TagSection>[]))
+                  in (extdata.mangaInfo.tagGroups ?? <TagSection>[]))
                 MultiChildExpansionTile(
                   title: tagsec.title.capitalize(),
                   children: [
@@ -431,21 +412,49 @@ class _WebMetadataList extends StatelessWidget {
                     },
                     text: tr.mangaView.openOn(arg: 'cubari.moe'),
                   ),
-                if (handle.type == SourceType.source &&
-                    extdata != null &&
-                    (extdata!.mangaInfo.shareUrl != null || shareUrl != null))
-                  ButtonChip(
-                    onPressed: () async {
-                      final url = extdata!.mangaInfo.shareUrl ?? shareUrl!;
-                      await Styles.tryLaunchUrl(context, url);
-                    },
-                    text: tr.mangaView.openOn(arg: handle.sourceId),
-                  ),
+                if (extdata != null)
+                  _WebShareChip(handle: handle, extdata: extdata),
               ],
             ),
           ],
         ),
       ],
+    );
+  }
+}
+
+class _WebShareChip extends HookConsumerWidget {
+  const _WebShareChip({required this.handle, required this.extdata});
+
+  final SourceHandler handle;
+  final SourceManga extdata;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (handle.type != SourceType.source) return const SizedBox.shrink();
+
+    final tr = context.t;
+    final shareUrlHint = extdata.mangaInfo.shareUrl;
+
+    final shareUrlFuture = useMemoized(
+      () => shareUrlHint != null || handle.sourceId == 'gist'
+          ? null
+          : ref
+                .read(extensionSourceProvider(handle.sourceId).notifier)
+                .getMangaURL(handle.location),
+      [handle, shareUrlHint],
+    );
+    final shareUrl = useFuture(shareUrlFuture);
+
+    final url = shareUrlHint ?? shareUrl.data;
+
+    if (url == null) return const SizedBox.shrink();
+
+    return ButtonChip(
+      onPressed: () async {
+        await Styles.tryLaunchUrl(context, url);
+      },
+      text: tr.mangaView.openOn(arg: handle.sourceId),
     );
   }
 }
@@ -621,8 +630,6 @@ class _WebMangaWideLayout extends ConsumerWidget {
     required this.handle,
     required this.link,
     required this.source,
-    required this.extdata,
-    required this.shareUrl,
     required this.chapterScrollController,
   });
 
@@ -630,8 +637,6 @@ class _WebMangaWideLayout extends ConsumerWidget {
   final SourceHandler handle;
   final HistoryLink link;
   final WebSourceInfo? source;
-  final SourceManga? extdata;
-  final String? shareUrl;
   final ScrollController chapterScrollController;
 
   @override
@@ -737,9 +742,7 @@ class _WebMangaWideLayout extends ConsumerWidget {
                       _WebMetadataList(
                         manga: manga,
                         handle: handle,
-                        extdata: extdata,
                         source: source,
-                        shareUrl: shareUrl,
                       ),
                     ],
                   ),
@@ -776,8 +779,6 @@ class _WebMangaNarrowLayout extends ConsumerWidget {
     required this.handle,
     required this.link,
     required this.source,
-    required this.extdata,
-    required this.shareUrl,
     required this.chapterScrollController,
   });
 
@@ -785,8 +786,6 @@ class _WebMangaNarrowLayout extends ConsumerWidget {
   final SourceHandler handle;
   final HistoryLink link;
   final WebSourceInfo? source;
-  final SourceManga? extdata;
-  final String? shareUrl;
   final ScrollController chapterScrollController;
 
   @override
@@ -903,9 +902,7 @@ class _WebMangaNarrowLayout extends ConsumerWidget {
               child: _WebMetadataList(
                 manga: manga,
                 handle: handle,
-                extdata: extdata,
                 source: source,
-                shareUrl: shareUrl,
               ),
             ),
             SliverPersistentHeader(
