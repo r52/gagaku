@@ -6,7 +6,11 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/extension_bridge.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:gagaku/web/deeplink.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:openid_client/openid_client_io.dart' as oidc;
+import 'package:url_launcher/url_launcher.dart';
 
 class ExtensionSettingsPage extends HookConsumerWidget {
   const ExtensionSettingsPage({super.key, required this.source});
@@ -165,8 +169,7 @@ class FormItemDelegateBuilder extends StatelessWidget {
           element: element as StepperRowElement,
         );
       case OAuthButtonRowElement():
-        // TODO: support this?
-        return UnsupportedRowBuilder(
+        return OAuthButtonRowBuilder(
           source: source,
           element: element as OAuthButtonRowElement,
         );
@@ -599,6 +602,150 @@ class UnsupportedRowBuilder extends ConsumerWidget {
 
     return Card(
       child: ListTile(title: Text("Unsupported element"), enabled: false),
+    );
+  }
+}
+
+class OAuthButtonRowBuilder extends ConsumerWidget {
+  const OAuthButtonRowBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+  });
+
+  final WebSourceInfo source;
+  final OAuthButtonRowElement element;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (element.isHidden) {
+      return const SizedBox.shrink();
+    }
+
+    return Card(
+      child: ListTile(
+        title: Text(element.title),
+        subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
+        onTap: () async {
+          final tokenEndpoint = switch (element.responseType) {
+            OAuthTokenResponse() => null,
+            OAuthCodeResponse(tokenEndpoint: final te) => te,
+            OAuthPKCEResponse(tokenEndpoint: final te) => te,
+            _ => null,
+          };
+
+          final metadata = oidc.OpenIdProviderMetadata.fromJson({
+            'issuer': Uri.parse(element.authorizeEndpoint).origin,
+            'authorization_endpoint': element.authorizeEndpoint,
+            'token_endpoint': tokenEndpoint,
+          });
+
+          final issuer = oidc.Issuer(metadata);
+          final client = oidc.Client(issuer, element.clientId ?? 'paperback');
+
+          final flow = switch (element.responseType) {
+            OAuthTokenResponse() => oidc.Flow.implicit(client),
+            OAuthCodeResponse() => oidc.Flow.authorizationCode(client),
+            OAuthPKCEResponse() => oidc.Flow.authorizationCodeWithPKCE(client),
+            _ => oidc.Flow.implicit(client),
+          };
+
+          if (element.scopes?.isNotEmpty == true) {
+            flow.scopes.clear();
+            flow.scopes.addAll(element.scopes!);
+          }
+
+          final redirectUri =
+              element.redirectUri ?? 'paperback://${source.id}-login';
+          final redirectParsed = Uri.parse(redirectUri);
+          flow.redirectUri = redirectParsed;
+
+          final authUrl = flow.authenticationUri;
+
+          PBLinkDelegate().addHandler(redirectParsed.host, (
+            context,
+            state,
+            router,
+          ) async {
+            PBLinkDelegate().removeHandler(redirectParsed.host);
+            return Block.then(() async {
+              await showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) {
+                  return HookConsumer(
+                    builder: (context, ref, child) {
+                      useEffect(() {
+                        void process() async {
+                          try {
+                            final cred = await flow.callback(
+                              state.uri.queryParameters,
+                            );
+                            final tokenResp = await cred.getTokenResponse();
+
+                            await ref
+                                .read(
+                                  extensionSourceProvider(source.id).notifier,
+                                )
+                                .callBinding(element.onSuccess, [
+                                  tokenResp.refreshToken ?? '',
+                                  tokenResp.accessToken ?? '',
+                                ]);
+
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context)
+                                ..removeCurrentSnackBar()
+                                ..showSnackBar(
+                                  SnackBar(
+                                    content: Text(context.t.auth.loginSuccess),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              Navigator.of(context).pop();
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context)
+                                ..removeCurrentSnackBar()
+                                ..showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      context.t.auth.loginFailed(
+                                        error: e.toString(),
+                                      ),
+                                    ),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              Navigator.of(context).pop();
+                            }
+                          }
+                        }
+
+                        process();
+                        return null;
+                      }, []);
+
+                      return AlertDialog(
+                        content: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const CircularProgressIndicator(),
+                            const SizedBox(width: 16),
+                            Text(context.t.auth.loggingIn),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            });
+          });
+
+          await launchUrl(authUrl, mode: LaunchMode.externalApplication);
+        },
+      ),
     );
   }
 }

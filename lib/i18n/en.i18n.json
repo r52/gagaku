@@ -72,7 +72,10 @@
     "clientSecretEmptyWarning": "Client Secret cannot be empty",
     "fieldsEmptyWarning": "Username/Password/Client ID/Client Secret cannot be empty",
     "loggedInAs": "Logged in as: $user",
-    "authenticating": "Authenticating..."
+    "authenticating": "Authenticating...",
+    "loginSuccess": "Login Successful",
+    "loginFailed": "Login Failed: $error",
+    "loggingIn": "Logging in..."
   },
   "sort": {
     "desc": "Descending",

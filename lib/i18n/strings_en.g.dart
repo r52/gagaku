@@ -336,6 +336,15 @@ class TranslationsAuthEn {
 
 	/// en: 'Authenticating...'
 	String get authenticating => 'Authenticating...';
+
+	/// en: 'Login Successful'
+	String get loginSuccess => 'Login Successful';
+
+	/// en: 'Login Failed: $error'
+	String loginFailed({required Object error}) => 'Login Failed: ${error}';
+
+	/// en: 'Logging in...'
+	String get loggingIn => 'Logging in...';
 }
 
 // Path: sort
@@ -1832,6 +1841,9 @@ extension on Translations {
 			'auth.fieldsEmptyWarning' => 'Username/Password/Client ID/Client Secret cannot be empty',
 			'auth.loggedInAs' => ({required Object user}) => 'Logged in as: ${user}',
 			'auth.authenticating' => 'Authenticating...',
+			'auth.loginSuccess' => 'Login Successful',
+			'auth.loginFailed' => ({required Object error}) => 'Login Failed: ${error}',
+			'auth.loggingIn' => 'Logging in...',
 			'sort.desc' => 'Descending',
 			'sort.asc' => 'Ascending',
 			'library' => 'Library',
