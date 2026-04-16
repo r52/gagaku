@@ -237,3 +237,18 @@ class AddRepoRoute extends GoRouteData with $AddRepoRoute {
     );
   }
 }
+
+@TypedGoRoute<InstallExtensionsRoute>(path: GagakuRoute.extensionInstall)
+class InstallExtensionsRoute extends GoRouteData with $InstallExtensionsRoute {
+  const InstallExtensionsRoute({required this.data});
+
+  final String data;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return DialogPage(
+      key: state.pageKey,
+      child: InstallExtensionsDialog(data: data),
+    );
+  }
+}

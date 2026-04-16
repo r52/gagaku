@@ -813,10 +813,11 @@ class ExtensionSource extends _$ExtensionSource {
 
   Future<PagedResults<SearchResultItem>> searchManga(
     SearchQuery query,
-    dynamic metadata,
-  ) async {
+    dynamic metadata, {
+    SortingOption? sortOp,
+  }) async {
     await future;
-    return await _bridge!.searchManga(query, metadata);
+    return await _bridge!.searchManga(query, metadata, sortOp: sortOp);
   }
 
   Future<WebManga?> getManga(String mangaId) async {
@@ -834,19 +835,9 @@ class ExtensionSource extends _$ExtensionSource {
     return await _bridge!.getMangaURL(mangaId);
   }
 
-  SortingOption? getCurrentSort() {
-    return _bridge?.currentSort;
-  }
-
-  void setCurrentSort(SortingOption? sort) {
-    if (_bridge != null) {
-      _bridge!.currentSort = sort;
-    }
-  }
-
-  Future<List<SortingOption>?> getSortingOptions() async {
+  Future<List<SortingOption>?> getSortingOptions(SearchQuery query) async {
     await future;
-    return _bridge!.getSortingOptions();
+    return _bridge!.getSortingOptions(query);
   }
 
   Future<List<SearchFilter>?> getFilters() async {
@@ -857,6 +848,11 @@ class ExtensionSource extends _$ExtensionSource {
   Future<List<Cookie>?> getCookies() async {
     await future;
     return _bridge!.getCookies();
+  }
+
+  Future<bool> hasSortOps() async {
+    await future;
+    return _bridge!.hasSortOps;
   }
 }
 

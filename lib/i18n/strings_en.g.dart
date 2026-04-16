@@ -241,6 +241,9 @@ class TranslationsErrorsEn {
 
 	// Translations
 
+	/// en: 'Error'
+	String get generic => 'Error';
+
 	/// en: 'No results'
 	String get noresults => 'No results';
 
@@ -333,6 +336,15 @@ class TranslationsAuthEn {
 
 	/// en: 'Authenticating...'
 	String get authenticating => 'Authenticating...';
+
+	/// en: 'Login Successful'
+	String get loginSuccess => 'Login Successful';
+
+	/// en: 'Login Failed: $error'
+	String loginFailed({required Object error}) => 'Login Failed: ${error}';
+
+	/// en: 'Logging in...'
+	String get loggingIn => 'Logging in...';
 }
 
 // Path: sort
@@ -1577,6 +1589,8 @@ class TranslationsWebSourcesSourceEn {
 
 	/// en: 'This extension provides no filter options'
 	String get noTagsWarning => 'This extension provides no filter options';
+
+	late final TranslationsWebSourcesSourceInstallEn install = TranslationsWebSourcesSourceInstallEn.internal(_root);
 }
 
 // Path: reader.direction
@@ -1729,6 +1743,27 @@ class TranslationsMangadexSortEn {
 	String get title_desc => 'Title Descending';
 }
 
+// Path: webSources.source.install
+class TranslationsWebSourcesSourceInstallEn {
+	TranslationsWebSourcesSourceInstallEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Install Extensions'
+	String get title => 'Install Extensions';
+
+	/// en: 'Only install extensions from sources you trust. Are you sure you want to install these extensions?'
+	String get warning => 'Only install extensions from sources you trust. Are you sure you want to install these extensions?';
+
+	/// en: 'Already installed'
+	String get alreadyInstalled => 'Already installed';
+
+	/// en: '${count} extension(s) installed.'
+	String success({required Object count}) => '${count} extension(s) installed.';
+}
+
 /// The flat map containing all translations for locale <en>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -1777,6 +1812,7 @@ extension on Translations {
 			'ui.unknown' => 'Unknown',
 			'ui.sureContinue' => 'Are you sure you want to continue?',
 			'ui.scrollToTop' => 'Scroll to top',
+			'errors.generic' => 'Error',
 			'errors.noresults' => 'No results',
 			'errors.notitles' => 'No titles',
 			'errors.nomanga' => 'No manga',
@@ -1805,6 +1841,9 @@ extension on Translations {
 			'auth.fieldsEmptyWarning' => 'Username/Password/Client ID/Client Secret cannot be empty',
 			'auth.loggedInAs' => ({required Object user}) => 'Logged in as: ${user}',
 			'auth.authenticating' => 'Authenticating...',
+			'auth.loginSuccess' => 'Login Successful',
+			'auth.loginFailed' => ({required Object error}) => 'Login Failed: ${error}',
+			'auth.loggingIn' => 'Logging in...',
 			'sort.desc' => 'Descending',
 			'sort.asc' => 'Ascending',
 			'library' => 'Library',
@@ -1879,6 +1918,10 @@ extension on Translations {
 			'webSources.source.sourceAddOK' => 'Extension enabled',
 			'webSources.source.installedVersion' => ({required Object version}) => ' (installed: v${version})',
 			'webSources.source.noTagsWarning' => 'This extension provides no filter options',
+			'webSources.source.install.title' => 'Install Extensions',
+			'webSources.source.install.warning' => 'Only install extensions from sources you trust. Are you sure you want to install these extensions?',
+			'webSources.source.install.alreadyInstalled' => 'Already installed',
+			'webSources.source.install.success' => ({required Object count}) => '${count} extension(s) installed.',
 			'webSources.sourceUnavailable' => ({required Object id}) => 'Source ${id} Unavailable',
 			'webSources.noSourcesWarning' => 'No extensions installed!',
 			'webSources.noSearchableSourcesWarning' => 'No searchable extensions installed!',

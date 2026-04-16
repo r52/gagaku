@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'package:gagaku/util/riverpod.dart';
 
+import 'package:gagaku/util/riverpod.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -366,21 +366,68 @@ class _UnpagedMangaViewBody extends HookWidget {
 }
 
 // Metadata section shown in the left panel (wide) or as a SliverList child (narrow).
-class _MangaMetadataColumn extends StatelessWidget {
-  const _MangaMetadataColumn({
-    required this.manga,
-    required this.mangaTagChips,
-    required this.lastvolchap,
-  });
+class _MangaMetadataColumn extends HookWidget {
+  const _MangaMetadataColumn({required this.manga});
 
   final Manga manga;
-  final Map<TagGroup, List<Widget>> mangaTagChips;
-  final String? lastvolchap;
 
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
     final theme = Theme.of(context);
+
+    String? lastvolchap = useMemoized(
+      () {
+        String? chapStr;
+
+        if ((manga.attributes!.lastVolume != null &&
+                manga.attributes!.lastVolume!.isNotEmpty) ||
+            (manga.attributes!.lastChapter != null &&
+                manga.attributes!.lastChapter!.isNotEmpty)) {
+          chapStr = '';
+
+          if (manga.attributes!.lastVolume != null &&
+              manga.attributes!.lastVolume!.isNotEmpty) {
+            chapStr += tr.mangaView.volume(n: manga.attributes!.lastVolume!);
+          }
+
+          if (manga.attributes!.lastChapter != null &&
+              manga.attributes!.lastChapter!.isNotEmpty) {
+            chapStr +=
+                '${chapStr.isEmpty ? '' : ', '}${tr.mangaView.chapter(n: manga.attributes!.lastChapter!)}';
+          }
+        }
+
+        return chapStr;
+      },
+      [
+        manga.attributes!.lastChapter,
+        manga.attributes!.lastVolume,
+        tr.$meta.locale.languageCode,
+      ],
+    );
+
+    final mangaTagChips = useMemoized<Map<TagGroup, List<Widget>>>(() {
+      final map = manga.attributes!.tags.groupListsBy(
+        (tag) => tag.attributes.group,
+      );
+      return map.map((group, list) {
+        return MapEntry(
+          group,
+          list
+              .map(
+                (e) => IconTextChip(
+                  key: ValueKey(e.id),
+                  text: e.attributes.name.get(tr.$meta.locale.languageCode),
+                  onPressed: () =>
+                      MangaDexTagViewRoute(tagId: e.id, tag: e).push(context),
+                ),
+              )
+              .toList(),
+        );
+      });
+    }, [manga, tr.$meta.locale.languageCode]);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -592,7 +639,7 @@ class _MangaMetadataColumn extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(lastvolchap!),
+                      child: Text(lastvolchap),
                     ),
                   ),
                 ],
@@ -1877,58 +1924,6 @@ class _MangaDexWideLayout extends HookConsumerWidget {
       () => tabController.index,
     );
 
-    String? lastvolchap = useMemoized(
-      () {
-        String? chapStr;
-
-        if ((manga.attributes!.lastVolume != null &&
-                manga.attributes!.lastVolume!.isNotEmpty) ||
-            (manga.attributes!.lastChapter != null &&
-                manga.attributes!.lastChapter!.isNotEmpty)) {
-          chapStr = '';
-
-          if (manga.attributes!.lastVolume != null &&
-              manga.attributes!.lastVolume!.isNotEmpty) {
-            chapStr += tr.mangaView.volume(n: manga.attributes!.lastVolume!);
-          }
-
-          if (manga.attributes!.lastChapter != null &&
-              manga.attributes!.lastChapter!.isNotEmpty) {
-            chapStr +=
-                '${chapStr.isEmpty ? '' : ', '}${tr.mangaView.chapter(n: manga.attributes!.lastChapter!)}';
-          }
-        }
-
-        return chapStr;
-      },
-      [
-        manga.attributes!.lastChapter,
-        manga.attributes!.lastVolume,
-        tr.$meta.locale.languageCode,
-      ],
-    );
-
-    final mangaTagChips = useMemoized<Map<TagGroup, List<Widget>>>(() {
-      final map = manga.attributes!.tags.groupListsBy(
-        (tag) => tag.attributes.group,
-      );
-      return map.map((group, list) {
-        return MapEntry(
-          group,
-          list
-              .map(
-                (e) => IconTextChip(
-                  key: ValueKey(e.id),
-                  text: e.attributes.name.get(tr.$meta.locale.languageCode),
-                  onPressed: () =>
-                      MangaDexTagViewRoute(tagId: e.id, tag: e).push(context),
-                ),
-              )
-              .toList(),
-        );
-      });
-    }, [manga, tr.$meta.locale.languageCode]);
-
     final leftWidth = (MediaQuery.sizeOf(context).width * 0.35).clamp(
       240.0,
       360.0,
@@ -1955,11 +1950,7 @@ class _MangaDexWideLayout extends HookConsumerWidget {
       ),
     );
 
-    final metadataColumn = _MangaMetadataColumn(
-      manga: manga,
-      mangaTagChips: mangaTagChips,
-      lastvolchap: lastvolchap,
-    );
+    final metadataColumn = _MangaMetadataColumn(manga: manga);
 
     final chaptersViewWide = _MangaChaptersView(
       manga: manga,
@@ -2099,58 +2090,6 @@ class _MangaDexNarrowLayout extends HookConsumerWidget {
       () => tabController.index,
     );
 
-    String? lastvolchap = useMemoized(
-      () {
-        String? chapStr;
-
-        if ((manga.attributes!.lastVolume != null &&
-                manga.attributes!.lastVolume!.isNotEmpty) ||
-            (manga.attributes!.lastChapter != null &&
-                manga.attributes!.lastChapter!.isNotEmpty)) {
-          chapStr = '';
-
-          if (manga.attributes!.lastVolume != null &&
-              manga.attributes!.lastVolume!.isNotEmpty) {
-            chapStr += tr.mangaView.volume(n: manga.attributes!.lastVolume!);
-          }
-
-          if (manga.attributes!.lastChapter != null &&
-              manga.attributes!.lastChapter!.isNotEmpty) {
-            chapStr +=
-                '${chapStr.isEmpty ? '' : ', '}${tr.mangaView.chapter(n: manga.attributes!.lastChapter!)}';
-          }
-        }
-
-        return chapStr;
-      },
-      [
-        manga.attributes!.lastChapter,
-        manga.attributes!.lastVolume,
-        tr.$meta.locale.languageCode,
-      ],
-    );
-
-    final mangaTagChips = useMemoized<Map<TagGroup, List<Widget>>>(() {
-      final map = manga.attributes!.tags.groupListsBy(
-        (tag) => tag.attributes.group,
-      );
-      return map.map((group, list) {
-        return MapEntry(
-          group,
-          list
-              .map(
-                (e) => IconTextChip(
-                  key: ValueKey(e.id),
-                  text: e.attributes.name.get(tr.$meta.locale.languageCode),
-                  onPressed: () =>
-                      MangaDexTagViewRoute(tagId: e.id, tag: e).push(context),
-                ),
-              )
-              .toList(),
-        );
-      });
-    }, [manga, tr.$meta.locale.languageCode]);
-
     final isPhoneLandscape =
         !DeviceContext.isPortraitMode(context) &&
         DeviceContext.screenWidthSmall(context);
@@ -2272,11 +2211,7 @@ class _MangaDexNarrowLayout extends HookConsumerWidget {
               ),
               SliverList.list(
                 children: [
-                  _MangaMetadataColumn(
-                    manga: manga,
-                    mangaTagChips: mangaTagChips,
-                    lastvolchap: lastvolchap,
-                  ),
+                  _MangaMetadataColumn(manga: manga),
                   TabBar(
                     controller: tabController,
                     tabs: [

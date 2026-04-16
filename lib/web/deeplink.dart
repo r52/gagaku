@@ -14,7 +14,7 @@ typedef DeepLinkHandlerCallback =
       GoRouter router,
     );
 
-final _defaultHandlers = {'addrepo'};
+final _defaultHandlers = {'addrepo', 'installextensions'};
 
 class PBLinkDelegate {
   PBLinkDelegate._internal();
@@ -29,6 +29,7 @@ class PBLinkDelegate {
 
   late final Map<String, DeepLinkHandlerCallback> _handlers = {
     'addrepo': handleAddRepo,
+    'installextensions': handleInstallExtensions,
   };
 
   Future<void> addHandler(
@@ -115,6 +116,42 @@ class PBLinkDelegate {
               ),
             );
         }
+      }
+    });
+  }
+
+  FutureOr<OnEnterResult> handleInstallExtensions(
+    BuildContext context,
+    GoRouterState state,
+    GoRouter router,
+  ) async {
+    final tr = context.t;
+    final data = state.uri.queryParameters['data'];
+
+    if (data == null || data.isEmpty) {
+      return const Block.stop();
+    }
+
+    return Block.then(() async {
+      final messenger = ScaffoldMessenger.of(context);
+
+      final result = await router.push<int>(
+        '${GagakuRoute.extensionInstall}?data=${Uri.encodeComponent(data)}',
+      );
+
+      if (result != null && context.mounted) {
+        if (!context.mounted) return;
+
+        messenger
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(
+                tr.webSources.source.install.success(count: result),
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
       }
     });
   }

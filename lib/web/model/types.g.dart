@@ -274,10 +274,29 @@ _BuiltWith _$BuiltWithFromJson(Map<String, dynamic> json) => _BuiltWith(
 Map<String, dynamic> _$BuiltWithToJson(_BuiltWith instance) =>
     <String, dynamic>{'toolchain': instance.toolchain, 'types': instance.types};
 
+_RepositoryDescription _$RepositoryDescriptionFromJson(
+  Map<String, dynamic> json,
+) => _RepositoryDescription(
+  name: json['name'] as String,
+  description: json['description'] as String?,
+);
+
+Map<String, dynamic> _$RepositoryDescriptionToJson(
+  _RepositoryDescription instance,
+) => <String, dynamic>{
+  'name': instance.name,
+  'description': instance.description,
+};
+
 _Versioning _$VersioningFromJson(Map<String, dynamic> json) => _Versioning(
   buildTime: json['buildTime'] as String,
   sources: json['sources'] as List<dynamic>,
   builtWith: BuiltWith.fromJson(json['builtWith'] as Map<String, dynamic>),
+  repository: json['repository'] == null
+      ? null
+      : RepositoryDescription.fromJson(
+          json['repository'] as Map<String, dynamic>,
+        ),
 );
 
 Map<String, dynamic> _$VersioningToJson(_Versioning instance) =>
@@ -285,6 +304,7 @@ Map<String, dynamic> _$VersioningToJson(_Versioning instance) =>
       'buildTime': instance.buildTime,
       'sources': instance.sources,
       'builtWith': instance.builtWith.toJson(),
+      'repository': instance.repository?.toJson(),
     };
 
 OAuthTokenResponse _$OAuthTokenResponseFromJson(Map<String, dynamic> json) =>
