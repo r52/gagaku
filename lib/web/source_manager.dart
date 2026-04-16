@@ -97,31 +97,38 @@ class SourceManager extends HookConsumerWidget {
     final query = searchValue.text.toLowerCase();
 
     // Filter available repos
-    final filteredAvailable = <RepoData, List<SourceVersion>>{};
-    if (availableSources.hasData) {
-      for (final entry in availableSources.data!.entries) {
-        final r = entry.key;
-        final list = entry.value;
-        final filteredList = query.isEmpty
-            ? list
-            : list
-                  .where(
-                    (s) =>
-                        s.name.toLowerCase().contains(query) ||
-                        s.getDescription().toLowerCase().contains(query),
-                  )
-                  .toList();
+    final filteredAvailable = useMemoized(() {
+      final map = <RepoData, List<SourceVersion>>{};
+      if (availableSources.hasData) {
+        for (final entry in availableSources.data!.entries) {
+          final r = entry.key;
+          final list = entry.value;
+          final filteredList = query.isEmpty
+              ? list
+              : list
+                    .where(
+                      (s) =>
+                          s.name.toLowerCase().contains(query) ||
+                          s.getDescription().toLowerCase().contains(query),
+                    )
+                    .toList();
 
-        if (filteredList.isNotEmpty) {
-          filteredAvailable[r] = filteredList;
+          if (filteredList.isNotEmpty) {
+            map[r] = filteredList;
+          }
         }
       }
-    }
+      return map;
+    }, [availableSources.data, query]);
 
     // Filter installed
-    final filteredInstalled = query.isEmpty
-        ? installed
-        : installed.where((e) => e.name.toLowerCase().contains(query)).toList();
+    final filteredInstalled = useMemoized(() {
+      return query.isEmpty
+          ? installed
+          : installed
+                .where((e) => e.name.toLowerCase().contains(query))
+                .toList();
+    }, [installed, query]);
 
     List<Widget> slivers = [
       SliverAppBar(
@@ -610,47 +617,56 @@ class InstallExtensionsDialog extends HookConsumerWidget {
 
     try {
       final decodedData = utf8.decode(base64Decode(data));
-      final List<dynamic> request = json.decode(decodedData);
+      final dynamic decodedJson = json.decode(decodedData);
+
+      if (decodedJson is! List) return list;
+      final List<dynamic> request = decodedJson;
 
       for (final item in request) {
-        if (item is! List || item.length < 2) continue;
-        final extensionId = item[0].toString();
-        final repoUrl = item[1].toString();
-
-        final uri = Uri.parse('$repoUrl/versioning.json');
-        final response = await http.get(uri);
-
         try {
-          final bodyData = Versioning.fromJson(json.decode(response.body));
+          if (item is! List || item.length < 2) continue;
+          final extensionId = item[0].toString();
+          final repoUrl = item[1].toString();
 
-          if (bodyData.builtWith.types.startsWith(
-                SupportedVersion.v0_9.version,
-              ) &&
-              bodyData.sources.isNotEmpty) {
-            final version = SupportedVersion.values.firstWhere(
-              (v) => bodyData.builtWith.types.startsWith(v.version),
-            );
+          final uri = Uri.parse('$repoUrl/versioning.json');
+          final response = await http.get(uri);
 
-            final sources = bodyData.sources.map(
-              (e) => switch (version) {
-                SupportedVersion.v0_9 => SourceVersion09.fromJson(e),
-              },
-            );
+          try {
+            final bodyData = Versioning.fromJson(json.decode(response.body));
 
-            final source = sources.firstWhereOrNull((s) => s.id == extensionId);
-
-            if (source != null) {
-              list[source] = RepoData.fromInfo(
-                RepoInfo(
-                  name: bodyData.repository?.name ?? repoUrl,
-                  url: repoUrl,
-                ),
-                version,
+            if (bodyData.builtWith.types.startsWith(
+                  SupportedVersion.v0_9.version,
+                ) &&
+                bodyData.sources.isNotEmpty) {
+              final version = SupportedVersion.values.firstWhere(
+                (v) => bodyData.builtWith.types.startsWith(v.version),
               );
+
+              final sources = bodyData.sources.map(
+                (e) => switch (version) {
+                  SupportedVersion.v0_9 => SourceVersion09.fromJson(e),
+                },
+              );
+
+              final source = sources.firstWhereOrNull(
+                (s) => s.id == extensionId,
+              );
+
+              if (source != null) {
+                list[source] = RepoData.fromInfo(
+                  RepoInfo(
+                    name: bodyData.repository?.name ?? repoUrl,
+                    url: repoUrl,
+                  ),
+                  version,
+                );
+              }
             }
+          } catch (e) {
+            logger.w('Error parsing $repoUrl/versioning.json', error: e);
           }
         } catch (e) {
-          logger.w('Error parsing $repoUrl/versioning.json', error: e);
+          logger.w('Error fetching item', error: e);
         }
       }
     } catch (e) {
@@ -753,7 +769,10 @@ class InstallExtensionsDialog extends HookConsumerWidget {
                     final source = entry.key;
                     final repo = entry.value;
 
-                    if (installedList.any((e) => e.id == source.id)) continue;
+                    if (installedList.any((e) => e.id == source.id) ||
+                        dataToInstall.any((e) => e.id == source.id)) {
+                      continue;
+                    }
 
                     dataToInstall.add(
                       WebSourceInfo(

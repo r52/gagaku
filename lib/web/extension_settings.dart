@@ -634,8 +634,20 @@ class OAuthButtonRowBuilder extends ConsumerWidget {
             _ => null,
           };
 
+          String issuerUrl;
+          try {
+            final uri = Uri.parse(element.authorizeEndpoint);
+            if (uri.hasScheme && uri.hasAuthority) {
+              issuerUrl = uri.origin;
+            } else {
+              issuerUrl = element.authorizeEndpoint;
+            }
+          } catch (_) {
+            issuerUrl = element.authorizeEndpoint;
+          }
+
           final metadata = oidc.OpenIdProviderMetadata.fromJson({
-            'issuer': Uri.parse(element.authorizeEndpoint).origin,
+            'issuer': issuerUrl,
             'authorization_endpoint': element.authorizeEndpoint,
             'token_endpoint': tokenEndpoint,
           });
