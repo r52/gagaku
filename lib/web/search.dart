@@ -82,6 +82,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
   late WebSourceInfo source;
   dynamic metadata = _firstSearch;
   SearchQuery? query;
+  SortingOption? currentSort;
 
   void _refresh() {
     metadata = _firstSearch;
@@ -101,9 +102,33 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
       }
 
       await ref.readAsync(extensionSourceProvider(source.id).future);
-      final results = await ref
-          .read(extensionSourceProvider(source.id).notifier)
-          .searchManga(query!, (pageKey == _firstSearch) ? null : pageKey);
+      final notifier = ref.read(extensionSourceProvider(source.id).notifier);
+
+      if (pageKey == _firstSearch) {
+        final options = await notifier.getSortingOptions(query!);
+        if (options != null && options.isNotEmpty) {
+          final isValid =
+              currentSort != null &&
+              options.any((o) => o.id == currentSort!.id);
+          if (!isValid) {
+            currentSort = options.first;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) setState(() {});
+            });
+          }
+        } else if (currentSort != null) {
+          currentSort = null;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() {});
+          });
+        }
+      }
+
+      final results = await notifier.searchManga(
+        query!,
+        (pageKey == _firstSearch) ? null : pageKey,
+        sortOp: currentSort,
+      );
 
       final m = results.items.map(
         (e) => HistoryLink.fromSearchReultItem(source, e),
@@ -186,6 +211,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                     setState(() {
                       source = opt;
                       query = query?.copyWith(filters: []);
+                      currentSort = null;
                     });
                     _refresh();
                   }
@@ -197,12 +223,13 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
         extraRow: [
           HookBuilder(
             builder: (context) {
+              final q = query ?? const SearchQuery(title: '');
               final results = useMemoized(() async {
                 await ref.readAsync(extensionSourceProvider(source.id).future);
                 return ref
                     .read(extensionSourceProvider(source.id).notifier)
-                    .getSortingOptions();
-              }, [source]);
+                    .getSortingOptions(q);
+              }, [source, q]);
               final future = useFuture(results);
 
               if (future.hasError) {
@@ -215,14 +242,16 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
 
               final options = future.data;
 
-              if (options == null) {
+              if (options == null || options.isEmpty) {
                 return const SizedBox.shrink();
               }
 
+              final selection =
+                  options.firstWhereOrNull((o) => o.id == currentSort?.id) ??
+                  options.first;
+
               return DropdownMenu<SortingOption>(
-                initialSelection: ref
-                    .read(extensionSourceProvider(source.id).notifier)
-                    .getCurrentSort(),
+                initialSelection: selection,
                 width: 200,
                 requestFocusOnTap: false,
                 enableSearch: false,
@@ -233,11 +262,10 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                     )
                     .toList(),
                 onSelected: (SortingOption? opt) {
-                  if (opt != null) {
-                    ref
-                        .read(extensionSourceProvider(source.id).notifier)
-                        .setCurrentSort(opt);
-                    setState(() {});
+                  if (opt != null && currentSort?.id != opt.id) {
+                    setState(() {
+                      currentSort = opt;
+                    });
                     _refresh();
                   }
                 },

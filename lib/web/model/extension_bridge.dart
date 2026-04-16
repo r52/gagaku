@@ -33,13 +33,14 @@ class ExtensionWebViewBridge {
       (_view?.isRunning() ?? false) ? _view?.webViewController : null;
 
   List<SearchFilter>? _filters;
-  List<SortingOption>? _sortingOptions;
   final Map<String, SettingsForm> _forms = {};
   List<Cookie>? _cookies;
 
+  bool _hasSortOps = false;
+  bool get hasSortOps => _hasSortOps;
+
   Timer? _completeTimer;
 
-  SortingOption? currentSort;
   late final Completer<void> _initCompleter = Completer<void>();
   Future<void> get initialized => _initCompleter.future;
 
@@ -143,8 +144,7 @@ class ExtensionWebViewBridge {
     _view = null;
     _initialized = false;
     _filters = null;
-    _sortingOptions = null;
-    currentSort = null;
+    _hasSortOps = false;
     _forms.clear();
   }
 
@@ -338,19 +338,15 @@ class ExtensionWebViewBridge {
         _filters = rsec.map((e) => SearchFilter.fromJson(e)).toList();
       }
 
-      // Get sort options
+      // Test sort options
       final params = SearchQuery(title: "").toJson();
       final sortopts = await controller.callAsyncJavaScript(
         arguments: {'query': params},
-        functionBody: "return await ${source.id}.getSortingOptions?.();",
+        functionBody: "return await ${source.id}.getSortingOptions?.(query);",
       );
 
       if (sortopts != null && sortopts.value != null) {
-        final ssec = sortopts.value as List<dynamic>;
-        _sortingOptions = ssec.map((e) => SortingOption.fromJson(e)).toList();
-        currentSort = (_sortingOptions != null && _sortingOptions!.isNotEmpty)
-            ? _sortingOptions!.first
-            : null;
+        _hasSortOps = true;
       }
 
       if (url != null) {
@@ -567,17 +563,18 @@ return p;
 
   Future<PagedResults<SearchResultItem>> searchManga(
     SearchQuery query,
-    dynamic metadata,
-  ) async {
+    dynamic metadata, {
+    SortingOption? sortOp,
+  }) async {
     if (query.title.isEmpty && query.filters.isEmpty) {
       return PagedResults<SearchResultItem>(items: []);
     }
 
     final params = query.toJson();
-    final sortOp = currentSort?.toJson();
+    final sop = sortOp?.toJson();
 
     final result = await _controller?.callAsyncJavaScript(
-      arguments: {'query': params, 'metadata': metadata, 'sortOp': sortOp},
+      arguments: {'query': params, 'metadata': metadata, 'sortOp': sop},
       functionBody:
           """
 return await $sourceId.getSearchResults(query, metadata, sortOp)
@@ -684,8 +681,23 @@ return p;
     return result;
   }
 
-  List<SortingOption>? getSortingOptions() {
-    return _sortingOptions?.map((e) => e.copyWith()).toList();
+  Future<List<SortingOption>?> getSortingOptions(SearchQuery query) async {
+    if (!_hasSortOps) {
+      return null;
+    }
+
+    final sortopts = await _controller?.callAsyncJavaScript(
+      arguments: {'query': query.toJson()},
+      functionBody: "return await $sourceId.getSortingOptions?.(query);",
+    );
+
+    if (sortopts != null && sortopts.value != null) {
+      final ssec = sortopts.value as List<dynamic>;
+      final options = ssec.map((e) => SortingOption.fromJson(e)).toList();
+      return options;
+    }
+
+    return null;
   }
 
   List<SearchFilter>? getFilters() {
