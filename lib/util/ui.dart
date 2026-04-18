@@ -273,7 +273,7 @@ class MultiChildExpansionTile extends StatelessWidget {
   }
 }
 
-class CountryFlag extends HookWidget {
+class CountryFlag extends StatelessWidget {
   const CountryFlag({super.key, required this.flag, this.size = 18});
 
   final String flag;
@@ -282,9 +282,13 @@ class CountryFlag extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final style = ThemeCache().getFlagTheme(size);
-
     return Text(flag, softWrap: false, style: style);
   }
+}
+
+class CountryFlagSpan extends TextSpan {
+  CountryFlagSpan({required String flag, double size = 18})
+    : super(text: flag, style: ThemeCache().getFlagTheme(size));
 }
 
 class ButtonChip extends StatelessWidget {

@@ -549,7 +549,7 @@ class ChapterFeedWidget extends HookWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           controller: scroller,
           restorationId: restorationId,
-          cacheExtent: MediaQuery.sizeOf(context).height,
+          cacheExtent: MediaQuery.sizeOf(context).height * 1.5,
           slivers: [
             ...leading,
             if (title != null)
@@ -834,24 +834,19 @@ class MangaTitleButton extends StatelessWidget {
           mangaId: manga.id,
           manga: manga,
         ).push(context),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+        child: Text.rich(
+          TextSpan(
+            style: CommonTextStyles.sixteenBold.copyWith(
+              color: theme.colorScheme.onSurface,
+            ),
             children: [
-              CountryFlag(flag: manga.attributes!.originalLanguage.flag),
-              const SizedBox(width: 8.0),
-              Flexible(
-                child: Text(
-                  manga.attributes!.title.get('en'),
-                  style: CommonTextStyles.sixteenBold.copyWith(
-                    color: theme.colorScheme.onSurface,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
+              CountryFlagSpan(flag: manga.attributes!.originalLanguage.flag),
+              const WidgetSpan(child: SizedBox(width: 8.0)),
+              TextSpan(text: manga.attributes!.title.get('en')),
             ],
           ),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
       ),
     );
@@ -1744,15 +1739,8 @@ class ChapterTitle extends ConsumerWidget {
       TextSpan(
         style: textstyle,
         children: [
-          WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 6.0),
-              child: CountryFlag(
-                flag: chapter.attributes.translatedLanguage.flag,
-              ),
-            ),
-          ),
+          CountryFlagSpan(flag: chapter.attributes.translatedLanguage.flag),
+          const WidgetSpan(child: SizedBox(width: 6.0)),
           if (isOfficialPub)
             const WidgetSpan(
               alignment: PlaceholderAlignment.middle,
