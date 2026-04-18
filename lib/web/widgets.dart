@@ -808,35 +808,35 @@ class ChapterButtonWidget extends HookConsumerWidget {
       color: (isRead == true ? theme.disabledColor : theme.colorScheme.primary),
     );
 
-    final markReadBtn = IconButton(
-      onPressed: () async {
-        bool set = !isRead;
+    final markReadBtn = MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () async {
+          bool set = !isRead;
 
-        ref.run((tsx) async {
-          return await tsx
-              .get(webReadMarkersProvider.notifier)
-              .set(mangakey, chapterkey, set);
-        });
-      },
-      padding: const EdgeInsets.all(0.0),
-      splashRadius: 15,
-      iconSize: 20,
-      tooltip: tr.mangaView.markAs(
-        arg: isRead == true ? tr.mangaView.unread : tr.mangaView.read,
+          ref.run((tsx) async {
+            return await tsx
+                .get(webReadMarkersProvider.notifier)
+                .set(mangakey, chapterkey, set);
+          });
+        },
+        child: Tooltip(
+          message: tr.mangaView.markAs(
+            arg: isRead == true ? tr.mangaView.unread : tr.mangaView.read,
+          ),
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: Icon(
+              isRead == true ? Icons.visibility_off : Icons.visibility,
+              color: isRead == true
+                  ? theme.disabledColor
+                  : theme.primaryIconTheme.color,
+              size: 20,
+            ),
+          ),
+        ),
       ),
-      icon: Icon(
-        isRead == true ? Icons.visibility_off : Icons.visibility,
-        color: (isRead == true
-            ? theme.disabledColor
-            : theme.primaryIconTheme.color),
-      ),
-      constraints: const BoxConstraints(
-        minWidth: 20.0,
-        minHeight: 20.0,
-        maxWidth: 30.0,
-        maxHeight: 30.0,
-      ),
-      visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
     );
 
     final readerData = WebReaderData(
@@ -906,16 +906,14 @@ class ChapterButtonWidget extends HookConsumerWidget {
       ],
     );
 
-    return RepaintBoundary(
-      child: InkWell(
-        onTap: () => route.push(context),
-        child: _ChapterButtonCard(isRead: isRead, child: tile),
-      ),
+    return GestureDetector(
+      onTap: () => route.push(context),
+      child: _ChapterButtonCard(isRead: isRead, child: tile),
     );
   }
 }
 
-class _ChapterButtonCard extends StatelessWidget {
+class _ChapterButtonCard extends HookWidget {
   final bool isRead;
   final Widget child;
 
@@ -926,20 +924,35 @@ class _ChapterButtonCard extends StatelessWidget {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
     final tileColor = theme.colorScheme.primaryContainer;
+    final hoverColor = theme.hoverColor;
 
-    return Ink(
-      padding: EdgeInsets.symmetric(
-        horizontal: (screenSizeSmall ? 6.0 : 10.0),
-        vertical: 4.0,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(Radius.circular(4)),
-        color: tileColor,
-        border: Border(
-          left: BorderSide(color: isRead ? tileColor : Colors.blue, width: 4.0),
+    final isHovered = useState(false);
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => isHovered.value = true,
+      onExit: (_) => isHovered.value = false,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(4)),
+          color: isHovered.value
+              ? Color.alphaBlend(hoverColor, tileColor)
+              : tileColor,
+          border: Border(
+            left: BorderSide(
+              color: isRead ? tileColor : Colors.blue,
+              width: 4.0,
+            ),
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: (screenSizeSmall ? 6.0 : 10.0),
+            vertical: 4.0,
+          ),
+          child: child,
         ),
       ),
-      child: child,
     );
   }
 }
@@ -963,61 +976,59 @@ class ChapterFeedItem extends StatelessWidget {
       link: state.link,
     );
 
-    return RepaintBoundary(
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: screenSizeSmall
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    titleBtn,
-                    const Divider(height: 4.0),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        coverBtn,
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 4.0,
-                            children: [
-                              for (final item in state.manga.chapters.take(3))
-                                ChapterButtonWidget(
-                                  data: item,
-                                  manga: state.manga,
-                                  handle: state.link.handle!,
-                                ),
-                            ],
-                          ),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: screenSizeSmall
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  titleBtn,
+                  const Divider(height: 4.0),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      coverBtn,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 4.0,
+                          children: [
+                            for (final item in state.manga.chapters.take(3))
+                              ChapterButtonWidget(
+                                data: item,
+                                manga: state.manga,
+                                handle: state.link.handle!,
+                              ),
+                          ],
                         ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            : Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  coverBtn,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 4.0,
+                      children: [
+                        titleBtn,
+                        const Divider(height: 10.0),
+                        for (final item in state.manga.chapters.take(3))
+                          ChapterButtonWidget(
+                            data: item,
+                            manga: state.manga,
+                            handle: state.link.handle!,
+                          ),
                       ],
                     ),
-                  ],
-                )
-              : Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    coverBtn,
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 4.0,
-                        children: [
-                          titleBtn,
-                          const Divider(height: 10.0),
-                          for (final item in state.manga.chapters.take(3))
-                            ChapterButtonWidget(
-                              data: item,
-                              manga: state.manga,
-                              handle: state.link.handle!,
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-        ),
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -1036,57 +1047,60 @@ class _CoverButton extends ConsumerWidget {
     final headers = ref.watch(sourceHeadersProvider(sourceId));
     final imageCache = ref.watch(extensionImageCacheProvider);
 
-    return ElevatedButton(
-      onPressed: () async {
-        final api = ref.read(webSourceBrokerProvider);
-        final messenger = ScaffoldMessenger.of(context);
-        final result = await api.handleLink(link);
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () async {
+          final api = ref.read(webSourceBrokerProvider);
+          final messenger = ScaffoldMessenger.of(context);
+          final result = await api.handleLink(link);
 
-        if (!context.mounted) return;
-        if (result.handle == null) {
-          messenger
-            ..removeCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(tr.errors.unsupportedUrl),
-                backgroundColor: Colors.red,
+          if (!context.mounted) return;
+          if (result.handle == null) {
+            messenger
+              ..removeCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(tr.errors.unsupportedUrl),
+                  backgroundColor: Colors.red,
+                ),
+              );
+          } else {
+            openWebSource(context, result.handle!);
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(
+            top: 1.0,
+            bottom: 1.0,
+            left: 0.0,
+            right: 6.0,
+          ),
+          child: CachedNetworkImage(
+            imageUrl: link.cover!,
+            httpHeaders: headers,
+            cacheManager: imageCache,
+            memCacheWidth: 256,
+            maxWidthDiskCache: 256,
+            imageBuilder: (context, imageProvider) => DecoratedBox(
+              decoration: BoxDecoration(
+                image: DecorationImage(image: imageProvider),
+                borderRadius: const BorderRadius.all(Radius.circular(4.0)),
               ),
-            );
-        } else {
-          openWebSource(context, result.handle!);
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.only(
-          top: 1.0,
-          bottom: 1.0,
-          left: 0.0,
-          right: 6.0,
-        ),
-      ),
-      child: CachedNetworkImage(
-        imageUrl: link.cover!,
-        httpHeaders: headers,
-        cacheManager: imageCache,
-        memCacheWidth: 256,
-        maxWidthDiskCache: 256,
-        imageBuilder: (context, imageProvider) => DecoratedBox(
-          decoration: BoxDecoration(
-            image: DecorationImage(image: imageProvider),
-            borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+            ),
+            width: screenSizeSmall ? 64.0 : 128.0,
+            height: screenSizeSmall ? 91.0 : 182.0,
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                const Center(child: CircularProgressIndicator()),
+            errorBuilder: (context, error, stacktrace) {
+              return Tooltip(
+                message: error.toString(),
+                child: const Icon(Icons.error),
+              );
+            },
+            fit: BoxFit.cover,
           ),
         ),
-        width: screenSizeSmall ? 64.0 : 128.0,
-        height: screenSizeSmall ? 91.0 : 182.0,
-        progressIndicatorBuilder: (context, url, downloadProgress) =>
-            const Center(child: CircularProgressIndicator()),
-        errorBuilder: (context, error, stacktrace) {
-          return Tooltip(
-            message: error.toString(),
-            child: const Icon(Icons.error),
-          );
-        },
-        fit: BoxFit.cover,
       ),
     );
   }
@@ -1102,36 +1116,45 @@ class _MangaTitle extends ConsumerWidget {
     final tr = context.t;
     final theme = Theme.of(context);
 
-    return TextButton.icon(
-      style: TextButton.styleFrom(
-        padding: EdgeInsets.zero,
-        alignment: Alignment.centerLeft,
-        minimumSize: const Size(0.0, 24.0),
-        shape: const RoundedRectangleBorder(),
-        foregroundColor: theme.colorScheme.onSurface,
-        textStyle: CommonTextStyles.sixteenBold,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-      onPressed: () async {
-        final api = ref.read(webSourceBrokerProvider);
-        final messenger = ScaffoldMessenger.of(context);
-        final result = await api.handleLink(link);
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () async {
+          final api = ref.read(webSourceBrokerProvider);
+          final messenger = ScaffoldMessenger.of(context);
+          final result = await api.handleLink(link);
 
-        if (!context.mounted) return;
-        if (result.handle == null) {
-          messenger
-            ..removeCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(tr.errors.unsupportedUrl),
-                backgroundColor: Colors.red,
+          if (!context.mounted) return;
+          if (result.handle == null) {
+            messenger
+              ..removeCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(tr.errors.unsupportedUrl),
+                  backgroundColor: Colors.red,
+                ),
+              );
+          } else {
+            openWebSource(context, result.handle!);
+          }
+        },
+        child: Padding(
+          padding: EdgeInsets.zero,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 24.0),
+              child: Text(
+                link.title,
+                overflow: TextOverflow.ellipsis,
+                style: CommonTextStyles.sixteenBold.copyWith(
+                  color: theme.colorScheme.onSurface,
+                ),
               ),
-            );
-        } else {
-          openWebSource(context, result.handle!);
-        }
-      },
-      label: Text(link.title, overflow: TextOverflow.ellipsis),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

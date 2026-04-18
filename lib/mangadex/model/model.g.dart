@@ -247,7 +247,7 @@ final class MangaReadChaptersProvider
   }
 }
 
-String _$mangaReadChaptersHash() => r'bd30b176e1c5ad7e34d9504222b9c90d64a3eded';
+String _$mangaReadChaptersHash() => r'f69cb236a372dfc346cf9c9ba750a26961c8069d';
 
 final class MangaReadChaptersFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<ReadChapterSet?>, Manga> {

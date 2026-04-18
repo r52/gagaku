@@ -359,41 +359,30 @@ class IconTextChip extends StatelessWidget {
 
     Widget child = Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 4.0,
-        children: [
-          ?icon,
-          Flexible(
-            child: Text(
-              text,
-              style: textStyle,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
+      child: Text.rich(
+        TextSpan(
+          style: textStyle,
+          children: [
+            if (icon != null)
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 4.0),
+                  child: icon,
+                ),
+              ),
+            TextSpan(text: text),
+          ],
+        ),
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
       ),
     );
 
     final borderRadius = const BorderRadius.all(Radius.circular(6.0));
     final backgroundColor = color ?? colorScheme.tertiaryContainer;
 
-    if (onPressed != null) {
-      return ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: 24.0),
-        child: Material(
-          borderRadius: borderRadius,
-          color: backgroundColor,
-          child: InkWell(
-            onTap: onPressed,
-            borderRadius: borderRadius,
-            child: child,
-          ),
-        ),
-      );
-    }
-
-    return ConstrainedBox(
+    Widget container = ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 24.0),
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -403,6 +392,15 @@ class IconTextChip extends StatelessWidget {
         child: child,
       ),
     );
+
+    if (onPressed != null) {
+      return MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(onTap: onPressed, child: container),
+      );
+    }
+
+    return container;
   }
 }
 
