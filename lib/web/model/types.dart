@@ -661,21 +661,24 @@ class SourceIntentOrListParser
 
   @override
   List<SourceIntents> fromJson(dynamic intents) {
-    if (intents is List) {
-      return intents
-          .map((e) => SourceIntents.values.firstWhere((s) => s.flag == e))
-          .toList();
-    }
+    List<int> values;
     if (intents is int) {
-      return SourceIntents.values.fold([], (list, intent) {
-        if ((intents & intent.flag) == intent.flag) {
-          list.add(intent);
-        }
-        return list;
-      });
+      values = [intents];
+    } else if (intents is List) {
+      values = intents.whereType<int>().toList();
+    } else {
+      throw UnsupportedError('Unsupported intent type');
     }
 
-    throw UnsupportedError('Unsupported intent type');
+    final Set<SourceIntents> result = {};
+    for (final val in values) {
+      for (final intent in SourceIntents.values) {
+        if ((val & intent.flag) == intent.flag) {
+          result.add(intent);
+        }
+      }
+    }
+    return result.toList();
   }
 
   @override
