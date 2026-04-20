@@ -43,15 +43,172 @@ abstract interface class GagakuBackupDataConverter {
   void writeWebConfigFavoritesHistory(Store store, Map<String, dynamic> json);
 }
 
-class GagakuBackupDataV1 implements GagakuBackupDataConverter {
+abstract base class GagakuBackupBase implements GagakuBackupDataConverter {
+  const GagakuBackupBase();
+
+  static const extenstionStateKey = "extension-state";
+  static const extenstionSecureStateKey = "extension-secure-state";
+  static const readerConfigKey = "reader";
+  static const mangadexConfigKey = "mangadex";
+  static const gagakuConfigKey = "gagaku";
+  static const mangadexHistoryKey = "mangadex_history";
+
+  T? _getUnique<T>(Store store) {
+    final box = store.box<T>();
+    final query = box.query().build();
+    final result = query.findUnique();
+    query.close();
+    return result;
+  }
+
+  void _importConfig<T>(
+    Store store,
+    Map<String, dynamic> data,
+    String key,
+    T Function(Map<String, dynamic>) fromJson,
+    void Function(T oldConfig, T newConfig) applyId,
+  ) {
+    if (!data.containsKey(key)) return;
+
+    final oldConfig = _getUnique<T>(store);
+    final newConfig = fromJson(data[key] as Map<String, dynamic>);
+
+    if (oldConfig != null) {
+      applyId(oldConfig, newConfig);
+    }
+
+    store.box<T>().put(newConfig);
+  }
+
+  @override
+  void importExtensionSecureState(Store store, Map<String, dynamic> data) {
+    final box = store.box<ExtensionStateDB>();
+    final query = box.query(ExtensionStateDB_.secure.equals(true)).build();
+
+    ExtensionStateDB? db = query.findUnique() ?? ExtensionStateDB(secure: true);
+    query.close();
+
+    if (data.containsKey(extenstionSecureStateKey)) {
+      final state = data[extenstionSecureStateKey] as Map<String, dynamic>;
+      db.state = state.cast<String, Map<String, dynamic>>();
+      box.put(db);
+    }
+  }
+
+  @override
+  void importExtensionState(Store store, Map<String, dynamic> data) {
+    final box = store.box<ExtensionStateDB>();
+    final query = box.query(ExtensionStateDB_.secure.equals(false)).build();
+
+    ExtensionStateDB? db =
+        query.findUnique() ?? ExtensionStateDB(secure: false);
+    query.close();
+
+    if (data.containsKey(extenstionStateKey)) {
+      final state = data[extenstionStateKey] as Map<String, dynamic>;
+      db.state = state.cast<String, Map<String, dynamic>>();
+      box.put(db);
+    }
+  }
+
+  @override
+  void importGagakuConfig(Store store, Map<String, dynamic> data) {
+    _importConfig<GagakuConfig>(
+      store,
+      data,
+      gagakuConfigKey,
+      GagakuConfig.fromJson,
+      (oldCfg, newCfg) => newCfg.dbid = oldCfg.dbid,
+    );
+  }
+
+  @override
+  void importMangadexConfig(Store store, Map<String, dynamic> data) {
+    _importConfig<MangaDexConfig>(
+      store,
+      data,
+      mangadexConfigKey,
+      MangaDexConfig.fromJson,
+      (oldCfg, newCfg) => newCfg.dbid = oldCfg.dbid,
+    );
+  }
+
+  @override
+  void importMangadexHistory(Store store, Map<String, dynamic> data) {
+    final db = _getUnique<MangaDexHistoryDB>(store) ?? MangaDexHistoryDB();
+
+    if (data.containsKey(mangadexHistoryKey)) {
+      final state = data[mangadexHistoryKey];
+      if (state is! List) {
+        logger.w('Data in $mangadexHistoryKey not a List');
+        return;
+      }
+      db.queue = List<String>.from(state);
+      store.box<MangaDexHistoryDB>().put(db);
+    }
+  }
+
+  @override
+  void importReaderConfig(Store store, Map<String, dynamic> data) {
+    _importConfig<ReaderConfig>(
+      store,
+      data,
+      readerConfigKey,
+      ReaderConfig.fromJson,
+      (oldCfg, newCfg) => newCfg.dbid = oldCfg.dbid,
+    );
+  }
+
+  @override
+  void writeExtensionSecureState(Store store, Map<String, dynamic> data) {
+    final query = store
+        .box<ExtensionStateDB>()
+        .query(ExtensionStateDB_.secure.equals(true))
+        .build();
+    final db = query.findUnique();
+    query.close();
+    if (db != null) data[extenstionSecureStateKey] = db.state;
+  }
+
+  @override
+  void writeExtensionState(Store store, Map<String, dynamic> data) {
+    final query = store
+        .box<ExtensionStateDB>()
+        .query(ExtensionStateDB_.secure.equals(false))
+        .build();
+    final db = query.findUnique();
+    query.close();
+    if (db != null) data[extenstionStateKey] = db.state;
+  }
+
+  @override
+  void writeGagakuConfig(Store store, Map<String, dynamic> data) {
+    final cfg = _getUnique<GagakuConfig>(store);
+    if (cfg != null) data[gagakuConfigKey] = cfg.toJson();
+  }
+
+  @override
+  void writeMangadexConfig(Store store, Map<String, dynamic> data) {
+    final cfg = _getUnique<MangaDexConfig>(store);
+    if (cfg != null) data[mangadexConfigKey] = cfg.toJson();
+  }
+
+  @override
+  void writeMangadexHistory(Store store, Map<String, dynamic> data) {
+    final db = _getUnique<MangaDexHistoryDB>(store);
+    if (db != null) data[mangadexHistoryKey] = db.queue;
+  }
+
+  @override
+  void writeReaderConfig(Store store, Map<String, dynamic> data) {
+    final cfg = _getUnique<ReaderConfig>(store);
+    if (cfg != null) data[readerConfigKey] = cfg.toJson();
+  }
+}
+
+base class GagakuBackupDataV1 extends GagakuBackupBase {
   const GagakuBackupDataV1();
 
-  static const _extenstionStateKey = "extension-state";
-  static const _extenstionSecureStateKey = "extension-secure-state";
-  static const _readerConfigKey = "reader";
-  static const _mangadexConfigKey = "mangadex";
-  static const _gagakuConfigKey = "gagaku";
-  static const _mangadexHistoryKey = "mangadex_history";
   static const _webfavoritesKey = "web_favorites";
   static const _webhistoryKey = "web_history";
   static const _webReadMarkersKey = "web_read_history";
@@ -90,161 +247,28 @@ class GagakuBackupDataV1 implements GagakuBackupDataConverter {
       return data;
     }, data);
 
-    final output = json.encode(data);
-    return output;
-  }
-
-  @override
-  void importExtensionSecureState(Store store, Map<String, dynamic> data) {
-    final box = store.box<ExtensionStateDB>();
-    final query = box.query(ExtensionStateDB_.secure.equals(true)).build();
-
-    ExtensionStateDB? db;
-    db = query.findUnique();
-    db ??= ExtensionStateDB(secure: true);
-    query.close();
-
-    final key = _extenstionSecureStateKey;
-    if (data.containsKey(key)) {
-      final state = data[key] as Map<String, dynamic>;
-      final content = state.cast<String, Map<String, dynamic>>();
-      db.state = content;
-
-      box.put(db);
-    }
-  }
-
-  @override
-  void importExtensionState(Store store, Map<String, dynamic> data) {
-    final box = store.box<ExtensionStateDB>();
-    final query = box.query(ExtensionStateDB_.secure.equals(false)).build();
-
-    ExtensionStateDB? db;
-    db = query.findUnique();
-    db ??= ExtensionStateDB(secure: false);
-    query.close();
-
-    final key = _extenstionStateKey;
-    if (data.containsKey(key)) {
-      final state = data[key] as Map<String, dynamic>;
-      final content = state.cast<String, Map<String, dynamic>>();
-      db.state = content;
-
-      box.put(db);
-    }
-  }
-
-  @override
-  void importGagakuConfig(Store store, Map<String, dynamic> data) {
-    final box = store.box<GagakuConfig>();
-    final query = box.query().build();
-
-    GagakuConfig? cfg;
-    cfg = query.findUnique();
-    query.close();
-
-    final key = _gagakuConfigKey;
-    if (data.containsKey(key)) {
-      final state = data[key];
-
-      final c = GagakuConfig.fromJson(state);
-      if (cfg != null) {
-        c.dbid = cfg.dbid;
-      }
-
-      box.put(c);
-    }
-  }
-
-  @override
-  void importMangadexConfig(Store store, Map<String, dynamic> data) {
-    final box = store.box<MangaDexConfig>();
-    final query = box.query().build();
-
-    MangaDexConfig? cfg;
-    cfg = query.findUnique();
-    query.close();
-
-    final key = _mangadexConfigKey;
-    if (data.containsKey(key)) {
-      final state = data[key];
-
-      final c = MangaDexConfig.fromJson(state);
-      if (cfg != null) {
-        c.dbid = cfg.dbid;
-      }
-
-      box.put(c);
-    }
-  }
-
-  @override
-  void importMangadexHistory(Store store, Map<String, dynamic> data) {
-    final box = store.box<MangaDexHistoryDB>();
-    final query = box.query().build();
-
-    MangaDexHistoryDB? db;
-    db = query.findUnique();
-    db ??= MangaDexHistoryDB();
-    query.close();
-
-    final key = _mangadexHistoryKey;
-    if (data.containsKey(key)) {
-      final state = data[key];
-
-      if (state is! List) {
-        // invalid type
-        logger.w('Data in $key not a List');
-        return;
-      }
-
-      final content = List<String>.from(state);
-      db.queue = content;
-
-      box.put(db);
-    }
-  }
-
-  @override
-  void importReaderConfig(Store store, Map<String, dynamic> data) {
-    final box = store.box<ReaderConfig>();
-    final query = box.query().build();
-
-    ReaderConfig? cfg;
-    cfg = query.findUnique();
-    query.close();
-
-    final key = _readerConfigKey;
-    if (data.containsKey(key)) {
-      final state = data[key];
-
-      final c = ReaderConfig.fromJson(state);
-      if (cfg != null) {
-        c.dbid = cfg.dbid;
-      }
-
-      box.put(c);
-    }
+    return json.encode(data);
   }
 
   @override
   void importWebReadHistory(Store store, Map<String, dynamic> data) {
-    final box = store.box<ReadMarkersDB>();
-    final query = box.query().build();
+    final db = _getUnique<ReadMarkersDB>(store) ?? ReadMarkersDB();
 
-    ReadMarkersDB? db;
-    db = query.findUnique();
-    db ??= ReadMarkersDB();
-    query.close();
+    if (data.containsKey(_webReadMarkersKey)) {
+      final content = data[_webReadMarkersKey] as Map<String, dynamic>;
+      db.markers = content.map((m, s) => MapEntry(m, Set<String>.from(s)));
+      store.box<ReadMarkersDB>().put(db);
+    }
+  }
 
-    final key = _webReadMarkersKey;
-    if (data.containsKey(key)) {
-      final content = data[key] as Map<String, dynamic>;
+  @override
+  void writeWebReadHistory(Store store, Map<String, dynamic> data) {
+    final db = _getUnique<ReadMarkersDB>(store);
 
-      final markers = content.map((m, s) => MapEntry(m, Set<String>.from(s)));
-      db.markers = markers;
-
-      box.put(db);
+    if (db != null) {
+      data[_webReadMarkersKey] = db.markers.map(
+        (key, value) => MapEntry(key, value.toList()),
+      );
     }
   }
 
@@ -410,90 +434,6 @@ class GagakuBackupDataV1 implements GagakuBackupDataConverter {
   }
 
   @override
-  void writeExtensionSecureState(Store store, Map<String, dynamic> data) {
-    final box = store.box<ExtensionStateDB>();
-    final query = box.query(ExtensionStateDB_.secure.equals(true)).build();
-
-    ExtensionStateDB? db;
-    db = query.findUnique();
-    query.close();
-
-    if (db != null) {
-      data[_extenstionSecureStateKey] = db.state;
-    }
-  }
-
-  @override
-  void writeExtensionState(Store store, Map<String, dynamic> data) {
-    final box = store.box<ExtensionStateDB>();
-    final query = box.query(ExtensionStateDB_.secure.equals(false)).build();
-
-    ExtensionStateDB? db;
-    db = query.findUnique();
-    query.close();
-
-    if (db != null) {
-      data[_extenstionStateKey] = db.state;
-    }
-  }
-
-  @override
-  void writeGagakuConfig(Store store, Map<String, dynamic> data) {
-    final box = store.box<GagakuConfig>();
-    final query = box.query().build();
-
-    GagakuConfig? cfg;
-    cfg = query.findUnique();
-    query.close();
-
-    if (cfg != null) {
-      data[_gagakuConfigKey] = cfg.toJson();
-    }
-  }
-
-  @override
-  void writeMangadexConfig(Store store, Map<String, dynamic> data) {
-    final box = store.box<MangaDexConfig>();
-    final query = box.query().build();
-
-    MangaDexConfig? cfg;
-    cfg = query.findUnique();
-    query.close();
-
-    if (cfg != null) {
-      data[_mangadexConfigKey] = cfg.toJson();
-    }
-  }
-
-  @override
-  void writeMangadexHistory(Store store, Map<String, dynamic> data) {
-    final box = store.box<MangaDexHistoryDB>();
-    final query = box.query().build();
-
-    MangaDexHistoryDB? db;
-    db = query.findUnique();
-    query.close();
-
-    if (db != null) {
-      data[_mangadexHistoryKey] = db.queue;
-    }
-  }
-
-  @override
-  void writeReaderConfig(Store store, Map<String, dynamic> data) {
-    final box = store.box<ReaderConfig>();
-    final query = box.query().build();
-
-    ReaderConfig? cfg;
-    cfg = query.findUnique();
-    query.close();
-
-    if (cfg != null) {
-      data[_readerConfigKey] = cfg.toJson();
-    }
-  }
-
-  @override
   void writeWebConfigFavoritesHistory(Store store, Map<String, dynamic> data) {
     final ecfgbox = store.box<ExtensionConfig>();
     final ecfgquery = ecfgbox.query().build();
@@ -537,33 +477,11 @@ class GagakuBackupDataV1 implements GagakuBackupDataConverter {
         item.id: item.list.map((i) => i.toJson()).toList(),
     };
   }
-
-  @override
-  void writeWebReadHistory(Store store, Map<String, dynamic> data) {
-    final box = store.box<ReadMarkersDB>();
-    final query = box.query().build();
-
-    ReadMarkersDB? db;
-    db = query.findUnique();
-    query.close();
-
-    if (db != null) {
-      data[_webReadMarkersKey] = db.markers.map(
-        (key, value) => MapEntry(key, value.toList()),
-      );
-    }
-  }
 }
 
-class GagakuBackupDataV2 implements GagakuBackupDataConverter {
+base class GagakuBackupDataV2 extends GagakuBackupBase {
   const GagakuBackupDataV2();
 
-  static const _extenstionStateKey = "extension-state";
-  static const _extenstionSecureStateKey = "extension-secure-state";
-  static const _readerConfigKey = "reader";
-  static const _mangadexConfigKey = "mangadex";
-  static const _gagakuConfigKey = "gagaku";
-  static const _mangadexHistoryKey = "mangadex_history";
   static const _webfavoritesKey = "web_favorites";
   static const _webhistoryKey = "web_history";
   static const _webReadMarkersKey = "web_read_markers";
@@ -605,192 +523,48 @@ class GagakuBackupDataV2 implements GagakuBackupDataConverter {
       return data;
     }, data);
 
-    final output = json.encode(data);
-    return output;
-  }
-
-  @override
-  void importExtensionSecureState(Store store, Map<String, dynamic> data) {
-    final box = store.box<ExtensionStateDB>();
-    final query = box.query(ExtensionStateDB_.secure.equals(true)).build();
-
-    ExtensionStateDB? db;
-    db = query.findUnique();
-    db ??= ExtensionStateDB(secure: true);
-    query.close();
-
-    final key = _extenstionSecureStateKey;
-    if (data.containsKey(key)) {
-      final state = data[key] as Map<String, dynamic>;
-      final content = state.cast<String, Map<String, dynamic>>();
-      db.state = content;
-
-      box.put(db);
-    }
-  }
-
-  @override
-  void importExtensionState(Store store, Map<String, dynamic> data) {
-    final box = store.box<ExtensionStateDB>();
-    final query = box.query(ExtensionStateDB_.secure.equals(false)).build();
-
-    ExtensionStateDB? db;
-    db = query.findUnique();
-    db ??= ExtensionStateDB(secure: false);
-    query.close();
-
-    final key = _extenstionStateKey;
-    if (data.containsKey(key)) {
-      final state = data[key] as Map<String, dynamic>;
-      final content = state.cast<String, Map<String, dynamic>>();
-      db.state = content;
-
-      box.put(db);
-    }
-  }
-
-  @override
-  void importGagakuConfig(Store store, Map<String, dynamic> data) {
-    final box = store.box<GagakuConfig>();
-    final query = box.query().build();
-
-    GagakuConfig? cfg;
-    cfg = query.findUnique();
-    query.close();
-
-    final key = _gagakuConfigKey;
-    if (data.containsKey(key)) {
-      final state = data[key];
-
-      final c = GagakuConfig.fromJson(state);
-      if (cfg != null) {
-        c.dbid = cfg.dbid;
-      }
-
-      box.put(c);
-    }
-  }
-
-  @override
-  void importMangadexConfig(Store store, Map<String, dynamic> data) {
-    final box = store.box<MangaDexConfig>();
-    final query = box.query().build();
-
-    MangaDexConfig? cfg;
-    cfg = query.findUnique();
-    query.close();
-
-    final key = _mangadexConfigKey;
-    if (data.containsKey(key)) {
-      final state = data[key];
-
-      final c = MangaDexConfig.fromJson(state);
-      if (cfg != null) {
-        c.dbid = cfg.dbid;
-      }
-
-      box.put(c);
-    }
-  }
-
-  @override
-  void importMangadexHistory(Store store, Map<String, dynamic> data) {
-    final box = store.box<MangaDexHistoryDB>();
-    final query = box.query().build();
-
-    MangaDexHistoryDB? db;
-    db = query.findUnique();
-    db ??= MangaDexHistoryDB();
-    query.close();
-
-    final key = _mangadexHistoryKey;
-    if (data.containsKey(key)) {
-      final state = data[key];
-
-      if (state is! List) {
-        // invalid type
-        logger.w('Data in $key not a List');
-        return;
-      }
-
-      final content = List<String>.from(state);
-      db.queue = content;
-
-      box.put(db);
-    }
-  }
-
-  @override
-  void importReaderConfig(Store store, Map<String, dynamic> data) {
-    final box = store.box<ReaderConfig>();
-    final query = box.query().build();
-
-    ReaderConfig? cfg;
-    cfg = query.findUnique();
-    query.close();
-
-    final key = _readerConfigKey;
-    if (data.containsKey(key)) {
-      final state = data[key];
-
-      final c = ReaderConfig.fromJson(state);
-      if (cfg != null) {
-        c.dbid = cfg.dbid;
-      }
-
-      box.put(c);
-    }
+    return json.encode(data);
   }
 
   @override
   void importWebReadHistory(Store store, Map<String, dynamic> data) {
-    final box = store.box<ReadMarkersDB>();
-    final query = box.query().build();
+    final db = _getUnique<ReadMarkersDB>(store) ?? ReadMarkersDB();
 
-    ReadMarkersDB? db;
-    db = query.findUnique();
-    db ??= ReadMarkersDB();
-    query.close();
+    if (data.containsKey(_webReadMarkersKey)) {
+      final content = data[_webReadMarkersKey] as Map<String, dynamic>;
+      db.markers = content.map((m, s) => MapEntry(m, Set<String>.from(s)));
+      store.box<ReadMarkersDB>().put(db);
+    }
+  }
 
-    final key = _webReadMarkersKey;
-    if (data.containsKey(key)) {
-      final content = data[key] as Map<String, dynamic>;
+  @override
+  void writeWebReadHistory(Store store, Map<String, dynamic> data) {
+    final db = _getUnique<ReadMarkersDB>(store);
 
-      final markers = content.map((m, s) => MapEntry(m, Set<String>.from(s)));
-      db.markers = markers;
-
-      box.put(db);
+    if (db != null) {
+      data[_webReadMarkersKey] = db.markers.map(
+        (key, value) => MapEntry(key, value.toList()),
+      );
     }
   }
 
   void importExtensionConfig(Store store, Map<String, dynamic> data) {
-    final box = store.box<ExtensionConfig>();
-    final query = box.query().build();
-
-    ExtensionConfig? cfg;
-    cfg = query.findUnique();
-    query.close();
-
-    final key = _webConfigKey;
-    if (data.containsKey(key)) {
-      final state = data[key];
-
-      final c = ExtensionConfig.fromJson(state);
-      if (cfg != null) {
-        c.dbid = cfg.dbid;
-      }
-
-      box.put(c);
-    }
+    _importConfig<ExtensionConfig>(
+      store,
+      data,
+      _webConfigKey,
+      ExtensionConfig.fromJson,
+      (oldCfg, newCfg) => newCfg.dbid = oldCfg.dbid,
+    );
   }
 
   void importInstalledSources(Store store, Map<String, dynamic> data) {
     final sbox = store.box<WebSourceInfo>();
     sbox.removeAll();
 
-    final key = _extInstalledSourcesKey;
-    if (data.containsKey(key) && data[key] is List) {
-      final list = data[key] as List<dynamic>;
+    if (data.containsKey(_extInstalledSourcesKey) &&
+        data[_extInstalledSourcesKey] is List) {
+      final list = data[_extInstalledSourcesKey] as List<dynamic>;
       final sources = list.map((e) => WebSourceInfo.fromJson(e)).toList();
       sbox.putMany(sources);
     }
@@ -800,9 +574,8 @@ class GagakuBackupDataV2 implements GagakuBackupDataConverter {
     final box = store.box<RepoInfo>();
     box.removeAll();
 
-    final key = _extRepoListKey;
-    if (data.containsKey(key) && data[key] is List) {
-      final list = data[key] as List<dynamic>;
+    if (data.containsKey(_extRepoListKey) && data[_extRepoListKey] is List) {
+      final list = data[_extRepoListKey] as List<dynamic>;
       final repos = list.map((e) => RepoInfo.fromJson(e)).toList();
       box.putMany(repos);
     }
@@ -902,98 +675,8 @@ class GagakuBackupDataV2 implements GagakuBackupDataConverter {
     }
   }
 
-  @override
-  void writeExtensionSecureState(Store store, Map<String, dynamic> data) {
-    final box = store.box<ExtensionStateDB>();
-    final query = box.query(ExtensionStateDB_.secure.equals(true)).build();
-
-    ExtensionStateDB? db;
-    db = query.findUnique();
-    query.close();
-
-    if (db != null) {
-      data[_extenstionSecureStateKey] = db.state;
-    }
-  }
-
-  @override
-  void writeExtensionState(Store store, Map<String, dynamic> data) {
-    final box = store.box<ExtensionStateDB>();
-    final query = box.query(ExtensionStateDB_.secure.equals(false)).build();
-
-    ExtensionStateDB? db;
-    db = query.findUnique();
-    query.close();
-
-    if (db != null) {
-      data[_extenstionStateKey] = db.state;
-    }
-  }
-
-  @override
-  void writeGagakuConfig(Store store, Map<String, dynamic> data) {
-    final box = store.box<GagakuConfig>();
-    final query = box.query().build();
-
-    GagakuConfig? cfg;
-    cfg = query.findUnique();
-    query.close();
-
-    if (cfg != null) {
-      data[_gagakuConfigKey] = cfg.toJson();
-    }
-  }
-
-  @override
-  void writeMangadexConfig(Store store, Map<String, dynamic> data) {
-    final box = store.box<MangaDexConfig>();
-    final query = box.query().build();
-
-    MangaDexConfig? cfg;
-    cfg = query.findUnique();
-    query.close();
-
-    if (cfg != null) {
-      data[_mangadexConfigKey] = cfg.toJson();
-    }
-  }
-
-  @override
-  void writeMangadexHistory(Store store, Map<String, dynamic> data) {
-    final box = store.box<MangaDexHistoryDB>();
-    final query = box.query().build();
-
-    MangaDexHistoryDB? db;
-    db = query.findUnique();
-    query.close();
-
-    if (db != null) {
-      data[_mangadexHistoryKey] = db.queue;
-    }
-  }
-
-  @override
-  void writeReaderConfig(Store store, Map<String, dynamic> data) {
-    final box = store.box<ReaderConfig>();
-    final query = box.query().build();
-
-    ReaderConfig? cfg;
-    cfg = query.findUnique();
-    query.close();
-
-    if (cfg != null) {
-      data[_readerConfigKey] = cfg.toJson();
-    }
-  }
-
   void writeExtensionConfig(Store store, Map<String, dynamic> data) {
-    final ecfgbox = store.box<ExtensionConfig>();
-    final ecfgquery = ecfgbox.query().build();
-
-    ExtensionConfig? ecfg;
-    ecfg = ecfgquery.findUnique();
-    ecfgquery.close();
-
+    final ecfg = _getUnique<ExtensionConfig>(store);
     if (ecfg != null) {
       data[_webConfigKey] = ecfg.toJson();
     }
@@ -1002,14 +685,12 @@ class GagakuBackupDataV2 implements GagakuBackupDataConverter {
   void writeInstalledSources(Store store, Map<String, dynamic> data) {
     final sbox = store.box<WebSourceInfo>();
     final sources = sbox.getAll();
-
     data[_extInstalledSourcesKey] = sources.map((e) => e.toJson()).toList();
   }
 
   void writeRepoList(Store store, Map<String, dynamic> data) {
     final rbox = store.box<RepoInfo>();
     final repos = rbox.getAll();
-
     data[_extRepoListKey] = repos.map((e) => e.toJson()).toList();
   }
 
@@ -1038,21 +719,5 @@ class GagakuBackupDataV2 implements GagakuBackupDataConverter {
     data[_webfavoritesKey] = favlists
         .map((e) => FavoriteListExport.fromList(e))
         .toList();
-  }
-
-  @override
-  void writeWebReadHistory(Store store, Map<String, dynamic> data) {
-    final box = store.box<ReadMarkersDB>();
-    final query = box.query().build();
-
-    ReadMarkersDB? db;
-    db = query.findUnique();
-    query.close();
-
-    if (db != null) {
-      data[_webReadMarkersKey] = db.markers.map(
-        (key, value) => MapEntry(key, value.toList()),
-      );
-    }
   }
 }
