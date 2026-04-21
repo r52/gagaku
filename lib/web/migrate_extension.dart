@@ -21,13 +21,10 @@ class MigrateExtensionDialog extends HookConsumerWidget {
     final oldExtensionsConfig = useMemoized(() {
       final store = GagakuData().store;
       final historyBox = store.box<HistoryLink>();
-      final links = historyBox.getAll();
-      final ids = links
-          .map((e) => e.handle?.sourceId)
-          .where((e) => e != null)
-          .cast<String>()
-          .toSet()
-          .toList();
+      final query = historyBox.query().build();
+      final urls = query.property(HistoryLink_.url).find();
+      query.close();
+      final ids = urls.map((u) => u.split('/').first).toSet().toList();
       ids.sort();
       return ids;
     });
@@ -130,12 +127,11 @@ class MigrateExtensionDialog extends HookConsumerWidget {
 
                   // 1. Migrate HistoryLink (and by extension WebFavoritesList links)
                   final historyBox = store.box<HistoryLink>();
-                  final links = historyBox
-                      .query()
-                      .build()
-                      .find()
-                      .where((link) => link.handle?.sourceId == oldId.value)
-                      .toList();
+                  final query = historyBox
+                      .query(HistoryLink_.url.startsWith('${oldId.value}/'))
+                      .build();
+                  final links = query.find();
+                  query.close();
 
                   for (final link in links) {
                     if (link.url.startsWith('${oldId.value}/')) {
