@@ -192,7 +192,7 @@ class WebMangaListWidget extends HookConsumerWidget {
           controller: scrollController,
           scrollBehavior: scrollBehavior,
           physics: physics,
-          // cacheExtent: MediaQuery.sizeOf(context).height,
+          cacheExtent: MediaQuery.sizeOf(context).height * 1.5,
           slivers: [
             ...leading,
             SliverToBoxAdapter(
@@ -700,42 +700,31 @@ class FavoritesButton extends HookWidget {
       builder: (context, controller, child) {
         return Tooltip(
           message: tr.mangaActions.favorite,
-          child: Material(
-            color: theme.colorScheme.surface.withAlpha(200),
-            shape: borderRadius == null ? const CircleBorder() : null,
-            borderRadius: borderRadius,
-            child: !manager.hasData
-                ? const SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-                : InkWell(
-                    onTap: () {
-                      if (controller.isOpen) {
-                        controller.close();
-                      } else {
-                        controller.open();
-                      }
-                    },
-                    customBorder: borderRadius == null
-                        ? const CircleBorder()
-                        : null,
-                    child: child,
-                  ),
+          child: IconButton(
+            style: IconButton.styleFrom(
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              backgroundColor: theme.colorScheme.surface.withAlpha(200),
+              shape: borderRadius == null
+                  ? const CircleBorder()
+                  : RoundedRectangleBorder(borderRadius: borderRadius!),
+            ),
+            onPressed: !manager.hasData
+                ? null
+                : () {
+                    if (controller.isOpen) {
+                      controller.close();
+                    } else {
+                      controller.open();
+                    }
+                  },
+            icon: child!,
           ),
         );
       },
       menuChildren: menuChildren,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Icon(
-          isFavorited ? Icons.favorite : Icons.favorite_border,
-          color: isFavorited ? theme.colorScheme.primary : null,
-        ),
+      child: Icon(
+        isFavorited ? Icons.favorite : Icons.favorite_border,
+        color: isFavorited ? theme.colorScheme.primary : null,
       ),
     );
   }
