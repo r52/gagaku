@@ -11,62 +11,6 @@ part of 'types.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-/// @nodoc
-mixin _$ReadMarkersDB {
-
- int get dbid; set dbid(int value); Map<String, Set<String>> get markers; set markers(Map<String, Set<String>> value);
-/// Create a copy of ReadMarkersDB
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$ReadMarkersDBCopyWith<ReadMarkersDB> get copyWith => _$ReadMarkersDBCopyWithImpl<ReadMarkersDB>(this as ReadMarkersDB, _$identity);
-
-
-
-
-
-@override
-String toString() {
-  return 'ReadMarkersDB(dbid: $dbid, markers: $markers)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $ReadMarkersDBCopyWith<$Res>  {
-  factory $ReadMarkersDBCopyWith(ReadMarkersDB value, $Res Function(ReadMarkersDB) _then) = _$ReadMarkersDBCopyWithImpl;
-@useResult
-$Res call({
- int dbid, Map<String, Set<String>>? markers
-});
-
-
-
-
-}
-/// @nodoc
-class _$ReadMarkersDBCopyWithImpl<$Res>
-    implements $ReadMarkersDBCopyWith<$Res> {
-  _$ReadMarkersDBCopyWithImpl(this._self, this._then);
-
-  final ReadMarkersDB _self;
-  final $Res Function(ReadMarkersDB) _then;
-
-/// Create a copy of ReadMarkersDB
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? dbid = null,Object? markers = freezed,}) {
-  return _then(ReadMarkersDB(
-dbid: null == dbid ? _self.dbid : dbid // ignore: cast_nullable_to_non_nullable
-as int,markers: freezed == markers ? _self.markers! : markers // ignore: cast_nullable_to_non_nullable
-as Map<String, Set<String>>?,
-  ));
-}
-
-}
-
-
-
 
 /// @nodoc
 mixin _$SourceHandler {
