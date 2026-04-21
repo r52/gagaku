@@ -147,7 +147,15 @@
       "newExtensionId": "New Extension",
       "verifyMigration": "Verify the migration details before proceeding.",
       "chooseExtension": "Choose an extension",
-      "migrateSuccess": "Data migrated. Please completely restart the app for the changes to take effect."
+      "migrateSuccess": "Data migrated. Please completely restart the app for the changes to take effect.",
+      "pruneExtension": "Prune Unused Data",
+      "pruneExtensionDesc": "Remove unused extension settings and read markers for items not in your history.",
+      "pruneSummary": "Data to be removed:",
+      "pruneState": "Extension States: $count",
+      "pruneSecureState": "Secure States: $count",
+      "pruneReadMarkers": "Read Markers: $count",
+      "pruneEmpty": "No unused data found.",
+      "pruneSuccess": "Data successfully pruned."
     },
     "repo": {
       "manage": "Manage Repos",

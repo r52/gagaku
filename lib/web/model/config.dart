@@ -177,6 +177,24 @@ class ExtensionState extends _$ExtensionState {
       box.put(state);
     }
   }
+
+  List<String> getStaleKeys(Set<String> validIds) {
+    return state.state.keys.where((k) => !validIds.contains(k)).toList();
+  }
+
+  void pruneKeys(List<String> staleKeys) {
+    bool updated = false;
+    for (final key in staleKeys) {
+      if (state.state.containsKey(key)) {
+        state.state.remove(key);
+        updated = true;
+      }
+    }
+    if (updated) {
+      final box = GagakuData().store.box<ExtensionStateDB>();
+      box.put(state);
+    }
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -226,6 +244,24 @@ class ExtensionSecureState extends _$ExtensionSecureState {
   void migrate(String oldId, String newId) {
     if (state.state.containsKey(oldId)) {
       state.state[newId] = state.state.remove(oldId)!;
+      final box = GagakuData().store.box<ExtensionStateDB>();
+      box.put(state);
+    }
+  }
+
+  List<String> getStaleKeys(Set<String> validIds) {
+    return state.state.keys.where((k) => !validIds.contains(k)).toList();
+  }
+
+  void pruneKeys(List<String> staleKeys) {
+    bool updated = false;
+    for (final key in staleKeys) {
+      if (state.state.containsKey(key)) {
+        state.state.remove(key);
+        updated = true;
+      }
+    }
+    if (updated) {
       final box = GagakuData().store.box<ExtensionStateDB>();
       box.put(state);
     }
