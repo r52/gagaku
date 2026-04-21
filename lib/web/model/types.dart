@@ -58,7 +58,8 @@ class ReadMarkersDB with _$ReadMarkersDB {
     );
   }
 
-  ReadMarkersDB({this.dbid = 0, this.markers = const {}});
+  ReadMarkersDB({this.dbid = 0, Map<String, Set<String>>? markers})
+    : markers = markers ?? {};
 }
 
 @Entity()

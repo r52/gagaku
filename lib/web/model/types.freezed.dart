@@ -38,7 +38,7 @@ abstract mixin class $ReadMarkersDBCopyWith<$Res>  {
   factory $ReadMarkersDBCopyWith(ReadMarkersDB value, $Res Function(ReadMarkersDB) _then) = _$ReadMarkersDBCopyWithImpl;
 @useResult
 $Res call({
- int dbid, Map<String, Set<String>> markers
+ int dbid, Map<String, Set<String>>? markers
 });
 
 
@@ -55,11 +55,11 @@ class _$ReadMarkersDBCopyWithImpl<$Res>
 
 /// Create a copy of ReadMarkersDB
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? dbid = null,Object? markers = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? dbid = null,Object? markers = freezed,}) {
   return _then(ReadMarkersDB(
 dbid: null == dbid ? _self.dbid : dbid // ignore: cast_nullable_to_non_nullable
-as int,markers: null == markers ? _self.markers : markers // ignore: cast_nullable_to_non_nullable
-as Map<String, Set<String>>,
+as int,markers: freezed == markers ? _self.markers! : markers // ignore: cast_nullable_to_non_nullable
+as Map<String, Set<String>>?,
   ));
 }
 

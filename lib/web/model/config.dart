@@ -105,7 +105,11 @@ class ExtensionStateDB {
   @Transient()
   ExtensionStateMap state;
 
-  ExtensionStateDB({this.dbid = 0, this.secure = false, this.state = const {}});
+  ExtensionStateDB({
+    this.dbid = 0,
+    this.secure = false,
+    Map<String, Map<String, dynamic>>? state,
+  }) : state = state ?? {};
 
   String get dbState => json.encode(state);
 
@@ -165,6 +169,14 @@ class ExtensionState extends _$ExtensionState {
     final box = GagakuData().store.box<ExtensionStateDB>();
     box.put(state);
   }
+
+  void migrate(String oldId, String newId) {
+    if (state.state.containsKey(oldId)) {
+      state.state[newId] = state.state.remove(oldId)!;
+      final box = GagakuData().store.box<ExtensionStateDB>();
+      box.put(state);
+    }
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -209,5 +221,13 @@ class ExtensionSecureState extends _$ExtensionSecureState {
 
     final box = GagakuData().store.box<ExtensionStateDB>();
     box.put(state);
+  }
+
+  void migrate(String oldId, String newId) {
+    if (state.state.containsKey(oldId)) {
+      state.state[newId] = state.state.remove(oldId)!;
+      final box = GagakuData().store.box<ExtensionStateDB>();
+      box.put(state);
+    }
   }
 }
