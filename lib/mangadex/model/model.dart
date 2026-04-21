@@ -2016,6 +2016,8 @@ class ReadChapters extends _$ReadChapters {
 
 @riverpod
 Future<ReadChapterSet?> mangaReadChapters(Ref ref, Manga manga) async {
+  ref.disposeAfter(const Duration(minutes: 5));
+
   final me = await ref.watch(loggedUserProvider.future);
   if (me == null) return null;
 

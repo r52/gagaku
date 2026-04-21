@@ -725,6 +725,53 @@ class WebReadMarkers extends _$WebReadMarkers {
 
     return db;
   }
+
+  Future<ReadMarkersDB> migrate(String oldId, String newId) async {
+    ReadMarkersDB db = await future;
+    final keys = db.markers.keys.toList();
+    bool updated = false;
+
+    for (final key in keys) {
+      if (key.startsWith('$oldId/')) {
+        final newKey = key.replaceFirst('$oldId/', '$newId/');
+        db.markers[newKey] = db.markers.remove(key)!;
+        updated = true;
+      }
+    }
+
+    if (updated) {
+      final box = GagakuData().store.box<ReadMarkersDB>();
+      db = db.copyWith();
+      box.put(db);
+      state = AsyncData(db);
+    }
+    return db;
+  }
+
+  Future<List<String>> getStaleKeys(Set<String> validKeys) async {
+    final db = await future;
+    return db.markers.keys.where((k) => !validKeys.contains(k)).toList();
+  }
+
+  Future<ReadMarkersDB> pruneKeys(List<String> staleKeys) async {
+    ReadMarkersDB db = await future;
+    bool updated = false;
+
+    for (final key in staleKeys) {
+      if (db.markers.containsKey(key)) {
+        db.markers.remove(key);
+        updated = true;
+      }
+    }
+
+    if (updated) {
+      final box = GagakuData().store.box<ReadMarkersDB>();
+      db = db.copyWith();
+      box.put(db);
+      state = AsyncData(db);
+    }
+    return db;
+  }
 }
 
 @riverpod

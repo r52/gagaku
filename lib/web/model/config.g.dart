@@ -113,7 +113,7 @@ final class ExtensionStateProvider
   }
 }
 
-String _$extensionStateHash() => r'793a03042a21a1c60a0703659f419051266ffd10';
+String _$extensionStateHash() => r'4fe53039cb63ec78590436b9277cc84ce0b5ccd6';
 
 abstract class _$ExtensionState extends $Notifier<ExtensionStateDB> {
   ExtensionStateDB build();
@@ -166,7 +166,7 @@ final class ExtensionSecureStateProvider
 }
 
 String _$extensionSecureStateHash() =>
-    r'fbce2ebe73d57cbaa9e7d959d0d66a78c36be5c0';
+    r'f7b9b878296c98a8425487214a2baee737cd85a7';
 
 abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateDB> {
   ExtensionStateDB build();

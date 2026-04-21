@@ -1493,6 +1493,51 @@ class TranslationsWebSourcesSettingsEn {
 
 	/// en: 'Settings Cleared'
 	String get clearSuccess => 'Settings Cleared';
+
+	/// en: 'Migrate Extension Data'
+	String get migrateExtension => 'Migrate Extension Data';
+
+	/// en: 'Migrate all data from one extension to another.'
+	String get migrateExtensionDesc => 'Migrate all data from one extension to another.';
+
+	/// en: 'Old Extension'
+	String get oldExtensionId => 'Old Extension';
+
+	/// en: 'New Extension'
+	String get newExtensionId => 'New Extension';
+
+	/// en: 'Verify the migration details before proceeding.'
+	String get verifyMigration => 'Verify the migration details before proceeding.';
+
+	/// en: 'Choose an extension'
+	String get chooseExtension => 'Choose an extension';
+
+	/// en: 'Data migrated. Please completely restart the app for the changes to take effect.'
+	String get migrateSuccess => 'Data migrated. Please completely restart the app for the changes to take effect.';
+
+	/// en: 'Prune Unused Data'
+	String get pruneExtension => 'Prune Unused Data';
+
+	/// en: 'Remove unused extension settings and read markers for items not in your history.'
+	String get pruneExtensionDesc => 'Remove unused extension settings and read markers for items not in your history.';
+
+	/// en: 'Data to be removed:'
+	String get pruneSummary => 'Data to be removed:';
+
+	/// en: 'Extension States: $count'
+	String pruneState({required Object count}) => 'Extension States: ${count}';
+
+	/// en: 'Secure States: $count'
+	String pruneSecureState({required Object count}) => 'Secure States: ${count}';
+
+	/// en: 'Read Markers: $count'
+	String pruneReadMarkers({required Object count}) => 'Read Markers: ${count}';
+
+	/// en: 'No unused data found.'
+	String get pruneEmpty => 'No unused data found.';
+
+	/// en: 'Data successfully pruned.'
+	String get pruneSuccess => 'Data successfully pruned.';
 }
 
 // Path: webSources.repo
@@ -1892,6 +1937,21 @@ extension on Translations {
 			'webSources.settings.clearAllWarning' => 'Are you sure you want to delete all extension settings?',
 			'webSources.settings.clearSettings' => 'Clear Settings',
 			'webSources.settings.clearSuccess' => 'Settings Cleared',
+			'webSources.settings.migrateExtension' => 'Migrate Extension Data',
+			'webSources.settings.migrateExtensionDesc' => 'Migrate all data from one extension to another.',
+			'webSources.settings.oldExtensionId' => 'Old Extension',
+			'webSources.settings.newExtensionId' => 'New Extension',
+			'webSources.settings.verifyMigration' => 'Verify the migration details before proceeding.',
+			'webSources.settings.chooseExtension' => 'Choose an extension',
+			'webSources.settings.migrateSuccess' => 'Data migrated. Please completely restart the app for the changes to take effect.',
+			'webSources.settings.pruneExtension' => 'Prune Unused Data',
+			'webSources.settings.pruneExtensionDesc' => 'Remove unused extension settings and read markers for items not in your history.',
+			'webSources.settings.pruneSummary' => 'Data to be removed:',
+			'webSources.settings.pruneState' => ({required Object count}) => 'Extension States: ${count}',
+			'webSources.settings.pruneSecureState' => ({required Object count}) => 'Secure States: ${count}',
+			'webSources.settings.pruneReadMarkers' => ({required Object count}) => 'Read Markers: ${count}',
+			'webSources.settings.pruneEmpty' => 'No unused data found.',
+			'webSources.settings.pruneSuccess' => 'Data successfully pruned.',
 			'webSources.repo.manage' => 'Manage Repos',
 			'webSources.repo.newRepo' => '${_root.ui.addNew} Repo',
 			'webSources.repo.browser' => 'View in browser',

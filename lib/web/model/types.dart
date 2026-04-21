@@ -35,30 +35,32 @@ class WebReaderData {
   final CtxCallback? onLinkPressed;
 }
 
-@unfreezed
 @Entity()
-class ReadMarkersDB with _$ReadMarkersDB {
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+class ReadMarkersDB {
   @Id()
   int dbid;
 
-  @override
   @Transient()
   Map<String, Set<String>> markers;
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   String get dbMarkers =>
       json.encode(markers.map((key, value) => MapEntry(key, value.toList())));
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   set dbMarkers(String value) {
     markers = (json.decode(value) as Map<String, dynamic>).map(
       (m, s) => MapEntry(m, Set<String>.from(s)),
     );
   }
 
-  ReadMarkersDB({this.dbid = 0, this.markers = const {}});
+  ReadMarkersDB({this.dbid = 0, Map<String, Set<String>>? markers})
+    : markers = markers ?? {};
+
+  ReadMarkersDB copyWith({int? dbid, Map<String, Set<String>>? markers}) {
+    return ReadMarkersDB(
+      dbid: dbid ?? this.dbid,
+      markers: markers ?? Map.of(this.markers),
+    );
+  }
 }
 
 @Entity()
@@ -661,21 +663,24 @@ class SourceIntentOrListParser
 
   @override
   List<SourceIntents> fromJson(dynamic intents) {
-    if (intents is List) {
-      return intents
-          .map((e) => SourceIntents.values.firstWhere((s) => s.flag == e))
-          .toList();
-    }
+    List<int> values;
     if (intents is int) {
-      return SourceIntents.values.fold([], (list, intent) {
-        if ((intents & intent.flag) == intent.flag) {
-          list.add(intent);
-        }
-        return list;
-      });
+      values = [intents];
+    } else if (intents is List) {
+      values = intents.whereType<int>().toList();
+    } else {
+      throw UnsupportedError('Unsupported intent type');
     }
 
-    throw UnsupportedError('Unsupported intent type');
+    final Set<SourceIntents> result = {};
+    for (final val in values) {
+      for (final intent in SourceIntents.values) {
+        if ((val & intent.flag) == intent.flag) {
+          result.add(intent);
+        }
+      }
+    }
+    return result.toList();
   }
 
   @override

@@ -21,7 +21,6 @@ import 'package:gagaku/web/model/types.dart' show SearchQuery;
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -988,7 +987,7 @@ class _ChapterListElement {
   final bool isIndented;
 }
 
-class _ChapterListSliver extends HookConsumerWidget {
+class _ChapterListSliver extends HookWidget {
   const _ChapterListSliver({
     required this.state,
     required this.fetchNextPage,
@@ -1002,17 +1001,9 @@ class _ChapterListSliver extends HookConsumerWidget {
   static const _noVolumeKey = 'none';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final tr = context.t;
-    final me = ref.watch(loggedUserProvider.select((user) => user.value?.id));
-    final readData = ref.watch(mangaReadChaptersProvider(manga));
-    final statsData = ref.watch(chapterStatsProvider);
-    final numFormatter = useMemoized(
-      () => NumberFormat.compact(
-        locale: tr.$meta.locale.flutterLocale.toString(),
-      ),
-      [tr.$meta.locale],
-    );
+
     // final sort = ref.watch(mangaChaptersListSortProvider);
     // final sortfunc = sort == ListSort.ascending
     //     ? compareNatural
@@ -1121,39 +1112,11 @@ class _ChapterListSliver extends HookConsumerWidget {
             );
           }
 
-          final isRead = switch (readData) {
-            AsyncData(value: final data?) => data.contains(item.chapter!.id),
-            AsyncData(value: null) => false,
-            _ => null,
-          };
-
-          final comments = switch (statsData) {
-            AsyncData(value: final data) => data[item.chapter!.id]?.comments,
-            _ => null,
-          };
-
           // is chapter beyond this point
           final chapbtn = ChapterButtonWidget(
             key: ValueKey(item.chapter!.id),
             chapter: item.chapter!,
             manga: manga,
-            readStatus: isRead,
-            comments: comments,
-            isLoggedIn: me != null,
-            numFormatter: numFormatter,
-            onMarkRead: me == null
-                ? null
-                : (setRead) async {
-                    ref.run((tsx) async {
-                      return await tsx
-                          .get(readChaptersProvider(me).notifier)
-                          .set(
-                            manga,
-                            read: setRead ? [item.chapter!] : null,
-                            unread: !setRead ? [item.chapter!] : null,
-                          );
-                    });
-                  },
           );
 
           if (item.isIndented) {

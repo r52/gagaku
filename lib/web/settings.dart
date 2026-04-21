@@ -6,6 +6,8 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/web/migrate_extension.dart';
+import 'package:gagaku/web/prune_extension.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
@@ -204,6 +206,52 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                     },
                     icon: const Icon(Icons.delete_sweep),
                     label: Text(t.webSources.settings.clearSettings),
+                  ),
+                );
+              },
+            ),
+            SettingCardWidget(
+              title: Text(
+                t.webSources.settings.migrateExtension,
+                style: titleStyle,
+              ),
+              subtitle: Text(t.webSources.settings.migrateExtensionDesc),
+              builder: (context) {
+                return Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const MigrateExtensionDialog();
+                        },
+                      );
+                    },
+                    icon: const Icon(Icons.drive_file_move),
+                    label: Text(t.webSources.settings.migrateExtension),
+                  ),
+                );
+              },
+            ),
+            SettingCardWidget(
+              title: Text(
+                t.webSources.settings.pruneExtension,
+                style: titleStyle,
+              ),
+              subtitle: Text(t.webSources.settings.pruneExtensionDesc),
+              builder: (context) {
+                return Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const PruneExtensionDialog();
+                        },
+                      );
+                    },
+                    icon: const Icon(Icons.delete_outline),
+                    label: Text(t.webSources.settings.pruneExtension),
                   ),
                 );
               },
