@@ -910,22 +910,56 @@ Map<String, dynamic> _$WebViewRowElementToJson(WebViewRowElement instance) =>
       'type': instance.$type,
     };
 
-_FormSectionElement _$FormSectionElementFromJson(Map<String, dynamic> json) =>
-    _FormSectionElement(
+TagSectionElement _$TagSectionElementFromJson(Map<String, dynamic> json) =>
+    TagSectionElement(
       id: json['id'] as String,
       header: json['header'] as String?,
       footer: json['footer'] as String?,
       items: (json['items'] as List<dynamic>)
           .map((e) => FormItemElement.fromJson(e as Map<String, dynamic>))
           .toList(),
+      $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$FormSectionElementToJson(_FormSectionElement instance) =>
+Map<String, dynamic> _$TagSectionElementToJson(TagSectionElement instance) =>
     <String, dynamic>{
       'id': instance.id,
       'header': instance.header,
       'footer': instance.footer,
       'items': instance.items.map((e) => e.toJson()).toList(),
+      'type': instance.$type,
+    };
+
+ListSectionElement _$ListSectionElementFromJson(Map<String, dynamic> json) =>
+    ListSectionElement(
+      id: json['id'] as String,
+      header: json['header'] as String?,
+      footer: json['footer'] as String?,
+      items: (json['items'] as List<dynamic>)
+          .map((e) => FormItemElement.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      allowDeletion: json['allowDeletion'] as bool,
+      allowAddition: json['allowAddition'] as bool,
+      allowReorder: json['allowReorder'] as bool,
+      onReorder: json['onReorder'] as String?,
+      onDeletion: json['onDeletion'] as String?,
+      onAddition: json['onAddition'] as String?,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$ListSectionElementToJson(ListSectionElement instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'header': instance.header,
+      'footer': instance.footer,
+      'items': instance.items.map((e) => e.toJson()).toList(),
+      'allowDeletion': instance.allowDeletion,
+      'allowAddition': instance.allowAddition,
+      'allowReorder': instance.allowReorder,
+      'onReorder': instance.onReorder,
+      'onDeletion': instance.onDeletion,
+      'onAddition': instance.onAddition,
+      'type': instance.$type,
     };
 
 _FilterOption _$FilterOptionFromJson(Map<String, dynamic> json) =>

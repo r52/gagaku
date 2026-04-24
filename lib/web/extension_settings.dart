@@ -45,7 +45,16 @@ class ExtensionSettingsPage extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(tr.arg_settings(arg: source.name)),
-        leading: const BackButton(),
+        leading: BackButton(
+          onPressed: () {
+            if (future.data != null) {
+              final data = future.data!;
+              data.call('formDidDisappear');
+            }
+
+            Navigator.maybePop(context);
+          },
+        ),
       ),
       body: SafeArea(child: body),
     );
@@ -182,7 +191,7 @@ class FormItemDelegateBuilder extends StatelessWidget {
   }
 }
 
-class FormSectionBuilder extends StatelessWidget {
+class FormSectionBuilder extends ConsumerWidget {
   const FormSectionBuilder({
     super.key,
     required this.source,
@@ -193,13 +202,49 @@ class FormSectionBuilder extends StatelessWidget {
   final FormSectionElement section;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final listsec = section is ListSectionElement
+        ? section as ListSectionElement
+        : null;
+
+    // TODO: support onDeletion when things actually use it
+
     return Column(
       children: [
-        if (section.header != null)
-          Text(section.header!, style: CommonTextStyles.twentyBold),
-        for (final item in section.items)
-          FormItemDelegateBuilder(source: source, element: item),
+        if (section.header != null || listsec?.allowAddition == true)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (section.header != null)
+                Text(section.header!, style: CommonTextStyles.twentyBold),
+              if (listsec?.allowAddition == true)
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () async {
+                    await ref
+                        .read(extensionSourceProvider(source.id).notifier)
+                        .callBinding(listsec!.onAddition!);
+                  },
+                ),
+            ],
+          ),
+        if (listsec?.allowReorder == true)
+          ReorderableListView(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            onReorder: (oldIndex, newIndex) async {
+              await ref
+                  .read(extensionSourceProvider(source.id).notifier)
+                  .callBinding(listsec!.onReorder!, [oldIndex, newIndex]);
+            },
+            children: [
+              for (final item in section.items)
+                FormItemDelegateBuilder(source: source, element: item),
+            ],
+          )
+        else
+          for (final item in section.items)
+            FormItemDelegateBuilder(source: source, element: item),
         if (section.footer != null) Text(section.footer!),
       ],
     );
