@@ -134,60 +134,94 @@ class FormItemDelegateBuilder extends StatelessWidget {
     super.key,
     required this.source,
     required this.element,
+    this.onDelete,
   });
 
   final WebSourceInfo source;
   final FormItemElement element;
+  final Future<void> Function()? onDelete;
 
   @override
   Widget build(BuildContext context) {
+    Widget child;
+
     switch (element) {
       case NavigationRowElement():
-        return NavigationRowBuilder(
+        child = NavigationRowBuilder(
           source: source,
           element: element as NavigationRowElement,
         );
+        break;
       case SelectRowElement():
-        return SelectRowBuilder(
+        child = SelectRowBuilder(
           source: source,
           element: element as SelectRowElement,
         );
+        break;
       case InputRowElement():
-        return InputRowBuilder(
+        child = InputRowBuilder(
           source: source,
           element: element as InputRowElement,
         );
+        break;
       case ButtonRowElement():
-        return ButtonRowBuilder(
+        child = ButtonRowBuilder(
           source: source,
           element: element as ButtonRowElement,
         );
+        break;
       case ToggleRowElement():
-        return ToggleRowBuilder(
+        child = ToggleRowBuilder(
           source: source,
           element: element as ToggleRowElement,
         );
+        break;
       case LabelRowElement():
-        return LabelRowBuilder(
+        child = LabelRowBuilder(
           source: source,
           element: element as LabelRowElement,
         );
+        break;
       case StepperRowElement():
-        return StepperRowBuilder(
+        child = StepperRowBuilder(
           source: source,
           element: element as StepperRowElement,
         );
+        break;
       case OAuthButtonRowElement():
-        return OAuthButtonRowBuilder(
+        child = OAuthButtonRowBuilder(
           source: source,
           element: element as OAuthButtonRowElement,
         );
+        break;
       case WebViewRowElement():
-        return UnsupportedRowBuilder(
+        child = UnsupportedRowBuilder(
           source: source,
           element: element as OAuthButtonRowElement,
         );
+        break;
     }
+
+    if (onDelete != null) {
+      return Dismissible(
+        key: Key('${element.id}_dismissible'),
+        direction: DismissDirection.endToStart,
+        confirmDismiss: (direction) async {
+          await onDelete!();
+          return false;
+          // Return false so we rely on the backend state update instead
+          // of removing locally and breaking the index sync
+        },
+        background: Container(
+          color: Colors.red,
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: 20),
+          child: const Icon(Icons.delete, color: Colors.white),
+        ),
+        child: child,
+      );
+    }
+    return child;
   }
 }
 
@@ -207,8 +241,6 @@ class FormSectionBuilder extends ConsumerWidget {
         ? section as ListSectionElement
         : null;
 
-    // TODO: support onDeletion when things actually use it
-
     return Column(
       children: [
         if (section.header != null || listsec?.allowAddition == true)
@@ -221,9 +253,12 @@ class FormSectionBuilder extends ConsumerWidget {
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () async {
-                    await ref
-                        .read(extensionSourceProvider(source.id).notifier)
-                        .callBinding(listsec!.onAddition!);
+                    await _safeCallBinding(
+                      context,
+                      ref,
+                      source.id,
+                      listsec!.onAddition!,
+                    );
                   },
                 ),
             ],
@@ -233,18 +268,53 @@ class FormSectionBuilder extends ConsumerWidget {
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
             onReorder: (oldIndex, newIndex) async {
-              await ref
-                  .read(extensionSourceProvider(source.id).notifier)
-                  .callBinding(listsec!.onReorder!, [oldIndex, newIndex]);
+              if (oldIndex < newIndex) {
+                newIndex -= 1;
+              }
+              await _safeCallBinding(
+                context,
+                ref,
+                source.id,
+                listsec!.onReorder!,
+                [oldIndex, newIndex],
+              );
             },
             children: [
               for (final item in section.items)
-                FormItemDelegateBuilder(source: source, element: item),
+                FormItemDelegateBuilder(
+                  key: Key(item.id),
+                  source: source,
+                  element: item,
+                  onDelete: listsec!.onDeletion != null
+                      ? () => _safeCallBinding(
+                          context,
+                          ref,
+                          source.id,
+                          listsec.onDeletion!,
+                          [section.items.indexOf(item)],
+                        )
+                      : null,
+                ),
             ],
           )
         else
           for (final item in section.items)
-            FormItemDelegateBuilder(source: source, element: item),
+            FormItemDelegateBuilder(
+              key: Key(
+                item.id,
+              ), // Added to give each item a unique key for deletion UI state
+              source: source,
+              element: item,
+              onDelete: listsec?.onDeletion != null
+                  ? () => _safeCallBinding(
+                      context,
+                      ref,
+                      source.id,
+                      listsec!.onDeletion!,
+                      [section.items.indexOf(item)],
+                    )
+                  : null,
+            ),
         if (section.footer != null) Text(section.footer!),
       ],
     );
@@ -271,9 +341,7 @@ class ButtonRowBuilder extends ConsumerWidget {
       child: ListTile(
         title: Text(element.title),
         onTap: () async {
-          await ref
-              .read(extensionSourceProvider(source.id).notifier)
-              .callBinding(element.onSelect);
+          await _safeCallBinding(context, ref, source.id, element.onSelect);
         },
       ),
     );
@@ -317,9 +385,13 @@ class SelectRowBuilder extends HookConsumerWidget {
                   onSelected: (String? value) {
                     if (value != null) {
                       data.value = [value];
-                      ref
-                          .read(extensionSourceProvider(source.id).notifier)
-                          .callBinding(element.onValueChange, [data.value]);
+                      _safeCallBinding(
+                        context,
+                        ref,
+                        source.id,
+                        element.onValueChange,
+                        [data.value],
+                      );
                     }
                   },
                 ),
@@ -369,9 +441,13 @@ class SelectRowBuilder extends HookConsumerWidget {
                             data.value = [...data.value..remove(option.id)];
                           }
 
-                          ref
-                              .read(extensionSourceProvider(source.id).notifier)
-                              .callBinding(element.onValueChange, [data.value]);
+                          _safeCallBinding(
+                            context,
+                            ref,
+                            source.id,
+                            element.onValueChange,
+                            [data.value],
+                          );
                         },
                         child: Text(option.title),
                       ),
@@ -451,10 +527,15 @@ class InputRowBuilder extends HookConsumerWidget {
 
             useEffect(() {
               Future.delayed(Duration.zero, () {
+                if (!context.mounted) return;
                 if (debouncedInput != null) {
-                  ref
-                      .read(extensionSourceProvider(source.id).notifier)
-                      .callBinding(element.onValueChange, [debouncedInput]);
+                  _safeCallBinding(
+                    context,
+                    ref,
+                    source.id,
+                    element.onValueChange,
+                    [debouncedInput],
+                  );
                 }
               });
               return null;
@@ -619,9 +700,7 @@ class LabelRowBuilder extends ConsumerWidget {
         subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
         onTap: element.onSelect != null
             ? () {
-                ref
-                    .read(extensionSourceProvider(source.id).notifier)
-                    .callBinding(element.onSelect!);
+                _safeCallBinding(context, ref, source.id, element.onSelect!);
               }
             : null,
       ),
@@ -804,5 +883,41 @@ class OAuthButtonRowBuilder extends ConsumerWidget {
         },
       ),
     );
+  }
+}
+
+Future<void> _safeCallBinding(
+  BuildContext context,
+  WidgetRef ref,
+  String sourceId,
+  String bindingId, [
+  List<dynamic> args = const [],
+]) async {
+  try {
+    await ref
+        .read(extensionSourceProvider(sourceId).notifier)
+        .callBinding(bindingId, args);
+  } on FormConfirmationException catch (e) {
+    if (!context.mounted) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm'),
+        content: Text(e.message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Confirm'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && context.mounted) {
+      await _safeCallBinding(context, ref, sourceId, e.onConfirmation, []);
+    }
   }
 }

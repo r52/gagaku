@@ -201,8 +201,19 @@ export function ApplicationPolyfill(): typeof Application {
     callBinding: async function <K>(id: SelectorID<K>, ...args: any[]) {
       console.log(`Calling binding ${id}`);
       let binding = selectorRegistry.selector(id);
-      // @ts-ignore
-      return await binding(...args);
+      try {
+        // @ts-ignore
+        return await binding(...args);
+      } catch (e: any) {
+        if (e?.type === "confirmationError") {
+          return {
+            __isFormConfirmationError: true,
+            message: e.message,
+            onConfirmation: e.onConfirmation,
+          };
+        }
+        throw e;
+      }
     },
 
     // @ts-expect-error

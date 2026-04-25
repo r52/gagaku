@@ -1369,3 +1369,16 @@ abstract class WebViewExecutionResult with _$WebViewExecutionResult {
   factory WebViewExecutionResult.fromJson(Map<String, dynamic> json) =>
       _$WebViewExecutionResultFromJson(json);
 }
+
+class FormConfirmationException implements Exception {
+  final String message;
+  final String onConfirmation;
+
+  FormConfirmationException({
+    required this.message,
+    required this.onConfirmation,
+  });
+
+  @override
+  String toString() => 'FormConfirmationException: $message';
+}

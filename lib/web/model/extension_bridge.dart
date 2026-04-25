@@ -409,7 +409,15 @@ await ${source.id}.saveCloudflareBypassCookies(jc);
           "return await window.Application.callBinding('$bindingId', $arg)",
     );
 
-    return result?.value;
+    final value = result?.value;
+    if (value is Map && value['__isFormConfirmationError'] == true) {
+      throw FormConfirmationException(
+        message: value['message'] as String,
+        onConfirmation: value['onConfirmation'] as String,
+      );
+    }
+
+    return value;
   }
 
   Future<SettingsForm> getSettingsForm(WebSourceInfo source) async {
