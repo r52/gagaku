@@ -110,37 +110,37 @@ void main() {
         },
         'link-cache': [
           {
-            "title": "Isekai Meikyuu de Harem o",
-            "url": "WeebCentral/01J76XYCCM010SKFASEMQ0XKPT",
+            "title": "Fake Manga Title 1",
+            "url": "FakeExtension/fake_location_1",
             "cover": "cover.jpg",
             "handle": {
               "type": "source",
-              "sourceId": "WeebCentral",
-              "location": "01J76XYCCM010SKFASEMQ0XKPT",
+              "sourceId": "FakeExtension",
+              "location": "fake_location_1",
               "chapter": null,
             },
             "lastAccessed": "2025-09-16T16:46:33.030",
           },
           {
-            "title": "Another",
-            "url": "WeebCentral/01J76XYFHVMSQVDJPQ42TN2XYN",
+            "title": "Fake Manga Title 2",
+            "url": "FakeExtension/fake_location_2",
             "cover": "cover.jpg",
             "handle": {
               "type": "source",
-              "sourceId": "WeebCentral",
-              "location": "test",
+              "sourceId": "FakeExtension",
+              "location": "fake_location_2",
               "chapter": null,
             },
             "lastAccessed": "2025-09-16T16:46:33.030",
           },
         ],
-        'web_history': ["WeebCentral/01J76XYCCM010SKFASEMQ0XKPT"],
+        'web_history': ["FakeExtension/fake_location_1"],
         'web_favorites': [
           {
             "id": "eaa2874c-bea6-430e-bf7e-85fac65e30ce",
             "name": "Reading",
             "sortOrder": 0,
-            "list": ["WeebCentral/01J76XYFHVMSQVDJPQ42TN2XYN"],
+            "list": ["FakeExtension/fake_location_2"],
           },
         ],
       };
@@ -182,10 +182,7 @@ void main() {
 
       final historylist = lists.firstWhere((e) => e.id == historyListUUID);
       expect(historylist.list.length, 1);
-      expect(
-        historylist.list.first.url,
-        "WeebCentral/01J76XYCCM010SKFASEMQ0XKPT",
-      );
+      expect(historylist.list.first.url, "FakeExtension/fake_location_1");
 
       final favlists = lists.where((e) => e.id != historyListUUID).toList();
       expect(favlists.length, 1);

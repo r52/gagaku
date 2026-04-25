@@ -5878,6 +5878,22 @@ as String,
 
 }
 
+FormSectionElement _$FormSectionElementFromJson(
+  Map<String, dynamic> json
+) {
+        switch (json['type']) {
+                  case 'listSection':
+          return ListSectionElement.fromJson(
+            json
+          );
+        
+          default:
+            return TagSectionElement.fromJson(
+  json
+);
+        }
+      
+}
 
 /// @nodoc
 mixin _$FormSectionElement {
@@ -5949,9 +5965,9 @@ as List<FormItemElement>,
 /// @nodoc
 @JsonSerializable()
 
-class _FormSectionElement implements FormSectionElement {
-  const _FormSectionElement({required this.id, this.header, this.footer, required final  List<FormItemElement> items}): _items = items;
-  factory _FormSectionElement.fromJson(Map<String, dynamic> json) => _$FormSectionElementFromJson(json);
+class TagSectionElement implements FormSectionElement {
+  const TagSectionElement({required this.id, this.header, this.footer, required final  List<FormItemElement> items, final  String? $type}): _items = items,$type = $type ?? 'flowSection';
+  factory TagSectionElement.fromJson(Map<String, dynamic> json) => _$TagSectionElementFromJson(json);
 
 @override final  String id;
 @override final  String? header;
@@ -5964,20 +5980,24 @@ class _FormSectionElement implements FormSectionElement {
 }
 
 
+@JsonKey(name: 'type')
+final String $type;
+
+
 /// Create a copy of FormSectionElement
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$FormSectionElementCopyWith<_FormSectionElement> get copyWith => __$FormSectionElementCopyWithImpl<_FormSectionElement>(this, _$identity);
+$TagSectionElementCopyWith<TagSectionElement> get copyWith => _$TagSectionElementCopyWithImpl<TagSectionElement>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$FormSectionElementToJson(this, );
+  return _$TagSectionElementToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FormSectionElement&&(identical(other.id, id) || other.id == id)&&(identical(other.header, header) || other.header == header)&&(identical(other.footer, footer) || other.footer == footer)&&const DeepCollectionEquality().equals(other._items, _items));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TagSectionElement&&(identical(other.id, id) || other.id == id)&&(identical(other.header, header) || other.header == header)&&(identical(other.footer, footer) || other.footer == footer)&&const DeepCollectionEquality().equals(other._items, _items));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -5986,15 +6006,15 @@ int get hashCode => Object.hash(runtimeType,id,header,footer,const DeepCollectio
 
 @override
 String toString() {
-  return 'FormSectionElement(id: $id, header: $header, footer: $footer, items: $items)';
+  return 'FormSectionElement.flowSection(id: $id, header: $header, footer: $footer, items: $items)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$FormSectionElementCopyWith<$Res> implements $FormSectionElementCopyWith<$Res> {
-  factory _$FormSectionElementCopyWith(_FormSectionElement value, $Res Function(_FormSectionElement) _then) = __$FormSectionElementCopyWithImpl;
+abstract mixin class $TagSectionElementCopyWith<$Res> implements $FormSectionElementCopyWith<$Res> {
+  factory $TagSectionElementCopyWith(TagSectionElement value, $Res Function(TagSectionElement) _then) = _$TagSectionElementCopyWithImpl;
 @override @useResult
 $Res call({
  String id, String? header, String? footer, List<FormItemElement> items
@@ -6005,22 +6025,121 @@ $Res call({
 
 }
 /// @nodoc
-class __$FormSectionElementCopyWithImpl<$Res>
-    implements _$FormSectionElementCopyWith<$Res> {
-  __$FormSectionElementCopyWithImpl(this._self, this._then);
+class _$TagSectionElementCopyWithImpl<$Res>
+    implements $TagSectionElementCopyWith<$Res> {
+  _$TagSectionElementCopyWithImpl(this._self, this._then);
 
-  final _FormSectionElement _self;
-  final $Res Function(_FormSectionElement) _then;
+  final TagSectionElement _self;
+  final $Res Function(TagSectionElement) _then;
 
 /// Create a copy of FormSectionElement
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? header = freezed,Object? footer = freezed,Object? items = null,}) {
-  return _then(_FormSectionElement(
+  return _then(TagSectionElement(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,header: freezed == header ? _self.header : header // ignore: cast_nullable_to_non_nullable
 as String?,footer: freezed == footer ? _self.footer : footer // ignore: cast_nullable_to_non_nullable
 as String?,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
 as List<FormItemElement>,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class ListSectionElement implements FormSectionElement {
+  const ListSectionElement({required this.id, this.header, this.footer, required final  List<FormItemElement> items, required this.allowDeletion, required this.allowAddition, required this.allowReorder, this.onReorder, this.onDeletion, this.onAddition, final  String? $type}): _items = items,$type = $type ?? 'listSection';
+  factory ListSectionElement.fromJson(Map<String, dynamic> json) => _$ListSectionElementFromJson(json);
+
+@override final  String id;
+@override final  String? header;
+@override final  String? footer;
+ final  List<FormItemElement> _items;
+@override List<FormItemElement> get items {
+  if (_items is EqualUnmodifiableListView) return _items;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_items);
+}
+
+ final  bool allowDeletion;
+ final  bool allowAddition;
+ final  bool allowReorder;
+ final  SelectorID? onReorder;
+// (srcIndex: number, destIndex: number) => Promise<void>
+ final  SelectorID? onDeletion;
+// (index: number) => Promise<void>
+ final  SelectorID? onAddition;
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of FormSectionElement
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ListSectionElementCopyWith<ListSectionElement> get copyWith => _$ListSectionElementCopyWithImpl<ListSectionElement>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ListSectionElementToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ListSectionElement&&(identical(other.id, id) || other.id == id)&&(identical(other.header, header) || other.header == header)&&(identical(other.footer, footer) || other.footer == footer)&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.allowDeletion, allowDeletion) || other.allowDeletion == allowDeletion)&&(identical(other.allowAddition, allowAddition) || other.allowAddition == allowAddition)&&(identical(other.allowReorder, allowReorder) || other.allowReorder == allowReorder)&&(identical(other.onReorder, onReorder) || other.onReorder == onReorder)&&(identical(other.onDeletion, onDeletion) || other.onDeletion == onDeletion)&&(identical(other.onAddition, onAddition) || other.onAddition == onAddition));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,header,footer,const DeepCollectionEquality().hash(_items),allowDeletion,allowAddition,allowReorder,onReorder,onDeletion,onAddition);
+
+@override
+String toString() {
+  return 'FormSectionElement.listSection(id: $id, header: $header, footer: $footer, items: $items, allowDeletion: $allowDeletion, allowAddition: $allowAddition, allowReorder: $allowReorder, onReorder: $onReorder, onDeletion: $onDeletion, onAddition: $onAddition)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ListSectionElementCopyWith<$Res> implements $FormSectionElementCopyWith<$Res> {
+  factory $ListSectionElementCopyWith(ListSectionElement value, $Res Function(ListSectionElement) _then) = _$ListSectionElementCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String? header, String? footer, List<FormItemElement> items, bool allowDeletion, bool allowAddition, bool allowReorder, SelectorID? onReorder, SelectorID? onDeletion, SelectorID? onAddition
+});
+
+
+
+
+}
+/// @nodoc
+class _$ListSectionElementCopyWithImpl<$Res>
+    implements $ListSectionElementCopyWith<$Res> {
+  _$ListSectionElementCopyWithImpl(this._self, this._then);
+
+  final ListSectionElement _self;
+  final $Res Function(ListSectionElement) _then;
+
+/// Create a copy of FormSectionElement
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? header = freezed,Object? footer = freezed,Object? items = null,Object? allowDeletion = null,Object? allowAddition = null,Object? allowReorder = null,Object? onReorder = freezed,Object? onDeletion = freezed,Object? onAddition = freezed,}) {
+  return _then(ListSectionElement(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,header: freezed == header ? _self.header : header // ignore: cast_nullable_to_non_nullable
+as String?,footer: freezed == footer ? _self.footer : footer // ignore: cast_nullable_to_non_nullable
+as String?,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
+as List<FormItemElement>,allowDeletion: null == allowDeletion ? _self.allowDeletion : allowDeletion // ignore: cast_nullable_to_non_nullable
+as bool,allowAddition: null == allowAddition ? _self.allowAddition : allowAddition // ignore: cast_nullable_to_non_nullable
+as bool,allowReorder: null == allowReorder ? _self.allowReorder : allowReorder // ignore: cast_nullable_to_non_nullable
+as bool,onReorder: freezed == onReorder ? _self.onReorder : onReorder // ignore: cast_nullable_to_non_nullable
+as SelectorID?,onDeletion: freezed == onDeletion ? _self.onDeletion : onDeletion // ignore: cast_nullable_to_non_nullable
+as SelectorID?,onAddition: freezed == onAddition ? _self.onAddition : onAddition // ignore: cast_nullable_to_non_nullable
+as SelectorID?,
   ));
 }
 

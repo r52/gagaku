@@ -1244,14 +1244,28 @@ sealed class FormItemElement with _$FormItemElement {
       _$FormItemElementFromJson(json);
 }
 
-@freezed
-abstract class FormSectionElement with _$FormSectionElement {
-  const factory FormSectionElement({
+@Freezed(unionKey: 'type', fallbackUnion: 'flowSection')
+sealed class FormSectionElement with _$FormSectionElement {
+  const factory FormSectionElement.flowSection({
     required String id,
     String? header,
     String? footer,
     required List<FormItemElement> items,
-  }) = _FormSectionElement;
+  }) = TagSectionElement;
+
+  const factory FormSectionElement.listSection({
+    required String id,
+    String? header,
+    String? footer,
+    required List<FormItemElement> items,
+    required bool allowDeletion,
+    required bool allowAddition,
+    required bool allowReorder,
+    SelectorID?
+    onReorder, // (srcIndex: number, destIndex: number) => Promise<void>
+    SelectorID? onDeletion, // (index: number) => Promise<void>
+    SelectorID? onAddition, // () => Promise<void>
+  }) = ListSectionElement;
 
   factory FormSectionElement.fromJson(Map<String, dynamic> json) =>
       _$FormSectionElementFromJson(json);
@@ -1354,4 +1368,17 @@ abstract class WebViewExecutionResult with _$WebViewExecutionResult {
 
   factory WebViewExecutionResult.fromJson(Map<String, dynamic> json) =>
       _$WebViewExecutionResultFromJson(json);
+}
+
+class FormConfirmationException implements Exception {
+  final String message;
+  final String onConfirmation;
+
+  FormConfirmationException({
+    required this.message,
+    required this.onConfirmation,
+  });
+
+  @override
+  String toString() => 'FormConfirmationException: $message';
 }

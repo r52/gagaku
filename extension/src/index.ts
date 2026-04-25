@@ -6,6 +6,7 @@ import { FormManager } from "./FormManager";
 
 import { decodeHTMLStrict } from "entities";
 import { SelectorID } from "@paperback/types";
+import md5 from 'md5';
 
 export function ApplicationPolyfill(): typeof Application {
   let stateStorage: Record<string, unknown> = {}
@@ -80,31 +81,30 @@ export function ApplicationPolyfill(): typeof Application {
 
     base64Encode: function (value) {
       if (typeof value === 'string') {
-        return Buffer.from(value, 'utf-8').toString('base64') as typeof value
+        return btoa(value) as typeof value
       } else {
         const bytes = new Uint8Array(value)
-        const binary = bytes.reduce(
-          (str, byte) => str + String.fromCharCode(byte),
-          ''
-        )
-
-        const base64String = btoa(binary) // Base64-encoded string
-
-        // Now convert that string to an ArrayBuffer (binary representation of base64 string)
-        const base64Buffer = new Uint8Array(base64String.length)
-        for (let i = 0; i < base64String.length; i++) {
-          base64Buffer[i] = base64String.charCodeAt(i)
+        let binary = ''
+        const chunkSize = 8192
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+          const chunk = Array.from(bytes.subarray(i, i + chunkSize))
+          binary += String.fromCharCode.apply(null, chunk as unknown as number[])
         }
 
-        return base64Buffer.buffer as typeof value
+        return btoa(binary) as unknown as typeof value
       }
     },
     base64Decode: function (value) {
       if (typeof value === 'string') {
-        return Buffer.from(value, 'base64').toString('utf-8') as typeof value
+        return atob(value) as typeof value
       } else {
         const base64Bytes = new Uint8Array(value)
-        const base64String = String.fromCharCode(...base64Bytes)
+        let base64String = ''
+        const chunkSize = 8192
+        for (let i = 0; i < base64Bytes.length; i += chunkSize) {
+          const chunk = Array.from(base64Bytes.subarray(i, i + chunkSize))
+          base64String += String.fromCharCode.apply(null, chunk as unknown as number[])
+        }
 
         const binaryString = atob(base64String)
         const decodedBytes = new Uint8Array(binaryString.length)
@@ -114,6 +114,17 @@ export function ApplicationPolyfill(): typeof Application {
 
         return decodedBytes.buffer as typeof value
       }
+    },
+
+    crypto_md5Hash: function (value: string | ArrayBuffer) {
+      let data: Uint8Array | string
+      if (typeof value === 'string') {
+        data = value
+      } else {
+        data = new Uint8Array(value)
+      }
+      
+      return md5(data)
     },
 
     getSecureState: function (key) {
@@ -190,8 +201,19 @@ export function ApplicationPolyfill(): typeof Application {
     callBinding: async function <K>(id: SelectorID<K>, ...args: any[]) {
       console.log(`Calling binding ${id}`);
       let binding = selectorRegistry.selector(id);
-      // @ts-ignore
-      return await binding(...args);
+      try {
+        // @ts-ignore
+        return await binding(...args);
+      } catch (e: any) {
+        if (e?.type === "confirmationError") {
+          return {
+            __isFormConfirmationError: true,
+            message: e.message,
+            onConfirmation: e.onConfirmation,
+          };
+        }
+        throw e;
+      }
     },
 
     // @ts-expect-error

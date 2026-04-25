@@ -73,12 +73,12 @@ class ExtensionWebViewBridge {
           UserScript(
             source: GagakuData().extensionHost,
             injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
-            forMainFrameOnly: false,
+            forMainFrameOnly: true,
           ),
           UserScript(
             source: extensionBody,
             injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
-            forMainFrameOnly: false,
+            forMainFrameOnly: true,
           ),
         ]),
         initialSettings: InAppWebViewSettings(
@@ -290,7 +290,6 @@ class ExtensionWebViewBridge {
   ) async {
     try {
       final sourceId = source.id;
-
       final initScript = switch (source.version) {
         SupportedVersion.v0_9 =>
           "var ${source.id} = window.source.${source.id};",
@@ -410,7 +409,15 @@ await ${source.id}.saveCloudflareBypassCookies(jc);
           "return await window.Application.callBinding('$bindingId', $arg)",
     );
 
-    return result?.value;
+    final value = result?.value;
+    if (value is Map && value['__isFormConfirmationError'] == true) {
+      throw FormConfirmationException(
+        message: value['message'] as String,
+        onConfirmation: value['onConfirmation'] as String,
+      );
+    }
+
+    return value;
   }
 
   Future<SettingsForm> getSettingsForm(WebSourceInfo source) async {

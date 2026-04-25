@@ -29,15 +29,6 @@ part 'manga_view.g.dart';
 
 enum _ViewType { chapters, art, related }
 
-const _loadingAction = SizedBox(
-  width: 36,
-  height: 36,
-  child: Padding(
-    padding: EdgeInsets.all(8.0),
-    child: CircularProgressIndicator(),
-  ),
-);
-
 @Riverpod(retry: noRetry)
 Future<Manga> _fetchMangaFromId(Ref ref, String mangaId) async {
   final me = await ref.watch(loggedUserProvider.future);
@@ -1322,37 +1313,38 @@ class _FollowingStatusButton extends ConsumerWidget {
     final statusProvider = ref.watch(readingStatusProvider(manga));
     final reading = statusProvider.value;
 
-    if (following == null ||
+    final isLoading =
+        followProvider.isLoading ||
         statusProvider.isLoading ||
-        setFollowing is MutationPending) {
-      return _loadingAction;
-    }
+        setFollowing is MutationPending;
 
-    if (following == false && reading == null) {
+    if (following == null || (following == false && reading == null)) {
       return ElevatedButton(
         style: Styles.buttonStyle(),
-        onPressed: () async {
-          final result = await showDialog<(MangaReadingStatus, bool)>(
-            context: context,
-            builder: (BuildContext context) {
-              return _AddToLibraryDialog();
-            },
-          );
+        onPressed: isLoading
+            ? null
+            : () async {
+                final result = await showDialog<(MangaReadingStatus, bool)>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return _AddToLibraryDialog();
+                  },
+                );
 
-          if (result != null) {
-            readingStatusMutation(manga).run(ref, (ref) async {
-              return await ref
-                  .get(readingStatusProvider(manga).notifier)
-                  .set(result.$1);
-            });
+                if (result != null) {
+                  readingStatusMutation(manga).run(ref, (ref) async {
+                    return await ref
+                        .get(readingStatusProvider(manga).notifier)
+                        .set(result.$1);
+                  });
 
-            followStatusMutation(manga).run(ref, (ref) async {
-              return await ref
-                  .get(followingStatusProvider(manga).notifier)
-                  .set(result.$2);
-            });
-          }
-        },
+                  followStatusMutation(manga).run(ref, (ref) async {
+                    return await ref
+                        .get(followingStatusProvider(manga).notifier)
+                        .set(result.$2);
+                  });
+                }
+              },
         child: Text(tr.mangaActions.addToLibrary),
       );
     }
@@ -1368,14 +1360,16 @@ class _FollowingStatusButton extends ConsumerWidget {
         backgroundColor: theme.colorScheme.surface.withAlpha(200),
       ),
       color: theme.colorScheme.primary,
-      onPressed: () async {
-        bool set = !following;
-        followStatusMutation(manga).run(ref, (ref) async {
-          return await ref
-              .get(followingStatusProvider(manga).notifier)
-              .set(set);
-        });
-      },
+      onPressed: isLoading
+          ? null
+          : () async {
+              bool set = !following;
+              followStatusMutation(manga).run(ref, (ref) async {
+                return await ref
+                    .get(followingStatusProvider(manga).notifier)
+                    .set(set);
+              });
+            },
       icon: Icon(
         following
             ? Icons.notifications_active
@@ -1399,9 +1393,8 @@ class _ReadingStatusDropdown extends ConsumerWidget {
     final reading = readProvider.value;
     final setReadingStatus = ref.watch(readingStatusMutation(manga));
 
-    if (readProvider.isLoading || setReadingStatus is MutationPending) {
-      return _loadingAction;
-    }
+    final isLoading =
+        readProvider.isLoading || setReadingStatus is MutationPending;
 
     if (reading == null) {
       return const SizedBox.shrink();
@@ -1410,6 +1403,7 @@ class _ReadingStatusDropdown extends ConsumerWidget {
     return DropdownMenu<MangaReadingStatus>(
       initialSelection: reading,
       width: 175.0,
+      enabled: !isLoading,
       enableFilter: false,
       enableSearch: false,
       requestFocusOnTap: false,
@@ -1468,23 +1462,22 @@ class _RatingMenu extends HookConsumerWidget {
 
     return MenuAnchor(
       builder: (context, controller, child) {
-        return Material(
-          color: hasRating
-              ? theme.colorScheme.primaryContainer
-              : theme.colorScheme.surface.withAlpha(200),
-          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-          child: isLoading
-              ? _loadingAction
-              : InkWell(
-                  onTap: () {
-                    if (controller.isOpen) {
-                      controller.close();
-                    } else {
-                      controller.open();
-                    }
-                  },
-                  child: child,
-                ),
+        return IconButton(
+          style: Styles.squareIconButtonStyle(
+            backgroundColor: hasRating
+                ? theme.colorScheme.primaryContainer
+                : theme.colorScheme.surface.withAlpha(200),
+          ),
+          onPressed: isLoading
+              ? null
+              : () {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
+                },
+          icon: child!,
         );
       },
       menuChildren: [
@@ -1506,10 +1499,9 @@ class _RatingMenu extends HookConsumerWidget {
           ),
       ],
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 2.0),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          spacing: 4.0,
           children: [
             Icon(
               Icons.star_border,
@@ -1547,21 +1539,20 @@ class _UserListsMenu extends ConsumerWidget {
 
     return MenuAnchor(
       builder: (context, controller, child) {
-        return Material(
-          color: theme.colorScheme.surface.withAlpha(200),
-          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-          child: isLoading
-              ? _loadingAction
-              : InkWell(
-                  onTap: () {
-                    if (controller.isOpen) {
-                      controller.close();
-                    } else {
-                      controller.open();
-                    }
-                  },
-                  child: child,
-                ),
+        return IconButton(
+          style: Styles.squareIconButtonStyle(
+            backgroundColor: theme.colorScheme.surface.withAlpha(200),
+          ),
+          onPressed: isLoading
+              ? null
+              : () {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
+                },
+          icon: child!,
         );
       },
       menuChildren: [
@@ -1675,10 +1666,7 @@ class _UserListsMenu extends ConsumerWidget {
           },
         ),
       ],
-      child: const Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Icon(Icons.playlist_add),
-      ),
+      child: const Icon(Icons.playlist_add),
     );
   }
 }
