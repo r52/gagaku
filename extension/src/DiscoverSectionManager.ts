@@ -1,6 +1,7 @@
 import type {
   DiscoverSection,
   DiscoverSectionItem,
+  Metadata,
   PagedResults,
   SelectorID,
   SelectorRegistry,
@@ -21,7 +22,7 @@ export class MockDiscoverSectionManager implements DiscoverSectionManager {
     selector?: SelectorID<
       (
         section: DiscoverSection,
-        metadata: unknown | undefined
+        metadata: Metadata
       ) => Promise<PagedResults<DiscoverSectionItem>>
     >
   }[]
@@ -36,7 +37,7 @@ export class MockDiscoverSectionManager implements DiscoverSectionManager {
     selector?: SelectorID<
       (
         section: DiscoverSection,
-        metadata: unknown | undefined
+        metadata: Metadata
       ) => Promise<PagedResults<DiscoverSectionItem>>
     >
   ): void {

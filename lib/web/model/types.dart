@@ -934,15 +934,13 @@ abstract class SortingOption with _$SortingOption {
 abstract class SearchQuery with _$SearchQuery {
   const SearchQuery._();
 
-  const factory SearchQuery({
-    required String title,
-    @Default([]) List<SearchFilterValue> filters,
-  }) = _SearchQuery;
+  const factory SearchQuery({required String title, dynamic metadata}) =
+      _SearchQuery;
 
   factory SearchQuery.fromJson(Map<String, dynamic> json) =>
       _$SearchQueryFromJson(json);
 
-  bool get isEmpty => title.isEmpty && filters.isEmpty;
+  bool get isEmpty => title.isEmpty && metadata == null;
 }
 
 @freezed
@@ -1142,6 +1140,7 @@ sealed class DiscoverSectionItem with _$DiscoverSectionItem {
 typedef SelectorID = String;
 typedef FormID = String;
 
+// TODO: candidate for removal
 @freezed
 abstract class SelectRowOption with _$SelectRowOption {
   const factory SelectRowOption({required String id, required String title}) =
@@ -1179,6 +1178,7 @@ sealed class FormItemElement with _$FormItemElement {
     required SelectorID onValueChange, // (value: boolean) => Promise<void>
   }) = ToggleRowElement;
 
+  // TODO: candidate for removal
   const factory FormItemElement.selectRow({
     required String id,
     required bool isHidden,
@@ -1251,7 +1251,7 @@ sealed class FormSectionElement with _$FormSectionElement {
     String? header,
     String? footer,
     required List<FormItemElement> items,
-  }) = TagSectionElement;
+  }) = FlowSectionElement;
 
   const factory FormSectionElement.listSection({
     required String id,
@@ -1269,69 +1269,6 @@ sealed class FormSectionElement with _$FormSectionElement {
 
   factory FormSectionElement.fromJson(Map<String, dynamic> json) =>
       _$FormSectionElementFromJson(json);
-}
-
-@freezed
-abstract class FilterOption with _$FilterOption {
-  const factory FilterOption({required String id, required String value}) =
-      _FilterOption;
-
-  factory FilterOption.fromJson(Map<String, dynamic> json) =>
-      _$FilterOptionFromJson(json);
-}
-
-@Freezed(unionKey: 'type')
-sealed class SearchFilter with _$SearchFilter {
-  const factory SearchFilter.dropdown({
-    required String id,
-    required String title,
-    required List<FilterOption> options,
-    required String value,
-  }) = DropdownSearchFilter;
-
-  const factory SearchFilter.multiselect({
-    required String id,
-    required String title,
-    required List<FilterOption> options,
-    required Map<String, String> value,
-    required bool allowExclusion,
-    required bool allowEmptySelection,
-    num? maximum,
-  }) = SelectSearchFilter;
-
-  const factory SearchFilter.tags({
-    required String id,
-    required String title,
-    required List<TagSection> sections,
-    required Map<String, Map<String, String>> value,
-    required bool allowExclusion,
-    required bool allowEmptySelection,
-    num? maximum,
-  }) = TagSearchFilter;
-
-  const factory SearchFilter.input({
-    required String id,
-    required String title,
-    required String placeholder,
-    required String value,
-  }) = InputSearchFilter;
-
-  factory SearchFilter.fromJson(Map<String, dynamic> json) =>
-      _$SearchFilterFromJson(json);
-}
-
-@freezed
-abstract class SearchFilterValue with _$SearchFilterValue {
-  const SearchFilterValue._();
-
-  const factory SearchFilterValue({required String id, required Object value}) =
-      _SearchFilterValue;
-
-  factory SearchFilterValue.fromJson(Map<String, dynamic> json) =>
-      _$SearchFilterValueFromJson(json);
-
-  factory SearchFilterValue.fromSearchFilter(SearchFilter filter) =>
-      SearchFilterValue(id: filter.id, value: filter.value);
 }
 
 @freezed

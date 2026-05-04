@@ -32,8 +32,8 @@ class ExtensionWebViewBridge {
   InAppWebViewController? get _controller =>
       (_view?.isRunning() ?? false) ? _view?.webViewController : null;
 
-  List<SearchFilter>? _filters;
-  final Map<String, SettingsForm> _forms = {};
+  bool _hasAdvancedSearchForm = false;
+  final Map<String, ExtensionForm> _forms = {};
   List<Cookie>? _cookies;
 
   bool _hasSortOps = false;
@@ -143,7 +143,7 @@ class ExtensionWebViewBridge {
     _completeTimer = null;
     _view = null;
     _initialized = false;
-    _filters = null;
+    _hasAdvancedSearchForm = false;
     _hasSortOps = false;
     _forms.clear();
   }
@@ -194,7 +194,7 @@ class ExtensionWebViewBridge {
 
         _forms.putIfAbsent(
           formId,
-          () => SettingsForm(id: formId, controller: controller),
+          () => ExtensionForm(id: formId, controller: controller),
         );
       },
     );
@@ -327,24 +327,23 @@ class ExtensionWebViewBridge {
         functionBody: "return await ${source.id}.initialise();",
       );
 
-      // Get tags
-      final result = await controller.callAsyncJavaScript(
-        functionBody: "return await ${source.id}.getSearchFilters();",
+      // Check for advanced search definition
+      final advancedSearchCheck = await controller.callAsyncJavaScript(
+        functionBody:
+            "return typeof ${source.id}.getAdvancedSearchForm === 'function';",
       );
 
-      if (result != null && result.value != null) {
-        final rsec = result.value as List<dynamic>;
-        _filters = rsec.map((e) => SearchFilter.fromJson(e)).toList();
+      if (advancedSearchCheck != null && advancedSearchCheck.value == true) {
+        _hasAdvancedSearchForm = true;
       }
 
-      // Test sort options
-      final params = SearchQuery(title: "").toJson();
-      final sortopts = await controller.callAsyncJavaScript(
-        arguments: {'query': params},
-        functionBody: "return await ${source.id}.getSortingOptions?.(query);",
+      // Check sort options
+      final sortoptsCheck = await controller.callAsyncJavaScript(
+        functionBody:
+            "return typeof ${source.id}.getSortingOptions === 'function';",
       );
 
-      if (sortopts != null && sortopts.value != null) {
+      if (sortoptsCheck != null && sortoptsCheck.value == true) {
         _hasSortOps = true;
       }
 
@@ -420,7 +419,7 @@ await ${source.id}.saveCloudflareBypassCookies(jc);
     return value;
   }
 
-  Future<SettingsForm> getSettingsForm(WebSourceInfo source) async {
+  Future<ExtensionForm> getSettingsForm(WebSourceInfo source) async {
     if (!source.hasCapability(SourceIntents.settingsUI)) {
       throw UnsupportedError("Source does not support settings");
     }
@@ -454,7 +453,7 @@ return id;
     return _forms[formid]!;
   }
 
-  Future<SettingsForm> getForm(WebSourceInfo source, FormID id) async {
+  Future<ExtensionForm> getForm(WebSourceInfo source, FormID id) async {
     if (!source.hasCapability(SourceIntents.settingsUI)) {
       throw UnsupportedError("Source does not support settings");
     }
@@ -573,7 +572,7 @@ return p;
     dynamic metadata, {
     SortingOption? sortOp,
   }) async {
-    if (query.title.isEmpty && query.filters.isEmpty) {
+    if (query.isEmpty) {
       return PagedResults<SearchResultItem>(items: []);
     }
 
@@ -707,8 +706,41 @@ return p;
     return null;
   }
 
-  List<SearchFilter>? getFilters() {
-    return _filters?.map((e) => e.copyWith()).toList();
+  bool get hasAdvancedSearchForm => _hasAdvancedSearchForm;
+
+  Future<ExtensionForm?> getAdvancedSearchForm(SearchQuery query) async {
+    if (!_hasAdvancedSearchForm) {
+      return null;
+    }
+
+    final result = await _controller?.callAsyncJavaScript(
+      arguments: {'query': query.toJson()},
+      functionBody:
+          """
+var form = await $sourceId.getAdvancedSearchForm(query);
+form.formWillAppear?.();
+var id = await window.Application.initializeForm("advancedSearch", form);
+return id;
+""",
+    );
+
+    if (result == null || result.error != null) {
+      throw JavaScriptException(
+        message: 'JavaScript error:',
+        errorMessage: result?.error,
+      );
+    }
+
+    final formid = result.value as FormID;
+
+    if (!_forms.containsKey(formid)) {
+      throw JavaScriptException(
+        message: 'Failed to create form',
+        errorMessage: formid,
+      );
+    }
+
+    return _forms[formid]!;
   }
 
   List<Cookie>? getCookies() {
@@ -716,8 +748,8 @@ return p;
   }
 }
 
-class SettingsForm with ChangeNotifier {
-  SettingsForm({required this.id, required InAppWebViewController controller})
+class ExtensionForm with ChangeNotifier {
+  ExtensionForm({required this.id, required InAppWebViewController controller})
     : _controller = controller {
     _sections = _getSections();
   }
@@ -727,6 +759,9 @@ class SettingsForm with ChangeNotifier {
 
   late Future<List<FormSectionElement>> _sections;
   Future<List<FormSectionElement>> get sections => _sections;
+
+  bool _requiresExplicitSubmission = false;
+  bool get requiresExplicitSubmission => _requiresExplicitSubmission;
 
   Future<List<FormSectionElement>> _getSections() async {
     final result = await _controller.callAsyncJavaScript(
@@ -771,11 +806,7 @@ return a;
         .map((e) => FormSectionElement.fromJson(e as dynamic))
         .toList();
 
-    return sections;
-  }
-
-  Future<bool> requiresExplicitSubmission() async {
-    final result = await _controller.callAsyncJavaScript(
+    final hasSubmit = await _controller.callAsyncJavaScript(
       arguments: {'formid': id},
       functionBody: """
 var form = window.Application.getForm(formid);
@@ -783,18 +814,20 @@ if (typeof form === "undefined") {
   return false;
 }
 
-return form.requiresExplicitSubmission();
+return form.requiresExplicitSubmission;
 """,
     );
 
-    if (result == null || result.error != null) {
+    if (hasSubmit == null || hasSubmit.error != null) {
       throw JavaScriptException(
         message: 'JavaScript error:',
-        errorMessage: result?.error,
+        errorMessage: hasSubmit?.error,
       );
     }
 
-    return result.value as bool;
+    _requiresExplicitSubmission = hasSubmit.value as bool;
+
+    return sections;
   }
 
   Future<void> call(String method) async {
@@ -834,5 +867,53 @@ form.formWillAppear?.();
     _controller.evaluateJavascript(
       source: "window.Application.uninitializeForms();",
     );
+  }
+
+  Future<void> formDidSubmit() async {
+    final result = await _controller.callAsyncJavaScript(
+      arguments: {'formid': id},
+      functionBody: """
+var form = window.Application.getForm(formid);
+if (typeof form === "undefined") {
+  return;
+}
+
+return await form.formDidSubmit?.();
+""",
+    );
+
+    if (result?.error != null) {
+      throw Exception(result!.error);
+    }
+  }
+
+  Future<void> formDidCancel() async {
+    await _controller.callAsyncJavaScript(
+      arguments: {'formid': id},
+      functionBody: """
+var form = window.Application.getForm(formid);
+if (typeof form === "undefined") {
+  return;
+}
+
+return await form.formDidCancel?.();
+""",
+    );
+  }
+
+  Future<dynamic> getSearchQueryMetadata() async {
+    final result = await _controller.callAsyncJavaScript(
+      arguments: {'formid': id},
+      functionBody: """
+var form = window.Application.getForm(formid);
+if (typeof form === "undefined") {
+  return null;
+}
+
+return await form.getSearchQueryMetadata?.();
+""",
+    );
+
+    return result?.value;
   }
 }

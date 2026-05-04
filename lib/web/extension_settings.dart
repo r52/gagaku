@@ -20,12 +20,15 @@ class ExtensionSettingsPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final results = useMemoized(
-      () => ref
+    final results = useMemoized(() async {
+      final form = await ref
           .read(extensionSourceProvider(source.id).notifier)
-          .getSettingsForm(),
-      [source],
-    );
+          .getSettingsForm();
+
+      form.call('formDidAppear');
+
+      return form;
+    }, [source]);
     final future = useFuture(results);
 
     Widget body = Center(child: CircularProgressIndicator());
@@ -47,11 +50,12 @@ class ExtensionSettingsPage extends HookConsumerWidget {
         title: Text(tr.arg_settings(arg: source.name)),
         leading: BackButton(
           onPressed: () {
+            ExtensionForm? form;
             if (future.data != null) {
-              final data = future.data!;
-              data.call('formDidDisappear');
+              form = future.data!;
             }
 
+            form?.call('formWillDisappear');
             Navigator.maybePop(context);
           },
         ),
@@ -70,7 +74,7 @@ class FormBuilder extends StatefulHookConsumerWidget {
   });
 
   final WebSourceInfo source;
-  final SettingsForm form;
+  final ExtensionForm form;
   final bool isTopLevel;
 
   @override
@@ -80,6 +84,8 @@ class FormBuilder extends StatefulHookConsumerWidget {
 class _FormBuilderState extends ConsumerState<FormBuilder> {
   @override
   void dispose() {
+    widget.form.call('formDidDisappear');
+
     if (widget.isTopLevel) {
       widget.form.uninitialize();
     }
@@ -117,12 +123,58 @@ class _FormBuilderState extends ConsumerState<FormBuilder> {
       );
     }
 
-    // TODO submit button support?
-
     return Scaffold(
       appBar: AppBar(
         title: Text(tr.arg_settings(arg: widget.source.name)),
-        leading: const BackButton(),
+        leading: BackButton(
+          onPressed: () {
+            widget.form.formDidCancel();
+            Navigator.maybePop(context);
+          },
+        ),
+        actions: widget.form.requiresExplicitSubmission
+            ? [
+                OverflowBar(
+                  spacing: 8.0,
+                  children: [
+                    Tooltip(
+                      message: tr.ui.cancel,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          widget.form.formDidCancel();
+                          Navigator.maybePop(context);
+                        },
+                        icon: const Icon(Icons.close),
+                        label: Text(tr.ui.cancel),
+                      ),
+                    ),
+                    Tooltip(
+                      message: tr.ui.submit,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          try {
+                            await widget.form.formDidSubmit();
+                            final result = await widget.form
+                                .getSearchQueryMetadata();
+                            if (context.mounted) {
+                              Navigator.maybePop(context, result);
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(e.toString())),
+                              );
+                            }
+                          }
+                        },
+                        icon: const Icon(Icons.check),
+                        label: Text(tr.ui.submit),
+                      ),
+                    ),
+                  ],
+                ),
+              ]
+            : null,
       ),
       body: SafeArea(child: body),
     );
@@ -153,6 +205,7 @@ class FormItemDelegateBuilder extends StatelessWidget {
         );
         break;
       case SelectRowElement():
+        // TODO: candidate for removal
         child = SelectRowBuilder(
           source: source,
           element: element as SelectRowElement,
@@ -348,6 +401,7 @@ class ButtonRowBuilder extends ConsumerWidget {
   }
 }
 
+// TODO: candidate for removal
 class SelectRowBuilder extends HookConsumerWidget {
   const SelectRowBuilder({
     super.key,
@@ -566,6 +620,7 @@ class NavigationRowBuilder extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nav = Navigator.of(context);
+    final theme = Theme.of(context);
     final results = useMemoized(
       () => ref
           .read(extensionSourceProvider(source.id).notifier)
@@ -590,7 +645,21 @@ class NavigationRowBuilder extends HookConsumerWidget {
         child: ListTile(
           title: Text(element.title),
           subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
-          trailing: Icon(Icons.arrow_forward_ios),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (element.value != null) ...[
+                Text(
+                  element.value!,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.outline,
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              const Icon(Icons.arrow_forward_ios, size: 16),
+            ],
+          ),
           onTap: () => nav.push(
             PageTransitionRouteBuilder(
               pageTransitionsBuilder:
@@ -698,6 +767,7 @@ class LabelRowBuilder extends ConsumerWidget {
       child: ListTile(
         title: Text(element.title),
         subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
+        trailing: element.value != null ? Text(element.value!) : null,
         onTap: element.onSelect != null
             ? () {
                 _safeCallBinding(context, ref, source.id, element.onSelect!);

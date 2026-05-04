@@ -383,18 +383,18 @@ class _WebMetadataList extends StatelessWidget {
                     for (final tag in tagsec.tags)
                       IconTextChip(
                         text: tag.title,
-                        onPressed: () => ExtensionSearchRoute(
-                          initialSource: source,
-                          query: SearchQuery(
-                            title: '',
-                            filters: [
-                              SearchFilterValue(
-                                id: tagsec.id,
-                                value: {tag.id: 'included'},
-                              ),
-                            ],
-                          ),
-                        ).push(context),
+                        // onPressed: () => ExtensionSearchRoute(
+                        //   initialSource: source,
+                        //   query: SearchQuery(
+                        //     title: '',
+                        //     metadata: [
+                        //       {
+                        //         "id": tagsec.id,
+                        //         "value": {tag.id: "included"},
+                        //       },
+                        //     ],
+                        //   ),
+                        // ).push(context),
                       ),
                   ],
                 ),

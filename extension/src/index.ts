@@ -1,5 +1,4 @@
 import { MockDiscoverSectionManager } from "./DiscoverSectionManager";
-import { MockSearchFilterManager } from "./SearchFilterManager";
 import { MockSelectorRegistry } from "./Selector";
 import { MockRequestManager } from "./RequestManager";
 import { FormManager } from "./FormManager";
@@ -20,7 +19,6 @@ export function ApplicationPolyfill(): typeof Application {
   const discoverSectionManager = new MockDiscoverSectionManager(
     selectorRegistry
   )
-  const searchFilterManager = new MockSearchFilterManager()
   // <!-- unused
 
   const formManager = new FormManager();
@@ -50,15 +48,6 @@ export function ApplicationPolyfill(): typeof Application {
       discoverSectionManager.invalidateDiscoverSections.bind(
         discoverSectionManager
       ),
-
-    registerSearchFilter:
-      searchFilterManager.registerSearchFilter.bind(searchFilterManager),
-    unregisterSearchFilter:
-      searchFilterManager.unregisterSearchFilter.bind(searchFilterManager),
-    registeredSearchFilters:
-      searchFilterManager.registeredSearchFilters.bind(searchFilterManager),
-    invalidateSearchFilters:
-      searchFilterManager.invalidateSearchFilters.bind(searchFilterManager),
 
     registerInterceptor:
       requestManager.registerInterceptor.bind(requestManager),

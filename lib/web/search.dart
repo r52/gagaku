@@ -9,6 +9,8 @@ import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/model/search_history.dart';
 import 'package:gagaku/web/model/types.dart';
+import "package:gagaku/web/model/extension_bridge.dart";
+import "package:gagaku/web/extension_settings.dart";
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -210,7 +212,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                   if (opt != null) {
                     setState(() {
                       source = opt;
-                      query = query?.copyWith(filters: []);
+                      query = query?.copyWith(metadata: null);
                       currentSort = null;
                     });
                     _refresh();
@@ -318,39 +320,64 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
                     _refresh();
                   },
                   trailing: <Widget>[
-                    Tooltip(
-                      message: tr.search.filters,
-                      child: IconButton(
-                        onPressed: () async {
-                          final result = await nav
-                              .push<List<SearchFilterValue>>(
+                    HookBuilder(
+                      builder: (context) {
+                        final results = useMemoized(() async {
+                          await ref.readAsync(
+                            extensionSourceProvider(source.id).future,
+                          );
+                          return ref
+                              .read(extensionSourceProvider(source.id).notifier)
+                              .hasAdvancedSearchForm();
+                        }, [source]);
+                        final future = useFuture(results);
+
+                        if (future.connectionState == ConnectionState.waiting ||
+                            future.hasError ||
+                            !future.hasData ||
+                            future.data == false) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return Tooltip(
+                          message: tr.search.filters,
+                          child: IconButton(
+                            onPressed: () async {
+                              final result = await nav.push<dynamic>(
                                 SlideTransitionRouteBuilder(
                                   pageBuilder:
                                       (
                                         context,
                                         animation,
                                         secondaryAnimation,
-                                      ) => _ExtensionFilterWidget(
+                                      ) => ExtensionAdvancedSearchPage(
                                         source: source,
-                                        query: query,
+                                        query:
+                                            query ??
+                                            const SearchQuery(title: ''),
                                       ),
                                 ),
                               );
 
-                          if (result != null) {
-                            setState(() {
-                              query = query != null
-                                  ? query!.copyWith(filters: result)
-                                  : SearchQuery(title: '', filters: result);
-                            });
-                            _refresh();
-                          }
-                        },
-                        color: (query == null || query!.filters.isEmpty)
-                            ? theme.disabledColor
-                            : null,
-                        icon: const Icon(Icons.filter_list),
-                      ),
+                              if (result != null) {
+                                setState(() {
+                                  query = query != null
+                                      ? query!.copyWith(metadata: result)
+                                      : SearchQuery(
+                                          title: '',
+                                          metadata: result,
+                                        );
+                                });
+                                _refresh();
+                              }
+                            },
+                            color: (query == null || query!.metadata == null)
+                                ? theme.disabledColor
+                                : null,
+                            icon: const Icon(Icons.filter_list),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 );
@@ -427,6 +454,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
   }
 }
 
+/*
 class _ExtensionFilterWidget extends StatefulHookConsumerWidget {
   const _ExtensionFilterWidget({required this.source, this.query});
 
@@ -758,6 +786,65 @@ class _SectionChildren extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Wrap(spacing: 4.0, runSpacing: 4.0, children: children),
+    );
+  }
+}
+*/
+
+class ExtensionAdvancedSearchPage extends HookConsumerWidget {
+  const ExtensionAdvancedSearchPage({
+    super.key,
+    required this.source,
+    required this.query,
+  });
+
+  final WebSourceInfo source;
+  final SearchQuery query;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
+    final results = useMemoized(() async {
+      final form = await ref
+          .read(extensionSourceProvider(source.id).notifier)
+          .getAdvancedSearchForm(query);
+
+      form?.call('formDidAppear');
+
+      return form;
+    }, [source, query]);
+    final future = useFuture(results);
+
+    Widget body = const Center(child: CircularProgressIndicator());
+
+    if (future.hasError) {
+      body = ErrorList(error: future.error!, stackTrace: future.stackTrace!);
+    } else if (future.connectionState == ConnectionState.waiting ||
+        !future.hasData) {
+      body = const Center(child: CircularProgressIndicator());
+    }
+
+    if (future.data != null) {
+      final data = future.data!;
+      return FormBuilder(source: source, form: data, isTopLevel: true);
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(tr.search.filters),
+        leading: BackButton(
+          onPressed: () {
+            ExtensionForm? form;
+            if (future.data != null) {
+              form = future.data!;
+            }
+
+            form?.call('formWillDisappear');
+            Navigator.maybePop(context);
+          },
+        ),
+      ),
+      body: SafeArea(child: body),
     );
   }
 }

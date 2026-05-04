@@ -349,20 +349,11 @@ _SortingOption _$SortingOptionFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$SortingOptionToJson(_SortingOption instance) =>
     <String, dynamic>{'id': instance.id, 'label': instance.label};
 
-_SearchQuery _$SearchQueryFromJson(Map<String, dynamic> json) => _SearchQuery(
-  title: json['title'] as String,
-  filters:
-      (json['filters'] as List<dynamic>?)
-          ?.map((e) => SearchFilterValue.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
-);
+_SearchQuery _$SearchQueryFromJson(Map<String, dynamic> json) =>
+    _SearchQuery(title: json['title'] as String, metadata: json['metadata']);
 
 Map<String, dynamic> _$SearchQueryToJson(_SearchQuery instance) =>
-    <String, dynamic>{
-      'title': instance.title,
-      'filters': instance.filters.map((e) => e.toJson()).toList(),
-    };
+    <String, dynamic>{'title': instance.title, 'metadata': instance.metadata};
 
 _SearchResultItem _$SearchResultItemFromJson(Map<String, dynamic> json) =>
     _SearchResultItem(
@@ -910,8 +901,8 @@ Map<String, dynamic> _$WebViewRowElementToJson(WebViewRowElement instance) =>
       'type': instance.$type,
     };
 
-TagSectionElement _$TagSectionElementFromJson(Map<String, dynamic> json) =>
-    TagSectionElement(
+FlowSectionElement _$FlowSectionElementFromJson(Map<String, dynamic> json) =>
+    FlowSectionElement(
       id: json['id'] as String,
       header: json['header'] as String?,
       footer: json['footer'] as String?,
@@ -921,7 +912,7 @@ TagSectionElement _$TagSectionElementFromJson(Map<String, dynamic> json) =>
       $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$TagSectionElementToJson(TagSectionElement instance) =>
+Map<String, dynamic> _$FlowSectionElementToJson(FlowSectionElement instance) =>
     <String, dynamic>{
       'id': instance.id,
       'header': instance.header,
@@ -961,115 +952,6 @@ Map<String, dynamic> _$ListSectionElementToJson(ListSectionElement instance) =>
       'onAddition': instance.onAddition,
       'type': instance.$type,
     };
-
-_FilterOption _$FilterOptionFromJson(Map<String, dynamic> json) =>
-    _FilterOption(id: json['id'] as String, value: json['value'] as String);
-
-Map<String, dynamic> _$FilterOptionToJson(_FilterOption instance) =>
-    <String, dynamic>{'id': instance.id, 'value': instance.value};
-
-DropdownSearchFilter _$DropdownSearchFilterFromJson(
-  Map<String, dynamic> json,
-) => DropdownSearchFilter(
-  id: json['id'] as String,
-  title: json['title'] as String,
-  options: (json['options'] as List<dynamic>)
-      .map((e) => FilterOption.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  value: json['value'] as String,
-  $type: json['type'] as String?,
-);
-
-Map<String, dynamic> _$DropdownSearchFilterToJson(
-  DropdownSearchFilter instance,
-) => <String, dynamic>{
-  'id': instance.id,
-  'title': instance.title,
-  'options': instance.options.map((e) => e.toJson()).toList(),
-  'value': instance.value,
-  'type': instance.$type,
-};
-
-SelectSearchFilter _$SelectSearchFilterFromJson(Map<String, dynamic> json) =>
-    SelectSearchFilter(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      options: (json['options'] as List<dynamic>)
-          .map((e) => FilterOption.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      value: Map<String, String>.from(json['value'] as Map),
-      allowExclusion: json['allowExclusion'] as bool,
-      allowEmptySelection: json['allowEmptySelection'] as bool,
-      maximum: json['maximum'] as num?,
-      $type: json['type'] as String?,
-    );
-
-Map<String, dynamic> _$SelectSearchFilterToJson(SelectSearchFilter instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'title': instance.title,
-      'options': instance.options.map((e) => e.toJson()).toList(),
-      'value': instance.value,
-      'allowExclusion': instance.allowExclusion,
-      'allowEmptySelection': instance.allowEmptySelection,
-      'maximum': instance.maximum,
-      'type': instance.$type,
-    };
-
-TagSearchFilter _$TagSearchFilterFromJson(Map<String, dynamic> json) =>
-    TagSearchFilter(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      sections: (json['sections'] as List<dynamic>)
-          .map((e) => TagSection.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      value: (json['value'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(k, Map<String, String>.from(e as Map)),
-      ),
-      allowExclusion: json['allowExclusion'] as bool,
-      allowEmptySelection: json['allowEmptySelection'] as bool,
-      maximum: json['maximum'] as num?,
-      $type: json['type'] as String?,
-    );
-
-Map<String, dynamic> _$TagSearchFilterToJson(TagSearchFilter instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'title': instance.title,
-      'sections': instance.sections.map((e) => e.toJson()).toList(),
-      'value': instance.value,
-      'allowExclusion': instance.allowExclusion,
-      'allowEmptySelection': instance.allowEmptySelection,
-      'maximum': instance.maximum,
-      'type': instance.$type,
-    };
-
-InputSearchFilter _$InputSearchFilterFromJson(Map<String, dynamic> json) =>
-    InputSearchFilter(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      placeholder: json['placeholder'] as String,
-      value: json['value'] as String,
-      $type: json['type'] as String?,
-    );
-
-Map<String, dynamic> _$InputSearchFilterToJson(InputSearchFilter instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'title': instance.title,
-      'placeholder': instance.placeholder,
-      'value': instance.value,
-      'type': instance.$type,
-    };
-
-_SearchFilterValue _$SearchFilterValueFromJson(Map<String, dynamic> json) =>
-    _SearchFilterValue(
-      id: json['id'] as String,
-      value: json['value'] as Object,
-    );
-
-Map<String, dynamic> _$SearchFilterValueToJson(_SearchFilterValue instance) =>
-    <String, dynamic>{'id': instance.id, 'value': instance.value};
 
 _ExecuteInWebViewSource _$ExecuteInWebViewSourceFromJson(
   Map<String, dynamic> json,
