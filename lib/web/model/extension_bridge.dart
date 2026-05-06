@@ -69,18 +69,6 @@ class ExtensionWebViewBridge {
         initialUrlRequest: URLRequest(
           url: WebUri(source.baseUrl ?? 'about:blank'),
         ),
-        initialUserScripts: UnmodifiableListView<UserScript>([
-          UserScript(
-            source: GagakuData().extensionHost,
-            injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
-            forMainFrameOnly: true,
-          ),
-          UserScript(
-            source: extensionBody,
-            injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
-            forMainFrameOnly: true,
-          ),
-        ]),
         initialSettings: InAppWebViewSettings(
           contentBlockers: defaultTargetPlatform == TargetPlatform.android
               ? contentBlockers
@@ -121,8 +109,13 @@ class ExtensionWebViewBridge {
             }
           }
         },
-        onLoadStop: (controller, url) =>
-            _onWebViewLoadStop(controller, url, source, _initCompleter),
+        onLoadStop: (controller, url) => _onWebViewLoadStop(
+          controller,
+          url,
+          source,
+          extensionBody,
+          _initCompleter,
+        ),
       );
     } catch (e) {
       logger.w('Error creating extension view', error: e);
@@ -286,9 +279,18 @@ class ExtensionWebViewBridge {
     InAppWebViewController controller,
     Uri? url,
     WebSourceInfo source,
+    String extensionBody,
     Completer<void> completer,
   ) async {
     try {
+      if (_initialized) {
+        return;
+      }
+
+      // Don't bother with UserScripts (Bundle/Binder size limits, injected in redirection/navigation etc)
+      await controller.evaluateJavascript(source: GagakuData().extensionHost);
+      await controller.evaluateJavascript(source: extensionBody);
+
       final sourceId = source.id;
       final initScript = switch (source.version) {
         SupportedVersion.v0_9 =>
@@ -302,10 +304,6 @@ class ExtensionWebViewBridge {
 
       if (initRes == null || initRes.error != null || initRes.value != true) {
         throw Exception("Source did not initialize correctly");
-      }
-
-      if (_initialized) {
-        return;
       }
 
       // Set extension state
