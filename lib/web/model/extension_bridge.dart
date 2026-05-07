@@ -287,6 +287,22 @@ class ExtensionWebViewBridge {
         return;
       }
 
+      final expectedHost = Uri.parse(source.baseUrl ?? 'about:blank').host;
+      if (url?.host != expectedHost && expectedHost.isNotEmpty) {
+        return;
+      }
+
+      // Check if we are already injected or in the process of injecting
+      // in this specific JS document context. Avoids SyntaxError on rapid onLoadStop
+      // triggers (iframe, hash changes) while properly resetting on redirects.
+      final contextLock = await controller.evaluateJavascript(
+        source:
+            "window.__gagaku_initializing === true ? true : (window.__gagaku_initializing = true, false);",
+      );
+      if (contextLock == true) {
+        return;
+      }
+
       // Don't bother with UserScripts (Bundle/Binder size limits, injected in redirection/navigation etc)
       await controller.evaluateJavascript(source: GagakuData().extensionHost);
       await controller.evaluateJavascript(source: extensionBody);

@@ -25,7 +25,7 @@ class ExtensionSettingsPage extends HookConsumerWidget {
           .read(extensionSourceProvider(source.id).notifier)
           .getSettingsForm();
 
-      form.call('formDidAppear');
+      await form.call('formDidAppear');
 
       return form;
     }, [source]);
