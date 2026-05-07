@@ -454,6 +454,7 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
   }
 }
 
+// TODO: delete this later
 /*
 class _ExtensionFilterWidget extends StatefulHookConsumerWidget {
   const _ExtensionFilterWidget({required this.source, this.query});

@@ -679,11 +679,26 @@ Map<String, dynamic> _$FeaturedCarouselItemToJson(
   'type': instance.$type,
 };
 
-_SelectRowOption _$SelectRowOptionFromJson(Map<String, dynamic> json) =>
-    _SelectRowOption(id: json['id'] as String, title: json['title'] as String);
+_LabelRowValue _$LabelRowValueFromJson(Map<String, dynamic> json) =>
+    _LabelRowValue(
+      text: json['text'] as String?,
+      symbol: json['symbol'] as String?,
+      style: $enumDecodeNullable(_$RowStyleEnumMap, json['style']),
+    );
 
-Map<String, dynamic> _$SelectRowOptionToJson(_SelectRowOption instance) =>
-    <String, dynamic>{'id': instance.id, 'title': instance.title};
+Map<String, dynamic> _$LabelRowValueToJson(_LabelRowValue instance) =>
+    <String, dynamic>{
+      'text': instance.text,
+      'symbol': instance.symbol,
+      'style': _$RowStyleEnumMap[instance.style],
+    };
+
+const _$RowStyleEnumMap = {
+  RowStyle.warning: 'warning',
+  RowStyle.error: 'error',
+  RowStyle.success: 'success',
+  RowStyle.tinted: 'tinted',
+};
 
 LabelRowElement _$LabelRowElementFromJson(Map<String, dynamic> json) =>
     LabelRowElement(
@@ -691,7 +706,8 @@ LabelRowElement _$LabelRowElementFromJson(Map<String, dynamic> json) =>
       isHidden: json['isHidden'] as bool,
       title: json['title'] as String,
       subtitle: json['subtitle'] as String?,
-      value: json['value'] as String?,
+      value: const LabelRowValueConverter().fromJson(json['value']),
+      style: $enumDecodeNullable(_$RowStyleEnumMap, json['style']),
       onSelect: json['onSelect'] as String?,
       $type: json['type'] as String?,
     );
@@ -702,7 +718,8 @@ Map<String, dynamic> _$LabelRowElementToJson(LabelRowElement instance) =>
       'isHidden': instance.isHidden,
       'title': instance.title,
       'subtitle': instance.subtitle,
-      'value': instance.value,
+      'value': const LabelRowValueConverter().toJson(instance.value),
+      'style': _$RowStyleEnumMap[instance.style],
       'onSelect': instance.onSelect,
       'type': instance.$type,
     };
@@ -745,36 +762,6 @@ Map<String, dynamic> _$ToggleRowElementToJson(ToggleRowElement instance) =>
       'isHidden': instance.isHidden,
       'title': instance.title,
       'value': instance.value,
-      'onValueChange': instance.onValueChange,
-      'type': instance.$type,
-    };
-
-SelectRowElement _$SelectRowElementFromJson(Map<String, dynamic> json) =>
-    SelectRowElement(
-      id: json['id'] as String,
-      isHidden: json['isHidden'] as bool,
-      title: json['title'] as String,
-      subtitle: json['subtitle'] as String?,
-      value: (json['value'] as List<dynamic>).map((e) => e as String).toList(),
-      minItemCount: (json['minItemCount'] as num).toInt(),
-      maxItemCount: (json['maxItemCount'] as num?)?.toInt(),
-      options: (json['options'] as List<dynamic>)
-          .map((e) => SelectRowOption.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      onValueChange: json['onValueChange'] as String,
-      $type: json['type'] as String?,
-    );
-
-Map<String, dynamic> _$SelectRowElementToJson(SelectRowElement instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'isHidden': instance.isHidden,
-      'title': instance.title,
-      'subtitle': instance.subtitle,
-      'value': instance.value,
-      'minItemCount': instance.minItemCount,
-      'maxItemCount': instance.maxItemCount,
-      'options': instance.options.map((e) => e.toJson()).toList(),
       'onValueChange': instance.onValueChange,
       'type': instance.$type,
     };

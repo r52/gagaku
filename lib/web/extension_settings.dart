@@ -204,13 +204,6 @@ class FormItemDelegateBuilder extends StatelessWidget {
           element: element as NavigationRowElement,
         );
         break;
-      case SelectRowElement():
-        // TODO: candidate for removal
-        child = SelectRowBuilder(
-          source: source,
-          element: element as SelectRowElement,
-        );
-        break;
       case InputRowElement():
         child = InputRowBuilder(
           source: source,
@@ -397,153 +390,6 @@ class ButtonRowBuilder extends ConsumerWidget {
           await _safeCallBinding(context, ref, source.id, element.onSelect);
         },
       ),
-    );
-  }
-}
-
-// TODO: candidate for removal
-class SelectRowBuilder extends HookConsumerWidget {
-  const SelectRowBuilder({
-    super.key,
-    required this.source,
-    required this.element,
-  });
-
-  final WebSourceInfo source;
-  final SelectRowElement element;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final data = useState([...element.value]);
-
-    return SettingCardWidget(
-      title: Text(element.title),
-      subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
-      builder: (context) {
-        return HookBuilder(
-          builder: (context) {
-            if (element.maxItemCount == 1) {
-              return Center(
-                child: DropdownMenu<String>(
-                  initialSelection: data.value.isNotEmpty
-                      ? data.value.first
-                      : null,
-                  requestFocusOnTap: false,
-                  enableSearch: false,
-                  enableFilter: false,
-                  dropdownMenuEntries: [
-                    for (final option in element.options)
-                      DropdownMenuEntry(value: option.id, label: option.title),
-                  ],
-                  onSelected: (String? value) {
-                    if (value != null) {
-                      data.value = [value];
-                      _safeCallBinding(
-                        context,
-                        ref,
-                        source.id,
-                        element.onValueChange,
-                        [data.value],
-                      );
-                    }
-                  },
-                ),
-              );
-            } else {
-              return Center(
-                child: MenuAnchor(
-                  builder: (context, controller, child) => SizedBox(
-                    width: double.infinity,
-                    child: Material(
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(6.0),
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          if (controller.isOpen) {
-                            controller.close();
-                          } else {
-                            controller.open();
-                          }
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(6.0),
-                          child: child,
-                        ),
-                      ),
-                    ),
-                  ),
-                  menuChildren: [
-                    for (final option in element.options)
-                      CheckboxMenuButton(
-                        closeOnActivate: false,
-                        value: data.value.contains(option.id),
-                        onChanged: (bool? value) async {
-                          if (value == true) {
-                            if (element.maxItemCount != null &&
-                                data.value.length == element.maxItemCount) {
-                              return;
-                            }
-
-                            data.value = [...data.value, option.id];
-                          } else {
-                            if (data.value.length == element.minItemCount) {
-                              return;
-                            }
-                            data.value = [...data.value..remove(option.id)];
-                          }
-
-                          _safeCallBinding(
-                            context,
-                            ref,
-                            source.id,
-                            element.onValueChange,
-                            [data.value],
-                          );
-                        },
-                        child: Text(option.title),
-                      ),
-                  ],
-                  child: Column(
-                    children: [
-                      Wrap(
-                        spacing: 2.0,
-                        runSpacing: 2.0,
-                        children: [
-                          for (final option in data.value)
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                data.value = [...data.value..remove(option)];
-                                ref
-                                    .read(
-                                      extensionSourceProvider(
-                                        source.id,
-                                      ).notifier,
-                                    )
-                                    .callBinding(element.onValueChange, [
-                                      data.value,
-                                    ]);
-                              },
-                              icon: const Icon(Icons.close),
-                              label: Text(
-                                element.options
-                                    .firstWhere((e) => e.id == option)
-                                    .title,
-                              ),
-                            ),
-                        ],
-                      ),
-                      const Icon(Icons.arrow_drop_down),
-                    ],
-                  ),
-                ),
-              );
-            }
-          },
-        );
-      },
     );
   }
 }
@@ -757,17 +603,82 @@ class LabelRowBuilder extends ConsumerWidget {
   final WebSourceInfo source;
   final LabelRowElement element;
 
+  Color? _getColorForStyle(BuildContext context, RowStyle? style) {
+    if (style == null) return null;
+    switch (style) {
+      case RowStyle.success:
+        return Colors.green;
+      case RowStyle.error:
+        return Colors.red;
+      case RowStyle.warning:
+        return Colors.orange;
+      case RowStyle.tinted:
+        return Theme.of(context).colorScheme.primary;
+    }
+  }
+
+  String? _getSymbol(String? symbol) {
+    if (symbol == null) return null;
+    switch (symbol) {
+      case 'checkmark':
+        return '✓';
+      case 'xmark':
+        return '✕';
+      default:
+        return symbol;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (element.isHidden) {
       return const SizedBox.shrink();
     }
 
+    final theme = Theme.of(context);
+    String? displayValue;
+    String? displaySymbol;
+    RowStyle? innerStyle;
+
+    if (element.value is String) {
+      displayValue = element.value as String;
+    } else if (element.value is LabelRowValue) {
+      final val = element.value as LabelRowValue;
+      displayValue = val.text;
+      displaySymbol = val.symbol;
+      innerStyle = val.style;
+    } else if (element.value is Map) {
+      // Fallback for unchecked dynamic map
+      final map = element.value as Map;
+      displayValue = map['text'] as String?;
+      displaySymbol = map['symbol'] as String?;
+    }
+
+    final outerColor = _getColorForStyle(context, element.style);
+    final innerColor = _getColorForStyle(context, innerStyle);
+    final resolvedSymbol = _getSymbol(displaySymbol);
+    final trailingText = resolvedSymbol ?? displayValue;
+
+    Widget? trailingWidget;
+    if (trailingText != null) {
+      trailingWidget = Text(
+        trailingText,
+        style: TextStyle(
+          color: innerColor ?? outerColor ?? theme.colorScheme.outline,
+          fontWeight: (innerColor ?? outerColor) != null
+              ? FontWeight.bold
+              : null,
+        ),
+      );
+    }
+
     return Card(
       child: ListTile(
+        textColor: outerColor,
+        iconColor: outerColor,
         title: Text(element.title),
         subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
-        trailing: element.value != null ? Text(element.value!) : null,
+        trailing: trailingWidget,
         onTap: element.onSelect != null
             ? () {
                 _safeCallBinding(context, ref, source.id, element.onSelect!);

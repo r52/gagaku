@@ -4832,42 +4832,42 @@ as ContentRating?,
 
 
 /// @nodoc
-mixin _$SelectRowOption {
+mixin _$LabelRowValue {
 
- String get id; String get title;
-/// Create a copy of SelectRowOption
+ String? get text; String? get symbol; RowStyle? get style;
+/// Create a copy of LabelRowValue
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$SelectRowOptionCopyWith<SelectRowOption> get copyWith => _$SelectRowOptionCopyWithImpl<SelectRowOption>(this as SelectRowOption, _$identity);
+$LabelRowValueCopyWith<LabelRowValue> get copyWith => _$LabelRowValueCopyWithImpl<LabelRowValue>(this as LabelRowValue, _$identity);
 
-  /// Serializes this SelectRowOption to a JSON map.
+  /// Serializes this LabelRowValue to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SelectRowOption&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LabelRowValue&&(identical(other.text, text) || other.text == text)&&(identical(other.symbol, symbol) || other.symbol == symbol)&&(identical(other.style, style) || other.style == style));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title);
+int get hashCode => Object.hash(runtimeType,text,symbol,style);
 
 @override
 String toString() {
-  return 'SelectRowOption(id: $id, title: $title)';
+  return 'LabelRowValue(text: $text, symbol: $symbol, style: $style)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $SelectRowOptionCopyWith<$Res>  {
-  factory $SelectRowOptionCopyWith(SelectRowOption value, $Res Function(SelectRowOption) _then) = _$SelectRowOptionCopyWithImpl;
+abstract mixin class $LabelRowValueCopyWith<$Res>  {
+  factory $LabelRowValueCopyWith(LabelRowValue value, $Res Function(LabelRowValue) _then) = _$LabelRowValueCopyWithImpl;
 @useResult
 $Res call({
- String id, String title
+ String? text, String? symbol, RowStyle? style
 });
 
 
@@ -4875,20 +4875,21 @@ $Res call({
 
 }
 /// @nodoc
-class _$SelectRowOptionCopyWithImpl<$Res>
-    implements $SelectRowOptionCopyWith<$Res> {
-  _$SelectRowOptionCopyWithImpl(this._self, this._then);
+class _$LabelRowValueCopyWithImpl<$Res>
+    implements $LabelRowValueCopyWith<$Res> {
+  _$LabelRowValueCopyWithImpl(this._self, this._then);
 
-  final SelectRowOption _self;
-  final $Res Function(SelectRowOption) _then;
+  final LabelRowValue _self;
+  final $Res Function(LabelRowValue) _then;
 
-/// Create a copy of SelectRowOption
+/// Create a copy of LabelRowValue
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? text = freezed,Object? symbol = freezed,Object? style = freezed,}) {
   return _then(_self.copyWith(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,
+text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String?,symbol: freezed == symbol ? _self.symbol : symbol // ignore: cast_nullable_to_non_nullable
+as String?,style: freezed == style ? _self.style : style // ignore: cast_nullable_to_non_nullable
+as RowStyle?,
   ));
 }
 
@@ -4899,47 +4900,48 @@ as String,
 /// @nodoc
 @JsonSerializable()
 
-class _SelectRowOption implements SelectRowOption {
-  const _SelectRowOption({required this.id, required this.title});
-  factory _SelectRowOption.fromJson(Map<String, dynamic> json) => _$SelectRowOptionFromJson(json);
+class _LabelRowValue implements LabelRowValue {
+  const _LabelRowValue({this.text, this.symbol, this.style});
+  factory _LabelRowValue.fromJson(Map<String, dynamic> json) => _$LabelRowValueFromJson(json);
 
-@override final  String id;
-@override final  String title;
+@override final  String? text;
+@override final  String? symbol;
+@override final  RowStyle? style;
 
-/// Create a copy of SelectRowOption
+/// Create a copy of LabelRowValue
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$SelectRowOptionCopyWith<_SelectRowOption> get copyWith => __$SelectRowOptionCopyWithImpl<_SelectRowOption>(this, _$identity);
+_$LabelRowValueCopyWith<_LabelRowValue> get copyWith => __$LabelRowValueCopyWithImpl<_LabelRowValue>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$SelectRowOptionToJson(this, );
+  return _$LabelRowValueToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SelectRowOption&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LabelRowValue&&(identical(other.text, text) || other.text == text)&&(identical(other.symbol, symbol) || other.symbol == symbol)&&(identical(other.style, style) || other.style == style));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title);
+int get hashCode => Object.hash(runtimeType,text,symbol,style);
 
 @override
 String toString() {
-  return 'SelectRowOption(id: $id, title: $title)';
+  return 'LabelRowValue(text: $text, symbol: $symbol, style: $style)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$SelectRowOptionCopyWith<$Res> implements $SelectRowOptionCopyWith<$Res> {
-  factory _$SelectRowOptionCopyWith(_SelectRowOption value, $Res Function(_SelectRowOption) _then) = __$SelectRowOptionCopyWithImpl;
+abstract mixin class _$LabelRowValueCopyWith<$Res> implements $LabelRowValueCopyWith<$Res> {
+  factory _$LabelRowValueCopyWith(_LabelRowValue value, $Res Function(_LabelRowValue) _then) = __$LabelRowValueCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String title
+ String? text, String? symbol, RowStyle? style
 });
 
 
@@ -4947,20 +4949,21 @@ $Res call({
 
 }
 /// @nodoc
-class __$SelectRowOptionCopyWithImpl<$Res>
-    implements _$SelectRowOptionCopyWith<$Res> {
-  __$SelectRowOptionCopyWithImpl(this._self, this._then);
+class __$LabelRowValueCopyWithImpl<$Res>
+    implements _$LabelRowValueCopyWith<$Res> {
+  __$LabelRowValueCopyWithImpl(this._self, this._then);
 
-  final _SelectRowOption _self;
-  final $Res Function(_SelectRowOption) _then;
+  final _LabelRowValue _self;
+  final $Res Function(_LabelRowValue) _then;
 
-/// Create a copy of SelectRowOption
+/// Create a copy of LabelRowValue
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,}) {
-  return _then(_SelectRowOption(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,
+@override @pragma('vm:prefer-inline') $Res call({Object? text = freezed,Object? symbol = freezed,Object? style = freezed,}) {
+  return _then(_LabelRowValue(
+text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String?,symbol: freezed == symbol ? _self.symbol : symbol // ignore: cast_nullable_to_non_nullable
+as String?,style: freezed == style ? _self.style : style // ignore: cast_nullable_to_non_nullable
+as RowStyle?,
   ));
 }
 
@@ -4981,10 +4984,6 @@ FormItemElement _$FormItemElementFromJson(
           );
                 case 'toggleRow':
           return ToggleRowElement.fromJson(
-            json
-          );
-                case 'selectRow':
-          return SelectRowElement.fromJson(
             json
           );
                 case 'buttonRow':
@@ -5089,14 +5088,16 @@ as String,
 @JsonSerializable()
 
 class LabelRowElement implements FormItemElement {
-  const LabelRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, this.value, this.onSelect, final  String? $type}): $type = $type ?? 'labelRow';
+  const LabelRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, @LabelRowValueConverter() this.value, this.style, this.onSelect, final  String? $type}): $type = $type ?? 'labelRow';
   factory LabelRowElement.fromJson(Map<String, dynamic> json) => _$LabelRowElementFromJson(json);
 
 @override final  String id;
 @override final  bool isHidden;
 @override final  String title;
  final  String? subtitle;
- final  String? value;
+@LabelRowValueConverter() final  dynamic value;
+// String | LabelRowValue
+ final  RowStyle? style;
  final  SelectorID? onSelect;
 
 @JsonKey(name: 'type')
@@ -5116,16 +5117,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LabelRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.value, value) || other.value == value)&&(identical(other.onSelect, onSelect) || other.onSelect == onSelect));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LabelRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.value, value)&&(identical(other.style, style) || other.style == style)&&(identical(other.onSelect, onSelect) || other.onSelect == onSelect));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title,subtitle,value,onSelect);
+int get hashCode => Object.hash(runtimeType,id,isHidden,title,subtitle,const DeepCollectionEquality().hash(value),style,onSelect);
 
 @override
 String toString() {
-  return 'FormItemElement.labelRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, onSelect: $onSelect)';
+  return 'FormItemElement.labelRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, style: $style, onSelect: $onSelect)';
 }
 
 
@@ -5136,7 +5137,7 @@ abstract mixin class $LabelRowElementCopyWith<$Res> implements $FormItemElementC
   factory $LabelRowElementCopyWith(LabelRowElement value, $Res Function(LabelRowElement) _then) = _$LabelRowElementCopyWithImpl;
 @override @useResult
 $Res call({
- String id, bool isHidden, String title, String? subtitle, String? value, SelectorID? onSelect
+ String id, bool isHidden, String title, String? subtitle,@LabelRowValueConverter() dynamic value, RowStyle? style, SelectorID? onSelect
 });
 
 
@@ -5153,14 +5154,15 @@ class _$LabelRowElementCopyWithImpl<$Res>
 
 /// Create a copy of FormItemElement
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? subtitle = freezed,Object? value = freezed,Object? onSelect = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? subtitle = freezed,Object? value = freezed,Object? style = freezed,Object? onSelect = freezed,}) {
   return _then(LabelRowElement(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
 as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
 as String?,value: freezed == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
-as String?,onSelect: freezed == onSelect ? _self.onSelect : onSelect // ignore: cast_nullable_to_non_nullable
+as dynamic,style: freezed == style ? _self.style : style // ignore: cast_nullable_to_non_nullable
+as RowStyle?,onSelect: freezed == onSelect ? _self.onSelect : onSelect // ignore: cast_nullable_to_non_nullable
 as SelectorID?,
   ));
 }
@@ -5325,107 +5327,6 @@ as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast
 as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
 as bool,onValueChange: null == onValueChange ? _self.onValueChange : onValueChange // ignore: cast_nullable_to_non_nullable
-as SelectorID,
-  ));
-}
-
-
-}
-
-/// @nodoc
-@JsonSerializable()
-
-class SelectRowElement implements FormItemElement {
-  const SelectRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, required final  List<String> value, required this.minItemCount, this.maxItemCount, required final  List<SelectRowOption> options, required this.onValueChange, final  String? $type}): _value = value,_options = options,$type = $type ?? 'selectRow';
-  factory SelectRowElement.fromJson(Map<String, dynamic> json) => _$SelectRowElementFromJson(json);
-
-@override final  String id;
-@override final  bool isHidden;
-@override final  String title;
- final  String? subtitle;
- final  List<String> _value;
- List<String> get value {
-  if (_value is EqualUnmodifiableListView) return _value;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_value);
-}
-
- final  int minItemCount;
- final  int? maxItemCount;
- final  List<SelectRowOption> _options;
- List<SelectRowOption> get options {
-  if (_options is EqualUnmodifiableListView) return _options;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_options);
-}
-
- final  SelectorID onValueChange;
-
-@JsonKey(name: 'type')
-final String $type;
-
-
-/// Create a copy of FormItemElement
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$SelectRowElementCopyWith<SelectRowElement> get copyWith => _$SelectRowElementCopyWithImpl<SelectRowElement>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$SelectRowElementToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SelectRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other._value, _value)&&(identical(other.minItemCount, minItemCount) || other.minItemCount == minItemCount)&&(identical(other.maxItemCount, maxItemCount) || other.maxItemCount == maxItemCount)&&const DeepCollectionEquality().equals(other._options, _options)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title,subtitle,const DeepCollectionEquality().hash(_value),minItemCount,maxItemCount,const DeepCollectionEquality().hash(_options),onValueChange);
-
-@override
-String toString() {
-  return 'FormItemElement.selectRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, minItemCount: $minItemCount, maxItemCount: $maxItemCount, options: $options, onValueChange: $onValueChange)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $SelectRowElementCopyWith<$Res> implements $FormItemElementCopyWith<$Res> {
-  factory $SelectRowElementCopyWith(SelectRowElement value, $Res Function(SelectRowElement) _then) = _$SelectRowElementCopyWithImpl;
-@override @useResult
-$Res call({
- String id, bool isHidden, String title, String? subtitle, List<String> value, int minItemCount, int? maxItemCount, List<SelectRowOption> options, SelectorID onValueChange
-});
-
-
-
-
-}
-/// @nodoc
-class _$SelectRowElementCopyWithImpl<$Res>
-    implements $SelectRowElementCopyWith<$Res> {
-  _$SelectRowElementCopyWithImpl(this._self, this._then);
-
-  final SelectRowElement _self;
-  final $Res Function(SelectRowElement) _then;
-
-/// Create a copy of FormItemElement
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? subtitle = freezed,Object? value = null,Object? minItemCount = null,Object? maxItemCount = freezed,Object? options = null,Object? onValueChange = null,}) {
-  return _then(SelectRowElement(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
-as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
-as String?,value: null == value ? _self._value : value // ignore: cast_nullable_to_non_nullable
-as List<String>,minItemCount: null == minItemCount ? _self.minItemCount : minItemCount // ignore: cast_nullable_to_non_nullable
-as int,maxItemCount: freezed == maxItemCount ? _self.maxItemCount : maxItemCount // ignore: cast_nullable_to_non_nullable
-as int?,options: null == options ? _self._options : options // ignore: cast_nullable_to_non_nullable
-as List<SelectRowOption>,onValueChange: null == onValueChange ? _self.onValueChange : onValueChange // ignore: cast_nullable_to_non_nullable
 as SelectorID,
   ));
 }
