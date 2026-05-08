@@ -349,20 +349,11 @@ _SortingOption _$SortingOptionFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$SortingOptionToJson(_SortingOption instance) =>
     <String, dynamic>{'id': instance.id, 'label': instance.label};
 
-_SearchQuery _$SearchQueryFromJson(Map<String, dynamic> json) => _SearchQuery(
-  title: json['title'] as String,
-  filters:
-      (json['filters'] as List<dynamic>?)
-          ?.map((e) => SearchFilterValue.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
-);
+_SearchQuery _$SearchQueryFromJson(Map<String, dynamic> json) =>
+    _SearchQuery(title: json['title'] as String, metadata: json['metadata']);
 
 Map<String, dynamic> _$SearchQueryToJson(_SearchQuery instance) =>
-    <String, dynamic>{
-      'title': instance.title,
-      'filters': instance.filters.map((e) => e.toJson()).toList(),
-    };
+    <String, dynamic>{'title': instance.title, 'metadata': instance.metadata};
 
 _SearchResultItem _$SearchResultItemFromJson(Map<String, dynamic> json) =>
     _SearchResultItem(
@@ -688,11 +679,26 @@ Map<String, dynamic> _$FeaturedCarouselItemToJson(
   'type': instance.$type,
 };
 
-_SelectRowOption _$SelectRowOptionFromJson(Map<String, dynamic> json) =>
-    _SelectRowOption(id: json['id'] as String, title: json['title'] as String);
+_LabelRowValue _$LabelRowValueFromJson(Map<String, dynamic> json) =>
+    _LabelRowValue(
+      text: json['text'] as String?,
+      symbol: json['symbol'] as String?,
+      style: $enumDecodeNullable(_$RowStyleEnumMap, json['style']),
+    );
 
-Map<String, dynamic> _$SelectRowOptionToJson(_SelectRowOption instance) =>
-    <String, dynamic>{'id': instance.id, 'title': instance.title};
+Map<String, dynamic> _$LabelRowValueToJson(_LabelRowValue instance) =>
+    <String, dynamic>{
+      'text': instance.text,
+      'symbol': instance.symbol,
+      'style': _$RowStyleEnumMap[instance.style],
+    };
+
+const _$RowStyleEnumMap = {
+  RowStyle.warning: 'warning',
+  RowStyle.error: 'error',
+  RowStyle.success: 'success',
+  RowStyle.tinted: 'tinted',
+};
 
 LabelRowElement _$LabelRowElementFromJson(Map<String, dynamic> json) =>
     LabelRowElement(
@@ -700,7 +706,8 @@ LabelRowElement _$LabelRowElementFromJson(Map<String, dynamic> json) =>
       isHidden: json['isHidden'] as bool,
       title: json['title'] as String,
       subtitle: json['subtitle'] as String?,
-      value: json['value'] as String?,
+      value: const LabelRowValueConverter().fromJson(json['value']),
+      style: $enumDecodeNullable(_$RowStyleEnumMap, json['style']),
       onSelect: json['onSelect'] as String?,
       $type: json['type'] as String?,
     );
@@ -711,7 +718,8 @@ Map<String, dynamic> _$LabelRowElementToJson(LabelRowElement instance) =>
       'isHidden': instance.isHidden,
       'title': instance.title,
       'subtitle': instance.subtitle,
-      'value': instance.value,
+      'value': const LabelRowValueConverter().toJson(instance.value),
+      'style': _$RowStyleEnumMap[instance.style],
       'onSelect': instance.onSelect,
       'type': instance.$type,
     };
@@ -754,36 +762,6 @@ Map<String, dynamic> _$ToggleRowElementToJson(ToggleRowElement instance) =>
       'isHidden': instance.isHidden,
       'title': instance.title,
       'value': instance.value,
-      'onValueChange': instance.onValueChange,
-      'type': instance.$type,
-    };
-
-SelectRowElement _$SelectRowElementFromJson(Map<String, dynamic> json) =>
-    SelectRowElement(
-      id: json['id'] as String,
-      isHidden: json['isHidden'] as bool,
-      title: json['title'] as String,
-      subtitle: json['subtitle'] as String?,
-      value: (json['value'] as List<dynamic>).map((e) => e as String).toList(),
-      minItemCount: (json['minItemCount'] as num).toInt(),
-      maxItemCount: (json['maxItemCount'] as num?)?.toInt(),
-      options: (json['options'] as List<dynamic>)
-          .map((e) => SelectRowOption.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      onValueChange: json['onValueChange'] as String,
-      $type: json['type'] as String?,
-    );
-
-Map<String, dynamic> _$SelectRowElementToJson(SelectRowElement instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'isHidden': instance.isHidden,
-      'title': instance.title,
-      'subtitle': instance.subtitle,
-      'value': instance.value,
-      'minItemCount': instance.minItemCount,
-      'maxItemCount': instance.maxItemCount,
-      'options': instance.options.map((e) => e.toJson()).toList(),
       'onValueChange': instance.onValueChange,
       'type': instance.$type,
     };
@@ -910,8 +888,8 @@ Map<String, dynamic> _$WebViewRowElementToJson(WebViewRowElement instance) =>
       'type': instance.$type,
     };
 
-TagSectionElement _$TagSectionElementFromJson(Map<String, dynamic> json) =>
-    TagSectionElement(
+FlowSectionElement _$FlowSectionElementFromJson(Map<String, dynamic> json) =>
+    FlowSectionElement(
       id: json['id'] as String,
       header: json['header'] as String?,
       footer: json['footer'] as String?,
@@ -921,7 +899,7 @@ TagSectionElement _$TagSectionElementFromJson(Map<String, dynamic> json) =>
       $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$TagSectionElementToJson(TagSectionElement instance) =>
+Map<String, dynamic> _$FlowSectionElementToJson(FlowSectionElement instance) =>
     <String, dynamic>{
       'id': instance.id,
       'header': instance.header,
@@ -961,115 +939,6 @@ Map<String, dynamic> _$ListSectionElementToJson(ListSectionElement instance) =>
       'onAddition': instance.onAddition,
       'type': instance.$type,
     };
-
-_FilterOption _$FilterOptionFromJson(Map<String, dynamic> json) =>
-    _FilterOption(id: json['id'] as String, value: json['value'] as String);
-
-Map<String, dynamic> _$FilterOptionToJson(_FilterOption instance) =>
-    <String, dynamic>{'id': instance.id, 'value': instance.value};
-
-DropdownSearchFilter _$DropdownSearchFilterFromJson(
-  Map<String, dynamic> json,
-) => DropdownSearchFilter(
-  id: json['id'] as String,
-  title: json['title'] as String,
-  options: (json['options'] as List<dynamic>)
-      .map((e) => FilterOption.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  value: json['value'] as String,
-  $type: json['type'] as String?,
-);
-
-Map<String, dynamic> _$DropdownSearchFilterToJson(
-  DropdownSearchFilter instance,
-) => <String, dynamic>{
-  'id': instance.id,
-  'title': instance.title,
-  'options': instance.options.map((e) => e.toJson()).toList(),
-  'value': instance.value,
-  'type': instance.$type,
-};
-
-SelectSearchFilter _$SelectSearchFilterFromJson(Map<String, dynamic> json) =>
-    SelectSearchFilter(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      options: (json['options'] as List<dynamic>)
-          .map((e) => FilterOption.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      value: Map<String, String>.from(json['value'] as Map),
-      allowExclusion: json['allowExclusion'] as bool,
-      allowEmptySelection: json['allowEmptySelection'] as bool,
-      maximum: json['maximum'] as num?,
-      $type: json['type'] as String?,
-    );
-
-Map<String, dynamic> _$SelectSearchFilterToJson(SelectSearchFilter instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'title': instance.title,
-      'options': instance.options.map((e) => e.toJson()).toList(),
-      'value': instance.value,
-      'allowExclusion': instance.allowExclusion,
-      'allowEmptySelection': instance.allowEmptySelection,
-      'maximum': instance.maximum,
-      'type': instance.$type,
-    };
-
-TagSearchFilter _$TagSearchFilterFromJson(Map<String, dynamic> json) =>
-    TagSearchFilter(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      sections: (json['sections'] as List<dynamic>)
-          .map((e) => TagSection.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      value: (json['value'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(k, Map<String, String>.from(e as Map)),
-      ),
-      allowExclusion: json['allowExclusion'] as bool,
-      allowEmptySelection: json['allowEmptySelection'] as bool,
-      maximum: json['maximum'] as num?,
-      $type: json['type'] as String?,
-    );
-
-Map<String, dynamic> _$TagSearchFilterToJson(TagSearchFilter instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'title': instance.title,
-      'sections': instance.sections.map((e) => e.toJson()).toList(),
-      'value': instance.value,
-      'allowExclusion': instance.allowExclusion,
-      'allowEmptySelection': instance.allowEmptySelection,
-      'maximum': instance.maximum,
-      'type': instance.$type,
-    };
-
-InputSearchFilter _$InputSearchFilterFromJson(Map<String, dynamic> json) =>
-    InputSearchFilter(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      placeholder: json['placeholder'] as String,
-      value: json['value'] as String,
-      $type: json['type'] as String?,
-    );
-
-Map<String, dynamic> _$InputSearchFilterToJson(InputSearchFilter instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'title': instance.title,
-      'placeholder': instance.placeholder,
-      'value': instance.value,
-      'type': instance.$type,
-    };
-
-_SearchFilterValue _$SearchFilterValueFromJson(Map<String, dynamic> json) =>
-    _SearchFilterValue(
-      id: json['id'] as String,
-      value: json['value'] as Object,
-    );
-
-Map<String, dynamic> _$SearchFilterValueToJson(_SearchFilterValue instance) =>
-    <String, dynamic>{'id': instance.id, 'value': instance.value};
 
 _ExecuteInWebViewSource _$ExecuteInWebViewSourceFromJson(
   Map<String, dynamic> json,

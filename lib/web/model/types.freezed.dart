@@ -2763,7 +2763,7 @@ as String,
 /// @nodoc
 mixin _$SearchQuery {
 
- String get title; List<SearchFilterValue> get filters;
+ String get title; dynamic get metadata;
 /// Create a copy of SearchQuery
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2776,16 +2776,16 @@ $SearchQueryCopyWith<SearchQuery> get copyWith => _$SearchQueryCopyWithImpl<Sear
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SearchQuery&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.filters, filters));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SearchQuery&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.metadata, metadata));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,const DeepCollectionEquality().hash(filters));
+int get hashCode => Object.hash(runtimeType,title,const DeepCollectionEquality().hash(metadata));
 
 @override
 String toString() {
-  return 'SearchQuery(title: $title, filters: $filters)';
+  return 'SearchQuery(title: $title, metadata: $metadata)';
 }
 
 
@@ -2796,7 +2796,7 @@ abstract mixin class $SearchQueryCopyWith<$Res>  {
   factory $SearchQueryCopyWith(SearchQuery value, $Res Function(SearchQuery) _then) = _$SearchQueryCopyWithImpl;
 @useResult
 $Res call({
- String title, List<SearchFilterValue> filters
+ String title, dynamic metadata
 });
 
 
@@ -2813,11 +2813,11 @@ class _$SearchQueryCopyWithImpl<$Res>
 
 /// Create a copy of SearchQuery
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? filters = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? metadata = freezed,}) {
   return _then(_self.copyWith(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,filters: null == filters ? _self.filters : filters // ignore: cast_nullable_to_non_nullable
-as List<SearchFilterValue>,
+as String,metadata: freezed == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
+as dynamic,
   ));
 }
 
@@ -2829,17 +2829,11 @@ as List<SearchFilterValue>,
 @JsonSerializable()
 
 class _SearchQuery extends SearchQuery {
-  const _SearchQuery({required this.title, final  List<SearchFilterValue> filters = const []}): _filters = filters,super._();
+  const _SearchQuery({required this.title, this.metadata}): super._();
   factory _SearchQuery.fromJson(Map<String, dynamic> json) => _$SearchQueryFromJson(json);
 
 @override final  String title;
- final  List<SearchFilterValue> _filters;
-@override@JsonKey() List<SearchFilterValue> get filters {
-  if (_filters is EqualUnmodifiableListView) return _filters;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_filters);
-}
-
+@override final  dynamic metadata;
 
 /// Create a copy of SearchQuery
 /// with the given fields replaced by the non-null parameter values.
@@ -2854,16 +2848,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SearchQuery&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other._filters, _filters));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SearchQuery&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.metadata, metadata));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,const DeepCollectionEquality().hash(_filters));
+int get hashCode => Object.hash(runtimeType,title,const DeepCollectionEquality().hash(metadata));
 
 @override
 String toString() {
-  return 'SearchQuery(title: $title, filters: $filters)';
+  return 'SearchQuery(title: $title, metadata: $metadata)';
 }
 
 
@@ -2874,7 +2868,7 @@ abstract mixin class _$SearchQueryCopyWith<$Res> implements $SearchQueryCopyWith
   factory _$SearchQueryCopyWith(_SearchQuery value, $Res Function(_SearchQuery) _then) = __$SearchQueryCopyWithImpl;
 @override @useResult
 $Res call({
- String title, List<SearchFilterValue> filters
+ String title, dynamic metadata
 });
 
 
@@ -2891,11 +2885,11 @@ class __$SearchQueryCopyWithImpl<$Res>
 
 /// Create a copy of SearchQuery
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? filters = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? metadata = freezed,}) {
   return _then(_SearchQuery(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,filters: null == filters ? _self._filters : filters // ignore: cast_nullable_to_non_nullable
-as List<SearchFilterValue>,
+as String,metadata: freezed == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
+as dynamic,
   ));
 }
 
@@ -4838,42 +4832,42 @@ as ContentRating?,
 
 
 /// @nodoc
-mixin _$SelectRowOption {
+mixin _$LabelRowValue {
 
- String get id; String get title;
-/// Create a copy of SelectRowOption
+ String? get text; String? get symbol; RowStyle? get style;
+/// Create a copy of LabelRowValue
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$SelectRowOptionCopyWith<SelectRowOption> get copyWith => _$SelectRowOptionCopyWithImpl<SelectRowOption>(this as SelectRowOption, _$identity);
+$LabelRowValueCopyWith<LabelRowValue> get copyWith => _$LabelRowValueCopyWithImpl<LabelRowValue>(this as LabelRowValue, _$identity);
 
-  /// Serializes this SelectRowOption to a JSON map.
+  /// Serializes this LabelRowValue to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SelectRowOption&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LabelRowValue&&(identical(other.text, text) || other.text == text)&&(identical(other.symbol, symbol) || other.symbol == symbol)&&(identical(other.style, style) || other.style == style));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title);
+int get hashCode => Object.hash(runtimeType,text,symbol,style);
 
 @override
 String toString() {
-  return 'SelectRowOption(id: $id, title: $title)';
+  return 'LabelRowValue(text: $text, symbol: $symbol, style: $style)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $SelectRowOptionCopyWith<$Res>  {
-  factory $SelectRowOptionCopyWith(SelectRowOption value, $Res Function(SelectRowOption) _then) = _$SelectRowOptionCopyWithImpl;
+abstract mixin class $LabelRowValueCopyWith<$Res>  {
+  factory $LabelRowValueCopyWith(LabelRowValue value, $Res Function(LabelRowValue) _then) = _$LabelRowValueCopyWithImpl;
 @useResult
 $Res call({
- String id, String title
+ String? text, String? symbol, RowStyle? style
 });
 
 
@@ -4881,20 +4875,21 @@ $Res call({
 
 }
 /// @nodoc
-class _$SelectRowOptionCopyWithImpl<$Res>
-    implements $SelectRowOptionCopyWith<$Res> {
-  _$SelectRowOptionCopyWithImpl(this._self, this._then);
+class _$LabelRowValueCopyWithImpl<$Res>
+    implements $LabelRowValueCopyWith<$Res> {
+  _$LabelRowValueCopyWithImpl(this._self, this._then);
 
-  final SelectRowOption _self;
-  final $Res Function(SelectRowOption) _then;
+  final LabelRowValue _self;
+  final $Res Function(LabelRowValue) _then;
 
-/// Create a copy of SelectRowOption
+/// Create a copy of LabelRowValue
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? text = freezed,Object? symbol = freezed,Object? style = freezed,}) {
   return _then(_self.copyWith(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,
+text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String?,symbol: freezed == symbol ? _self.symbol : symbol // ignore: cast_nullable_to_non_nullable
+as String?,style: freezed == style ? _self.style : style // ignore: cast_nullable_to_non_nullable
+as RowStyle?,
   ));
 }
 
@@ -4905,47 +4900,48 @@ as String,
 /// @nodoc
 @JsonSerializable()
 
-class _SelectRowOption implements SelectRowOption {
-  const _SelectRowOption({required this.id, required this.title});
-  factory _SelectRowOption.fromJson(Map<String, dynamic> json) => _$SelectRowOptionFromJson(json);
+class _LabelRowValue implements LabelRowValue {
+  const _LabelRowValue({this.text, this.symbol, this.style});
+  factory _LabelRowValue.fromJson(Map<String, dynamic> json) => _$LabelRowValueFromJson(json);
 
-@override final  String id;
-@override final  String title;
+@override final  String? text;
+@override final  String? symbol;
+@override final  RowStyle? style;
 
-/// Create a copy of SelectRowOption
+/// Create a copy of LabelRowValue
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$SelectRowOptionCopyWith<_SelectRowOption> get copyWith => __$SelectRowOptionCopyWithImpl<_SelectRowOption>(this, _$identity);
+_$LabelRowValueCopyWith<_LabelRowValue> get copyWith => __$LabelRowValueCopyWithImpl<_LabelRowValue>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$SelectRowOptionToJson(this, );
+  return _$LabelRowValueToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SelectRowOption&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LabelRowValue&&(identical(other.text, text) || other.text == text)&&(identical(other.symbol, symbol) || other.symbol == symbol)&&(identical(other.style, style) || other.style == style));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title);
+int get hashCode => Object.hash(runtimeType,text,symbol,style);
 
 @override
 String toString() {
-  return 'SelectRowOption(id: $id, title: $title)';
+  return 'LabelRowValue(text: $text, symbol: $symbol, style: $style)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$SelectRowOptionCopyWith<$Res> implements $SelectRowOptionCopyWith<$Res> {
-  factory _$SelectRowOptionCopyWith(_SelectRowOption value, $Res Function(_SelectRowOption) _then) = __$SelectRowOptionCopyWithImpl;
+abstract mixin class _$LabelRowValueCopyWith<$Res> implements $LabelRowValueCopyWith<$Res> {
+  factory _$LabelRowValueCopyWith(_LabelRowValue value, $Res Function(_LabelRowValue) _then) = __$LabelRowValueCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String title
+ String? text, String? symbol, RowStyle? style
 });
 
 
@@ -4953,20 +4949,21 @@ $Res call({
 
 }
 /// @nodoc
-class __$SelectRowOptionCopyWithImpl<$Res>
-    implements _$SelectRowOptionCopyWith<$Res> {
-  __$SelectRowOptionCopyWithImpl(this._self, this._then);
+class __$LabelRowValueCopyWithImpl<$Res>
+    implements _$LabelRowValueCopyWith<$Res> {
+  __$LabelRowValueCopyWithImpl(this._self, this._then);
 
-  final _SelectRowOption _self;
-  final $Res Function(_SelectRowOption) _then;
+  final _LabelRowValue _self;
+  final $Res Function(_LabelRowValue) _then;
 
-/// Create a copy of SelectRowOption
+/// Create a copy of LabelRowValue
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,}) {
-  return _then(_SelectRowOption(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,
+@override @pragma('vm:prefer-inline') $Res call({Object? text = freezed,Object? symbol = freezed,Object? style = freezed,}) {
+  return _then(_LabelRowValue(
+text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String?,symbol: freezed == symbol ? _self.symbol : symbol // ignore: cast_nullable_to_non_nullable
+as String?,style: freezed == style ? _self.style : style // ignore: cast_nullable_to_non_nullable
+as RowStyle?,
   ));
 }
 
@@ -4987,10 +4984,6 @@ FormItemElement _$FormItemElementFromJson(
           );
                 case 'toggleRow':
           return ToggleRowElement.fromJson(
-            json
-          );
-                case 'selectRow':
-          return SelectRowElement.fromJson(
             json
           );
                 case 'buttonRow':
@@ -5095,14 +5088,16 @@ as String,
 @JsonSerializable()
 
 class LabelRowElement implements FormItemElement {
-  const LabelRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, this.value, this.onSelect, final  String? $type}): $type = $type ?? 'labelRow';
+  const LabelRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, @LabelRowValueConverter() this.value, this.style, this.onSelect, final  String? $type}): $type = $type ?? 'labelRow';
   factory LabelRowElement.fromJson(Map<String, dynamic> json) => _$LabelRowElementFromJson(json);
 
 @override final  String id;
 @override final  bool isHidden;
 @override final  String title;
  final  String? subtitle;
- final  String? value;
+@LabelRowValueConverter() final  dynamic value;
+// String | LabelRowValue
+ final  RowStyle? style;
  final  SelectorID? onSelect;
 
 @JsonKey(name: 'type')
@@ -5122,16 +5117,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LabelRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.value, value) || other.value == value)&&(identical(other.onSelect, onSelect) || other.onSelect == onSelect));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LabelRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.value, value)&&(identical(other.style, style) || other.style == style)&&(identical(other.onSelect, onSelect) || other.onSelect == onSelect));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title,subtitle,value,onSelect);
+int get hashCode => Object.hash(runtimeType,id,isHidden,title,subtitle,const DeepCollectionEquality().hash(value),style,onSelect);
 
 @override
 String toString() {
-  return 'FormItemElement.labelRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, onSelect: $onSelect)';
+  return 'FormItemElement.labelRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, style: $style, onSelect: $onSelect)';
 }
 
 
@@ -5142,7 +5137,7 @@ abstract mixin class $LabelRowElementCopyWith<$Res> implements $FormItemElementC
   factory $LabelRowElementCopyWith(LabelRowElement value, $Res Function(LabelRowElement) _then) = _$LabelRowElementCopyWithImpl;
 @override @useResult
 $Res call({
- String id, bool isHidden, String title, String? subtitle, String? value, SelectorID? onSelect
+ String id, bool isHidden, String title, String? subtitle,@LabelRowValueConverter() dynamic value, RowStyle? style, SelectorID? onSelect
 });
 
 
@@ -5159,14 +5154,15 @@ class _$LabelRowElementCopyWithImpl<$Res>
 
 /// Create a copy of FormItemElement
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? subtitle = freezed,Object? value = freezed,Object? onSelect = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? subtitle = freezed,Object? value = freezed,Object? style = freezed,Object? onSelect = freezed,}) {
   return _then(LabelRowElement(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
 as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
 as String?,value: freezed == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
-as String?,onSelect: freezed == onSelect ? _self.onSelect : onSelect // ignore: cast_nullable_to_non_nullable
+as dynamic,style: freezed == style ? _self.style : style // ignore: cast_nullable_to_non_nullable
+as RowStyle?,onSelect: freezed == onSelect ? _self.onSelect : onSelect // ignore: cast_nullable_to_non_nullable
 as SelectorID?,
   ));
 }
@@ -5331,107 +5327,6 @@ as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast
 as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
 as bool,onValueChange: null == onValueChange ? _self.onValueChange : onValueChange // ignore: cast_nullable_to_non_nullable
-as SelectorID,
-  ));
-}
-
-
-}
-
-/// @nodoc
-@JsonSerializable()
-
-class SelectRowElement implements FormItemElement {
-  const SelectRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, required final  List<String> value, required this.minItemCount, this.maxItemCount, required final  List<SelectRowOption> options, required this.onValueChange, final  String? $type}): _value = value,_options = options,$type = $type ?? 'selectRow';
-  factory SelectRowElement.fromJson(Map<String, dynamic> json) => _$SelectRowElementFromJson(json);
-
-@override final  String id;
-@override final  bool isHidden;
-@override final  String title;
- final  String? subtitle;
- final  List<String> _value;
- List<String> get value {
-  if (_value is EqualUnmodifiableListView) return _value;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_value);
-}
-
- final  int minItemCount;
- final  int? maxItemCount;
- final  List<SelectRowOption> _options;
- List<SelectRowOption> get options {
-  if (_options is EqualUnmodifiableListView) return _options;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_options);
-}
-
- final  SelectorID onValueChange;
-
-@JsonKey(name: 'type')
-final String $type;
-
-
-/// Create a copy of FormItemElement
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$SelectRowElementCopyWith<SelectRowElement> get copyWith => _$SelectRowElementCopyWithImpl<SelectRowElement>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$SelectRowElementToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SelectRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other._value, _value)&&(identical(other.minItemCount, minItemCount) || other.minItemCount == minItemCount)&&(identical(other.maxItemCount, maxItemCount) || other.maxItemCount == maxItemCount)&&const DeepCollectionEquality().equals(other._options, _options)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title,subtitle,const DeepCollectionEquality().hash(_value),minItemCount,maxItemCount,const DeepCollectionEquality().hash(_options),onValueChange);
-
-@override
-String toString() {
-  return 'FormItemElement.selectRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, minItemCount: $minItemCount, maxItemCount: $maxItemCount, options: $options, onValueChange: $onValueChange)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $SelectRowElementCopyWith<$Res> implements $FormItemElementCopyWith<$Res> {
-  factory $SelectRowElementCopyWith(SelectRowElement value, $Res Function(SelectRowElement) _then) = _$SelectRowElementCopyWithImpl;
-@override @useResult
-$Res call({
- String id, bool isHidden, String title, String? subtitle, List<String> value, int minItemCount, int? maxItemCount, List<SelectRowOption> options, SelectorID onValueChange
-});
-
-
-
-
-}
-/// @nodoc
-class _$SelectRowElementCopyWithImpl<$Res>
-    implements $SelectRowElementCopyWith<$Res> {
-  _$SelectRowElementCopyWithImpl(this._self, this._then);
-
-  final SelectRowElement _self;
-  final $Res Function(SelectRowElement) _then;
-
-/// Create a copy of FormItemElement
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? subtitle = freezed,Object? value = null,Object? minItemCount = null,Object? maxItemCount = freezed,Object? options = null,Object? onValueChange = null,}) {
-  return _then(SelectRowElement(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
-as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
-as String?,value: null == value ? _self._value : value // ignore: cast_nullable_to_non_nullable
-as List<String>,minItemCount: null == minItemCount ? _self.minItemCount : minItemCount // ignore: cast_nullable_to_non_nullable
-as int,maxItemCount: freezed == maxItemCount ? _self.maxItemCount : maxItemCount // ignore: cast_nullable_to_non_nullable
-as int?,options: null == options ? _self._options : options // ignore: cast_nullable_to_non_nullable
-as List<SelectRowOption>,onValueChange: null == onValueChange ? _self.onValueChange : onValueChange // ignore: cast_nullable_to_non_nullable
 as SelectorID,
   ));
 }
@@ -5888,7 +5783,7 @@ FormSectionElement _$FormSectionElementFromJson(
           );
         
           default:
-            return TagSectionElement.fromJson(
+            return FlowSectionElement.fromJson(
   json
 );
         }
@@ -5965,9 +5860,9 @@ as List<FormItemElement>,
 /// @nodoc
 @JsonSerializable()
 
-class TagSectionElement implements FormSectionElement {
-  const TagSectionElement({required this.id, this.header, this.footer, required final  List<FormItemElement> items, final  String? $type}): _items = items,$type = $type ?? 'flowSection';
-  factory TagSectionElement.fromJson(Map<String, dynamic> json) => _$TagSectionElementFromJson(json);
+class FlowSectionElement implements FormSectionElement {
+  const FlowSectionElement({required this.id, this.header, this.footer, required final  List<FormItemElement> items, final  String? $type}): _items = items,$type = $type ?? 'flowSection';
+  factory FlowSectionElement.fromJson(Map<String, dynamic> json) => _$FlowSectionElementFromJson(json);
 
 @override final  String id;
 @override final  String? header;
@@ -5988,16 +5883,16 @@ final String $type;
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$TagSectionElementCopyWith<TagSectionElement> get copyWith => _$TagSectionElementCopyWithImpl<TagSectionElement>(this, _$identity);
+$FlowSectionElementCopyWith<FlowSectionElement> get copyWith => _$FlowSectionElementCopyWithImpl<FlowSectionElement>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$TagSectionElementToJson(this, );
+  return _$FlowSectionElementToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TagSectionElement&&(identical(other.id, id) || other.id == id)&&(identical(other.header, header) || other.header == header)&&(identical(other.footer, footer) || other.footer == footer)&&const DeepCollectionEquality().equals(other._items, _items));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FlowSectionElement&&(identical(other.id, id) || other.id == id)&&(identical(other.header, header) || other.header == header)&&(identical(other.footer, footer) || other.footer == footer)&&const DeepCollectionEquality().equals(other._items, _items));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -6013,8 +5908,8 @@ String toString() {
 }
 
 /// @nodoc
-abstract mixin class $TagSectionElementCopyWith<$Res> implements $FormSectionElementCopyWith<$Res> {
-  factory $TagSectionElementCopyWith(TagSectionElement value, $Res Function(TagSectionElement) _then) = _$TagSectionElementCopyWithImpl;
+abstract mixin class $FlowSectionElementCopyWith<$Res> implements $FormSectionElementCopyWith<$Res> {
+  factory $FlowSectionElementCopyWith(FlowSectionElement value, $Res Function(FlowSectionElement) _then) = _$FlowSectionElementCopyWithImpl;
 @override @useResult
 $Res call({
  String id, String? header, String? footer, List<FormItemElement> items
@@ -6025,17 +5920,17 @@ $Res call({
 
 }
 /// @nodoc
-class _$TagSectionElementCopyWithImpl<$Res>
-    implements $TagSectionElementCopyWith<$Res> {
-  _$TagSectionElementCopyWithImpl(this._self, this._then);
+class _$FlowSectionElementCopyWithImpl<$Res>
+    implements $FlowSectionElementCopyWith<$Res> {
+  _$FlowSectionElementCopyWithImpl(this._self, this._then);
 
-  final TagSectionElement _self;
-  final $Res Function(TagSectionElement) _then;
+  final FlowSectionElement _self;
+  final $Res Function(FlowSectionElement) _then;
 
 /// Create a copy of FormSectionElement
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? header = freezed,Object? footer = freezed,Object? items = null,}) {
-  return _then(TagSectionElement(
+  return _then(FlowSectionElement(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,header: freezed == header ? _self.header : header // ignore: cast_nullable_to_non_nullable
 as String?,footer: freezed == footer ? _self.footer : footer // ignore: cast_nullable_to_non_nullable
@@ -6140,733 +6035,6 @@ as bool,onReorder: freezed == onReorder ? _self.onReorder : onReorder // ignore:
 as SelectorID?,onDeletion: freezed == onDeletion ? _self.onDeletion : onDeletion // ignore: cast_nullable_to_non_nullable
 as SelectorID?,onAddition: freezed == onAddition ? _self.onAddition : onAddition // ignore: cast_nullable_to_non_nullable
 as SelectorID?,
-  ));
-}
-
-
-}
-
-
-/// @nodoc
-mixin _$FilterOption {
-
- String get id; String get value;
-/// Create a copy of FilterOption
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$FilterOptionCopyWith<FilterOption> get copyWith => _$FilterOptionCopyWithImpl<FilterOption>(this as FilterOption, _$identity);
-
-  /// Serializes this FilterOption to a JSON map.
-  Map<String, dynamic> toJson();
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FilterOption&&(identical(other.id, id) || other.id == id)&&(identical(other.value, value) || other.value == value));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,value);
-
-@override
-String toString() {
-  return 'FilterOption(id: $id, value: $value)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $FilterOptionCopyWith<$Res>  {
-  factory $FilterOptionCopyWith(FilterOption value, $Res Function(FilterOption) _then) = _$FilterOptionCopyWithImpl;
-@useResult
-$Res call({
- String id, String value
-});
-
-
-
-
-}
-/// @nodoc
-class _$FilterOptionCopyWithImpl<$Res>
-    implements $FilterOptionCopyWith<$Res> {
-  _$FilterOptionCopyWithImpl(this._self, this._then);
-
-  final FilterOption _self;
-  final $Res Function(FilterOption) _then;
-
-/// Create a copy of FilterOption
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? value = null,}) {
-  return _then(_self.copyWith(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
-}
-
-
-
-/// @nodoc
-@JsonSerializable()
-
-class _FilterOption implements FilterOption {
-  const _FilterOption({required this.id, required this.value});
-  factory _FilterOption.fromJson(Map<String, dynamic> json) => _$FilterOptionFromJson(json);
-
-@override final  String id;
-@override final  String value;
-
-/// Create a copy of FilterOption
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$FilterOptionCopyWith<_FilterOption> get copyWith => __$FilterOptionCopyWithImpl<_FilterOption>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$FilterOptionToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FilterOption&&(identical(other.id, id) || other.id == id)&&(identical(other.value, value) || other.value == value));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,value);
-
-@override
-String toString() {
-  return 'FilterOption(id: $id, value: $value)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$FilterOptionCopyWith<$Res> implements $FilterOptionCopyWith<$Res> {
-  factory _$FilterOptionCopyWith(_FilterOption value, $Res Function(_FilterOption) _then) = __$FilterOptionCopyWithImpl;
-@override @useResult
-$Res call({
- String id, String value
-});
-
-
-
-
-}
-/// @nodoc
-class __$FilterOptionCopyWithImpl<$Res>
-    implements _$FilterOptionCopyWith<$Res> {
-  __$FilterOptionCopyWithImpl(this._self, this._then);
-
-  final _FilterOption _self;
-  final $Res Function(_FilterOption) _then;
-
-/// Create a copy of FilterOption
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? value = null,}) {
-  return _then(_FilterOption(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
-
-}
-
-SearchFilter _$SearchFilterFromJson(
-  Map<String, dynamic> json
-) {
-        switch (json['type']) {
-                  case 'dropdown':
-          return DropdownSearchFilter.fromJson(
-            json
-          );
-                case 'multiselect':
-          return SelectSearchFilter.fromJson(
-            json
-          );
-                case 'tags':
-          return TagSearchFilter.fromJson(
-            json
-          );
-                case 'input':
-          return InputSearchFilter.fromJson(
-            json
-          );
-        
-          default:
-            throw CheckedFromJsonException(
-  json,
-  'type',
-  'SearchFilter',
-  'Invalid union type "${json['type']}"!'
-);
-        }
-      
-}
-
-/// @nodoc
-mixin _$SearchFilter {
-
- String get id; String get title; Object get value;
-/// Create a copy of SearchFilter
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$SearchFilterCopyWith<SearchFilter> get copyWith => _$SearchFilterCopyWithImpl<SearchFilter>(this as SearchFilter, _$identity);
-
-  /// Serializes this SearchFilter to a JSON map.
-  Map<String, dynamic> toJson();
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SearchFilter&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.value, value));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(value));
-
-@override
-String toString() {
-  return 'SearchFilter(id: $id, title: $title, value: $value)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $SearchFilterCopyWith<$Res>  {
-  factory $SearchFilterCopyWith(SearchFilter value, $Res Function(SearchFilter) _then) = _$SearchFilterCopyWithImpl;
-@useResult
-$Res call({
- String id, String title
-});
-
-
-
-
-}
-/// @nodoc
-class _$SearchFilterCopyWithImpl<$Res>
-    implements $SearchFilterCopyWith<$Res> {
-  _$SearchFilterCopyWithImpl(this._self, this._then);
-
-  final SearchFilter _self;
-  final $Res Function(SearchFilter) _then;
-
-/// Create a copy of SearchFilter
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,}) {
-  return _then(_self.copyWith(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
-}
-
-
-
-/// @nodoc
-@JsonSerializable()
-
-class DropdownSearchFilter implements SearchFilter {
-  const DropdownSearchFilter({required this.id, required this.title, required final  List<FilterOption> options, required this.value, final  String? $type}): _options = options,$type = $type ?? 'dropdown';
-  factory DropdownSearchFilter.fromJson(Map<String, dynamic> json) => _$DropdownSearchFilterFromJson(json);
-
-@override final  String id;
-@override final  String title;
- final  List<FilterOption> _options;
- List<FilterOption> get options {
-  if (_options is EqualUnmodifiableListView) return _options;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_options);
-}
-
-@override final  String value;
-
-@JsonKey(name: 'type')
-final String $type;
-
-
-/// Create a copy of SearchFilter
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$DropdownSearchFilterCopyWith<DropdownSearchFilter> get copyWith => _$DropdownSearchFilterCopyWithImpl<DropdownSearchFilter>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$DropdownSearchFilterToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DropdownSearchFilter&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other._options, _options)&&(identical(other.value, value) || other.value == value));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(_options),value);
-
-@override
-String toString() {
-  return 'SearchFilter.dropdown(id: $id, title: $title, options: $options, value: $value)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $DropdownSearchFilterCopyWith<$Res> implements $SearchFilterCopyWith<$Res> {
-  factory $DropdownSearchFilterCopyWith(DropdownSearchFilter value, $Res Function(DropdownSearchFilter) _then) = _$DropdownSearchFilterCopyWithImpl;
-@override @useResult
-$Res call({
- String id, String title, List<FilterOption> options, String value
-});
-
-
-
-
-}
-/// @nodoc
-class _$DropdownSearchFilterCopyWithImpl<$Res>
-    implements $DropdownSearchFilterCopyWith<$Res> {
-  _$DropdownSearchFilterCopyWithImpl(this._self, this._then);
-
-  final DropdownSearchFilter _self;
-  final $Res Function(DropdownSearchFilter) _then;
-
-/// Create a copy of SearchFilter
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? options = null,Object? value = null,}) {
-  return _then(DropdownSearchFilter(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,options: null == options ? _self._options : options // ignore: cast_nullable_to_non_nullable
-as List<FilterOption>,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
-
-}
-
-/// @nodoc
-@JsonSerializable()
-
-class SelectSearchFilter implements SearchFilter {
-  const SelectSearchFilter({required this.id, required this.title, required final  List<FilterOption> options, required final  Map<String, String> value, required this.allowExclusion, required this.allowEmptySelection, this.maximum, final  String? $type}): _options = options,_value = value,$type = $type ?? 'multiselect';
-  factory SelectSearchFilter.fromJson(Map<String, dynamic> json) => _$SelectSearchFilterFromJson(json);
-
-@override final  String id;
-@override final  String title;
- final  List<FilterOption> _options;
- List<FilterOption> get options {
-  if (_options is EqualUnmodifiableListView) return _options;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_options);
-}
-
- final  Map<String, String> _value;
-@override Map<String, String> get value {
-  if (_value is EqualUnmodifiableMapView) return _value;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_value);
-}
-
- final  bool allowExclusion;
- final  bool allowEmptySelection;
- final  num? maximum;
-
-@JsonKey(name: 'type')
-final String $type;
-
-
-/// Create a copy of SearchFilter
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$SelectSearchFilterCopyWith<SelectSearchFilter> get copyWith => _$SelectSearchFilterCopyWithImpl<SelectSearchFilter>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$SelectSearchFilterToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SelectSearchFilter&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other._options, _options)&&const DeepCollectionEquality().equals(other._value, _value)&&(identical(other.allowExclusion, allowExclusion) || other.allowExclusion == allowExclusion)&&(identical(other.allowEmptySelection, allowEmptySelection) || other.allowEmptySelection == allowEmptySelection)&&(identical(other.maximum, maximum) || other.maximum == maximum));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(_options),const DeepCollectionEquality().hash(_value),allowExclusion,allowEmptySelection,maximum);
-
-@override
-String toString() {
-  return 'SearchFilter.multiselect(id: $id, title: $title, options: $options, value: $value, allowExclusion: $allowExclusion, allowEmptySelection: $allowEmptySelection, maximum: $maximum)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $SelectSearchFilterCopyWith<$Res> implements $SearchFilterCopyWith<$Res> {
-  factory $SelectSearchFilterCopyWith(SelectSearchFilter value, $Res Function(SelectSearchFilter) _then) = _$SelectSearchFilterCopyWithImpl;
-@override @useResult
-$Res call({
- String id, String title, List<FilterOption> options, Map<String, String> value, bool allowExclusion, bool allowEmptySelection, num? maximum
-});
-
-
-
-
-}
-/// @nodoc
-class _$SelectSearchFilterCopyWithImpl<$Res>
-    implements $SelectSearchFilterCopyWith<$Res> {
-  _$SelectSearchFilterCopyWithImpl(this._self, this._then);
-
-  final SelectSearchFilter _self;
-  final $Res Function(SelectSearchFilter) _then;
-
-/// Create a copy of SearchFilter
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? options = null,Object? value = null,Object? allowExclusion = null,Object? allowEmptySelection = null,Object? maximum = freezed,}) {
-  return _then(SelectSearchFilter(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,options: null == options ? _self._options : options // ignore: cast_nullable_to_non_nullable
-as List<FilterOption>,value: null == value ? _self._value : value // ignore: cast_nullable_to_non_nullable
-as Map<String, String>,allowExclusion: null == allowExclusion ? _self.allowExclusion : allowExclusion // ignore: cast_nullable_to_non_nullable
-as bool,allowEmptySelection: null == allowEmptySelection ? _self.allowEmptySelection : allowEmptySelection // ignore: cast_nullable_to_non_nullable
-as bool,maximum: freezed == maximum ? _self.maximum : maximum // ignore: cast_nullable_to_non_nullable
-as num?,
-  ));
-}
-
-
-}
-
-/// @nodoc
-@JsonSerializable()
-
-class TagSearchFilter implements SearchFilter {
-  const TagSearchFilter({required this.id, required this.title, required final  List<TagSection> sections, required final  Map<String, Map<String, String>> value, required this.allowExclusion, required this.allowEmptySelection, this.maximum, final  String? $type}): _sections = sections,_value = value,$type = $type ?? 'tags';
-  factory TagSearchFilter.fromJson(Map<String, dynamic> json) => _$TagSearchFilterFromJson(json);
-
-@override final  String id;
-@override final  String title;
- final  List<TagSection> _sections;
- List<TagSection> get sections {
-  if (_sections is EqualUnmodifiableListView) return _sections;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_sections);
-}
-
- final  Map<String, Map<String, String>> _value;
-@override Map<String, Map<String, String>> get value {
-  if (_value is EqualUnmodifiableMapView) return _value;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_value);
-}
-
- final  bool allowExclusion;
- final  bool allowEmptySelection;
- final  num? maximum;
-
-@JsonKey(name: 'type')
-final String $type;
-
-
-/// Create a copy of SearchFilter
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$TagSearchFilterCopyWith<TagSearchFilter> get copyWith => _$TagSearchFilterCopyWithImpl<TagSearchFilter>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$TagSearchFilterToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TagSearchFilter&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other._sections, _sections)&&const DeepCollectionEquality().equals(other._value, _value)&&(identical(other.allowExclusion, allowExclusion) || other.allowExclusion == allowExclusion)&&(identical(other.allowEmptySelection, allowEmptySelection) || other.allowEmptySelection == allowEmptySelection)&&(identical(other.maximum, maximum) || other.maximum == maximum));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(_sections),const DeepCollectionEquality().hash(_value),allowExclusion,allowEmptySelection,maximum);
-
-@override
-String toString() {
-  return 'SearchFilter.tags(id: $id, title: $title, sections: $sections, value: $value, allowExclusion: $allowExclusion, allowEmptySelection: $allowEmptySelection, maximum: $maximum)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $TagSearchFilterCopyWith<$Res> implements $SearchFilterCopyWith<$Res> {
-  factory $TagSearchFilterCopyWith(TagSearchFilter value, $Res Function(TagSearchFilter) _then) = _$TagSearchFilterCopyWithImpl;
-@override @useResult
-$Res call({
- String id, String title, List<TagSection> sections, Map<String, Map<String, String>> value, bool allowExclusion, bool allowEmptySelection, num? maximum
-});
-
-
-
-
-}
-/// @nodoc
-class _$TagSearchFilterCopyWithImpl<$Res>
-    implements $TagSearchFilterCopyWith<$Res> {
-  _$TagSearchFilterCopyWithImpl(this._self, this._then);
-
-  final TagSearchFilter _self;
-  final $Res Function(TagSearchFilter) _then;
-
-/// Create a copy of SearchFilter
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? sections = null,Object? value = null,Object? allowExclusion = null,Object? allowEmptySelection = null,Object? maximum = freezed,}) {
-  return _then(TagSearchFilter(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,sections: null == sections ? _self._sections : sections // ignore: cast_nullable_to_non_nullable
-as List<TagSection>,value: null == value ? _self._value : value // ignore: cast_nullable_to_non_nullable
-as Map<String, Map<String, String>>,allowExclusion: null == allowExclusion ? _self.allowExclusion : allowExclusion // ignore: cast_nullable_to_non_nullable
-as bool,allowEmptySelection: null == allowEmptySelection ? _self.allowEmptySelection : allowEmptySelection // ignore: cast_nullable_to_non_nullable
-as bool,maximum: freezed == maximum ? _self.maximum : maximum // ignore: cast_nullable_to_non_nullable
-as num?,
-  ));
-}
-
-
-}
-
-/// @nodoc
-@JsonSerializable()
-
-class InputSearchFilter implements SearchFilter {
-  const InputSearchFilter({required this.id, required this.title, required this.placeholder, required this.value, final  String? $type}): $type = $type ?? 'input';
-  factory InputSearchFilter.fromJson(Map<String, dynamic> json) => _$InputSearchFilterFromJson(json);
-
-@override final  String id;
-@override final  String title;
- final  String placeholder;
-@override final  String value;
-
-@JsonKey(name: 'type')
-final String $type;
-
-
-/// Create a copy of SearchFilter
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$InputSearchFilterCopyWith<InputSearchFilter> get copyWith => _$InputSearchFilterCopyWithImpl<InputSearchFilter>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$InputSearchFilterToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InputSearchFilter&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.placeholder, placeholder) || other.placeholder == placeholder)&&(identical(other.value, value) || other.value == value));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,title,placeholder,value);
-
-@override
-String toString() {
-  return 'SearchFilter.input(id: $id, title: $title, placeholder: $placeholder, value: $value)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $InputSearchFilterCopyWith<$Res> implements $SearchFilterCopyWith<$Res> {
-  factory $InputSearchFilterCopyWith(InputSearchFilter value, $Res Function(InputSearchFilter) _then) = _$InputSearchFilterCopyWithImpl;
-@override @useResult
-$Res call({
- String id, String title, String placeholder, String value
-});
-
-
-
-
-}
-/// @nodoc
-class _$InputSearchFilterCopyWithImpl<$Res>
-    implements $InputSearchFilterCopyWith<$Res> {
-  _$InputSearchFilterCopyWithImpl(this._self, this._then);
-
-  final InputSearchFilter _self;
-  final $Res Function(InputSearchFilter) _then;
-
-/// Create a copy of SearchFilter
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? placeholder = null,Object? value = null,}) {
-  return _then(InputSearchFilter(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,placeholder: null == placeholder ? _self.placeholder : placeholder // ignore: cast_nullable_to_non_nullable
-as String,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
-
-}
-
-
-/// @nodoc
-mixin _$SearchFilterValue {
-
- String get id; Object get value;
-/// Create a copy of SearchFilterValue
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$SearchFilterValueCopyWith<SearchFilterValue> get copyWith => _$SearchFilterValueCopyWithImpl<SearchFilterValue>(this as SearchFilterValue, _$identity);
-
-  /// Serializes this SearchFilterValue to a JSON map.
-  Map<String, dynamic> toJson();
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SearchFilterValue&&(identical(other.id, id) || other.id == id)&&const DeepCollectionEquality().equals(other.value, value));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,const DeepCollectionEquality().hash(value));
-
-@override
-String toString() {
-  return 'SearchFilterValue(id: $id, value: $value)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $SearchFilterValueCopyWith<$Res>  {
-  factory $SearchFilterValueCopyWith(SearchFilterValue value, $Res Function(SearchFilterValue) _then) = _$SearchFilterValueCopyWithImpl;
-@useResult
-$Res call({
- String id, Object value
-});
-
-
-
-
-}
-/// @nodoc
-class _$SearchFilterValueCopyWithImpl<$Res>
-    implements $SearchFilterValueCopyWith<$Res> {
-  _$SearchFilterValueCopyWithImpl(this._self, this._then);
-
-  final SearchFilterValue _self;
-  final $Res Function(SearchFilterValue) _then;
-
-/// Create a copy of SearchFilterValue
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? value = null,}) {
-  return _then(_self.copyWith(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,value: null == value ? _self.value : value ,
-  ));
-}
-
-}
-
-
-
-/// @nodoc
-@JsonSerializable()
-
-class _SearchFilterValue extends SearchFilterValue {
-  const _SearchFilterValue({required this.id, required this.value}): super._();
-  factory _SearchFilterValue.fromJson(Map<String, dynamic> json) => _$SearchFilterValueFromJson(json);
-
-@override final  String id;
-@override final  Object value;
-
-/// Create a copy of SearchFilterValue
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$SearchFilterValueCopyWith<_SearchFilterValue> get copyWith => __$SearchFilterValueCopyWithImpl<_SearchFilterValue>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$SearchFilterValueToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SearchFilterValue&&(identical(other.id, id) || other.id == id)&&const DeepCollectionEquality().equals(other.value, value));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,id,const DeepCollectionEquality().hash(value));
-
-@override
-String toString() {
-  return 'SearchFilterValue(id: $id, value: $value)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$SearchFilterValueCopyWith<$Res> implements $SearchFilterValueCopyWith<$Res> {
-  factory _$SearchFilterValueCopyWith(_SearchFilterValue value, $Res Function(_SearchFilterValue) _then) = __$SearchFilterValueCopyWithImpl;
-@override @useResult
-$Res call({
- String id, Object value
-});
-
-
-
-
-}
-/// @nodoc
-class __$SearchFilterValueCopyWithImpl<$Res>
-    implements _$SearchFilterValueCopyWith<$Res> {
-  __$SearchFilterValueCopyWithImpl(this._self, this._then);
-
-  final _SearchFilterValue _self;
-  final $Res Function(_SearchFilterValue) _then;
-
-/// Create a copy of SearchFilterValue
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? value = null,}) {
-  return _then(_SearchFilterValue(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,value: null == value ? _self.value : value ,
   ));
 }
 

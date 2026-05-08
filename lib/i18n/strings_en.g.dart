@@ -127,6 +127,9 @@ class TranslationsUiEn {
 	/// en: 'Cancel'
 	String get cancel => 'Cancel';
 
+	/// en: 'Submit'
+	String get submit => 'Submit';
+
 	/// en: 'Yes'
 	String get yes => 'Yes';
 
@@ -1822,6 +1825,7 @@ extension on Translations {
 			'ui.go' => 'Go',
 			'ui.ok' => 'Ok',
 			'ui.cancel' => 'Cancel',
+			'ui.submit' => 'Submit',
 			'ui.yes' => 'Yes',
 			'ui.no' => 'No',
 			'ui.on' => 'On',

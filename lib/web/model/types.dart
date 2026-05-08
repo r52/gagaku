@@ -934,15 +934,13 @@ abstract class SortingOption with _$SortingOption {
 abstract class SearchQuery with _$SearchQuery {
   const SearchQuery._();
 
-  const factory SearchQuery({
-    required String title,
-    @Default([]) List<SearchFilterValue> filters,
-  }) = _SearchQuery;
+  const factory SearchQuery({required String title, dynamic metadata}) =
+      _SearchQuery;
 
   factory SearchQuery.fromJson(Map<String, dynamic> json) =>
       _$SearchQueryFromJson(json);
 
-  bool get isEmpty => title.isEmpty && filters.isEmpty;
+  bool get isEmpty => title.isEmpty && metadata == null;
 }
 
 @freezed
@@ -1142,13 +1140,33 @@ sealed class DiscoverSectionItem with _$DiscoverSectionItem {
 typedef SelectorID = String;
 typedef FormID = String;
 
-@freezed
-abstract class SelectRowOption with _$SelectRowOption {
-  const factory SelectRowOption({required String id, required String title}) =
-      _SelectRowOption;
+enum RowStyle { warning, error, success, tinted }
 
-  factory SelectRowOption.fromJson(Map<String, dynamic> json) =>
-      _$SelectRowOptionFromJson(json);
+@freezed
+abstract class LabelRowValue with _$LabelRowValue {
+  const factory LabelRowValue({String? text, String? symbol, RowStyle? style}) =
+      _LabelRowValue;
+
+  factory LabelRowValue.fromJson(Map<String, dynamic> json) =>
+      _$LabelRowValueFromJson(json);
+}
+
+class LabelRowValueConverter implements JsonConverter<dynamic, dynamic> {
+  const LabelRowValueConverter();
+
+  @override
+  dynamic fromJson(dynamic json) {
+    if (json is String) return json;
+    if (json is Map<String, dynamic>) return LabelRowValue.fromJson(json);
+    return null;
+  }
+
+  @override
+  dynamic toJson(dynamic object) {
+    if (object is String) return object;
+    if (object is LabelRowValue) return object.toJson();
+    return null;
+  }
 }
 
 @Freezed(unionKey: 'type')
@@ -1158,7 +1176,8 @@ sealed class FormItemElement with _$FormItemElement {
     required bool isHidden,
     required String title,
     String? subtitle,
-    String? value,
+    @LabelRowValueConverter() dynamic value, // String | LabelRowValue
+    RowStyle? style,
     SelectorID? onSelect, // () => Promise<void>
   }) = LabelRowElement;
 
@@ -1178,18 +1197,6 @@ sealed class FormItemElement with _$FormItemElement {
     required bool value,
     required SelectorID onValueChange, // (value: boolean) => Promise<void>
   }) = ToggleRowElement;
-
-  const factory FormItemElement.selectRow({
-    required String id,
-    required bool isHidden,
-    required String title,
-    String? subtitle,
-    required List<String> value,
-    required int minItemCount,
-    int? maxItemCount,
-    required List<SelectRowOption> options,
-    required SelectorID onValueChange, // (value: string[]) => Promise<void>
-  }) = SelectRowElement;
 
   const factory FormItemElement.buttonRow({
     required String id,
@@ -1251,7 +1258,7 @@ sealed class FormSectionElement with _$FormSectionElement {
     String? header,
     String? footer,
     required List<FormItemElement> items,
-  }) = TagSectionElement;
+  }) = FlowSectionElement;
 
   const factory FormSectionElement.listSection({
     required String id,
@@ -1269,69 +1276,6 @@ sealed class FormSectionElement with _$FormSectionElement {
 
   factory FormSectionElement.fromJson(Map<String, dynamic> json) =>
       _$FormSectionElementFromJson(json);
-}
-
-@freezed
-abstract class FilterOption with _$FilterOption {
-  const factory FilterOption({required String id, required String value}) =
-      _FilterOption;
-
-  factory FilterOption.fromJson(Map<String, dynamic> json) =>
-      _$FilterOptionFromJson(json);
-}
-
-@Freezed(unionKey: 'type')
-sealed class SearchFilter with _$SearchFilter {
-  const factory SearchFilter.dropdown({
-    required String id,
-    required String title,
-    required List<FilterOption> options,
-    required String value,
-  }) = DropdownSearchFilter;
-
-  const factory SearchFilter.multiselect({
-    required String id,
-    required String title,
-    required List<FilterOption> options,
-    required Map<String, String> value,
-    required bool allowExclusion,
-    required bool allowEmptySelection,
-    num? maximum,
-  }) = SelectSearchFilter;
-
-  const factory SearchFilter.tags({
-    required String id,
-    required String title,
-    required List<TagSection> sections,
-    required Map<String, Map<String, String>> value,
-    required bool allowExclusion,
-    required bool allowEmptySelection,
-    num? maximum,
-  }) = TagSearchFilter;
-
-  const factory SearchFilter.input({
-    required String id,
-    required String title,
-    required String placeholder,
-    required String value,
-  }) = InputSearchFilter;
-
-  factory SearchFilter.fromJson(Map<String, dynamic> json) =>
-      _$SearchFilterFromJson(json);
-}
-
-@freezed
-abstract class SearchFilterValue with _$SearchFilterValue {
-  const SearchFilterValue._();
-
-  const factory SearchFilterValue({required String id, required Object value}) =
-      _SearchFilterValue;
-
-  factory SearchFilterValue.fromJson(Map<String, dynamic> json) =>
-      _$SearchFilterValueFromJson(json);
-
-  factory SearchFilterValue.fromSearchFilter(SearchFilter filter) =>
-      SearchFilterValue(id: filter.id, value: filter.value);
 }
 
 @freezed

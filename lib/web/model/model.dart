@@ -830,12 +830,12 @@ class ExtensionSource extends _$ExtensionSource {
     return await _bridge!.callBinding(bindingId, args);
   }
 
-  Future<SettingsForm> getSettingsForm() async {
+  Future<ExtensionForm> getSettingsForm() async {
     final source = await future;
     return await _bridge!.getSettingsForm(source);
   }
 
-  Future<SettingsForm> getForm(FormID id) async {
+  Future<ExtensionForm> getForm(FormID id) async {
     final source = await future;
     return await _bridge!.getForm(source, id);
   }
@@ -887,9 +887,14 @@ class ExtensionSource extends _$ExtensionSource {
     return _bridge!.getSortingOptions(query);
   }
 
-  Future<List<SearchFilter>?> getFilters() async {
+  Future<ExtensionForm?> getAdvancedSearchForm(SearchQuery query) async {
     await future;
-    return _bridge!.getFilters();
+    return await _bridge!.getAdvancedSearchForm(query);
+  }
+
+  Future<bool> hasAdvancedSearchForm() async {
+    await future;
+    return _bridge!.hasAdvancedSearchForm;
   }
 
   Future<List<Cookie>?> getCookies() async {

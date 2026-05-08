@@ -20,12 +20,15 @@ class ExtensionSettingsPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final results = useMemoized(
-      () => ref
+    final results = useMemoized(() async {
+      final form = await ref
           .read(extensionSourceProvider(source.id).notifier)
-          .getSettingsForm(),
-      [source],
-    );
+          .getSettingsForm();
+
+      await form.call('formDidAppear');
+
+      return form;
+    }, [source]);
     final future = useFuture(results);
 
     Widget body = Center(child: CircularProgressIndicator());
@@ -47,11 +50,12 @@ class ExtensionSettingsPage extends HookConsumerWidget {
         title: Text(tr.arg_settings(arg: source.name)),
         leading: BackButton(
           onPressed: () {
+            ExtensionForm? form;
             if (future.data != null) {
-              final data = future.data!;
-              data.call('formDidDisappear');
+              form = future.data!;
             }
 
+            form?.call('formWillDisappear');
             Navigator.maybePop(context);
           },
         ),
@@ -70,7 +74,7 @@ class FormBuilder extends StatefulHookConsumerWidget {
   });
 
   final WebSourceInfo source;
-  final SettingsForm form;
+  final ExtensionForm form;
   final bool isTopLevel;
 
   @override
@@ -80,6 +84,8 @@ class FormBuilder extends StatefulHookConsumerWidget {
 class _FormBuilderState extends ConsumerState<FormBuilder> {
   @override
   void dispose() {
+    widget.form.call('formDidDisappear');
+
     if (widget.isTopLevel) {
       widget.form.uninitialize();
     }
@@ -111,18 +117,65 @@ class _FormBuilderState extends ConsumerState<FormBuilder> {
         itemBuilder: (context, index) {
           return FormSectionBuilder(
             source: widget.source,
+            form: widget.form,
             section: data[index],
           );
         },
       );
     }
 
-    // TODO submit button support?
-
     return Scaffold(
       appBar: AppBar(
         title: Text(tr.arg_settings(arg: widget.source.name)),
-        leading: const BackButton(),
+        leading: BackButton(
+          onPressed: () {
+            widget.form.formDidCancel();
+            Navigator.maybePop(context);
+          },
+        ),
+        actions: widget.form.requiresExplicitSubmission
+            ? [
+                OverflowBar(
+                  spacing: 8.0,
+                  children: [
+                    Tooltip(
+                      message: tr.ui.cancel,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          widget.form.formDidCancel();
+                          Navigator.maybePop(context);
+                        },
+                        icon: const Icon(Icons.close),
+                        label: Text(tr.ui.cancel),
+                      ),
+                    ),
+                    Tooltip(
+                      message: tr.ui.submit,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          try {
+                            await widget.form.formDidSubmit();
+                            final result = await widget.form
+                                .getSearchQueryMetadata();
+                            if (context.mounted) {
+                              Navigator.maybePop(context, result);
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(e.toString())),
+                              );
+                            }
+                          }
+                        },
+                        icon: const Icon(Icons.check),
+                        label: Text(tr.ui.submit),
+                      ),
+                    ),
+                  ],
+                ),
+              ]
+            : null,
       ),
       body: SafeArea(child: body),
     );
@@ -133,11 +186,13 @@ class FormItemDelegateBuilder extends StatelessWidget {
   const FormItemDelegateBuilder({
     super.key,
     required this.source,
+    required this.form,
     required this.element,
     this.onDelete,
   });
 
   final WebSourceInfo source;
+  final ExtensionForm form;
   final FormItemElement element;
   final Future<void> Function()? onDelete;
 
@@ -149,13 +204,8 @@ class FormItemDelegateBuilder extends StatelessWidget {
       case NavigationRowElement():
         child = NavigationRowBuilder(
           source: source,
+          form: form,
           element: element as NavigationRowElement,
-        );
-        break;
-      case SelectRowElement():
-        child = SelectRowBuilder(
-          source: source,
-          element: element as SelectRowElement,
         );
         break;
       case InputRowElement():
@@ -229,10 +279,12 @@ class FormSectionBuilder extends ConsumerWidget {
   const FormSectionBuilder({
     super.key,
     required this.source,
+    required this.form,
     required this.section,
   });
 
   final WebSourceInfo source;
+  final ExtensionForm form;
   final FormSectionElement section;
 
   @override
@@ -284,6 +336,7 @@ class FormSectionBuilder extends ConsumerWidget {
                 FormItemDelegateBuilder(
                   key: Key(item.id),
                   source: source,
+                  form: form,
                   element: item,
                   onDelete: listsec!.onDeletion != null
                       ? () => _safeCallBinding(
@@ -304,6 +357,7 @@ class FormSectionBuilder extends ConsumerWidget {
                 item.id,
               ), // Added to give each item a unique key for deletion UI state
               source: source,
+              form: form,
               element: item,
               onDelete: listsec?.onDeletion != null
                   ? () => _safeCallBinding(
@@ -344,152 +398,6 @@ class ButtonRowBuilder extends ConsumerWidget {
           await _safeCallBinding(context, ref, source.id, element.onSelect);
         },
       ),
-    );
-  }
-}
-
-class SelectRowBuilder extends HookConsumerWidget {
-  const SelectRowBuilder({
-    super.key,
-    required this.source,
-    required this.element,
-  });
-
-  final WebSourceInfo source;
-  final SelectRowElement element;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final data = useState([...element.value]);
-
-    return SettingCardWidget(
-      title: Text(element.title),
-      subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
-      builder: (context) {
-        return HookBuilder(
-          builder: (context) {
-            if (element.maxItemCount == 1) {
-              return Center(
-                child: DropdownMenu<String>(
-                  initialSelection: data.value.isNotEmpty
-                      ? data.value.first
-                      : null,
-                  requestFocusOnTap: false,
-                  enableSearch: false,
-                  enableFilter: false,
-                  dropdownMenuEntries: [
-                    for (final option in element.options)
-                      DropdownMenuEntry(value: option.id, label: option.title),
-                  ],
-                  onSelected: (String? value) {
-                    if (value != null) {
-                      data.value = [value];
-                      _safeCallBinding(
-                        context,
-                        ref,
-                        source.id,
-                        element.onValueChange,
-                        [data.value],
-                      );
-                    }
-                  },
-                ),
-              );
-            } else {
-              return Center(
-                child: MenuAnchor(
-                  builder: (context, controller, child) => SizedBox(
-                    width: double.infinity,
-                    child: Material(
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(6.0),
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          if (controller.isOpen) {
-                            controller.close();
-                          } else {
-                            controller.open();
-                          }
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(6.0),
-                          child: child,
-                        ),
-                      ),
-                    ),
-                  ),
-                  menuChildren: [
-                    for (final option in element.options)
-                      CheckboxMenuButton(
-                        closeOnActivate: false,
-                        value: data.value.contains(option.id),
-                        onChanged: (bool? value) async {
-                          if (value == true) {
-                            if (element.maxItemCount != null &&
-                                data.value.length == element.maxItemCount) {
-                              return;
-                            }
-
-                            data.value = [...data.value, option.id];
-                          } else {
-                            if (data.value.length == element.minItemCount) {
-                              return;
-                            }
-                            data.value = [...data.value..remove(option.id)];
-                          }
-
-                          _safeCallBinding(
-                            context,
-                            ref,
-                            source.id,
-                            element.onValueChange,
-                            [data.value],
-                          );
-                        },
-                        child: Text(option.title),
-                      ),
-                  ],
-                  child: Column(
-                    children: [
-                      Wrap(
-                        spacing: 2.0,
-                        runSpacing: 2.0,
-                        children: [
-                          for (final option in data.value)
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                data.value = [...data.value..remove(option)];
-                                ref
-                                    .read(
-                                      extensionSourceProvider(
-                                        source.id,
-                                      ).notifier,
-                                    )
-                                    .callBinding(element.onValueChange, [
-                                      data.value,
-                                    ]);
-                              },
-                              icon: const Icon(Icons.close),
-                              label: Text(
-                                element.options
-                                    .firstWhere((e) => e.id == option)
-                                    .title,
-                              ),
-                            ),
-                        ],
-                      ),
-                      const Icon(Icons.arrow_drop_down),
-                    ],
-                  ),
-                ),
-              );
-            }
-          },
-        );
-      },
     );
   }
 }
@@ -557,15 +465,18 @@ class NavigationRowBuilder extends HookConsumerWidget {
   const NavigationRowBuilder({
     super.key,
     required this.source,
+    required this.form,
     required this.element,
   });
 
   final WebSourceInfo source;
+  final ExtensionForm form;
   final NavigationRowElement element;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nav = Navigator.of(context);
+    final theme = Theme.of(context);
     final results = useMemoized(
       () => ref
           .read(extensionSourceProvider(source.id).notifier)
@@ -590,15 +501,32 @@ class NavigationRowBuilder extends HookConsumerWidget {
         child: ListTile(
           title: Text(element.title),
           subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
-          trailing: Icon(Icons.arrow_forward_ios),
-          onTap: () => nav.push(
-            PageTransitionRouteBuilder(
-              pageTransitionsBuilder:
-                  const FadeForwardsPageTransitionsBuilder(),
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  FormBuilder(source: source, form: data, isTopLevel: false),
-            ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (element.value != null) ...[
+                Text(
+                  element.value!,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.outline,
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              const Icon(Icons.arrow_forward_ios, size: 16),
+            ],
           ),
+          onTap: () async {
+            await nav.push(
+              PageTransitionRouteBuilder(
+                pageTransitionsBuilder:
+                    const FadeForwardsPageTransitionsBuilder(),
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    FormBuilder(source: source, form: data, isTopLevel: false),
+              ),
+            );
+            form.reloadForm();
+          },
         ),
       );
     }
@@ -688,16 +616,82 @@ class LabelRowBuilder extends ConsumerWidget {
   final WebSourceInfo source;
   final LabelRowElement element;
 
+  Color? _getColorForStyle(BuildContext context, RowStyle? style) {
+    if (style == null) return null;
+    switch (style) {
+      case RowStyle.success:
+        return Colors.green;
+      case RowStyle.error:
+        return Colors.red;
+      case RowStyle.warning:
+        return Colors.orange;
+      case RowStyle.tinted:
+        return Theme.of(context).colorScheme.primary;
+    }
+  }
+
+  String? _getSymbol(String? symbol) {
+    if (symbol == null) return null;
+    switch (symbol) {
+      case 'checkmark':
+        return '✓';
+      case 'xmark':
+        return '✕';
+      default:
+        return symbol;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (element.isHidden) {
       return const SizedBox.shrink();
     }
 
+    final theme = Theme.of(context);
+    String? displayValue;
+    String? displaySymbol;
+    RowStyle? innerStyle;
+
+    if (element.value is String) {
+      displayValue = element.value as String;
+    } else if (element.value is LabelRowValue) {
+      final val = element.value as LabelRowValue;
+      displayValue = val.text;
+      displaySymbol = val.symbol;
+      innerStyle = val.style;
+    } else if (element.value is Map) {
+      // Fallback for unchecked dynamic map
+      final map = element.value as Map;
+      displayValue = map['text'] as String?;
+      displaySymbol = map['symbol'] as String?;
+    }
+
+    final outerColor = _getColorForStyle(context, element.style);
+    final innerColor = _getColorForStyle(context, innerStyle);
+    final resolvedSymbol = _getSymbol(displaySymbol);
+    final trailingText = resolvedSymbol ?? displayValue;
+
+    Widget? trailingWidget;
+    if (trailingText != null) {
+      trailingWidget = Text(
+        trailingText,
+        style: TextStyle(
+          color: innerColor ?? outerColor ?? theme.colorScheme.outline,
+          fontWeight: (innerColor ?? outerColor) != null
+              ? FontWeight.bold
+              : null,
+        ),
+      );
+    }
+
     return Card(
       child: ListTile(
+        textColor: outerColor,
+        iconColor: outerColor,
         title: Text(element.title),
         subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
+        trailing: trailingWidget,
         onTap: element.onSelect != null
             ? () {
                 _safeCallBinding(context, ref, source.id, element.onSelect!);
