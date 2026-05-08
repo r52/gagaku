@@ -117,6 +117,7 @@ class _FormBuilderState extends ConsumerState<FormBuilder> {
         itemBuilder: (context, index) {
           return FormSectionBuilder(
             source: widget.source,
+            form: widget.form,
             section: data[index],
           );
         },
@@ -185,11 +186,13 @@ class FormItemDelegateBuilder extends StatelessWidget {
   const FormItemDelegateBuilder({
     super.key,
     required this.source,
+    required this.form,
     required this.element,
     this.onDelete,
   });
 
   final WebSourceInfo source;
+  final ExtensionForm form;
   final FormItemElement element;
   final Future<void> Function()? onDelete;
 
@@ -201,6 +204,7 @@ class FormItemDelegateBuilder extends StatelessWidget {
       case NavigationRowElement():
         child = NavigationRowBuilder(
           source: source,
+          form: form,
           element: element as NavigationRowElement,
         );
         break;
@@ -275,10 +279,12 @@ class FormSectionBuilder extends ConsumerWidget {
   const FormSectionBuilder({
     super.key,
     required this.source,
+    required this.form,
     required this.section,
   });
 
   final WebSourceInfo source;
+  final ExtensionForm form;
   final FormSectionElement section;
 
   @override
@@ -330,6 +336,7 @@ class FormSectionBuilder extends ConsumerWidget {
                 FormItemDelegateBuilder(
                   key: Key(item.id),
                   source: source,
+                  form: form,
                   element: item,
                   onDelete: listsec!.onDeletion != null
                       ? () => _safeCallBinding(
@@ -350,6 +357,7 @@ class FormSectionBuilder extends ConsumerWidget {
                 item.id,
               ), // Added to give each item a unique key for deletion UI state
               source: source,
+              form: form,
               element: item,
               onDelete: listsec?.onDeletion != null
                   ? () => _safeCallBinding(
@@ -457,10 +465,12 @@ class NavigationRowBuilder extends HookConsumerWidget {
   const NavigationRowBuilder({
     super.key,
     required this.source,
+    required this.form,
     required this.element,
   });
 
   final WebSourceInfo source;
+  final ExtensionForm form;
   final NavigationRowElement element;
 
   @override
@@ -506,14 +516,17 @@ class NavigationRowBuilder extends HookConsumerWidget {
               const Icon(Icons.arrow_forward_ios, size: 16),
             ],
           ),
-          onTap: () => nav.push(
-            PageTransitionRouteBuilder(
-              pageTransitionsBuilder:
-                  const FadeForwardsPageTransitionsBuilder(),
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  FormBuilder(source: source, form: data, isTopLevel: false),
-            ),
-          ),
+          onTap: () async {
+            await nav.push(
+              PageTransitionRouteBuilder(
+                pageTransitionsBuilder:
+                    const FadeForwardsPageTransitionsBuilder(),
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    FormBuilder(source: source, form: data, isTopLevel: false),
+              ),
+            );
+            form.reloadForm();
+          },
         ),
       );
     }

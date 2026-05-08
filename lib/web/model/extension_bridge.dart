@@ -556,7 +556,7 @@ return formid;
       arguments: {'section': section.toJson(), 'metadata': metadata},
       functionBody:
           """
-var p = await $sourceId.getDiscoverSectionItems(section, metadata);
+var p = await $sourceId.getDiscoverSectionItems(section, metadata ?? undefined);
 p.items.forEach((e) => {
   if ("publishDate" in e) {
     e.publishDate = e.publishDate?.toISOString();
@@ -597,7 +597,8 @@ return p;
       arguments: {'query': params, 'metadata': metadata, 'sortOp': sop},
       functionBody:
           """
-return await $sourceId.getSearchResults(query, metadata, sortOp)
+if (query.metadata === null) delete query.metadata;
+return await $sourceId.getSearchResults(query, metadata ?? undefined, sortOp ?? undefined);
 """,
     );
 
@@ -708,7 +709,11 @@ return p;
 
     final sortopts = await _controller?.callAsyncJavaScript(
       arguments: {'query': query.toJson()},
-      functionBody: "return await $sourceId.getSortingOptions?.(query);",
+      functionBody:
+          """
+if (query.metadata === null) delete query.metadata;
+return await $sourceId.getSortingOptions?.(query);
+""",
     );
 
     if (sortopts != null && sortopts.value != null) {
@@ -731,6 +736,7 @@ return p;
       arguments: {'query': query.toJson()},
       functionBody:
           """
+if (query.metadata === null) delete query.metadata;
 var form = await $sourceId.getAdvancedSearchForm(query);
 form.formWillAppear?.();
 var id = await window.Application.initializeForm("advancedSearch", form);
