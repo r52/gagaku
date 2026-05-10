@@ -1292,11 +1292,35 @@ abstract class ExecuteInWebViewSource with _$ExecuteInWebViewSource {
 }
 
 @freezed
+abstract class PBDocumentCookie with _$PBDocumentCookie {
+  const factory PBDocumentCookie({
+    required String name,
+    required String value,
+    required String domain,
+    String? path,
+    DateTime? created,
+    DateTime? expires,
+  }) = _PBDocumentCookie;
+
+  factory PBDocumentCookie.fromJson(Map<String, dynamic> json) =>
+      _$PBDocumentCookieFromJson(json);
+}
+
+@freezed
+abstract class WebViewStorage with _$WebViewStorage {
+  const factory WebViewStorage({@Default([]) List<PBDocumentCookie> cookies}) =
+      _WebViewStorage;
+
+  factory WebViewStorage.fromJson(Map<String, dynamic> json) =>
+      _$WebViewStorageFromJson(json);
+}
+
+@freezed
 abstract class ExecuteInWebViewContext with _$ExecuteInWebViewContext {
   const factory ExecuteInWebViewContext({
     required ExecuteInWebViewSource source,
     required String inject,
-    // storage: Cookies
+    @Default(WebViewStorage()) WebViewStorage storage,
   }) = _ExecuteInWebViewContext;
 
   factory ExecuteInWebViewContext.fromJson(Map<String, dynamic> json) =>
@@ -1307,7 +1331,7 @@ abstract class ExecuteInWebViewContext with _$ExecuteInWebViewContext {
 abstract class WebViewExecutionResult with _$WebViewExecutionResult {
   const factory WebViewExecutionResult({
     required dynamic result,
-    // storage: Cookies
+    @Default(WebViewStorage()) WebViewStorage storage,
   }) = _WebViewExecutionResult;
 
   factory WebViewExecutionResult.fromJson(Map<String, dynamic> json) =>

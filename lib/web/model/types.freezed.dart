@@ -6186,9 +6186,298 @@ as bool,
 
 
 /// @nodoc
+mixin _$PBDocumentCookie {
+
+ String get name; String get value; String get domain; String? get path; DateTime? get created; DateTime? get expires;
+/// Create a copy of PBDocumentCookie
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PBDocumentCookieCopyWith<PBDocumentCookie> get copyWith => _$PBDocumentCookieCopyWithImpl<PBDocumentCookie>(this as PBDocumentCookie, _$identity);
+
+  /// Serializes this PBDocumentCookie to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PBDocumentCookie&&(identical(other.name, name) || other.name == name)&&(identical(other.value, value) || other.value == value)&&(identical(other.domain, domain) || other.domain == domain)&&(identical(other.path, path) || other.path == path)&&(identical(other.created, created) || other.created == created)&&(identical(other.expires, expires) || other.expires == expires));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,name,value,domain,path,created,expires);
+
+@override
+String toString() {
+  return 'PBDocumentCookie(name: $name, value: $value, domain: $domain, path: $path, created: $created, expires: $expires)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PBDocumentCookieCopyWith<$Res>  {
+  factory $PBDocumentCookieCopyWith(PBDocumentCookie value, $Res Function(PBDocumentCookie) _then) = _$PBDocumentCookieCopyWithImpl;
+@useResult
+$Res call({
+ String name, String value, String domain, String? path, DateTime? created, DateTime? expires
+});
+
+
+
+
+}
+/// @nodoc
+class _$PBDocumentCookieCopyWithImpl<$Res>
+    implements $PBDocumentCookieCopyWith<$Res> {
+  _$PBDocumentCookieCopyWithImpl(this._self, this._then);
+
+  final PBDocumentCookie _self;
+  final $Res Function(PBDocumentCookie) _then;
+
+/// Create a copy of PBDocumentCookie
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? value = null,Object? domain = null,Object? path = freezed,Object? created = freezed,Object? expires = freezed,}) {
+  return _then(_self.copyWith(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
+as String,domain: null == domain ? _self.domain : domain // ignore: cast_nullable_to_non_nullable
+as String,path: freezed == path ? _self.path : path // ignore: cast_nullable_to_non_nullable
+as String?,created: freezed == created ? _self.created : created // ignore: cast_nullable_to_non_nullable
+as DateTime?,expires: freezed == expires ? _self.expires : expires // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _PBDocumentCookie implements PBDocumentCookie {
+  const _PBDocumentCookie({required this.name, required this.value, required this.domain, this.path, this.created, this.expires});
+  factory _PBDocumentCookie.fromJson(Map<String, dynamic> json) => _$PBDocumentCookieFromJson(json);
+
+@override final  String name;
+@override final  String value;
+@override final  String domain;
+@override final  String? path;
+@override final  DateTime? created;
+@override final  DateTime? expires;
+
+/// Create a copy of PBDocumentCookie
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PBDocumentCookieCopyWith<_PBDocumentCookie> get copyWith => __$PBDocumentCookieCopyWithImpl<_PBDocumentCookie>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PBDocumentCookieToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PBDocumentCookie&&(identical(other.name, name) || other.name == name)&&(identical(other.value, value) || other.value == value)&&(identical(other.domain, domain) || other.domain == domain)&&(identical(other.path, path) || other.path == path)&&(identical(other.created, created) || other.created == created)&&(identical(other.expires, expires) || other.expires == expires));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,name,value,domain,path,created,expires);
+
+@override
+String toString() {
+  return 'PBDocumentCookie(name: $name, value: $value, domain: $domain, path: $path, created: $created, expires: $expires)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PBDocumentCookieCopyWith<$Res> implements $PBDocumentCookieCopyWith<$Res> {
+  factory _$PBDocumentCookieCopyWith(_PBDocumentCookie value, $Res Function(_PBDocumentCookie) _then) = __$PBDocumentCookieCopyWithImpl;
+@override @useResult
+$Res call({
+ String name, String value, String domain, String? path, DateTime? created, DateTime? expires
+});
+
+
+
+
+}
+/// @nodoc
+class __$PBDocumentCookieCopyWithImpl<$Res>
+    implements _$PBDocumentCookieCopyWith<$Res> {
+  __$PBDocumentCookieCopyWithImpl(this._self, this._then);
+
+  final _PBDocumentCookie _self;
+  final $Res Function(_PBDocumentCookie) _then;
+
+/// Create a copy of PBDocumentCookie
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? value = null,Object? domain = null,Object? path = freezed,Object? created = freezed,Object? expires = freezed,}) {
+  return _then(_PBDocumentCookie(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
+as String,domain: null == domain ? _self.domain : domain // ignore: cast_nullable_to_non_nullable
+as String,path: freezed == path ? _self.path : path // ignore: cast_nullable_to_non_nullable
+as String?,created: freezed == created ? _self.created : created // ignore: cast_nullable_to_non_nullable
+as DateTime?,expires: freezed == expires ? _self.expires : expires // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$WebViewStorage {
+
+ List<PBDocumentCookie> get cookies;
+/// Create a copy of WebViewStorage
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WebViewStorageCopyWith<WebViewStorage> get copyWith => _$WebViewStorageCopyWithImpl<WebViewStorage>(this as WebViewStorage, _$identity);
+
+  /// Serializes this WebViewStorage to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebViewStorage&&const DeepCollectionEquality().equals(other.cookies, cookies));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(cookies));
+
+@override
+String toString() {
+  return 'WebViewStorage(cookies: $cookies)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WebViewStorageCopyWith<$Res>  {
+  factory $WebViewStorageCopyWith(WebViewStorage value, $Res Function(WebViewStorage) _then) = _$WebViewStorageCopyWithImpl;
+@useResult
+$Res call({
+ List<PBDocumentCookie> cookies
+});
+
+
+
+
+}
+/// @nodoc
+class _$WebViewStorageCopyWithImpl<$Res>
+    implements $WebViewStorageCopyWith<$Res> {
+  _$WebViewStorageCopyWithImpl(this._self, this._then);
+
+  final WebViewStorage _self;
+  final $Res Function(WebViewStorage) _then;
+
+/// Create a copy of WebViewStorage
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? cookies = null,}) {
+  return _then(_self.copyWith(
+cookies: null == cookies ? _self.cookies : cookies // ignore: cast_nullable_to_non_nullable
+as List<PBDocumentCookie>,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _WebViewStorage implements WebViewStorage {
+  const _WebViewStorage({final  List<PBDocumentCookie> cookies = const []}): _cookies = cookies;
+  factory _WebViewStorage.fromJson(Map<String, dynamic> json) => _$WebViewStorageFromJson(json);
+
+ final  List<PBDocumentCookie> _cookies;
+@override@JsonKey() List<PBDocumentCookie> get cookies {
+  if (_cookies is EqualUnmodifiableListView) return _cookies;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_cookies);
+}
+
+
+/// Create a copy of WebViewStorage
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WebViewStorageCopyWith<_WebViewStorage> get copyWith => __$WebViewStorageCopyWithImpl<_WebViewStorage>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$WebViewStorageToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebViewStorage&&const DeepCollectionEquality().equals(other._cookies, _cookies));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_cookies));
+
+@override
+String toString() {
+  return 'WebViewStorage(cookies: $cookies)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WebViewStorageCopyWith<$Res> implements $WebViewStorageCopyWith<$Res> {
+  factory _$WebViewStorageCopyWith(_WebViewStorage value, $Res Function(_WebViewStorage) _then) = __$WebViewStorageCopyWithImpl;
+@override @useResult
+$Res call({
+ List<PBDocumentCookie> cookies
+});
+
+
+
+
+}
+/// @nodoc
+class __$WebViewStorageCopyWithImpl<$Res>
+    implements _$WebViewStorageCopyWith<$Res> {
+  __$WebViewStorageCopyWithImpl(this._self, this._then);
+
+  final _WebViewStorage _self;
+  final $Res Function(_WebViewStorage) _then;
+
+/// Create a copy of WebViewStorage
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? cookies = null,}) {
+  return _then(_WebViewStorage(
+cookies: null == cookies ? _self._cookies : cookies // ignore: cast_nullable_to_non_nullable
+as List<PBDocumentCookie>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$ExecuteInWebViewContext {
 
- ExecuteInWebViewSource get source; String get inject;
+ ExecuteInWebViewSource get source; String get inject; WebViewStorage get storage;
 /// Create a copy of ExecuteInWebViewContext
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -6201,16 +6490,16 @@ $ExecuteInWebViewContextCopyWith<ExecuteInWebViewContext> get copyWith => _$Exec
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExecuteInWebViewContext&&(identical(other.source, source) || other.source == source)&&(identical(other.inject, inject) || other.inject == inject));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExecuteInWebViewContext&&(identical(other.source, source) || other.source == source)&&(identical(other.inject, inject) || other.inject == inject)&&(identical(other.storage, storage) || other.storage == storage));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,source,inject);
+int get hashCode => Object.hash(runtimeType,source,inject,storage);
 
 @override
 String toString() {
-  return 'ExecuteInWebViewContext(source: $source, inject: $inject)';
+  return 'ExecuteInWebViewContext(source: $source, inject: $inject, storage: $storage)';
 }
 
 
@@ -6221,11 +6510,11 @@ abstract mixin class $ExecuteInWebViewContextCopyWith<$Res>  {
   factory $ExecuteInWebViewContextCopyWith(ExecuteInWebViewContext value, $Res Function(ExecuteInWebViewContext) _then) = _$ExecuteInWebViewContextCopyWithImpl;
 @useResult
 $Res call({
- ExecuteInWebViewSource source, String inject
+ ExecuteInWebViewSource source, String inject, WebViewStorage storage
 });
 
 
-$ExecuteInWebViewSourceCopyWith<$Res> get source;
+$ExecuteInWebViewSourceCopyWith<$Res> get source;$WebViewStorageCopyWith<$Res> get storage;
 
 }
 /// @nodoc
@@ -6238,11 +6527,12 @@ class _$ExecuteInWebViewContextCopyWithImpl<$Res>
 
 /// Create a copy of ExecuteInWebViewContext
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? source = null,Object? inject = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? source = null,Object? inject = null,Object? storage = null,}) {
   return _then(_self.copyWith(
 source: null == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
 as ExecuteInWebViewSource,inject: null == inject ? _self.inject : inject // ignore: cast_nullable_to_non_nullable
-as String,
+as String,storage: null == storage ? _self.storage : storage // ignore: cast_nullable_to_non_nullable
+as WebViewStorage,
   ));
 }
 /// Create a copy of ExecuteInWebViewContext
@@ -6254,6 +6544,15 @@ $ExecuteInWebViewSourceCopyWith<$Res> get source {
   return $ExecuteInWebViewSourceCopyWith<$Res>(_self.source, (value) {
     return _then(_self.copyWith(source: value));
   });
+}/// Create a copy of ExecuteInWebViewContext
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebViewStorageCopyWith<$Res> get storage {
+  
+  return $WebViewStorageCopyWith<$Res>(_self.storage, (value) {
+    return _then(_self.copyWith(storage: value));
+  });
 }
 }
 
@@ -6263,11 +6562,12 @@ $ExecuteInWebViewSourceCopyWith<$Res> get source {
 @JsonSerializable()
 
 class _ExecuteInWebViewContext implements ExecuteInWebViewContext {
-  const _ExecuteInWebViewContext({required this.source, required this.inject});
+  const _ExecuteInWebViewContext({required this.source, required this.inject, this.storage = const WebViewStorage()});
   factory _ExecuteInWebViewContext.fromJson(Map<String, dynamic> json) => _$ExecuteInWebViewContextFromJson(json);
 
 @override final  ExecuteInWebViewSource source;
 @override final  String inject;
+@override@JsonKey() final  WebViewStorage storage;
 
 /// Create a copy of ExecuteInWebViewContext
 /// with the given fields replaced by the non-null parameter values.
@@ -6282,16 +6582,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExecuteInWebViewContext&&(identical(other.source, source) || other.source == source)&&(identical(other.inject, inject) || other.inject == inject));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExecuteInWebViewContext&&(identical(other.source, source) || other.source == source)&&(identical(other.inject, inject) || other.inject == inject)&&(identical(other.storage, storage) || other.storage == storage));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,source,inject);
+int get hashCode => Object.hash(runtimeType,source,inject,storage);
 
 @override
 String toString() {
-  return 'ExecuteInWebViewContext(source: $source, inject: $inject)';
+  return 'ExecuteInWebViewContext(source: $source, inject: $inject, storage: $storage)';
 }
 
 
@@ -6302,11 +6602,11 @@ abstract mixin class _$ExecuteInWebViewContextCopyWith<$Res> implements $Execute
   factory _$ExecuteInWebViewContextCopyWith(_ExecuteInWebViewContext value, $Res Function(_ExecuteInWebViewContext) _then) = __$ExecuteInWebViewContextCopyWithImpl;
 @override @useResult
 $Res call({
- ExecuteInWebViewSource source, String inject
+ ExecuteInWebViewSource source, String inject, WebViewStorage storage
 });
 
 
-@override $ExecuteInWebViewSourceCopyWith<$Res> get source;
+@override $ExecuteInWebViewSourceCopyWith<$Res> get source;@override $WebViewStorageCopyWith<$Res> get storage;
 
 }
 /// @nodoc
@@ -6319,11 +6619,12 @@ class __$ExecuteInWebViewContextCopyWithImpl<$Res>
 
 /// Create a copy of ExecuteInWebViewContext
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? source = null,Object? inject = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? source = null,Object? inject = null,Object? storage = null,}) {
   return _then(_ExecuteInWebViewContext(
 source: null == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
 as ExecuteInWebViewSource,inject: null == inject ? _self.inject : inject // ignore: cast_nullable_to_non_nullable
-as String,
+as String,storage: null == storage ? _self.storage : storage // ignore: cast_nullable_to_non_nullable
+as WebViewStorage,
   ));
 }
 
@@ -6336,6 +6637,15 @@ $ExecuteInWebViewSourceCopyWith<$Res> get source {
   return $ExecuteInWebViewSourceCopyWith<$Res>(_self.source, (value) {
     return _then(_self.copyWith(source: value));
   });
+}/// Create a copy of ExecuteInWebViewContext
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebViewStorageCopyWith<$Res> get storage {
+  
+  return $WebViewStorageCopyWith<$Res>(_self.storage, (value) {
+    return _then(_self.copyWith(storage: value));
+  });
 }
 }
 
@@ -6343,7 +6653,7 @@ $ExecuteInWebViewSourceCopyWith<$Res> get source {
 /// @nodoc
 mixin _$WebViewExecutionResult {
 
- dynamic get result;
+ dynamic get result; WebViewStorage get storage;
 /// Create a copy of WebViewExecutionResult
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -6356,16 +6666,16 @@ $WebViewExecutionResultCopyWith<WebViewExecutionResult> get copyWith => _$WebVie
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebViewExecutionResult&&const DeepCollectionEquality().equals(other.result, result));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebViewExecutionResult&&const DeepCollectionEquality().equals(other.result, result)&&(identical(other.storage, storage) || other.storage == storage));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(result));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(result),storage);
 
 @override
 String toString() {
-  return 'WebViewExecutionResult(result: $result)';
+  return 'WebViewExecutionResult(result: $result, storage: $storage)';
 }
 
 
@@ -6376,11 +6686,11 @@ abstract mixin class $WebViewExecutionResultCopyWith<$Res>  {
   factory $WebViewExecutionResultCopyWith(WebViewExecutionResult value, $Res Function(WebViewExecutionResult) _then) = _$WebViewExecutionResultCopyWithImpl;
 @useResult
 $Res call({
- dynamic result
+ dynamic result, WebViewStorage storage
 });
 
 
-
+$WebViewStorageCopyWith<$Res> get storage;
 
 }
 /// @nodoc
@@ -6393,13 +6703,23 @@ class _$WebViewExecutionResultCopyWithImpl<$Res>
 
 /// Create a copy of WebViewExecutionResult
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? result = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? result = freezed,Object? storage = null,}) {
   return _then(_self.copyWith(
 result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
-as dynamic,
+as dynamic,storage: null == storage ? _self.storage : storage // ignore: cast_nullable_to_non_nullable
+as WebViewStorage,
   ));
 }
-
+/// Create a copy of WebViewExecutionResult
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebViewStorageCopyWith<$Res> get storage {
+  
+  return $WebViewStorageCopyWith<$Res>(_self.storage, (value) {
+    return _then(_self.copyWith(storage: value));
+  });
+}
 }
 
 
@@ -6408,10 +6728,11 @@ as dynamic,
 @JsonSerializable()
 
 class _WebViewExecutionResult implements WebViewExecutionResult {
-  const _WebViewExecutionResult({required this.result});
+  const _WebViewExecutionResult({required this.result, this.storage = const WebViewStorage()});
   factory _WebViewExecutionResult.fromJson(Map<String, dynamic> json) => _$WebViewExecutionResultFromJson(json);
 
 @override final  dynamic result;
+@override@JsonKey() final  WebViewStorage storage;
 
 /// Create a copy of WebViewExecutionResult
 /// with the given fields replaced by the non-null parameter values.
@@ -6426,16 +6747,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebViewExecutionResult&&const DeepCollectionEquality().equals(other.result, result));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebViewExecutionResult&&const DeepCollectionEquality().equals(other.result, result)&&(identical(other.storage, storage) || other.storage == storage));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(result));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(result),storage);
 
 @override
 String toString() {
-  return 'WebViewExecutionResult(result: $result)';
+  return 'WebViewExecutionResult(result: $result, storage: $storage)';
 }
 
 
@@ -6446,11 +6767,11 @@ abstract mixin class _$WebViewExecutionResultCopyWith<$Res> implements $WebViewE
   factory _$WebViewExecutionResultCopyWith(_WebViewExecutionResult value, $Res Function(_WebViewExecutionResult) _then) = __$WebViewExecutionResultCopyWithImpl;
 @override @useResult
 $Res call({
- dynamic result
+ dynamic result, WebViewStorage storage
 });
 
 
-
+@override $WebViewStorageCopyWith<$Res> get storage;
 
 }
 /// @nodoc
@@ -6463,14 +6784,24 @@ class __$WebViewExecutionResultCopyWithImpl<$Res>
 
 /// Create a copy of WebViewExecutionResult
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? result = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? result = freezed,Object? storage = null,}) {
   return _then(_WebViewExecutionResult(
 result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
-as dynamic,
+as dynamic,storage: null == storage ? _self.storage : storage // ignore: cast_nullable_to_non_nullable
+as WebViewStorage,
   ));
 }
 
-
+/// Create a copy of WebViewExecutionResult
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebViewStorageCopyWith<$Res> get storage {
+  
+  return $WebViewStorageCopyWith<$Res>(_self.storage, (value) {
+    return _then(_self.copyWith(storage: value));
+  });
+}
 }
 
 // dart format on

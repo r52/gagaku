@@ -958,6 +958,44 @@ Map<String, dynamic> _$ExecuteInWebViewSourceToJson(
   'loadImages': instance.loadImages,
 };
 
+_PBDocumentCookie _$PBDocumentCookieFromJson(Map<String, dynamic> json) =>
+    _PBDocumentCookie(
+      name: json['name'] as String,
+      value: json['value'] as String,
+      domain: json['domain'] as String,
+      path: json['path'] as String?,
+      created: json['created'] == null
+          ? null
+          : DateTime.parse(json['created'] as String),
+      expires: json['expires'] == null
+          ? null
+          : DateTime.parse(json['expires'] as String),
+    );
+
+Map<String, dynamic> _$PBDocumentCookieToJson(_PBDocumentCookie instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'value': instance.value,
+      'domain': instance.domain,
+      'path': instance.path,
+      'created': instance.created?.toIso8601String(),
+      'expires': instance.expires?.toIso8601String(),
+    };
+
+_WebViewStorage _$WebViewStorageFromJson(Map<String, dynamic> json) =>
+    _WebViewStorage(
+      cookies:
+          (json['cookies'] as List<dynamic>?)
+              ?.map((e) => PBDocumentCookie.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+    );
+
+Map<String, dynamic> _$WebViewStorageToJson(_WebViewStorage instance) =>
+    <String, dynamic>{
+      'cookies': instance.cookies.map((e) => e.toJson()).toList(),
+    };
+
 _ExecuteInWebViewContext _$ExecuteInWebViewContextFromJson(
   Map<String, dynamic> json,
 ) => _ExecuteInWebViewContext(
@@ -965,6 +1003,9 @@ _ExecuteInWebViewContext _$ExecuteInWebViewContextFromJson(
     json['source'] as Map<String, dynamic>,
   ),
   inject: json['inject'] as String,
+  storage: json['storage'] == null
+      ? const WebViewStorage()
+      : WebViewStorage.fromJson(json['storage'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$ExecuteInWebViewContextToJson(
@@ -972,12 +1013,21 @@ Map<String, dynamic> _$ExecuteInWebViewContextToJson(
 ) => <String, dynamic>{
   'source': instance.source.toJson(),
   'inject': instance.inject,
+  'storage': instance.storage.toJson(),
 };
 
 _WebViewExecutionResult _$WebViewExecutionResultFromJson(
   Map<String, dynamic> json,
-) => _WebViewExecutionResult(result: json['result']);
+) => _WebViewExecutionResult(
+  result: json['result'],
+  storage: json['storage'] == null
+      ? const WebViewStorage()
+      : WebViewStorage.fromJson(json['storage'] as Map<String, dynamic>),
+);
 
 Map<String, dynamic> _$WebViewExecutionResultToJson(
   _WebViewExecutionResult instance,
-) => <String, dynamic>{'result': instance.result};
+) => <String, dynamic>{
+  'result': instance.result,
+  'storage': instance.storage.toJson(),
+};
