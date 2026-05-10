@@ -40,6 +40,7 @@ class ExtensionWebViewBridge {
   ExecuteInWebViewSource? _executionSource;
   Completer<void>? _executionReadyCompleter;
   Timer? _executionIdleTimer;
+  int _activeExecutions = 0;
 
   bool _hasSortOps = false;
   bool get hasSortOps => _hasSortOps;
@@ -219,121 +220,133 @@ class ExtensionWebViewBridge {
   Future<dynamic> _handleExecuteInWebView(
     JavaScriptHandlerFunctionData data,
   ) async {
-    final context = ExecuteInWebViewContext.fromJson(data.args[0]);
+    _activeExecutions++;
+    try {
+      final context = ExecuteInWebViewContext.fromJson(data.args[0]);
 
-    if (_executionSource != context.source || _executionView == null) {
-      _executionView?.dispose();
-      _executionSource = context.source;
-      _executionReadyCompleter = Completer<void>();
+      if (_executionSource != context.source || _executionView == null) {
+        _executionView?.dispose();
+        _executionSource = context.source;
+        _executionReadyCompleter = Completer<void>();
 
-      _executionView = HeadlessInAppWebView(
-        initialData: InAppWebViewInitialData(
-          data: context.source.html,
-          baseUrl: WebUri(context.source.baseUrl),
-        ),
-        initialSettings: InAppWebViewSettings(
-          contentBlockers: defaultTargetPlatform == TargetPlatform.android
-              ? [
-                  if (!context.source.loadCSS)
-                    ContentBlocker(
-                      trigger: ContentBlockerTrigger(
-                        urlFilter: ".*",
-                        resourceType: [
-                          ContentBlockerTriggerResourceType.STYLE_SHEET,
-                        ],
-                      ),
-                      action: ContentBlockerAction(
-                        type: ContentBlockerActionType.BLOCK,
-                      ),
-                    ),
-                  if (!context.source.loadImages)
-                    ContentBlocker(
-                      trigger: ContentBlockerTrigger(
-                        urlFilter: ".*",
-                        resourceType: [ContentBlockerTriggerResourceType.IMAGE],
-                      ),
-                      action: ContentBlockerAction(
-                        type: ContentBlockerActionType.BLOCK,
-                      ),
-                    ),
-                ]
-              : null,
-          loadsImagesAutomatically: context.source.loadImages,
-          browserAcceleratorKeysEnabled: false,
-          isInspectable: false,
-        ),
-        onLoadStop: (controller, url) async {
-          if (_executionReadyCompleter?.isCompleted == false) {
-            _executionReadyCompleter?.complete();
-          }
-        },
-      );
-
-      await _executionView!.run();
-    }
-
-    await _executionReadyCompleter!.future;
-
-    _executionIdleTimer?.cancel();
-    _executionIdleTimer = Timer(const Duration(minutes: 30), () {
-      _executionView?.dispose();
-      _executionView = null;
-      _executionSource = null;
-      _executionReadyCompleter = null;
-    });
-
-    final url = WebUri(context.source.baseUrl);
-    final cookieManager = CookieManager.instance();
-
-    for (final cookie in context.storage.cookies) {
-      await cookieManager.setCookie(
-        url: url,
-        name: cookie.name,
-        value: cookie.value,
-        domain: cookie.domain,
-        path: cookie.path ?? '/',
-        expiresDate: cookie.expires?.millisecondsSinceEpoch,
-      );
-    }
-
-    final controller = _executionView!.webViewController!;
-
-    final results = await controller
-        .callAsyncJavaScript(functionBody: context.inject)
-        .timeout(const Duration(seconds: 30));
-
-    if (results == null || results.error != null) {
-      throw JavaScriptException(
-        message: 'JavaScript error in executeInWebView:',
-        errorMessage: '${context.source.baseUrl} - ${results?.error}',
-      );
-    }
-
-    final outCookies = await cookieManager.getCookies(
-      url: url,
-      webViewController: controller,
-    );
-
-    final pbCookies = outCookies
-        .map(
-          (c) => PBDocumentCookie(
-            name: c.name,
-            value: c.value,
-            domain: c.domain ?? '',
-            path: c.path,
-            expires: c.expiresDate != null
-                ? DateTime.fromMillisecondsSinceEpoch(c.expiresDate!)
-                : null,
+        _executionView = HeadlessInAppWebView(
+          initialData: InAppWebViewInitialData(
+            data: context.source.html,
+            baseUrl: WebUri(context.source.baseUrl),
           ),
-        )
-        .toList();
+          initialSettings: InAppWebViewSettings(
+            contentBlockers: defaultTargetPlatform == TargetPlatform.android
+                ? [
+                    if (!context.source.loadCSS)
+                      ContentBlocker(
+                        trigger: ContentBlockerTrigger(
+                          urlFilter: ".*",
+                          resourceType: [
+                            ContentBlockerTriggerResourceType.STYLE_SHEET,
+                          ],
+                        ),
+                        action: ContentBlockerAction(
+                          type: ContentBlockerActionType.BLOCK,
+                        ),
+                      ),
+                    if (!context.source.loadImages)
+                      ContentBlocker(
+                        trigger: ContentBlockerTrigger(
+                          urlFilter: ".*",
+                          resourceType: [
+                            ContentBlockerTriggerResourceType.IMAGE,
+                          ],
+                        ),
+                        action: ContentBlockerAction(
+                          type: ContentBlockerActionType.BLOCK,
+                        ),
+                      ),
+                  ]
+                : null,
+            loadsImagesAutomatically: context.source.loadImages,
+            browserAcceleratorKeysEnabled: false,
+            isInspectable: false,
+          ),
+          onLoadStop: (controller, url) async {
+            if (_executionReadyCompleter?.isCompleted == false) {
+              _executionReadyCompleter?.complete();
+            }
+          },
+        );
 
-    final webViewResult = WebViewExecutionResult(
-      result: results.value,
-      storage: WebViewStorage(cookies: pbCookies),
-    );
+        await _executionView!.run();
+      }
 
-    return webViewResult.toJson();
+      await _executionReadyCompleter!.future;
+
+      _executionIdleTimer?.cancel();
+
+      final url = WebUri(context.source.baseUrl);
+      final cookieManager = CookieManager.instance();
+
+      for (final cookie in context.storage.cookies) {
+        await cookieManager.setCookie(
+          url: url,
+          name: cookie.name,
+          value: cookie.value,
+          domain: cookie.domain,
+          path: cookie.path ?? '/',
+          expiresDate: cookie.expires?.millisecondsSinceEpoch,
+        );
+      }
+
+      final controller = _executionView!.webViewController!;
+
+      final results = await controller
+          .callAsyncJavaScript(functionBody: context.inject)
+          .timeout(const Duration(seconds: 30));
+
+      if (results == null || results.error != null) {
+        throw JavaScriptException(
+          message: 'JavaScript error in executeInWebView:',
+          errorMessage: '${context.source.baseUrl} - ${results?.error}',
+        );
+      }
+
+      final outCookies = await cookieManager.getCookies(
+        url: url,
+        webViewController: controller,
+      );
+
+      final pbCookies = outCookies
+          .map(
+            (c) => PBDocumentCookie(
+              name: c.name,
+              value: c.value,
+              domain: c.domain ?? url.host,
+              path: c.path,
+              expires: c.expiresDate != null
+                  ? DateTime.fromMillisecondsSinceEpoch(c.expiresDate!)
+                  : null,
+            ),
+          )
+          .toList();
+
+      final webViewResult = WebViewExecutionResult(
+        result: results.value,
+        storage: WebViewStorage(cookies: pbCookies),
+      );
+
+      return webViewResult.toJson();
+    } finally {
+      _activeExecutions--;
+      if (_activeExecutions == 0) {
+        _executionIdleTimer?.cancel();
+        _executionIdleTimer = Timer(const Duration(minutes: 30), () {
+          if (_activeExecutions == 0) {
+            _executionView?.dispose();
+            _executionView = null;
+            _executionSource = null;
+            _executionReadyCompleter = null;
+          }
+        });
+      }
+    }
   }
 
   Future<void> _onWebViewLoadStop(
@@ -443,12 +456,13 @@ class ExtensionWebViewBridge {
         if (source.hasCapability(SourceIntents.cloudflareBypassRequired) &&
             hasCf) {
           logger.d("Setting Cloudflare bypass cookies for ${source.id}");
+          final expectedDomain = url.host;
           final pbCookies = cookies
               .map(
                 (c) => PBDocumentCookie(
                   name: c.name,
                   value: c.value,
-                  domain: c.domain ?? '',
+                  domain: c.domain ?? expectedDomain,
                   path: c.path,
                   expires: c.expiresDate != null
                       ? DateTime.fromMillisecondsSinceEpoch(c.expiresDate!)
