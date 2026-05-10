@@ -36,6 +36,12 @@ class ExtensionWebViewBridge {
   final Map<String, ExtensionForm> _forms = {};
   List<Cookie>? _cookies;
 
+  HeadlessInAppWebView? _executionView;
+  ExecuteInWebViewSource? _executionSource;
+  Completer<void>? _executionReadyCompleter;
+  Timer? _executionIdleTimer;
+  int _activeExecutions = 0;
+
   bool _hasSortOps = false;
   bool get hasSortOps => _hasSortOps;
 
@@ -132,9 +138,15 @@ class ExtensionWebViewBridge {
 
   void dispose() {
     _view?.dispose();
+    _executionView?.dispose();
     _completeTimer?.cancel();
+    _executionIdleTimer?.cancel();
     _completeTimer = null;
+    _executionIdleTimer = null;
     _view = null;
+    _executionView = null;
+    _executionReadyCompleter = null;
+    _executionSource = null;
     _initialized = false;
     _hasAdvancedSearchForm = false;
     _hasSortOps = false;
@@ -201,11 +213,23 @@ class ExtensionWebViewBridge {
 
     controller.addJavaScriptHandler(
       handlerName: 'executeInWebView',
-      callback: (JavaScriptHandlerFunctionData data) async {
-        final context = ExecuteInWebViewContext.fromJson(data.args[0]);
-        final completer = Completer<Map<String, dynamic>>();
+      callback: _handleExecuteInWebView,
+    );
+  }
 
-        final temp = HeadlessInAppWebView(
+  Future<dynamic> _handleExecuteInWebView(
+    JavaScriptHandlerFunctionData data,
+  ) async {
+    _activeExecutions++;
+    try {
+      final context = ExecuteInWebViewContext.fromJson(data.args[0]);
+
+      if (_executionSource != context.source || _executionView == null) {
+        _executionView?.dispose();
+        _executionSource = context.source;
+        _executionReadyCompleter = Completer<void>();
+
+        _executionView = HeadlessInAppWebView(
           initialData: InAppWebViewInitialData(
             data: context.source.html,
             baseUrl: WebUri(context.source.baseUrl),
@@ -244,35 +268,85 @@ class ExtensionWebViewBridge {
             isInspectable: false,
           ),
           onLoadStop: (controller, url) async {
-            final results = await controller.callAsyncJavaScript(
-              functionBody: context.inject,
-            );
-
-            if (results == null || results.error != null) {
-              completer.completeError(
-                JavaScriptException(
-                  message: 'JavaScript error in executeInWebView:',
-                  errorMessage: '${context.source.baseUrl} - ${results?.error}',
-                ),
-              );
-              return;
+            if (_executionReadyCompleter?.isCompleted == false) {
+              _executionReadyCompleter?.complete();
             }
-
-            completer.complete({'result': results.value});
           },
         );
 
-        try {
-          await temp.run();
-          final result = await completer.future.timeout(
-            const Duration(seconds: 30),
-          );
-          return result;
-        } finally {
-          temp.dispose();
-        }
-      },
-    );
+        await _executionView!.run();
+      }
+
+      await _executionReadyCompleter!.future;
+
+      _executionIdleTimer?.cancel();
+
+      final url = WebUri(context.source.baseUrl);
+      final cookieManager = CookieManager.instance();
+
+      for (final cookie in context.storage.cookies) {
+        await cookieManager.setCookie(
+          url: url,
+          name: cookie.name,
+          value: cookie.value,
+          domain: cookie.domain,
+          path: cookie.path ?? '/',
+          expiresDate: cookie.expires?.millisecondsSinceEpoch,
+        );
+      }
+
+      final controller = _executionView!.webViewController!;
+
+      final results = await controller
+          .callAsyncJavaScript(functionBody: context.inject)
+          .timeout(const Duration(seconds: 30));
+
+      if (results == null || results.error != null) {
+        throw JavaScriptException(
+          message: 'JavaScript error in executeInWebView:',
+          errorMessage: '${context.source.baseUrl} - ${results?.error}',
+        );
+      }
+
+      final outCookies = await cookieManager.getCookies(
+        url: url,
+        webViewController: controller,
+      );
+
+      final pbCookies = outCookies
+          .map(
+            (c) => PBDocumentCookie(
+              name: c.name,
+              value: c.value,
+              domain: c.domain ?? url.host,
+              path: c.path,
+              expires: c.expiresDate != null
+                  ? DateTime.fromMillisecondsSinceEpoch(c.expiresDate!)
+                  : null,
+            ),
+          )
+          .toList();
+
+      final webViewResult = WebViewExecutionResult(
+        result: results.value,
+        storage: WebViewStorage(cookies: pbCookies),
+      );
+
+      return webViewResult.toJson();
+    } finally {
+      _activeExecutions--;
+      if (_activeExecutions == 0) {
+        _executionIdleTimer?.cancel();
+        _executionIdleTimer = Timer(const Duration(minutes: 30), () {
+          if (_activeExecutions == 0) {
+            _executionView?.dispose();
+            _executionView = null;
+            _executionSource = null;
+            _executionReadyCompleter = null;
+          }
+        });
+      }
+    }
   }
 
   Future<void> _onWebViewLoadStop(
@@ -382,22 +456,32 @@ class ExtensionWebViewBridge {
         if (source.hasCapability(SourceIntents.cloudflareBypassRequired) &&
             hasCf) {
           logger.d("Setting Cloudflare bypass cookies for ${source.id}");
-          final jscook = cookies.map((e) => e.toJson()).toList();
+          final expectedDomain = url.host;
+          final pbCookies = cookies
+              .map(
+                (c) => PBDocumentCookie(
+                  name: c.name,
+                  value: c.value,
+                  domain: c.domain ?? expectedDomain,
+                  path: c.path,
+                  expires: c.expiresDate != null
+                      ? DateTime.fromMillisecondsSinceEpoch(c.expiresDate!)
+                      : null,
+                ),
+              )
+              .toList();
+
           await controller.callAsyncJavaScript(
-            arguments: {'cookies': jscook},
+            arguments: {'cookies': pbCookies.map((e) => e.toJson()).toList()},
             functionBody:
                 """
 var jc = cookies.map((e) => {
-  return {
-    name: e.name,
-    value: e.value,
-    domain: e.domain,
-    path: e.path,
-    expires: new Date(e.expiresDate * 1000)
-  };
+    e.created = e.created ? new Date(e.created) : undefined;
+    e.expires = e.expires ? new Date(e.expires) : undefined;
+    return e;
 });
 await ${source.id}.saveCloudflareBypassCookies(jc);
-                """,
+""",
           );
         }
       }
