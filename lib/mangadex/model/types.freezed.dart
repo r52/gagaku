@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MangaFilters implements DiagnosticableTreeMixin {
 
- Set<Tag> get includedTags; TagMode get includedTagsMode; Set<Tag> get excludedTags; TagMode get excludedTagsMode; Set<CreatorType> get author; Set<CreatorType> get artist; Set<MangaStatus> get status; Set<MangaDemographic> get publicationDemographic; Set<ContentRating> get contentRating; FilterOrder get order;
+ Set<Tag> get includedTags; TagMode get includedTagsMode; Set<Tag> get excludedTags; TagMode get excludedTagsMode; Set<CreatorType> get author; Set<CreatorType> get artist; Set<MangaStatus> get status; Set<MangaDemographic> get publicationDemographic; Set<ContentRating> get contentRating; MangaFilterOrder get order;
 /// Create a copy of MangaFilters
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -51,7 +51,7 @@ abstract mixin class $MangaFiltersCopyWith<$Res>  {
   factory $MangaFiltersCopyWith(MangaFilters value, $Res Function(MangaFilters) _then) = _$MangaFiltersCopyWithImpl;
 @useResult
 $Res call({
- Set<Tag> includedTags, TagMode includedTagsMode, Set<Tag> excludedTags, TagMode excludedTagsMode, Set<CreatorType> author, Set<CreatorType> artist, Set<MangaStatus> status, Set<MangaDemographic> publicationDemographic, Set<ContentRating> contentRating, FilterOrder order
+ Set<Tag> includedTags, TagMode includedTagsMode, Set<Tag> excludedTags, TagMode excludedTagsMode, Set<CreatorType> author, Set<CreatorType> artist, Set<MangaStatus> status, Set<MangaDemographic> publicationDemographic, Set<ContentRating> contentRating, MangaFilterOrder order
 });
 
 
@@ -80,7 +80,7 @@ as Set<CreatorType>,status: null == status ? _self.status : status // ignore: ca
 as Set<MangaStatus>,publicationDemographic: null == publicationDemographic ? _self.publicationDemographic : publicationDemographic // ignore: cast_nullable_to_non_nullable
 as Set<MangaDemographic>,contentRating: null == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
 as Set<ContentRating>,order: null == order ? _self.order : order // ignore: cast_nullable_to_non_nullable
-as FilterOrder,
+as MangaFilterOrder,
   ));
 }
 
@@ -92,7 +92,7 @@ as FilterOrder,
 
 
 class _MangaFilters extends MangaFilters with DiagnosticableTreeMixin {
-  const _MangaFilters({final  Set<Tag> includedTags = const {}, this.includedTagsMode = TagMode.and, final  Set<Tag> excludedTags = const {}, this.excludedTagsMode = TagMode.or, final  Set<CreatorType> author = const {}, final  Set<CreatorType> artist = const {}, final  Set<MangaStatus> status = const {}, final  Set<MangaDemographic> publicationDemographic = const {}, final  Set<ContentRating> contentRating = const {}, this.order = FilterOrder.relevance_desc}): _includedTags = includedTags,_excludedTags = excludedTags,_author = author,_artist = artist,_status = status,_publicationDemographic = publicationDemographic,_contentRating = contentRating,super._();
+  const _MangaFilters({final  Set<Tag> includedTags = const {}, this.includedTagsMode = TagMode.and, final  Set<Tag> excludedTags = const {}, this.excludedTagsMode = TagMode.or, final  Set<CreatorType> author = const {}, final  Set<CreatorType> artist = const {}, final  Set<MangaStatus> status = const {}, final  Set<MangaDemographic> publicationDemographic = const {}, final  Set<ContentRating> contentRating = const {}, this.order = MangaFilterOrder.relevance_desc}): _includedTags = includedTags,_excludedTags = excludedTags,_author = author,_artist = artist,_status = status,_publicationDemographic = publicationDemographic,_contentRating = contentRating,super._();
   
 
  final  Set<Tag> _includedTags;
@@ -146,7 +146,7 @@ class _MangaFilters extends MangaFilters with DiagnosticableTreeMixin {
   return EqualUnmodifiableSetView(_contentRating);
 }
 
-@override@JsonKey() final  FilterOrder order;
+@override@JsonKey() final  MangaFilterOrder order;
 
 /// Create a copy of MangaFilters
 /// with the given fields replaced by the non-null parameter values.
@@ -184,7 +184,7 @@ abstract mixin class _$MangaFiltersCopyWith<$Res> implements $MangaFiltersCopyWi
   factory _$MangaFiltersCopyWith(_MangaFilters value, $Res Function(_MangaFilters) _then) = __$MangaFiltersCopyWithImpl;
 @override @useResult
 $Res call({
- Set<Tag> includedTags, TagMode includedTagsMode, Set<Tag> excludedTags, TagMode excludedTagsMode, Set<CreatorType> author, Set<CreatorType> artist, Set<MangaStatus> status, Set<MangaDemographic> publicationDemographic, Set<ContentRating> contentRating, FilterOrder order
+ Set<Tag> includedTags, TagMode includedTagsMode, Set<Tag> excludedTags, TagMode excludedTagsMode, Set<CreatorType> author, Set<CreatorType> artist, Set<MangaStatus> status, Set<MangaDemographic> publicationDemographic, Set<ContentRating> contentRating, MangaFilterOrder order
 });
 
 
@@ -213,7 +213,7 @@ as Set<CreatorType>,status: null == status ? _self._status : status // ignore: c
 as Set<MangaStatus>,publicationDemographic: null == publicationDemographic ? _self._publicationDemographic : publicationDemographic // ignore: cast_nullable_to_non_nullable
 as Set<MangaDemographic>,contentRating: null == contentRating ? _self._contentRating : contentRating // ignore: cast_nullable_to_non_nullable
 as Set<ContentRating>,order: null == order ? _self.order : order // ignore: cast_nullable_to_non_nullable
-as FilterOrder,
+as MangaFilterOrder,
   ));
 }
 

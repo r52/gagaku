@@ -50,7 +50,7 @@ Future<List<Manga>> _trendingThisYear(Ref ref, Tag tag) async {
     feedKey: _trendingFeedKey,
     entity: tag,
     offset: 0,
-    order: FilterOrder.followedCount_desc,
+    order: MangaFilterOrder.followedCount_desc,
     extraParams: extraParams,
   );
 
@@ -75,7 +75,7 @@ Future<List<Manga>> _recentlyAdded(Ref ref, Tag tag) async {
     feedKey: _recentlyAddedFeedKey,
     entity: tag,
     offset: 0,
-    order: FilterOrder.createdAt_desc,
+    order: MangaFilterOrder.createdAt_desc,
     extraParams: extraParams,
   );
 
@@ -135,7 +135,7 @@ class MangaDexTagViewWidget extends HookConsumerWidget {
         feedKey: _popularFeedKey,
         entity: tag,
         offset: popularPage.value * 6,
-        order: FilterOrder.followedCount_desc,
+        order: MangaFilterOrder.followedCount_desc,
       );
 
       return manga;

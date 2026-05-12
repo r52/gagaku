@@ -34,7 +34,7 @@ Future<List<Manga>> _popularTitles(Ref ref) async {
     limit: info.limit,
     feedKey: info.key,
     offset: 0,
-    order: FilterOrder.followedCount_desc,
+    order: MangaFilterOrder.followedCount_desc,
     extraParams: extraParams,
   );
 
@@ -64,7 +64,7 @@ Future<List<Manga>> _recentlyAdded(Ref ref) async {
     limit: info.limit,
     feedKey: info.key,
     offset: 0,
-    order: FilterOrder.createdAt_desc,
+    order: MangaFilterOrder.createdAt_desc,
     extraParams: extraParams,
   );
 
@@ -79,7 +79,7 @@ Future<List<Manga>> _recentlyAdded(Ref ref) async {
 Future<List<Manga>> _latestUpdates(Ref ref) async {
   const info = MangaDexFeeds.globalFeed;
   final api = ref.watch(mangadexProvider);
-  final chapterlist = await api.fetchFeed(
+  final chapterlist = await api.fetchChapterFeed(
     path: info.path!,
     feedKey: info.key,
     limit: info.limit,

@@ -516,22 +516,20 @@ class MangaDexModel {
   /// [limit]     limits number of items per query
   /// [offset]    denotes the nth item to start fetching from.
   /// [entity]    a [MangaDexEntity] entity that the feed corresponds to
-  /// [orderKey]  order scheme
-  /// [order]     order direction
+  /// [order]     order scheme and direction
   ///
   /// Use specific providers that determine the feed to fetch
-  Future<MDEntityList> fetchFeed({
+  Future<MDEntityList> fetchChapterFeed({
     required String path,
     required String feedKey,
     required int limit,
     int offset = 0,
     MangaDexEntity? entity,
-    String orderKey = 'publishAt',
-    String order = 'desc',
+    ChapterFilterOrder order = ChapterFilterOrder.publishAt_desc,
     bool ignoreOriginalLanguage = false,
   }) async {
     final key =
-        '$feedKey(${entity != null ? '${entity.id},' : ''}$orderKey=$order,$offset)';
+        '$feedKey(${entity != null ? '${entity.id},' : ''}$order,$offset)';
 
     if (await _cache.exists(key)) {
       return await _cache.getEntityList(key);
@@ -540,6 +538,7 @@ class MangaDexModel {
     final settings = ref.read(mdConfigProvider);
 
     // Download missing data
+    final ord = order.json;
     final queryParams = {
       'limit': limit.toString(),
       'offset': offset.toString(),
@@ -552,7 +551,7 @@ class MangaDexModel {
             .toList(),
       'includeFutureUpdates': '0',
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
-      'order[$orderKey]': order,
+      ord.key: ord.value,
       'includes[]': ['scanlation_group', 'user'],
     };
 
@@ -721,11 +720,11 @@ class MangaDexModel {
     required String feedKey,
     MangaDexUUID? entity,
     int offset = 0,
-    FilterOrder order = FilterOrder.latestUploadedChapter_desc,
+    MangaFilterOrder order = MangaFilterOrder.latestUploadedChapter_desc,
     Map<String, dynamic>? extraParams,
   }) async {
     final key =
-        '$feedKey(${entity != null ? '${entity.id},' : ''}$offset,$order)';
+        '$feedKey(${entity != null ? '${entity.id},' : ''}$order,$offset)';
 
     if (await _cache.exists(key)) {
       return await _cache.getEntityList(key);

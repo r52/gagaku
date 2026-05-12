@@ -33,7 +33,7 @@ class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
 
-      final chapterlist = await api.fetchFeed(
+      final chapterlist = await api.fetchChapterFeed(
         path: info.path!,
         feedKey: info.key,
         limit: info.limit,

@@ -345,7 +345,17 @@
       "year_asc": "Year Ascending",
       "year_desc": "Year Descending",
       "title_asc": "Title Ascending",
-      "title_desc": "Title Descending"
+      "title_desc": "Title Descending",
+      "rating_asc": "Lowest Rating",
+      "rating_desc": "Highest Rating",
+      "publishAt_asc": "Oldest Publish",
+      "publishAt_desc": "Latest Publish",
+      "readableAt_asc": "Oldest Readable",
+      "readableAt_desc": "Latest Readable",
+      "volume_asc": "Volume Ascending",
+      "volume_desc": "Volume Descending",
+      "chapter_asc": "Chapter Ascending",
+      "chapter_desc": "Chapter Descending"
     },
     "ratings": [
       "Remove Rating",

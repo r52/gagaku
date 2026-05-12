@@ -108,14 +108,15 @@ class _MangaDexMangaViewWidgetState
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final sort = ref.watch(mangaChaptersListSortProvider);
-      final chapterlist = await api.fetchFeed(
+      final chapterlist = await api.fetchChapterFeed(
         path: chapterInfo.path!.replaceFirst('{id}', widget.manga.id),
         feedKey: chapterInfo.key,
         limit: chapterInfo.limit,
         offset: pageKey,
         entity: widget.manga,
-        orderKey: 'chapter',
-        order: sort.order,
+        order: sort == ListSort.ascending
+            ? ChapterFilterOrder.chapter_asc
+            : ChapterFilterOrder.chapter_desc,
         ignoreOriginalLanguage: true,
       );
 

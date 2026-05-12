@@ -47,7 +47,7 @@ class _MangaDexRecentFeedPageState
         limit: info.limit,
         feedKey: info.key,
         offset: pageKey,
-        order: FilterOrder.createdAt_desc,
+        order: MangaFilterOrder.createdAt_desc,
         extraParams: extraParams,
       );
 

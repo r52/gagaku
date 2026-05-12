@@ -250,7 +250,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
             primary: false,
             title: Text(tr.search.text),
             actions: [
-              DropdownMenu<FilterOrder>(
+              DropdownMenu<MangaFilterOrder>(
                 initialSelection: filter.filter.order,
                 enableFilter: false,
                 enableSearch: false,
@@ -264,7 +264,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                     ),
                   ),
                 ),
-                onSelected: (FilterOrder? order) async {
+                onSelected: (MangaFilterOrder? order) async {
                   if (order != null) {
                     setState(() {
                       _searchParameters = filter.copyWith(
@@ -277,11 +277,11 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                   }
                 },
                 dropdownMenuEntries:
-                    List<DropdownMenuEntry<FilterOrder>>.generate(
-                      FilterOrder.values.length,
-                      (int index) => DropdownMenuEntry<FilterOrder>(
-                        value: FilterOrder.values[index],
-                        label: tr[FilterOrder.values[index].label],
+                    List<DropdownMenuEntry<MangaFilterOrder>>.generate(
+                      MangaFilterOrder.values.length,
+                      (int index) => DropdownMenuEntry<MangaFilterOrder>(
+                        value: MangaFilterOrder.values[index],
+                        label: tr[MangaFilterOrder.values[index].label],
                       ),
                     ),
               ),

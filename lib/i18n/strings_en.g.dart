@@ -1789,6 +1789,36 @@ class TranslationsMangadexSortEn {
 
 	/// en: 'Title Descending'
 	String get title_desc => 'Title Descending';
+
+	/// en: 'Lowest Rating'
+	String get rating_asc => 'Lowest Rating';
+
+	/// en: 'Highest Rating'
+	String get rating_desc => 'Highest Rating';
+
+	/// en: 'Oldest Publish'
+	String get publishAt_asc => 'Oldest Publish';
+
+	/// en: 'Latest Publish'
+	String get publishAt_desc => 'Latest Publish';
+
+	/// en: 'Oldest Readable'
+	String get readableAt_asc => 'Oldest Readable';
+
+	/// en: 'Latest Readable'
+	String get readableAt_desc => 'Latest Readable';
+
+	/// en: 'Volume Ascending'
+	String get volume_asc => 'Volume Ascending';
+
+	/// en: 'Volume Descending'
+	String get volume_desc => 'Volume Descending';
+
+	/// en: 'Chapter Ascending'
+	String get chapter_asc => 'Chapter Ascending';
+
+	/// en: 'Chapter Descending'
+	String get chapter_desc => 'Chapter Descending';
 }
 
 // Path: webSources.source.install
@@ -2110,6 +2140,16 @@ extension on Translations {
 			'mangadex.sort.year_desc' => 'Year Descending',
 			'mangadex.sort.title_asc' => 'Title Ascending',
 			'mangadex.sort.title_desc' => 'Title Descending',
+			'mangadex.sort.rating_asc' => 'Lowest Rating',
+			'mangadex.sort.rating_desc' => 'Highest Rating',
+			'mangadex.sort.publishAt_asc' => 'Oldest Publish',
+			'mangadex.sort.publishAt_desc' => 'Latest Publish',
+			'mangadex.sort.readableAt_asc' => 'Oldest Readable',
+			'mangadex.sort.readableAt_desc' => 'Latest Readable',
+			'mangadex.sort.volume_asc' => 'Volume Ascending',
+			'mangadex.sort.volume_desc' => 'Volume Descending',
+			'mangadex.sort.chapter_asc' => 'Chapter Ascending',
+			'mangadex.sort.chapter_desc' => 'Chapter Descending',
 			'mangadex.ratings.0' => 'Remove Rating',
 			'mangadex.ratings.1' => '(1) Appalling',
 			'mangadex.ratings.2' => '(2) Horrible',
