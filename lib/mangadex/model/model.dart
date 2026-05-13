@@ -459,7 +459,7 @@ class MangaDexModel {
 
   Exception createException(String msg, Response response) {
     if (response.statusCode == 503) {
-      msg = 'MangaDex is down for maintanence';
+      msg = 'MangaDex is down for maintenance';
     }
 
     final message =
@@ -581,71 +581,171 @@ class MangaDexModel {
     throw createException("$feedKey() failed.", response);
   }
 
-  /// Fetches chapter data of the given chapter [uuids]
-  Future<Iterable<Chapter>> fetchChapters(Iterable<String> uuids) async {
-    final settings = ref.read(mdConfigProvider);
-
-    final list = <Chapter>[];
-
-    final fetch = (await uuids.whereAsync(
+  /// Generic chunked fetch by IDs.
+  ///
+  /// Filters out cached IDs, chunks the remainder, fires parallel GET requests,
+  /// caches results, and returns all requested entities from the cache.
+  Future<List<T>> _fetchByIds<T>({
+    required String endpoint,
+    required Iterable<String> ids,
+    required UnserializeCallback fromJson,
+    required int chunkSize,
+    required Map<String, dynamic> Function() buildQueryParams,
+  }) async {
+    // 1. Filter uncached IDs
+    final uncached = (await ids.whereAsync(
       (id) async => !await _cache.exists(id),
     )).toList();
 
-    if (fetch.isNotEmpty) {
-      int start = 0, end = 0;
+    final result = <T>[];
 
-      var queryParams = {
-        'limit': MangaDexEndpoints.breakLimit.toString(),
-        'includeFutureUpdates': '0',
-        //'order[publishAt]': 'desc',
-        'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
-        'includes[]': ['scanlation_group', 'user'],
-      };
-
-      final futures = <Future<void>>[];
-
-      while (end < fetch.length) {
-        start = end;
-        end += min(fetch.length - start, MangaDexEndpoints.breakLimit);
-
-        final chunkParams = Map<String, dynamic>.from(queryParams);
-        chunkParams['ids[]'] = fetch.getRange(start, end);
-
-        final uri = MangaDexEndpoints.api.replace(
-          path: MangaDexEndpoints.chapter,
-          queryParameters: chunkParams,
-        );
-
-        futures.add(
-          _dio.getUri(uri).then((response) async {
-            if (response.statusCode == 200) {
-              final result = MDEntityList.fromJson(response.data);
-              await _cache.putAllAPIResolved(result.data);
-            } else {
-              throw createException("fetchChapters() failed.", response);
-            }
-          }),
-        );
-      }
-
-      final results = await Result.captureAll(futures);
-
-      for (final result in results) {
-        if (result.isError) {
-          // Log the partial failure, but allow the successful chunks to proceed
-          logger.w("A chunk failed to fetch", error: result.asError!.error);
+    if (uncached.isEmpty) {
+      // All cached — just read from cache
+      for (final id in ids) {
+        if (await _cache.exists(id)) {
+          result.add(_cache.get<T>(id, fromJson));
         }
       }
+      return result;
     }
 
-    // Craft the list
-    for (final id in uuids) {
-      if (await _cache.exists(id)) {
-        list.add(_cache.get<Chapter>(id, Chapter.fromJson));
+    // 2. Chunk and fire parallel requests
+    final futures = <Future<void>>[];
+    int start = 0, end = 0;
+
+    while (end < uncached.length) {
+      start = end;
+      end += min(uncached.length - start, chunkSize);
+
+      final chunkParams = Map<String, dynamic>.from(buildQueryParams());
+      chunkParams['ids[]'] = uncached.getRange(start, end);
+
+      final uri = MangaDexEndpoints.api.replace(
+        path: endpoint,
+        queryParameters: chunkParams,
+      );
+
+      futures.add(
+        _dio.getUri(uri).then((response) async {
+          if (response.statusCode == 200) {
+            final parsed = MDEntityList.fromJson(response.data);
+            await _cache.putAllAPIResolved(parsed.data);
+          } else {
+            throw createException(
+              "$_fetchByIds() failed for $endpoint.",
+              response,
+            );
+          }
+        }),
+      );
+    }
+
+    // 3. Tolerate partial failures
+    final results = await Result.captureAll(futures);
+    for (final result in results) {
+      if (result.isError) {
+        logger.w("A chunk failed to fetch", error: result.asError!.error);
       }
     }
 
-    return list;
+    // 4. Re-read all original IDs from cache
+    for (final id in ids) {
+      if (await _cache.exists(id)) {
+        result.add(_cache.get<T>(id, fromJson));
+      }
+    }
+
+    return result;
+  }
+
+  /// Generic toggle helper for POST/DELETE endpoints.
+  ///
+  /// [uri] must already be fully constructed (including path params).
+  /// [enable] determines POST (true) vs DELETE (false).
+  /// [postData] optional body for POST requests.
+  /// [logPrefix] used in failure log messages.
+  Future<bool> _toggleEndpoint({
+    required Uri uri,
+    required bool enable,
+    Map<String, dynamic>? postData,
+    required String logPrefix,
+  }) async {
+    Response response;
+
+    if (enable) {
+      response = await _dio.postUri(uri, data: postData);
+    } else {
+      response = await _dio.deleteUri(uri);
+    }
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = response.data;
+      if (body['result'] == 'ok') return true;
+    }
+
+    logger.w(
+      '$logPrefix returned code ${response.statusCode}',
+      error: response.data,
+    );
+
+    return false;
+  }
+
+  /// Generic stats/ratings fetch helper.
+  ///
+  /// Parameters:
+  /// - [endpoint]: API path (e.g. `/statistics/manga`)
+  /// - [queryParamKey]: Query param key for IDs (e.g. `manga[]`)
+  /// - [ids]: IDs to fetch
+  /// - [fromJson]: Parser for the response body
+  /// - [errorLog]: Factory for error log message
+  /// - [preProcess]: Optional pre-parse check; return true to yield empty map
+  Future<Map<String, T>> _fetchStats<T>({
+    required String endpoint,
+    required String queryParamKey,
+    required Iterable<String> ids,
+    required Map<String, T> Function(Map<String, dynamic>) fromJson,
+    required String Function() errorLog,
+    bool Function(Map<String, dynamic>)? preProcess,
+  }) async {
+    if (ids.isEmpty) return {};
+
+    final queryParams = {queryParamKey: ids.toList()};
+
+    final uri = MangaDexEndpoints.api.replace(
+      path: endpoint,
+      queryParameters: queryParams,
+    );
+
+    final response = await _dio.getUri(uri);
+
+    if (response.statusCode == 200) {
+      final data = response.data as Map<String, dynamic>;
+      if (preProcess != null && preProcess(data)) return {};
+      return fromJson(data);
+    } else {
+      throw createException(errorLog(), response);
+    }
+  }
+
+  /// Fetches chapter data of the given chapter [uuids]
+  Future<List<Chapter>> fetchChapters(Iterable<String> uuids) async {
+    final settings = ref.read(mdConfigProvider);
+
+    final result = await _fetchByIds<Chapter>(
+      endpoint: MangaDexEndpoints.chapter,
+      ids: uuids,
+      fromJson: Chapter.fromJson,
+      chunkSize: MangaDexEndpoints.breakLimit,
+      buildQueryParams: () => {
+        'limit': MangaDexEndpoints.breakLimit.toString(),
+        'includeFutureUpdates': '0',
+        'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
+        'includes[]': ['scanlation_group', 'user'],
+      },
+    );
+
+    return result;
   }
 
   Future<List<Manga>> fetchMangaById({
@@ -654,64 +754,17 @@ class MangaDexModel {
   }) async {
     final settings = ref.read(mdConfigProvider);
 
-    var queryParams = <String, dynamic>{
-      'limit': limit.toString(),
-      'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
-      'includes[]': ['cover_art', 'author', 'artist'],
-    };
-
-    final list = <Manga>[];
-    final fetch = (await ids.whereAsync(
-      (id) async => !await _cache.exists(id),
-    )).toList();
-
-    if (fetch.isNotEmpty) {
-      int start = 0, end = 0;
-
-      final futures = <Future<void>>[];
-
-      while (end < fetch.length) {
-        start = end;
-        end += min(fetch.length - start, limit);
-
-        final chunkParams = Map<String, dynamic>.from(queryParams);
-        chunkParams['ids[]'] = fetch.getRange(start, end);
-
-        final uri = MangaDexEndpoints.api.replace(
-          path: MangaDexEndpoints.manga,
-          queryParameters: chunkParams,
-        );
-
-        futures.add(
-          _dio.getUri(uri).then((response) async {
-            if (response.statusCode == 200) {
-              final result = MDEntityList.fromJson(response.data);
-              await _cache.putAllAPIResolved(result.data);
-            } else {
-              throw createException("fetchMangaById() failed.", response);
-            }
-          }),
-        );
-      }
-
-      final results = await Result.captureAll(futures);
-
-      for (final result in results) {
-        if (result.isError) {
-          // Log the partial failure, but allow the successful chunks to proceed
-          logger.w("A chunk failed to fetch", error: result.asError!.error);
-        }
-      }
-    }
-
-    // Craft the list
-    for (final id in ids) {
-      if (await _cache.exists(id)) {
-        list.add(_cache.get<Manga>(id, Manga.fromJson));
-      }
-    }
-
-    return list;
+    return _fetchByIds<Manga>(
+      endpoint: MangaDexEndpoints.manga,
+      ids: ids,
+      fromJson: Manga.fromJson,
+      chunkSize: limit,
+      buildQueryParams: () => {
+        'limit': limit.toString(),
+        'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
+        'includes[]': ['cover_art', 'author', 'artist'],
+      },
+    );
   }
 
   /// Fetches a list of manga data given the query parameters
@@ -876,26 +929,11 @@ class MangaDexModel {
       path: MangaDexEndpoints.setFollow.replaceFirst('{id}', manga.id),
     );
 
-    Response response;
-
-    if (setFollow) {
-      response = await _dio.postUri(uri);
-    } else {
-      response = await _dio.deleteUri(uri);
-    }
-
-    if (response.statusCode == 200) {
-      // Success
-      return true;
-    }
-
-    // Log the failure
-    logger.w(
-      "setMangaFollowing(${manga.id}, $setFollow) returned code ${response.statusCode}",
-      error: response.data,
+    return await _toggleEndpoint(
+      uri: uri,
+      enable: setFollow,
+      logPrefix: 'setMangaFollowing(${manga.id}, $setFollow)',
     );
-
-    return false;
   }
 
   /// Gets the user's reading status for [manga]
@@ -1193,29 +1231,14 @@ class MangaDexModel {
   Future<Map<String, MangaStatistics>> fetchStatistics(
     Iterable<Manga> mangas,
   ) async {
-    final fetch = mangas.map((e) => e.id);
-
-    if (fetch.isNotEmpty) {
-      final queryParams = {'manga[]': fetch.toList()};
-
-      final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.statistics,
-        queryParameters: queryParams,
-      );
-
-      final response = await _dio.getUri(uri);
-
-      if (response.statusCode == 200) {
-        final resp = MangaStatisticsResponse.fromJson(response.data);
-
-        return resp.statistics;
-      } else {
-        // Throw if failure
-        throw createException("fetchStatistics() failed.", response);
-      }
-    }
-
-    return {};
+    final ids = mangas.map((e) => e.id);
+    return _fetchStats(
+      endpoint: MangaDexEndpoints.statistics,
+      queryParamKey: 'manga[]',
+      ids: ids,
+      fromJson: (data) => MangaStatisticsResponse.fromJson(data).statistics,
+      errorLog: () => "fetchStatistics() failed.",
+    );
   }
 
   /// Fetches statistics of given [chapters]
@@ -1225,29 +1248,14 @@ class MangaDexModel {
   Future<Map<String, ChapterStatistics>> fetchChapterStats(
     Iterable<Chapter> chapters,
   ) async {
-    final fetch = chapters.map((e) => e.id);
-
-    if (fetch.isNotEmpty) {
-      final queryParams = {'chapter[]': fetch.toList()};
-
-      final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.chapterStats,
-        queryParameters: queryParams,
-      );
-
-      final response = await _dio.getUri(uri);
-
-      if (response.statusCode == 200) {
-        final resp = ChapterStatisticsResponse.fromJson(response.data);
-
-        return resp.statistics;
-      } else {
-        // Throw if failure
-        throw createException("fetchChapterStats() failed.", response);
-      }
-    }
-
-    return {};
+    final ids = chapters.map((e) => e.id);
+    return _fetchStats(
+      endpoint: MangaDexEndpoints.chapterStats,
+      queryParamKey: 'chapter[]',
+      ids: ids,
+      fromJson: (data) => ChapterStatisticsResponse.fromJson(data).statistics,
+      errorLog: () => "fetchChapterStats() failed.",
+    );
   }
 
   /// Retrieve cover art for a specific manga
@@ -1291,36 +1299,15 @@ class MangaDexModel {
   /// Do not use directly. Prefer [ratingsProvider] for its caching and
   /// state management.
   Future<Map<String, SelfRating>> fetchRatings(Iterable<Manga> mangas) async {
-    final fetch = mangas.map((e) => e.id);
-
-    if (fetch.isNotEmpty) {
-      final queryParams = {'manga[]': fetch.toList()};
-
-      final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.getRating,
-        queryParameters: queryParams,
-      );
-
-      final response = await _dio.getUri(uri);
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> body = response.data;
-
-        if (body['ratings'] is List) {
-          // If the api returns a List, then the result is null
-          return {};
-        }
-
-        final resp = SelfRatingResponse.fromJson(body);
-
-        return {...resp.ratings};
-      } else {
-        // Throw if failure
-        throw createException("fetchRating() failed.", response);
-      }
-    }
-
-    return {};
+    final ids = mangas.map((e) => e.id);
+    return _fetchStats(
+      endpoint: MangaDexEndpoints.getRating,
+      queryParamKey: 'manga[]',
+      ids: ids,
+      fromJson: (data) => SelfRatingResponse.fromJson(data).ratings,
+      errorLog: () => "fetchRating() failed.",
+      preProcess: (data) => (data['ratings'] as dynamic) is List,
+    );
   }
 
   /// Sets the [manga]'s self-rating
@@ -1335,92 +1322,25 @@ class MangaDexModel {
       path: MangaDexEndpoints.setRating.replaceFirst('{id}', manga.id),
     );
 
-    Response? response;
-
-    if (rating != null) {
-      final params = {'rating': rating};
-
-      response = await _dio.postUri(uri, data: params);
-    } else {
-      response = await _dio.deleteUri(uri);
-    }
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> body = response.data;
-
-      if (body['result'] == 'ok') {
-        return true;
-      }
-    }
-
-    // Log the failure
-    logger.w(
-      "setMangaRating(${manga.id}, $rating) returned code ${response.statusCode}",
-      error: response.data,
+    return await _toggleEndpoint(
+      uri: uri,
+      enable: rating != null,
+      postData: rating != null ? {'rating': rating} : null,
+      logPrefix: 'setMangaRating(${manga.id}, $rating)',
     );
-
-    return false;
   }
 
   /// Fetches group info of the given group [uuids]
   Future<List<Group>> fetchGroups(Iterable<String> uuids) async {
-    final list = <Group>[];
-
-    final fetch = (await uuids.whereAsync(
-      (id) async => !await _cache.exists(id),
-    )).toList();
-
-    if (fetch.isNotEmpty) {
-      int start = 0, end = 0;
-
-      var queryParams = <String, dynamic>{
+    return _fetchByIds<Group>(
+      endpoint: MangaDexEndpoints.group,
+      ids: uuids,
+      fromJson: Group.fromJson,
+      chunkSize: MangaDexEndpoints.breakLimit,
+      buildQueryParams: () => {
         'limit': MangaDexEndpoints.breakLimit.toString(),
-      };
-
-      final futures = <Future<void>>[];
-
-      while (end < fetch.length) {
-        start = end;
-        end += min(fetch.length - start, MangaDexEndpoints.breakLimit);
-
-        final chunkParams = Map<String, dynamic>.from(queryParams);
-        chunkParams['ids[]'] = fetch.getRange(start, end);
-
-        final uri = MangaDexEndpoints.api.replace(
-          path: MangaDexEndpoints.group,
-          queryParameters: chunkParams,
-        );
-
-        futures.add(
-          _dio.getUri(uri).then((response) async {
-            if (response.statusCode == 200) {
-              final result = MDEntityList.fromJson(response.data);
-              await _cache.putAllAPIResolved(result.data);
-            } else {
-              throw createException("fetchGroups() failed.", response);
-            }
-          }),
-        );
-      }
-
-      final results = await Result.captureAll(futures);
-
-      for (final result in results) {
-        if (result.isError) {
-          // Log the partial failure, but allow the successful chunks to proceed
-          logger.w("A chunk failed to fetch", error: result.asError!.error);
-        }
-      }
-    }
-
-    // Craft the list
-    for (final id in uuids) {
-      if (await _cache.exists(id)) {
-        list.add(_cache.get<Group>(id, Group.fromJson));
-      }
-    }
-
-    return list;
+      },
+    );
   }
 
   /// Fetches creator info of the given [uuids]
@@ -1430,86 +1350,38 @@ class MangaDexModel {
   }) async {
     assert(uuids != null || name != null);
 
-    final list = <CreatorType>[];
-
     if (uuids != null) {
-      final fetch = (await uuids.whereAsync(
-        (id) async => !await _cache.exists(id),
-      )).toList();
-
-      if (fetch.isNotEmpty) {
-        int start = 0, end = 0;
-
-        var queryParams = <String, dynamic>{
+      return _fetchByIds<CreatorType>(
+        endpoint: MangaDexEndpoints.creator,
+        ids: uuids,
+        fromJson: Author.fromJson,
+        chunkSize: MangaDexEndpoints.breakLimit,
+        buildQueryParams: () => {
           'limit': MangaDexEndpoints.breakLimit.toString(),
-        };
-
-        final futures = <Future<void>>[];
-
-        while (end < fetch.length) {
-          start = end;
-          end += min(fetch.length - start, MangaDexEndpoints.breakLimit);
-
-          final chunkParams = Map<String, dynamic>.from(queryParams);
-          chunkParams['ids[]'] = fetch.getRange(start, end);
-
-          final uri = MangaDexEndpoints.api.replace(
-            path: MangaDexEndpoints.creator,
-            queryParameters: chunkParams,
-          );
-
-          futures.add(
-            _dio.getUri(uri).then((response) async {
-              if (response.statusCode == 200) {
-                final result = MDEntityList.fromJson(response.data);
-                await _cache.putAllAPIResolved(result.data);
-              } else {
-                throw createException("fetchCreators() failed.", response);
-              }
-            }),
-          );
-        }
-
-        final results = await Result.captureAll(futures);
-
-        for (final result in results) {
-          if (result.isError) {
-            // Log the partial failure, but allow the successful chunks to proceed
-            logger.w("A chunk failed to fetch", error: result.asError!.error);
-          }
-        }
-      }
-
-      // Craft the list
-      for (final id in uuids) {
-        if (await _cache.exists(id)) {
-          list.add(_cache.get<CreatorType>(id, Author.fromJson));
-        }
-      }
-    } else {
-      // name search
-      final queryParams = <String, dynamic>{'limit': '10', 'name': name};
-
-      final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.creator,
-        queryParameters: queryParams,
+        },
       );
-
-      final response = await _dio.getUri(uri);
-
-      if (response.statusCode == 200) {
-        final result = MDEntityList.fromJson(response.data);
-
-        // Cache the data
-        await _cache.putAllAPIResolved(result.data);
-        list.addAll(result.data.cast<CreatorType>());
-      } else {
-        // Throw if failure
-        throw createException("fetchCreators() failed.", response);
-      }
     }
 
-    return list;
+    // name search
+    final queryParams = <String, dynamic>{'limit': '10', 'name': name};
+
+    final uri = MangaDexEndpoints.api.replace(
+      path: MangaDexEndpoints.creator,
+      queryParameters: queryParams,
+    );
+
+    final response = await _dio.getUri(uri);
+
+    if (response.statusCode == 200) {
+      final result = MDEntityList.fromJson(response.data);
+
+      // Cache the data
+      await _cache.putAllAPIResolved(result.data);
+      return result.data.cast<CreatorType>();
+    }
+
+    // Throw if failure
+    throw createException("fetchCreators() failed.", response);
   }
 
   /// Fetches a [CustomList] by id
@@ -1564,29 +1436,11 @@ class MangaDexModel {
       path: MangaDexEndpoints.followList.replaceFirst('{id}', list.id),
     );
 
-    Response? response;
-
-    if (follow) {
-      response = await _dio.postUri(uri);
-    } else {
-      response = await _dio.deleteUri(uri);
-    }
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> body = response.data;
-
-      if (body['result'] == 'ok') {
-        return true;
-      }
-    }
-
-    // Log the failure
-    logger.w(
-      "setFollowList($id, $follow) returned code ${response.statusCode}",
-      error: response.data,
+    return await _toggleEndpoint(
+      uri: uri,
+      enable: follow,
+      logPrefix: 'setFollowList($id, $follow)',
     );
-
-    return false;
   }
 
   /// Fetches logged user's [CustomList] list
