@@ -789,6 +789,7 @@ class MangaDexModel {
       'limit': limit.toString(),
       'contentRating[]': settings.contentRating.map((e) => e.name).toList(),
       'includes[]': ['cover_art', 'author', 'artist'],
+      'offset': offset.toString(),
     };
 
     queryParams.addEntries([order.json]);
@@ -815,8 +816,6 @@ class MangaDexModel {
           throw InvalidDataException(msg);
       }
     }
-
-    queryParams['offset'] = offset.toString();
 
     final uri = MangaDexEndpoints.api.replace(
       path: MangaDexEndpoints.manga,
@@ -1038,14 +1037,9 @@ class MangaDexModel {
 
         if (body['data'] is List) {
           // Since grouped = true, if the api returns a List, then the result
-          // is null
-          ReadChaptersMap map = {};
+          // is null for all queried manga. Return empty sets for all.
 
-          for (var m in mangas) {
-            map[m.id] = ReadChapterSet(m.id, {});
-          }
-
-          return map;
+          return {for (var m in mangas) m.id: ReadChapterSet(m.id, {})};
         }
 
         final cmap = body['data'] as Map<String, dynamic>;
@@ -1148,7 +1142,7 @@ class MangaDexModel {
   }
 
   /// Fetches the user's manga library
-  Future<LibraryMap?> fetchUserLibrary(String userId) async {
+  Future<LibraryMap> fetchUserLibrary(String userId) async {
     if (!await loggedIn()) {
       throw StateError(
         "fetchUserLibrary() called on invalid token/login. Shouldn't ever get here",
@@ -1179,7 +1173,7 @@ class MangaDexModel {
 
       if (body['statuses'] is List) {
         // If the api returns a List, then the result is null
-        return null;
+        return {};
       }
 
       final mlist = body['statuses'] as Map<String, dynamic>;
@@ -1384,6 +1378,59 @@ class MangaDexModel {
     throw createException("fetchCreators() failed.", response);
   }
 
+  /// Generic CRUD helper for CustomList operations.
+  @protected
+  Future<T> _customListCrud<T>({
+    required String method,
+    required String endpoint,
+    required Map<String, dynamic>? Function() data,
+    required T Function(Map<String, dynamic>) parse,
+    required String logPrefix,
+    required Future<void> Function(T) cache,
+  }) async {
+    if (!await loggedIn()) {
+      throw StateError('$logPrefix() called on invalid token/login.');
+    }
+
+    final uri = MangaDexEndpoints.api.replace(path: endpoint);
+    Response response;
+    final reqData = data();
+
+    switch (method) {
+      case 'GET':
+        response = await _dio.getUri(uri);
+        break;
+      case 'POST':
+        response = await _dio.postUri(uri, data: reqData);
+        break;
+      case 'PUT':
+        response = await _dio.putUri(uri, data: reqData);
+        break;
+      case 'DELETE':
+        response = await _dio.deleteUri(uri);
+        break;
+      default:
+        throw ArgumentError('Unsupported method: $method');
+    }
+
+    if (response.statusCode == 200 ||
+        (response.statusCode! >= 200 && response.statusCode! <= 299)) {
+      final body = response.data as Map<String, dynamic>;
+      if (body['result'] == 'ok') {
+        final result = parse(body);
+        await cache(result);
+        return result;
+      }
+    }
+
+    logger.w(
+      '$logPrefix returned code ${response.statusCode}',
+      error: response.data,
+    );
+
+    throw createException('$logPrefix() failed.', response);
+  }
+
   /// Fetches a [CustomList] by id
   Future<CustomList?> fetchListById(String listId) async {
     if (listId.isEmpty) {
@@ -1402,10 +1449,8 @@ class MangaDexModel {
     final response = await _dio.getUri(uri);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body = response.data;
+      final body = response.data as Map<String, dynamic>;
       final result = CustomList.fromJson(body['data']);
-
-      // Cache the result
       return await _cache.put(
         listId,
         json.encode(result.toJson()),
@@ -1413,7 +1458,9 @@ class MangaDexModel {
         true,
         unserializer: CustomList.fromJson,
       );
-    } else if (response.statusCode == 404) {
+    }
+
+    if (response.statusCode == 404) {
       // List not found
       return null;
     }
@@ -1498,32 +1545,22 @@ class MangaDexModel {
   ) async {
     if (!await loggedIn()) {
       throw StateError(
-        "updateMangaInCustomList() called on invalid token/login. Shouldn't ever get here",
+        'updateMangaInCustomList() called on invalid token/login.',
       );
     }
 
     final id = list.id;
+    final endpoint = MangaDexEndpoints.updateMangaInList
+        .replaceFirst('{id}', manga.id)
+        .replaceFirst('{listId}', id);
 
-    final uri = MangaDexEndpoints.api.replace(
-      path: MangaDexEndpoints.updateMangaInList
-          .replaceFirst('{id}', manga.id)
-          .replaceFirst('{listId}', id),
-    );
-
-    Response? response;
-
-    if (add) {
-      response = await _dio.postUri(uri);
-    } else {
-      response = await _dio.deleteUri(uri);
-    }
+    final uri = MangaDexEndpoints.api.replace(path: endpoint);
+    final response = await (add ? _dio.postUri(uri) : _dio.deleteUri(uri));
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> body = response.data;
-
+      final body = response.data as Map<String, dynamic>;
       if (body['result'] == 'ok') {
         final relationships = [...list.relationships];
-
         if (add) {
           relationships.add(Manga(id: manga.id));
         } else {
@@ -1547,49 +1584,29 @@ class MangaDexModel {
       }
     }
 
-    // Log the failure
     logger.w(
-      "updateMangaInCustomList($id, ${manga.id}, $add) returned code ${response.statusCode}",
+      'updateMangaInCustomList($id, ${manga.id}, $add) returned code ${response.statusCode}',
       error: response.data,
     );
-
     return null;
   }
 
   /// Deletes a [CustomList]
   Future<bool> deleteList(CustomList list) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "deleteList() called on invalid token/login. Shouldn't ever get here",
-      );
-    }
-
     final id = list.id;
 
-    final uri = MangaDexEndpoints.api.replace(
-      path: MangaDexEndpoints.modifyList.replaceFirst('{id}', id),
-    );
-
-    Response? response;
-
-    response = await _dio.deleteUri(uri);
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> body = response.data;
-
-      if (body['result'] == 'ok') {
-        // Remove the cache
+    final result = await _customListCrud<bool>(
+      method: 'DELETE',
+      endpoint: MangaDexEndpoints.modifyList.replaceFirst('{id}', id),
+      data: () => null,
+      parse: (_) => true,
+      logPrefix: 'deleteList($id)',
+      cache: (_) async {
         _cache.remove(id);
-        return true;
-      }
-    }
-
-    // Log the failure
-    logger.w(
-      "deleteList($id) returned code ${response.statusCode}",
-      error: response.data,
+      },
     );
-    throw createException("deleteList($id) failed.", response);
+
+    return result;
   }
 
   /// Creates a new [CustomList]
@@ -1598,51 +1615,28 @@ class MangaDexModel {
     CustomListVisibility visibility,
     Iterable<String> mangaIds,
   ) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "createNewList() called on invalid token/login. Shouldn't ever get here",
-      );
-    }
-
-    final uri = MangaDexEndpoints.api.replace(
-      path: MangaDexEndpoints.createList,
-    );
-
-    final params = {
-      'name': name,
-      'visibility': visibility.name,
-      'manga': mangaIds.toList(),
-    };
-
-    final response = await _dio.postUri(uri, data: params);
-
-    if (response.statusCode! >= 200 && response.statusCode! <= 299) {
-      final Map<String, dynamic> body = response.data;
-
-      if (body['result'] == 'ok') {
-        // Process new list
-        final nlist = CustomList.fromJson(body['data']);
-
-        // Cache the result
-        return await _cache.put(
-          nlist.id,
-          json.encode(nlist.toJson()),
-          nlist,
+    final result = await _customListCrud<CustomList>(
+      method: 'POST',
+      endpoint: MangaDexEndpoints.createList,
+      data: () => {
+        'name': name,
+        'visibility': visibility.name,
+        'manga': mangaIds.toList(),
+      },
+      parse: (body) => CustomList.fromJson(body['data']),
+      logPrefix: 'createNewList($name, ${visibility.name})',
+      cache: (result) async {
+        await _cache.put(
+          result.id,
+          json.encode(result.toJson()),
+          result,
           true,
           unserializer: CustomList.fromJson,
         );
-      }
-    }
+      },
+    );
 
-    // Log the failure
-    logger.w(
-      "createNewList($name, ${visibility.name}) returned code ${response.statusCode}",
-      error: response.data,
-    );
-    throw createException(
-      "createNewList($name, ${visibility.name}) failed.",
-      response,
-    );
+    return result;
   }
 
   /// Edits an existing [CustomList]
@@ -1652,50 +1646,31 @@ class MangaDexModel {
     CustomListVisibility visibility,
     Iterable<String> mangaIds,
   ) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "editList() called on invalid token/login. Shouldn't ever get here",
-      );
-    }
-
     final id = list.id;
 
-    final uri = MangaDexEndpoints.api.replace(
-      path: MangaDexEndpoints.modifyList.replaceFirst('{id}', id),
-    );
-
-    final params = {
-      'name': name,
-      'visibility': visibility.name,
-      'manga': mangaIds.toList(),
-      'version': list.attributes.version,
-    };
-
-    final response = await _dio.putUri(uri, data: params);
-
-    if (response.statusCode! >= 200 && response.statusCode! <= 299) {
-      final Map<String, dynamic> body = response.data;
-
-      if (body['result'] == 'ok') {
-        // Process new list
-        final nlist = CustomList.fromJson(body['data']);
-
-        // Cache the result
-        return await _cache.put(
-          nlist.id,
-          json.encode(nlist.toJson()),
-          nlist,
+    final result = await _customListCrud<CustomList>(
+      method: 'PUT',
+      endpoint: MangaDexEndpoints.modifyList.replaceFirst('{id}', id),
+      data: () => {
+        'name': name,
+        'visibility': visibility.name,
+        'manga': mangaIds.toList(),
+        'version': list.attributes.version,
+      },
+      parse: (body) => CustomList.fromJson(body['data']),
+      logPrefix: 'editList($id, ${visibility.name})',
+      cache: (result) async {
+        await _cache.put(
+          result.id,
+          json.encode(result.toJson()),
+          result,
           true,
           unserializer: CustomList.fromJson,
         );
-      }
-    }
-
-    // Throw if failure
-    throw createException(
-      "editList($id, ${visibility.name}) failed.",
-      response,
+      },
     );
+
+    return result;
   }
 
   /// Get logged in user details
@@ -1895,10 +1870,6 @@ class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
 
     final api = ref.watch(mangadexProvider);
     final library = await api.fetchUserLibrary(userId);
-
-    if (library == null) {
-      return {};
-    }
 
     disposeAfter(const Duration(minutes: 5));
 
