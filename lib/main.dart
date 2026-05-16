@@ -122,14 +122,15 @@ class App extends HookConsumerWidget {
     // Trigger dialog when an update is available.
     useEffect(() {
       switch (updateResult) {
-        case AsyncValue(value: UpdateResultAvailable(:final info)):
+        case AsyncData(value: UpdateResultAvailable(:final info)):
           WidgetsBinding.instance.addPostFrameCallback((_) {
             final navContext = rootNavigatorKey.currentContext;
             if (navContext != null && navContext.mounted) {
               showUpdateDialog(navContext, info);
             }
           });
-        default:
+        case AsyncData(value: UpdateResultUpToDate()) ||
+            AsyncData(value: UpdateResultIgnored()):
           Future.delayed(Duration.zero, () async {
             final updatedConfig = config.copyWith(
               lastUpdateCheck: DateTime.now(),
@@ -140,6 +141,7 @@ class App extends HookConsumerWidget {
                   .save(updatedConfig);
             });
           });
+        default:
           break;
       }
       return null;
