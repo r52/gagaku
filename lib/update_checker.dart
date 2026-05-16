@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -238,10 +239,12 @@ class UpdateChecker extends _$UpdateChecker {
   /// Compare two semver strings.
   /// Returns positive if [remote] is newer, negative if [local] is newer, 0 if equal.
   int _compareStable(String remote) {
-    final localParts = kPackageVersion.split('.').map(int.parse).toList();
+    final localParts = _parseSemver(kPackageVersion);
     final remoteParts = _parseSemver(remote);
 
-    for (var i = 0; i < 3; i++) {
+    final length = math.max(localParts.length, remoteParts.length);
+
+    for (var i = 0; i < length; i++) {
       final l = localParts.length > i ? localParts[i] : 0;
       final r = remoteParts.length > i ? remoteParts[i] : 0;
       if (r > l) return 1;
@@ -253,7 +256,7 @@ class UpdateChecker extends _$UpdateChecker {
   List<int> _parseSemver(String version) {
     // Strip pre-release suffix for basic comparison.
     final base = version.split('-').first;
-    return base.split('.').map(int.parse).toList();
+    return base.split('.').map((part) => int.tryParse(part) ?? 0).toList();
   }
 }
 

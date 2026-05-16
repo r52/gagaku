@@ -124,8 +124,9 @@ class App extends HookConsumerWidget {
       switch (updateResult) {
         case AsyncValue(value: UpdateResultAvailable(:final info)):
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (context.mounted) {
-              showUpdateDialog(context, info);
+            final navContext = rootNavigatorKey.currentContext;
+            if (navContext != null && navContext.mounted) {
+              showUpdateDialog(navContext, info);
             }
           });
         default:
