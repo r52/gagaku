@@ -392,8 +392,8 @@ class AppSettingsPage extends HookConsumerWidget {
               subtitle: Text(t.backup.dataSub),
               builder: (context) {
                 return Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
                     spacing: 10.0,
                     children: [
                       HookBuilder(
