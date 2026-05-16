@@ -559,5 +559,27 @@
   "permissions": {
     "needed": "Permissions Needed",
     "request": "Extra permissions are required to update your feed in the background."
+  },
+  "updates": {
+    "checkForUpdates": "Check for Updates",
+    "checkForUpdatesSub": "Check for new versions on startup",
+    "updateChannel": "Update Channel",
+    "updateChannelSub": "Choose which releases to check for",
+    "channelStable": "Stable",
+    "channelStableDesc": "Stable releases",
+    "channelBeta": "Beta",
+    "channelBetaDesc": "Dev-preview, bleeding edge",
+    "checkFrequency": "Check Frequency",
+    "checkFrequencySub": "How often to check for updates",
+    "freqHourly": "Every hour",
+    "freqDaily": "Once per day",
+    "freqWeekly": "Once per week",
+    "freqMonthly": "Once per month",
+    "updateAvailableTitle": "Update Available",
+    "updateAvailableBody": "A new version is available.\nCurrent: $currentVersion\nAvailable: $newVersion",
+    "updateAvailableBetaBody": "A new dev-preview is available.\nYour build: $currentVersion\nLatest: $latestVersion",
+    "download": "Download",
+    "notNow": "Not Now",
+    "ignoreThisVersion": "Ignore This Version"
   }
 }

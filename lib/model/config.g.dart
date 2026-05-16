@@ -20,6 +20,18 @@ GagakuConfig _$GagakuConfigFromJson(Map<String, dynamic> json) => GagakuConfig(
   gridAlbumExtent:
       $enumDecodeNullable(_$GridAlbumExtentEnumMap, json['gridAlbumExtent']) ??
       GridAlbumExtent.medium,
+  checkForUpdates: json['checkForUpdates'] as bool? ?? true,
+  updateCheckCooldownHours:
+      (json['updateCheckCooldownHours'] as num?)?.toInt() ?? 24,
+  updateChannel: json['updateChannel'] as String? ?? 'stable',
+  ignoredUpdates:
+      (json['ignoredUpdates'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  lastUpdateCheck: json['lastUpdateCheck'] == null
+      ? null
+      : DateTime.parse(json['lastUpdateCheck'] as String),
 );
 
 Map<String, dynamic> _$GagakuConfigToJson(GagakuConfig instance) =>
@@ -27,6 +39,11 @@ Map<String, dynamic> _$GagakuConfigToJson(GagakuConfig instance) =>
       'themeMode': _$ThemeModeEnumMap[instance.themeMode]!,
       'theme': _$GagakuThemeEnumMap[instance.theme]!,
       'gridAlbumExtent': _$GridAlbumExtentEnumMap[instance.gridAlbumExtent]!,
+      'checkForUpdates': instance.checkForUpdates,
+      'updateCheckCooldownHours': instance.updateCheckCooldownHours,
+      'updateChannel': instance.updateChannel,
+      'ignoredUpdates': instance.ignoredUpdates,
+      'lastUpdateCheck': instance.lastUpdateCheck?.toIso8601String(),
     };
 
 const _$ThemeModeEnumMap = {
@@ -95,7 +112,7 @@ final class GagakuSettingsProvider
   }
 }
 
-String _$gagakuSettingsHash() => r'3bd2c7ba475c6fad94fb99b29e58ce788c8b010f';
+String _$gagakuSettingsHash() => r'96625ca037bbe36bbc09bec40472ead5f1b393d8';
 
 abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
   GagakuConfig build();

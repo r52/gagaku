@@ -102,6 +102,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final TranslationsBackupEn backup = TranslationsBackupEn.internal(_root);
 	late final TranslationsChapterFeedEn chapterFeed = TranslationsChapterFeedEn.internal(_root);
 	late final TranslationsPermissionsEn permissions = TranslationsPermissionsEn.internal(_root);
+	late final TranslationsUpdatesEn updates = TranslationsUpdatesEn.internal(_root);
 }
 
 // Path: ui
@@ -1369,6 +1370,75 @@ class TranslationsPermissionsEn {
 	String get request => 'Extra permissions are required to update your feed in the background.';
 }
 
+// Path: updates
+class TranslationsUpdatesEn {
+	TranslationsUpdatesEn.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Check for Updates'
+	String get checkForUpdates => 'Check for Updates';
+
+	/// en: 'Check for new versions on startup'
+	String get checkForUpdatesSub => 'Check for new versions on startup';
+
+	/// en: 'Update Channel'
+	String get updateChannel => 'Update Channel';
+
+	/// en: 'Choose which releases to check for'
+	String get updateChannelSub => 'Choose which releases to check for';
+
+	/// en: 'Stable'
+	String get channelStable => 'Stable';
+
+	/// en: 'Stable releases'
+	String get channelStableDesc => 'Stable releases';
+
+	/// en: 'Beta'
+	String get channelBeta => 'Beta';
+
+	/// en: 'Dev-preview, bleeding edge'
+	String get channelBetaDesc => 'Dev-preview, bleeding edge';
+
+	/// en: 'Check Frequency'
+	String get checkFrequency => 'Check Frequency';
+
+	/// en: 'How often to check for updates'
+	String get checkFrequencySub => 'How often to check for updates';
+
+	/// en: 'Every hour'
+	String get freqHourly => 'Every hour';
+
+	/// en: 'Once per day'
+	String get freqDaily => 'Once per day';
+
+	/// en: 'Once per week'
+	String get freqWeekly => 'Once per week';
+
+	/// en: 'Once per month'
+	String get freqMonthly => 'Once per month';
+
+	/// en: 'Update Available'
+	String get updateAvailableTitle => 'Update Available';
+
+	/// en: 'A new version is available. Current: $currentVersion Available: $newVersion'
+	String updateAvailableBody({required Object currentVersion, required Object newVersion}) => 'A new version is available.\nCurrent: ${currentVersion}\nAvailable: ${newVersion}';
+
+	/// en: 'A new dev-preview is available. Your build: $currentVersion Latest: $latestVersion'
+	String updateAvailableBetaBody({required Object currentVersion, required Object latestVersion}) => 'A new dev-preview is available.\nYour build: ${currentVersion}\nLatest: ${latestVersion}';
+
+	/// en: 'Download'
+	String get download => 'Download';
+
+	/// en: 'Not Now'
+	String get notNow => 'Not Now';
+
+	/// en: 'Ignore This Version'
+	String get ignoreThisVersion => 'Ignore This Version';
+}
+
 // Path: localLibrary.settings
 class TranslationsLocalLibrarySettingsEn {
 	TranslationsLocalLibrarySettingsEn.internal(this._root);
@@ -2324,6 +2394,26 @@ extension on Translations {
 			'chapterFeed.updateRequired' => 'Update required! No feed data or data out of date',
 			'permissions.needed' => 'Permissions Needed',
 			'permissions.request' => 'Extra permissions are required to update your feed in the background.',
+			'updates.checkForUpdates' => 'Check for Updates',
+			'updates.checkForUpdatesSub' => 'Check for new versions on startup',
+			'updates.updateChannel' => 'Update Channel',
+			'updates.updateChannelSub' => 'Choose which releases to check for',
+			'updates.channelStable' => 'Stable',
+			'updates.channelStableDesc' => 'Stable releases',
+			'updates.channelBeta' => 'Beta',
+			'updates.channelBetaDesc' => 'Dev-preview, bleeding edge',
+			'updates.checkFrequency' => 'Check Frequency',
+			'updates.checkFrequencySub' => 'How often to check for updates',
+			'updates.freqHourly' => 'Every hour',
+			'updates.freqDaily' => 'Once per day',
+			'updates.freqWeekly' => 'Once per week',
+			'updates.freqMonthly' => 'Once per month',
+			'updates.updateAvailableTitle' => 'Update Available',
+			'updates.updateAvailableBody' => ({required Object currentVersion, required Object newVersion}) => 'A new version is available.\nCurrent: ${currentVersion}\nAvailable: ${newVersion}',
+			'updates.updateAvailableBetaBody' => ({required Object currentVersion, required Object latestVersion}) => 'A new dev-preview is available.\nYour build: ${currentVersion}\nLatest: ${latestVersion}',
+			'updates.download' => 'Download',
+			'updates.notNow' => 'Not Now',
+			'updates.ignoreThisVersion' => 'Ignore This Version',
 			_ => null,
 		};
 	}

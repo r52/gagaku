@@ -68,11 +68,37 @@ class GagakuConfig with _$GagakuConfig {
     gridAlbumExtent = GridAlbumExtent.values.byName(value);
   }
 
+  /// Whether to check for updates on startup (default: true)
+  @override
+  bool checkForUpdates;
+
+  /// Update check cooldown in hours: 1 (hourly), 24 (daily), 168 (weekly), 720 (monthly)
+  @override
+  int updateCheckCooldownHours;
+
+  /// Update channel: 'stable' or 'beta' (default: 'stable')
+  @override
+  String updateChannel;
+
+  /// List of update versions the user has explicitly ignored
+  @override
+  List<String> ignoredUpdates;
+
+  /// Timestamp of the last update check (used for cooldown)
+  @Property(type: PropertyType.date)
+  @override
+  DateTime? lastUpdateCheck;
+
   GagakuConfig({
     this.dbid = 0,
     this.themeMode = ThemeMode.system,
     this.theme = GagakuTheme.lime,
     this.gridAlbumExtent = GridAlbumExtent.medium,
+    this.checkForUpdates = true,
+    this.updateCheckCooldownHours = 24,
+    this.updateChannel = 'stable',
+    this.ignoredUpdates = const [],
+    this.lastUpdateCheck,
   });
 
   factory GagakuConfig.fromJson(Map<String, dynamic> json) =>
@@ -94,6 +120,22 @@ class GagakuSettings extends _$GagakuSettings {
     if (cfg == null) {
       cfg = GagakuConfig();
       box.put(cfg);
+    } else {
+      // Ensure all fields are present (for backward compatibility)
+      bool updated = false;
+
+      if (cfg.updateCheckCooldownHours == 0) {
+        cfg.updateCheckCooldownHours = 24;
+        updated = true;
+      }
+      if (cfg.updateChannel.isEmpty) {
+        cfg.updateChannel = 'stable';
+        updated = true;
+      }
+
+      if (updated) {
+        box.put(cfg);
+      }
     }
 
     return cfg;

@@ -1,9 +1,9 @@
-// ignore_for_file: no_leading_underscores_for_local_identifiers, avoid_print
+// ignore_for_file: depend_on_referenced_packages, no_leading_underscores_for_local_identifiers, avoid_print
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-// ignore: depend_on_referenced_packages
+
 import 'package:build/build.dart';
 import 'package:yaml/yaml.dart';
 
@@ -33,6 +33,16 @@ Builder versionBuilderFactory(BuilderOptions options) {
 
     outputContents += 'const kPackageName = \'${data['name']}\';\n';
     outputContents += 'const kPackageVersion = \'${data['version']}\';\n';
+
+    // Generate commit SHA
+    String commitSha = 'unknown';
+    try {
+      final shaResult = Process.runSync('git', ['rev-parse', 'HEAD']);
+      if (shaResult.exitCode == 0) {
+        commitSha = shaResult.stdout.toString().trim();
+      }
+    } catch (_) {}
+    outputContents += "const kCommitSha = '$commitSha';\n";
 
     File dartFile = File(outputFilePath);
     dartFile.writeAsStringSync(outputContents, flush: true);

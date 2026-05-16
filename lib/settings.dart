@@ -240,6 +240,95 @@ class AppSettingsPage extends HookConsumerWidget {
                 );
               },
             ),
+
+            // --- Update settings ---
+            SettingCardWidget(
+              title: Text(t.updates.checkForUpdates, style: titleStyle),
+              subtitle: Text(t.updates.checkForUpdatesSub),
+              builder: (context) {
+                return Center(
+                  child: Switch(
+                    value: cfg.checkForUpdates,
+                    onChanged: (bool value) {
+                      final c = cfg.copyWith(checkForUpdates: value);
+                      ref.run((tsx) async {
+                        return tsx.get(gagakuSettingsProvider.notifier).save(c);
+                      });
+                    },
+                  ),
+                );
+              },
+            ),
+            SettingCardWidget(
+              title: Text(t.updates.updateChannel, style: titleStyle),
+              subtitle: Text(t.updates.updateChannelSub),
+              builder: (context) {
+                return Center(
+                  child: DropdownMenu<String>(
+                    initialSelection: cfg.updateChannel,
+                    requestFocusOnTap: false,
+                    enableSearch: false,
+                    enableFilter: false,
+                    dropdownMenuEntries: [
+                      DropdownMenuEntry(
+                        value: 'stable',
+                        label: t.updates.channelStable,
+                      ),
+                      DropdownMenuEntry(
+                        value: 'beta',
+                        label: t.updates.channelBeta,
+                      ),
+                    ],
+                    onSelected: (String? value) {
+                      if (value != null) {
+                        final c = cfg.copyWith(updateChannel: value);
+                        ref.run((tsx) async {
+                          return tsx
+                              .get(gagakuSettingsProvider.notifier)
+                              .save(c);
+                        });
+                      }
+                    },
+                  ),
+                );
+              },
+            ),
+            SettingCardWidget(
+              title: Text(t.updates.checkFrequency, style: titleStyle),
+              subtitle: Text(t.updates.checkFrequencySub),
+              builder: (context) {
+                return Center(
+                  child: DropdownMenu<int>(
+                    initialSelection: cfg.updateCheckCooldownHours,
+                    requestFocusOnTap: false,
+                    enableSearch: false,
+                    enableFilter: false,
+                    dropdownMenuEntries: [
+                      DropdownMenuEntry(value: 1, label: t.updates.freqHourly),
+                      DropdownMenuEntry(value: 24, label: t.updates.freqDaily),
+                      DropdownMenuEntry(
+                        value: 168,
+                        label: t.updates.freqWeekly,
+                      ),
+                      DropdownMenuEntry(
+                        value: 720,
+                        label: t.updates.freqMonthly,
+                      ),
+                    ],
+                    onSelected: (int? value) {
+                      if (value != null) {
+                        final c = cfg.copyWith(updateCheckCooldownHours: value);
+                        ref.run((tsx) async {
+                          return tsx
+                              .get(gagakuSettingsProvider.notifier)
+                              .save(c);
+                        });
+                      }
+                    },
+                  ),
+                );
+              },
+            ),
             SettingCardWidget(
               title: Text(t.cache.clear, style: titleStyle),
               subtitle: Text(t.cache.clearSub),
