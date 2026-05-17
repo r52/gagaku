@@ -53,7 +53,7 @@
     },
     {
       "id": "3:8905727601441002465",
-      "lastPropertyId": "4:6453226003670022507",
+      "lastPropertyId": "9:256716685694045656",
       "name": "GagakuConfig",
       "properties": [
         {
@@ -76,6 +76,31 @@
           "id": "4:6453226003670022507",
           "name": "dbGridAlbumExtent",
           "type": 9
+        },
+        {
+          "id": "5:4757731781904400164",
+          "name": "checkForUpdates",
+          "type": 1
+        },
+        {
+          "id": "6:142834503235178736",
+          "name": "updateCheckCooldownHours",
+          "type": 6
+        },
+        {
+          "id": "7:792936636075357605",
+          "name": "updateChannel",
+          "type": 9
+        },
+        {
+          "id": "8:3742548953557989391",
+          "name": "ignoredUpdates",
+          "type": 30
+        },
+        {
+          "id": "9:256716685694045656",
+          "name": "lastUpdateCheck",
+          "type": 10
         }
       ],
       "relations": []

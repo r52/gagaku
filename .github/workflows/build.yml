@@ -175,8 +175,10 @@ jobs:
           RELDATE="$(date +'%Y-%m-%d %H:%M')"
           NAME="Dev Preview ($RELDATE)"
           TAGNAME="dev-preview"
+          COMMIT_SHA="${{ github.sha }}"
+          NOTES="Built from commit ${COMMIT_SHA}"
           gh release delete --cleanup-tag --yes "$TAGNAME" || true
           sleep 15
-          gh release create "$TAGNAME" --prerelease --target "${{ github.ref }}" --title "$NAME" artifacts/*
+          gh release create "$TAGNAME" --prerelease --target "${{ github.ref }}" --title "$NAME" --notes "$NOTES" artifacts/*
         env:
           GITHUB_TOKEN: ${{ github.token }}

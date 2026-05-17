@@ -133,7 +133,7 @@ final class _TrendingThisYearProvider
   }
 }
 
-String _$_trendingThisYearHash() => r'47ab90f1630dc5d55dd7ae5fea6f357bf4b6b497';
+String _$_trendingThisYearHash() => r'407a3ace1ea66b3d2066ff5b1ea86350ff473286';
 
 final class _TrendingThisYearFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Manga>>, Tag> {
@@ -208,7 +208,7 @@ final class _RecentlyAddedProvider
   }
 }
 
-String _$_recentlyAddedHash() => r'db80c62e64ad17d0dc404af963c83b475bd891dd';
+String _$_recentlyAddedHash() => r'00f44bcc6aff928b265a4099adfe28d8b37c68ec';
 
 final class _RecentlyAddedFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Manga>>, Tag> {

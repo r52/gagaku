@@ -11,6 +11,9 @@ import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/model/types.dart';
 import 'package:gagaku/routes.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/update_checker.dart';
+import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/deeplink.dart';
 import 'package:go_router/go_router.dart';
@@ -83,7 +86,7 @@ void main() async {
   runApp(ProviderScope(child: TranslationProvider(child: App())));
 }
 
-class App extends ConsumerWidget {
+class App extends HookConsumerWidget {
   App({super.key});
 
   final _router = GoRouter(
@@ -114,6 +117,35 @@ class App extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final config = ref.watch(gagakuSettingsProvider);
+    final updateResult = ref.watch(updateCheckerProvider);
+
+    // Trigger dialog when an update is available.
+    useEffect(() {
+      switch (updateResult) {
+        case AsyncData(value: UpdateResultAvailable(:final info)):
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final navContext = rootNavigatorKey.currentContext;
+            if (navContext != null && navContext.mounted) {
+              showUpdateDialog(navContext, info);
+            }
+          });
+        case AsyncData(value: UpdateResultUpToDate()) ||
+            AsyncData(value: UpdateResultIgnored()):
+          Future.delayed(Duration.zero, () async {
+            final updatedConfig = config.copyWith(
+              lastUpdateCheck: DateTime.now(),
+            );
+            ref.run((tsx) async {
+              return tsx
+                  .get(gagakuSettingsProvider.notifier)
+                  .save(updatedConfig);
+            });
+          });
+        default:
+          break;
+      }
+      return null;
+    }, [updateResult]);
 
     return MaterialApp.router(
       title: 'Gagaku',

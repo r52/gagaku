@@ -22,7 +22,7 @@ export class MockRequestManager implements RequestManager {
   constructor(selectorRegistry: SelectorRegistry) {
     this.selectorRegistry = selectorRegistry
     this.registeredInterceptors = []
-    this.userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.7680.120 Mobile Safari/537.36'
+    this.userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.121 Mobile Safari/537.36'
   }
 
   registerInterceptor(

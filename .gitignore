@@ -58,3 +58,5 @@ node_modules/
 
 # ai
 .aiexclude
+.memories/
+memories/

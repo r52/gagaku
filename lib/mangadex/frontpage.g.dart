@@ -46,7 +46,7 @@ final class _PopularTitlesProvider
   }
 }
 
-String _$_popularTitlesHash() => r'bd736590bbe6e6adcb7fbb060e3794725e3fc049';
+String _$_popularTitlesHash() => r'd1f3dcdfc2a1f69bc9c1593f4dacf51c9de15f9e';
 
 @ProviderFor(_recentlyAdded)
 final _recentlyAddedProvider = _RecentlyAddedProvider._();
@@ -85,7 +85,7 @@ final class _RecentlyAddedProvider
   }
 }
 
-String _$_recentlyAddedHash() => r'c674998b67a04d66d78727ed66605b1af2dfa8db';
+String _$_recentlyAddedHash() => r'c62da84fd51b626344a62554b18b8be768eae30d';
 
 @ProviderFor(_latestUpdates)
 final _latestUpdatesProvider = _LatestUpdatesProvider._();
@@ -124,7 +124,7 @@ final class _LatestUpdatesProvider
   }
 }
 
-String _$_latestUpdatesHash() => r'7681a094cf7bb2e9c23ef54b0bd3d06a8fc198ec';
+String _$_latestUpdatesHash() => r'e53fe8e044cf7b73529f44a8d5c41f53996ebfaa';
 
 @ProviderFor(_fetchCustomListManga)
 final _fetchCustomListMangaProvider = _FetchCustomListMangaFamily._();

@@ -95,26 +95,64 @@ enum TagGroup {
 
 enum CoverArtQuality { best, medium, small, tiny }
 
-enum FilterOrder {
-  relevance_asc(MapEntry('order[relevance]', 'asc')),
-  relevance_desc(MapEntry('order[relevance]', 'desc')),
-  followedCount_asc(MapEntry('order[followedCount]', 'asc')),
-  followedCount_desc(MapEntry('order[followedCount]', 'desc')),
-  latestUploadedChapter_asc(MapEntry('order[latestUploadedChapter]', 'asc')),
-  latestUploadedChapter_desc(MapEntry('order[latestUploadedChapter]', 'desc')),
-  updatedAt_asc(MapEntry('order[updatedAt]', 'asc')),
-  updatedAt_desc(MapEntry('order[updatedAt]', 'desc')),
-  createdAt_asc(MapEntry('order[createdAt]', 'asc')),
-  createdAt_desc(MapEntry('order[createdAt]', 'desc')),
-  year_asc(MapEntry('order[year]', 'asc')),
-  year_desc(MapEntry('order[year]', 'desc')),
-  title_asc(MapEntry('order[title]', 'asc')),
-  title_desc(MapEntry('order[title]', 'desc'));
+abstract interface class SortOrder<T extends MangaDexEntity> {
+  MapEntry<String, String> get json;
+  String get label;
+}
 
-  const FilterOrder(this.json);
-  final MapEntry<String, dynamic> json;
+enum MangaFilterOrder implements SortOrder<Manga> {
+  relevance_asc('relevance', 'asc'),
+  relevance_desc('relevance', 'desc'),
+  followedCount_asc('followedCount', 'asc'),
+  followedCount_desc('followedCount', 'desc'),
+  latestUploadedChapter_asc('latestUploadedChapter', 'asc'),
+  latestUploadedChapter_desc('latestUploadedChapter', 'desc'),
+  updatedAt_asc('updatedAt', 'asc'),
+  updatedAt_desc('updatedAt', 'desc'),
+  createdAt_asc('createdAt', 'asc'),
+  createdAt_desc('createdAt', 'desc'),
+  year_asc('year', 'asc'),
+  year_desc('year', 'desc'),
+  title_asc('title', 'asc'),
+  title_desc('title', 'desc'),
+  rating_asc('rating', 'asc'),
+  rating_desc('rating', 'desc');
+
+  const MangaFilterOrder(this.key, this.dir);
+  final String key;
+  final String dir;
+
+  @override
+  MapEntry<String, String> get json => MapEntry('order[$key]', dir);
 
   static const _key = 'mangadex.sort.';
+  @override
+  String get label => '$_key$name';
+}
+
+enum ChapterFilterOrder implements SortOrder<Chapter> {
+  createdAt_asc('createdAt', 'asc'),
+  createdAt_desc('createdAt', 'desc'),
+  updatedAt_asc('updatedAt', 'asc'),
+  updatedAt_desc('updatedAt', 'desc'),
+  publishAt_asc('publishAt', 'asc'),
+  publishAt_desc('publishAt', 'desc'),
+  readableAt_asc('readableAt', 'asc'),
+  readableAt_desc('readableAt', 'desc'),
+  volume_asc('volume', 'asc'),
+  volume_desc('volume', 'desc'),
+  chapter_asc('chapter', 'asc'),
+  chapter_desc('chapter', 'desc');
+
+  const ChapterFilterOrder(this.key, this.dir);
+  final String key;
+  final String dir;
+
+  @override
+  MapEntry<String, String> get json => MapEntry('order[$key]', dir);
+
+  static const _key = 'mangadex.sort.';
+  @override
   String get label => '$_key$name';
 }
 
@@ -208,7 +246,7 @@ abstract class MangaFilters with _$MangaFilters {
     @Default({}) Set<MangaStatus> status,
     @Default({}) Set<MangaDemographic> publicationDemographic,
     @Default({}) Set<ContentRating> contentRating,
-    @Default(FilterOrder.relevance_desc) FilterOrder order,
+    @Default(MangaFilterOrder.relevance_desc) MangaFilterOrder order,
   }) = _MangaFilters;
 
   // factory MangaFilters.fromJson(Map<String, dynamic> json) =>

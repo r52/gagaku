@@ -633,8 +633,7 @@ class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
     required this.limit,
     required this.path,
     this.entity,
-    this.orderKey = 'publishAt',
-    this.order = 'desc',
+    this.order = ChapterFilterOrder.publishAt_desc,
   });
 
   // List params
@@ -648,8 +647,7 @@ class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
   final int limit;
   final String path;
   final MangaDexEntity? entity;
-  final String orderKey;
-  final String order;
+  final ChapterFilterOrder order;
 
   @override
   ConsumerState<InfiniteScrollChapterFeedWidget> createState() =>
@@ -668,13 +666,12 @@ class _InfiniteScrollFeedState
       final me = await ref.readAsync(loggedUserProvider.future);
       final api = ref.read(mangadexProvider);
 
-      final chapterlist = await api.fetchFeed(
+      final chapterlist = await api.fetchChapterFeed(
         path: widget.path,
         feedKey: widget.feedKey,
         limit: widget.limit,
         offset: pageKey,
         entity: widget.entity,
-        orderKey: widget.orderKey,
         order: widget.order,
       );
 

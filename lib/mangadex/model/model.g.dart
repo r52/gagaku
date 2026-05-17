@@ -309,7 +309,7 @@ final class UserLibraryProvider
   }
 }
 
-String _$userLibraryHash() => r'ea56d099e6c781ce26f14be4fc53d052c80b6ff8';
+String _$userLibraryHash() => r'8b20691f9657df387911294aa477b743f16c13cb';
 
 final class UserLibraryFamily extends $Family
     with
