@@ -33,8 +33,6 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
       _fetchGroupDataProvider(config.value.groupBlacklist),
     );
 
-    const spacing = 4.0;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(tr.arg_settings(arg: 'MangaDex')),
@@ -65,153 +63,247 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
-            SettingCardWidget(
+            MultiSelectChipSettingTile(
               title: Text(
                 tr.mangadex.settings.translatedLanguages,
                 style: titleStyle,
               ),
               subtitle: Text(tr.mangadex.settings.translatedLanguagesDesc),
+              chips: config.value.translatedLanguages.map((lang) {
+                return InputChip(
+                  label: Text(tr[lang.label]),
+                  avatar: CountryFlag(flag: lang.flag, size: 15),
+                  onDeleted: () {
+                    config.value = config.value.copyWith(
+                      translatedLanguages: {...config.value.translatedLanguages}
+                        ..remove(lang),
+                    );
+                  },
+                );
+              }).toList(),
               builder: (context) {
-                return MultiSelectMenuAnchor<Language>(
-                  items: Languages.languages,
-                  selected: config.value.translatedLanguages,
-                  labelFor: (lang) => tr[lang.label],
-                  trailingIconFor: (lang) =>
-                      CountryFlag(flag: lang.flag, size: 15),
-                  placeholder: tr.mangadex.settings.selectLanguages,
-                  onChanged: (updated) => config.value = config.value.copyWith(
-                    translatedLanguages: updated,
-                  ),
+                final langsList = Languages.languages.toList();
+                return ValueListenableBuilder(
+                  valueListenable: config,
+                  builder: (context, currentConfig, _) {
+                    return Flexible(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: langsList.length,
+                        itemBuilder: (context, index) {
+                          final lang = langsList[index];
+                          return CheckboxListTile(
+                            title: Text(tr[lang.label]),
+                            secondary: CountryFlag(flag: lang.flag, size: 15),
+                            value: currentConfig.translatedLanguages.contains(
+                              lang,
+                            ),
+                            onChanged: (bool? value) {
+                              if (value == true) {
+                                config.value = currentConfig.copyWith(
+                                  translatedLanguages: {
+                                    ...currentConfig.translatedLanguages,
+                                  }..add(lang),
+                                );
+                              } else {
+                                config.value = currentConfig.copyWith(
+                                  translatedLanguages: {
+                                    ...currentConfig.translatedLanguages,
+                                  }..remove(lang),
+                                );
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  },
                 );
               },
             ),
-            SettingCardWidget(
+            MultiSelectChipSettingTile(
               title: Text(
                 tr.mangadex.settings.originalLanguage,
                 style: titleStyle,
               ),
               subtitle: Text(tr.mangadex.settings.originalLanguageDesc),
+              chips: config.value.originalLanguage.map((lang) {
+                return InputChip(
+                  label: Text(tr[lang.label]),
+                  avatar: CountryFlag(flag: lang.flag, size: 15),
+                  onDeleted: () {
+                    config.value = config.value.copyWith(
+                      originalLanguage: {...config.value.originalLanguage}
+                        ..remove(lang),
+                    );
+                  },
+                );
+              }).toList(),
               builder: (context) {
-                return MultiSelectMenuAnchor<Language>(
-                  items: Languages.languages,
-                  selected: config.value.originalLanguage,
-                  labelFor: (lang) => tr[lang.label],
-                  trailingIconFor: (lang) =>
-                      CountryFlag(flag: lang.flag, size: 15),
-                  placeholder: tr.mangadex.settings.selectLanguages,
-                  onChanged: (updated) => config.value = config.value.copyWith(
-                    originalLanguage: updated,
-                  ),
+                final langsList = Languages.languages.toList();
+                return ValueListenableBuilder(
+                  valueListenable: config,
+                  builder: (context, currentConfig, _) {
+                    return Flexible(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: langsList.length,
+                        itemBuilder: (context, index) {
+                          final lang = langsList[index];
+                          return CheckboxListTile(
+                            title: Text(tr[lang.label]),
+                            secondary: CountryFlag(flag: lang.flag, size: 15),
+                            value: currentConfig.originalLanguage.contains(
+                              lang,
+                            ),
+                            onChanged: (bool? value) {
+                              if (value == true) {
+                                config.value = currentConfig.copyWith(
+                                  originalLanguage: {
+                                    ...currentConfig.originalLanguage,
+                                  }..add(lang),
+                                );
+                              } else {
+                                config.value = currentConfig.copyWith(
+                                  originalLanguage: {
+                                    ...currentConfig.originalLanguage,
+                                  }..remove(lang),
+                                );
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  },
                 );
               },
             ),
-            SettingCardWidget(
+            BottomSheetSettingTile(
               title: Text(
                 tr.mangadex.settings.contentRating,
                 style: titleStyle,
               ),
               builder: (context) {
-                return MultiSelectMenuAnchor<ContentRating>(
-                  items: ContentRating.values,
-                  selected: config.value.contentRating,
-                  labelFor: (content) => tr[content.label],
-                  placeholder: tr.mangadex.settings.selectContentFilters,
-                  onChanged: (updated) => config.value = config.value.copyWith(
-                    contentRating: updated,
-                  ),
+                return ValueListenableBuilder(
+                  valueListenable: config,
+                  builder: (context, currentConfig, _) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (final content in ContentRating.values)
+                          CheckboxListTile(
+                            title: Text(tr[content.label]),
+                            value: currentConfig.contentRating.contains(
+                              content,
+                            ),
+                            onChanged: (bool? value) {
+                              if (value == true) {
+                                config.value = currentConfig.copyWith(
+                                  contentRating: {
+                                    ...currentConfig.contentRating,
+                                  }..add(content),
+                                );
+                              } else {
+                                config.value = currentConfig.copyWith(
+                                  contentRating: {
+                                    ...currentConfig.contentRating,
+                                  }..remove(content),
+                                );
+                              }
+                            },
+                          ),
+                      ],
+                    );
+                  },
                 );
               },
             ),
-            SettingCardWidget(
+            SwitchListTile(
               title: Text(tr.mangadex.settings.dataSaver, style: titleStyle),
-              builder: (context) {
-                return Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(tr.ui.off),
-                      Switch(
-                        value: config.value.dataSaver,
-                        onChanged: (value) {
-                          config.value = config.value.copyWith(
-                            dataSaver: value,
-                          );
-                        },
-                      ),
-                      Text(tr.ui.on),
-                    ],
-                  ),
-                );
+              value: config.value.dataSaver,
+              onChanged: (value) {
+                config.value = config.value.copyWith(dataSaver: value);
               },
             ),
-            SettingCardWidget(
+            BottomSheetSettingTile(
               title: Text(
                 tr.mangadex.settings.groupBlacklist,
                 style: titleStyle,
               ),
               builder: (context) {
-                if (config.value.groupBlacklist.isEmpty) {
-                  return Center(
-                    child: Wrap(children: [InputChip(label: Text(tr.ui.none))]),
-                  );
-                }
-
-                final children = <Widget>[];
-
-                switch (groupDataProvider) {
-                  case AsyncValue(value: final groups?):
-                    for (final group in config.value.groupBlacklist) {
-                      final groupInfo = groups.firstWhere(
-                        (element) => element.id == group,
-                      );
-                      children.add(
-                        InputChip(
-                          label: Text(groupInfo.attributes.name),
-                          onDeleted: () {
-                            config.value = config.value.copyWith(
-                              groupBlacklist: config.value.groupBlacklist
-                                  .where((element) => element != group)
-                                  .toSet(),
-                            );
-                          },
+                return ValueListenableBuilder(
+                  valueListenable: config,
+                  builder: (context, currentConfig, _) {
+                    if (currentConfig.groupBlacklist.isEmpty) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(tr.ui.none),
                         ),
                       );
                     }
-                    break;
-                  case AsyncValue(:final error?, :final stackTrace?):
-                    final messenger = ScaffoldMessenger.of(context);
-                    Styles.showSnackBar(messenger, content: '$error');
-                    logger.e(
-                      "_fetchGroupDataProvider failed",
-                      error: error,
-                      stackTrace: stackTrace,
+
+                    final children = <Widget>[];
+
+                    switch (groupDataProvider) {
+                      case AsyncValue(value: final groups?):
+                        for (final group in currentConfig.groupBlacklist) {
+                          final groupInfo = groups.firstWhere(
+                            (element) => element.id == group,
+                          );
+                          children.add(
+                            ListTile(
+                              title: Text(groupInfo.attributes.name),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () {
+                                  config.value = currentConfig.copyWith(
+                                    groupBlacklist: currentConfig.groupBlacklist
+                                        .where((element) => element != group)
+                                        .toSet(),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        }
+                        break;
+                      case AsyncValue(:final error?, :final stackTrace?):
+                        final messenger = ScaffoldMessenger.of(context);
+                        Styles.showSnackBar(messenger, content: '$error');
+                        logger.e(
+                          "_fetchGroupDataProvider failed",
+                          error: error,
+                          stackTrace: stackTrace,
+                        );
+
+                        for (final group in currentConfig.groupBlacklist) {
+                          children.add(
+                            ListTile(
+                              title: Text(group),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () {
+                                  config.value = currentConfig.copyWith(
+                                    groupBlacklist: currentConfig.groupBlacklist
+                                        .where((element) => element != group)
+                                        .toSet(),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        }
+                        break;
+                      case AsyncValue(:final progress):
+                        return ListSpinner(progress: progress?.toDouble());
+                    }
+
+                    return Flexible(
+                      child: ListView(shrinkWrap: true, children: children),
                     );
-
-                    for (final group in config.value.groupBlacklist) {
-                      children.add(
-                        InputChip(
-                          label: Text(group),
-                          onDeleted: () {
-                            config.value = config.value.copyWith(
-                              groupBlacklist: config.value.groupBlacklist
-                                  .where((element) => element != group)
-                                  .toSet(),
-                            );
-                          },
-                        ),
-                      );
-                    }
-                    break;
-                  case AsyncValue(:final progress):
-                    return ListSpinner(progress: progress?.toDouble());
-                }
-
-                return Center(
-                  child: Wrap(
-                    spacing: spacing,
-                    runSpacing: spacing,
-                    children: children,
-                  ),
+                  },
                 );
               },
             ),

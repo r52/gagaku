@@ -61,41 +61,26 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
-            SettingCardWidget(
+            SettingTile(
               title: Text(
                 tr.localLibrary.settings.libraryPath,
                 style: CommonTextStyles.twentyBold,
               ),
-              subtitle: Text(tr.localLibrary.settings.libraryPathDesc),
-              builder: (context) {
-                return Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 10.0,
-                    children: [
-                      Text(config.value.libraryDirectory),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final perms = await Permission.manageExternalStorage
-                              .request();
+              subtitle: Text(config.value.libraryDirectory),
+              trailing: const Icon(Icons.folder_open),
+              onTap: () async {
+                final perms = await Permission.manageExternalStorage.request();
 
-                          if (perms.isGranted) {
-                            String? selectedDirectory =
-                                await FilePicker.getDirectoryPath();
+                if (perms.isGranted) {
+                  String? selectedDirectory =
+                      await FilePicker.getDirectoryPath();
 
-                            if (selectedDirectory != null) {
-                              config.value = config.value.copyWith(
-                                libraryDirectory: selectedDirectory,
-                              );
-                            }
-                          }
-                        },
-                        icon: const Icon(Icons.folder_open),
-                        label: Text(tr.ui.browse),
-                      ),
-                    ],
-                  ),
-                );
+                  if (selectedDirectory != null) {
+                    config.value = config.value.copyWith(
+                      libraryDirectory: selectedDirectory,
+                    );
+                  }
+                }
               },
             ),
           ],

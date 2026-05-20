@@ -90,169 +90,131 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
-            SettingCardWidget(
+            SettingTile(
               title: Text(tr.webSources.settings.categories, style: titleStyle),
               subtitle: Text(tr.webSources.settings.categoriesDesc),
-              builder: (context) {
-                return Center(
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      final result = await nav.push<List<WebFavoritesList>>(
-                        SlideTransitionRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  CategoryManager(categories: [...favs.value]),
-                        ),
-                      );
-
-                      if (result != null) {
-                        favs.value = result;
-                      }
-                    },
-                    icon: const Icon(Icons.library_add),
-                    label: Text(tr.ui.manage),
+              trailing: const Icon(Icons.library_add),
+              onTap: () async {
+                final result = await nav.push<List<WebFavoritesList>>(
+                  SlideTransitionRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        CategoryManager(categories: [...favs.value]),
                   ),
                 );
+
+                if (result != null) {
+                  favs.value = result;
+                }
               },
             ),
-            SettingCardWidget(
+            SettingTile(
               title: Text(
                 tr.webSources.settings.categoriesToUpdate,
                 style: titleStyle,
               ),
               subtitle: Text(tr.webSources.settings.categoriesToUpdateDesc),
-              builder: (context) {
-                return Center(
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      final result = await showDialog<List<String>>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return UpdateCategoryDialog(
-                            categories: favs.value,
-                            preselected: config.value.categoriesToUpdate,
-                          );
-                        },
-                      );
-
-                      if (result != null) {
-                        config.value = config.value.copyWith(
-                          categoriesToUpdate: result,
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.library_add),
-                    label: Text(tr.ui.manage),
-                  ),
+              trailing: const Icon(Icons.library_add),
+              onTap: () async {
+                final result = await showDialog<List<String>>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return UpdateCategoryDialog(
+                      categories: favs.value,
+                      preselected: config.value.categoriesToUpdate,
+                    );
+                  },
                 );
+
+                if (result != null) {
+                  config.value = config.value.copyWith(
+                    categoriesToUpdate: result,
+                  );
+                }
               },
             ),
-            SettingCardWidget(
+            SettingTile(
               title: Text(t.webSources.settings.clearAll, style: titleStyle),
               subtitle: Text(t.webSources.settings.clearAllDesc),
-              builder: (context) {
-                return Center(
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      final result = await showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          final nav = Navigator.of(context);
-                          return AlertDialog(
-                            title: Text(t.webSources.settings.clearAll),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(t.webSources.settings.clearAllWarning),
-                                Text(t.ui.irreversibleWarning),
-                              ],
-                            ),
-                            actions: <Widget>[
-                              ElevatedButton(
-                                child: Text(t.ui.no),
-                                onPressed: () {
-                                  nav.pop(null);
-                                },
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  nav.pop(true);
-                                },
-                                child: Text(t.ui.yes),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-
-                      if (result == true) {
-                        await ref.run((tsx) async {
-                          tsx.get(extensionStateProvider.notifier).clearAll();
-                          tsx
-                              .get(extensionSecureStateProvider.notifier)
-                              .clearAll();
-                        });
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context)
-                          ..removeCurrentSnackBar()
-                          ..showSnackBar(
-                            SnackBar(
-                              content: Text(t.webSources.settings.clearSuccess),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                      }
-                    },
-                    icon: const Icon(Icons.delete_sweep),
-                    label: Text(t.webSources.settings.clearSettings),
-                  ),
+              trailing: const Icon(Icons.delete_sweep),
+              onTap: () async {
+                final result = await showDialog<bool>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    final nav = Navigator.of(context);
+                    return AlertDialog(
+                      title: Text(t.webSources.settings.clearAll),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(t.webSources.settings.clearAllWarning),
+                          Text(t.ui.irreversibleWarning),
+                        ],
+                      ),
+                      actions: <Widget>[
+                        ElevatedButton(
+                          child: Text(t.ui.no),
+                          onPressed: () {
+                            nav.pop(null);
+                          },
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            nav.pop(true);
+                          },
+                          child: Text(t.ui.yes),
+                        ),
+                      ],
+                    );
+                  },
                 );
+
+                if (result == true) {
+                  await ref.run((tsx) async {
+                    tsx.get(extensionStateProvider.notifier).clearAll();
+                    tsx.get(extensionSecureStateProvider.notifier).clearAll();
+                  });
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context)
+                    ..removeCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(t.webSources.settings.clearSuccess),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                }
               },
             ),
-            SettingCardWidget(
+            SettingTile(
               title: Text(
                 t.webSources.settings.migrateExtension,
                 style: titleStyle,
               ),
               subtitle: Text(t.webSources.settings.migrateExtensionDesc),
-              builder: (context) {
-                return Center(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return const MigrateExtensionDialog();
-                        },
-                      );
-                    },
-                    icon: const Icon(Icons.drive_file_move),
-                    label: Text(t.webSources.settings.migrateExtension),
-                  ),
+              trailing: const Icon(Icons.drive_file_move),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return const MigrateExtensionDialog();
+                  },
                 );
               },
             ),
-            SettingCardWidget(
+            SettingTile(
               title: Text(
                 t.webSources.settings.pruneExtension,
                 style: titleStyle,
               ),
               subtitle: Text(t.webSources.settings.pruneExtensionDesc),
-              builder: (context) {
-                return Center(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return const PruneExtensionDialog();
-                        },
-                      );
-                    },
-                    icon: const Icon(Icons.delete_outline),
-                    label: Text(t.webSources.settings.pruneExtension),
-                  ),
+              trailing: const Icon(Icons.delete_outline),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return const PruneExtensionDialog();
+                  },
                 );
               },
             ),
