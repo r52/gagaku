@@ -36,8 +36,6 @@ class ExtensionWebViewBridge {
   final Map<String, ExtensionForm> _forms = {};
   List<Cookie>? _cookies;
 
-  HeadlessInAppWebView? _executionView;
-
   bool _hasSortOps = false;
   bool get hasSortOps => _hasSortOps;
 
@@ -134,11 +132,9 @@ class ExtensionWebViewBridge {
 
   void dispose() {
     _view?.dispose();
-    _executionView?.dispose();
     _completeTimer?.cancel();
     _completeTimer = null;
     _view = null;
-    _executionView = null;
     _initialized = false;
     _hasAdvancedSearchForm = false;
     _hasSortOps = false;
@@ -212,13 +208,13 @@ class ExtensionWebViewBridge {
   Future<dynamic> _handleExecuteInWebView(
     JavaScriptHandlerFunctionData data,
   ) async {
+    HeadlessInAppWebView? executionView;
     try {
       final context = ExecuteInWebViewContext.fromJson(data.args[0]);
 
-      _executionView?.dispose();
       final executionReadyCompleter = Completer<void>();
 
-      _executionView = HeadlessInAppWebView(
+      executionView = HeadlessInAppWebView(
         initialData: InAppWebViewInitialData(
           data: context.source.html,
           baseUrl: WebUri(context.source.baseUrl),
@@ -235,7 +231,7 @@ class ExtensionWebViewBridge {
         },
       );
 
-      await _executionView!.run();
+      await executionView.run();
 
       await executionReadyCompleter.future;
 
@@ -253,7 +249,7 @@ class ExtensionWebViewBridge {
         );
       }
 
-      final controller = _executionView!.webViewController!;
+      final controller = executionView.webViewController!;
 
       final results = await controller
           .callAsyncJavaScript(functionBody: context.inject)
@@ -292,8 +288,7 @@ class ExtensionWebViewBridge {
 
       return webViewResult.toJson();
     } finally {
-      _executionView?.dispose();
-      _executionView = null;
+      executionView?.dispose();
     }
   }
 
