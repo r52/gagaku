@@ -163,380 +163,355 @@ class AppSettingsPage extends HookConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
-            SettingCardWidget(
+            BottomSheetSettingTile(
               title: Text(t.theme.mode, style: titleStyle),
+              trailing: Text(
+                cfg.themeMode == ThemeMode.light
+                    ? t.theme.light
+                    : cfg.themeMode == ThemeMode.dark
+                    ? t.theme.dark
+                    : t.theme.system,
+              ),
               builder: (context) {
-                return Center(
-                  child: DropdownMenu<ThemeMode>(
-                    initialSelection: cfg.themeMode,
-                    requestFocusOnTap: false,
-                    enableSearch: false,
-                    enableFilter: false,
-                    dropdownMenuEntries: [
-                      DropdownMenuEntry(
+                return RadioGroup<ThemeMode>(
+                  groupValue: cfg.themeMode,
+                  onChanged: (ThemeMode? value) {
+                    if (value != null) {
+                      final c = cfg.copyWith(themeMode: value);
+                      ref.run(
+                        (tsx) async =>
+                            tsx.get(gagakuSettingsProvider.notifier).save(c),
+                      );
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      RadioListTile<ThemeMode>(
+                        title: Text(t.theme.light),
                         value: ThemeMode.light,
-                        label: t.theme.light,
                       ),
-                      DropdownMenuEntry(
+                      RadioListTile<ThemeMode>(
+                        title: Text(t.theme.dark),
                         value: ThemeMode.dark,
-                        label: t.theme.dark,
                       ),
-                      DropdownMenuEntry(
+                      RadioListTile<ThemeMode>(
+                        title: Text(t.theme.system),
                         value: ThemeMode.system,
-                        label: t.theme.system,
                       ),
                     ],
-                    onSelected: (ThemeMode? value) {
-                      if (value != null) {
-                        final c = cfg.copyWith(themeMode: value);
-                        ref.run((tsx) async {
-                          return tsx
-                              .get(gagakuSettingsProvider.notifier)
-                              .save(c);
-                        });
-                      }
-                    },
                   ),
                 );
               },
             ),
-            SettingCardWidget(
+            BottomSheetSettingTile(
               title: Text(t.theme.color, style: titleStyle),
+              trailing: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: cfg.theme.color,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: theme.colorScheme.onSurface),
+                ),
+              ),
               builder: (context) {
-                return Center(
-                  child: DropdownMenu<GagakuTheme>(
-                    initialSelection: cfg.theme,
-                    enableSearch: false,
-                    enableFilter: false,
-                    requestFocusOnTap: false,
-                    dropdownMenuEntries: [
-                      for (final c in GagakuTheme.values)
-                        DropdownMenuEntry(
-                          leadingIcon: Container(
-                            width: 15,
-                            height: 15,
-                            decoration: BoxDecoration(
-                              color: c.color,
-                              border: Border.all(
-                                color: theme.colorScheme.onSurface,
+                return Wrap(
+                  spacing: 12.0,
+                  runSpacing: 12.0,
+                  children: [
+                    for (final c in GagakuTheme.values)
+                      InkWell(
+                        onTap: () {
+                          final newCfg = cfg.copyWith(theme: c);
+                          ref.run(
+                            (tsx) async => tsx
+                                .get(gagakuSettingsProvider.notifier)
+                                .save(newCfg),
+                          );
+                          Navigator.of(context).pop();
+                        },
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: c.color,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: cfg.theme == c
+                                      ? theme.colorScheme.primary
+                                      : theme.colorScheme.onSurface,
+                                  width: cfg.theme == c ? 3 : 1,
+                                ),
                               ),
                             ),
-                          ),
-                          value: c,
-                          label: t[c.label],
+                            const SizedBox(height: 4),
+                            Text(t[c.label]),
+                          ],
                         ),
-                    ],
-                    onSelected: (GagakuTheme? value) {
-                      if (value != null) {
-                        final c = cfg.copyWith(theme: value);
-                        ref.run((tsx) async {
-                          return tsx
-                              .get(gagakuSettingsProvider.notifier)
-                              .save(c);
-                        });
-                      }
-                    },
-                  ),
+                      ),
+                  ],
                 );
               },
             ),
 
             // --- Update settings ---
-            SettingCardWidget(
+            SwitchListTile(
               title: Text(t.updates.checkForUpdates, style: titleStyle),
               subtitle: Text(t.updates.checkForUpdatesSub),
-              builder: (context) {
-                return Center(
-                  child: Switch(
-                    value: cfg.checkForUpdates,
-                    onChanged: (bool value) {
-                      final c = cfg.copyWith(checkForUpdates: value);
-                      ref.run((tsx) async {
-                        return tsx.get(gagakuSettingsProvider.notifier).save(c);
-                      });
-                    },
-                  ),
+              value: cfg.checkForUpdates,
+              onChanged: (bool value) {
+                final c = cfg.copyWith(checkForUpdates: value);
+                ref.run(
+                  (tsx) async =>
+                      tsx.get(gagakuSettingsProvider.notifier).save(c),
                 );
               },
             ),
-            SettingCardWidget(
+            BottomSheetSettingTile(
               title: Text(t.updates.updateChannel, style: titleStyle),
               subtitle: Text(t.updates.updateChannelSub),
+              trailing: Text(cfg.updateChannel),
               builder: (context) {
-                return Center(
-                  child: DropdownMenu<String>(
-                    initialSelection: cfg.updateChannel,
-                    requestFocusOnTap: false,
-                    enableSearch: false,
-                    enableFilter: false,
-                    dropdownMenuEntries: [
-                      DropdownMenuEntry(
+                return RadioGroup<String>(
+                  groupValue: cfg.updateChannel,
+                  onChanged: (String? value) {
+                    if (value != null) {
+                      final c = cfg.copyWith(updateChannel: value);
+                      ref.run(
+                        (tsx) async =>
+                            tsx.get(gagakuSettingsProvider.notifier).save(c),
+                      );
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      RadioListTile<String>(
+                        title: Text(t.updates.channelStable),
                         value: 'stable',
-                        label: t.updates.channelStable,
                       ),
-                      DropdownMenuEntry(
+                      RadioListTile<String>(
+                        title: Text(t.updates.channelBeta),
                         value: 'beta',
-                        label: t.updates.channelBeta,
                       ),
                     ],
-                    onSelected: (String? value) {
-                      if (value != null) {
-                        final c = cfg.copyWith(updateChannel: value);
-                        ref.run((tsx) async {
-                          return tsx
-                              .get(gagakuSettingsProvider.notifier)
-                              .save(c);
-                        });
-                      }
-                    },
                   ),
                 );
               },
             ),
-            SettingCardWidget(
+            BottomSheetSettingTile(
               title: Text(t.updates.checkFrequency, style: titleStyle),
               subtitle: Text(t.updates.checkFrequencySub),
+              trailing: Text('${cfg.updateCheckCooldownHours}h'),
               builder: (context) {
-                return Center(
-                  child: DropdownMenu<int>(
-                    initialSelection: cfg.updateCheckCooldownHours,
-                    requestFocusOnTap: false,
-                    enableSearch: false,
-                    enableFilter: false,
-                    dropdownMenuEntries: [
-                      DropdownMenuEntry(value: 1, label: t.updates.freqHourly),
-                      DropdownMenuEntry(value: 24, label: t.updates.freqDaily),
-                      DropdownMenuEntry(
-                        value: 168,
-                        label: t.updates.freqWeekly,
+                return RadioGroup<int>(
+                  groupValue: cfg.updateCheckCooldownHours,
+                  onChanged: (int? value) {
+                    if (value != null) {
+                      final c = cfg.copyWith(updateCheckCooldownHours: value);
+                      ref.run(
+                        (tsx) async =>
+                            tsx.get(gagakuSettingsProvider.notifier).save(c),
+                      );
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      RadioListTile<int>(
+                        title: Text(t.updates.freqHourly),
+                        value: 1,
                       ),
-                      DropdownMenuEntry(
+                      RadioListTile<int>(
+                        title: Text(t.updates.freqDaily),
+                        value: 24,
+                      ),
+                      RadioListTile<int>(
+                        title: Text(t.updates.freqWeekly),
+                        value: 168,
+                      ),
+                      RadioListTile<int>(
+                        title: Text(t.updates.freqMonthly),
                         value: 720,
-                        label: t.updates.freqMonthly,
                       ),
                     ],
-                    onSelected: (int? value) {
-                      if (value != null) {
-                        final c = cfg.copyWith(updateCheckCooldownHours: value);
-                        ref.run((tsx) async {
-                          return tsx
-                              .get(gagakuSettingsProvider.notifier)
-                              .save(c);
-                        });
-                      }
-                    },
                   ),
                 );
               },
             ),
-            SettingCardWidget(
+            SettingTile(
               title: Text(t.cache.clear, style: titleStyle),
               subtitle: Text(t.cache.clearSub),
-              builder: (context) {
-                return Center(
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      final result = await showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          final nav = Navigator.of(context);
-                          return AlertDialog(
-                            title: Text(t.cache.clear),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(t.cache.clearWarning),
-                                Text(t.ui.irreversibleWarning),
-                              ],
-                            ),
-                            actions: <Widget>[
-                              ElevatedButton(
-                                child: Text(t.ui.no),
-                                onPressed: () {
-                                  nav.pop(null);
-                                },
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  nav.pop(true);
-                                },
-                                child: Text(t.ui.yes),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-
-                      if (result == true) {
-                        await cache.clearAll();
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context)
-                          ..removeCurrentSnackBar()
-                          ..showSnackBar(
-                            SnackBar(
-                              content: Text(t.cache.clearSuccess),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                      }
-                    },
-                    icon: const Icon(Icons.delete_sweep),
-                    label: Text(t.cache.clear),
-                  ),
+              trailing: const Icon(Icons.delete_sweep),
+              onTap: () async {
+                final result = await showDialog<bool>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    final nav = Navigator.of(context);
+                    return AlertDialog(
+                      title: Text(t.cache.clear),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(t.cache.clearWarning),
+                          Text(t.ui.irreversibleWarning),
+                        ],
+                      ),
+                      actions: <Widget>[
+                        ElevatedButton(
+                          child: Text(t.ui.no),
+                          onPressed: () {
+                            nav.pop(null);
+                          },
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            nav.pop(true);
+                          },
+                          child: Text(t.ui.yes),
+                        ),
+                      ],
+                    );
+                  },
                 );
+
+                if (result == true) {
+                  await cache.clearAll();
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context)
+                    ..removeCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(t.cache.clearSuccess),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                }
               },
             ),
-            SettingCardWidget(
-              title: Text(t.backup.data, style: titleStyle),
-              subtitle: Text(t.backup.dataSub),
+            HookBuilder(
               builder: (context) {
-                return Center(
-                  child: Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 10.0,
-                    children: [
-                      HookBuilder(
-                        builder: (context) {
-                          final isLoading = useState(false);
+                final isLoading = useState(false);
 
-                          return ElevatedButton.icon(
-                            onPressed: isLoading.value
-                                ? null
-                                : () async {
-                                    isLoading.value = true;
-                                    final result = await _backupData(context);
-                                    isLoading.value = false;
+                return SettingTile(
+                  title: Text(t.backup.data, style: titleStyle),
+                  subtitle: Text(t.backup.dataSub),
+                  trailing: isLoading.value
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.save),
+                  onTap: isLoading.value
+                      ? null
+                      : () async {
+                          isLoading.value = true;
+                          final result = await _backupData(context);
+                          isLoading.value = false;
 
-                                    if (result != null) {
-                                      if (!context.mounted) return;
-                                      ScaffoldMessenger.of(context)
-                                        ..removeCurrentSnackBar()
-                                        ..showSnackBar(
-                                          SnackBar(
-                                            content: Text(t.backup.success),
-                                            backgroundColor: Colors.green,
-                                          ),
-                                        );
-                                    } else {
-                                      if (!context.mounted) return;
-                                      ScaffoldMessenger.of(context)
-                                        ..removeCurrentSnackBar()
-                                        ..showSnackBar(
-                                          SnackBar(
-                                            content: Text(t.backup.cancelled),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                    }
-                                  },
-                            icon: isLoading.value
-                                ? CircularProgressIndicator(
-                                    constraints: BoxConstraints.expand(
-                                      width: 20,
-                                      height: 20,
-                                    ),
-                                  )
-                                : const Icon(Icons.save),
-                            label: Text(t.backup.toFile),
-                          );
-                        },
-                      ),
-                      HookBuilder(
-                        builder: (context) {
-                          final isLoading = useState(false);
-                          return ElevatedButton.icon(
-                            onPressed: isLoading.value
-                                ? null
-                                : () async {
-                                    isLoading.value = true;
-                                    final result = await _restoreBackup(
-                                      context,
-                                    );
-                                    isLoading.value = false;
-
-                                    String msg = t.backup.restoreSuccess;
-                                    Color bg = Colors.green;
-
-                                    if (!context.mounted) return;
-                                    switch (result) {
-                                      case true:
-                                        msg = t.backup.restoreSuccess;
-                                        bg = Colors.green;
-                                        break;
-                                      case false:
-                                        msg = t.backup.restoreFail;
-                                        bg = Colors.red;
-                                        break;
-                                      case null:
-                                        msg = t.backup.restoreCancelled;
-                                        bg = Colors.red;
-                                        break;
-                                    }
-
-                                    if (!context.mounted) return;
-                                    ScaffoldMessenger.of(context)
-                                      ..removeCurrentSnackBar()
-                                      ..showSnackBar(
-                                        SnackBar(
-                                          content: Text(msg),
-                                          backgroundColor: bg,
-                                        ),
-                                      );
-                                  },
-                            icon: isLoading.value
-                                ? CircularProgressIndicator(
-                                    constraints: BoxConstraints.expand(
-                                      width: 20,
-                                      height: 20,
-                                    ),
-                                  )
-                                : const Icon(Icons.settings_backup_restore),
-                            label: Text(t.backup.fromFile),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            SettingCardWidget(
-              title: Text(t.backup.dataLocation, style: titleStyle),
-              subtitle: Text(t.backup.dataLocSub),
-              builder: (context) {
-                return Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 10.0,
-                    children: [
-                      (dataLocation.value != null
-                          ? Text(dataLocation.value!)
-                          : Text(t.backup.dataLocDefault)),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final perms = await Permission.manageExternalStorage
-                              .request();
-
-                          if (perms.isGranted) {
-                            String? selectedDirectory =
-                                await FilePicker.getDirectoryPath();
-
-                            if (selectedDirectory != null) {
-                              await gbox.put(
-                                'data_location',
-                                selectedDirectory,
+                          if (result != null) {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context)
+                              ..removeCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(t.backup.success),
+                                  backgroundColor: Colors.green,
+                                ),
                               );
-                              dataLocation.value = selectedDirectory;
-                            }
+                          } else {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context)
+                              ..removeCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(t.backup.cancelled),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
                           }
                         },
-                        icon: const Icon(Icons.folder_open),
-                        label: Text(t.ui.browse),
-                      ),
-                    ],
-                  ),
                 );
+              },
+            ),
+            HookBuilder(
+              builder: (context) {
+                final isLoading = useState(false);
+                return SettingTile(
+                  title: Text(t.backup.restore, style: titleStyle),
+                  subtitle: Text(t.backup.fromFile),
+                  trailing: isLoading.value
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.settings_backup_restore),
+                  onTap: isLoading.value
+                      ? null
+                      : () async {
+                          isLoading.value = true;
+                          final result = await _restoreBackup(context);
+                          isLoading.value = false;
+
+                          String msg = t.backup.restoreSuccess;
+                          Color bg = Colors.green;
+
+                          if (!context.mounted) return;
+                          switch (result) {
+                            case true:
+                              msg = t.backup.restoreSuccess;
+                              bg = Colors.green;
+                              break;
+                            case false:
+                              msg = t.backup.restoreFail;
+                              bg = Colors.red;
+                              break;
+                            case null:
+                              msg = t.backup.restoreCancelled;
+                              bg = Colors.red;
+                              break;
+                          }
+
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context)
+                            ..removeCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(content: Text(msg), backgroundColor: bg),
+                            );
+                        },
+                );
+              },
+            ),
+            SettingTile(
+              title: Text(t.backup.dataLocation, style: titleStyle),
+              subtitle: Text(
+                dataLocation.value != null
+                    ? dataLocation.value!
+                    : t.backup.dataLocDefault,
+              ),
+              trailing: const Icon(Icons.folder_open),
+              onTap: () async {
+                final perms = await Permission.manageExternalStorage.request();
+
+                if (perms.isGranted) {
+                  String? selectedDirectory =
+                      await FilePicker.getDirectoryPath();
+
+                  if (selectedDirectory != null) {
+                    await gbox.put('data_location', selectedDirectory);
+                    dataLocation.value = selectedDirectory;
+                  }
+                }
               },
             ),
           ],

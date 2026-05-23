@@ -36,12 +36,6 @@ class ExtensionWebViewBridge {
   final Map<String, ExtensionForm> _forms = {};
   List<Cookie>? _cookies;
 
-  HeadlessInAppWebView? _executionView;
-  ExecuteInWebViewSource? _executionSource;
-  Completer<void>? _executionReadyCompleter;
-  Timer? _executionIdleTimer;
-  int _activeExecutions = 0;
-
   bool _hasSortOps = false;
   bool get hasSortOps => _hasSortOps;
 
@@ -138,15 +132,9 @@ class ExtensionWebViewBridge {
 
   void dispose() {
     _view?.dispose();
-    _executionView?.dispose();
     _completeTimer?.cancel();
-    _executionIdleTimer?.cancel();
     _completeTimer = null;
-    _executionIdleTimer = null;
     _view = null;
-    _executionView = null;
-    _executionReadyCompleter = null;
-    _executionSource = null;
     _initialized = false;
     _hasAdvancedSearchForm = false;
     _hasSortOps = false;
@@ -220,66 +208,32 @@ class ExtensionWebViewBridge {
   Future<dynamic> _handleExecuteInWebView(
     JavaScriptHandlerFunctionData data,
   ) async {
-    _activeExecutions++;
+    HeadlessInAppWebView? executionView;
     try {
       final context = ExecuteInWebViewContext.fromJson(data.args[0]);
 
-      if (_executionSource != context.source || _executionView == null) {
-        _executionView?.dispose();
-        _executionSource = context.source;
-        _executionReadyCompleter = Completer<void>();
+      final executionReadyCompleter = Completer<void>();
 
-        _executionView = HeadlessInAppWebView(
-          initialData: InAppWebViewInitialData(
-            data: context.source.html,
-            baseUrl: WebUri(context.source.baseUrl),
-          ),
-          initialSettings: InAppWebViewSettings(
-            contentBlockers: defaultTargetPlatform == TargetPlatform.android
-                ? [
-                    if (!context.source.loadCSS)
-                      ContentBlocker(
-                        trigger: ContentBlockerTrigger(
-                          urlFilter: ".*",
-                          resourceType: [
-                            ContentBlockerTriggerResourceType.STYLE_SHEET,
-                          ],
-                        ),
-                        action: ContentBlockerAction(
-                          type: ContentBlockerActionType.BLOCK,
-                        ),
-                      ),
-                    if (!context.source.loadImages)
-                      ContentBlocker(
-                        trigger: ContentBlockerTrigger(
-                          urlFilter: ".*",
-                          resourceType: [
-                            ContentBlockerTriggerResourceType.IMAGE,
-                          ],
-                        ),
-                        action: ContentBlockerAction(
-                          type: ContentBlockerActionType.BLOCK,
-                        ),
-                      ),
-                  ]
-                : null,
-            loadsImagesAutomatically: context.source.loadImages,
-            browserAcceleratorKeysEnabled: false,
-            isInspectable: false,
-          ),
-          onLoadStop: (controller, url) async {
-            if (_executionReadyCompleter?.isCompleted == false) {
-              _executionReadyCompleter?.complete();
-            }
-          },
-        );
+      executionView = HeadlessInAppWebView(
+        initialData: InAppWebViewInitialData(
+          data: context.source.html,
+          baseUrl: WebUri(context.source.baseUrl),
+        ),
+        initialSettings: InAppWebViewSettings(
+          loadsImagesAutomatically: context.source.loadImages,
+          browserAcceleratorKeysEnabled: false,
+          isInspectable: false,
+        ),
+        onLoadStop: (controller, url) async {
+          if (executionReadyCompleter.isCompleted == false) {
+            executionReadyCompleter.complete();
+          }
+        },
+      );
 
-        await _executionView!.run();
-      }
+      await executionView.run();
 
-      await _executionReadyCompleter!.future;
-
-      _executionIdleTimer?.cancel();
+      await executionReadyCompleter.future;
 
       final url = WebUri(context.source.baseUrl);
       final cookieManager = CookieManager.instance();
@@ -295,7 +249,7 @@ class ExtensionWebViewBridge {
         );
       }
 
-      final controller = _executionView!.webViewController!;
+      final controller = executionView.webViewController!;
 
       final results = await controller
           .callAsyncJavaScript(functionBody: context.inject)
@@ -334,18 +288,7 @@ class ExtensionWebViewBridge {
 
       return webViewResult.toJson();
     } finally {
-      _activeExecutions--;
-      if (_activeExecutions == 0) {
-        _executionIdleTimer?.cancel();
-        _executionIdleTimer = Timer(const Duration(minutes: 30), () {
-          if (_activeExecutions == 0) {
-            _executionView?.dispose();
-            _executionView = null;
-            _executionSource = null;
-            _executionReadyCompleter = null;
-          }
-        });
-      }
+      executionView?.dispose();
     }
   }
 

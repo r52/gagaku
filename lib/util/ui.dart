@@ -521,46 +521,248 @@ class TriStateChip extends StatelessWidget {
   }
 }
 
-class SettingCardWidget extends StatelessWidget {
-  const SettingCardWidget({
+class SettingTile extends StatelessWidget {
+  const SettingTile({
     super.key,
     required this.title,
     this.subtitle,
+    this.trailing,
+    this.onTap,
+  });
+
+  final Widget title;
+  final Widget? subtitle;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: title,
+      subtitle: subtitle,
+      trailing: trailing,
+      onTap: onTap,
+    );
+  }
+}
+
+class MultiSelectChipSettingTile extends StatelessWidget {
+  const MultiSelectChipSettingTile({
+    super.key,
+    required this.title,
+    this.subtitle,
+    required this.chips,
     required this.builder,
   });
 
   final Widget title;
   final Widget? subtitle;
-  final Widget Function(BuildContext context) builder;
+  final List<Widget> chips;
+  final Widget Function(BuildContext) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    void showSheet() {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        backgroundColor: theme.colorScheme.surface,
+        builder: (context) {
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 16.0,
+                right: 16.0,
+                top: 16.0,
+                bottom: 32.0,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  DefaultTextStyle(
+                    style: theme.textTheme.titleLarge!,
+                    child: title,
+                  ),
+                  const SizedBox(height: 16.0),
+                  builder(context),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    return InkWell(
+      onTap: showSheet,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            DefaultTextStyle(style: theme.textTheme.bodyLarge!, child: title),
+            if (subtitle != null) ...[
+              const SizedBox(height: 2.0),
+              DefaultTextStyle(
+                style: theme.textTheme.bodyMedium!.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                child: subtitle!,
+              ),
+            ],
+            const SizedBox(height: 8.0),
+            Wrap(
+              spacing: 8.0,
+              runSpacing: -4.0,
+              children: [
+                ...chips,
+                ActionChip(
+                  label: const Icon(Icons.add, size: 18.0),
+                  onPressed: showSheet,
+                  shape: const StadiumBorder(),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class BottomSheetSettingTile extends StatelessWidget {
+  const BottomSheetSettingTile({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.trailing,
+    required this.builder,
+  });
+
+  final Widget title;
+  final Widget? subtitle;
+  final Widget? trailing;
+  final Widget Function(BuildContext) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return ListTile(
+      title: title,
+      subtitle: subtitle,
+      trailing: trailing ?? const Icon(Icons.arrow_drop_down),
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          useSafeArea: true,
+          backgroundColor: theme.colorScheme.surface,
+          builder: (context) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  left: 16.0,
+                  right: 16.0,
+                  top: 16.0,
+                  bottom: 32.0,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    DefaultTextStyle(
+                      style: theme.textTheme.titleLarge!,
+                      child: title,
+                    ),
+                    const SizedBox(height: 16.0),
+                    builder(context),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class ComplexSettingBlock extends StatelessWidget {
+  const ComplexSettingBlock({
+    super.key,
+    required this.title,
+    this.subtitle,
+    required this.child,
+  });
+
+  final Widget title;
+  final Widget? subtitle;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
     final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     if (screenSizeSmall) {
-      return ExpansionTile(
-        title: title,
-        subtitle: subtitle,
-        children: [
-          ColoredBox(
-            color: Theme.of(context).cardColor,
-            child: Center(child: builder(context)),
-          ),
-        ],
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DefaultTextStyle(
+              style: Theme.of(context).textTheme.bodyLarge!,
+              child: title,
+            ),
+            if (subtitle != null) ...[
+              const SizedBox(height: 4.0),
+              DefaultTextStyle(
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                child: subtitle!,
+              ),
+            ],
+            const SizedBox(height: 12.0),
+            child,
+          ],
+        ),
       );
     }
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(spacing: 10.0, children: [title, ?subtitle]),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DefaultTextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge!,
+                  child: title,
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 4.0),
+                  DefaultTextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    child: subtitle!,
+                  ),
+                ],
+              ],
             ),
-            Expanded(child: builder(context)),
-          ],
-        ),
+          ),
+          const SizedBox(width: 16.0),
+          Expanded(child: child),
+        ],
       ),
     );
   }

@@ -418,45 +418,43 @@ class InputRowBuilder extends HookConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    return SettingCardWidget(
+    return ComplexSettingBlock(
       title: Text(element.title),
-      builder: (context) {
-        return HookBuilder(
-          builder: (context) {
-            final controller = useTextEditingController(text: element.value);
-            final settingText = useListenableSelector(
-              controller,
-              () => controller.text,
-            );
-            final debouncedInput = useDebounced(
-              settingText,
-              const Duration(milliseconds: 500),
-            );
+      child: HookBuilder(
+        builder: (context) {
+          final controller = useTextEditingController(text: element.value);
+          final settingText = useListenableSelector(
+            controller,
+            () => controller.text,
+          );
+          final debouncedInput = useDebounced(
+            settingText,
+            const Duration(milliseconds: 500),
+          );
 
-            useEffect(() {
-              Future.delayed(Duration.zero, () {
-                if (!context.mounted) return;
-                if (debouncedInput != null) {
-                  _safeCallBinding(
-                    context,
-                    ref,
-                    source.id,
-                    element.onValueChange,
-                    [debouncedInput],
-                  );
-                }
-              });
-              return null;
-            }, [debouncedInput]);
+          useEffect(() {
+            Future.delayed(Duration.zero, () {
+              if (!context.mounted) return;
+              if (debouncedInput != null) {
+                _safeCallBinding(
+                  context,
+                  ref,
+                  source.id,
+                  element.onValueChange,
+                  [debouncedInput],
+                );
+              }
+            });
+            return null;
+          }, [debouncedInput]);
 
-            return TextFormField(
-              controller: controller,
-              decoration: const InputDecoration(filled: true),
-              obscureText: element.isSecureEntry == true,
-            );
-          },
-        );
-      },
+          return TextFormField(
+            controller: controller,
+            decoration: const InputDecoration(filled: true),
+            obscureText: element.isSecureEntry == true,
+          );
+        },
+      ),
     );
   }
 }
@@ -553,19 +551,15 @@ class ToggleRowBuilder extends HookConsumerWidget {
 
     final currentVal = useState(element.value);
 
-    return SettingCardWidget(
+    return SwitchListTile(
       title: Text(element.title),
-      builder: (context) {
-        return Switch(
-          value: currentVal.value,
-          onChanged: (value) {
-            ref.read(extensionSourceProvider(source.id).notifier).callBinding(
-              element.onValueChange,
-              [value],
-            );
-            currentVal.value = value;
-          },
+      value: currentVal.value,
+      onChanged: (value) {
+        ref.read(extensionSourceProvider(source.id).notifier).callBinding(
+          element.onValueChange,
+          [value],
         );
+        currentVal.value = value;
       },
     );
   }
@@ -585,23 +579,21 @@ class StepperRowBuilder extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentVal = useState(element.value);
 
-    return SettingCardWidget(
+    return ComplexSettingBlock(
       title: Text(element.title),
-      builder: (context) {
-        return SpinBox(
-          value: currentVal.value.toDouble(),
-          min: element.minValue.toDouble(),
-          max: element.maxValue.toDouble(),
-          step: element.stepValue.toDouble(),
-          onChanged: (value) {
-            ref.read(extensionSourceProvider(source.id).notifier).callBinding(
-              element.onValueChange,
-              [value],
-            );
-            currentVal.value = value;
-          },
-        );
-      },
+      child: SpinBox(
+        value: currentVal.value.toDouble(),
+        min: element.minValue.toDouble(),
+        max: element.maxValue.toDouble(),
+        step: element.stepValue.toDouble(),
+        onChanged: (value) {
+          ref.read(extensionSourceProvider(source.id).notifier).callBinding(
+            element.onValueChange,
+            [value],
+          );
+          currentVal.value = value;
+        },
+      ),
     );
   }
 }
