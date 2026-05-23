@@ -88,7 +88,6 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                   builder: (context, currentConfig, _) {
                     return Flexible(
                       child: ListView.builder(
-                        shrinkWrap: true,
                         itemCount: langsList.length,
                         itemBuilder: (context, index) {
                           final lang = langsList[index];
@@ -146,7 +145,6 @@ class MangaDexSettingsWidget extends HookConsumerWidget {
                   builder: (context, currentConfig, _) {
                     return Flexible(
                       child: ListView.builder(
-                        shrinkWrap: true,
                         itemCount: langsList.length,
                         itemBuilder: (context, index) {
                           final lang = langsList[index];

@@ -405,7 +405,11 @@ class AppSettingsPage extends HookConsumerWidget {
                   title: Text(t.backup.data, style: titleStyle),
                   subtitle: Text(t.backup.dataSub),
                   trailing: isLoading.value
-                      ? const CircularProgressIndicator()
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
                       : const Icon(Icons.save),
                   onTap: isLoading.value
                       ? null
@@ -446,7 +450,11 @@ class AppSettingsPage extends HookConsumerWidget {
                   title: Text(t.backup.restore, style: titleStyle),
                   subtitle: Text(t.backup.fromFile),
                   trailing: isLoading.value
-                      ? const CircularProgressIndicator()
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
                       : const Icon(Icons.settings_backup_restore),
                   onTap: isLoading.value
                       ? null
