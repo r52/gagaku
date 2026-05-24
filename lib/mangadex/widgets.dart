@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:animations/animations.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
@@ -545,11 +546,11 @@ class ChapterFeedWidget extends HookWidget {
       child: RefreshIndicator(
         onRefresh: onRefresh,
         child: CustomScrollView(
+          scrollCacheExtent: const ScrollCacheExtent.viewport(1.5),
           scrollBehavior: const MouseTouchScrollBehavior(),
           physics: const AlwaysScrollableScrollPhysics(),
           controller: scroller,
           restorationId: restorationId,
-          cacheExtent: MediaQuery.sizeOf(context).height * 1.5,
           slivers: [
             ...leading,
             if (title != null)
@@ -1227,10 +1228,10 @@ class MangaListWidget extends HookConsumerWidget {
     return Stack(
       children: [
         CustomScrollView(
+          scrollCacheExtent: const ScrollCacheExtent.viewport(1.0),
           controller: scrollController,
           scrollBehavior: scrollBehavior,
           physics: physics,
-          cacheExtent: MediaQuery.sizeOf(context).height,
           slivers: [
             ...leading,
             SliverToBoxAdapter(

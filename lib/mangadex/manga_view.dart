@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/rendering.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:collection/collection.dart';
@@ -774,9 +775,9 @@ class _MangaChaptersView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
+      scrollCacheExtent: const ScrollCacheExtent.viewport(1.0),
       physics: const AlwaysScrollableScrollPhysics(),
       controller: scrollController,
-      cacheExtent: MediaQuery.sizeOf(context).height,
       slivers: [
         PagingListener(
           controller: controller,

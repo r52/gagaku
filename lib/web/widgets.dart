@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'package:flutter/rendering.dart';
 import 'package:gagaku/util/riverpod.dart';
 
 import 'package:cached_network_image_ce/cached_network_image.dart';
@@ -189,10 +190,10 @@ class WebMangaListWidget extends HookConsumerWidget {
     return Stack(
       children: [
         CustomScrollView(
+          scrollCacheExtent: const ScrollCacheExtent.viewport(1.5),
           controller: scrollController,
           scrollBehavior: scrollBehavior,
           physics: physics,
-          cacheExtent: MediaQuery.sizeOf(context).height * 1.5,
           slivers: [
             ...leading,
             SliverToBoxAdapter(
