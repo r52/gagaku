@@ -39,7 +39,9 @@ sealed class UpdateResult {
 }
 
 class UpdateResultUpToDate extends UpdateResult {
-  const UpdateResultUpToDate();
+  const UpdateResultUpToDate({this.checked = false});
+
+  final bool checked;
 }
 
 class UpdateResultAvailable extends UpdateResult {
@@ -115,7 +117,7 @@ class UpdateChecker extends _$UpdateChecker {
     }
 
     if (!isUpdateAvailable) {
-      return const UpdateResultUpToDate();
+      return const UpdateResultUpToDate(checked: true);
     }
 
     // Check if ignored.

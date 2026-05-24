@@ -129,7 +129,7 @@ class App extends HookConsumerWidget {
               showUpdateDialog(navContext, info);
             }
           });
-        case AsyncData(value: UpdateResultUpToDate()) ||
+        case AsyncData(value: UpdateResultUpToDate(checked: true)) ||
             AsyncData(value: UpdateResultIgnored()):
           Future.delayed(Duration.zero, () async {
             final updatedConfig = config.copyWith(
