@@ -790,6 +790,28 @@ return id;
     return _forms[formid]!;
   }
 
+  /// Pre-process an image request through the extension's interceptor chain.
+  ///
+  /// Returns the processed request data (URL, method, headers with cookies
+  /// injected) without executing the HTTP request. The caller (Dart) executes
+  /// the request using HttpClient, avoiding CORS restrictions that would
+  /// occur with the browser's fetch() API.
+  Future<Map<String, dynamic>> processImageRequest(String url) async {
+    final result = await _controller?.callAsyncJavaScript(
+      arguments: {'url': url},
+      functionBody: "return await window.Application.processImageRequest(url);",
+    );
+
+    if (result == null || result.error != null) {
+      throw JavaScriptException(
+        message: 'JavaScript error in processImageRequest:',
+        errorMessage: result?.error,
+      );
+    }
+
+    return result.value as Map<String, dynamic>;
+  }
+
   List<Cookie>? getCookies() {
     return _cookies;
   }

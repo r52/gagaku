@@ -4,21 +4,21 @@ import { MockRequestManager } from "./RequestManager";
 import { FormManager } from "./FormManager";
 
 import { decodeHTMLStrict } from "entities";
-import { SelectorID } from "@paperback/types";
-import md5 from 'md5';
+import type { Request, SelectorID } from "@paperback/types";
+import md5 from "md5";
 
 export function ApplicationPolyfill(): typeof Application {
-  let stateStorage: Record<string, unknown> = {}
-  const secureStateStorage: Record<string, unknown> = {}
+  let stateStorage: Record<string, unknown> = {};
+  const secureStateStorage: Record<string, unknown> = {};
 
-  const selectorRegistry = new MockSelectorRegistry()
-  const requestManager = new MockRequestManager(selectorRegistry)
+  const selectorRegistry = new MockSelectorRegistry();
+  const requestManager = new MockRequestManager(selectorRegistry);
 
   // unused
   // TODO support this?
   const discoverSectionManager = new MockDiscoverSectionManager(
-    selectorRegistry
-  )
+    selectorRegistry,
+  );
   // <!-- unused
 
   const formManager = new FormManager();
@@ -26,27 +26,26 @@ export function ApplicationPolyfill(): typeof Application {
   return {
     decodeHTMLEntities: decodeHTMLStrict,
 
-    sleep: function (seconds) {
-      return new Promise((resolve) => {
-        setTimeout(resolve, seconds * 1000)
-      })
-    },
+    sleep: (seconds) =>
+      new Promise((resolve) => {
+        setTimeout(resolve, seconds * 1000);
+      }),
 
     registerDiscoverSection:
       discoverSectionManager.registerDiscoverSection.bind(
-        discoverSectionManager
+        discoverSectionManager,
       ),
     unregisterDiscoverSection:
       discoverSectionManager.unregisterDiscoverSection.bind(
-        discoverSectionManager
+        discoverSectionManager,
       ),
     registeredDiscoverSections:
       discoverSectionManager.registeredDiscoverSections.bind(
-        discoverSectionManager
+        discoverSectionManager,
       ),
     invalidateDiscoverSections:
       discoverSectionManager.invalidateDiscoverSections.bind(
-        discoverSectionManager
+        discoverSectionManager,
       ),
 
     registerInterceptor:
@@ -58,69 +57,70 @@ export function ApplicationPolyfill(): typeof Application {
       requestManager.getDefaultUserAgent.bind(requestManager),
     scheduleRequest: requestManager.scheduleRequest.bind(requestManager),
 
-    arrayBufferToUTF8String: function (arrayBuffer) {
-      return new TextDecoder('utf-8').decode(arrayBuffer)
-    },
-    arrayBufferToASCIIString: function (arrayBuffer) {
-      return new TextDecoder('ascii').decode(arrayBuffer)
-    },
-    arrayBufferToUTF16String: function (arrayBuffer) {
-      return new TextDecoder('utf-16').decode(arrayBuffer)
-    },
+    arrayBufferToUTF8String: (arrayBuffer) =>
+      new TextDecoder("utf-8").decode(arrayBuffer),
+    arrayBufferToASCIIString: (arrayBuffer) =>
+      new TextDecoder("ascii").decode(arrayBuffer),
+    arrayBufferToUTF16String: (arrayBuffer) =>
+      new TextDecoder("utf-16").decode(arrayBuffer),
 
-    base64Encode: function (value) {
-      if (typeof value === 'string') {
-        return btoa(value) as typeof value
+    base64Encode: (value) => {
+      if (typeof value === "string") {
+        return btoa(value) as typeof value;
       } else {
-        const bytes = new Uint8Array(value)
-        let binary = ''
-        const chunkSize = 8192
+        const bytes = new Uint8Array(value);
+        let binary = "";
+        const chunkSize = 8192;
         for (let i = 0; i < bytes.length; i += chunkSize) {
-          const chunk = Array.from(bytes.subarray(i, i + chunkSize))
-          binary += String.fromCharCode.apply(null, chunk as unknown as number[])
+          const chunk = Array.from(bytes.subarray(i, i + chunkSize));
+          binary += String.fromCharCode.apply(
+            null,
+            chunk as unknown as number[],
+          );
         }
 
-        return btoa(binary) as unknown as typeof value
+        return btoa(binary) as unknown as typeof value;
       }
     },
-    base64Decode: function (value) {
-      if (typeof value === 'string') {
-        return atob(value) as typeof value
+    base64Decode: (value) => {
+      if (typeof value === "string") {
+        return atob(value) as typeof value;
       } else {
-        const base64Bytes = new Uint8Array(value)
-        let base64String = ''
-        const chunkSize = 8192
+        const base64Bytes = new Uint8Array(value);
+        let base64String = "";
+        const chunkSize = 8192;
         for (let i = 0; i < base64Bytes.length; i += chunkSize) {
-          const chunk = Array.from(base64Bytes.subarray(i, i + chunkSize))
-          base64String += String.fromCharCode.apply(null, chunk as unknown as number[])
+          const chunk = Array.from(base64Bytes.subarray(i, i + chunkSize));
+          base64String += String.fromCharCode.apply(
+            null,
+            chunk as unknown as number[],
+          );
         }
 
-        const binaryString = atob(base64String)
-        const decodedBytes = new Uint8Array(binaryString.length)
+        const binaryString = atob(base64String);
+        const decodedBytes = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) {
-          decodedBytes[i] = binaryString.charCodeAt(i)
+          decodedBytes[i] = binaryString.charCodeAt(i);
         }
 
-        return decodedBytes.buffer as typeof value
+        return decodedBytes.buffer as typeof value;
       }
     },
 
-    crypto_md5Hash: function (value: string | ArrayBuffer) {
-      let data: Uint8Array | string
-      if (typeof value === 'string') {
-        data = value
+    crypto_md5Hash: (value: string | ArrayBuffer) => {
+      let data: Uint8Array | string;
+      if (typeof value === "string") {
+        data = value;
       } else {
-        data = new Uint8Array(value)
+        data = new Uint8Array(value);
       }
-      
-      return md5(data)
+
+      return md5(data);
     },
 
-    getSecureState: function (key) {
-      return secureStateStorage[key]
-    },
+    getSecureState: (key) => secureStateStorage[key],
 
-    setSecureState: function (value, key) {
+    setSecureState: (value, key) => {
       if ("gagaku" in globalThis) {
         if (value === undefined) {
           value = null;
@@ -129,18 +129,16 @@ export function ApplicationPolyfill(): typeof Application {
         secureStateStorage[key] = value;
         globalThis.gagaku?.callHandler(
           "setExtensionSecureState",
-          secureStateStorage
+          secureStateStorage,
         );
       } else {
         secureStateStorage[key] = value;
       }
     },
 
-    getState: function (key) {
-      return stateStorage[key]
-    },
+    getState: (key) => stateStorage[key],
 
-    setState: function (value, key) {
+    setState: (value, key) => {
       if ("gagaku" in globalThis) {
         if (value === undefined) {
           value = null;
@@ -153,15 +151,15 @@ export function ApplicationPolyfill(): typeof Application {
       }
     },
 
-    resetAllState: function () {
-      stateStorage = {}
+    resetAllState: () => {
+      stateStorage = {};
 
       if ("gagaku" in globalThis) {
         globalThis.gagaku?.callHandler("resetAllState");
       }
     },
 
-    executeInWebView: function (context) {
+    executeInWebView: (context) => {
       if ("gagaku" in globalThis) {
         return globalThis.gagaku?.callHandler("executeInWebView", context);
       }
@@ -170,28 +168,24 @@ export function ApplicationPolyfill(): typeof Application {
     },
 
     // gagaku
-    createExtensionState: function (
-      state: Record<string, any> | undefined
-    ) {
+    createExtensionState: (state: Record<string, any> | undefined) => {
       console.log(`registering extension state: ${state}`);
       if (state) {
         Object.assign(stateStorage, state);
       }
     },
 
-    createExtensionSecureState: function (
-      state: Record<string, any> | undefined
-    ) {
+    createExtensionSecureState: (state: Record<string, any> | undefined) => {
       if (state) {
         Object.assign(secureStateStorage, state);
       }
     },
 
-    callBinding: async function <K>(id: SelectorID<K>, ...args: any[]) {
+    callBinding: async <K>(id: SelectorID<K>, ...args: any[]) => {
       console.log(`Calling binding ${id}`);
-      let binding = selectorRegistry.selector(id);
+      const binding = selectorRegistry.selector(id);
       try {
-        // @ts-ignore
+        // @ts-expect-error
         return await binding(...args);
       } catch (e: any) {
         if (e?.type === "confirmationError") {
@@ -206,7 +200,7 @@ export function ApplicationPolyfill(): typeof Application {
     },
 
     // @ts-expect-error
-    formDidChange: function (formId: string) {
+    formDidChange: (formId: string) => {
       if ("gagaku" in globalThis) {
         globalThis.gagaku?.callHandler("formDidChange", formId);
       }
@@ -222,7 +216,23 @@ export function ApplicationPolyfill(): typeof Application {
 
     Selector: selectorRegistry.Selector.bind(selectorRegistry),
     SelectorRegistry: selectorRegistry,
-  }
+
+    processImageRequest: async (
+      url: string,
+    ): Promise<{
+      url: string;
+      method?: string;
+      headers?: Record<string, string>;
+      body?: ArrayBuffer | string | FormData;
+    }> => {
+      const request: Request = {
+        url: url,
+        method: "GET",
+      };
+
+      return await requestManager.preProcessRequest(request);
+    },
+  };
 }
 
 globalThis.Application = ApplicationPolyfill();

@@ -60,3 +60,5 @@ node_modules/
 .aiexclude
 .memories/
 memories/
+.pi-lens/
+.plans/

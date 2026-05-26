@@ -906,6 +906,16 @@ class ExtensionSource extends _$ExtensionSource {
     await future;
     return _bridge!.hasSortOps;
   }
+
+  /// Pre-process an image request through the extension's interceptor chain.
+  ///
+  /// Returns processed request data (URL, method, headers with cookies
+  /// injected) without executing the HTTP request. The caller (Dart) executes
+  /// the request using HttpClient, avoiding CORS restrictions.
+  Future<Map<String, dynamic>> processImageRequest(String url) async {
+    await future;
+    return await _bridge!.processImageRequest(url);
+  }
 }
 
 @Riverpod(retry: noRetry)
