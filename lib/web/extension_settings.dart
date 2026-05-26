@@ -319,10 +319,7 @@ class FormSectionBuilder extends ConsumerWidget {
           ReorderableListView(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            onReorder: (oldIndex, newIndex) async {
-              if (oldIndex < newIndex) {
-                newIndex -= 1;
-              }
+            onReorderItem: (oldIndex, newIndex) async {
               await _safeCallBinding(
                 context,
                 ref,
