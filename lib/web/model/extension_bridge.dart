@@ -802,14 +802,14 @@ return id;
       functionBody: "return await window.Application.processImageRequest(url);",
     );
 
-    if (result == null || result.error != null) {
+    if (result == null || result.error != null || result.value == null) {
       throw JavaScriptException(
         message: 'JavaScript error in processImageRequest:',
-        errorMessage: result?.error,
+        errorMessage: result?.error ?? 'Result value is null',
       );
     }
 
-    return result.value as Map<String, dynamic>;
+    return Map<String, dynamic>.from(result.value as Map);
   }
 
   List<Cookie>? getCookies() {

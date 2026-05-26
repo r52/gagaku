@@ -40,18 +40,18 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	Translations $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => Translations(meta: meta ?? this.$meta);
 
 	// Translations
-	late final TranslationsUiEn ui = TranslationsUiEn.internal(_root);
-	late final TranslationsErrorsEn errors = TranslationsErrorsEn.internal(_root);
-	late final TranslationsAuthEn auth = TranslationsAuthEn.internal(_root);
-	late final TranslationsSortEn sort = TranslationsSortEn.internal(_root);
+	late final Translations$ui$en ui = Translations$ui$en.internal(_root);
+	late final Translations$errors$en errors = Translations$errors$en.internal(_root);
+	late final Translations$auth$en auth = Translations$auth$en.internal(_root);
+	late final Translations$sort$en sort = Translations$sort$en.internal(_root);
 
 	/// en: 'Library'
 	String get library => 'Library';
 
-	late final TranslationsHistoryEn history = TranslationsHistoryEn.internal(_root);
-	late final TranslationsLocalLibraryEn localLibrary = TranslationsLocalLibraryEn.internal(_root);
-	late final TranslationsWebSourcesEn webSources = TranslationsWebSourcesEn.internal(_root);
-	late final TranslationsSearchEn search = TranslationsSearchEn.internal(_root);
+	late final Translations$history$en history = Translations$history$en.internal(_root);
+	late final Translations$localLibrary$en localLibrary = Translations$localLibrary$en.internal(_root);
+	late final Translations$webSources$en webSources = Translations$webSources$en.internal(_root);
+	late final Translations$search$en search = Translations$search$en.internal(_root);
 
 	/// en: 'Settings'
 	String get settings => 'Settings';
@@ -86,28 +86,28 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 		other: '${n} items',
 	);
 
-	late final TranslationsThemeEn theme = TranslationsThemeEn.internal(_root);
-	late final TranslationsReaderEn reader = TranslationsReaderEn.internal(_root);
-	late final TranslationsMangadexEn mangadex = TranslationsMangadexEn.internal(_root);
-	late final TranslationsMangaViewEn mangaView = TranslationsMangaViewEn.internal(_root);
-	late final TranslationsReadingStatusEn readingStatus = TranslationsReadingStatusEn.internal(_root);
-	late final TranslationsMangaStatusEn mangaStatus = TranslationsMangaStatusEn.internal(_root);
-	late final TranslationsMangaActionsEn mangaActions = TranslationsMangaActionsEn.internal(_root);
-	late final TranslationsMangaRelationsEn mangaRelations = TranslationsMangaRelationsEn.internal(_root);
-	late final TranslationsTrackingEn tracking = TranslationsTrackingEn.internal(_root);
-	late final TranslationsContentRatingEn contentRating = TranslationsContentRatingEn.internal(_root);
-	late final TranslationsLanguageEn language = TranslationsLanguageEn.internal(_root);
-	late final TranslationsColorsEn colors = TranslationsColorsEn.internal(_root);
-	late final TranslationsCacheEn cache = TranslationsCacheEn.internal(_root);
-	late final TranslationsBackupEn backup = TranslationsBackupEn.internal(_root);
-	late final TranslationsChapterFeedEn chapterFeed = TranslationsChapterFeedEn.internal(_root);
-	late final TranslationsPermissionsEn permissions = TranslationsPermissionsEn.internal(_root);
-	late final TranslationsUpdatesEn updates = TranslationsUpdatesEn.internal(_root);
+	late final Translations$theme$en theme = Translations$theme$en.internal(_root);
+	late final Translations$reader$en reader = Translations$reader$en.internal(_root);
+	late final Translations$mangadex$en mangadex = Translations$mangadex$en.internal(_root);
+	late final Translations$mangaView$en mangaView = Translations$mangaView$en.internal(_root);
+	late final Translations$readingStatus$en readingStatus = Translations$readingStatus$en.internal(_root);
+	late final Translations$mangaStatus$en mangaStatus = Translations$mangaStatus$en.internal(_root);
+	late final Translations$mangaActions$en mangaActions = Translations$mangaActions$en.internal(_root);
+	late final Translations$mangaRelations$en mangaRelations = Translations$mangaRelations$en.internal(_root);
+	late final Translations$tracking$en tracking = Translations$tracking$en.internal(_root);
+	late final Translations$contentRating$en contentRating = Translations$contentRating$en.internal(_root);
+	late final Translations$language$en language = Translations$language$en.internal(_root);
+	late final Translations$colors$en colors = Translations$colors$en.internal(_root);
+	late final Translations$cache$en cache = Translations$cache$en.internal(_root);
+	late final Translations$backup$en backup = Translations$backup$en.internal(_root);
+	late final Translations$chapterFeed$en chapterFeed = Translations$chapterFeed$en.internal(_root);
+	late final Translations$permissions$en permissions = Translations$permissions$en.internal(_root);
+	late final Translations$updates$en updates = Translations$updates$en.internal(_root);
 }
 
 // Path: ui
-class TranslationsUiEn {
-	TranslationsUiEn.internal(this._root);
+class Translations$ui$en {
+	Translations$ui$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -238,8 +238,8 @@ class TranslationsUiEn {
 }
 
 // Path: errors
-class TranslationsErrorsEn {
-	TranslationsErrorsEn.internal(this._root);
+class Translations$errors$en {
+	Translations$errors$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -295,8 +295,8 @@ class TranslationsErrorsEn {
 }
 
 // Path: auth
-class TranslationsAuthEn {
-	TranslationsAuthEn.internal(this._root);
+class Translations$auth$en {
+	Translations$auth$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -352,8 +352,8 @@ class TranslationsAuthEn {
 }
 
 // Path: sort
-class TranslationsSortEn {
-	TranslationsSortEn.internal(this._root);
+class Translations$sort$en {
+	Translations$sort$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -367,8 +367,8 @@ class TranslationsSortEn {
 }
 
 // Path: history
-class TranslationsHistoryEn {
-	TranslationsHistoryEn.internal(this._root);
+class Translations$history$en {
+	Translations$history$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -385,8 +385,8 @@ class TranslationsHistoryEn {
 }
 
 // Path: localLibrary
-class TranslationsLocalLibraryEn {
-	TranslationsLocalLibraryEn.internal(this._root);
+class Translations$localLibrary$en {
+	Translations$localLibrary$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -407,7 +407,7 @@ class TranslationsLocalLibraryEn {
 	/// en: 'This directory contains no readable images!'
 	String get dirUnreadableWarning => 'This directory contains no readable images!';
 
-	late final TranslationsLocalLibrarySettingsEn settings = TranslationsLocalLibrarySettingsEn.internal(_root);
+	late final Translations$localLibrary$settings$en settings = Translations$localLibrary$settings$en.internal(_root);
 
 	/// en: 'Read Archive'
 	String get readArchive => 'Read Archive';
@@ -421,13 +421,13 @@ class TranslationsLocalLibraryEn {
 	/// en: 'Scanning library...'
 	String get scanning => 'Scanning library...';
 
-	late final TranslationsLocalLibraryErrorsEn errors = TranslationsLocalLibraryErrorsEn.internal(_root);
-	late final TranslationsLocalLibrarySortEn sort = TranslationsLocalLibrarySortEn.internal(_root);
+	late final Translations$localLibrary$errors$en errors = Translations$localLibrary$errors$en.internal(_root);
+	late final Translations$localLibrary$sort$en sort = Translations$localLibrary$sort$en.internal(_root);
 }
 
 // Path: webSources
-class TranslationsWebSourcesEn {
-	TranslationsWebSourcesEn.internal(this._root);
+class Translations$webSources$en {
+	Translations$webSources$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -448,10 +448,10 @@ class TranslationsWebSourcesEn {
 	/// en: 'Open Link'
 	String get openLink => 'Open Link';
 
-	late final TranslationsWebSourcesSupportedUrlEn supportedUrl = TranslationsWebSourcesSupportedUrlEn.internal(_root);
-	late final TranslationsWebSourcesSettingsEn settings = TranslationsWebSourcesSettingsEn.internal(_root);
-	late final TranslationsWebSourcesRepoEn repo = TranslationsWebSourcesRepoEn.internal(_root);
-	late final TranslationsWebSourcesSourceEn source = TranslationsWebSourcesSourceEn.internal(_root);
+	late final Translations$webSources$supportedUrl$en supportedUrl = Translations$webSources$supportedUrl$en.internal(_root);
+	late final Translations$webSources$settings$en settings = Translations$webSources$settings$en.internal(_root);
+	late final Translations$webSources$repo$en repo = Translations$webSources$repo$en.internal(_root);
+	late final Translations$webSources$source$en source = Translations$webSources$source$en.internal(_root);
 
 	/// en: 'Source ${id} Unavailable'
 	String sourceUnavailable({required Object id}) => 'Source ${id} Unavailable';
@@ -497,8 +497,8 @@ class TranslationsWebSourcesEn {
 }
 
 // Path: search
-class TranslationsSearchEn {
-	TranslationsSearchEn.internal(this._root);
+class Translations$search$en {
+	Translations$search$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -545,8 +545,8 @@ class TranslationsSearchEn {
 }
 
 // Path: theme
-class TranslationsThemeEn {
-	TranslationsThemeEn.internal(this._root);
+class Translations$theme$en {
+	Translations$theme$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -569,14 +569,14 @@ class TranslationsThemeEn {
 }
 
 // Path: reader
-class TranslationsReaderEn {
-	TranslationsReaderEn.internal(this._root);
+class Translations$reader$en {
+	Translations$reader$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
 	// Translations
-	late final TranslationsReaderDirectionEn direction = TranslationsReaderDirectionEn.internal(_root);
-	late final TranslationsReaderFormatEn format = TranslationsReaderFormatEn.internal(_root);
+	late final Translations$reader$direction$en direction = Translations$reader$direction$en.internal(_root);
+	late final Translations$reader$format$en format = Translations$reader$format$en.internal(_root);
 
 	/// en: 'Reader Settings'
 	String get settings => 'Reader Settings';
@@ -604,8 +604,8 @@ class TranslationsReaderEn {
 }
 
 // Path: mangadex
-class TranslationsMangadexEn {
-	TranslationsMangadexEn.internal(this._root);
+class Translations$mangadex$en {
+	Translations$mangadex$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -737,18 +737,18 @@ class TranslationsMangadexEn {
 	/// en: 'Browse all $tag titles'
 	String tagTitles({required Object tag}) => 'Browse all ${tag} titles';
 
-	late final TranslationsMangadexCreatorEn creator = TranslationsMangadexCreatorEn.internal(_root);
+	late final Translations$mangadex$creator$en creator = Translations$mangadex$creator$en.internal(_root);
 
 	/// en: 'Visibility'
 	String get visibility => 'Visibility';
 
-	late final TranslationsMangadexListVisibilityEn listVisibility = TranslationsMangadexListVisibilityEn.internal(_root);
+	late final Translations$mangadex$listVisibility$en listVisibility = Translations$mangadex$listVisibility$en.internal(_root);
 
 	/// en: 'Add Titles'
 	String get addTitles => '${_root.ui.add} ${_root.titles}';
 
-	late final TranslationsMangadexSettingsEn settings = TranslationsMangadexSettingsEn.internal(_root);
-	late final TranslationsMangadexSortEn sort = TranslationsMangadexSortEn.internal(_root);
+	late final Translations$mangadex$settings$en settings = Translations$mangadex$settings$en.internal(_root);
+	late final Translations$mangadex$sort$en sort = Translations$mangadex$sort$en.internal(_root);
 	List<String> get ratings => [
 		'Remove Rating',
 		'(1) Appalling',
@@ -765,8 +765,8 @@ class TranslationsMangadexEn {
 }
 
 // Path: mangaView
-class TranslationsMangaViewEn {
-	TranslationsMangaViewEn.internal(this._root);
+class Translations$mangaView$en {
+	Translations$mangaView$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -858,8 +858,8 @@ class TranslationsMangaViewEn {
 }
 
 // Path: readingStatus
-class TranslationsReadingStatusEn {
-	TranslationsReadingStatusEn.internal(this._root);
+class Translations$readingStatus$en {
+	Translations$readingStatus$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -888,8 +888,8 @@ class TranslationsReadingStatusEn {
 }
 
 // Path: mangaStatus
-class TranslationsMangaStatusEn {
-	TranslationsMangaStatusEn.internal(this._root);
+class Translations$mangaStatus$en {
+	Translations$mangaStatus$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -909,8 +909,8 @@ class TranslationsMangaStatusEn {
 }
 
 // Path: mangaActions
-class TranslationsMangaActionsEn {
-	TranslationsMangaActionsEn.internal(this._root);
+class Translations$mangaActions$en {
+	Translations$mangaActions$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -936,8 +936,8 @@ class TranslationsMangaActionsEn {
 }
 
 // Path: mangaRelations
-class TranslationsMangaRelationsEn {
-	TranslationsMangaRelationsEn.internal(this._root);
+class Translations$mangaRelations$en {
+	Translations$mangaRelations$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -993,8 +993,8 @@ class TranslationsMangaRelationsEn {
 }
 
 // Path: tracking
-class TranslationsTrackingEn {
-	TranslationsTrackingEn.internal(this._root);
+class Translations$tracking$en {
+	Translations$tracking$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1014,8 +1014,8 @@ class TranslationsTrackingEn {
 }
 
 // Path: contentRating
-class TranslationsContentRatingEn {
-	TranslationsContentRatingEn.internal(this._root);
+class Translations$contentRating$en {
+	Translations$contentRating$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1035,8 +1035,8 @@ class TranslationsContentRatingEn {
 }
 
 // Path: language
-class TranslationsLanguageEn {
-	TranslationsLanguageEn.internal(this._root);
+class Translations$language$en {
+	Translations$language$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1209,8 +1209,8 @@ class TranslationsLanguageEn {
 }
 
 // Path: colors
-class TranslationsColorsEn {
-	TranslationsColorsEn.internal(this._root);
+class Translations$colors$en {
+	Translations$colors$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1251,8 +1251,8 @@ class TranslationsColorsEn {
 }
 
 // Path: cache
-class TranslationsCacheEn {
-	TranslationsCacheEn.internal(this._root);
+class Translations$cache$en {
+	Translations$cache$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1272,8 +1272,8 @@ class TranslationsCacheEn {
 }
 
 // Path: backup
-class TranslationsBackupEn {
-	TranslationsBackupEn.internal(this._root);
+class Translations$backup$en {
+	Translations$backup$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1323,8 +1323,8 @@ class TranslationsBackupEn {
 }
 
 // Path: chapterFeed
-class TranslationsChapterFeedEn {
-	TranslationsChapterFeedEn.internal(this._root);
+class Translations$chapterFeed$en {
+	Translations$chapterFeed$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1356,8 +1356,8 @@ class TranslationsChapterFeedEn {
 }
 
 // Path: permissions
-class TranslationsPermissionsEn {
-	TranslationsPermissionsEn.internal(this._root);
+class Translations$permissions$en {
+	Translations$permissions$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1371,8 +1371,8 @@ class TranslationsPermissionsEn {
 }
 
 // Path: updates
-class TranslationsUpdatesEn {
-	TranslationsUpdatesEn.internal(this._root);
+class Translations$updates$en {
+	Translations$updates$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1440,8 +1440,8 @@ class TranslationsUpdatesEn {
 }
 
 // Path: localLibrary.settings
-class TranslationsLocalLibrarySettingsEn {
-	TranslationsLocalLibrarySettingsEn.internal(this._root);
+class Translations$localLibrary$settings$en {
+	Translations$localLibrary$settings$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1455,8 +1455,8 @@ class TranslationsLocalLibrarySettingsEn {
 }
 
 // Path: localLibrary.errors
-class TranslationsLocalLibraryErrorsEn {
-	TranslationsLocalLibraryErrorsEn.internal(this._root);
+class Translations$localLibrary$errors$en {
+	Translations$localLibrary$errors$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1473,8 +1473,8 @@ class TranslationsLocalLibraryErrorsEn {
 }
 
 // Path: localLibrary.sort
-class TranslationsLocalLibrarySortEn {
-	TranslationsLocalLibrarySortEn.internal(this._root);
+class Translations$localLibrary$sort$en {
+	Translations$localLibrary$sort$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1494,8 +1494,8 @@ class TranslationsLocalLibrarySortEn {
 }
 
 // Path: webSources.supportedUrl
-class TranslationsWebSourcesSupportedUrlEn {
-	TranslationsWebSourcesSupportedUrlEn.internal(this._root);
+class Translations$webSources$supportedUrl$en {
+	Translations$webSources$supportedUrl$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1509,8 +1509,8 @@ class TranslationsWebSourcesSupportedUrlEn {
 }
 
 // Path: webSources.settings
-class TranslationsWebSourcesSettingsEn {
-	TranslationsWebSourcesSettingsEn.internal(this._root);
+class Translations$webSources$settings$en {
+	Translations$webSources$settings$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1614,8 +1614,8 @@ class TranslationsWebSourcesSettingsEn {
 }
 
 // Path: webSources.repo
-class TranslationsWebSourcesRepoEn {
-	TranslationsWebSourcesRepoEn.internal(this._root);
+class Translations$webSources$repo$en {
+	Translations$webSources$repo$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1665,8 +1665,8 @@ class TranslationsWebSourcesRepoEn {
 }
 
 // Path: webSources.source
-class TranslationsWebSourcesSourceEn {
-	TranslationsWebSourcesSourceEn.internal(this._root);
+class Translations$webSources$source$en {
+	Translations$webSources$source$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1708,12 +1708,12 @@ class TranslationsWebSourcesSourceEn {
 	/// en: 'This extension provides no filter options'
 	String get noTagsWarning => 'This extension provides no filter options';
 
-	late final TranslationsWebSourcesSourceInstallEn install = TranslationsWebSourcesSourceInstallEn.internal(_root);
+	late final Translations$webSources$source$install$en install = Translations$webSources$source$install$en.internal(_root);
 }
 
 // Path: reader.direction
-class TranslationsReaderDirectionEn {
-	TranslationsReaderDirectionEn.internal(this._root);
+class Translations$reader$direction$en {
+	Translations$reader$direction$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1727,8 +1727,8 @@ class TranslationsReaderDirectionEn {
 }
 
 // Path: reader.format
-class TranslationsReaderFormatEn {
-	TranslationsReaderFormatEn.internal(this._root);
+class Translations$reader$format$en {
+	Translations$reader$format$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1742,8 +1742,8 @@ class TranslationsReaderFormatEn {
 }
 
 // Path: mangadex.creator
-class TranslationsMangadexCreatorEn {
-	TranslationsMangadexCreatorEn.internal(this._root);
+class Translations$mangadex$creator$en {
+	Translations$mangadex$creator$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1760,8 +1760,8 @@ class TranslationsMangadexCreatorEn {
 }
 
 // Path: mangadex.listVisibility
-class TranslationsMangadexListVisibilityEn {
-	TranslationsMangadexListVisibilityEn.internal(this._root);
+class Translations$mangadex$listVisibility$en {
+	Translations$mangadex$listVisibility$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1775,8 +1775,8 @@ class TranslationsMangadexListVisibilityEn {
 }
 
 // Path: mangadex.settings
-class TranslationsMangadexSettingsEn {
-	TranslationsMangadexSettingsEn.internal(this._root);
+class Translations$mangadex$settings$en {
+	Translations$mangadex$settings$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1811,8 +1811,8 @@ class TranslationsMangadexSettingsEn {
 }
 
 // Path: mangadex.sort
-class TranslationsMangadexSortEn {
-	TranslationsMangadexSortEn.internal(this._root);
+class Translations$mangadex$sort$en {
+	Translations$mangadex$sort$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1892,8 +1892,8 @@ class TranslationsMangadexSortEn {
 }
 
 // Path: webSources.source.install
-class TranslationsWebSourcesSourceInstallEn {
-	TranslationsWebSourcesSourceInstallEn.internal(this._root);
+class Translations$webSources$source$install$en {
+	Translations$webSources$source$install$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 

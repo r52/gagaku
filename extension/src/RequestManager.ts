@@ -80,7 +80,7 @@ export class MockRequestManager implements RequestManager {
         interceptor.interceptRequestSelectorId,
       );
 
-      finalRequest = await requestInterceptor(request);
+      finalRequest = await requestInterceptor(finalRequest);
     }
 
     let requestBody: ArrayBuffer | string | FormData | undefined;
@@ -142,7 +142,7 @@ export class MockRequestManager implements RequestManager {
         interceptor.interceptRequestSelectorId,
       );
 
-      finalRequest = await requestInterceptor(request);
+      finalRequest = await requestInterceptor(finalRequest);
     }
 
     let requestBody: ArrayBuffer | string | FormData | undefined;
