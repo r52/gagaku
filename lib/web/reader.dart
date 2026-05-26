@@ -5,7 +5,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/util/exception.dart';
-import 'package:gagaku/util/http.dart' show getUserAgent;
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -98,28 +97,24 @@ Future<List<ReaderPage>> _getSourcePages(
   dynamic chapter,
   SourceHandler handle,
 ) async {
-  List<String>? links = [];
-
   final sourceId = handle.sourceId;
 
-  final refer = ref.watch(extensionReferrerProvider);
   await ref.readAsync(extensionSourceProvider(sourceId).future);
-  links = await ref
-      .read(extensionSourceProvider(sourceId).notifier)
-      .getChapterPages(chapter as Chapter);
+  final notifier = ref.read(extensionSourceProvider(sourceId).notifier);
+  final links = await notifier.getChapterPages(chapter as Chapter);
 
-  String referer = refer[sourceId] ?? '';
-
-  final pages = links
-      .map(
-        (e) => ReaderPage(
-          provider: NetworkImage(
-            e,
-            headers: {'referer': referer, 'user-agent': getUserAgent()},
-          ),
+  final pages = await Future.wait(
+    links.map((e) async {
+      final processed = await notifier.processImageRequest(e);
+      final url = processed['url'] as String;
+      return ReaderPage(
+        provider: NetworkImage(
+          url,
+          headers: Map<String, String>.from(processed['headers'] ?? {}),
         ),
-      )
-      .toList();
+      );
+    }),
+  );
 
   ref.onDispose(() {
     pages.clear();

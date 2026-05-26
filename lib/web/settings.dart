@@ -277,11 +277,7 @@ class CategoryManager extends HookConsumerWidget {
             Text(tr.ui.dragHint),
             Expanded(
               child: ReorderableListView.builder(
-                onReorder: (oldIndex, newIndex) {
-                  if (oldIndex < newIndex) {
-                    newIndex -= 1;
-                  }
-
+                onReorderItem: (oldIndex, newIndex) {
                   final items = list.value;
 
                   final item = items.removeAt(oldIndex);
