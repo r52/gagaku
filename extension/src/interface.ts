@@ -8,6 +8,10 @@ declare global {
   // WebView interface
   var gagaku: WebViewInterface | undefined;
 
+  interface Window {
+    __gagaku_proxy_port: number;
+  }
+
   namespace Application {
     // binding
     function callBinding<K>(id: SelectorID<K>, ...args: any[]): Promise<any>;
