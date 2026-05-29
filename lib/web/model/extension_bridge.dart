@@ -823,6 +823,7 @@ return id;
     );
 
     if (result == null || result.error != null) {
+      proxyServer.cancelImageRequest(url);
       // Completer will NOT be completed - error out
       if (!completer.isCompleted) {
         completer.completeError(

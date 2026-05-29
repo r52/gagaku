@@ -6,11 +6,28 @@ import 'package:flutter/foundation.dart';
 import 'package:gagaku/log.dart';
 import 'package:image/image.dart' as image;
 
+Map<String, Object> _decodeImagePixels(Uint8List bytes) {
+  final decoded = image.decodeImage(bytes);
+  if (decoded == null) {
+    throw const FormatException('Unsupported image format');
+  }
+
+  return {
+    'width': decoded.width,
+    'height': decoded.height,
+    'pixels': decoded.getBytes(order: image.ChannelOrder.rgba),
+  };
+}
+
 class ProxyServer {
   ProxyServer();
 
   HttpServer? _server;
   int? get port => _server?.port;
+
+  final HttpClient _client = HttpClient()
+    ..autoUncompress = true
+    ..connectionTimeout = const Duration(seconds: 15);
 
   /// Maximum number of pending image completers to keep.
   ///
@@ -102,9 +119,7 @@ class ProxyServer {
     );
     final bodyData = data['body'] as String?;
 
-    final client = HttpClient()
-      ..autoUncompress = true
-      ..connectionTimeout = const Duration(seconds: 15);
+    final client = _client;
 
     try {
       final uri = Uri.parse(url);
@@ -162,23 +177,16 @@ class ProxyServer {
         respHeaders[name] = values.join(', ');
       });
 
-      // Read cookies from Set-Cookie headers
+      // Read cookies from response.cookies
       final cookies = <Map<String, dynamic>>[];
-      final setCookies = response.headers['set-cookie'] ?? [];
-      for (final cookieStr in setCookies) {
-        // Simple cookie parsing - extract name=value
-        final parts = cookieStr.split(';');
-        final nameValue = parts.first.trim();
-        final eqIdx = nameValue.indexOf('=');
-        if (eqIdx > 0) {
-          cookies.add({
-            'name': nameValue.substring(0, eqIdx),
-            'value': nameValue.substring(eqIdx + 1),
-            'domain': '',
-            'path': '/',
-            'expires': DateTime.now().toIso8601String(),
-          });
-        }
+      for (final cookie in response.cookies) {
+        cookies.add({
+          'name': cookie.name,
+          'value': cookie.value,
+          'domain': cookie.domain ?? uri.host,
+          'path': cookie.path ?? '/',
+          'expires': (cookie.expires ?? DateTime.now()).toIso8601String(),
+        });
       }
 
       final bodyB64 = base64Encode(responseBytes);
@@ -205,8 +213,6 @@ class ProxyServer {
         ..headers.set('Content-Type', 'application/json')
         ..write(jsonEncode({'error': e.toString()}));
       await request.response.close();
-    } finally {
-      client.close();
     }
   }
 
@@ -230,6 +236,12 @@ class ProxyServer {
     _imageCompleters[url] = completer;
     logger.d('Registered pending image request for $url');
     return completer;
+  }
+
+  /// Cancel a pending image request.
+  void cancelImageRequest(String url) {
+    _imageCompleters.remove(url);
+    logger.d('Cancelled pending image request for $url');
   }
 
   /// Handle POST /image - decode image data and complete the Dart-side completer.
@@ -269,21 +281,16 @@ class ProxyServer {
 
     try {
       final bytes = base64Decode(bodyData);
-      final decoded = image.decodeImage(bytes);
-      if (decoded == null) {
-        throw const FormatException('Unsupported image format');
-      }
-
-      final pixels = decoded.getBytes(order: image.ChannelOrder.rgba);
+      final decoded = await compute(_decodeImagePixels, bytes);
 
       request.response
         ..statusCode = 200
         ..headers.set('Content-Type', 'application/json')
         ..write(
           jsonEncode({
-            'width': decoded.width,
-            'height': decoded.height,
-            'pixels': base64Encode(pixels),
+            'width': decoded['width'],
+            'height': decoded['height'],
+            'pixels': base64Encode(decoded['pixels']! as Uint8List),
           }),
         );
       await request.response.close();
@@ -305,6 +312,7 @@ class ProxyServer {
       }
     }
     _imageCompleters.clear();
+    _client.close(force: true);
     await _server?.close(force: true);
     _server = null;
     logger.i('Proxy server stopped');

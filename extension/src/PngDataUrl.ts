@@ -1,3 +1,5 @@
+import { bytesToBase64 } from "./Base64";
+
 const pngSignature = new Uint8Array([
   0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
 ]);
@@ -122,18 +124,6 @@ function rgbaScanlines(
   return scanlines;
 }
 
-function base64Encode(bytes: Uint8Array): string {
-  const chunkSize = 8190;
-  const parts: string[] = [];
-
-  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
-    const chunk = bytes.subarray(offset, offset + chunkSize);
-    parts.push(String.fromCharCode(...chunk));
-  }
-
-  return btoa(parts.join(""));
-}
-
 export function encodePngDataUrl(
   pixels: Uint8ClampedArray,
   width: number,
@@ -157,5 +147,5 @@ export function encodePngDataUrl(
     chunk("IEND", new Uint8Array()),
   ]);
 
-  return `data:image/png;base64,${base64Encode(png)}`;
+  return `data:image/png;base64,${bytesToBase64(png)}`;
 }

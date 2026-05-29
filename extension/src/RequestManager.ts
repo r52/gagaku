@@ -7,6 +7,7 @@ import type {
   SelectorID,
   SelectorRegistry,
 } from "@paperback/types";
+import { base64ToBytes } from "./Base64";
 
 type RequestManager = Pick<
   typeof Application,
@@ -68,8 +69,6 @@ export class MockRequestManager implements RequestManager {
   }
 
   private async encodeRequestBody(
-    url: string,
-    method: string | undefined,
     body: ArrayBuffer | string | FormData | undefined,
     headers: Record<string, string>,
   ): Promise<string | undefined> {
@@ -87,11 +86,8 @@ export class MockRequestManager implements RequestManager {
       return Application.base64Encode(body) as unknown as string;
     }
 
-    const request = new globalThis.Request(url, {
-      method: method ?? "POST",
-      body,
-    });
-    const contentType = request.headers.get("content-type");
+    const response = new globalThis.Response(body);
+    const contentType = response.headers.get("content-type");
     if (
       contentType &&
       !Object.keys(headers).some((key) => key.toLowerCase() === "content-type")
@@ -100,7 +96,7 @@ export class MockRequestManager implements RequestManager {
     }
 
     return Application.base64Encode(
-      await request.arrayBuffer(),
+      await response.arrayBuffer(),
     ) as unknown as string;
   }
 
@@ -168,8 +164,6 @@ export class MockRequestManager implements RequestManager {
         method: finalRequest.method,
         headers: requestHeaders,
         body: await this.encodeRequestBody(
-          finalRequest.url,
-          finalRequest.method,
           requestBody,
           requestHeaders,
         ),
@@ -215,12 +209,7 @@ export class MockRequestManager implements RequestManager {
     // Convert body from base64 to ArrayBuffer
     let finalArrayBuffer: ArrayBuffer;
     if (proxyData.body) {
-      const bytes = new Uint8Array(
-        atob(proxyData.body)
-          .split("")
-          .map((c) => c.charCodeAt(0)),
-      );
-      finalArrayBuffer = bytes.buffer as ArrayBuffer;
+      finalArrayBuffer = base64ToBytes(proxyData.body).buffer as ArrayBuffer;
     } else {
       finalArrayBuffer = new ArrayBuffer(0);
     }

@@ -57,6 +57,80 @@ function copyRegion(
   }
 }
 
+function clipCopyRegion(
+  sourceWidth: number,
+  sourceHeight: number,
+  sourceX: number,
+  sourceY: number,
+  targetWidth: number,
+  targetHeight: number,
+  targetX: number,
+  targetY: number,
+  width: number,
+  height: number,
+):
+  | {
+      sourceX: number;
+      sourceY: number;
+      targetX: number;
+      targetY: number;
+      width: number;
+      height: number;
+    }
+  | undefined {
+  let clippedSourceX = Math.trunc(sourceX);
+  let clippedSourceY = Math.trunc(sourceY);
+  let clippedTargetX = Math.trunc(targetX);
+  let clippedTargetY = Math.trunc(targetY);
+  let clippedWidth = Math.trunc(width);
+  let clippedHeight = Math.trunc(height);
+
+  if (clippedSourceX < 0) {
+    clippedWidth += clippedSourceX;
+    clippedTargetX -= clippedSourceX;
+    clippedSourceX = 0;
+  }
+  if (clippedSourceY < 0) {
+    clippedHeight += clippedSourceY;
+    clippedTargetY -= clippedSourceY;
+    clippedSourceY = 0;
+  }
+  if (clippedTargetX < 0) {
+    clippedWidth += clippedTargetX;
+    clippedSourceX -= clippedTargetX;
+    clippedTargetX = 0;
+  }
+  if (clippedTargetY < 0) {
+    clippedHeight += clippedTargetY;
+    clippedSourceY -= clippedTargetY;
+    clippedTargetY = 0;
+  }
+
+  clippedWidth = Math.min(
+    clippedWidth,
+    sourceWidth - clippedSourceX,
+    targetWidth - clippedTargetX,
+  );
+  clippedHeight = Math.min(
+    clippedHeight,
+    sourceHeight - clippedSourceY,
+    targetHeight - clippedTargetY,
+  );
+
+  if (clippedWidth <= 0 || clippedHeight <= 0) {
+    return undefined;
+  }
+
+  return {
+    sourceX: clippedSourceX,
+    sourceY: clippedSourceY,
+    targetX: clippedTargetX,
+    targetY: clippedTargetY,
+    width: clippedWidth,
+    height: clippedHeight,
+  };
+}
+
 function createEvent(type: string): Event {
   if (typeof Event === "function") {
     return new Event(type);
@@ -137,32 +211,38 @@ class PaperbackCanvasRenderingContext2D {
     dw?: number,
     dh?: number,
   ): void {
-    const width = Math.min(
-      Math.trunc(dw ?? image.naturalWidth),
+    if (!image.complete) {
+      return;
+    }
+
+    const region = clipCopyRegion(
       image.naturalWidth,
-      this.canvas.width - dx,
-    );
-    const height = Math.min(
-      Math.trunc(dh ?? image.naturalHeight),
       image.naturalHeight,
-      this.canvas.height - dy,
+      0,
+      0,
+      this.canvas.width,
+      this.canvas.height,
+      Math.trunc(dx),
+      Math.trunc(dy),
+      Math.trunc(dw ?? image.naturalWidth),
+      Math.trunc(dh ?? image.naturalHeight),
     );
 
-    if (width <= 0 || height <= 0) {
+    if (region == null) {
       return;
     }
 
     copyRegion(
       image.pixels,
       image.naturalWidth,
-      0,
-      0,
+      region.sourceX,
+      region.sourceY,
       this.canvas.pixels,
       this.canvas.width,
-      Math.trunc(dx),
-      Math.trunc(dy),
-      width,
-      height,
+      region.targetX,
+      region.targetY,
+      region.width,
+      region.height,
     );
   }
 
@@ -170,37 +250,67 @@ class PaperbackCanvasRenderingContext2D {
     const width = Math.trunc(sw);
     const height = Math.trunc(sh);
     const pixels = new Uint8ClampedArray(new ArrayBuffer(width * height * 4));
-
-    copyRegion(
-      this.canvas.pixels,
+    const region = clipCopyRegion(
       this.canvas.width,
+      this.canvas.height,
       Math.trunc(sx),
       Math.trunc(sy),
-      pixels,
       width,
+      height,
       0,
       0,
       width,
       height,
     );
 
+    if (region != null) {
+      copyRegion(
+        this.canvas.pixels,
+        this.canvas.width,
+        region.sourceX,
+        region.sourceY,
+        pixels,
+        width,
+        region.targetX,
+        region.targetY,
+        region.width,
+        region.height,
+      );
+    }
+
     return new ImageData(flipRows(pixels, width, height), width, height);
   }
 
   putImageData(imageData: ImageData, dx: number, dy: number): void {
     const pixels = flipRows(imageData.data, imageData.width, imageData.height);
-
-    copyRegion(
-      pixels,
+    const region = clipCopyRegion(
       imageData.width,
+      imageData.height,
       0,
       0,
-      this.canvas.pixels,
       this.canvas.width,
+      this.canvas.height,
       Math.trunc(dx),
       Math.trunc(dy),
       imageData.width,
       imageData.height,
+    );
+
+    if (region == null) {
+      return;
+    }
+
+    copyRegion(
+      pixels,
+      imageData.width,
+      region.sourceX,
+      region.sourceY,
+      this.canvas.pixels,
+      this.canvas.width,
+      region.targetX,
+      region.targetY,
+      region.width,
+      region.height,
     );
   }
 }
