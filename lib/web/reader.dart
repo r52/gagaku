@@ -8,6 +8,7 @@ import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:gagaku/web/model/extension_image.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -99,22 +100,15 @@ Future<List<ReaderPage>> _getSourcePages(
 ) async {
   final sourceId = handle.sourceId;
 
-  await ref.readAsync(extensionSourceProvider(sourceId).future);
-  final notifier = ref.read(extensionSourceProvider(sourceId).notifier);
+  final sourceProvider = extensionSourceProvider(sourceId);
+  await ref.readAsync(sourceProvider.future);
+  final notifier = ref.read(sourceProvider.notifier);
+  final bridge = await notifier.getBridge();
   final links = await notifier.getChapterPages(chapter as Chapter);
 
-  final pages = await Future.wait(
-    links.map((e) async {
-      final processed = await notifier.processImageRequest(e);
-      final url = processed['url'] as String;
-      return ReaderPage(
-        provider: NetworkImage(
-          url,
-          headers: Map<String, String>.from(processed['headers'] ?? {}),
-        ),
-      );
-    }),
-  );
+  final pages = links
+      .map((e) => ReaderPage(provider: ExtensionImage(e, bridge)))
+      .toList();
 
   ref.onDispose(() {
     pages.clear();

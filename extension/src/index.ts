@@ -2,10 +2,14 @@ import { MockDiscoverSectionManager } from "./DiscoverSectionManager";
 import { MockSelectorRegistry } from "./Selector";
 import { MockRequestManager } from "./RequestManager";
 import { FormManager } from "./FormManager";
+import { installPaperbackCanvasPolyfill } from "./CanvasPolyfill";
+import { base64ToBytes, bytesToBase64, bytesToBinaryString } from "./Base64";
 
 import { decodeHTMLStrict } from "entities";
 import type { Request, SelectorID } from "@paperback/types";
 import md5 from "md5";
+
+installPaperbackCanvasPolyfill();
 
 export function ApplicationPolyfill(): typeof Application {
   let stateStorage: Record<string, unknown> = {};
@@ -68,18 +72,7 @@ export function ApplicationPolyfill(): typeof Application {
       if (typeof value === "string") {
         return btoa(value) as typeof value;
       } else {
-        const bytes = new Uint8Array(value);
-        let binary = "";
-        const chunkSize = 8192;
-        for (let i = 0; i < bytes.length; i += chunkSize) {
-          const chunk = Array.from(bytes.subarray(i, i + chunkSize));
-          binary += String.fromCharCode.apply(
-            null,
-            chunk as unknown as number[],
-          );
-        }
-
-        return btoa(binary) as unknown as typeof value;
+        return bytesToBase64(new Uint8Array(value)) as unknown as typeof value;
       }
     },
     base64Decode: (value) => {
@@ -87,23 +80,8 @@ export function ApplicationPolyfill(): typeof Application {
         return atob(value) as typeof value;
       } else {
         const base64Bytes = new Uint8Array(value);
-        let base64String = "";
-        const chunkSize = 8192;
-        for (let i = 0; i < base64Bytes.length; i += chunkSize) {
-          const chunk = Array.from(base64Bytes.subarray(i, i + chunkSize));
-          base64String += String.fromCharCode.apply(
-            null,
-            chunk as unknown as number[],
-          );
-        }
-
-        const binaryString = atob(base64String);
-        const decodedBytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          decodedBytes[i] = binaryString.charCodeAt(i);
-        }
-
-        return decodedBytes.buffer as typeof value;
+        const base64String = bytesToBinaryString(base64Bytes);
+        return base64ToBytes(base64String).buffer as typeof value;
       }
     },
 
@@ -217,20 +195,23 @@ export function ApplicationPolyfill(): typeof Application {
     Selector: selectorRegistry.Selector.bind(selectorRegistry),
     SelectorRegistry: selectorRegistry,
 
-    processImageRequest: async (
-      url: string,
-    ): Promise<{
-      url: string;
-      method?: string;
-      headers?: Record<string, string>;
-      body?: ArrayBuffer | string | FormData;
-    }> => {
-      const request: Request = {
-        url: url,
-        method: "GET",
-      };
+    processImageRequest: async (url: string) => {
+      // 1. Execute the request through the proxy (handles CORS + interceptors)
+      const request: Request = { url: url, method: "GET" };
+      const [, body] = await requestManager.scheduleRequest(request);
 
-      return await requestManager.preProcessRequest(request);
+      // 2. Store the image data via the proxy (Dart-side completer)
+      const proxyUrl = `http://127.0.0.1:${window.__gagaku_proxy_port}/image`;
+      await fetch(proxyUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: url,
+          body: Application.base64Encode(body),
+        }),
+      });
+
+      return { stored: true, url: url };
     },
   };
 }

@@ -320,6 +320,14 @@ class ExtensionWebViewBridge {
         return;
       }
 
+      // Inject proxy port so JS can reach the local HTTP server
+      final proxyPort = GagakuData().proxyServer?.port;
+      if (proxyPort != null) {
+        await controller.evaluateJavascript(
+          source: "window.__gagaku_proxy_port = $proxyPort;",
+        );
+      }
+
       // Don't bother with UserScripts (Bundle/Binder size limits, injected in redirection/navigation etc)
       await controller.evaluateJavascript(source: GagakuData().extensionHost);
       await controller.evaluateJavascript(source: extensionBody);
@@ -790,26 +798,49 @@ return id;
     return _forms[formid]!;
   }
 
-  /// Pre-process an image request through the extension's interceptor chain.
+  /// Fetch an image via the proxy server.
   ///
-  /// Returns the processed request data (URL, method, headers with cookies
-  /// injected) without executing the HTTP request. The caller (Dart) executes
-  /// the request using HttpClient, avoiding CORS restrictions that would
-  /// occur with the browser's fetch() API.
-  Future<Map<String, dynamic>> processImageRequest(String url) async {
+  /// This method:
+  /// 1. Registers a Completer in the proxy server (waiting for JS to POST)
+  /// 2. Calls JS `processImageRequest` (which executes the request via
+  ///    the proxy and POSTs the image data back)
+  /// 3. Awaits the Completer's future to receive the image bytes
+  Future<Uint8List> registerImageCompleter(String url) async {
+    final proxyServer = GagakuData().proxyServer;
+    if (proxyServer == null) {
+      throw Exception('Proxy server not running');
+    }
+
+    // 1. Register completer FIRST - this must happen before calling JS, because
+    //    JS might POST before we've registered the completer.
+    final completer = proxyServer.registerImageRequest(url);
+
+    // 2. Call JS processImageRequest - this runs scheduleRequest (via proxy /fetch)
+    //    then POSTs the image data to proxy /image, which completes our completer.
     final result = await _controller?.callAsyncJavaScript(
       arguments: {'url': url},
       functionBody: "return await window.Application.processImageRequest(url);",
     );
 
-    if (result == null || result.error != null || result.value == null) {
+    if (result == null || result.error != null) {
+      proxyServer.cancelImageRequest(url);
+      // Completer will NOT be completed - error out
+      if (!completer.isCompleted) {
+        completer.completeError(
+          JavaScriptException(
+            message: 'JavaScript error in processImageRequest:',
+            errorMessage: result?.error ?? 'Result value is null',
+          ),
+        );
+      }
       throw JavaScriptException(
         message: 'JavaScript error in processImageRequest:',
         errorMessage: result?.error ?? 'Result value is null',
       );
     }
 
-    return Map<String, dynamic>.from(result.value as Map);
+    // 3. Await the completer - blocked until JS POSTs image data to /image
+    return await completer.future;
   }
 
   List<Cookie>? getCookies() {

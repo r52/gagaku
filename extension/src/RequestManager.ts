@@ -1,13 +1,13 @@
-import {
-  type Cookie,
-  parseURL,
-  type Request,
-  type RequestInterceptor,
-  type Response,
-  type ResponseInterceptor,
-  type SelectorID,
-  type SelectorRegistry,
+import type {
+  Cookie,
+  Request,
+  RequestInterceptor,
+  Response,
+  ResponseInterceptor,
+  SelectorID,
+  SelectorRegistry,
 } from "@paperback/types";
+import { base64ToBytes } from "./Base64";
 
 type RequestManager = Pick<
   typeof Application,
@@ -68,71 +68,36 @@ export class MockRequestManager implements RequestManager {
     return this.userAgent;
   }
 
-  async preProcessRequest(request: Request): Promise<{
-    url: string;
-    method?: string;
-    headers?: Record<string, string>;
-    body?: ArrayBuffer | string | FormData;
-  }> {
-    let finalRequest = request;
-    for (const interceptor of this.registeredInterceptors) {
-      const requestInterceptor = this.selectorRegistry.selector(
-        interceptor.interceptRequestSelectorId,
-      );
-
-      finalRequest = await requestInterceptor(finalRequest);
+  private async encodeRequestBody(
+    body: ArrayBuffer | string | FormData | undefined,
+    headers: Record<string, string>,
+  ): Promise<string | undefined> {
+    if (body === undefined) {
+      return undefined;
     }
 
-    let requestBody: ArrayBuffer | string | FormData | undefined;
-    if (finalRequest.body) {
-      const rawBody = finalRequest.body;
-
-      switch (typeof rawBody) {
-        case "string": {
-          requestBody = rawBody;
-          break;
-        }
-        case "object": {
-          if (rawBody instanceof ArrayBuffer) {
-            requestBody = rawBody;
-          } else {
-            requestBody = Object.keys(rawBody).reduce((formData, key) => {
-              const value = (rawBody as Record<string, unknown>)[key];
-              if (typeof value === "string" || value instanceof Blob) {
-                formData.append(key, value);
-              } else if (value !== undefined && value !== null) {
-                formData.append(key, String(value));
-              }
-              return formData;
-            }, new FormData());
-          }
-
-          break;
-        }
-        default: {
-          break;
-        }
-      }
+    if (typeof body === "string") {
+      return Application.base64Encode(
+        new TextEncoder().encode(body).buffer,
+      ) as unknown as string;
     }
 
-    const requestHeaders = { ...finalRequest.headers };
-    if (finalRequest.cookies) {
-      const rawCookies = finalRequest.cookies;
-      requestHeaders["Cookie"] = Object.keys(finalRequest.cookies)
-        .reduce(
-          (headerValue, cookieKey) =>
-            `${headerValue} ${cookieKey}=${rawCookies[cookieKey]};`,
-          "",
-        )
-        .trim();
+    if (body instanceof ArrayBuffer) {
+      return Application.base64Encode(body) as unknown as string;
     }
 
-    return {
-      url: finalRequest.url,
-      method: finalRequest.method,
-      headers: requestHeaders,
-      body: requestBody,
-    };
+    const response = new globalThis.Response(body);
+    const contentType = response.headers.get("content-type");
+    if (
+      contentType &&
+      !Object.keys(headers).some((key) => key.toLowerCase() === "content-type")
+    ) {
+      headers["Content-Type"] = contentType;
+    }
+
+    return Application.base64Encode(
+      await response.arrayBuffer(),
+    ) as unknown as string;
   }
 
   async scheduleRequest(request: Request): Promise<[Response, ArrayBuffer]> {
@@ -177,7 +142,7 @@ export class MockRequestManager implements RequestManager {
       }
     }
 
-    const requestHeaders = finalRequest.headers ?? {};
+    const requestHeaders = { ...(finalRequest.headers ?? {}) };
     if (finalRequest.cookies) {
       const rawCookies = finalRequest.cookies;
       requestHeaders["Cookie"] = Object.keys(finalRequest.cookies)
@@ -189,63 +154,67 @@ export class MockRequestManager implements RequestManager {
         .trim();
     }
 
-    const fetchResponse = await fetch(finalRequest.url, {
-      method: finalRequest.method,
-      body: requestBody ?? null,
-      headers: requestHeaders,
+    // POST to proxy /fetch endpoint (Dart HttpClient bypasses CORS)
+    const proxyUrl = `http://127.0.0.1:${(window as any).__gagaku_proxy_port}/fetch`;
+    const proxyResponse = await fetch(proxyUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        url: finalRequest.url,
+        method: finalRequest.method,
+        headers: requestHeaders,
+        body: await this.encodeRequestBody(
+          requestBody,
+          requestHeaders,
+        ),
+      }),
     });
 
-    const responseHeaders: Record<string, string> = {};
-    for (const [name, value] of fetchResponse.headers.entries()) {
-      responseHeaders[name] = value;
+    const proxyData = (await proxyResponse.json()) as {
+      url?: string;
+      status?: number;
+      headers?: Record<string, string>;
+      cookies?: Array<{
+        name: string;
+        value: string;
+        domain: string;
+        path: string;
+        expires: string;
+      }>;
+      body?: string;
+      error?: string;
+    };
+
+    if (proxyData.error) {
+      throw new Error(`Proxy fetch error: ${proxyData.error}`);
     }
 
-    const responseCookies: Cookie[] = [];
-    for (const cookieString of fetchResponse.headers.getSetCookie()) {
-      const properties = cookieString.split(";");
-      const [name, value] = properties.shift()!.split("=");
-      let domain: string | undefined;
-      let path: string | undefined;
-      let expires: Date | undefined;
-      for (const str of properties) {
-        const [name, value] = str.split("=");
-        switch (name!.toLowerCase()) {
-          case "expires": {
-            expires = new Date(value!);
-            continue;
-          }
-          case "max-age": {
-            expires = new Date(Date.now() + Number(value!) * 1000);
-            continue;
-          }
-          case "domain": {
-            domain = value!;
-            continue;
-          }
-          default: {
-            continue;
-          }
-        }
-      }
-
-      responseCookies.push({
-        name: name!,
-        value: value!,
-        domain: domain ?? parseURL(fetchResponse.url).hostname!,
-        path: path ?? "/",
-        expires: expires ?? new Date(),
-      });
-    }
+    // Build response object
+    const responseHeaders: Record<string, string> = proxyData.headers ?? {};
+    const responseCookies: Cookie[] = (proxyData.cookies ?? []).map((c) => ({
+      name: c.name,
+      value: c.value,
+      domain: c.domain,
+      path: c.path,
+      expires: new Date(c.expires),
+    }));
 
     const finalResponse: Response = {
-      url: fetchResponse.url,
+      url: proxyData.url ?? finalRequest.url,
       headers: responseHeaders,
-      status: fetchResponse.status,
+      status: proxyData.status ?? 0,
       cookies: responseCookies,
     };
 
-    let finalArrayBuffer = await fetchResponse.arrayBuffer();
+    // Convert body from base64 to ArrayBuffer
+    let finalArrayBuffer: ArrayBuffer;
+    if (proxyData.body) {
+      finalArrayBuffer = base64ToBytes(proxyData.body).buffer as ArrayBuffer;
+    } else {
+      finalArrayBuffer = new ArrayBuffer(0);
+    }
 
+    // Run response interceptors (unchanged)
     for (let i = this.registeredInterceptors.length - 1; i >= 0; i--) {
       const { interceptResponseSelectorId } = this.registeredInterceptors[i]!;
       const responseInterceptor = this.selectorRegistry.selector(
