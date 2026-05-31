@@ -103,11 +103,11 @@ Future<List<ReaderPage>> _getSourcePages(
   final sourceProvider = extensionSourceProvider(sourceId);
   await ref.readAsync(sourceProvider.future);
   final notifier = ref.read(sourceProvider.notifier);
-  final bridge = await notifier.getBridge();
+  final runtime = await notifier.getRuntime();
   final links = await notifier.getChapterPages(chapter as Chapter);
 
   final pages = links
-      .map((e) => ReaderPage(provider: ExtensionImage(e, bridge)))
+      .map((e) => ReaderPage(provider: ExtensionImage(e, runtime)))
       .toList();
 
   ref.onDispose(() {

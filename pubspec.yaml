@@ -87,6 +87,7 @@ dependencies:
   pool: ^1.5.2
   cached_network_image_ce: ^4.6.3
   image: ^4.8.0
+  fjs: ^2.2.0
 
 dev_dependencies:
   flutter_test:
@@ -109,6 +110,8 @@ dev_dependencies:
   slang_build_runner: ^4.6.0
   objectbox_generator: any
   go_router_builder: ^4.1.1
+  integration_test:
+    sdk: flutter
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

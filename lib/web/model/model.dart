@@ -17,6 +17,7 @@ import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/extension_bridge.dart';
+import 'package:gagaku/web/model/fjs_extension_runtime.dart';
 import 'package:gagaku/web/model/extension_repository.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -27,6 +28,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'model.g.dart';
 
 const historyListUUID = 'd6f79229-6f8e-4872-9610-5200a54aef8f';
+const _useFjsExtensionRuntime = bool.fromEnvironment('GAGAKU_USE_FJS');
 
 void openWebSource(BuildContext context, SourceHandler handle) {
   if (handle.chapter != null) {
@@ -789,35 +791,62 @@ Stream<List<WebSourceInfo>> installedSources(Ref ref) async* {
 
 @Riverpod(keepAlive: true, retry: noRetry)
 class ExtensionSource extends _$ExtensionSource {
-  ExtensionWebViewBridge? _bridge;
+  ExtensionRuntime? _runtime;
 
   @override
   Future<WebSourceInfo> build(String sourceId) async {
     final repo = ExtensionRepository();
     final (source, body) = await repo.fetchSourceAndBody(sourceId);
 
-    _bridge = ExtensionWebViewBridge(
-      sourceId: sourceId,
-      onResetAllState: (id) =>
-          ref.read(extensionStateProvider.notifier).resetAllState(id),
-      onSetExtensionState: (id, state) => ref
-          .read(extensionStateProvider.notifier)
-          .setExtensionState(id, state),
-      onSetExtensionSecureState: (id, state) => ref
+    void onResetAllState(String id) {
+      ref.read(extensionStateProvider.notifier).resetAllState(id);
+    }
+
+    void onSetExtensionState(String id, dynamic state) {
+      ref.read(extensionStateProvider.notifier).setExtensionState(id, state);
+    }
+
+    void onSetExtensionSecureState(String id, dynamic state) {
+      ref
           .read(extensionSecureStateProvider.notifier)
-          .setExtensionState(id, state),
-      getExtensionState: (id) =>
-          ref.read(extensionStateProvider.notifier).getExtensionState(id),
-      getExtensionSecureState: (id) =>
-          ref.read(extensionSecureStateProvider.notifier).getExtensionState(id),
-    );
+          .setExtensionState(id, state);
+    }
+
+    dynamic getExtensionState(String id) {
+      return ref.read(extensionStateProvider.notifier).getExtensionState(id);
+    }
+
+    dynamic getExtensionSecureState(String id) {
+      return ref
+          .read(extensionSecureStateProvider.notifier)
+          .getExtensionState(id);
+    }
+
+    _runtime = _useFjsExtensionRuntime
+        ? FjsExtensionRuntime(
+            sourceId: sourceId,
+            extensionHost: GagakuData().extensionHost,
+            onResetAllState: onResetAllState,
+            onSetExtensionState: onSetExtensionState,
+            onSetExtensionSecureState: onSetExtensionSecureState,
+            getExtensionState: getExtensionState,
+            getExtensionSecureState: getExtensionSecureState,
+          )
+        : ExtensionWebViewBridge(
+            sourceId: sourceId,
+            onResetAllState: onResetAllState,
+            onSetExtensionState: onSetExtensionState,
+            onSetExtensionSecureState: onSetExtensionSecureState,
+            getExtensionState: getExtensionState,
+            getExtensionSecureState: getExtensionSecureState,
+          );
 
     ref.onDispose(() {
-      _bridge?.dispose();
-      _bridge = null;
+      _runtime?.dispose();
+      _runtime = null;
     });
 
-    await _bridge!.init(source, body);
+    await _runtime!.init(source, body);
 
     return source;
   }
@@ -827,27 +856,27 @@ class ExtensionSource extends _$ExtensionSource {
     List<dynamic> args = const [],
   ]) async {
     await future;
-    return await _bridge!.callBinding(bindingId, args);
+    return await _runtime!.callBinding(bindingId, args);
   }
 
   Future<ExtensionForm> getSettingsForm() async {
     final source = await future;
-    return await _bridge!.getSettingsForm(source);
+    return await _runtime!.getSettingsForm(source);
   }
 
   Future<ExtensionForm> getForm(FormID id) async {
     final source = await future;
-    return await _bridge!.getForm(source, id);
+    return await _runtime!.getForm(source, id);
   }
 
   Future<void> uninitializeForms() async {
     final source = await future;
-    await _bridge!.uninitializeForms(source);
+    await _runtime!.uninitializeForms(source);
   }
 
   Future<List<DiscoverSection>> getDiscoverSections() async {
     final source = await future;
-    return await _bridge!.getDiscoverSections(source);
+    return await _runtime!.getDiscoverSections(source);
   }
 
   Future<PagedResults<DiscoverSectionItem>> getDiscoverSectionItems(
@@ -855,7 +884,7 @@ class ExtensionSource extends _$ExtensionSource {
     dynamic metadata,
   ) async {
     final source = await future;
-    return await _bridge!.getDiscoverSectionItems(source, section, metadata);
+    return await _runtime!.getDiscoverSectionItems(source, section, metadata);
   }
 
   Future<PagedResults<SearchResultItem>> searchManga(
@@ -864,55 +893,55 @@ class ExtensionSource extends _$ExtensionSource {
     SortingOption? sortOp,
   }) async {
     await future;
-    return await _bridge!.searchManga(query, metadata, sortOp: sortOp);
+    return await _runtime!.searchManga(query, metadata, sortOp: sortOp);
   }
 
   Future<WebManga?> getManga(String mangaId) async {
     await future;
-    return await _bridge!.getManga(mangaId);
+    return await _runtime!.getManga(mangaId);
   }
 
   Future<List<String>> getChapterPages(Chapter chapter) async {
     await future;
-    return await _bridge!.getChapterPages(chapter);
+    return await _runtime!.getChapterPages(chapter);
   }
 
   Future<String?> getMangaURL(String mangaId) async {
     await future;
-    return await _bridge!.getMangaURL(mangaId);
+    return await _runtime!.getMangaURL(mangaId);
   }
 
   Future<List<SortingOption>?> getSortingOptions(SearchQuery query) async {
     await future;
-    return _bridge!.getSortingOptions(query);
+    return _runtime!.getSortingOptions(query);
   }
 
   Future<ExtensionForm?> getAdvancedSearchForm(SearchQuery query) async {
     await future;
-    return await _bridge!.getAdvancedSearchForm(query);
+    return await _runtime!.getAdvancedSearchForm(query);
   }
 
   Future<bool> hasAdvancedSearchForm() async {
     await future;
-    return _bridge!.hasAdvancedSearchForm;
+    return _runtime!.hasAdvancedSearchForm;
   }
 
   Future<List<Cookie>?> getCookies() async {
     await future;
-    return _bridge!.getCookies();
+    return _runtime!.getCookies();
   }
 
   Future<bool> hasSortOps() async {
     await future;
-    return _bridge!.hasSortOps;
+    return _runtime!.hasSortOps;
   }
 
-  /// Returns the underlying [ExtensionWebViewBridge] for this source.
+  /// Returns the underlying [ExtensionRuntime] for this source.
   ///
-  /// Ensures the provider is initialized before returning the bridge.
-  Future<ExtensionWebViewBridge> getBridge() async {
+  /// Ensures the provider is initialized before returning the runtime.
+  Future<ExtensionRuntime> getRuntime() async {
     await future;
-    return _bridge!;
+    return _runtime!;
   }
 }
 

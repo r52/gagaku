@@ -9,6 +9,39 @@ interface DecodedImage {
 
 type ImageLoadHandler = ((event: Event) => void) | null;
 
+class PaperbackImageData {
+  readonly data: Uint8ClampedArray<ArrayBuffer>;
+  readonly width: number;
+  readonly height: number;
+  readonly colorSpace = "srgb";
+
+  constructor(
+    dataOrWidth: Uint8ClampedArray<ArrayBuffer> | number,
+    widthOrHeight: number,
+    height?: number,
+  ) {
+    if (typeof dataOrWidth === "number") {
+      this.width = Math.trunc(dataOrWidth);
+      this.height = Math.trunc(widthOrHeight);
+      this.data = new Uint8ClampedArray(
+        new ArrayBuffer(this.width * this.height * 4),
+      );
+      return;
+    }
+
+    if (height == null) {
+      throw new TypeError("ImageData height is required");
+    }
+
+    this.width = Math.trunc(widthOrHeight);
+    this.height = Math.trunc(height);
+    if (dataOrWidth.length !== this.width * this.height * 4) {
+      throw new RangeError("ImageData pixel length does not match dimensions");
+    }
+    this.data = dataOrWidth;
+  }
+}
+
 function parseDataUrl(value: string): Uint8ClampedArray<ArrayBuffer> | null {
   const match = /^data:[^,]*;base64,(.*)$/i.exec(value);
   if (match == null) {
@@ -370,13 +403,16 @@ function canConstructNativeCanvas(): boolean {
 }
 
 export function installPaperbackCanvasPolyfill(): void {
-  if (
-    typeof document === "undefined" ||
-    typeof globalThis.HTMLCanvasElement === "undefined" ||
-    typeof globalThis.ImageData === "undefined" ||
-    canConstructNativeCanvas()
-  ) {
+  if (canConstructNativeCanvas()) {
     return;
+  }
+
+  if (typeof globalThis.ImageData === "undefined") {
+    Object.defineProperty(globalThis, "ImageData", {
+      value: PaperbackImageData,
+      configurable: true,
+      writable: true,
+    });
   }
 
   Object.defineProperty(globalThis, "HTMLCanvasElement", {

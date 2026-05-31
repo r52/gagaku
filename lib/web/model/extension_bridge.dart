@@ -8,9 +8,12 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/exception.dart';
 
+import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/types.dart';
 
-class ExtensionWebViewBridge {
+export 'package:gagaku/web/model/extension_runtime.dart';
+
+class ExtensionWebViewBridge implements ExtensionRuntime {
   ExtensionWebViewBridge({
     required this.sourceId,
     required this.onResetAllState,
@@ -37,6 +40,7 @@ class ExtensionWebViewBridge {
   List<Cookie>? _cookies;
 
   bool _hasSortOps = false;
+  @override
   bool get hasSortOps => _hasSortOps;
 
   Timer? _completeTimer;
@@ -44,6 +48,7 @@ class ExtensionWebViewBridge {
   late final Completer<void> _initCompleter = Completer<void>();
   Future<void> get initialized => _initCompleter.future;
 
+  @override
   Future<void> init(WebSourceInfo source, String extensionBody) async {
     final contentBlockers = <ContentBlocker>[];
 
@@ -130,6 +135,7 @@ class ExtensionWebViewBridge {
     _completeTimer = null;
   }
 
+  @override
   void dispose() {
     _view?.dispose();
     _completeTimer?.cancel();
@@ -187,7 +193,7 @@ class ExtensionWebViewBridge {
 
         _forms.putIfAbsent(
           formId,
-          () => ExtensionForm(id: formId, controller: controller),
+          () => WebViewExtensionForm(id: formId, controller: controller),
         );
       },
     );
@@ -447,6 +453,7 @@ await ${source.id}.saveCloudflareBypassCookies(jc);
     }
   }
 
+  @override
   Future<dynamic> callBinding(
     String bindingId, [
     List<dynamic> args = const [],
@@ -468,6 +475,7 @@ await ${source.id}.saveCloudflareBypassCookies(jc);
     return value;
   }
 
+  @override
   Future<ExtensionForm> getSettingsForm(WebSourceInfo source) async {
     if (!source.hasCapability(SourceIntents.settingsUI)) {
       throw UnsupportedError("Source does not support settings");
@@ -502,6 +510,7 @@ return id;
     return _forms[formid]!;
   }
 
+  @override
   Future<ExtensionForm> getForm(WebSourceInfo source, FormID id) async {
     if (!source.hasCapability(SourceIntents.settingsUI)) {
       throw UnsupportedError("Source does not support settings");
@@ -544,6 +553,7 @@ return formid;
     return _forms[formid]!;
   }
 
+  @override
   Future<void> uninitializeForms(WebSourceInfo source) async {
     if (!source.hasCapability(SourceIntents.settingsUI)) {
       throw UnsupportedError("Source does not support settings");
@@ -554,6 +564,7 @@ return formid;
     );
   }
 
+  @override
   Future<List<DiscoverSection>> getDiscoverSections(
     WebSourceInfo source,
   ) async {
@@ -578,6 +589,7 @@ return formid;
     return sections;
   }
 
+  @override
   Future<PagedResults<DiscoverSectionItem>> getDiscoverSectionItems(
     WebSourceInfo source,
     DiscoverSection section,
@@ -616,6 +628,7 @@ return p;
     return items;
   }
 
+  @override
   Future<PagedResults<SearchResultItem>> searchManga(
     SearchQuery query,
     dynamic metadata, {
@@ -652,6 +665,7 @@ return await $sourceId.getSearchResults(query, metadata ?? undefined, sortOp ?? 
     return pmangas;
   }
 
+  @override
   Future<WebManga?> getManga(String mangaId) async {
     if (mangaId.isEmpty) {
       return null;
@@ -701,6 +715,7 @@ return p;
     return manga;
   }
 
+  @override
   Future<List<String>> getChapterPages(Chapter chapter) async {
     final cdeets = await _controller?.callAsyncJavaScript(
       arguments: {'chapter': chapter.toJson()},
@@ -719,6 +734,7 @@ return p;
     return chapterd.pages;
   }
 
+  @override
   Future<String?> getMangaURL(String mangaId) async {
     if (mangaId.isEmpty) {
       return null;
@@ -737,6 +753,7 @@ return p;
     return result;
   }
 
+  @override
   Future<List<SortingOption>?> getSortingOptions(SearchQuery query) async {
     if (!_hasSortOps) {
       return null;
@@ -760,8 +777,10 @@ return await $sourceId.getSortingOptions?.(query);
     return null;
   }
 
+  @override
   bool get hasAdvancedSearchForm => _hasAdvancedSearchForm;
 
+  @override
   Future<ExtensionForm?> getAdvancedSearchForm(SearchQuery query) async {
     if (!_hasAdvancedSearchForm) {
       return null;
@@ -805,7 +824,8 @@ return id;
   /// 2. Calls JS `processImageRequest` (which executes the request via
   ///    the proxy and POSTs the image data back)
   /// 3. Awaits the Completer's future to receive the image bytes
-  Future<Uint8List> registerImageCompleter(String url) async {
+  @override
+  Future<Uint8List> processImageRequest(String url) async {
     final proxyServer = GagakuData().proxyServer;
     if (proxyServer == null) {
       throw Exception('Proxy server not running');
@@ -843,24 +863,32 @@ return id;
     return await completer.future;
   }
 
+  @override
   List<Cookie>? getCookies() {
     return _cookies;
   }
 }
 
-class ExtensionForm with ChangeNotifier {
-  ExtensionForm({required this.id, required InAppWebViewController controller})
-    : _controller = controller {
+class WebViewExtensionForm extends ExtensionForm {
+  WebViewExtensionForm({
+    required this.id,
+    required InAppWebViewController controller,
+  }) : _controller = controller {
     _sections = _getSections();
   }
 
+  @override
   final FormID id;
   final InAppWebViewController _controller;
 
   late Future<List<FormSectionElement>> _sections;
+
+  @override
   Future<List<FormSectionElement>> get sections => _sections;
 
   bool _requiresExplicitSubmission = false;
+
+  @override
   bool get requiresExplicitSubmission => _requiresExplicitSubmission;
 
   Future<List<FormSectionElement>> _getSections() async {
@@ -930,6 +958,7 @@ return form.requiresExplicitSubmission;
     return sections;
   }
 
+  @override
   Future<void> call(String method) async {
     await _controller.callAsyncJavaScript(
       arguments: {'formid': id},
@@ -945,6 +974,7 @@ return form.$method?.();
     );
   }
 
+  @override
   Future<void> reloadForm() async {
     await _controller.callAsyncJavaScript(
       arguments: {'formid': id},
@@ -963,12 +993,14 @@ form.formWillAppear?.();
     notifyListeners();
   }
 
+  @override
   void uninitialize() {
     _controller.evaluateJavascript(
       source: "window.Application.uninitializeForms();",
     );
   }
 
+  @override
   Future<void> formDidSubmit() async {
     final result = await _controller.callAsyncJavaScript(
       arguments: {'formid': id},
@@ -987,6 +1019,7 @@ return await form.formDidSubmit?.();
     }
   }
 
+  @override
   Future<void> formDidCancel() async {
     await _controller.callAsyncJavaScript(
       arguments: {'formid': id},
@@ -1001,6 +1034,7 @@ return await form.formDidCancel?.();
     );
   }
 
+  @override
   Future<dynamic> getSearchQueryMetadata() async {
     final result = await _controller.callAsyncJavaScript(
       arguments: {'formid': id},
