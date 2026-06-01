@@ -14,6 +14,27 @@ void main() {
     dynamic storedSecureState;
     var decodeImageRequests = 0;
     final receivedRequests = <Map<String, String?>>[];
+    String? receivedFormDataContentType;
+    String? receivedFormDataBody;
+    String? receivedCrossOriginCookie;
+    final largePayload = Uint8List.fromList(
+      List.generate(2 * 1024 * 1024, (index) => index % 251),
+    );
+    final crossOriginServer = await HttpServer.bind(
+      InternetAddress.loopbackIPv4,
+      0,
+    );
+    addTearDown(() => crossOriginServer.close(force: true));
+    crossOriginServer.listen((request) async {
+      receivedCrossOriginCookie = request.headers.value(
+        HttpHeaders.cookieHeader,
+      );
+      request.response
+        ..statusCode = 200
+        ..headers.contentType = ContentType.text
+        ..write('cross-origin');
+      await request.response.close();
+    });
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     addTearDown(() => server.close(force: true));
     server.listen((request) async {
@@ -39,6 +60,66 @@ void main() {
           ..statusCode = 200
           ..headers.contentType = ContentType.binary
           ..add([1, 2, 3]);
+        await request.response.close();
+        return;
+      }
+
+      if (request.uri.path == '/phase8-redirect') {
+        request.response
+          ..statusCode = HttpStatus.found
+          ..headers.set(HttpHeaders.locationHeader, '/phase8-redirect-target');
+        await request.response.close();
+        return;
+      }
+
+      if (request.uri.path == '/phase8-redirect-target') {
+        request.response
+          ..statusCode = 200
+          ..headers.contentType = ContentType.text
+          ..write('redirected');
+        await request.response.close();
+        return;
+      }
+
+      if (request.uri.path == '/phase8-cross-origin-redirect') {
+        request.response
+          ..statusCode = HttpStatus.found
+          ..headers.set(
+            HttpHeaders.locationHeader,
+            'http://127.0.0.1:${crossOriginServer.port}/target',
+          );
+        await request.response.close();
+        return;
+      }
+
+      if (request.uri.path == '/phase8-gzip') {
+        request.response
+          ..statusCode = 200
+          ..headers.contentType = ContentType.text
+          ..headers.set(HttpHeaders.contentEncodingHeader, 'gzip')
+          ..add(gzip.encode(utf8.encode('compressed')));
+        await request.response.close();
+        return;
+      }
+
+      if (request.uri.path == '/phase8-form-data') {
+        receivedFormDataContentType = request.headers.value(
+          HttpHeaders.contentTypeHeader,
+        );
+        receivedFormDataBody = await utf8.decoder.bind(request).join();
+        request.response
+          ..statusCode = 200
+          ..headers.contentType = ContentType.text
+          ..write('form-received');
+        await request.response.close();
+        return;
+      }
+
+      if (request.uri.path == '/phase8-large-binary') {
+        request.response
+          ..statusCode = 200
+          ..headers.contentType = ContentType.binary
+          ..add(largePayload);
         await request.response.close();
         return;
       }
@@ -100,21 +181,22 @@ void main() {
 
     addTearDown(runtime.dispose);
 
-    await runtime.init(
-      WebSourceInfo(
-        id: 'phase2source',
-        name: 'Phase 2 Source',
-        repo: 'phase2',
-        baseUrl: 'http://127.0.0.1:${server.port}/',
-        icon: '',
-        capabilities: const [
-          SourceIntents.mangaChapters,
-          SourceIntents.mangaSearch,
-          SourceIntents.settingsUI,
-          SourceIntents.cloudflareBypassRequired,
-        ],
-      ),
-      r'''
+    final source = WebSourceInfo(
+      id: 'phase2source',
+      name: 'Phase 2 Source',
+      repo: 'phase2',
+      baseUrl: 'http://127.0.0.1:${server.port}/',
+      icon: '',
+      capabilities: const [
+        SourceIntents.mangaChapters,
+        SourceIntents.mangaSearch,
+        SourceIntents.settingsUI,
+        SourceIntents.cloudflareBypassRequired,
+        SourceIntents.discoverSections,
+      ],
+    );
+
+    await runtime.init(source, r'''
 globalThis.source ??= {};
 let savedCloudflareCookies = [];
 const settingsForm = {
@@ -128,6 +210,15 @@ const settingsForm = {
   },
   getSearchQueryMetadata: async () => ({ from: "settings" })
 };
+const advancedSearchForm = {
+  requiresExplicitSubmission: false,
+  formWillAppear: () => {},
+  getSections: () => [],
+  getSearchQueryMetadata: async () => ({ genre: "action" })
+};
+let phase9SearchRequestCount = 0;
+globalThis.phase9SearchRequestCount = () => phase9SearchRequestCount;
+globalThis.phase9SortingQueryHasMetadata = null;
 
 const bindingTarget = {
   run: async (value) => ({
@@ -163,6 +254,10 @@ const responseInterceptorTarget = {
     if (request.url.includes("/phase5")) {
       const bytes = new Uint8Array(body);
       return new Uint8Array([7, ...bytes, 9]).buffer;
+    }
+
+    if (request.url.includes("/phase8-large-binary")) {
+      return body;
     }
 
     const text = Application.arrayBufferToUTF8String(body);
@@ -201,6 +296,57 @@ const requestBindingTarget = {
 
 globalThis.phase4RequestBindingId =
   Application.Selector(requestBindingTarget, "run");
+
+const phase8FetchBindingTarget = {
+  run: async (
+    redirectUrl,
+    crossOriginRedirectUrl,
+    gzipUrl,
+    formDataUrl,
+    largeBinaryUrl
+  ) => {
+    const [, redirectBody] = await Application.scheduleRequest({
+      url: redirectUrl,
+      method: "GET"
+    });
+    const [, crossOriginRedirectBody] = await Application.scheduleRequest({
+      url: crossOriginRedirectUrl,
+      method: "GET",
+      cookies: { secret: "do-not-forward" }
+    });
+    const [, gzipBody] = await Application.scheduleRequest({
+      url: gzipUrl,
+      method: "GET"
+    });
+    const [, formDataBody] = await Application.scheduleRequest({
+      url: formDataUrl,
+      method: "POST",
+      body: { alpha: "one", count: 2 }
+    });
+    const [, largeBinaryBody] = await Application.scheduleRequest({
+      url: largeBinaryUrl,
+      method: "GET"
+    });
+    const largeBinaryBytes = new Uint8Array(largeBinaryBody);
+
+    return {
+      redirect: Application.arrayBufferToUTF8String(redirectBody),
+      crossOriginRedirect:
+        Application.arrayBufferToUTF8String(crossOriginRedirectBody),
+      gzip: Application.arrayBufferToUTF8String(gzipBody),
+      formData: Application.arrayBufferToUTF8String(formDataBody),
+      largeBinary: {
+        length: largeBinaryBytes.length,
+        first: largeBinaryBytes[0],
+        middle: largeBinaryBytes[1024 * 1024],
+        last: largeBinaryBytes[largeBinaryBytes.length - 1]
+      }
+    };
+  }
+};
+
+globalThis.phase8FetchBindingId =
+  Application.Selector(phase8FetchBindingTarget, "run");
 
 const executeInWebViewBindingTarget = {
   run: async () => {
@@ -270,8 +416,60 @@ globalThis.source.phase2source = {
     savedCloudflareCookies = cookies;
   },
   getSettingsForm: async () => settingsForm,
-  getAdvancedSearchForm: async () => ({}),
-  getSortingOptions: async () => [],
+  getAdvancedSearchForm: async () => advancedSearchForm,
+  getSortingOptions: async (query) => {
+    globalThis.phase9SortingQueryHasMetadata = "metadata" in query;
+    return [{ id: "latest", label: "Latest" }];
+  },
+  getDiscoverSections: async () => [
+    {
+      id: "updates",
+      title: "Updates",
+      subtitle: undefined,
+      type: 3
+    }
+  ],
+  getDiscoverSectionItems: async (section, metadata) => {
+    await Application.sleep(0.01);
+    return {
+      items: [
+        {
+          type: "chapterUpdatesCarouselItem",
+          mangaId: "phase9-discover-manga",
+          chapterId: "phase9-discover-chapter",
+          imageUrl: "https://example.com/discover.jpg",
+          title: section.title,
+          subtitle: undefined,
+          publishDate: new Date("2026-05-31T12:34:56.789Z")
+        }
+      ],
+      metadata: { page: (metadata?.page ?? 0) + 1 }
+    };
+  },
+  getSearchResults: async (query, metadata, sortOp) => {
+    phase9SearchRequestCount++;
+    return {
+      items: [
+        {
+          mangaId: "phase9-search-manga",
+          title: query.title,
+          imageUrl: "https://example.com/search.jpg",
+          subtitle: undefined,
+          metadata: {
+            queryHasMetadata: "metadata" in query,
+            sortId: sortOp?.id ?? null
+          }
+        }
+      ],
+      metadata: { page: (metadata?.page ?? 0) + 1 }
+    };
+  },
+  getMangaShareUrl: async (mangaId) => {
+    if (mangaId === "throws") {
+      throw new Error("share URL unavailable");
+    }
+    return `https://example.com/manga/${mangaId}`;
+  },
   getMangaDetails: async (mangaId) => ({
     mangaId,
     mangaInfo: {
@@ -310,8 +508,7 @@ globalThis.source.phase2source = {
     ]
   })
 };
-''',
-    );
+''');
 
     expect(FjsExtensionRuntime.activeRuntimeCount, 1);
     expect(runtime.hasAdvancedSearchForm, true);
@@ -468,10 +665,44 @@ globalThis.source.phase2source = {
       ),
     );
 
+    final phase8FetchBindingId = await runtime.evalForTesting(
+      'globalThis.phase8FetchBindingId',
+    );
+    final phase8FetchResult = await runtime.callBinding(phase8FetchBindingId, [
+      'http://127.0.0.1:${server.port}/phase8-redirect',
+      'http://127.0.0.1:${server.port}/phase8-cross-origin-redirect',
+      'http://127.0.0.1:${server.port}/phase8-gzip',
+      'http://127.0.0.1:${server.port}/phase8-form-data',
+      'http://127.0.0.1:${server.port}/phase8-large-binary',
+    ]);
+    expect(phase8FetchResult['redirect'], 'redirected::intercepted');
+    expect(
+      phase8FetchResult['crossOriginRedirect'],
+      'cross-origin::intercepted',
+    );
+    expect(receivedCrossOriginCookie, isNull);
+    expect(phase8FetchResult['gzip'], 'compressed::intercepted');
+    expect(phase8FetchResult['formData'], 'form-received::intercepted');
+    expect(receivedFormDataContentType, startsWith('multipart/form-data;'));
+    expect(receivedFormDataBody, contains('name="alpha"'));
+    expect(receivedFormDataBody, contains('one'));
+    expect(receivedFormDataBody, contains('name="count"'));
+    expect(receivedFormDataBody, contains('2'));
+    expect(phase8FetchResult['largeBinary'], {
+      'length': largePayload.length,
+      'first': largePayload.first,
+      'middle': largePayload[1024 * 1024],
+      'last': largePayload.last,
+    });
+
     final imageBytes = await runtime.processImageRequest(
       'http://127.0.0.1:${server.port}/phase5',
     );
     expect(imageBytes, Uint8List.fromList([7, 1, 2, 3, 9]));
+    final largeImageBytes = await runtime.processImageRequest(
+      'http://127.0.0.1:${server.port}/phase8-large-binary',
+    );
+    expect(largeImageBytes, largePayload);
 
     final executeBindingId = await runtime.evalForTesting(
       'globalThis.phase6ExecuteBindingId',
@@ -505,6 +736,158 @@ globalThis.source.phase2source = {
       'https://example.com/chapter-10/1.jpg',
       'https://example.com/chapter-10/2.jpg',
     ]);
+
+    final emptySearch = await runtime.searchManga(
+      const SearchQuery(title: ''),
+      null,
+    );
+    expect(emptySearch.items, isEmpty);
+    expect(
+      await runtime.evalForTesting('globalThis.phase9SearchRequestCount()'),
+      0,
+    );
+
+    final sortingOptions = await runtime.getSortingOptions(
+      const SearchQuery(title: 'sort'),
+    );
+    expect(sortingOptions, [
+      const SortingOption(id: 'latest', label: 'Latest'),
+    ]);
+    expect(
+      await runtime.evalForTesting('globalThis.phase9SortingQueryHasMetadata'),
+      false,
+    );
+
+    final advancedSearchForm = await runtime.getAdvancedSearchForm(
+      const SearchQuery(title: ''),
+    );
+    expect(advancedSearchForm, isNotNull);
+    expect(await advancedSearchForm!.sections, isEmpty);
+    final advancedSearchMetadata = await advancedSearchForm
+        .getSearchQueryMetadata();
+    expect(advancedSearchMetadata, {'genre': 'action'});
+    final reopenedAdvancedSearchForm = await runtime.getAdvancedSearchForm(
+      const SearchQuery(title: ''),
+    );
+    expect(reopenedAdvancedSearchForm, isNotNull);
+    advancedSearchForm.uninitialize();
+    await runtime.evalForTesting('true');
+    expect(await reopenedAdvancedSearchForm!.sections, isEmpty);
+    expect(await reopenedAdvancedSearchForm.getSearchQueryMetadata(), {
+      'genre': 'action',
+    });
+
+    final firstSearch = await runtime.searchManga(
+      const SearchQuery(title: 'Phase 9 Search'),
+      null,
+    );
+    expect(firstSearch.metadata, {'page': 1});
+    expect(firstSearch.items.single.title, 'Phase 9 Search');
+    expect(firstSearch.items.single.metadata, {
+      'queryHasMetadata': false,
+      'sortId': null,
+    });
+
+    final sortedSearch = await runtime.searchManga(
+      SearchQuery(title: 'Phase 9 Search', metadata: advancedSearchMetadata),
+      {'page': 4},
+      sortOp: sortingOptions!.single,
+    );
+    expect(sortedSearch.metadata, {'page': 5});
+    expect(sortedSearch.items.single.metadata, {
+      'queryHasMetadata': true,
+      'sortId': 'latest',
+    });
+
+    final discoverSections = await runtime.getDiscoverSections(source);
+    expect(discoverSections, hasLength(1));
+    expect(discoverSections.single.title, 'Updates');
+    expect(discoverSections.single.type, DiscoverSectionType.chapterUpdates);
+    final discoverItems = await runtime.getDiscoverSectionItems(
+      source,
+      discoverSections.single,
+      null,
+    );
+    expect(discoverItems.metadata, {'page': 1});
+    final discoverItem =
+        discoverItems.items.single as ChapterUpdatesCarouselItem;
+    expect(discoverItem.title, 'Updates');
+    expect(
+      discoverItem.publishDate,
+      DateTime.parse('2026-05-31T12:34:56.789Z'),
+    );
+    expect(
+      await Future.wait(
+        List.generate(
+          4,
+          (_) => runtime.getDiscoverSectionItems(
+            source,
+            discoverSections.single,
+            null,
+          ),
+        ),
+      ),
+      everyElement(
+        isA<PagedResults<DiscoverSectionItem>>().having(
+          (items) => items.metadata,
+          'metadata',
+          {'page': 1},
+        ),
+      ),
+    );
+
+    expect(
+      await runtime.getMangaURL('phase9-share'),
+      'https://example.com/manga/phase9-share',
+    );
+    expect(await runtime.getMangaURL(''), isNull);
+    expect(await runtime.getMangaURL('throws'), isNull);
+    await runtime.evalForTesting(
+      'delete globalThis.phase2source.getMangaShareUrl',
+    );
+    expect(await runtime.getMangaURL('missing'), isNull);
+
+    Future<void> initializeDisposalProbe(String sourceId) async {
+      final disposalProbe = FjsExtensionRuntime(
+        sourceId: sourceId,
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, _) {},
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+      );
+      addTearDown(disposalProbe.dispose);
+
+      final disposalSource = WebSourceInfo(
+        id: sourceId,
+        name: sourceId,
+        repo: 'phase9',
+        icon: '',
+        capabilities: const [SourceIntents.settingsUI],
+      );
+      await disposalProbe.init(disposalSource, '''
+globalThis.source ??= {};
+const settingsForm = {
+  requiresExplicitSubmission: false,
+  getSections: () => []
+};
+globalThis.source.$sourceId = {
+  initialise: async () => {},
+  getSettingsForm: async () => settingsForm
+};
+''');
+      final form = await disposalProbe.getSettingsForm(disposalSource);
+      expect(await form.sections, isEmpty);
+    }
+
+    await Future.wait([
+      initializeDisposalProbe('phase9dispose1'),
+      initializeDisposalProbe('phase9dispose2'),
+    ]);
+    expect(FjsExtensionRuntime.activeRuntimeCount, 3);
 
     await FjsExtensionRuntime.disposeAll();
     expect(FjsExtensionRuntime.activeRuntimeCount, 0);
