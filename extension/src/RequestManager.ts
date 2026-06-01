@@ -8,7 +8,6 @@ import {
   type SelectorID,
   type SelectorRegistry,
 } from "@paperback/types";
-import { base64ToBytes } from "./Base64";
 
 type RequestManager = Pick<
   typeof Application,
@@ -130,29 +129,6 @@ export class MockRequestManager implements RequestManager {
     }
 
     return { finalRequest, requestBody, requestHeaders };
-  }
-
-  private async encodeRequestBody(
-    body: ArrayBuffer | string | FormData | undefined,
-    headers: Record<string, string>,
-  ): Promise<string | undefined> {
-    if (body === undefined) {
-      return undefined;
-    }
-
-    if (typeof body === "string") {
-      return Application.base64Encode(
-        new TextEncoder().encode(body).buffer,
-      ) as unknown as string;
-    }
-
-    if (body instanceof ArrayBuffer) {
-      return Application.base64Encode(body) as unknown as string;
-    }
-
-    return Application.base64Encode(
-      await this.encodeFormDataBody(body, headers),
-    ) as unknown as string;
   }
 
   private async encodeFormDataBody(
@@ -391,84 +367,7 @@ export class MockRequestManager implements RequestManager {
     }
   }
 
-  private async scheduleProxyRequest(
-    request: Request,
-  ): Promise<[Response, ArrayBuffer]> {
-    const { finalRequest, requestBody, requestHeaders } =
-      await this.prepareRequest(request);
-
-    const proxyUrl = `http://127.0.0.1:${(window as any).__gagaku_proxy_port}/fetch`;
-    const proxyResponse = await fetch(proxyUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        url: finalRequest.url,
-        method: finalRequest.method,
-        headers: requestHeaders,
-        body: await this.encodeRequestBody(
-          requestBody,
-          requestHeaders,
-        ),
-      }),
-    });
-
-    const proxyData = (await proxyResponse.json()) as {
-      url?: string;
-      status?: number;
-      headers?: Record<string, string>;
-      cookies?: Array<{
-        name: string;
-        value: string;
-        domain: string;
-        path: string;
-        expires: string;
-      }>;
-      body?: string;
-      error?: string;
-    };
-
-    if (proxyData.error) {
-      throw new Error(`Proxy fetch error: ${proxyData.error}`);
-    }
-
-    const responseHeaders: Record<string, string> = proxyData.headers ?? {};
-    const responseCookies: Cookie[] = (proxyData.cookies ?? []).map((c) => ({
-      name: c.name,
-      value: c.value,
-      domain: c.domain,
-      path: c.path,
-      expires: new Date(c.expires),
-    }));
-
-    const finalResponse: Response = {
-      url: proxyData.url ?? finalRequest.url,
-      headers: responseHeaders,
-      status: proxyData.status ?? 0,
-      cookies: responseCookies,
-    };
-
-    let finalArrayBuffer: ArrayBuffer;
-    if (proxyData.body) {
-      finalArrayBuffer = base64ToBytes(proxyData.body).buffer as ArrayBuffer;
-    } else {
-      finalArrayBuffer = new ArrayBuffer(0);
-    }
-
-    return [
-      finalResponse,
-      await this.applyResponseInterceptors(
-        finalRequest,
-        finalResponse,
-        finalArrayBuffer,
-      ),
-    ];
-  }
-
   async scheduleRequest(request: Request): Promise<[Response, ArrayBuffer]> {
-    if ((globalThis as any).__gagaku_use_native_fetch === true) {
-      return this.scheduleNativeFetchRequest(request);
-    }
-
-    return this.scheduleProxyRequest(request);
+    return this.scheduleNativeFetchRequest(request);
   }
 }

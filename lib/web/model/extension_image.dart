@@ -8,8 +8,7 @@ import 'package:gagaku/web/model/extension_runtime.dart';
 /// An image provider that fetches images via [ExtensionRuntime].
 ///
 /// Unlike [NetworkImage], this uses the extension runtime to fetch
-/// page images. The proxy server handles CORS bypass and large image
-/// data transfer (avoiding the ~1MB IPC limit).
+/// page images after extension interceptors have processed them.
 @immutable
 class ExtensionImage extends ImageProvider<ExtensionImage> {
   /// Creates an [ExtensionImage] that fetches the image at [url]

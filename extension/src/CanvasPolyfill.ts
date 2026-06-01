@@ -1,11 +1,5 @@
-import { base64ToBytes, bytesToBase64 } from "./Base64";
+import { base64ToBytes } from "./Base64";
 import { encodePngDataUrl } from "./PngDataUrl";
-
-interface DecodedImage {
-  width: number;
-  height: number;
-  pixels: string;
-}
 
 type ImageLoadHandler = ((event: Event) => void) | null;
 
@@ -204,27 +198,16 @@ class PaperbackImage {
         throw new Error("Paperback image polyfill only supports data URLs");
       }
 
-      const response = await fetch(
-        `http://127.0.0.1:${window.__gagaku_proxy_port}/decode-image`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ body: bytesToBase64(bytes) }),
-        },
-      );
-      const decoded = (await response.json()) as DecodedImage & {
-        error?: string;
-      };
-
-      if (decoded.error != null) {
-        throw new Error(decoded.error);
+      if (globalThis.gagaku == null) {
+        throw new Error("Paperback image decoding is unavailable");
       }
+      const decoded = await globalThis.gagaku.decodeImage(bytes);
 
       this.naturalWidth = decoded.width;
       this.naturalHeight = decoded.height;
       this.width = decoded.width;
       this.height = decoded.height;
-      this.pixels = new Uint8ClampedArray(base64ToBytes(decoded.pixels).buffer);
+      this.pixels = new Uint8ClampedArray(decoded.pixels);
       this.complete = true;
       this.onload?.(createEvent("load"));
     } catch (error) {

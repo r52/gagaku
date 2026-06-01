@@ -12,7 +12,6 @@ void main() {
   test('fjs runtime bootstraps the extension host and source body', () async {
     dynamic storedState;
     dynamic storedSecureState;
-    var decodeImageRequests = 0;
     final receivedRequests = <Map<String, String?>>[];
     String? receivedFormDataContentType;
     String? receivedFormDataBody;
@@ -38,23 +37,6 @@ void main() {
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     addTearDown(() => server.close(force: true));
     server.listen((request) async {
-      if (request.uri.path == '/decode-image') {
-        decodeImageRequests++;
-        await utf8.decoder.bind(request).join();
-        request.response
-          ..statusCode = 200
-          ..headers.contentType = ContentType.json
-          ..write(
-            jsonEncode({
-              'width': 1,
-              'height': 1,
-              'pixels': base64Encode([11, 22, 33, 255]),
-            }),
-          );
-        await request.response.close();
-        return;
-      }
-
       if (request.uri.path == '/phase5') {
         request.response
           ..statusCode = 200
@@ -568,9 +550,6 @@ globalThis.source.phase2source = {
       await runtime.evalForTesting('typeof globalThis.__gagaku_json_stringify'),
       'undefined',
     );
-    await runtime.evalForTesting(
-      'globalThis.__gagaku_proxy_port = ${server.port}',
-    );
     expect(
       await runtime.evalForTesting(r'''
 (async () => {
@@ -579,7 +558,7 @@ globalThis.source.phase2source = {
   await new Promise((resolve, reject) => {
     image.onload = resolve;
     image.onerror = reject;
-    image.src = "data:image/png;base64,AQID";
+    image.src = "data:image/bmp;base64,Qk06AAAAAAAAADYAAAAoAAAAAQAAAAEAAAABABgAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AA==";
   });
   const canvas = new HTMLCanvasElement();
   canvas.width = 1;
@@ -596,14 +575,12 @@ globalThis.source.phase2source = {
 })()
 '''),
       {
-        'pixels': [11, 22, 33, 255],
+        'pixels': [255, 0, 0, 255],
         'dataUrl': true,
         'imageDataLength': 4,
         'inferredImageDataHeight': 2,
       },
     );
-    expect(decodeImageRequests, 1);
-
     final bindingId = await runtime.evalForTesting(
       'globalThis.phase2BindingId',
     );

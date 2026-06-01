@@ -16,7 +16,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
-import 'package:gagaku/web/model/extension_bridge.dart';
+import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/fjs_extension_runtime.dart';
 import 'package:gagaku/web/model/extension_repository.dart';
 import 'package:gagaku/web/model/types.dart';
@@ -28,10 +28,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'model.g.dart';
 
 const historyListUUID = 'd6f79229-6f8e-4872-9610-5200a54aef8f';
-const _useLegacyWebViewExtensionRuntime = bool.fromEnvironment(
-  'GAGAKU_INTERNAL_USE_WEBVIEW_EXTENSION_RUNTIME',
-);
-
 void openWebSource(BuildContext context, SourceHandler handle) {
   if (handle.chapter != null) {
     WebReaderData? readerData;
@@ -824,24 +820,15 @@ class ExtensionSource extends _$ExtensionSource {
           .getExtensionState(id);
     }
 
-    _runtime = _useLegacyWebViewExtensionRuntime
-        ? ExtensionWebViewBridge(
-            sourceId: sourceId,
-            onResetAllState: onResetAllState,
-            onSetExtensionState: onSetExtensionState,
-            onSetExtensionSecureState: onSetExtensionSecureState,
-            getExtensionState: getExtensionState,
-            getExtensionSecureState: getExtensionSecureState,
-          )
-        : FjsExtensionRuntime(
-            sourceId: sourceId,
-            extensionHost: GagakuData().extensionHost,
-            onResetAllState: onResetAllState,
-            onSetExtensionState: onSetExtensionState,
-            onSetExtensionSecureState: onSetExtensionSecureState,
-            getExtensionState: getExtensionState,
-            getExtensionSecureState: getExtensionSecureState,
-          );
+    _runtime = FjsExtensionRuntime(
+      sourceId: sourceId,
+      extensionHost: GagakuData().extensionHost,
+      onResetAllState: onResetAllState,
+      onSetExtensionState: onSetExtensionState,
+      onSetExtensionSecureState: onSetExtensionSecureState,
+      getExtensionState: getExtensionState,
+      getExtensionSecureState: getExtensionSecureState,
+    );
 
     ref.onDispose(() {
       _runtime?.dispose();

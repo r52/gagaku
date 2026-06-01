@@ -10,6 +10,20 @@ import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/extension_webview_fallback.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:image/image.dart' as image;
+
+Map<String, Object> _decodeImagePixels(Uint8List bytes) {
+  final decoded = image.decodeImage(bytes);
+  if (decoded == null) {
+    throw const FormatException('Unsupported image format');
+  }
+
+  return {
+    'width': decoded.width,
+    'height': decoded.height,
+    'pixels': decoded.getBytes(order: image.ChannelOrder.rgba),
+  };
+}
 
 class FjsExtensionRuntime implements ExtensionRuntime {
   FjsExtensionRuntime({
@@ -207,7 +221,6 @@ return JSON.stringify(value);
         'install host bridge',
         () => _evalGlobal(_bootstrapScript(), label: 'install host bridge'),
       );
-      await _runInitStep('set proxy port', _setProxyPort);
       final startupCookies = await _runInitStep(
         'load startup cookies',
         () => _loadStartupCookies(source),
@@ -268,23 +281,18 @@ globalThis.window = globalThis;
 globalThis.self = globalThis;
 globalThis.global = globalThis;
 globalThis.source ??= {};
-globalThis.__gagaku_use_native_fetch = true;
 
 globalThis.gagaku = {
   callHandler: async (handlerName, ...args) => {
     return await fjs.bridge_call(
       JSON.stringify({ handlerName, args })
     );
+  },
+  decodeImage: async (bytes) => {
+    return await fjs.bridge_call({ channel: "decodeImage", bytes });
   }
 };
 ''';
-  }
-
-  Future<void> _setProxyPort() async {
-    final proxyPort = GagakuData().proxyServer?.port;
-    if (proxyPort != null) {
-      await _evalGlobal('globalThis.__gagaku_proxy_port = $proxyPort;');
-    }
   }
 
   Future<List<Cookie>> _loadStartupCookies(WebSourceInfo source) async {
@@ -450,6 +458,9 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
       );
       return JsResult.ok(const JsValue.none());
     }
+    if (payload['channel'] == 'decodeImage') {
+      return _handleDecodeImage(payload['bytes']);
+    }
 
     final handlerName = payload['handlerName'] as String?;
     final args = payload['args'] as List? ?? const [];
@@ -508,6 +519,25 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
         return JsResult.err(
           JsError.bridge('Unsupported gagaku bridge handler: $handlerName'),
         );
+    }
+  }
+
+  Future<JsResult> _handleDecodeImage(dynamic payload) async {
+    final bytes = switch (payload) {
+      Uint8List bytes => bytes,
+      List values => Uint8List.fromList(values.cast<int>()),
+      _ => null,
+    };
+    if (bytes == null) {
+      return const JsResult.err(JsError.bridge('Invalid decodeImage payload'));
+    }
+
+    try {
+      return JsResult.ok(
+        JsValue.from(await compute(_decodeImagePixels, bytes)),
+      );
+    } catch (error) {
+      return JsResult.err(JsError.bridge(error.toString()));
     }
   }
 

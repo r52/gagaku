@@ -6,7 +6,7 @@ import { installPaperbackCanvasPolyfill } from "./CanvasPolyfill";
 import { base64ToBytes, bytesToBase64, bytesToBinaryString } from "./Base64";
 
 import { decodeHTMLStrict } from "entities";
-import type { Request, SelectorID } from "@paperback/types";
+import type { SelectorID } from "@paperback/types";
 import md5 from "md5";
 
 installPaperbackCanvasPolyfill();
@@ -195,25 +195,6 @@ export function ApplicationPolyfill(): typeof Application {
 
     Selector: selectorRegistry.Selector.bind(selectorRegistry),
     SelectorRegistry: selectorRegistry,
-
-    processImageRequest: async (url: string) => {
-      // 1. Execute the request through the proxy (handles CORS + interceptors)
-      const request: Request = { url: url, method: "GET" };
-      const [, body] = await requestManager.scheduleRequest(request);
-
-      // 2. Store the image data via the proxy (Dart-side completer)
-      const proxyUrl = `http://127.0.0.1:${window.__gagaku_proxy_port}/image`;
-      await fetch(proxyUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          url: url,
-          body: Application.base64Encode(body),
-        }),
-      });
-
-      return { stored: true, url: url };
-    },
   };
 }
 

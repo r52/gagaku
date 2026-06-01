@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -8,7 +7,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/version.dart';
-import 'package:gagaku/web/proxy.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
@@ -86,7 +84,6 @@ class GagakuData {
 
   List<String> blockers = [];
   Map<String, dynamic> knownHosts = {};
-  ProxyServer? proxyServer;
 
   factory GagakuData() {
     return _instance;
@@ -206,9 +203,6 @@ class GagakuData {
       'assets/extensionhost/bundle.js',
     );
 
-    // Start proxy server (non-blocking)
-    unawaited(_startProxyServer());
-
     // Fire and forget finding the dynamic agent so we do not block runApp
     _fetchDynamicUserAgent();
 
@@ -237,15 +231,6 @@ class GagakuData {
       }
     } catch (e) {
       logger.e(e);
-    }
-  }
-
-  Future<void> _startProxyServer() async {
-    try {
-      proxyServer = ProxyServer();
-      await proxyServer!.start();
-    } catch (e) {
-      logger.e('Failed to start proxy server', error: e);
     }
   }
 
