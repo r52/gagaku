@@ -11,6 +11,7 @@ import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/extension_webview_fallback.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:image/image.dart' as image;
+import 'package:pool/pool.dart';
 
 Map<String, Object> _decodeImagePixels(Uint8List bytes) {
   final decoded = image.decodeImage(bytes);
@@ -84,6 +85,10 @@ globalThis.console = Object.fromEntries(
   bool _hasSortOps = false;
   List<Cookie>? _cookies;
   final Map<String, FjsExtensionForm> _forms = {};
+
+  // Reader precaching can fan out requests, but concurrent fjs evals on one
+  // QuickJS context are not reliable.
+  final Pool _imageRequestPool = Pool(1);
 
   @override
   bool get hasAdvancedSearchForm => _hasAdvancedSearchForm;
@@ -812,8 +817,9 @@ return await globalThis.$sourceId.getSortingOptions?.(query) ?? null;
   }
 
   @override
-  Future<Uint8List> processImageRequest(String url) async {
-    final result = await _evalScoped("""
+  Future<Uint8List> processImageRequest(String url) {
+    return _imageRequestPool.withResource(() async {
+      final result = await _evalScoped("""
 const [, body] = await globalThis.Application.scheduleRequest({
   url: ${_json(url)},
   method: "GET"
@@ -821,14 +827,15 @@ const [, body] = await globalThis.Application.scheduleRequest({
 return new Uint8Array(body);
 """);
 
-    final value = result.value;
-    return switch (value) {
-      Uint8List bytes => bytes,
-      List bytes => Uint8List.fromList(bytes.cast<int>()),
-      _ => throw StateError(
-        'Expected fjs image request to return bytes, got ${value.runtimeType}',
-      ),
-    };
+      final value = result.value;
+      return switch (value) {
+        Uint8List bytes => bytes,
+        List bytes => Uint8List.fromList(bytes.cast<int>()),
+        _ => throw StateError(
+          'Expected fjs image request to return bytes, got ${value.runtimeType}',
+        ),
+      };
+    });
   }
 
   @override
@@ -873,6 +880,7 @@ return await globalThis.$sourceId.getSearchResults(
   @override
   Future<void> dispose() async {
     _activeRuntimes.remove(this);
+    await _imageRequestPool.close();
 
     final engine = _engine;
     _engine = null;

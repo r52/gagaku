@@ -62,6 +62,13 @@ class ExtensionImage extends ImageProvider<ExtensionImage> {
         throw Exception('ExtensionImage is an empty file: $url');
       }
 
+      chunkEvents.add(
+        ImageChunkEvent(
+          cumulativeBytesLoaded: bytes.lengthInBytes,
+          expectedTotalBytes: bytes.lengthInBytes,
+        ),
+      );
+
       return decode(await ui.ImmutableBuffer.fromUint8List(bytes));
     } catch (e) {
       scheduleMicrotask(() {
@@ -88,11 +95,14 @@ class ExtensionImage extends ImageProvider<ExtensionImage> {
   @override
   bool operator ==(Object other) {
     if (other.runtimeType != runtimeType) return false;
-    return other is ExtensionImage && other.url == url && other.scale == scale;
+    return other is ExtensionImage &&
+        other.url == url &&
+        other.runtime == runtime &&
+        other.scale == scale;
   }
 
   @override
-  int get hashCode => Object.hash(url, scale);
+  int get hashCode => Object.hash(url, runtime, scale);
 
   @override
   String toString() =>

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,6 +17,8 @@ void main() {
     String? receivedFormDataContentType;
     String? receivedFormDataBody;
     String? receivedCrossOriginCookie;
+    var activeImageRequests = 0;
+    var maxActiveImageRequests = 0;
     final largePayload = Uint8List.fromList(
       List.generate(2 * 1024 * 1024, (index) => index % 251),
     );
@@ -103,6 +106,25 @@ void main() {
           ..headers.contentType = ContentType.binary
           ..add(largePayload);
         await request.response.close();
+        return;
+      }
+
+      if (request.uri.path.startsWith('/phase10-serialized-image/')) {
+        activeImageRequests++;
+        maxActiveImageRequests = max(
+          maxActiveImageRequests,
+          activeImageRequests,
+        );
+        try {
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+          request.response
+            ..statusCode = 200
+            ..headers.contentType = ContentType.binary
+            ..add([int.parse(request.uri.pathSegments.last)]);
+          await request.response.close();
+        } finally {
+          activeImageRequests--;
+        }
         return;
       }
 
@@ -248,6 +270,10 @@ const responseInterceptorTarget = {
     }
 
     if (request.url.includes("/phase8-large-binary")) {
+      return body;
+    }
+
+    if (request.url.includes("/phase10-serialized-image/")) {
       return body;
     }
 
@@ -706,6 +732,19 @@ globalThis.source.phase2source = {
       'http://127.0.0.1:${server.port}/phase8-large-binary',
     );
     expect(largeImageBytes, largePayload);
+    final serializedImageBytes = await Future.wait([
+      runtime.processImageRequest(
+        'http://127.0.0.1:${server.port}/phase10-serialized-image/1',
+      ),
+      runtime.processImageRequest(
+        'http://127.0.0.1:${server.port}/phase10-serialized-image/2',
+      ),
+    ]);
+    expect(serializedImageBytes, [
+      Uint8List.fromList([1]),
+      Uint8List.fromList([2]),
+    ]);
+    expect(maxActiveImageRequests, 1);
 
     final executeBindingId = await runtime.evalForTesting(
       'globalThis.phase6ExecuteBindingId',
