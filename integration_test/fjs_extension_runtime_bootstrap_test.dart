@@ -142,6 +142,7 @@ void main() {
               ..path = '/'
               ..expires = DateTime.now().add(const Duration(hours: 1)),
           )
+          ..cookies.add(Cookie('phase4-session', 'session-cookie')..path = '/')
           ..write('<html>phase4:$body</html>');
         await request.response.close();
         return;
@@ -230,7 +231,8 @@ globalThis.phase9SortingQueryHasMetadata = null;
 const bindingTarget = {
   run: async (value) => ({
     value,
-    initialized: Application.getState("phase2")
+    initialized: Application.getState("phase2"),
+    nested: { value }
   })
 };
 
@@ -587,7 +589,9 @@ globalThis.source.phase2source = {
   return {
     pixels: Array.from(context.getImageData(0, 0, 1, 1).data),
     dataUrl: canvas.toDataURL().startsWith("data:image/png;base64,"),
-    imageDataLength: new ImageData(1, 1).data.length
+    imageDataLength: new ImageData(1, 1).data.length,
+    inferredImageDataHeight:
+      new ImageData(new Uint8ClampedArray(8), 1).height
   };
 })()
 '''),
@@ -595,6 +599,7 @@ globalThis.source.phase2source = {
         'pixels': [11, 22, 33, 255],
         'dataUrl': true,
         'imageDataLength': 4,
+        'inferredImageDataHeight': 2,
       },
     );
     expect(decodeImageRequests, 1);
@@ -603,7 +608,13 @@ globalThis.source.phase2source = {
       'globalThis.phase2BindingId',
     );
     final bindingResult = await runtime.callBinding(bindingId, ['from-dart']);
-    expect(bindingResult, {'value': 'from-dart', 'initialized': 'initialized'});
+    expect(bindingResult, isA<Map<String, dynamic>>());
+    expect(bindingResult['nested'], isA<Map<String, dynamic>>());
+    expect(bindingResult, {
+      'value': 'from-dart',
+      'initialized': 'initialized',
+      'nested': {'value': 'from-dart'},
+    });
 
     final ephemeralBindingId = await runtime.evalForTesting(
       'globalThis.phase7EphemeralBindingId',
@@ -669,6 +680,14 @@ globalThis.source.phase2source = {
         isA<Map>()
             .having((cookie) => cookie['name'], 'name', 'phase4')
             .having((cookie) => cookie['value'], 'value', 'cookie-value'),
+      ),
+    );
+    expect(
+      requestResult['cookies'],
+      contains(
+        isA<Map>()
+            .having((cookie) => cookie['name'], 'name', 'phase4-session')
+            .having((cookie) => cookie['expires'], 'expires', 'undefined'),
       ),
     );
 

@@ -541,7 +541,7 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
       '${jsArgs.isEmpty ? '' : ',$jsArgs'});',
     );
 
-    final value = result.value;
+    final value = _normalizeBridgeJson(result.value);
     if (value is Map && value['__isFormConfirmationError'] == true) {
       throw FormConfirmationException(
         message: value['message'] as String,
@@ -914,8 +914,13 @@ for (const section of sections) {
 return sections;
 """, label: 'form[$id] get sections');
 
-    final sections = (result.value as List<dynamic>)
-        .map((e) => FormSectionElement.fromJson(e as dynamic))
+    final normalized = runtime._normalizeBridgeJson(result.value);
+    final sections = (normalized as List<dynamic>)
+        .map(
+          (e) => FormSectionElement.fromJson(
+            runtime._normalizeBridgeJsonMap(e, 'form[$id] section'),
+          ),
+        )
         .toList();
 
     final hasSubmit = await runtime.evalForForm("""

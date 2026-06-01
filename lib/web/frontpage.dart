@@ -301,7 +301,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
           for (final section in sections)
             await notifier.getDiscoverSectionItems(section, null),
         ];
-      }, [source, refresh.value]);
+      }, [source, refresh.value, sections]);
       final itemFuture = useFuture(sectionItems);
 
       if (itemFuture.hasError) {

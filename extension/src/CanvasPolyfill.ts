@@ -29,12 +29,13 @@ class PaperbackImageData {
       return;
     }
 
-    if (height == null) {
-      throw new TypeError("ImageData height is required");
+    this.width = Math.trunc(widthOrHeight);
+    const resolvedHeight = height ?? dataOrWidth.length / (this.width * 4);
+    if (!Number.isInteger(resolvedHeight)) {
+      throw new RangeError("ImageData pixel length does not match width");
     }
 
-    this.width = Math.trunc(widthOrHeight);
-    this.height = Math.trunc(height);
+    this.height = Math.trunc(resolvedHeight);
     if (dataOrWidth.length !== this.width * this.height * 4) {
       throw new RangeError("ImageData pixel length does not match dimensions");
     }

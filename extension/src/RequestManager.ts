@@ -222,7 +222,7 @@ export class MockRequestManager implements RequestManager {
         value,
         domain: domain ?? parseURL(fetchResponse.url).hostname!,
         path: path ?? "/",
-        expires: expires ?? new Date(),
+        expires,
       };
     });
   }
