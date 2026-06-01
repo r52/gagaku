@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -16,6 +17,7 @@ import 'package:gagaku/update_checker.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/deeplink.dart';
+import 'package:gagaku/web/model/fjs_extension_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -33,9 +35,21 @@ class _HttpOverrides extends HttpOverrides {
   }
 }
 
+final class _AppLifecycleObserver with WidgetsBindingObserver {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.detached) {
+      unawaited(FjsExtensionRuntime.disposeAll());
+    }
+  }
+}
+
+final _appLifecycleObserver = _AppLifecycleObserver();
+
 void main() async {
   HttpOverrides.global = _HttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding.instance.addObserver(_appLifecycleObserver);
   LocaleSettings.useDeviceLocale();
 
   PlatformInAppWebViewController.debugLoggingSettings.excludeFilter.add(

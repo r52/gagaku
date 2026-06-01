@@ -31,7 +31,7 @@ environment:
 dependencies:
   animations: ^2.0.7
   archive: ^4.0.1
-  file_picker: ^11.0.2
+  file_picker: ^12.0.0-beta.5
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -58,7 +58,7 @@ dependencies:
   url_launcher: ^6.1.10
   number_paginator: ^1.0.0
   collection: ^1.19.0
-  device_info_plus: ^12.1.0
+  device_info_plus: ^13.1.0
   super_sliver_list: ^0.4.0
   uuid: ^4.4.0
   permission_handler: ^12.0.0
@@ -75,7 +75,7 @@ dependencies:
   fresh_dio: ^0.6.0
   native_dio_adapter: ^1.4.0
   flutter_background: ^1.3.0+1
-  flutter_local_notifications: ^21.0.0
+  flutter_local_notifications: ^22.0.0-dev.3
   flutter_spinbox:
     git:
       url: https://github.com/ubuntu-flutter-community/flutter_spinbox
@@ -87,6 +87,7 @@ dependencies:
   pool: ^1.5.2
   cached_network_image_ce: ^4.6.3
   image: ^4.8.0
+  fjs: ^2.2.0
 
 dev_dependencies:
   flutter_test:
@@ -109,6 +110,8 @@ dev_dependencies:
   slang_build_runner: ^4.6.0
   objectbox_generator: any
   go_router_builder: ^4.1.1
+  integration_test:
+    sdk: flutter
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

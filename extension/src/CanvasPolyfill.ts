@@ -1,13 +1,41 @@
-import { base64ToBytes, bytesToBase64 } from "./Base64";
+import { base64ToBytes } from "./Base64";
 import { encodePngDataUrl } from "./PngDataUrl";
 
-interface DecodedImage {
-  width: number;
-  height: number;
-  pixels: string;
-}
-
 type ImageLoadHandler = ((event: Event) => void) | null;
+
+class PaperbackImageData {
+  readonly data: Uint8ClampedArray<ArrayBuffer>;
+  readonly width: number;
+  readonly height: number;
+  readonly colorSpace = "srgb";
+
+  constructor(
+    dataOrWidth: Uint8ClampedArray<ArrayBuffer> | number,
+    widthOrHeight: number,
+    height?: number,
+  ) {
+    if (typeof dataOrWidth === "number") {
+      this.width = Math.trunc(dataOrWidth);
+      this.height = Math.trunc(widthOrHeight);
+      this.data = new Uint8ClampedArray(
+        new ArrayBuffer(this.width * this.height * 4),
+      );
+      return;
+    }
+
+    this.width = Math.trunc(widthOrHeight);
+    const resolvedHeight = height ?? dataOrWidth.length / (this.width * 4);
+    if (!Number.isInteger(resolvedHeight)) {
+      throw new RangeError("ImageData pixel length does not match width");
+    }
+
+    this.height = Math.trunc(resolvedHeight);
+    if (dataOrWidth.length !== this.width * this.height * 4) {
+      throw new RangeError("ImageData pixel length does not match dimensions");
+    }
+    this.data = dataOrWidth;
+  }
+}
 
 function parseDataUrl(value: string): Uint8ClampedArray<ArrayBuffer> | null {
   const match = /^data:[^,]*;base64,(.*)$/i.exec(value);
@@ -170,27 +198,16 @@ class PaperbackImage {
         throw new Error("Paperback image polyfill only supports data URLs");
       }
 
-      const response = await fetch(
-        `http://127.0.0.1:${window.__gagaku_proxy_port}/decode-image`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ body: bytesToBase64(bytes) }),
-        },
-      );
-      const decoded = (await response.json()) as DecodedImage & {
-        error?: string;
-      };
-
-      if (decoded.error != null) {
-        throw new Error(decoded.error);
+      if (globalThis.gagaku == null) {
+        throw new Error("Paperback image decoding is unavailable");
       }
+      const decoded = await globalThis.gagaku.decodeImage(bytes);
 
       this.naturalWidth = decoded.width;
       this.naturalHeight = decoded.height;
       this.width = decoded.width;
       this.height = decoded.height;
-      this.pixels = new Uint8ClampedArray(base64ToBytes(decoded.pixels).buffer);
+      this.pixels = new Uint8ClampedArray(decoded.pixels);
       this.complete = true;
       this.onload?.(createEvent("load"));
     } catch (error) {
@@ -370,13 +387,16 @@ function canConstructNativeCanvas(): boolean {
 }
 
 export function installPaperbackCanvasPolyfill(): void {
-  if (
-    typeof document === "undefined" ||
-    typeof globalThis.HTMLCanvasElement === "undefined" ||
-    typeof globalThis.ImageData === "undefined" ||
-    canConstructNativeCanvas()
-  ) {
+  if (canConstructNativeCanvas()) {
     return;
+  }
+
+  if (typeof globalThis.ImageData === "undefined") {
+    Object.defineProperty(globalThis, "ImageData", {
+      value: PaperbackImageData,
+      configurable: true,
+      writable: true,
+    });
   }
 
   Object.defineProperty(globalThis, "HTMLCanvasElement", {

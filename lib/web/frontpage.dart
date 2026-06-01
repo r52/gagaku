@@ -295,16 +295,13 @@ class ExtensionHomeWidget extends HookConsumerWidget {
     if (sectionsSnapshot.data != null) {
       final sections = sectionsSnapshot.data!;
       final homepageWidgets = <Widget>[];
-      final sectionItems = useMemoized(
-        () => Future.wait(
-          sections.map(
-            (e) => ref
-                .read(extensionSourceProvider(source.id).notifier)
-                .getDiscoverSectionItems(e, null),
-          ),
-        ),
-        [source, refresh.value],
-      );
+      final sectionItems = useMemoized(() async {
+        final notifier = ref.read(extensionSourceProvider(source.id).notifier);
+        return [
+          for (final section in sections)
+            await notifier.getDiscoverSectionItems(section, null),
+        ];
+      }, [source, refresh.value, sections]);
       final itemFuture = useFuture(sectionItems);
 
       if (itemFuture.hasError) {

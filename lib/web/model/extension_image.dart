@@ -3,24 +3,23 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
-import 'package:gagaku/web/model/extension_bridge.dart';
+import 'package:gagaku/web/model/extension_runtime.dart';
 
-/// An image provider that fetches images via [ExtensionWebViewBridge].
+/// An image provider that fetches images via [ExtensionRuntime].
 ///
-/// Unlike [NetworkImage], this uses the extension bridge to fetch
-/// page images. The proxy server handles CORS bypass and large image
-/// data transfer (avoiding the ~1MB IPC limit).
+/// Unlike [NetworkImage], this uses the extension runtime to fetch
+/// page images after extension interceptors have processed them.
 @immutable
 class ExtensionImage extends ImageProvider<ExtensionImage> {
   /// Creates an [ExtensionImage] that fetches the image at [url]
-  /// using the given [bridge].
-  const ExtensionImage(this.url, this.bridge, {this.scale = 1.0});
+  /// using the given [runtime].
+  const ExtensionImage(this.url, this.runtime, {this.scale = 1.0});
 
   /// The URL of the image to fetch.
   final String url;
 
-  /// The extension bridge used to fetch the image data.
-  final ExtensionWebViewBridge bridge;
+  /// The extension runtime used to fetch the image data.
+  final ExtensionRuntime runtime;
 
   /// The scale factor.
   final double scale;
@@ -57,11 +56,18 @@ class ExtensionImage extends ImageProvider<ExtensionImage> {
     try {
       assert(key == this);
 
-      final bytes = await bridge.registerImageCompleter(key.url);
+      final bytes = await runtime.processImageRequest(key.url);
 
       if (bytes.isEmpty) {
         throw Exception('ExtensionImage is an empty file: $url');
       }
+
+      chunkEvents.add(
+        ImageChunkEvent(
+          cumulativeBytesLoaded: bytes.lengthInBytes,
+          expectedTotalBytes: bytes.lengthInBytes,
+        ),
+      );
 
       return decode(await ui.ImmutableBuffer.fromUint8List(bytes));
     } catch (e) {
@@ -89,11 +95,14 @@ class ExtensionImage extends ImageProvider<ExtensionImage> {
   @override
   bool operator ==(Object other) {
     if (other.runtimeType != runtimeType) return false;
-    return other is ExtensionImage && other.url == url && other.scale == scale;
+    return other is ExtensionImage &&
+        other.url == url &&
+        other.runtime == runtime &&
+        other.scale == scale;
   }
 
   @override
-  int get hashCode => Object.hash(url, scale);
+  int get hashCode => Object.hash(url, runtime, scale);
 
   @override
   String toString() =>

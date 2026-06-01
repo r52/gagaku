@@ -9,7 +9,7 @@ import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/model/search_history.dart';
 import 'package:gagaku/web/model/types.dart';
-import "package:gagaku/web/model/extension_bridge.dart";
+import "package:gagaku/web/model/extension_runtime.dart";
 import "package:gagaku/web/extension_settings.dart";
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

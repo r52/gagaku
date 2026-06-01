@@ -1,28 +1,19 @@
 import { SelectorID, SelectorRegistry } from "@paperback/types";
 
 class SelectorRef {
-  private objRef: WeakRef<any>
-
   get value(): any | undefined {
-    const obj = this.objRef.deref()
-    if (!obj) {
-      return undefined
-    }
-
-    const value = obj[this.key]
+    const value = this.obj[this.key]
     if (typeof value === 'function') {
-      return value.bind(obj)
+      return value.bind(this.obj)
     } else {
       return value
     }
   }
 
   constructor(
-    obj: any,
+    private obj: any,
     private key: string | number | symbol
-  ) {
-    this.objRef = new WeakRef(obj)
-  }
+  ) {}
 }
 
 export class MockSelectorRegistry implements SelectorRegistry {

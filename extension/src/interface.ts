@@ -1,16 +1,18 @@
 import type { Form, SelectorID } from "@paperback/types";
 
-export interface WebViewInterface {
+export interface GagakuInterface {
   callHandler(handlerName: string, ...args: any[]): any;
+  decodeImage(bytes: Uint8ClampedArray): Promise<DecodedImage>;
+}
+
+export interface DecodedImage {
+  width: number;
+  height: number;
+  pixels: Uint8Array;
 }
 
 declare global {
-  // WebView interface
-  var gagaku: WebViewInterface | undefined;
-
-  interface Window {
-    __gagaku_proxy_port: number;
-  }
+  var gagaku: GagakuInterface | undefined;
 
   namespace Application {
     // binding
@@ -24,15 +26,8 @@ declare global {
 
     // Form
     function initializeForm(id: string, form: Form): Promise<string>;
+    function uninitializeForm(id: string, instanceId: string): void;
     function uninitializeForms(): void;
-    function getForm(id: string): Form | undefined;
-
-    // Process an image request and return pre-processed data to Dart.
-    function processImageRequest(url: string): Promise<{
-      url: string;
-      method?: string;
-      headers?: Record<string, string>;
-      body?: ArrayBuffer | string | FormData;
-    }>;
+    function getForm(id: string, instanceId?: string): Form | undefined;
   }
 }

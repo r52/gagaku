@@ -98,7 +98,6 @@ class AppSettingsPage extends HookConsumerWidget {
     FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json'],
-      withData: true,
     );
 
     if (result == null) {
@@ -107,11 +106,15 @@ class AppSettingsPage extends HookConsumerWidget {
     }
 
     final pfile = result.files.single;
-    final data = pfile.bytes;
-
-    if (data == null) {
-      // invalid data
-      logger.w("Invalid backup data in file ${pfile.path!}");
+    late final List<int> data;
+    try {
+      data = await pfile.readAsByteStream().expand((bytes) => bytes).toList();
+    } catch (e, st) {
+      logger.w(
+        "Invalid backup data in file ${pfile.path}",
+        error: e,
+        stackTrace: st,
+      );
       return false;
     }
 
