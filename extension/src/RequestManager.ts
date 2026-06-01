@@ -261,6 +261,7 @@ export class MockRequestManager implements RequestManager {
       headers: responseHeaders,
       status: fetchResponse.status,
       cookies: this.responseCookies(fetchResponse),
+      mimeType: fetchResponse.headers.get("content-type")?.split(";", 1)[0]?.trim(),
     };
 
     const responseBody = await fetchResponse.arrayBuffer();
