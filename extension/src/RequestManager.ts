@@ -20,6 +20,8 @@ type RequestManager = Pick<
 >;
 
 export class MockRequestManager implements RequestManager {
+  private static readonly nativeFetchTimeoutMs = 30_000;
+
   private selectorRegistry: SelectorRegistry;
   private registeredInterceptors: {
     interceptorId: string;
@@ -148,6 +150,15 @@ export class MockRequestManager implements RequestManager {
       return Application.base64Encode(body) as unknown as string;
     }
 
+    return Application.base64Encode(
+      await this.encodeFormDataBody(body, headers),
+    ) as unknown as string;
+  }
+
+  private async encodeFormDataBody(
+    body: FormData,
+    headers: Record<string, string>,
+  ): Promise<ArrayBuffer> {
     const response = new globalThis.Response(body);
     const contentType = response.headers.get("content-type");
     if (
@@ -157,9 +168,7 @@ export class MockRequestManager implements RequestManager {
       headers["Content-Type"] = contentType;
     }
 
-    return Application.base64Encode(
-      await response.arrayBuffer(),
-    ) as unknown as string;
+    return response.arrayBuffer();
   }
 
   private responseCookies(fetchResponse: globalThis.Response): Cookie[] {
@@ -245,12 +254,17 @@ export class MockRequestManager implements RequestManager {
   ): Promise<[Response, ArrayBuffer]> {
     const { finalRequest, requestBody, requestHeaders } =
       await this.prepareRequest(request);
+    const nativeRequestBody =
+      requestBody instanceof FormData
+        ? await this.encodeFormDataBody(requestBody, requestHeaders)
+        : requestBody;
 
-    const fetchResponse = await fetch(finalRequest.url, {
-      method: finalRequest.method,
-      body: requestBody ?? null,
-      headers: requestHeaders,
-    });
+    const fetchResponse = await this.fetchNativeFollowingRedirects(
+      finalRequest.url,
+      finalRequest.method,
+      nativeRequestBody,
+      requestHeaders,
+    );
 
     const responseHeaders: Record<string, string> = {};
     for (const [name, value] of fetchResponse.headers.entries()) {
@@ -274,6 +288,107 @@ export class MockRequestManager implements RequestManager {
         responseBody,
       ),
     ];
+  }
+
+  private async fetchNativeFollowingRedirects(
+    initialUrl: string,
+    initialMethod: string,
+    initialBody: ArrayBuffer | string | FormData | undefined,
+    initialHeaders: Record<string, string>,
+  ): Promise<globalThis.Response> {
+    let url = initialUrl;
+    let method = initialMethod;
+    let body = initialBody;
+    let headers = initialHeaders;
+
+    for (let redirectCount = 0; redirectCount <= 20; redirectCount++) {
+      const response = await this.fetchNativeWithTimeout(url, {
+        method,
+        body: body ?? null,
+        headers,
+        redirect: "manual",
+      });
+      const location = response.headers.get("location");
+
+      if (
+        location === null ||
+        ![301, 302, 303, 307, 308].includes(response.status)
+      ) {
+        return response;
+      }
+
+      if (redirectCount === 20) {
+        throw new Error("Too many redirects");
+      }
+
+      const redirectedUrl = new URL(location, url);
+      const changesOrigin = new URL(url).origin !== redirectedUrl.origin;
+      const changesToGet =
+        response.status === 303 ||
+        ((response.status === 301 || response.status === 302) &&
+          method.toUpperCase() === "POST");
+
+      url = redirectedUrl.toString();
+      headers = Object.fromEntries(
+        Object.entries(headers).filter(([name]) => {
+          const normalizedName = name.toLowerCase();
+
+          if (
+            changesOrigin &&
+            ["authorization", "cookie", "proxy-authorization"].includes(
+              normalizedName,
+            )
+          ) {
+            return false;
+          }
+
+          return (
+            !changesToGet ||
+            (normalizedName !== "content-length" &&
+              normalizedName !== "content-type")
+          );
+        }),
+      );
+
+      if (changesToGet) {
+        method = "GET";
+        body = undefined;
+      }
+    }
+
+    throw new Error("Too many redirects");
+  }
+
+  private async fetchNativeWithTimeout(
+    url: string,
+    init: RequestInit,
+  ): Promise<globalThis.Response> {
+    const controller =
+      typeof AbortController === "function" ? new AbortController() : undefined;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+
+    try {
+      return await Promise.race([
+        fetch(url, {
+          ...init,
+          ...(controller ? { signal: controller.signal } : {}),
+        }),
+        new Promise<never>((_, reject) => {
+          timeout = setTimeout(() => {
+            controller?.abort();
+            reject(
+              new Error(
+                `Native fetch timed out after ${MockRequestManager.nativeFetchTimeoutMs}ms`,
+              ),
+            );
+          }, MockRequestManager.nativeFetchTimeoutMs);
+        }),
+      ]);
+    } finally {
+      if (timeout !== undefined) {
+        clearTimeout(timeout);
+      }
+    }
   }
 
   private async scheduleProxyRequest(

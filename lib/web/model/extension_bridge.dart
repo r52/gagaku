@@ -9,6 +9,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/exception.dart';
 
 import 'package:gagaku/web/model/extension_runtime.dart';
+import 'package:gagaku/web/model/extension_webview_fallback.dart';
 import 'package:gagaku/web/model/types.dart';
 
 export 'package:gagaku/web/model/extension_runtime.dart';
@@ -214,88 +215,8 @@ class ExtensionWebViewBridge implements ExtensionRuntime {
   Future<dynamic> _handleExecuteInWebView(
     JavaScriptHandlerFunctionData data,
   ) async {
-    HeadlessInAppWebView? executionView;
-    try {
-      final context = ExecuteInWebViewContext.fromJson(data.args[0]);
-
-      final executionReadyCompleter = Completer<void>();
-
-      executionView = HeadlessInAppWebView(
-        initialData: InAppWebViewInitialData(
-          data: context.source.html,
-          baseUrl: WebUri(context.source.baseUrl),
-        ),
-        initialSettings: InAppWebViewSettings(
-          loadsImagesAutomatically: context.source.loadImages,
-          browserAcceleratorKeysEnabled: false,
-          isInspectable: false,
-        ),
-        onLoadStop: (controller, url) async {
-          if (executionReadyCompleter.isCompleted == false) {
-            executionReadyCompleter.complete();
-          }
-        },
-      );
-
-      await executionView.run();
-
-      await executionReadyCompleter.future;
-
-      final url = WebUri(context.source.baseUrl);
-      final cookieManager = CookieManager.instance();
-
-      for (final cookie in context.storage.cookies) {
-        await cookieManager.setCookie(
-          url: url,
-          name: cookie.name,
-          value: cookie.value,
-          domain: cookie.domain,
-          path: cookie.path ?? '/',
-          expiresDate: cookie.expires?.millisecondsSinceEpoch,
-        );
-      }
-
-      final controller = executionView.webViewController!;
-
-      final results = await controller
-          .callAsyncJavaScript(functionBody: context.inject)
-          .timeout(const Duration(seconds: 30));
-
-      if (results == null || results.error != null) {
-        throw JavaScriptException(
-          message: 'JavaScript error in executeInWebView:',
-          errorMessage: '${context.source.baseUrl} - ${results?.error}',
-        );
-      }
-
-      final outCookies = await cookieManager.getCookies(
-        url: url,
-        webViewController: controller,
-      );
-
-      final pbCookies = outCookies
-          .map(
-            (c) => PBDocumentCookie(
-              name: c.name,
-              value: c.value,
-              domain: c.domain ?? url.host,
-              path: c.path,
-              expires: c.expiresDate != null
-                  ? DateTime.fromMillisecondsSinceEpoch(c.expiresDate!)
-                  : null,
-            ),
-          )
-          .toList();
-
-      final webViewResult = WebViewExecutionResult(
-        result: results.value,
-        storage: WebViewStorage(cookies: pbCookies),
-      );
-
-      return webViewResult.toJson();
-    } finally {
-      executionView?.dispose();
-    }
+    final context = ExecuteInWebViewContext.fromJson(data.args[0]);
+    return (await executeInTemporaryWebView(context)).toJson();
   }
 
   Future<void> _onWebViewLoadStop(

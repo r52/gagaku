@@ -28,7 +28,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'model.g.dart';
 
 const historyListUUID = 'd6f79229-6f8e-4872-9610-5200a54aef8f';
-const _useFjsExtensionRuntime = bool.fromEnvironment('GAGAKU_USE_FJS');
+const _useLegacyWebViewExtensionRuntime = bool.fromEnvironment(
+  'GAGAKU_INTERNAL_USE_WEBVIEW_EXTENSION_RUNTIME',
+);
 
 void openWebSource(BuildContext context, SourceHandler handle) {
   if (handle.chapter != null) {
@@ -822,18 +824,18 @@ class ExtensionSource extends _$ExtensionSource {
           .getExtensionState(id);
     }
 
-    _runtime = _useFjsExtensionRuntime
-        ? FjsExtensionRuntime(
+    _runtime = _useLegacyWebViewExtensionRuntime
+        ? ExtensionWebViewBridge(
             sourceId: sourceId,
-            extensionHost: GagakuData().extensionHost,
             onResetAllState: onResetAllState,
             onSetExtensionState: onSetExtensionState,
             onSetExtensionSecureState: onSetExtensionSecureState,
             getExtensionState: getExtensionState,
             getExtensionSecureState: getExtensionSecureState,
           )
-        : ExtensionWebViewBridge(
+        : FjsExtensionRuntime(
             sourceId: sourceId,
+            extensionHost: GagakuData().extensionHost,
             onResetAllState: onResetAllState,
             onSetExtensionState: onSetExtensionState,
             onSetExtensionSecureState: onSetExtensionSecureState,

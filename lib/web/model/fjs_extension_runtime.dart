@@ -8,6 +8,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/web/model/extension_runtime.dart';
+import 'package:gagaku/web/model/extension_webview_fallback.dart';
 import 'package:gagaku/web/model/types.dart';
 
 class FjsExtensionRuntime implements ExtensionRuntime {
@@ -504,90 +505,15 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
       );
     }
 
-    HeadlessInAppWebView? executionView;
     try {
       final context = ExecuteInWebViewContext.fromJson(
         Map<String, dynamic>.from(payload),
       );
-      final executionReadyCompleter = Completer<void>();
-
-      executionView = HeadlessInAppWebView(
-        initialData: InAppWebViewInitialData(
-          data: context.source.html,
-          baseUrl: WebUri(context.source.baseUrl),
-        ),
-        initialSettings: InAppWebViewSettings(
-          loadsImagesAutomatically: context.source.loadImages,
-          browserAcceleratorKeysEnabled: false,
-          isInspectable: false,
-        ),
-        onLoadStop: (controller, url) {
-          if (!executionReadyCompleter.isCompleted) {
-            executionReadyCompleter.complete();
-          }
-        },
-      );
-
-      await executionView.run();
-      await executionReadyCompleter.future;
-
-      final url = WebUri(context.source.baseUrl);
-      final cookieManager = CookieManager.instance();
-
-      for (final cookie in context.storage.cookies) {
-        await cookieManager.setCookie(
-          url: url,
-          name: cookie.name,
-          value: cookie.value,
-          domain: cookie.domain,
-          path: cookie.path ?? '/',
-          expiresDate: cookie.expires?.millisecondsSinceEpoch,
-        );
-      }
-
-      final controller = executionView.webViewController!;
-      final results = await controller
-          .callAsyncJavaScript(functionBody: context.inject)
-          .timeout(const Duration(seconds: 30));
-
-      if (results == null || results.error != null) {
-        throw JavaScriptException(
-          message: 'JavaScript error in executeInWebView:',
-          errorMessage: '${context.source.baseUrl} - ${results?.error}',
-        );
-      }
-
-      final outCookies = await cookieManager.getCookies(
-        url: url,
-        webViewController: controller,
-      );
-
-      final pbCookies = outCookies
-          .map(
-            (cookie) => PBDocumentCookie(
-              name: cookie.name,
-              value: cookie.value,
-              domain: cookie.domain ?? url.host,
-              path: cookie.path,
-              expires: cookie.expiresDate != null
-                  ? DateTime.fromMillisecondsSinceEpoch(cookie.expiresDate!)
-                  : null,
-            ),
-          )
-          .toList();
-
       return JsResult.ok(
-        JsValue.from(
-          WebViewExecutionResult(
-            result: results.value,
-            storage: WebViewStorage(cookies: pbCookies),
-          ).toJson(),
-        ),
+        JsValue.from((await executeInTemporaryWebView(context)).toJson()),
       );
     } catch (error) {
       return JsResult.err(JsError.bridge(error.toString()));
-    } finally {
-      executionView?.dispose();
     }
   }
 
