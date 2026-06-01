@@ -915,8 +915,8 @@ form.formWillAppear?.();
   }
 
   @override
-  void uninitialize() {
-    _controller.evaluateJavascript(
+  Future<void> uninitialize() async {
+    await _controller.evaluateJavascript(
       source: "window.Application.uninitializeForms();",
     );
   }

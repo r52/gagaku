@@ -60,7 +60,7 @@ abstract class ExtensionForm extends ChangeNotifier {
 
   Future<void> reloadForm();
 
-  void uninitialize();
+  Future<void> uninitialize();
 
   Future<void> formDidSubmit();
 

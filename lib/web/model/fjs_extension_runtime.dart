@@ -965,13 +965,11 @@ if (typeof form !== "undefined") {
   }
 
   @override
-  void uninitialize() {
-    unawaited(
-      runtime.evalForForm(
-        'globalThis.Application.uninitializeForm('
-        '${jsonEncode(id)}, ${jsonEncode(instanceId)});',
-        label: 'form[$id] uninitialize instance',
-      ),
+  Future<void> uninitialize() async {
+    await runtime.evalForForm(
+      'globalThis.Application.uninitializeForm('
+      '${jsonEncode(id)}, ${jsonEncode(instanceId)});',
+      label: 'form[$id] uninitialize instance',
     );
   }
 

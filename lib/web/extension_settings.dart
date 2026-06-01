@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_spinbox/flutter_spinbox.dart';
@@ -82,13 +84,21 @@ class FormBuilder extends StatefulHookConsumerWidget {
 }
 
 class _FormBuilderState extends ConsumerState<FormBuilder> {
+  Future<void>? _finalizeFuture;
+
+  Future<void> _finalizeForm() {
+    return _finalizeFuture ??= () async {
+      await widget.form.call('formDidDisappear');
+
+      if (widget.isTopLevel) {
+        await widget.form.uninitialize();
+      }
+    }();
+  }
+
   @override
   void dispose() {
-    widget.form.call('formDidDisappear');
-
-    if (widget.isTopLevel) {
-      widget.form.uninitialize();
-    }
+    unawaited(_finalizeForm());
 
     super.dispose();
   }
@@ -157,6 +167,7 @@ class _FormBuilderState extends ConsumerState<FormBuilder> {
                             await widget.form.formDidSubmit();
                             final result = await widget.form
                                 .getSearchQueryMetadata();
+                            await _finalizeForm();
                             if (context.mounted) {
                               Navigator.maybePop(context, result);
                             }

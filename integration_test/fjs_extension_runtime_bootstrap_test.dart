@@ -213,6 +213,13 @@ const settingsForm = {
 const advancedSearchForm = {
   requiresExplicitSubmission: false,
   formWillAppear: () => {},
+  formDidSubmit: async () => {
+    await Application.sleep(0.01);
+  },
+  formDidDisappear: async () => {
+    await Application.sleep(0.01);
+    Application.setState("yes", "phase9AdvancedSearchDidDisappear");
+  },
   getSections: () => [],
   getSearchQueryMetadata: async () => ({ genre: "action" })
 };
@@ -770,12 +777,21 @@ globalThis.source.phase2source = {
       const SearchQuery(title: ''),
     );
     expect(reopenedAdvancedSearchForm, isNotNull);
-    advancedSearchForm.uninitialize();
+    await advancedSearchForm.uninitialize();
     await runtime.evalForTesting('true');
     expect(await reopenedAdvancedSearchForm!.sections, isEmpty);
-    expect(await reopenedAdvancedSearchForm.getSearchQueryMetadata(), {
-      'genre': 'action',
-    });
+    await reopenedAdvancedSearchForm.formDidSubmit();
+    final submittedAdvancedSearchMetadata = await reopenedAdvancedSearchForm
+        .getSearchQueryMetadata();
+    expect(submittedAdvancedSearchMetadata, {'genre': 'action'});
+    await reopenedAdvancedSearchForm.call('formDidDisappear');
+    await reopenedAdvancedSearchForm.uninitialize();
+    expect(
+      await runtime.evalForTesting(
+        'globalThis.Application.getState("phase9AdvancedSearchDidDisappear")',
+      ),
+      'yes',
+    );
 
     final firstSearch = await runtime.searchManga(
       const SearchQuery(title: 'Phase 9 Search'),
@@ -789,7 +805,10 @@ globalThis.source.phase2source = {
     });
 
     final sortedSearch = await runtime.searchManga(
-      SearchQuery(title: 'Phase 9 Search', metadata: advancedSearchMetadata),
+      SearchQuery(
+        title: 'Phase 9 Search',
+        metadata: submittedAdvancedSearchMetadata,
+      ),
       {'page': 4},
       sortOp: sortingOptions!.single,
     );
