@@ -11,7 +11,42 @@ import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/extension_webview_fallback.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:image/image.dart' as image;
-import 'package:pool/pool.dart';
+
+enum _RuntimeEvalExecutorState { accepting, closing, closed }
+
+class _RuntimeEvalExecutor {
+  var _state = _RuntimeEvalExecutorState.accepting;
+  Future<void> _tail = Future<void>.value();
+  Future<void>? _closeFuture;
+  var _pendingOperations = 0;
+
+  bool get hasPendingOperations => _pendingOperations != 0;
+
+  Future<T> run<T>(Future<T> Function() action) {
+    if (_state != _RuntimeEvalExecutorState.accepting) {
+      return Future<T>.error(StateError('fjs extension runtime is closing'));
+    }
+
+    _pendingOperations++;
+    final operation = _tail.then((_) => action());
+    _tail = operation.then<void>((_) {}, onError: (_, _) {}).whenComplete(() {
+      _pendingOperations--;
+    });
+    return operation;
+  }
+
+  Future<void> close() {
+    final closeFuture = _closeFuture;
+    if (closeFuture != null) {
+      return closeFuture;
+    }
+
+    _state = _RuntimeEvalExecutorState.closing;
+    return _closeFuture = _tail.whenComplete(() {
+      _state = _RuntimeEvalExecutorState.closed;
+    });
+  }
+}
 
 Map<String, Object> _decodeImagePixels(Uint8List bytes) {
   final decoded = image.decodeImage(bytes);
@@ -85,10 +120,8 @@ globalThis.console = Object.fromEntries(
   bool _hasSortOps = false;
   List<Cookie>? _cookies;
   final Map<String, FjsExtensionForm> _forms = {};
-
-  // Reader precaching can fan out requests, but concurrent fjs evals on one
-  // QuickJS context are not reliable.
-  final Pool _imageRequestPool = Pool(1);
+  final _evalExecutor = _RuntimeEvalExecutor();
+  Future<void>? _disposeFuture;
 
   @override
   bool get hasAdvancedSearchForm => _hasAdvancedSearchForm;
@@ -115,21 +148,23 @@ globalThis.console = Object.fromEntries(
   Future<JsValue> _evalGlobal(
     String source, {
     String label = 'unlabelled eval',
-  }) async {
-    final engine = _engine;
-    if (engine == null || engine.closed) {
-      throw StateError('fjs extension runtime is not initialized');
-    }
+  }) {
+    return _evalExecutor.run(() async {
+      final engine = _engine;
+      if (engine == null || engine.closed) {
+        throw StateError('fjs extension runtime is not initialized');
+      }
 
-    try {
-      return await engine.eval(
-        source: JsCode.code(source),
-        options: JsEvalOptions.withPromise(),
-      );
-    } catch (error, stackTrace) {
-      debugPrint('fjs[$sourceId] eval failed: $label\n$error\n$stackTrace');
-      rethrow;
-    }
+      try {
+        return await engine.eval(
+          source: JsCode.code(source),
+          options: JsEvalOptions.withPromise(),
+        );
+      } catch (error, stackTrace) {
+        debugPrint('fjs[$sourceId] eval failed: $label\n$error\n$stackTrace');
+        rethrow;
+      }
+    });
   }
 
   Future<JsValue> _evalScoped(
@@ -817,9 +852,8 @@ return await globalThis.$sourceId.getSortingOptions?.(query) ?? null;
   }
 
   @override
-  Future<Uint8List> processImageRequest(String url) {
-    return _imageRequestPool.withResource(() async {
-      final result = await _evalScoped("""
+  Future<Uint8List> processImageRequest(String url) async {
+    final result = await _evalScoped("""
 const [, body] = await globalThis.Application.scheduleRequest({
   url: ${_json(url)},
   method: "GET"
@@ -827,15 +861,14 @@ const [, body] = await globalThis.Application.scheduleRequest({
 return new Uint8Array(body);
 """);
 
-      final value = result.value;
-      return switch (value) {
-        Uint8List bytes => bytes,
-        List bytes => Uint8List.fromList(bytes.cast<int>()),
-        _ => throw StateError(
-          'Expected fjs image request to return bytes, got ${value.runtimeType}',
-        ),
-      };
-    });
+    final value = result.value;
+    return switch (value) {
+      Uint8List bytes => bytes,
+      List bytes => Uint8List.fromList(bytes.cast<int>()),
+      _ => throw StateError(
+        'Expected fjs image request to return bytes, got ${value.runtimeType}',
+      ),
+    };
   }
 
   @override
@@ -878,20 +911,39 @@ return await globalThis.$sourceId.getSearchResults(
   }
 
   @override
-  Future<void> dispose() async {
+  Future<void> dispose() => _disposeFuture ??= _dispose();
+
+  Future<void> _dispose() async {
     _activeRuntimes.remove(this);
-    await _imageRequestPool.close();
+    final drainFuture = _evalExecutor.close();
 
     final engine = _engine;
+    if (_evalExecutor.hasPendingOperations) {
+      await drainFuture;
+    }
+
     _engine = null;
     _hasAdvancedSearchForm = false;
     _hasSortOps = false;
     _cookies = null;
     _forms.clear();
 
-    if (engine != null && !engine.closed) {
-      debugPrint('fjs[$sourceId]: closing engine');
-      await engine.close();
+    await _closeEngine(engine);
+    await drainFuture;
+  }
+
+  Future<void> _closeEngine(JsEngine? engine) async {
+    if (engine == null) {
+      return;
+    }
+
+    try {
+      if (!engine.closed) {
+        debugPrint('fjs[$sourceId]: closing engine');
+        await engine.close();
+      }
+    } finally {
+      engine.dispose();
     }
   }
 }

@@ -745,6 +745,34 @@ globalThis.source.phase2source = {
       Uint8List.fromList([2]),
     ]);
     expect(maxActiveImageRequests, 1);
+    await runtime.evalForTesting('''
+globalThis.phase11ActiveEvals = 0;
+globalThis.phase11MaxActiveEvals = 0;
+''');
+    final serializedEvals = await Future.wait([
+      runtime.evalForTesting('''
+globalThis.phase11ActiveEvals++;
+globalThis.phase11MaxActiveEvals = Math.max(
+  globalThis.phase11MaxActiveEvals,
+  globalThis.phase11ActiveEvals
+);
+await new Promise((resolve) => setTimeout(resolve, 100));
+globalThis.phase11ActiveEvals--;
+"first";
+'''),
+      runtime.evalForTesting('''
+globalThis.phase11ActiveEvals++;
+globalThis.phase11MaxActiveEvals = Math.max(
+  globalThis.phase11MaxActiveEvals,
+  globalThis.phase11ActiveEvals
+);
+await new Promise((resolve) => setTimeout(resolve, 100));
+globalThis.phase11ActiveEvals--;
+"second";
+'''),
+    ]);
+    expect(serializedEvals, ['first', 'second']);
+    expect(await runtime.evalForTesting('globalThis.phase11MaxActiveEvals'), 1);
 
     final executeBindingId = await runtime.evalForTesting(
       'globalThis.phase6ExecuteBindingId',
@@ -901,7 +929,7 @@ globalThis.source.phase2source = {
     );
     expect(await runtime.getMangaURL('missing'), isNull);
 
-    Future<void> initializeDisposalProbe(String sourceId) async {
+    Future<FjsExtensionRuntime> initializeDisposalProbe(String sourceId) async {
       final disposalProbe = FjsExtensionRuntime(
         sourceId: sourceId,
         extensionHost: await rootBundle.loadString(
@@ -935,7 +963,21 @@ globalThis.source.$sourceId = {
 ''');
       final form = await disposalProbe.getSettingsForm(disposalSource);
       expect(await form.sections, isEmpty);
+      return disposalProbe;
     }
+
+    final drainingProbe = await initializeDisposalProbe('phase11drain');
+    final acceptedEval = drainingProbe.evalForTesting('''
+await new Promise((resolve) => setTimeout(() => resolve("drained"), 100));
+''');
+    final drainingDispose = drainingProbe.dispose();
+    await expectLater(
+      drainingProbe.evalForTesting('"rejected"'),
+      throwsStateError,
+    );
+    expect(await acceptedEval, 'drained');
+    await drainingDispose;
+    await drainingProbe.dispose();
 
     await Future.wait([
       initializeDisposalProbe('phase9dispose1'),
