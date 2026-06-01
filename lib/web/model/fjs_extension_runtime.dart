@@ -453,7 +453,9 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
 
     final handlerName = payload['handlerName'] as String?;
     final args = payload['args'] as List? ?? const [];
-    debugPrint('fjs[$sourceId] bridge: $handlerName(${jsonEncode(args)})');
+    if (kDebugMode) {
+      debugPrint('fjs[$sourceId] bridge: $handlerName(${jsonEncode(args)})');
+    }
 
     switch (handlerName) {
       case 'resetAllState':
@@ -578,8 +580,32 @@ return await globalThis.$sourceId.getChapterDetails(chapter);
   }
 
   @override
-  Future<List<DiscoverSection>> getDiscoverSections(WebSourceInfo source) {
-    throw UnimplementedError('fjs discover sections are not implemented yet');
+  Future<List<DiscoverSection>> getDiscoverSections(
+    WebSourceInfo source,
+  ) async {
+    if (!source.hasCapability(SourceIntents.discoverSections)) {
+      throw UnsupportedError("Source does not support discover sections");
+    }
+
+    final sectionsJson = await _evalJsonScoped(
+      'return await globalThis.$sourceId.getDiscoverSections();',
+      label: 'get discover sections',
+    );
+    final normalizedSections = _normalizeBridgeJson(sectionsJson);
+    if (normalizedSections is! List) {
+      throw StateError(
+        'Expected getDiscoverSections to return a list, got '
+        '${normalizedSections.runtimeType}',
+      );
+    }
+
+    return normalizedSections
+        .map(
+          (section) => DiscoverSection.fromJson(
+            _normalizeBridgeJsonMap(section, 'getDiscoverSections item'),
+          ),
+        )
+        .toList();
   }
 
   @override
@@ -587,8 +613,26 @@ return await globalThis.$sourceId.getChapterDetails(chapter);
     WebSourceInfo source,
     DiscoverSection section,
     dynamic metadata,
-  ) {
-    throw UnimplementedError('fjs discover sections are not implemented yet');
+  ) async {
+    if (!source.hasCapability(SourceIntents.discoverSections)) {
+      throw UnsupportedError("Source does not support discover sections");
+    }
+
+    final resultsJson = await _evalJsonScoped('''
+const section = ${_json(section.toJson())};
+const metadata = ${_json(metadata)};
+return await globalThis.$sourceId.getDiscoverSectionItems(
+  section,
+  metadata ?? undefined
+);
+''', label: 'get discover section items');
+
+    return PagedResults.fromJson(
+      _normalizeBridgeJsonMap(resultsJson, 'getDiscoverSectionItems'),
+      (item) => DiscoverSectionItem.fromJson(
+        _normalizeBridgeJsonMap(item, 'getDiscoverSectionItems item'),
+      ),
+    );
   }
 
   @override
@@ -657,8 +701,24 @@ return await globalThis.$sourceId.getChapters(manga);
   }
 
   @override
-  Future<String?> getMangaURL(String mangaId) {
-    throw UnimplementedError('fjs manga share URLs are not implemented yet');
+  Future<String?> getMangaURL(String mangaId) async {
+    if (mangaId.isEmpty) {
+      return null;
+    }
+
+    try {
+      final result = await _evalScoped('''
+try {
+  return await globalThis.$sourceId.getMangaShareUrl?.(${_json(mangaId)}) ??
+    null;
+} catch {
+  return null;
+}
+''', label: 'get manga share URL');
+      return result.value as String?;
+    } catch (_) {
+      return null;
+    }
   }
 
   @override
@@ -680,8 +740,34 @@ return id;
   }
 
   @override
-  Future<List<SortingOption>?> getSortingOptions(SearchQuery query) {
-    throw UnimplementedError('fjs sorting options are not implemented yet');
+  Future<List<SortingOption>?> getSortingOptions(SearchQuery query) async {
+    if (!_hasSortOps) {
+      return null;
+    }
+
+    final optionsJson = await _evalJsonScoped('''
+const query = ${_json(query.toJson())};
+if (query.metadata === null) delete query.metadata;
+return await globalThis.$sourceId.getSortingOptions?.(query) ?? null;
+''', label: 'get sorting options');
+    final normalizedOptions = _normalizeBridgeJson(optionsJson);
+    if (normalizedOptions == null) {
+      return null;
+    }
+    if (normalizedOptions is! List) {
+      throw StateError(
+        'Expected getSortingOptions to return a list, got '
+        '${normalizedOptions.runtimeType}',
+      );
+    }
+
+    return normalizedOptions
+        .map(
+          (option) => SortingOption.fromJson(
+            _normalizeBridgeJsonMap(option, 'getSortingOptions item'),
+          ),
+        )
+        .toList();
   }
 
   @override
@@ -709,8 +795,29 @@ return new Uint8Array(body);
     SearchQuery query,
     dynamic metadata, {
     SortingOption? sortOp,
-  }) {
-    throw UnimplementedError('fjs search is not implemented yet');
+  }) async {
+    if (query.isEmpty) {
+      return PagedResults<SearchResultItem>(items: []);
+    }
+
+    final resultsJson = await _evalJsonScoped('''
+const query = ${_json(query.toJson())};
+if (query.metadata === null) delete query.metadata;
+const metadata = ${_json(metadata)};
+const sortOp = ${_json(sortOp?.toJson())};
+return await globalThis.$sourceId.getSearchResults(
+  query,
+  metadata ?? undefined,
+  sortOp ?? undefined
+);
+''', label: 'search manga');
+
+    return PagedResults.fromJson(
+      _normalizeBridgeJsonMap(resultsJson, 'getSearchResults'),
+      (item) => SearchResultItem.fromJson(
+        _normalizeBridgeJsonMap(item, 'getSearchResults item'),
+      ),
+    );
   }
 
   @override
