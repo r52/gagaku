@@ -147,6 +147,11 @@ void main() {
               ..expires = DateTime.now().add(const Duration(hours: 1)),
           )
           ..cookies.add(Cookie('phase4-session', 'session-cookie')..path = '/')
+          ..headers.add(
+            HttpHeaders.setCookieHeader,
+            'phase4-precedence=cookie-value; Max-Age=3600; '
+            'Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/',
+          )
           ..write('<html>phase4:$body</html>');
         await request.response.close();
         return;
@@ -579,6 +584,32 @@ globalThis.source.phase2source = {
     expect(
       await runtime.evalForTesting(r'''
 (async () => {
+  try {
+    await fjs.bridge_call("{");
+    return "accepted";
+  } catch (error) {
+    return String(error);
+  }
+})()
+'''),
+      isNot('accepted'),
+    );
+    expect(
+      await runtime.evalForTesting(r'''
+(async () => {
+  try {
+    await fjs.bridge_call({ channel: "decodeImage", bytes: [1, 2, "three"] });
+    return "accepted";
+  } catch (error) {
+    return String(error);
+  }
+})()
+'''),
+      isNot('accepted'),
+    );
+    expect(
+      await runtime.evalForTesting(r'''
+(async () => {
   console.log("phase7 console bridge", { nested: true });
   const image = new Image();
   await new Promise((resolve, reject) => {
@@ -691,6 +722,20 @@ globalThis.source.phase2source = {
         isA<Map>()
             .having((cookie) => cookie['name'], 'name', 'phase4-session')
             .having((cookie) => cookie['expires'], 'expires', 'undefined'),
+      ),
+    );
+    expect(
+      requestResult['cookies'],
+      contains(
+        isA<Map>()
+            .having((cookie) => cookie['name'], 'name', 'phase4-precedence')
+            .having(
+              (cookie) => DateTime.parse(
+                cookie['expires'] as String,
+              ).isAfter(DateTime.now()),
+              'expires',
+              isTrue,
+            ),
       ),
     );
 

@@ -30,7 +30,12 @@ Future<WebViewExecutionResult> executeInTemporaryWebView(
     );
 
     await executionView.run();
-    await executionReadyCompleter.future;
+    await executionReadyCompleter.future.timeout(
+      const Duration(seconds: 15),
+      onTimeout: () {
+        throw TimeoutException('Temporary WebView load timed out');
+      },
+    );
 
     final url = WebUri(context.source.baseUrl);
     final cookieManager = CookieManager.instance();

@@ -368,45 +368,61 @@ globalThis.gagaku = {
       }
     }
 
+    void completeError(Object error, StackTrace stackTrace) {
+      if (!completer.isCompleted) {
+        completer.completeError(error, stackTrace);
+      }
+    }
+
     timeout = Timer(const Duration(seconds: 15), () {
       complete(latestCookies);
     });
 
-    startupView = HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: WebUri(baseUrl)),
-      initialSettings: InAppWebViewSettings(
-        contentBlockers: contentBlockers.isEmpty ? null : contentBlockers,
-        browserAcceleratorKeysEnabled: false,
-        isInspectable: false,
-      ),
-      onLoadStop: (controller, url) async {
-        if (url == null) {
-          return;
-        }
-
-        final cookies = await CookieManager.instance().getCookies(
-          url: WebUri.uri(url),
-          webViewController: controller,
-        );
-        latestCookies = cookies;
-
-        final hasClearance = cookies.any(
-          (cookie) => cookie.name == 'cf_clearance',
-        );
-        if (!requiresCloudflare || hasClearance) {
-          complete(cookies);
-        }
-      },
-    );
-
     try {
+      startupView = HeadlessInAppWebView(
+        initialUrlRequest: URLRequest(url: WebUri(baseUrl)),
+        initialSettings: InAppWebViewSettings(
+          contentBlockers: contentBlockers.isEmpty ? null : contentBlockers,
+          browserAcceleratorKeysEnabled: false,
+          isInspectable: false,
+        ),
+        onLoadStop: (controller, url) async {
+          if (url == null) {
+            return;
+          }
+
+          try {
+            final cookies = await CookieManager.instance().getCookies(
+              url: WebUri.uri(url),
+              webViewController: controller,
+            );
+            latestCookies = cookies;
+
+            final hasClearance = cookies.any(
+              (cookie) => cookie.name == 'cf_clearance',
+            );
+            if (!requiresCloudflare || hasClearance) {
+              complete(cookies);
+            }
+          } catch (error, stackTrace) {
+            completeError(error, stackTrace);
+          }
+        },
+      );
+
       await startupView.run();
       final cookies = await completer.future;
       _cookies = cookies;
       return cookies;
+    } catch (error, stackTrace) {
+      debugPrint(
+        'fjs[$sourceId]: failed to load startup cookies\n$error\n$stackTrace',
+      );
+      _cookies = const [];
+      return const [];
     } finally {
       timeout.cancel();
-      startupView.dispose();
+      startupView?.dispose();
     }
   }
 
@@ -479,10 +495,17 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
 
   FutureOr<JsResult> _handleBridgeCall(JsValue value) {
     final bridgeValue = value.value;
-    final payload = switch (bridgeValue) {
-      String encoded => jsonDecode(encoded),
-      _ => bridgeValue,
-    };
+    final dynamic payload;
+    try {
+      payload = switch (bridgeValue) {
+        String encoded => jsonDecode(encoded),
+        _ => bridgeValue,
+      };
+    } catch (error) {
+      return JsResult.err(
+        JsError.bridge('Invalid gagaku bridge payload: $error'),
+      );
+    }
     if (payload is! Map) {
       return const JsResult.err(
         JsError.bridge('Invalid gagaku bridge payload'),
@@ -502,8 +525,14 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
       return _handleDecodeImage(payload['bytes']);
     }
 
-    final handlerName = payload['handlerName'] as String?;
-    final args = payload['args'] as List? ?? const [];
+    final handlerName = payload['handlerName'];
+    final rawArgs = payload['args'];
+    if (handlerName is! String || (rawArgs != null && rawArgs is! List)) {
+      return const JsResult.err(
+        JsError.bridge('Invalid gagaku bridge handler payload'),
+      );
+    }
+    final args = rawArgs as List? ?? const [];
     if (kDebugMode) {
       debugPrint('fjs[$sourceId] bridge: $handlerName(${jsonEncode(args)})');
     }
@@ -563,16 +592,18 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
   }
 
   Future<JsResult> _handleDecodeImage(dynamic payload) async {
-    final bytes = switch (payload) {
-      Uint8List bytes => bytes,
-      List values => Uint8List.fromList(values.cast<int>()),
-      _ => null,
-    };
-    if (bytes == null) {
-      return const JsResult.err(JsError.bridge('Invalid decodeImage payload'));
-    }
-
     try {
+      final bytes = switch (payload) {
+        Uint8List bytes => bytes,
+        List values => Uint8List.fromList(values.cast<int>()),
+        _ => null,
+      };
+      if (bytes == null) {
+        return const JsResult.err(
+          JsError.bridge('Invalid decodeImage payload'),
+        );
+      }
+
       return JsResult.ok(
         JsValue.from(await compute(_decodeImagePixels, bytes)),
       );

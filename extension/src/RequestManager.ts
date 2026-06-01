@@ -165,6 +165,7 @@ export class MockRequestManager implements RequestManager {
       let domain: string | undefined;
       let path: string | undefined;
       let expires: Date | undefined;
+      let maxAge: number | undefined;
 
       for (const property of properties) {
         const [rawPropertyName, ...rawPropertyValue] = property.split("=");
@@ -176,7 +177,12 @@ export class MockRequestManager implements RequestManager {
             continue;
           }
           case "max-age": {
-            expires = new Date(Date.now() + Number(propertyValue) * 1000);
+            if (/^-?\d+$/.test(propertyValue)) {
+              const parsedMaxAge = Number(propertyValue);
+              if (Number.isFinite(parsedMaxAge)) {
+                maxAge = parsedMaxAge;
+              }
+            }
             continue;
           }
           case "domain": {
@@ -198,7 +204,10 @@ export class MockRequestManager implements RequestManager {
         value,
         domain: domain ?? parseURL(fetchResponse.url).hostname!,
         path: path ?? "/",
-        expires,
+        expires:
+          maxAge === undefined
+            ? expires
+            : new Date(Date.now() + maxAge * 1000),
       };
     });
   }
