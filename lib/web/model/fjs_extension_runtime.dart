@@ -481,11 +481,22 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
         return JsResult.ok(const JsValue.none());
       case 'initializeForm':
         final formId = args.isEmpty ? null : args.first;
-        if (formId is String) {
-          _forms.putIfAbsent(
-            formId,
-            () => FjsExtensionForm(id: formId, runtime: this),
+        final instanceId = args.length < 2 ? null : args[1];
+        if (formId is String && instanceId is String) {
+          _forms[formId] = FjsExtensionForm(
+            id: formId,
+            instanceId: instanceId,
+            runtime: this,
           );
+        }
+        return JsResult.ok(const JsValue.none());
+      case 'uninitializeForm':
+        final formId = args.isEmpty ? null : args.first;
+        final instanceId = args.length < 2 ? null : args[1];
+        if (formId is String &&
+            instanceId is String &&
+            _forms[formId]?.instanceId == instanceId) {
+          _forms.remove(formId);
         }
         return JsResult.ok(const JsValue.none());
       case 'uninitializeForms':
@@ -848,12 +859,17 @@ return await globalThis.$sourceId.getSearchResults(
 }
 
 class FjsExtensionForm extends ExtensionForm {
-  FjsExtensionForm({required this.id, required this.runtime}) {
+  FjsExtensionForm({
+    required this.id,
+    required this.instanceId,
+    required this.runtime,
+  }) {
     _sections = _getSections();
   }
 
   @override
   final FormID id;
+  final String instanceId;
 
   final FjsExtensionRuntime runtime;
 
@@ -869,7 +885,10 @@ class FjsExtensionForm extends ExtensionForm {
 
   Future<List<FormSectionElement>> _getSections() async {
     final result = await runtime.evalForForm("""
-const form = globalThis.Application.getForm(${jsonEncode(id)});
+const form = globalThis.Application.getForm(
+  ${jsonEncode(id)},
+  ${jsonEncode(instanceId)}
+);
 if (typeof form === "undefined") {
   return [];
 }
@@ -900,7 +919,10 @@ return sections;
         .toList();
 
     final hasSubmit = await runtime.evalForForm("""
-const form = globalThis.Application.getForm(${jsonEncode(id)});
+const form = globalThis.Application.getForm(
+  ${jsonEncode(id)},
+  ${jsonEncode(instanceId)}
+);
 if (typeof form === "undefined") {
   return false;
 }
@@ -915,7 +937,10 @@ return form.requiresExplicitSubmission;
   @override
   Future<void> call(String method) async {
     await runtime.evalForForm("""
-const form = globalThis.Application.getForm(${jsonEncode(id)});
+const form = globalThis.Application.getForm(
+  ${jsonEncode(id)},
+  ${jsonEncode(instanceId)}
+);
 if (typeof form !== "undefined") {
   await form.$method?.();
 }
@@ -925,7 +950,10 @@ if (typeof form !== "undefined") {
   @override
   Future<void> reloadForm() async {
     await runtime.evalForForm("""
-const form = globalThis.Application.getForm(${jsonEncode(id)});
+const form = globalThis.Application.getForm(
+  ${jsonEncode(id)},
+  ${jsonEncode(instanceId)}
+);
 if (typeof form !== "undefined") {
   form.formWillAppear?.();
 }
@@ -940,8 +968,9 @@ if (typeof form !== "undefined") {
   void uninitialize() {
     unawaited(
       runtime.evalForForm(
-        'globalThis.Application.uninitializeForms();',
-        label: 'form[$id] uninitialize all forms',
+        'globalThis.Application.uninitializeForm('
+        '${jsonEncode(id)}, ${jsonEncode(instanceId)});',
+        label: 'form[$id] uninitialize instance',
       ),
     );
   }
@@ -949,7 +978,10 @@ if (typeof form !== "undefined") {
   @override
   Future<void> formDidSubmit() async {
     await runtime.evalForForm("""
-const form = globalThis.Application.getForm(${jsonEncode(id)});
+const form = globalThis.Application.getForm(
+  ${jsonEncode(id)},
+  ${jsonEncode(instanceId)}
+);
 if (typeof form !== "undefined") {
   await form.formDidSubmit?.();
 }
@@ -959,7 +991,10 @@ if (typeof form !== "undefined") {
   @override
   Future<void> formDidCancel() async {
     await runtime.evalForForm("""
-const form = globalThis.Application.getForm(${jsonEncode(id)});
+const form = globalThis.Application.getForm(
+  ${jsonEncode(id)},
+  ${jsonEncode(instanceId)}
+);
 if (typeof form !== "undefined") {
   await form.formDidCancel?.();
 }
@@ -969,7 +1004,10 @@ if (typeof form !== "undefined") {
   @override
   Future<dynamic> getSearchQueryMetadata() async {
     final result = await runtime.evalForForm("""
-const form = globalThis.Application.getForm(${jsonEncode(id)});
+const form = globalThis.Application.getForm(
+  ${jsonEncode(id)},
+  ${jsonEncode(instanceId)}
+);
 if (typeof form === "undefined") {
   return null;
 }

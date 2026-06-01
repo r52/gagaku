@@ -185,6 +185,7 @@ export function ApplicationPolyfill(): typeof Application {
     },
 
     initializeForm: formManager.initializeForm.bind(formManager),
+    uninitializeForm: formManager.uninitializeForm.bind(formManager),
     uninitializeForms: formManager.uninitializeForms.bind(formManager),
     getForm: formManager.getForm.bind(formManager),
 

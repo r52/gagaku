@@ -24,8 +24,9 @@ declare global {
 
     // Form
     function initializeForm(id: string, form: Form): Promise<string>;
+    function uninitializeForm(id: string, instanceId: string): void;
     function uninitializeForms(): void;
-    function getForm(id: string): Form | undefined;
+    function getForm(id: string, instanceId?: string): Form | undefined;
 
     // Process an image request and return pre-processed data to Dart.
     function processImageRequest(url: string): Promise<{
