@@ -43,7 +43,7 @@ void main() {
       if (request.uri.path == '/phase5') {
         request.response
           ..statusCode = 200
-          ..headers.contentType = ContentType.binary
+          ..headers.contentType = ContentType('image', 'webp')
           ..add([1, 2, 3]);
         await request.response.close();
         return;
@@ -270,6 +270,7 @@ const requestInterceptorTarget = {
 const responseInterceptorTarget = {
   run: async (request, response, body) => {
     if (request.url.includes("/phase5")) {
+      if (!response.mimeType?.startsWith("image/")) return body;
       const bytes = new Uint8Array(body);
       return new Uint8Array([7, ...bytes, 9]).buffer;
     }
