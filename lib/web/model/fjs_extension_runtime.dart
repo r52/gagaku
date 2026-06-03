@@ -449,7 +449,7 @@ globalThis.self = globalThis;
 globalThis.global = globalThis;
 globalThis.source ??= {};
 
-globalThis.gagaku = {
+globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
   callHandler: async (handlerName, ...args) => {
     return await fjs.bridge_call(
       JSON.stringify({ handlerName, args })
@@ -458,7 +458,7 @@ globalThis.gagaku = {
   decodeImage: async (payload) => {
     return await fjs.bridge_call({ channel: "decodeImage", payload });
   }
-};
+});
 ''';
   }
 

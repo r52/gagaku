@@ -87,7 +87,10 @@ dependencies:
   pool: ^1.5.2
   cached_network_image_ce: ^4.6.3
   image: ^4.8.0
-  fjs: ^2.2.0
+  fjs:
+    git:
+      url: https://github.com/r52/fjs.git
+      ref: gagaku
 
 dev_dependencies:
   flutter_test:

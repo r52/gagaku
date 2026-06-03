@@ -233,6 +233,18 @@ export function encodePngDataUrl(
     throw new Error("cannot encode PNG with empty dimensions");
   }
 
+  const nativeImage = globalThis.gagaku?.nativeImage;
+  if (nativeImage != null) {
+    const nativeStartedAt = now();
+    const dataUrl = nativeImage.encodePngDataUrl(pixels, width, height);
+    profilePngOperation(
+      "native",
+      nativeStartedAt,
+      `${dataUrl.length} chars`,
+    );
+    return dataUrl;
+  }
+
   const writeStartedAt = now();
   const png = writePng(pixels, width, height);
   profilePngOperation(
