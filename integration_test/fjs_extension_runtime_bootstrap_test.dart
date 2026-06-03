@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/web/model/fjs_extension_runtime.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:image/image.dart' as img;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -608,8 +609,7 @@ globalThis.source.phase2source = {
 '''),
       isNot('accepted'),
     );
-    expect(
-      await runtime.evalForTesting(r'''
+    final canvasResult = await runtime.evalForTesting(r'''
 (async () => {
   console.log("phase7 console bridge", { nested: true });
   const image = new Image();
@@ -625,20 +625,27 @@ globalThis.source.phase2source = {
   context.drawImage(image, 0, 0);
   return {
     pixels: Array.from(context.getImageData(0, 0, 1, 1).data),
-    dataUrl: canvas.toDataURL().startsWith("data:image/png;base64,"),
+    dataUrl: canvas.toDataURL(),
     imageDataLength: new ImageData(1, 1).data.length,
     inferredImageDataHeight:
       new ImageData(new Uint8ClampedArray(8), 1).height
   };
 })()
-'''),
-      {
-        'pixels': [255, 0, 0, 255],
-        'dataUrl': true,
-        'imageDataLength': 4,
-        'inferredImageDataHeight': 2,
-      },
-    );
+''');
+    expect(canvasResult, isA<Map<String, dynamic>>());
+    final canvasData = canvasResult as Map<String, dynamic>;
+    expect(canvasData['pixels'], [255, 0, 0, 255]);
+    expect(canvasData['imageDataLength'], 4);
+    expect(canvasData['inferredImageDataHeight'], 2);
+    final dataUrl = canvasData['dataUrl'] as String;
+    expect(dataUrl, startsWith('data:image/png;base64,'));
+    final pngComma = dataUrl.indexOf(',');
+    final png = img.decodePng(base64Decode(dataUrl.substring(pngComma + 1)));
+    expect(png, isNotNull);
+    expect(png!.width, 1);
+    expect(png.height, 1);
+    final pngPixel = png.getPixel(0, 0);
+    expect([pngPixel.r, pngPixel.g, pngPixel.b, pngPixel.a], [255, 0, 0, 255]);
     final bindingId = await runtime.evalForTesting(
       'globalThis.phase2BindingId',
     );

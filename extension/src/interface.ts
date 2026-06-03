@@ -2,7 +2,7 @@ import type { Form, SelectorID } from "@paperback/types";
 
 export interface GagakuInterface {
   callHandler(handlerName: string, ...args: any[]): any;
-  decodeImage(bytes: Uint8ClampedArray): Promise<DecodedImage>;
+  decodeImage(bytesOrDataUrl: Uint8ClampedArray | string): Promise<DecodedImage>;
 }
 
 export interface DecodedImage {

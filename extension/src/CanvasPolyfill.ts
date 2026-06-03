@@ -1,7 +1,27 @@
-import { base64ToBytes } from "./Base64";
 import { encodePngDataUrl } from "./PngDataUrl";
 
 type ImageLoadHandler = ((event: Event) => void) | null;
+
+const profileMinElapsedMs = 1;
+
+function now(): number {
+  return Date.now();
+}
+
+function profileImageOperation(
+  label: string,
+  startedAt: number,
+  details = "",
+): void {
+  const elapsed = now() - startedAt;
+  if (elapsed < profileMinElapsedMs) {
+    return;
+  }
+
+  console.debug(
+    `[gagaku:image] ${label} ${elapsed}ms${details ? ` ${details}` : ""}`,
+  );
+}
 
 class PaperbackImageData {
   readonly data: Uint8ClampedArray<ArrayBuffer>;
@@ -37,31 +57,9 @@ class PaperbackImageData {
   }
 }
 
-function parseDataUrl(value: string): Uint8ClampedArray<ArrayBuffer> | null {
-  const match = /^data:[^,]*;base64,(.*)$/i.exec(value);
-  if (match == null) {
-    return null;
-  }
-
-  return new Uint8ClampedArray(base64ToBytes(match[1]!).buffer);
-}
-
-function flipRows(
-  data: Uint8ClampedArray,
-  width: number,
-  height: number,
-): Uint8ClampedArray<ArrayBuffer> {
-  const stride = width * 4;
-  const flipped = new Uint8ClampedArray(new ArrayBuffer(data.length));
-
-  for (let y = 0; y < height; y++) {
-    flipped.set(
-      data.subarray(y * stride, (y + 1) * stride),
-      (height - 1 - y) * stride,
-    );
-  }
-
-  return flipped;
+function isBase64DataUrl(value: string): boolean {
+  const comma = value.indexOf(",");
+  return comma > 0 && /;base64/i.test(value.slice(0, comma));
 }
 
 function copyRegion(
@@ -80,6 +78,52 @@ function copyRegion(
 
   for (let y = 0; y < height; y++) {
     const sourceOffset = ((sourceY + y) * sourceWidth + sourceX) * 4;
+    const targetOffset = ((targetY + y) * targetWidth + targetX) * 4;
+    target.set(source.subarray(sourceOffset, sourceOffset + rowBytes), targetOffset);
+  }
+}
+
+function copyRegionToFlippedRows(
+  source: Uint8ClampedArray,
+  sourceWidth: number,
+  sourceX: number,
+  sourceY: number,
+  target: Uint8ClampedArray,
+  targetWidth: number,
+  targetHeight: number,
+  targetX: number,
+  targetY: number,
+  width: number,
+  height: number,
+): void {
+  const rowBytes = width * 4;
+
+  for (let y = 0; y < height; y++) {
+    const sourceOffset = ((sourceY + y) * sourceWidth + sourceX) * 4;
+    const flippedTargetY = targetHeight - 1 - (targetY + y);
+    const targetOffset = (flippedTargetY * targetWidth + targetX) * 4;
+    target.set(source.subarray(sourceOffset, sourceOffset + rowBytes), targetOffset);
+  }
+}
+
+function copyRegionFromFlippedRows(
+  source: Uint8ClampedArray,
+  sourceWidth: number,
+  sourceHeight: number,
+  sourceX: number,
+  sourceY: number,
+  target: Uint8ClampedArray,
+  targetWidth: number,
+  targetX: number,
+  targetY: number,
+  width: number,
+  height: number,
+): void {
+  const rowBytes = width * 4;
+
+  for (let y = 0; y < height; y++) {
+    const flippedSourceY = sourceHeight - 1 - (sourceY + y);
+    const sourceOffset = (flippedSourceY * sourceWidth + sourceX) * 4;
     const targetOffset = ((targetY + y) * targetWidth + targetX) * 4;
     target.set(source.subarray(sourceOffset, sourceOffset + rowBytes), targetOffset);
   }
@@ -192,16 +236,16 @@ class PaperbackImage {
   }
 
   private async load(value: string): Promise<void> {
+    const startedAt = now();
     try {
-      const bytes = parseDataUrl(value);
-      if (bytes == null) {
+      if (!isBase64DataUrl(value)) {
         throw new Error("Paperback image polyfill only supports data URLs");
       }
 
       if (globalThis.gagaku == null) {
         throw new Error("Paperback image decoding is unavailable");
       }
-      const decoded = await globalThis.gagaku.decodeImage(bytes);
+      const decoded = await globalThis.gagaku.decodeImage(value);
 
       this.naturalWidth = decoded.width;
       this.naturalHeight = decoded.height;
@@ -209,6 +253,11 @@ class PaperbackImage {
       this.height = decoded.height;
       this.pixels = new Uint8ClampedArray(decoded.pixels);
       this.complete = true;
+      profileImageOperation(
+        "Image.src decode",
+        startedAt,
+        `${this.width}x${this.height} ${this.pixels.length} rgba bytes`,
+      );
       this.onload?.(createEvent("load"));
     } catch (error) {
       this.onerror?.(
@@ -228,6 +277,7 @@ class PaperbackCanvasRenderingContext2D {
     dw?: number,
     dh?: number,
   ): void {
+    const startedAt = now();
     if (!image.complete) {
       return;
     }
@@ -261,9 +311,15 @@ class PaperbackCanvasRenderingContext2D {
       region.width,
       region.height,
     );
+    profileImageOperation(
+      "CanvasRenderingContext2D.drawImage",
+      startedAt,
+      `${region.width}x${region.height}`,
+    );
   }
 
   getImageData(sx: number, sy: number, sw: number, sh: number): ImageData {
+    const startedAt = now();
     const width = Math.trunc(sw);
     const height = Math.trunc(sh);
     const pixels = new Uint8ClampedArray(new ArrayBuffer(width * height * 4));
@@ -281,13 +337,14 @@ class PaperbackCanvasRenderingContext2D {
     );
 
     if (region != null) {
-      copyRegion(
+      copyRegionToFlippedRows(
         this.canvas.pixels,
         this.canvas.width,
         region.sourceX,
         region.sourceY,
         pixels,
         width,
+        height,
         region.targetX,
         region.targetY,
         region.width,
@@ -295,11 +352,17 @@ class PaperbackCanvasRenderingContext2D {
       );
     }
 
-    return new ImageData(flipRows(pixels, width, height), width, height);
+    const imageData = new ImageData(pixels, width, height);
+    profileImageOperation(
+      "CanvasRenderingContext2D.getImageData",
+      startedAt,
+      `${width}x${height}`,
+    );
+    return imageData;
   }
 
   putImageData(imageData: ImageData, dx: number, dy: number): void {
-    const pixels = flipRows(imageData.data, imageData.width, imageData.height);
+    const startedAt = now();
     const region = clipCopyRegion(
       imageData.width,
       imageData.height,
@@ -317,9 +380,10 @@ class PaperbackCanvasRenderingContext2D {
       return;
     }
 
-    copyRegion(
-      pixels,
+    copyRegionFromFlippedRows(
+      imageData.data,
       imageData.width,
+      imageData.height,
       region.sourceX,
       region.sourceY,
       this.canvas.pixels,
@@ -329,6 +393,11 @@ class PaperbackCanvasRenderingContext2D {
       region.width,
       region.height,
     );
+    profileImageOperation(
+      "CanvasRenderingContext2D.putImageData",
+      startedAt,
+      `${region.width}x${region.height}`,
+    );
   }
 }
 
@@ -336,15 +405,29 @@ class PaperbackCanvas {
   private _width = 300;
   private _height = 150;
   private _context: PaperbackCanvasRenderingContext2D | undefined;
+  private _pixels: Uint8ClampedArray<ArrayBuffer> | undefined;
 
-  pixels = new Uint8ClampedArray(new ArrayBuffer(this._width * this._height * 4));
+  get pixels(): Uint8ClampedArray<ArrayBuffer> {
+    this._pixels ??= new Uint8ClampedArray(
+      new ArrayBuffer(this._width * this._height * 4),
+    );
+    return this._pixels;
+  }
+
+  set pixels(value: Uint8ClampedArray<ArrayBuffer>) {
+    this._pixels = value;
+  }
 
   get width(): number {
     return this._width;
   }
 
   set width(value: number) {
-    this._width = Math.max(0, Math.trunc(value));
+    const width = Math.max(0, Math.trunc(value));
+    if (width === this._width) {
+      return;
+    }
+    this._width = width;
     this.resize();
   }
 
@@ -353,7 +436,11 @@ class PaperbackCanvas {
   }
 
   set height(value: number) {
-    this._height = Math.max(0, Math.trunc(value));
+    const height = Math.max(0, Math.trunc(value));
+    if (height === this._height) {
+      return;
+    }
+    this._height = height;
     this.resize();
   }
 
@@ -367,13 +454,18 @@ class PaperbackCanvas {
   }
 
   toDataURL(): string {
-    return encodePngDataUrl(this.pixels, this.width, this.height);
+    const startedAt = now();
+    const dataUrl = encodePngDataUrl(this.pixels, this.width, this.height);
+    profileImageOperation(
+      "HTMLCanvasElement.toDataURL",
+      startedAt,
+      `${this.width}x${this.height} ${dataUrl.length} chars`,
+    );
+    return dataUrl;
   }
 
   private resize(): void {
-    this.pixels = new Uint8ClampedArray(
-      new ArrayBuffer(this.width * this.height * 4),
-    );
+    this._pixels = undefined;
   }
 }
 
