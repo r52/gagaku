@@ -153,6 +153,8 @@ void main() {
           'sec-ch-ua-full-version-list': request.headers.value(
             'sec-ch-ua-full-version-list',
           ),
+          'origin': request.headers.value('origin'),
+          'referer': request.headers.value('referer'),
           'cookie': request.headers.value(HttpHeaders.cookieHeader),
           'body': body,
         });
@@ -311,10 +313,29 @@ const responseInterceptorTarget = {
 
 const requestBindingTarget = {
   run: async (url) => {
+    await Application.scheduleRequest({
+      url,
+      method: "GET",
+      headers: { "X-Phase": "no-referer" }
+    });
+
+    await Application.scheduleRequest({
+      url,
+      method: "GET",
+      headers: {
+        "X-Phase": "explicit-origin",
+        "Referer": "https://reader.example/explicit",
+        "Origin": "https://extension.example"
+      }
+    });
+
     const [response, body] = await Application.scheduleRequest({
       url,
       method: "POST",
-      headers: { "X-Phase": "original" },
+      headers: {
+        "X-Phase": "original",
+        "Referer": "https://reader.example/chapter/1?token=abc"
+      },
       cookies: { session: "abc" },
       body: "hello from fjs"
     });
@@ -734,22 +755,32 @@ globalThis.source.phase2source = {
       'http://127.0.0.1:${server.port}/phase4',
     ]);
 
-    expect(receivedRequests, hasLength(1));
-    expect(receivedRequests.single['method'], 'POST');
-    expect(receivedRequests.single['x-phase'], 'intercepted');
-    expect(receivedRequests.single['user-agent'], 'Phase Test Browser/123');
+    expect(receivedRequests, hasLength(3));
+    final noRefererRequest = receivedRequests[0];
+    final explicitOriginRequest = receivedRequests[1];
+    final requestWithReferer = receivedRequests[2];
+
+    expect(noRefererRequest['origin'], isNull);
+    expect(noRefererRequest['referer'], isNull);
+    expect(explicitOriginRequest['origin'], 'https://extension.example');
+    expect(explicitOriginRequest['referer'], 'https://reader.example/explicit');
+    expect(requestWithReferer['method'], 'POST');
+    expect(requestWithReferer['x-phase'], 'intercepted');
+    expect(requestWithReferer['user-agent'], 'Phase Test Browser/123');
+    expect(requestWithReferer['sec-ch-ua'], '"Phase Test Browser";v="123"');
+    expect(requestWithReferer['sec-ch-ua-mobile'], '?0');
+    expect(requestWithReferer['sec-ch-ua-platform'], '"Linux"');
     expect(
-      receivedRequests.single['sec-ch-ua'],
-      '"Phase Test Browser";v="123"',
-    );
-    expect(receivedRequests.single['sec-ch-ua-mobile'], '?0');
-    expect(receivedRequests.single['sec-ch-ua-platform'], '"Linux"');
-    expect(
-      receivedRequests.single['sec-ch-ua-full-version-list'],
+      requestWithReferer['sec-ch-ua-full-version-list'],
       '"Phase Test Browser";v="123.4.5.6"',
     );
-    expect(receivedRequests.single['cookie'], contains('session=abc'));
-    expect(receivedRequests.single['body'], 'hello from fjs');
+    expect(requestWithReferer['origin'], 'https://reader.example');
+    expect(
+      requestWithReferer['referer'],
+      'https://reader.example/chapter/1?token=abc',
+    );
+    expect(requestWithReferer['cookie'], contains('session=abc'));
+    expect(requestWithReferer['body'], 'hello from fjs');
     expect(requestResult['defaultUserAgent'], 'Phase Test Browser/123');
     expect(requestResult['status'], 201);
     expect(

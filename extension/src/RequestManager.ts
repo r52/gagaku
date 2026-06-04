@@ -101,6 +101,20 @@ export class MockRequestManager implements RequestManager {
     );
   }
 
+  private headerValue(
+    headers: Record<string, string>,
+    name: string,
+  ): string | undefined {
+    const normalizedName = name.toLowerCase();
+    for (const [headerName, value] of Object.entries(headers)) {
+      if (headerName.toLowerCase() === normalizedName) {
+        return value;
+      }
+    }
+
+    return undefined;
+  }
+
   private mergeDefaultUserAgentHeaders(
     headers: Record<string, string>,
   ): Record<string, string> {
@@ -113,6 +127,26 @@ export class MockRequestManager implements RequestManager {
     }
 
     return mergedHeaders;
+  }
+
+  private applyRefererOriginHeader(headers: Record<string, string>): void {
+    if (this.hasHeader(headers, "origin")) {
+      return;
+    }
+
+    const referer = this.headerValue(headers, "referer");
+    if (!referer) {
+      return;
+    }
+
+    try {
+      const origin = new URL(referer).origin;
+      if (origin !== "null") {
+        headers["Origin"] = origin;
+      }
+    } catch {
+      // Extensions may provide malformed Referer values. Leave them untouched.
+    }
   }
 
   private async prepareRequest(request: Request): Promise<{
@@ -164,6 +198,7 @@ export class MockRequestManager implements RequestManager {
     const requestHeaders = this.mergeDefaultUserAgentHeaders({
       ...(finalRequest.headers ?? {}),
     });
+    this.applyRefererOriginHeader(requestHeaders);
     if (finalRequest.cookies) {
       const rawCookies = finalRequest.cookies;
       requestHeaders["Cookie"] = Object.keys(finalRequest.cookies)
