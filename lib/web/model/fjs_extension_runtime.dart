@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:isolate';
 
 import 'package:collection/collection.dart';
 import 'package:fjs/fjs.dart';
@@ -48,17 +49,143 @@ class _RuntimeEvalExecutor {
   }
 }
 
-Map<String, Object> _decodeImagePixels(Uint8List bytes) {
+class _DecodedImagePixels {
+  const _DecodedImagePixels({
+    required this.width,
+    required this.height,
+    required this.pixels,
+    required this.workerElapsed,
+  });
+
+  final int width;
+  final int height;
+  final Uint8List pixels;
+  final Duration workerElapsed;
+}
+
+class _ImageDecodeWorker {
+  Future<SendPort>? _sendPortFuture;
+  var _nextId = 0;
+  final _pending = <int, Completer<_DecodedImagePixels>>{};
+
+  Future<_DecodedImagePixels> decode(dynamic payload) async {
+    final messagePayload = switch (payload) {
+      Uint8List bytes => TransferableTypedData.fromList([bytes]),
+      String dataUrl => dataUrl,
+      _ => throw StateError('Invalid decodeImage payload'),
+    };
+    final sendPort = await (_sendPortFuture ??= _start());
+    final completer = Completer<_DecodedImagePixels>();
+    final id = _nextId++;
+    _pending[id] = completer;
+
+    sendPort.send([id, messagePayload]);
+    return completer.future;
+  }
+
+  Future<SendPort> _start() async {
+    final receivePort = ReceivePort();
+    final sendPortCompleter = Completer<SendPort>();
+    receivePort.listen((message) {
+      switch (message) {
+        case SendPort sendPort:
+          sendPortCompleter.complete(sendPort);
+        case List message:
+          _handleWorkerResult(message);
+      }
+    });
+
+    await Isolate.spawn(
+      _imageDecodeWorkerMain,
+      receivePort.sendPort,
+      debugName: 'gagaku image decoder',
+    );
+    return sendPortCompleter.future;
+  }
+
+  void _handleWorkerResult(List<dynamic> message) {
+    final id = message[0] as int;
+    final completer = _pending.remove(id);
+    if (completer == null) {
+      return;
+    }
+
+    final ok = message[1] as bool;
+    if (!ok) {
+      completer.completeError(StateError(message[2] as String));
+      return;
+    }
+
+    final pixels = (message[4] as TransferableTypedData)
+        .materialize()
+        .asUint8List();
+    completer.complete(
+      _DecodedImagePixels(
+        width: message[2] as int,
+        height: message[3] as int,
+        pixels: pixels,
+        workerElapsed: Duration(microseconds: message[5] as int),
+      ),
+    );
+  }
+}
+
+final _imageDecodeWorker = _ImageDecodeWorker();
+
+Uint8List _decodeDataUrlBytes(String dataUrl) {
+  final comma = dataUrl.indexOf(',');
+  if (comma < 0 ||
+      !dataUrl.substring(0, comma).toLowerCase().contains(';base64')) {
+    throw const FormatException('Unsupported image data URL');
+  }
+  return base64Decode(dataUrl.substring(comma + 1));
+}
+
+_DecodedImagePixels _decodeImagePixels(dynamic payload) {
+  final stopwatch = Stopwatch()..start();
+  final bytes = switch (payload) {
+    TransferableTypedData data => data.materialize().asUint8List(),
+    String dataUrl => _decodeDataUrlBytes(dataUrl),
+    Uint8List bytes => bytes,
+    _ => throw const FormatException('Invalid decodeImage payload'),
+  };
+
   final decoded = image.decodeImage(bytes);
   if (decoded == null) {
     throw const FormatException('Unsupported image format');
   }
 
-  return {
-    'width': decoded.width,
-    'height': decoded.height,
-    'pixels': decoded.getBytes(order: image.ChannelOrder.rgba),
-  };
+  return _DecodedImagePixels(
+    width: decoded.width,
+    height: decoded.height,
+    pixels: decoded.getBytes(order: image.ChannelOrder.rgba),
+    workerElapsed: stopwatch.elapsed,
+  );
+}
+
+void _imageDecodeWorkerMain(SendPort mainPort) {
+  final receivePort = ReceivePort();
+  mainPort.send(receivePort.sendPort);
+  receivePort.listen((message) {
+    if (message is! List || message.length < 2) {
+      return;
+    }
+
+    final id = message[0] as int;
+    try {
+      final decoded = _decodeImagePixels(message[1]);
+      mainPort.send([
+        id,
+        true,
+        decoded.width,
+        decoded.height,
+        TransferableTypedData.fromList([decoded.pixels]),
+        decoded.workerElapsed.inMicroseconds,
+      ]);
+    } catch (error) {
+      mainPort.send([id, false, error.toString()]);
+    }
+  });
 }
 
 class FjsExtensionRuntime implements ExtensionRuntime {
@@ -322,16 +449,16 @@ globalThis.self = globalThis;
 globalThis.global = globalThis;
 globalThis.source ??= {};
 
-globalThis.gagaku = {
+globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
   callHandler: async (handlerName, ...args) => {
     return await fjs.bridge_call(
       JSON.stringify({ handlerName, args })
     );
   },
-  decodeImage: async (bytes) => {
-    return await fjs.bridge_call({ channel: "decodeImage", bytes });
+  decodeImage: async (payload) => {
+    return await fjs.bridge_call({ channel: "decodeImage", payload });
   }
-};
+});
 ''';
   }
 
@@ -522,7 +649,7 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
       return JsResult.ok(const JsValue.none());
     }
     if (payload['channel'] == 'decodeImage') {
-      return _handleDecodeImage(payload['bytes']);
+      return _handleDecodeImage(payload['payload'] ?? payload['bytes']);
     }
 
     final handlerName = payload['handlerName'];
@@ -593,19 +720,40 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
 
   Future<JsResult> _handleDecodeImage(dynamic payload) async {
     try {
-      final bytes = switch (payload) {
+      final normalizedPayload = switch (payload) {
         Uint8List bytes => bytes,
         List values => Uint8List.fromList(values.cast<int>()),
+        String dataUrl => dataUrl,
         _ => null,
       };
-      if (bytes == null) {
+      if (normalizedPayload == null) {
         return const JsResult.err(
           JsError.bridge('Invalid decodeImage payload'),
         );
       }
 
+      final stopwatch = Stopwatch()..start();
+      final decoded = await _imageDecodeWorker.decode(normalizedPayload);
+      final elapsed = stopwatch.elapsed;
+      final inputSize = switch (normalizedPayload) {
+        String dataUrl => dataUrl.length,
+        Uint8List bytes => bytes.lengthInBytes,
+        _ => 0,
+      };
+      debugPrint(
+        'fjs[$sourceId] image.decode '
+        '${decoded.width}x${decoded.height} '
+        '$inputSize input bytes/chars '
+        '${decoded.pixels.lengthInBytes} rgba bytes '
+        'worker=${decoded.workerElapsed.inMilliseconds}ms '
+        'total=${elapsed.inMilliseconds}ms',
+      );
       return JsResult.ok(
-        JsValue.from(await compute(_decodeImagePixels, bytes)),
+        JsValue.from({
+          'width': decoded.width,
+          'height': decoded.height,
+          'pixels': decoded.pixels,
+        }),
       );
     } catch (error) {
       return JsResult.err(JsError.bridge(error.toString()));
@@ -885,21 +1033,55 @@ return await globalThis.$sourceId.getSortingOptions?.(query) ?? null;
   @override
   Future<Uint8List> processImageRequest(String url) async {
     final result = await _evalScoped("""
-const [, body] = await globalThis.Application.scheduleRequest({
+const [response, body] = await globalThis.Application.scheduleRequest({
   url: ${_json(url)},
   method: "GET"
 });
-return new Uint8Array(body);
+return [
+  response.status ?? null,
+  response.url ?? null,
+  response.mimeType ?? null,
+  new Uint8Array(body)
+];
 """);
 
     final value = result.value;
-    return switch (value) {
+    if (value is! List || value.length < 4) {
+      throw StateError(
+        'Expected fjs image request to return response metadata, got '
+        '${value.runtimeType}',
+      );
+    }
+
+    final statusCode = switch (value[0]) {
+      int status => status,
+      num status => status.toInt(),
+      _ => null,
+    };
+    final responseUrl = value[1] as String?;
+    final mimeType = value[2] as String?;
+    final rawBytes = value[3];
+    final bytes = switch (rawBytes) {
       Uint8List bytes => bytes,
       List bytes => Uint8List.fromList(bytes.cast<int>()),
       _ => throw StateError(
-        'Expected fjs image request to return bytes, got ${value.runtimeType}',
+        'Expected fjs image request to return bytes, got '
+        '${rawBytes.runtimeType}',
       ),
     };
+
+    if (kDebugMode) {
+      final failed = statusCode != null && statusCode >= 400;
+      debugPrint(
+        'fjs[$sourceId] image.request${failed ? ' failed' : ''} '
+        'status=${statusCode ?? 'unknown'} '
+        '${bytes.lengthInBytes} bytes '
+        'mime=${mimeType ?? 'unknown'} '
+        'url=${responseUrl ?? url}',
+      );
+    }
+
+    return bytes;
   }
 
   @override
