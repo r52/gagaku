@@ -2,14 +2,11 @@ import { MockDiscoverSectionManager } from "./DiscoverSectionManager";
 import { MockSelectorRegistry } from "./Selector";
 import { MockRequestManager } from "./RequestManager";
 import { FormManager } from "./FormManager";
-import { installPaperbackCanvasPolyfill } from "./CanvasPolyfill";
 import { base64ToBytes, bytesToBase64, bytesToBinaryString } from "./Base64";
 
 import { decodeHTMLStrict } from "entities";
 import type { SelectorID } from "@paperback/types";
 import md5 from "md5";
-
-installPaperbackCanvasPolyfill();
 
 export function ApplicationPolyfill(): typeof Application {
   let stateStorage: Record<string, unknown> = {};

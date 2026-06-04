@@ -1033,21 +1033,55 @@ return await globalThis.$sourceId.getSortingOptions?.(query) ?? null;
   @override
   Future<Uint8List> processImageRequest(String url) async {
     final result = await _evalScoped("""
-const [, body] = await globalThis.Application.scheduleRequest({
+const [response, body] = await globalThis.Application.scheduleRequest({
   url: ${_json(url)},
   method: "GET"
 });
-return new Uint8Array(body);
+return [
+  response.status ?? null,
+  response.url ?? null,
+  response.mimeType ?? null,
+  new Uint8Array(body)
+];
 """);
 
     final value = result.value;
-    return switch (value) {
+    if (value is! List || value.length < 4) {
+      throw StateError(
+        'Expected fjs image request to return response metadata, got '
+        '${value.runtimeType}',
+      );
+    }
+
+    final statusCode = switch (value[0]) {
+      int status => status,
+      num status => status.toInt(),
+      _ => null,
+    };
+    final responseUrl = value[1] as String?;
+    final mimeType = value[2] as String?;
+    final rawBytes = value[3];
+    final bytes = switch (rawBytes) {
       Uint8List bytes => bytes,
       List bytes => Uint8List.fromList(bytes.cast<int>()),
       _ => throw StateError(
-        'Expected fjs image request to return bytes, got ${value.runtimeType}',
+        'Expected fjs image request to return bytes, got '
+        '${rawBytes.runtimeType}',
       ),
     };
+
+    if (kDebugMode) {
+      final failed = statusCode != null && statusCode >= 400;
+      debugPrint(
+        'fjs[$sourceId] image.request${failed ? ' failed' : ''} '
+        'status=${statusCode ?? 'unknown'} '
+        '${bytes.lengthInBytes} bytes '
+        'mime=${mimeType ?? 'unknown'} '
+        'url=${responseUrl ?? url}',
+      );
+    }
+
+    return bytes;
   }
 
   @override

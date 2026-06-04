@@ -623,12 +623,19 @@ globalThis.source.phase2source = {
   canvas.height = 1;
   const context = canvas.getContext("2d");
   context.drawImage(image, 0, 0);
+  const nativeImageData = new ImageData(new Uint8ClampedArray(8), 1);
+  nativeImageData.data[0] = 5;
+  nativeImageData.data[1] = 260;
+  nativeImageData.data[2] = -20;
+  nativeImageData.data[3] = 7;
   return {
     pixels: Array.from(context.getImageData(0, 0, 1, 1).data),
     dataUrl: canvas.toDataURL(),
     imageDataLength: new ImageData(1, 1).data.length,
     inferredImageDataHeight:
-      new ImageData(new Uint8ClampedArray(8), 1).height
+      new ImageData(new Uint8ClampedArray(8), 1).height,
+    nativeImageDataProbe:
+      globalThis.gagaku?.nativeCanvas?.inspectImageData(nativeImageData)
   };
 })()
 ''');
@@ -637,6 +644,16 @@ globalThis.source.phase2source = {
     expect(canvasData['pixels'], [255, 0, 0, 255]);
     expect(canvasData['imageDataLength'], 4);
     expect(canvasData['inferredImageDataHeight'], 2);
+    expect(canvasData['nativeImageDataProbe'], {
+      'width': 1,
+      'height': 2,
+      'length': 8,
+      'checksum': 267,
+      'first': 5,
+      'second': 255,
+      'third': 0,
+      'fourth': 7,
+    });
     final dataUrl = canvasData['dataUrl'] as String;
     expect(dataUrl, startsWith('data:image/png;base64,'));
     final pngComma = dataUrl.indexOf(',');
