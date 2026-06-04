@@ -573,7 +573,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     final expectedDomain = Uri.parse(source.baseUrl!).host;
     final pbCookies = cookies
         .map(
-          (cookie) => PBDocumentCookie(
+          (cookie) => PaperbackCookie(
             name: cookie.name,
             value: cookie.value,
             domain: cookie.domain ?? expectedDomain,
@@ -839,7 +839,15 @@ return await globalThis.$sourceId.getChapterDetails(chapter);
     final details = ChapterDetails.fromJson(
       _normalizeBridgeJsonMap(detailsJson, 'getChapterDetails'),
     );
-    return details.pages;
+    return switch (details) {
+      ImageChapterDetails(:final pages) => pages,
+      HtmlChapterDetails() => throw UnsupportedError(
+        'Text novel chapters are not supported',
+      ),
+      FileChapterDetails() => throw UnsupportedError(
+        'File chapters are not supported',
+      ),
+    };
   }
 
   @override

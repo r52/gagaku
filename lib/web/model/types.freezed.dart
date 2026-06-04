@@ -3344,7 +3344,7 @@ $MangaInfoCopyWith<$Res> get mangaInfo {
 /// @nodoc
 mixin _$MangaInfo {
 
- String get thumbnailUrl; String get synopsis; String get primaryTitle; List<String> get secondaryTitles;@ContentRatingParser() ContentRating get contentRating; String? get status; String? get artist; String? get author; String? get bannerUrl; num? get rating; List<TagSection>? get tagGroups; List<String>? get artworkUrls; Map<String, String>? get additionalInfo; String? get shareUrl;
+ String get thumbnailUrl; String get synopsis; String get primaryTitle; List<String> get secondaryTitles;@ContentRatingParser() ContentRating get contentRating; MangaContentType? get contentType; String? get status; String? get artist; String? get author; String? get bannerUrl; num? get rating; List<TagSection>? get tagGroups; List<String>? get artworkUrls; Map<String, String>? get additionalInfo; String? get shareUrl;
 /// Create a copy of MangaInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3357,16 +3357,16 @@ $MangaInfoCopyWith<MangaInfo> get copyWith => _$MangaInfoCopyWithImpl<MangaInfo>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfo&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.synopsis, synopsis) || other.synopsis == synopsis)&&(identical(other.primaryTitle, primaryTitle) || other.primaryTitle == primaryTitle)&&const DeepCollectionEquality().equals(other.secondaryTitles, secondaryTitles)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.status, status) || other.status == status)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.rating, rating) || other.rating == rating)&&const DeepCollectionEquality().equals(other.tagGroups, tagGroups)&&const DeepCollectionEquality().equals(other.artworkUrls, artworkUrls)&&const DeepCollectionEquality().equals(other.additionalInfo, additionalInfo)&&(identical(other.shareUrl, shareUrl) || other.shareUrl == shareUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfo&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.synopsis, synopsis) || other.synopsis == synopsis)&&(identical(other.primaryTitle, primaryTitle) || other.primaryTitle == primaryTitle)&&const DeepCollectionEquality().equals(other.secondaryTitles, secondaryTitles)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.contentType, contentType) || other.contentType == contentType)&&(identical(other.status, status) || other.status == status)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.rating, rating) || other.rating == rating)&&const DeepCollectionEquality().equals(other.tagGroups, tagGroups)&&const DeepCollectionEquality().equals(other.artworkUrls, artworkUrls)&&const DeepCollectionEquality().equals(other.additionalInfo, additionalInfo)&&(identical(other.shareUrl, shareUrl) || other.shareUrl == shareUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,thumbnailUrl,synopsis,primaryTitle,const DeepCollectionEquality().hash(secondaryTitles),contentRating,status,artist,author,bannerUrl,rating,const DeepCollectionEquality().hash(tagGroups),const DeepCollectionEquality().hash(artworkUrls),const DeepCollectionEquality().hash(additionalInfo),shareUrl);
+int get hashCode => Object.hash(runtimeType,thumbnailUrl,synopsis,primaryTitle,const DeepCollectionEquality().hash(secondaryTitles),contentRating,contentType,status,artist,author,bannerUrl,rating,const DeepCollectionEquality().hash(tagGroups),const DeepCollectionEquality().hash(artworkUrls),const DeepCollectionEquality().hash(additionalInfo),shareUrl);
 
 @override
 String toString() {
-  return 'MangaInfo(thumbnailUrl: $thumbnailUrl, synopsis: $synopsis, primaryTitle: $primaryTitle, secondaryTitles: $secondaryTitles, contentRating: $contentRating, status: $status, artist: $artist, author: $author, bannerUrl: $bannerUrl, rating: $rating, tagGroups: $tagGroups, artworkUrls: $artworkUrls, additionalInfo: $additionalInfo, shareUrl: $shareUrl)';
+  return 'MangaInfo(thumbnailUrl: $thumbnailUrl, synopsis: $synopsis, primaryTitle: $primaryTitle, secondaryTitles: $secondaryTitles, contentRating: $contentRating, contentType: $contentType, status: $status, artist: $artist, author: $author, bannerUrl: $bannerUrl, rating: $rating, tagGroups: $tagGroups, artworkUrls: $artworkUrls, additionalInfo: $additionalInfo, shareUrl: $shareUrl)';
 }
 
 
@@ -3377,7 +3377,7 @@ abstract mixin class $MangaInfoCopyWith<$Res>  {
   factory $MangaInfoCopyWith(MangaInfo value, $Res Function(MangaInfo) _then) = _$MangaInfoCopyWithImpl;
 @useResult
 $Res call({
- String thumbnailUrl, String synopsis, String primaryTitle, List<String> secondaryTitles,@ContentRatingParser() ContentRating contentRating, String? status, String? artist, String? author, String? bannerUrl, num? rating, List<TagSection>? tagGroups, List<String>? artworkUrls, Map<String, String>? additionalInfo, String? shareUrl
+ String thumbnailUrl, String synopsis, String primaryTitle, List<String> secondaryTitles,@ContentRatingParser() ContentRating contentRating, MangaContentType? contentType, String? status, String? artist, String? author, String? bannerUrl, num? rating, List<TagSection>? tagGroups, List<String>? artworkUrls, Map<String, String>? additionalInfo, String? shareUrl
 });
 
 
@@ -3394,14 +3394,15 @@ class _$MangaInfoCopyWithImpl<$Res>
 
 /// Create a copy of MangaInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? thumbnailUrl = null,Object? synopsis = null,Object? primaryTitle = null,Object? secondaryTitles = null,Object? contentRating = null,Object? status = freezed,Object? artist = freezed,Object? author = freezed,Object? bannerUrl = freezed,Object? rating = freezed,Object? tagGroups = freezed,Object? artworkUrls = freezed,Object? additionalInfo = freezed,Object? shareUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? thumbnailUrl = null,Object? synopsis = null,Object? primaryTitle = null,Object? secondaryTitles = null,Object? contentRating = null,Object? contentType = freezed,Object? status = freezed,Object? artist = freezed,Object? author = freezed,Object? bannerUrl = freezed,Object? rating = freezed,Object? tagGroups = freezed,Object? artworkUrls = freezed,Object? additionalInfo = freezed,Object? shareUrl = freezed,}) {
   return _then(_self.copyWith(
 thumbnailUrl: null == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String,synopsis: null == synopsis ? _self.synopsis : synopsis // ignore: cast_nullable_to_non_nullable
 as String,primaryTitle: null == primaryTitle ? _self.primaryTitle : primaryTitle // ignore: cast_nullable_to_non_nullable
 as String,secondaryTitles: null == secondaryTitles ? _self.secondaryTitles : secondaryTitles // ignore: cast_nullable_to_non_nullable
 as List<String>,contentRating: null == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
-as ContentRating,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as ContentRating,contentType: freezed == contentType ? _self.contentType : contentType // ignore: cast_nullable_to_non_nullable
+as MangaContentType?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String?,artist: freezed == artist ? _self.artist : artist // ignore: cast_nullable_to_non_nullable
 as String?,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as String?,bannerUrl: freezed == bannerUrl ? _self.bannerUrl : bannerUrl // ignore: cast_nullable_to_non_nullable
@@ -3422,7 +3423,7 @@ as String?,
 @JsonSerializable()
 
 class _MangaInfo implements MangaInfo {
-  const _MangaInfo({required this.thumbnailUrl, required this.synopsis, required this.primaryTitle, required final  List<String> secondaryTitles, @ContentRatingParser() required this.contentRating, this.status, this.artist, this.author, this.bannerUrl, this.rating, final  List<TagSection>? tagGroups, final  List<String>? artworkUrls, final  Map<String, String>? additionalInfo, this.shareUrl}): _secondaryTitles = secondaryTitles,_tagGroups = tagGroups,_artworkUrls = artworkUrls,_additionalInfo = additionalInfo;
+  const _MangaInfo({required this.thumbnailUrl, required this.synopsis, required this.primaryTitle, required final  List<String> secondaryTitles, @ContentRatingParser() required this.contentRating, this.contentType, this.status, this.artist, this.author, this.bannerUrl, this.rating, final  List<TagSection>? tagGroups, final  List<String>? artworkUrls, final  Map<String, String>? additionalInfo, this.shareUrl}): _secondaryTitles = secondaryTitles,_tagGroups = tagGroups,_artworkUrls = artworkUrls,_additionalInfo = additionalInfo;
   factory _MangaInfo.fromJson(Map<String, dynamic> json) => _$MangaInfoFromJson(json);
 
 @override final  String thumbnailUrl;
@@ -3436,6 +3437,7 @@ class _MangaInfo implements MangaInfo {
 }
 
 @override@ContentRatingParser() final  ContentRating contentRating;
+@override final  MangaContentType? contentType;
 @override final  String? status;
 @override final  String? artist;
 @override final  String? author;
@@ -3483,16 +3485,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaInfo&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.synopsis, synopsis) || other.synopsis == synopsis)&&(identical(other.primaryTitle, primaryTitle) || other.primaryTitle == primaryTitle)&&const DeepCollectionEquality().equals(other._secondaryTitles, _secondaryTitles)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.status, status) || other.status == status)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.rating, rating) || other.rating == rating)&&const DeepCollectionEquality().equals(other._tagGroups, _tagGroups)&&const DeepCollectionEquality().equals(other._artworkUrls, _artworkUrls)&&const DeepCollectionEquality().equals(other._additionalInfo, _additionalInfo)&&(identical(other.shareUrl, shareUrl) || other.shareUrl == shareUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaInfo&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.synopsis, synopsis) || other.synopsis == synopsis)&&(identical(other.primaryTitle, primaryTitle) || other.primaryTitle == primaryTitle)&&const DeepCollectionEquality().equals(other._secondaryTitles, _secondaryTitles)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.contentType, contentType) || other.contentType == contentType)&&(identical(other.status, status) || other.status == status)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.rating, rating) || other.rating == rating)&&const DeepCollectionEquality().equals(other._tagGroups, _tagGroups)&&const DeepCollectionEquality().equals(other._artworkUrls, _artworkUrls)&&const DeepCollectionEquality().equals(other._additionalInfo, _additionalInfo)&&(identical(other.shareUrl, shareUrl) || other.shareUrl == shareUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,thumbnailUrl,synopsis,primaryTitle,const DeepCollectionEquality().hash(_secondaryTitles),contentRating,status,artist,author,bannerUrl,rating,const DeepCollectionEquality().hash(_tagGroups),const DeepCollectionEquality().hash(_artworkUrls),const DeepCollectionEquality().hash(_additionalInfo),shareUrl);
+int get hashCode => Object.hash(runtimeType,thumbnailUrl,synopsis,primaryTitle,const DeepCollectionEquality().hash(_secondaryTitles),contentRating,contentType,status,artist,author,bannerUrl,rating,const DeepCollectionEquality().hash(_tagGroups),const DeepCollectionEquality().hash(_artworkUrls),const DeepCollectionEquality().hash(_additionalInfo),shareUrl);
 
 @override
 String toString() {
-  return 'MangaInfo(thumbnailUrl: $thumbnailUrl, synopsis: $synopsis, primaryTitle: $primaryTitle, secondaryTitles: $secondaryTitles, contentRating: $contentRating, status: $status, artist: $artist, author: $author, bannerUrl: $bannerUrl, rating: $rating, tagGroups: $tagGroups, artworkUrls: $artworkUrls, additionalInfo: $additionalInfo, shareUrl: $shareUrl)';
+  return 'MangaInfo(thumbnailUrl: $thumbnailUrl, synopsis: $synopsis, primaryTitle: $primaryTitle, secondaryTitles: $secondaryTitles, contentRating: $contentRating, contentType: $contentType, status: $status, artist: $artist, author: $author, bannerUrl: $bannerUrl, rating: $rating, tagGroups: $tagGroups, artworkUrls: $artworkUrls, additionalInfo: $additionalInfo, shareUrl: $shareUrl)';
 }
 
 
@@ -3503,7 +3505,7 @@ abstract mixin class _$MangaInfoCopyWith<$Res> implements $MangaInfoCopyWith<$Re
   factory _$MangaInfoCopyWith(_MangaInfo value, $Res Function(_MangaInfo) _then) = __$MangaInfoCopyWithImpl;
 @override @useResult
 $Res call({
- String thumbnailUrl, String synopsis, String primaryTitle, List<String> secondaryTitles,@ContentRatingParser() ContentRating contentRating, String? status, String? artist, String? author, String? bannerUrl, num? rating, List<TagSection>? tagGroups, List<String>? artworkUrls, Map<String, String>? additionalInfo, String? shareUrl
+ String thumbnailUrl, String synopsis, String primaryTitle, List<String> secondaryTitles,@ContentRatingParser() ContentRating contentRating, MangaContentType? contentType, String? status, String? artist, String? author, String? bannerUrl, num? rating, List<TagSection>? tagGroups, List<String>? artworkUrls, Map<String, String>? additionalInfo, String? shareUrl
 });
 
 
@@ -3520,14 +3522,15 @@ class __$MangaInfoCopyWithImpl<$Res>
 
 /// Create a copy of MangaInfo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? thumbnailUrl = null,Object? synopsis = null,Object? primaryTitle = null,Object? secondaryTitles = null,Object? contentRating = null,Object? status = freezed,Object? artist = freezed,Object? author = freezed,Object? bannerUrl = freezed,Object? rating = freezed,Object? tagGroups = freezed,Object? artworkUrls = freezed,Object? additionalInfo = freezed,Object? shareUrl = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? thumbnailUrl = null,Object? synopsis = null,Object? primaryTitle = null,Object? secondaryTitles = null,Object? contentRating = null,Object? contentType = freezed,Object? status = freezed,Object? artist = freezed,Object? author = freezed,Object? bannerUrl = freezed,Object? rating = freezed,Object? tagGroups = freezed,Object? artworkUrls = freezed,Object? additionalInfo = freezed,Object? shareUrl = freezed,}) {
   return _then(_MangaInfo(
 thumbnailUrl: null == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String,synopsis: null == synopsis ? _self.synopsis : synopsis // ignore: cast_nullable_to_non_nullable
 as String,primaryTitle: null == primaryTitle ? _self.primaryTitle : primaryTitle // ignore: cast_nullable_to_non_nullable
 as String,secondaryTitles: null == secondaryTitles ? _self._secondaryTitles : secondaryTitles // ignore: cast_nullable_to_non_nullable
 as List<String>,contentRating: null == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
-as ContentRating,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as ContentRating,contentType: freezed == contentType ? _self.contentType : contentType // ignore: cast_nullable_to_non_nullable
+as MangaContentType?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String?,artist: freezed == artist ? _self.artist : artist // ignore: cast_nullable_to_non_nullable
 as String?,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as String?,bannerUrl: freezed == bannerUrl ? _self.bannerUrl : bannerUrl // ignore: cast_nullable_to_non_nullable
@@ -4018,9 +4021,191 @@ $SourceMangaCopyWith<$Res> get sourceManga {
 
 
 /// @nodoc
+mixin _$PaperbackRequest {
+
+ String get url; String get method; Map<String, String>? get headers; dynamic get body; Map<String, String>? get cookies;
+/// Create a copy of PaperbackRequest
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PaperbackRequestCopyWith<PaperbackRequest> get copyWith => _$PaperbackRequestCopyWithImpl<PaperbackRequest>(this as PaperbackRequest, _$identity);
+
+  /// Serializes this PaperbackRequest to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaperbackRequest&&(identical(other.url, url) || other.url == url)&&(identical(other.method, method) || other.method == method)&&const DeepCollectionEquality().equals(other.headers, headers)&&const DeepCollectionEquality().equals(other.body, body)&&const DeepCollectionEquality().equals(other.cookies, cookies));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,url,method,const DeepCollectionEquality().hash(headers),const DeepCollectionEquality().hash(body),const DeepCollectionEquality().hash(cookies));
+
+@override
+String toString() {
+  return 'PaperbackRequest(url: $url, method: $method, headers: $headers, body: $body, cookies: $cookies)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PaperbackRequestCopyWith<$Res>  {
+  factory $PaperbackRequestCopyWith(PaperbackRequest value, $Res Function(PaperbackRequest) _then) = _$PaperbackRequestCopyWithImpl;
+@useResult
+$Res call({
+ String url, String method, Map<String, String>? headers, dynamic body, Map<String, String>? cookies
+});
+
+
+
+
+}
+/// @nodoc
+class _$PaperbackRequestCopyWithImpl<$Res>
+    implements $PaperbackRequestCopyWith<$Res> {
+  _$PaperbackRequestCopyWithImpl(this._self, this._then);
+
+  final PaperbackRequest _self;
+  final $Res Function(PaperbackRequest) _then;
+
+/// Create a copy of PaperbackRequest
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? url = null,Object? method = null,Object? headers = freezed,Object? body = freezed,Object? cookies = freezed,}) {
+  return _then(_self.copyWith(
+url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
+as String,method: null == method ? _self.method : method // ignore: cast_nullable_to_non_nullable
+as String,headers: freezed == headers ? _self.headers : headers // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,body: freezed == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
+as dynamic,cookies: freezed == cookies ? _self.cookies : cookies // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _PaperbackRequest implements PaperbackRequest {
+  const _PaperbackRequest({required this.url, required this.method, final  Map<String, String>? headers, this.body, final  Map<String, String>? cookies}): _headers = headers,_cookies = cookies;
+  factory _PaperbackRequest.fromJson(Map<String, dynamic> json) => _$PaperbackRequestFromJson(json);
+
+@override final  String url;
+@override final  String method;
+ final  Map<String, String>? _headers;
+@override Map<String, String>? get headers {
+  final value = _headers;
+  if (value == null) return null;
+  if (_headers is EqualUnmodifiableMapView) return _headers;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
+
+@override final  dynamic body;
+ final  Map<String, String>? _cookies;
+@override Map<String, String>? get cookies {
+  final value = _cookies;
+  if (value == null) return null;
+  if (_cookies is EqualUnmodifiableMapView) return _cookies;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
+
+
+/// Create a copy of PaperbackRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PaperbackRequestCopyWith<_PaperbackRequest> get copyWith => __$PaperbackRequestCopyWithImpl<_PaperbackRequest>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PaperbackRequestToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaperbackRequest&&(identical(other.url, url) || other.url == url)&&(identical(other.method, method) || other.method == method)&&const DeepCollectionEquality().equals(other._headers, _headers)&&const DeepCollectionEquality().equals(other.body, body)&&const DeepCollectionEquality().equals(other._cookies, _cookies));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,url,method,const DeepCollectionEquality().hash(_headers),const DeepCollectionEquality().hash(body),const DeepCollectionEquality().hash(_cookies));
+
+@override
+String toString() {
+  return 'PaperbackRequest(url: $url, method: $method, headers: $headers, body: $body, cookies: $cookies)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PaperbackRequestCopyWith<$Res> implements $PaperbackRequestCopyWith<$Res> {
+  factory _$PaperbackRequestCopyWith(_PaperbackRequest value, $Res Function(_PaperbackRequest) _then) = __$PaperbackRequestCopyWithImpl;
+@override @useResult
+$Res call({
+ String url, String method, Map<String, String>? headers, dynamic body, Map<String, String>? cookies
+});
+
+
+
+
+}
+/// @nodoc
+class __$PaperbackRequestCopyWithImpl<$Res>
+    implements _$PaperbackRequestCopyWith<$Res> {
+  __$PaperbackRequestCopyWithImpl(this._self, this._then);
+
+  final _PaperbackRequest _self;
+  final $Res Function(_PaperbackRequest) _then;
+
+/// Create a copy of PaperbackRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? url = null,Object? method = null,Object? headers = freezed,Object? body = freezed,Object? cookies = freezed,}) {
+  return _then(_PaperbackRequest(
+url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
+as String,method: null == method ? _self.method : method // ignore: cast_nullable_to_non_nullable
+as String,headers: freezed == headers ? _self._headers : headers // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,body: freezed == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
+as dynamic,cookies: freezed == cookies ? _self._cookies : cookies // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,
+  ));
+}
+
+
+}
+
+ChapterDetails _$ChapterDetailsFromJson(
+  Map<String, dynamic> json
+) {
+        switch (json['type']) {
+                  case 'html':
+          return HtmlChapterDetails.fromJson(
+            json
+          );
+                case 'file':
+          return FileChapterDetails.fromJson(
+            json
+          );
+
+          default:
+            return ImageChapterDetails.fromJson(
+  json
+);
+        }
+
+}
+
+/// @nodoc
 mixin _$ChapterDetails {
 
- String get id; String get mangaId; List<String> get pages;
+ String get id; String get mangaId;
 /// Create a copy of ChapterDetails
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -4033,16 +4218,16 @@ $ChapterDetailsCopyWith<ChapterDetails> get copyWith => _$ChapterDetailsCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&const DeepCollectionEquality().equals(other.pages, pages));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,mangaId,const DeepCollectionEquality().hash(pages));
+int get hashCode => Object.hash(runtimeType,id,mangaId);
 
 @override
 String toString() {
-  return 'ChapterDetails(id: $id, mangaId: $mangaId, pages: $pages)';
+  return 'ChapterDetails(id: $id, mangaId: $mangaId)';
 }
 
 
@@ -4053,7 +4238,7 @@ abstract mixin class $ChapterDetailsCopyWith<$Res>  {
   factory $ChapterDetailsCopyWith(ChapterDetails value, $Res Function(ChapterDetails) _then) = _$ChapterDetailsCopyWithImpl;
 @useResult
 $Res call({
- String id, String mangaId, List<String> pages
+ String id, String mangaId
 });
 
 
@@ -4070,12 +4255,11 @@ class _$ChapterDetailsCopyWithImpl<$Res>
 
 /// Create a copy of ChapterDetails
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? mangaId = null,Object? pages = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? mangaId = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,mangaId: null == mangaId ? _self.mangaId : mangaId // ignore: cast_nullable_to_non_nullable
-as String,pages: null == pages ? _self.pages : pages // ignore: cast_nullable_to_non_nullable
-as List<String>,
+as String,
   ));
 }
 
@@ -4086,34 +4270,38 @@ as List<String>,
 /// @nodoc
 @JsonSerializable()
 
-class _ChapterDetails implements ChapterDetails {
-  const _ChapterDetails({required this.id, required this.mangaId, required final  List<String> pages}): _pages = pages;
-  factory _ChapterDetails.fromJson(Map<String, dynamic> json) => _$ChapterDetailsFromJson(json);
+class ImageChapterDetails implements ChapterDetails {
+  const ImageChapterDetails({required this.id, required this.mangaId, required final  List<String> pages, final  String? $type}): _pages = pages,$type = $type ?? 'images';
+  factory ImageChapterDetails.fromJson(Map<String, dynamic> json) => _$ImageChapterDetailsFromJson(json);
 
 @override final  String id;
 @override final  String mangaId;
  final  List<String> _pages;
-@override List<String> get pages {
+ List<String> get pages {
   if (_pages is EqualUnmodifiableListView) return _pages;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_pages);
 }
 
 
+@JsonKey(name: 'type')
+final String $type;
+
+
 /// Create a copy of ChapterDetails
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$ChapterDetailsCopyWith<_ChapterDetails> get copyWith => __$ChapterDetailsCopyWithImpl<_ChapterDetails>(this, _$identity);
+$ImageChapterDetailsCopyWith<ImageChapterDetails> get copyWith => _$ImageChapterDetailsCopyWithImpl<ImageChapterDetails>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$ChapterDetailsToJson(this, );
+  return _$ImageChapterDetailsToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&const DeepCollectionEquality().equals(other._pages, _pages));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ImageChapterDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&const DeepCollectionEquality().equals(other._pages, _pages));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -4122,15 +4310,15 @@ int get hashCode => Object.hash(runtimeType,id,mangaId,const DeepCollectionEqual
 
 @override
 String toString() {
-  return 'ChapterDetails(id: $id, mangaId: $mangaId, pages: $pages)';
+  return 'ChapterDetails.images(id: $id, mangaId: $mangaId, pages: $pages)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$ChapterDetailsCopyWith<$Res> implements $ChapterDetailsCopyWith<$Res> {
-  factory _$ChapterDetailsCopyWith(_ChapterDetails value, $Res Function(_ChapterDetails) _then) = __$ChapterDetailsCopyWithImpl;
+abstract mixin class $ImageChapterDetailsCopyWith<$Res> implements $ChapterDetailsCopyWith<$Res> {
+  factory $ImageChapterDetailsCopyWith(ImageChapterDetails value, $Res Function(ImageChapterDetails) _then) = _$ImageChapterDetailsCopyWithImpl;
 @override @useResult
 $Res call({
  String id, String mangaId, List<String> pages
@@ -4141,17 +4329,17 @@ $Res call({
 
 }
 /// @nodoc
-class __$ChapterDetailsCopyWithImpl<$Res>
-    implements _$ChapterDetailsCopyWith<$Res> {
-  __$ChapterDetailsCopyWithImpl(this._self, this._then);
+class _$ImageChapterDetailsCopyWithImpl<$Res>
+    implements $ImageChapterDetailsCopyWith<$Res> {
+  _$ImageChapterDetailsCopyWithImpl(this._self, this._then);
 
-  final _ChapterDetails _self;
-  final $Res Function(_ChapterDetails) _then;
+  final ImageChapterDetails _self;
+  final $Res Function(ImageChapterDetails) _then;
 
 /// Create a copy of ChapterDetails
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? mangaId = null,Object? pages = null,}) {
-  return _then(_ChapterDetails(
+  return _then(ImageChapterDetails(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,mangaId: null == mangaId ? _self.mangaId : mangaId // ignore: cast_nullable_to_non_nullable
 as String,pages: null == pages ? _self._pages : pages // ignore: cast_nullable_to_non_nullable
@@ -4160,6 +4348,171 @@ as List<String>,
 }
 
 
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class HtmlChapterDetails implements ChapterDetails {
+  const HtmlChapterDetails({required this.id, required this.mangaId, required this.html, final  String? $type}): $type = $type ?? 'html';
+  factory HtmlChapterDetails.fromJson(Map<String, dynamic> json) => _$HtmlChapterDetailsFromJson(json);
+
+@override final  String id;
+@override final  String mangaId;
+ final  String html;
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of ChapterDetails
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$HtmlChapterDetailsCopyWith<HtmlChapterDetails> get copyWith => _$HtmlChapterDetailsCopyWithImpl<HtmlChapterDetails>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$HtmlChapterDetailsToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HtmlChapterDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.html, html) || other.html == html));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,mangaId,html);
+
+@override
+String toString() {
+  return 'ChapterDetails.html(id: $id, mangaId: $mangaId, html: $html)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $HtmlChapterDetailsCopyWith<$Res> implements $ChapterDetailsCopyWith<$Res> {
+  factory $HtmlChapterDetailsCopyWith(HtmlChapterDetails value, $Res Function(HtmlChapterDetails) _then) = _$HtmlChapterDetailsCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String mangaId, String html
+});
+
+
+
+
+}
+/// @nodoc
+class _$HtmlChapterDetailsCopyWithImpl<$Res>
+    implements $HtmlChapterDetailsCopyWith<$Res> {
+  _$HtmlChapterDetailsCopyWithImpl(this._self, this._then);
+
+  final HtmlChapterDetails _self;
+  final $Res Function(HtmlChapterDetails) _then;
+
+/// Create a copy of ChapterDetails
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? mangaId = null,Object? html = null,}) {
+  return _then(HtmlChapterDetails(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,mangaId: null == mangaId ? _self.mangaId : mangaId // ignore: cast_nullable_to_non_nullable
+as String,html: null == html ? _self.html : html // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class FileChapterDetails implements ChapterDetails {
+  const FileChapterDetails({required this.id, required this.mangaId, required this.format, required this.request, final  String? $type}): $type = $type ?? 'file';
+  factory FileChapterDetails.fromJson(Map<String, dynamic> json) => _$FileChapterDetailsFromJson(json);
+
+@override final  String id;
+@override final  String mangaId;
+ final  ChapterFileFormat format;
+ final  PaperbackRequest request;
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of ChapterDetails
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FileChapterDetailsCopyWith<FileChapterDetails> get copyWith => _$FileChapterDetailsCopyWithImpl<FileChapterDetails>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FileChapterDetailsToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FileChapterDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.format, format) || other.format == format)&&(identical(other.request, request) || other.request == request));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,mangaId,format,request);
+
+@override
+String toString() {
+  return 'ChapterDetails.file(id: $id, mangaId: $mangaId, format: $format, request: $request)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FileChapterDetailsCopyWith<$Res> implements $ChapterDetailsCopyWith<$Res> {
+  factory $FileChapterDetailsCopyWith(FileChapterDetails value, $Res Function(FileChapterDetails) _then) = _$FileChapterDetailsCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String mangaId, ChapterFileFormat format, PaperbackRequest request
+});
+
+
+$PaperbackRequestCopyWith<$Res> get request;
+
+}
+/// @nodoc
+class _$FileChapterDetailsCopyWithImpl<$Res>
+    implements $FileChapterDetailsCopyWith<$Res> {
+  _$FileChapterDetailsCopyWithImpl(this._self, this._then);
+
+  final FileChapterDetails _self;
+  final $Res Function(FileChapterDetails) _then;
+
+/// Create a copy of ChapterDetails
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? mangaId = null,Object? format = null,Object? request = null,}) {
+  return _then(FileChapterDetails(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,mangaId: null == mangaId ? _self.mangaId : mangaId // ignore: cast_nullable_to_non_nullable
+as String,format: null == format ? _self.format : format // ignore: cast_nullable_to_non_nullable
+as ChapterFileFormat,request: null == request ? _self.request : request // ignore: cast_nullable_to_non_nullable
+as PaperbackRequest,
+  ));
+}
+
+/// Create a copy of ChapterDetails
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PaperbackRequestCopyWith<$Res> get request {
+
+  return $PaperbackRequestCopyWith<$Res>(_self.request, (value) {
+    return _then(_self.copyWith(request: value));
+  });
+}
 }
 
 
@@ -4751,13 +5104,23 @@ as ContentRating?,
 @JsonSerializable()
 
 class FeaturedCarouselItem implements DiscoverSectionItem {
-  const FeaturedCarouselItem({required this.mangaId, required this.imageUrl, required this.title, this.supertitle, this.metadata, @NullableContentRatingParser() this.contentRating, final  String? $type}): $type = $type ?? 'featuredCarouselItem';
+  const FeaturedCarouselItem({required this.mangaId, required this.imageUrl, required this.title, this.supertitle, this.summary, final  List<InfoItem>? infoItems, this.metadata, @NullableContentRatingParser() this.contentRating, final  String? $type}): _infoItems = infoItems,$type = $type ?? 'featuredCarouselItem';
   factory FeaturedCarouselItem.fromJson(Map<String, dynamic> json) => _$FeaturedCarouselItemFromJson(json);
 
  final  String mangaId;
  final  String imageUrl;
  final  String title;
  final  String? supertitle;
+ final  String? summary;
+ final  List<InfoItem>? _infoItems;
+ List<InfoItem>? get infoItems {
+  final value = _infoItems;
+  if (value == null) return null;
+  if (_infoItems is EqualUnmodifiableListView) return _infoItems;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
 @override final  dynamic metadata;
 @override@NullableContentRatingParser() final  ContentRating? contentRating;
 
@@ -4778,16 +5141,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeaturedCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.supertitle, supertitle) || other.supertitle == supertitle)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeaturedCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.supertitle, supertitle) || other.supertitle == supertitle)&&(identical(other.summary, summary) || other.summary == summary)&&const DeepCollectionEquality().equals(other._infoItems, _infoItems)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,mangaId,imageUrl,title,supertitle,const DeepCollectionEquality().hash(metadata),contentRating);
+int get hashCode => Object.hash(runtimeType,mangaId,imageUrl,title,supertitle,summary,const DeepCollectionEquality().hash(_infoItems),const DeepCollectionEquality().hash(metadata),contentRating);
 
 @override
 String toString() {
-  return 'DiscoverSectionItem.featuredCarouselItem(mangaId: $mangaId, imageUrl: $imageUrl, title: $title, supertitle: $supertitle, metadata: $metadata, contentRating: $contentRating)';
+  return 'DiscoverSectionItem.featuredCarouselItem(mangaId: $mangaId, imageUrl: $imageUrl, title: $title, supertitle: $supertitle, summary: $summary, infoItems: $infoItems, metadata: $metadata, contentRating: $contentRating)';
 }
 
 
@@ -4798,7 +5161,7 @@ abstract mixin class $FeaturedCarouselItemCopyWith<$Res> implements $DiscoverSec
   factory $FeaturedCarouselItemCopyWith(FeaturedCarouselItem value, $Res Function(FeaturedCarouselItem) _then) = _$FeaturedCarouselItemCopyWithImpl;
 @override @useResult
 $Res call({
- String mangaId, String imageUrl, String title, String? supertitle, dynamic metadata,@NullableContentRatingParser() ContentRating? contentRating
+ String mangaId, String imageUrl, String title, String? supertitle, String? summary, List<InfoItem>? infoItems, dynamic metadata,@NullableContentRatingParser() ContentRating? contentRating
 });
 
 
@@ -4815,15 +5178,154 @@ class _$FeaturedCarouselItemCopyWithImpl<$Res>
 
 /// Create a copy of DiscoverSectionItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? mangaId = null,Object? imageUrl = null,Object? title = null,Object? supertitle = freezed,Object? metadata = freezed,Object? contentRating = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? mangaId = null,Object? imageUrl = null,Object? title = null,Object? supertitle = freezed,Object? summary = freezed,Object? infoItems = freezed,Object? metadata = freezed,Object? contentRating = freezed,}) {
   return _then(FeaturedCarouselItem(
 mangaId: null == mangaId ? _self.mangaId : mangaId // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,supertitle: freezed == supertitle ? _self.supertitle : supertitle // ignore: cast_nullable_to_non_nullable
-as String?,metadata: freezed == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
+as String?,summary: freezed == summary ? _self.summary : summary // ignore: cast_nullable_to_non_nullable
+as String?,infoItems: freezed == infoItems ? _self._infoItems : infoItems // ignore: cast_nullable_to_non_nullable
+as List<InfoItem>?,metadata: freezed == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
 as dynamic,contentRating: freezed == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
 as ContentRating?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$InfoItem {
+
+ String get symbol; String get text;
+/// Create a copy of InfoItem
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$InfoItemCopyWith<InfoItem> get copyWith => _$InfoItemCopyWithImpl<InfoItem>(this as InfoItem, _$identity);
+
+  /// Serializes this InfoItem to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InfoItem&&(identical(other.symbol, symbol) || other.symbol == symbol)&&(identical(other.text, text) || other.text == text));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,symbol,text);
+
+@override
+String toString() {
+  return 'InfoItem(symbol: $symbol, text: $text)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $InfoItemCopyWith<$Res>  {
+  factory $InfoItemCopyWith(InfoItem value, $Res Function(InfoItem) _then) = _$InfoItemCopyWithImpl;
+@useResult
+$Res call({
+ String symbol, String text
+});
+
+
+
+
+}
+/// @nodoc
+class _$InfoItemCopyWithImpl<$Res>
+    implements $InfoItemCopyWith<$Res> {
+  _$InfoItemCopyWithImpl(this._self, this._then);
+
+  final InfoItem _self;
+  final $Res Function(InfoItem) _then;
+
+/// Create a copy of InfoItem
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? symbol = null,Object? text = null,}) {
+  return _then(_self.copyWith(
+symbol: null == symbol ? _self.symbol : symbol // ignore: cast_nullable_to_non_nullable
+as String,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _InfoItem implements InfoItem {
+  const _InfoItem({required this.symbol, required this.text});
+  factory _InfoItem.fromJson(Map<String, dynamic> json) => _$InfoItemFromJson(json);
+
+@override final  String symbol;
+@override final  String text;
+
+/// Create a copy of InfoItem
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$InfoItemCopyWith<_InfoItem> get copyWith => __$InfoItemCopyWithImpl<_InfoItem>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$InfoItemToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InfoItem&&(identical(other.symbol, symbol) || other.symbol == symbol)&&(identical(other.text, text) || other.text == text));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,symbol,text);
+
+@override
+String toString() {
+  return 'InfoItem(symbol: $symbol, text: $text)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$InfoItemCopyWith<$Res> implements $InfoItemCopyWith<$Res> {
+  factory _$InfoItemCopyWith(_InfoItem value, $Res Function(_InfoItem) _then) = __$InfoItemCopyWithImpl;
+@override @useResult
+$Res call({
+ String symbol, String text
+});
+
+
+
+
+}
+/// @nodoc
+class __$InfoItemCopyWithImpl<$Res>
+    implements _$InfoItemCopyWith<$Res> {
+  __$InfoItemCopyWithImpl(this._self, this._then);
+
+  final _InfoItem _self;
+  final $Res Function(_InfoItem) _then;
+
+/// Create a copy of InfoItem
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? symbol = null,Object? text = null,}) {
+  return _then(_InfoItem(
+symbol: null == symbol ? _self.symbol : symbol // ignore: cast_nullable_to_non_nullable
+as String,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
@@ -6186,22 +6688,22 @@ as bool,
 
 
 /// @nodoc
-mixin _$PBDocumentCookie {
+mixin _$PaperbackCookie {
 
  String get name; String get value; String get domain; String? get path; DateTime? get created; DateTime? get expires;
-/// Create a copy of PBDocumentCookie
+/// Create a copy of PaperbackCookie
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$PBDocumentCookieCopyWith<PBDocumentCookie> get copyWith => _$PBDocumentCookieCopyWithImpl<PBDocumentCookie>(this as PBDocumentCookie, _$identity);
+$PaperbackCookieCopyWith<PaperbackCookie> get copyWith => _$PaperbackCookieCopyWithImpl<PaperbackCookie>(this as PaperbackCookie, _$identity);
 
-  /// Serializes this PBDocumentCookie to a JSON map.
+  /// Serializes this PaperbackCookie to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PBDocumentCookie&&(identical(other.name, name) || other.name == name)&&(identical(other.value, value) || other.value == value)&&(identical(other.domain, domain) || other.domain == domain)&&(identical(other.path, path) || other.path == path)&&(identical(other.created, created) || other.created == created)&&(identical(other.expires, expires) || other.expires == expires));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaperbackCookie&&(identical(other.name, name) || other.name == name)&&(identical(other.value, value) || other.value == value)&&(identical(other.domain, domain) || other.domain == domain)&&(identical(other.path, path) || other.path == path)&&(identical(other.created, created) || other.created == created)&&(identical(other.expires, expires) || other.expires == expires));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -6210,15 +6712,15 @@ int get hashCode => Object.hash(runtimeType,name,value,domain,path,created,expir
 
 @override
 String toString() {
-  return 'PBDocumentCookie(name: $name, value: $value, domain: $domain, path: $path, created: $created, expires: $expires)';
+  return 'PaperbackCookie(name: $name, value: $value, domain: $domain, path: $path, created: $created, expires: $expires)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $PBDocumentCookieCopyWith<$Res>  {
-  factory $PBDocumentCookieCopyWith(PBDocumentCookie value, $Res Function(PBDocumentCookie) _then) = _$PBDocumentCookieCopyWithImpl;
+abstract mixin class $PaperbackCookieCopyWith<$Res>  {
+  factory $PaperbackCookieCopyWith(PaperbackCookie value, $Res Function(PaperbackCookie) _then) = _$PaperbackCookieCopyWithImpl;
 @useResult
 $Res call({
  String name, String value, String domain, String? path, DateTime? created, DateTime? expires
@@ -6229,14 +6731,14 @@ $Res call({
 
 }
 /// @nodoc
-class _$PBDocumentCookieCopyWithImpl<$Res>
-    implements $PBDocumentCookieCopyWith<$Res> {
-  _$PBDocumentCookieCopyWithImpl(this._self, this._then);
+class _$PaperbackCookieCopyWithImpl<$Res>
+    implements $PaperbackCookieCopyWith<$Res> {
+  _$PaperbackCookieCopyWithImpl(this._self, this._then);
 
-  final PBDocumentCookie _self;
-  final $Res Function(PBDocumentCookie) _then;
+  final PaperbackCookie _self;
+  final $Res Function(PaperbackCookie) _then;
 
-/// Create a copy of PBDocumentCookie
+/// Create a copy of PaperbackCookie
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? value = null,Object? domain = null,Object? path = freezed,Object? created = freezed,Object? expires = freezed,}) {
   return _then(_self.copyWith(
@@ -6257,9 +6759,9 @@ as DateTime?,
 /// @nodoc
 @JsonSerializable()
 
-class _PBDocumentCookie implements PBDocumentCookie {
-  const _PBDocumentCookie({required this.name, required this.value, required this.domain, this.path, this.created, this.expires});
-  factory _PBDocumentCookie.fromJson(Map<String, dynamic> json) => _$PBDocumentCookieFromJson(json);
+class _PaperbackCookie implements PaperbackCookie {
+  const _PaperbackCookie({required this.name, required this.value, required this.domain, this.path, this.created, this.expires});
+  factory _PaperbackCookie.fromJson(Map<String, dynamic> json) => _$PaperbackCookieFromJson(json);
 
 @override final  String name;
 @override final  String value;
@@ -6268,20 +6770,20 @@ class _PBDocumentCookie implements PBDocumentCookie {
 @override final  DateTime? created;
 @override final  DateTime? expires;
 
-/// Create a copy of PBDocumentCookie
+/// Create a copy of PaperbackCookie
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$PBDocumentCookieCopyWith<_PBDocumentCookie> get copyWith => __$PBDocumentCookieCopyWithImpl<_PBDocumentCookie>(this, _$identity);
+_$PaperbackCookieCopyWith<_PaperbackCookie> get copyWith => __$PaperbackCookieCopyWithImpl<_PaperbackCookie>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$PBDocumentCookieToJson(this, );
+  return _$PaperbackCookieToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PBDocumentCookie&&(identical(other.name, name) || other.name == name)&&(identical(other.value, value) || other.value == value)&&(identical(other.domain, domain) || other.domain == domain)&&(identical(other.path, path) || other.path == path)&&(identical(other.created, created) || other.created == created)&&(identical(other.expires, expires) || other.expires == expires));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaperbackCookie&&(identical(other.name, name) || other.name == name)&&(identical(other.value, value) || other.value == value)&&(identical(other.domain, domain) || other.domain == domain)&&(identical(other.path, path) || other.path == path)&&(identical(other.created, created) || other.created == created)&&(identical(other.expires, expires) || other.expires == expires));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -6290,15 +6792,15 @@ int get hashCode => Object.hash(runtimeType,name,value,domain,path,created,expir
 
 @override
 String toString() {
-  return 'PBDocumentCookie(name: $name, value: $value, domain: $domain, path: $path, created: $created, expires: $expires)';
+  return 'PaperbackCookie(name: $name, value: $value, domain: $domain, path: $path, created: $created, expires: $expires)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$PBDocumentCookieCopyWith<$Res> implements $PBDocumentCookieCopyWith<$Res> {
-  factory _$PBDocumentCookieCopyWith(_PBDocumentCookie value, $Res Function(_PBDocumentCookie) _then) = __$PBDocumentCookieCopyWithImpl;
+abstract mixin class _$PaperbackCookieCopyWith<$Res> implements $PaperbackCookieCopyWith<$Res> {
+  factory _$PaperbackCookieCopyWith(_PaperbackCookie value, $Res Function(_PaperbackCookie) _then) = __$PaperbackCookieCopyWithImpl;
 @override @useResult
 $Res call({
  String name, String value, String domain, String? path, DateTime? created, DateTime? expires
@@ -6309,17 +6811,17 @@ $Res call({
 
 }
 /// @nodoc
-class __$PBDocumentCookieCopyWithImpl<$Res>
-    implements _$PBDocumentCookieCopyWith<$Res> {
-  __$PBDocumentCookieCopyWithImpl(this._self, this._then);
+class __$PaperbackCookieCopyWithImpl<$Res>
+    implements _$PaperbackCookieCopyWith<$Res> {
+  __$PaperbackCookieCopyWithImpl(this._self, this._then);
 
-  final _PBDocumentCookie _self;
-  final $Res Function(_PBDocumentCookie) _then;
+  final _PaperbackCookie _self;
+  final $Res Function(_PaperbackCookie) _then;
 
-/// Create a copy of PBDocumentCookie
+/// Create a copy of PaperbackCookie
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? value = null,Object? domain = null,Object? path = freezed,Object? created = freezed,Object? expires = freezed,}) {
-  return _then(_PBDocumentCookie(
+  return _then(_PaperbackCookie(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
 as String,domain: null == domain ? _self.domain : domain // ignore: cast_nullable_to_non_nullable
@@ -6337,7 +6839,7 @@ as DateTime?,
 /// @nodoc
 mixin _$WebViewStorage {
 
- List<PBDocumentCookie> get cookies;
+ List<PaperbackCookie> get cookies;
 /// Create a copy of WebViewStorage
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -6370,7 +6872,7 @@ abstract mixin class $WebViewStorageCopyWith<$Res>  {
   factory $WebViewStorageCopyWith(WebViewStorage value, $Res Function(WebViewStorage) _then) = _$WebViewStorageCopyWithImpl;
 @useResult
 $Res call({
- List<PBDocumentCookie> cookies
+ List<PaperbackCookie> cookies
 });
 
 
@@ -6390,7 +6892,7 @@ class _$WebViewStorageCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? cookies = null,}) {
   return _then(_self.copyWith(
 cookies: null == cookies ? _self.cookies : cookies // ignore: cast_nullable_to_non_nullable
-as List<PBDocumentCookie>,
+as List<PaperbackCookie>,
   ));
 }
 
@@ -6402,11 +6904,11 @@ as List<PBDocumentCookie>,
 @JsonSerializable()
 
 class _WebViewStorage implements WebViewStorage {
-  const _WebViewStorage({final  List<PBDocumentCookie> cookies = const []}): _cookies = cookies;
+  const _WebViewStorage({final  List<PaperbackCookie> cookies = const []}): _cookies = cookies;
   factory _WebViewStorage.fromJson(Map<String, dynamic> json) => _$WebViewStorageFromJson(json);
 
- final  List<PBDocumentCookie> _cookies;
-@override@JsonKey() List<PBDocumentCookie> get cookies {
+ final  List<PaperbackCookie> _cookies;
+@override@JsonKey() List<PaperbackCookie> get cookies {
   if (_cookies is EqualUnmodifiableListView) return _cookies;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_cookies);
@@ -6446,7 +6948,7 @@ abstract mixin class _$WebViewStorageCopyWith<$Res> implements $WebViewStorageCo
   factory _$WebViewStorageCopyWith(_WebViewStorage value, $Res Function(_WebViewStorage) _then) = __$WebViewStorageCopyWithImpl;
 @override @useResult
 $Res call({
- List<PBDocumentCookie> cookies
+ List<PaperbackCookie> cookies
 });
 
 
@@ -6466,7 +6968,7 @@ class __$WebViewStorageCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? cookies = null,}) {
   return _then(_WebViewStorage(
 cookies: null == cookies ? _self._cookies : cookies // ignore: cast_nullable_to_non_nullable
-as List<PBDocumentCookie>,
+as List<PaperbackCookie>,
   ));
 }
 

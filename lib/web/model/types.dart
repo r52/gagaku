@@ -987,6 +987,7 @@ abstract class MangaInfo with _$MangaInfo {
     required String primaryTitle,
     required List<String> secondaryTitles,
     @ContentRatingParser() required ContentRating contentRating,
+    MangaContentType? contentType,
     String? status,
     String? artist,
     String? author,
@@ -1001,6 +1002,8 @@ abstract class MangaInfo with _$MangaInfo {
   factory MangaInfo.fromJson(Map<String, dynamic> json) =>
       _$MangaInfoFromJson(json);
 }
+
+enum MangaContentType { comic, novel }
 
 @freezed
 abstract class TagSection with _$TagSection {
@@ -1042,12 +1045,41 @@ abstract class Chapter with _$Chapter {
 }
 
 @freezed
-abstract class ChapterDetails with _$ChapterDetails {
-  const factory ChapterDetails({
+abstract class PaperbackRequest with _$PaperbackRequest {
+  const factory PaperbackRequest({
+    required String url,
+    required String method,
+    Map<String, String>? headers,
+    dynamic body,
+    Map<String, String>? cookies,
+  }) = _PaperbackRequest;
+
+  factory PaperbackRequest.fromJson(Map<String, dynamic> json) =>
+      _$PaperbackRequestFromJson(json);
+}
+
+enum ChapterFileFormat { epub, pdf, cbz }
+
+@Freezed(unionKey: 'type', fallbackUnion: 'images')
+sealed class ChapterDetails with _$ChapterDetails {
+  const factory ChapterDetails.images({
     required String id,
     required String mangaId,
     required List<String> pages,
-  }) = _ChapterDetails;
+  }) = ImageChapterDetails;
+
+  const factory ChapterDetails.html({
+    required String id,
+    required String mangaId,
+    required String html,
+  }) = HtmlChapterDetails;
+
+  const factory ChapterDetails.file({
+    required String id,
+    required String mangaId,
+    required ChapterFileFormat format,
+    required PaperbackRequest request,
+  }) = FileChapterDetails;
 
   factory ChapterDetails.fromJson(Map<String, dynamic> json) =>
       _$ChapterDetailsFromJson(json);
@@ -1129,12 +1161,23 @@ sealed class DiscoverSectionItem with _$DiscoverSectionItem {
     required String imageUrl,
     required String title,
     String? supertitle,
+    String? summary,
+    List<InfoItem>? infoItems,
     dynamic metadata,
     @NullableContentRatingParser() ContentRating? contentRating,
   }) = FeaturedCarouselItem;
 
   factory DiscoverSectionItem.fromJson(Map<String, dynamic> json) =>
       _$DiscoverSectionItemFromJson(json);
+}
+
+@freezed
+abstract class InfoItem with _$InfoItem {
+  const factory InfoItem({required String symbol, required String text}) =
+      _InfoItem;
+
+  factory InfoItem.fromJson(Map<String, dynamic> json) =>
+      _$InfoItemFromJson(json);
 }
 
 typedef SelectorID = String;
@@ -1292,23 +1335,23 @@ abstract class ExecuteInWebViewSource with _$ExecuteInWebViewSource {
 }
 
 @freezed
-abstract class PBDocumentCookie with _$PBDocumentCookie {
-  const factory PBDocumentCookie({
+abstract class PaperbackCookie with _$PaperbackCookie {
+  const factory PaperbackCookie({
     required String name,
     required String value,
     required String domain,
     String? path,
     DateTime? created,
     DateTime? expires,
-  }) = _PBDocumentCookie;
+  }) = _PaperbackCookie;
 
-  factory PBDocumentCookie.fromJson(Map<String, dynamic> json) =>
-      _$PBDocumentCookieFromJson(json);
+  factory PaperbackCookie.fromJson(Map<String, dynamic> json) =>
+      _$PaperbackCookieFromJson(json);
 }
 
 @freezed
 abstract class WebViewStorage with _$WebViewStorage {
-  const factory WebViewStorage({@Default([]) List<PBDocumentCookie> cookies}) =
+  const factory WebViewStorage({@Default([]) List<PaperbackCookie> cookies}) =
       _WebViewStorage;
 
   factory WebViewStorage.fromJson(Map<String, dynamic> json) =>

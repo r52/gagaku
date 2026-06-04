@@ -408,6 +408,10 @@ _MangaInfo _$MangaInfoFromJson(Map<String, dynamic> json) => _MangaInfo(
       .map((e) => e as String)
       .toList(),
   contentRating: const ContentRatingParser().fromJson(json['contentRating']),
+  contentType: $enumDecodeNullable(
+    _$MangaContentTypeEnumMap,
+    json['contentType'],
+  ),
   status: json['status'] as String?,
   artist: json['artist'] as String?,
   author: json['author'] as String?,
@@ -433,6 +437,7 @@ Map<String, dynamic> _$MangaInfoToJson(
   'primaryTitle': instance.primaryTitle,
   'secondaryTitles': instance.secondaryTitles,
   'contentRating': const ContentRatingParser().toJson(instance.contentRating),
+  'contentType': _$MangaContentTypeEnumMap[instance.contentType],
   'status': instance.status,
   'artist': instance.artist,
   'author': instance.author,
@@ -442,6 +447,11 @@ Map<String, dynamic> _$MangaInfoToJson(
   'artworkUrls': instance.artworkUrls,
   'additionalInfo': instance.additionalInfo,
   'shareUrl': instance.shareUrl,
+};
+
+const _$MangaContentTypeEnumMap = {
+  MangaContentType.comic: 'comic',
+  MangaContentType.novel: 'novel',
 };
 
 _TagSection _$TagSectionFromJson(Map<String, dynamic> json) => _TagSection(
@@ -507,19 +517,86 @@ Map<String, dynamic> _$ChapterToJson(_Chapter instance) => <String, dynamic>{
   'sortingIndex': instance.sortingIndex,
 };
 
-_ChapterDetails _$ChapterDetailsFromJson(Map<String, dynamic> json) =>
-    _ChapterDetails(
+_PaperbackRequest _$PaperbackRequestFromJson(Map<String, dynamic> json) =>
+    _PaperbackRequest(
+      url: json['url'] as String,
+      method: json['method'] as String,
+      headers: (json['headers'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ),
+      body: json['body'],
+      cookies: (json['cookies'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ),
+    );
+
+Map<String, dynamic> _$PaperbackRequestToJson(_PaperbackRequest instance) =>
+    <String, dynamic>{
+      'url': instance.url,
+      'method': instance.method,
+      'headers': instance.headers,
+      'body': instance.body,
+      'cookies': instance.cookies,
+    };
+
+ImageChapterDetails _$ImageChapterDetailsFromJson(Map<String, dynamic> json) =>
+    ImageChapterDetails(
       id: json['id'] as String,
       mangaId: json['mangaId'] as String,
       pages: (json['pages'] as List<dynamic>).map((e) => e as String).toList(),
+      $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$ChapterDetailsToJson(_ChapterDetails instance) =>
+Map<String, dynamic> _$ImageChapterDetailsToJson(
+  ImageChapterDetails instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'mangaId': instance.mangaId,
+  'pages': instance.pages,
+  'type': instance.$type,
+};
+
+HtmlChapterDetails _$HtmlChapterDetailsFromJson(Map<String, dynamic> json) =>
+    HtmlChapterDetails(
+      id: json['id'] as String,
+      mangaId: json['mangaId'] as String,
+      html: json['html'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$HtmlChapterDetailsToJson(HtmlChapterDetails instance) =>
     <String, dynamic>{
       'id': instance.id,
       'mangaId': instance.mangaId,
-      'pages': instance.pages,
+      'html': instance.html,
+      'type': instance.$type,
     };
+
+FileChapterDetails _$FileChapterDetailsFromJson(Map<String, dynamic> json) =>
+    FileChapterDetails(
+      id: json['id'] as String,
+      mangaId: json['mangaId'] as String,
+      format: $enumDecode(_$ChapterFileFormatEnumMap, json['format']),
+      request: PaperbackRequest.fromJson(
+        json['request'] as Map<String, dynamic>,
+      ),
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$FileChapterDetailsToJson(FileChapterDetails instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'mangaId': instance.mangaId,
+      'format': _$ChapterFileFormatEnumMap[instance.format]!,
+      'request': instance.request.toJson(),
+      'type': instance.$type,
+    };
+
+const _$ChapterFileFormatEnumMap = {
+  ChapterFileFormat.epub: 'epub',
+  ChapterFileFormat.pdf: 'pdf',
+  ChapterFileFormat.cbz: 'cbz',
+};
 
 _DiscoverSection _$DiscoverSectionFromJson(Map<String, dynamic> json) =>
     _DiscoverSection(
@@ -658,6 +735,10 @@ FeaturedCarouselItem _$FeaturedCarouselItemFromJson(
   imageUrl: json['imageUrl'] as String,
   title: json['title'] as String,
   supertitle: json['supertitle'] as String?,
+  summary: json['summary'] as String?,
+  infoItems: (json['infoItems'] as List<dynamic>?)
+      ?.map((e) => InfoItem.fromJson(e as Map<String, dynamic>))
+      .toList(),
   metadata: json['metadata'],
   contentRating: const NullableContentRatingParser().fromJson(
     json['contentRating'],
@@ -672,11 +753,21 @@ Map<String, dynamic> _$FeaturedCarouselItemToJson(
   'imageUrl': instance.imageUrl,
   'title': instance.title,
   'supertitle': instance.supertitle,
+  'summary': instance.summary,
+  'infoItems': instance.infoItems?.map((e) => e.toJson()).toList(),
   'metadata': instance.metadata,
   'contentRating': const NullableContentRatingParser().toJson(
     instance.contentRating,
   ),
   'type': instance.$type,
+};
+
+_InfoItem _$InfoItemFromJson(Map<String, dynamic> json) =>
+    _InfoItem(symbol: json['symbol'] as String, text: json['text'] as String);
+
+Map<String, dynamic> _$InfoItemToJson(_InfoItem instance) => <String, dynamic>{
+  'symbol': instance.symbol,
+  'text': instance.text,
 };
 
 _LabelRowValue _$LabelRowValueFromJson(Map<String, dynamic> json) =>
@@ -958,8 +1049,8 @@ Map<String, dynamic> _$ExecuteInWebViewSourceToJson(
   'loadImages': instance.loadImages,
 };
 
-_PBDocumentCookie _$PBDocumentCookieFromJson(Map<String, dynamic> json) =>
-    _PBDocumentCookie(
+_PaperbackCookie _$PaperbackCookieFromJson(Map<String, dynamic> json) =>
+    _PaperbackCookie(
       name: json['name'] as String,
       value: json['value'] as String,
       domain: json['domain'] as String,
@@ -972,7 +1063,7 @@ _PBDocumentCookie _$PBDocumentCookieFromJson(Map<String, dynamic> json) =>
           : DateTime.parse(json['expires'] as String),
     );
 
-Map<String, dynamic> _$PBDocumentCookieToJson(_PBDocumentCookie instance) =>
+Map<String, dynamic> _$PaperbackCookieToJson(_PaperbackCookie instance) =>
     <String, dynamic>{
       'name': instance.name,
       'value': instance.value,
@@ -986,7 +1077,7 @@ _WebViewStorage _$WebViewStorageFromJson(Map<String, dynamic> json) =>
     _WebViewStorage(
       cookies:
           (json['cookies'] as List<dynamic>?)
-              ?.map((e) => PBDocumentCookie.fromJson(e as Map<String, dynamic>))
+              ?.map((e) => PaperbackCookie.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
     );
