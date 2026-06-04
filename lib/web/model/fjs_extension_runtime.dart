@@ -384,9 +384,16 @@ return JSON.stringify(value);
           ),
         ),
       );
+      final defaultUserAgentHeaders = await _runInitStep(
+        'resolve default user agent headers',
+        () => GagakuData().resolveBrowserUserAgentHeaders(),
+      );
       await _runInitStep(
         'install host bridge',
-        () => _evalGlobal(_bootstrapScript(), label: 'install host bridge'),
+        () => _evalGlobal(
+          _bootstrapScript(defaultUserAgentHeaders),
+          label: 'install host bridge',
+        ),
       );
       final startupCookies = await _runInitStep(
         'load startup cookies',
@@ -442,14 +449,15 @@ return JSON.stringify(value);
     }
   }
 
-  String _bootstrapScript() {
-    return r'''
+  String _bootstrapScript(Map<String, String> defaultUserAgentHeaders) {
+    return '''
 globalThis.window = globalThis;
 globalThis.self = globalThis;
 globalThis.global = globalThis;
 globalThis.source ??= {};
 
 globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
+  defaultUserAgentHeaders: Object.freeze(${jsonEncode(defaultUserAgentHeaders)}),
   callHandler: async (handlerName, ...args) => {
     return await fjs.bridge_call(
       JSON.stringify({ handlerName, args })

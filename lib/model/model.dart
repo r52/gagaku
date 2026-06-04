@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -64,6 +65,13 @@ const _blockers =
 const _knownHosts =
     'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/known_hosts.json';
 
+const defaultBrowserUserAgent =
+    'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.121 Mobile Safari/537.36';
+const defaultSecChUa =
+    '"Google Chrome";v="146", "Chromium";v="146", "Not_A Brand";v="24"';
+const defaultSecChUaMobile = '?1';
+const defaultSecChUaPlatform = '"Android"';
+
 class GagakuData {
   GagakuData._internal();
 
@@ -76,17 +84,53 @@ class GagakuData {
   // Default user agent
   final String gagakuUserAgent = '$kPackageName/$kPackageVersion';
 
-  // Dynamic user agent fetched from Webview
-  String? dynamicUserAgent;
-  String? dynamicSecChUa;
-  String? dynamicSecChUaMobile;
-  String? dynamicSecChUaPlatform;
+  Map<String, String> dynamicUserAgentHeaders = {};
+  Future<void>? _dynamicUserAgentFuture;
 
   List<String> blockers = [];
   Map<String, dynamic> knownHosts = {};
 
   factory GagakuData() {
     return _instance;
+  }
+
+  String? get dynamicUserAgent => dynamicUserAgentHeaders['user-agent'];
+  String? get dynamicSecChUa => dynamicUserAgentHeaders['sec-ch-ua'];
+  String? get dynamicSecChUaMobile =>
+      dynamicUserAgentHeaders['sec-ch-ua-mobile'];
+  String? get dynamicSecChUaPlatform =>
+      dynamicUserAgentHeaders['sec-ch-ua-platform'];
+
+  Map<String, String> get browserUserAgentHeaders {
+    return {
+      'user-agent': defaultBrowserUserAgent,
+      'sec-ch-ua': defaultSecChUa,
+      'sec-ch-ua-mobile': defaultSecChUaMobile,
+      'sec-ch-ua-platform': defaultSecChUaPlatform,
+      ...dynamicUserAgentHeaders,
+    };
+  }
+
+  Future<Map<String, String>> resolveBrowserUserAgentHeaders() async {
+    final future = _dynamicUserAgentFuture;
+    if (future != null && dynamicUserAgent == null) {
+      try {
+        await future.timeout(const Duration(seconds: 2));
+      } catch (_) {}
+    }
+
+    return browserUserAgentHeaders;
+  }
+
+  void _setDynamicUserAgentHeaders(Map<String, String> headers) {
+    dynamicUserAgentHeaders = headers;
+  }
+
+  Map<String, String> _extractUserAgentHeaders(Map<String, String> headers) {
+    return {
+      for (final MapEntry(:key, :value) in headers.entries)
+        if (key == 'user-agent' || key.startsWith('sec-ch-ua')) key: value,
+    };
   }
 
   Future<void> _fetchDynamicUserAgent() async {
@@ -106,10 +150,7 @@ class GagakuData {
           final ua = headers['user-agent'];
 
           if (ua != null && ua.isNotEmpty) {
-            dynamicUserAgent = ua;
-            dynamicSecChUa = headers['sec-ch-ua'];
-            dynamicSecChUaMobile = headers['sec-ch-ua-mobile'];
-            dynamicSecChUaPlatform = headers['sec-ch-ua-platform'];
+            _setDynamicUserAgentHeaders(_extractUserAgentHeaders(headers));
             fetched = true;
 
             logger.d("Fast fetched dynamic user agent: $dynamicUserAgent");
@@ -159,13 +200,16 @@ class GagakuData {
           );
 
           if (uaResult is Map) {
-            dynamicUserAgent = uaResult['userAgent']?.toString();
-
-            if (uaResult.containsKey('secChUa')) {
-              dynamicSecChUa = uaResult['secChUa']?.toString();
-              dynamicSecChUaMobile = uaResult['secChUaMobile']?.toString();
-              dynamicSecChUaPlatform = uaResult['secChUaPlatform']?.toString();
-            }
+            _setDynamicUserAgentHeaders({
+              if (uaResult['userAgent'] != null)
+                'user-agent': uaResult['userAgent'].toString(),
+              if (uaResult['secChUa'] != null)
+                'sec-ch-ua': uaResult['secChUa'].toString(),
+              if (uaResult['secChUaMobile'] != null)
+                'sec-ch-ua-mobile': uaResult['secChUaMobile'].toString(),
+              if (uaResult['secChUaPlatform'] != null)
+                'sec-ch-ua-platform': uaResult['secChUaPlatform'].toString(),
+            });
 
             logger.d("Fetched dynamic user agent: $dynamicUserAgent");
             if (dynamicSecChUa != null) {
@@ -203,8 +247,17 @@ class GagakuData {
       'assets/extensionhost/bundle.js',
     );
 
-    // Fire and forget finding the dynamic agent so we do not block runApp
-    _fetchDynamicUserAgent();
+    // Fire and forget finding the dynamic agent so we do not block runApp.
+    _dynamicUserAgentFuture = _fetchDynamicUserAgent().catchError((
+      Object error,
+      StackTrace stackTrace,
+    ) {
+      logger.e(
+        'Failed to start dynamic user agent fetch',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    });
 
     final blockerUri = Uri.parse(_blockers);
     final hostsUri = Uri.parse(_knownHosts);

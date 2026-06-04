@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:gagaku/web/model/fjs_extension_runtime.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:image/image.dart' as img;
@@ -14,6 +15,17 @@ void main() {
   test('fjs runtime bootstraps the extension host and source body', () async {
     dynamic storedState;
     dynamic storedSecureState;
+    final gdat = GagakuData();
+    gdat.dynamicUserAgentHeaders = {
+      'user-agent': 'Phase Test Browser/123',
+      'sec-ch-ua': '"Phase Test Browser";v="123"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"Linux"',
+      'sec-ch-ua-full-version-list': '"Phase Test Browser";v="123.4.5.6"',
+    };
+    addTearDown(() {
+      gdat.dynamicUserAgentHeaders = {};
+    });
     final receivedRequests = <Map<String, String?>>[];
     String? receivedFormDataContentType;
     String? receivedFormDataBody;
@@ -134,6 +146,13 @@ void main() {
         receivedRequests.add({
           'method': request.method,
           'x-phase': request.headers.value('x-phase'),
+          'user-agent': request.headers.value(HttpHeaders.userAgentHeader),
+          'sec-ch-ua': request.headers.value('sec-ch-ua'),
+          'sec-ch-ua-mobile': request.headers.value('sec-ch-ua-mobile'),
+          'sec-ch-ua-platform': request.headers.value('sec-ch-ua-platform'),
+          'sec-ch-ua-full-version-list': request.headers.value(
+            'sec-ch-ua-full-version-list',
+          ),
           'cookie': request.headers.value(HttpHeaders.cookieHeader),
           'body': body,
         });
@@ -301,6 +320,7 @@ const requestBindingTarget = {
     });
 
     return {
+      defaultUserAgent: await Application.getDefaultUserAgent(),
       url: response.url,
       status: response.status,
       headers: response.headers,
@@ -717,8 +737,20 @@ globalThis.source.phase2source = {
     expect(receivedRequests, hasLength(1));
     expect(receivedRequests.single['method'], 'POST');
     expect(receivedRequests.single['x-phase'], 'intercepted');
+    expect(receivedRequests.single['user-agent'], 'Phase Test Browser/123');
+    expect(
+      receivedRequests.single['sec-ch-ua'],
+      '"Phase Test Browser";v="123"',
+    );
+    expect(receivedRequests.single['sec-ch-ua-mobile'], '?0');
+    expect(receivedRequests.single['sec-ch-ua-platform'], '"Linux"');
+    expect(
+      receivedRequests.single['sec-ch-ua-full-version-list'],
+      '"Phase Test Browser";v="123.4.5.6"',
+    );
     expect(receivedRequests.single['cookie'], contains('session=abc'));
     expect(receivedRequests.single['body'], 'hello from fjs');
+    expect(requestResult['defaultUserAgent'], 'Phase Test Browser/123');
     expect(requestResult['status'], 201);
     expect(
       requestResult['headers'],

@@ -18,6 +18,9 @@ type RequestManager = Pick<
   | "getDefaultUserAgent"
 >;
 
+const fallbackUserAgent =
+  "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.121 Mobile Safari/537.36";
+
 export class MockRequestManager implements RequestManager {
   private static readonly nativeFetchTimeoutMs = 30_000;
 
@@ -29,6 +32,7 @@ export class MockRequestManager implements RequestManager {
   }[];
 
   private userAgent: string;
+  private defaultUserAgentHeaders: Record<string, string>;
 
   constructor(selectorRegistry: SelectorRegistry) {
     this.selectorRegistry = selectorRegistry;
@@ -36,7 +40,8 @@ export class MockRequestManager implements RequestManager {
     this.userAgent =
       typeof navigator !== "undefined"
         ? navigator.userAgent
-        : "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.121 Mobile Safari/537.36";
+        : fallbackUserAgent;
+    this.defaultUserAgentHeaders = this.createDefaultUserAgentHeaders();
   }
 
   registerInterceptor(
@@ -67,7 +72,47 @@ export class MockRequestManager implements RequestManager {
   setRedirectHandler(): void {}
 
   async getDefaultUserAgent(): Promise<string> {
-    return this.userAgent;
+    return this.defaultUserAgentHeaders["user-agent"] ?? this.userAgent;
+  }
+
+  private createDefaultUserAgentHeaders(): Record<string, string> {
+    const headers: Record<string, string> = {
+      "user-agent": this.userAgent,
+    };
+
+    const nativeHeaders = globalThis.gagaku?.defaultUserAgentHeaders;
+    if (!nativeHeaders || typeof nativeHeaders !== "object") {
+      return headers;
+    }
+
+    for (const [name, value] of Object.entries(nativeHeaders)) {
+      if (typeof value === "string" && value.length > 0) {
+        headers[name.toLowerCase()] = value;
+      }
+    }
+
+    return headers;
+  }
+
+  private hasHeader(headers: Record<string, string>, name: string): boolean {
+    const normalizedName = name.toLowerCase();
+    return Object.keys(headers).some(
+      (headerName) => headerName.toLowerCase() === normalizedName,
+    );
+  }
+
+  private mergeDefaultUserAgentHeaders(
+    headers: Record<string, string>,
+  ): Record<string, string> {
+    const mergedHeaders = { ...headers };
+
+    for (const [name, value] of Object.entries(this.defaultUserAgentHeaders)) {
+      if (!this.hasHeader(mergedHeaders, name)) {
+        mergedHeaders[name] = value;
+      }
+    }
+
+    return mergedHeaders;
   }
 
   private async prepareRequest(request: Request): Promise<{
@@ -116,7 +161,9 @@ export class MockRequestManager implements RequestManager {
       }
     }
 
-    const requestHeaders = { ...(finalRequest.headers ?? {}) };
+    const requestHeaders = this.mergeDefaultUserAgentHeaders({
+      ...(finalRequest.headers ?? {}),
+    });
     if (finalRequest.cookies) {
       const rawCookies = finalRequest.cookies;
       requestHeaders["Cookie"] = Object.keys(finalRequest.cookies)
@@ -234,9 +281,7 @@ export class MockRequestManager implements RequestManager {
     return finalArrayBuffer;
   }
 
-  private async scheduleNativeFetchRequest(
-    request: Request,
-  ): Promise<[Response, ArrayBuffer]> {
+  async scheduleRequest(request: Request): Promise<[Response, ArrayBuffer]> {
     const { finalRequest, requestBody, requestHeaders } =
       await this.prepareRequest(request);
     const nativeRequestBody =
@@ -377,7 +422,4 @@ export class MockRequestManager implements RequestManager {
     }
   }
 
-  async scheduleRequest(request: Request): Promise<[Response, ArrayBuffer]> {
-    return this.scheduleNativeFetchRequest(request);
-  }
 }
