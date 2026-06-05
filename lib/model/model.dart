@@ -136,6 +136,19 @@ class GagakuData {
   Future<void> _fetchDynamicUserAgent() async {
     HeadlessInAppWebView? headlessWebView;
     bool fetched = false;
+    final completer = Completer<void>();
+
+    void completeFetch() {
+      if (!completer.isCompleted) {
+        completer.complete();
+      }
+    }
+
+    void completeFetchError(Object error, StackTrace stackTrace) {
+      if (!completer.isCompleted) {
+        completer.completeError(error, stackTrace);
+      }
+    }
 
     headlessWebView = HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: WebUri("https://localhost/")),
@@ -159,6 +172,7 @@ class GagakuData {
                 "Fast Client Hints - UA: $dynamicSecChUa, Mobile: $dynamicSecChUaMobile, Platform: $dynamicSecChUaPlatform",
               );
             }
+            completeFetch();
           }
 
           return WebResourceResponse(
@@ -174,6 +188,7 @@ class GagakuData {
       onLoadStop: (controller, url) async {
         if (fetched) {
           headlessWebView?.dispose();
+          completeFetch();
           return;
         }
         try {
@@ -222,6 +237,7 @@ class GagakuData {
           logger.e("Failed to evaluate user agent script", error: e);
         } finally {
           headlessWebView?.dispose();
+          completeFetch();
         }
       },
       onReceivedError: (controller, request, error) {
@@ -230,16 +246,25 @@ class GagakuData {
           error: error,
         );
         headlessWebView?.dispose();
+        completeFetch();
       },
       onReceivedHttpError: (controller, request, errorResponse) {
         logger.e(
           'Failed to get dynamic user agent with status: ${errorResponse.statusCode}',
         );
         headlessWebView?.dispose();
+        completeFetch();
       },
     );
 
-    await headlessWebView.run();
+    try {
+      await headlessWebView.run();
+    } catch (error, stackTrace) {
+      headlessWebView.dispose();
+      completeFetchError(error, stackTrace);
+    }
+
+    await completer.future;
   }
 
   Future<void> initData() async {
