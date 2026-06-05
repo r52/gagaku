@@ -70,7 +70,7 @@ Future<WebViewExecutionResult> executeInTemporaryWebView(
 
     final pbCookies = outCookies
         .map(
-          (cookie) => PBDocumentCookie(
+          (cookie) => PaperbackCookie(
             name: cookie.name,
             value: cookie.value,
             domain: cookie.domain ?? url.host,

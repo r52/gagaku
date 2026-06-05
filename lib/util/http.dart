@@ -8,9 +8,6 @@ import 'package:http/io_client.dart';
 import 'package:http/retry.dart';
 import 'package:pool/pool.dart';
 
-const baseUserAgent =
-    'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.121 Mobile Safari/537.36';
-
 const _maxConcurrentRequests = 5;
 const _minRequestInterval = Duration(milliseconds: 200);
 final _nextRequestTimes = <String, int>{};
@@ -18,7 +15,7 @@ final _pools = <String, Pool>{};
 
 String getUserAgent([bool useCustomUA = false]) {
   if (useCustomUA) return GagakuData().gagakuUserAgent;
-  return GagakuData().dynamicUserAgent ?? baseUserAgent;
+  return GagakuData().browserUserAgentHeaders['user-agent']!;
 }
 
 CronetEngine createCronetEngine(String userAgent) => CronetEngine.build(

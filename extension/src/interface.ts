@@ -1,6 +1,7 @@
 import type { Form, SelectorID } from "@paperback/types";
 
 export interface GagakuInterface {
+  defaultUserAgentHeaders?: Record<string, string>;
   callHandler(handlerName: string, ...args: any[]): any;
 }
 

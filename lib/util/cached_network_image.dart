@@ -31,6 +31,7 @@ class ExtensionHttpClient extends http.BaseClient {
     }
 
     final gdat = GagakuData();
+    final browserHeaders = gdat.browserUserAgentHeaders;
 
     // Use dynamically extracted User Agent data natively or fall back to Mar 2026 chrome strings
     newRequest.headers.putIfAbsent(
@@ -40,17 +41,15 @@ class ExtensionHttpClient extends http.BaseClient {
     newRequest.headers.putIfAbsent('accept-language', () => 'en-US,en;q=0.9');
     newRequest.headers.putIfAbsent(
       'sec-ch-ua',
-      () =>
-          gdat.dynamicSecChUa ??
-          '"Google Chrome";v="146", "Chromium";v="146", "Not_A Brand";v="24"',
+      () => browserHeaders['sec-ch-ua']!,
     );
     newRequest.headers.putIfAbsent(
       'sec-ch-ua-mobile',
-      () => gdat.dynamicSecChUaMobile ?? '?1',
+      () => browserHeaders['sec-ch-ua-mobile']!,
     );
     newRequest.headers.putIfAbsent(
       'sec-ch-ua-platform',
-      () => gdat.dynamicSecChUaPlatform ?? '"Android"',
+      () => browserHeaders['sec-ch-ua-platform']!,
     );
     newRequest.headers.putIfAbsent('sec-fetch-dest', () => 'image');
     newRequest.headers.putIfAbsent('sec-fetch-mode', () => 'no-cors');

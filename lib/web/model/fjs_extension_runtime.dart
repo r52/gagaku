@@ -384,9 +384,16 @@ return JSON.stringify(value);
           ),
         ),
       );
+      final defaultUserAgentHeaders = await _runInitStep(
+        'resolve default user agent headers',
+        () => GagakuData().resolveBrowserUserAgentHeaders(),
+      );
       await _runInitStep(
         'install host bridge',
-        () => _evalGlobal(_bootstrapScript(), label: 'install host bridge'),
+        () => _evalGlobal(
+          _bootstrapScript(defaultUserAgentHeaders),
+          label: 'install host bridge',
+        ),
       );
       final startupCookies = await _runInitStep(
         'load startup cookies',
@@ -442,14 +449,15 @@ return JSON.stringify(value);
     }
   }
 
-  String _bootstrapScript() {
-    return r'''
+  String _bootstrapScript(Map<String, String> defaultUserAgentHeaders) {
+    return '''
 globalThis.window = globalThis;
 globalThis.self = globalThis;
 globalThis.global = globalThis;
 globalThis.source ??= {};
 
 globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
+  defaultUserAgentHeaders: Object.freeze(${jsonEncode(defaultUserAgentHeaders)}),
   callHandler: async (handlerName, ...args) => {
     return await fjs.bridge_call(
       JSON.stringify({ handlerName, args })
@@ -565,7 +573,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     final expectedDomain = Uri.parse(source.baseUrl!).host;
     final pbCookies = cookies
         .map(
-          (cookie) => PBDocumentCookie(
+          (cookie) => PaperbackCookie(
             name: cookie.name,
             value: cookie.value,
             domain: cookie.domain ?? expectedDomain,
@@ -831,7 +839,15 @@ return await globalThis.$sourceId.getChapterDetails(chapter);
     final details = ChapterDetails.fromJson(
       _normalizeBridgeJsonMap(detailsJson, 'getChapterDetails'),
     );
-    return details.pages;
+    return switch (details) {
+      ImageChapterDetails(:final pages) => pages,
+      HtmlChapterDetails() => throw UnsupportedError(
+        'Text novel chapters are not supported',
+      ),
+      FileChapterDetails() => throw UnsupportedError(
+        'File chapters are not supported',
+      ),
+    };
   }
 
   @override
@@ -1032,7 +1048,9 @@ return await globalThis.$sourceId.getSortingOptions?.(query) ?? null;
 
   @override
   Future<Uint8List> processImageRequest(String url) async {
-    final result = await _evalScoped("""
+    final result = await _evalScoped(
+      kDebugMode
+          ? """
 const [response, body] = await globalThis.Application.scheduleRequest({
   url: ${_json(url)},
   method: "GET"
@@ -1041,12 +1059,35 @@ return [
   response.status ?? null,
   response.url ?? null,
   response.mimeType ?? null,
+  response.headers ?? {},
   new Uint8Array(body)
 ];
-""");
+"""
+          : """
+const [, body] = await globalThis.Application.scheduleRequest({
+  url: ${_json(url)},
+  method: "GET"
+});
+return new Uint8Array(body);
+""",
+    );
 
     final value = result.value;
-    if (value is! List || value.length < 4) {
+    final rawBytes = kDebugMode ? _logImageRequest(url, value) : value;
+    final bytes = switch (rawBytes) {
+      Uint8List bytes => bytes,
+      List bytes => Uint8List.fromList(bytes.cast<int>()),
+      _ => throw StateError(
+        'Expected fjs image request to return bytes, got '
+        '${rawBytes.runtimeType}',
+      ),
+    };
+
+    return bytes;
+  }
+
+  dynamic _logImageRequest(String url, dynamic value) {
+    if (value is! List || value.length < 5) {
       throw StateError(
         'Expected fjs image request to return response metadata, got '
         '${value.runtimeType}',
@@ -1060,28 +1101,30 @@ return [
     };
     final responseUrl = value[1] as String?;
     final mimeType = value[2] as String?;
-    final rawBytes = value[3];
-    final bytes = switch (rawBytes) {
-      Uint8List bytes => bytes,
-      List bytes => Uint8List.fromList(bytes.cast<int>()),
-      _ => throw StateError(
-        'Expected fjs image request to return bytes, got '
-        '${rawBytes.runtimeType}',
-      ),
+    final responseHeaders = switch (value[3]) {
+      Map headers => <String, String>{
+        for (final MapEntry(:key, :value) in headers.entries)
+          key.toString(): value.toString(),
+      },
+      _ => const <String, String>{},
     };
+    final rawBytes = value[4];
+    final bytesLength = switch (rawBytes) {
+      Uint8List bytes => bytes.lengthInBytes,
+      List bytes => bytes.length,
+      _ => null,
+    };
+    final failed = statusCode != null && statusCode >= 400;
+    debugPrint(
+      'fjs[$sourceId] image.request${failed ? ' failed' : ''} '
+      'status=${statusCode ?? 'unknown'} '
+      '${bytesLength ?? 'unknown'} bytes '
+      'mime=${mimeType ?? 'unknown'} '
+      'url=${responseUrl ?? url} '
+      'headers=${jsonEncode(responseHeaders)}',
+    );
 
-    if (kDebugMode) {
-      final failed = statusCode != null && statusCode >= 400;
-      debugPrint(
-        'fjs[$sourceId] image.request${failed ? ' failed' : ''} '
-        'status=${statusCode ?? 'unknown'} '
-        '${bytes.lengthInBytes} bytes '
-        'mime=${mimeType ?? 'unknown'} '
-        'url=${responseUrl ?? url}',
-      );
-    }
-
-    return bytes;
+    return rawBytes;
   }
 
   @override

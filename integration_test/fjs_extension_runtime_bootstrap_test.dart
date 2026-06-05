@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:gagaku/web/model/fjs_extension_runtime.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:image/image.dart' as img;
@@ -14,6 +15,17 @@ void main() {
   test('fjs runtime bootstraps the extension host and source body', () async {
     dynamic storedState;
     dynamic storedSecureState;
+    final gdat = GagakuData();
+    gdat.dynamicUserAgentHeaders = {
+      'user-agent': 'Phase Test Browser/123',
+      'sec-ch-ua': '"Phase Test Browser";v="123"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"Linux"',
+      'sec-ch-ua-full-version-list': '"Phase Test Browser";v="123.4.5.6"',
+    };
+    addTearDown(() {
+      gdat.dynamicUserAgentHeaders = {};
+    });
     final receivedRequests = <Map<String, String?>>[];
     String? receivedFormDataContentType;
     String? receivedFormDataBody;
@@ -134,6 +146,15 @@ void main() {
         receivedRequests.add({
           'method': request.method,
           'x-phase': request.headers.value('x-phase'),
+          'user-agent': request.headers.value(HttpHeaders.userAgentHeader),
+          'sec-ch-ua': request.headers.value('sec-ch-ua'),
+          'sec-ch-ua-mobile': request.headers.value('sec-ch-ua-mobile'),
+          'sec-ch-ua-platform': request.headers.value('sec-ch-ua-platform'),
+          'sec-ch-ua-full-version-list': request.headers.value(
+            'sec-ch-ua-full-version-list',
+          ),
+          'origin': request.headers.value('origin'),
+          'referer': request.headers.value('referer'),
           'cookie': request.headers.value(HttpHeaders.cookieHeader),
           'body': body,
         });
@@ -292,15 +313,35 @@ const responseInterceptorTarget = {
 
 const requestBindingTarget = {
   run: async (url) => {
+    await Application.scheduleRequest({
+      url,
+      method: "GET",
+      headers: { "X-Phase": "no-referer" }
+    });
+
+    await Application.scheduleRequest({
+      url,
+      method: "GET",
+      headers: {
+        "X-Phase": "explicit-origin",
+        "Referer": "https://reader.example/explicit",
+        "Origin": "https://extension.example"
+      }
+    });
+
     const [response, body] = await Application.scheduleRequest({
       url,
       method: "POST",
-      headers: { "X-Phase": "original" },
+      headers: {
+        "X-Phase": "original",
+        "Referer": "https://reader.example/chapter/1?token=abc"
+      },
       cookies: { session: "abc" },
       body: "hello from fjs"
     });
 
     return {
+      defaultUserAgent: await Application.getDefaultUserAgent(),
       url: response.url,
       status: response.status,
       headers: response.headers,
@@ -714,11 +755,33 @@ globalThis.source.phase2source = {
       'http://127.0.0.1:${server.port}/phase4',
     ]);
 
-    expect(receivedRequests, hasLength(1));
-    expect(receivedRequests.single['method'], 'POST');
-    expect(receivedRequests.single['x-phase'], 'intercepted');
-    expect(receivedRequests.single['cookie'], contains('session=abc'));
-    expect(receivedRequests.single['body'], 'hello from fjs');
+    expect(receivedRequests, hasLength(3));
+    final noRefererRequest = receivedRequests[0];
+    final explicitOriginRequest = receivedRequests[1];
+    final requestWithReferer = receivedRequests[2];
+
+    expect(noRefererRequest['origin'], isNull);
+    expect(noRefererRequest['referer'], isNull);
+    expect(explicitOriginRequest['origin'], 'https://extension.example');
+    expect(explicitOriginRequest['referer'], 'https://reader.example/explicit');
+    expect(requestWithReferer['method'], 'POST');
+    expect(requestWithReferer['x-phase'], 'intercepted');
+    expect(requestWithReferer['user-agent'], 'Phase Test Browser/123');
+    expect(requestWithReferer['sec-ch-ua'], '"Phase Test Browser";v="123"');
+    expect(requestWithReferer['sec-ch-ua-mobile'], '?0');
+    expect(requestWithReferer['sec-ch-ua-platform'], '"Linux"');
+    expect(
+      requestWithReferer['sec-ch-ua-full-version-list'],
+      '"Phase Test Browser";v="123.4.5.6"',
+    );
+    expect(requestWithReferer['origin'], 'https://reader.example');
+    expect(
+      requestWithReferer['referer'],
+      'https://reader.example/chapter/1?token=abc',
+    );
+    expect(requestWithReferer['cookie'], contains('session=abc'));
+    expect(requestWithReferer['body'], 'hello from fjs');
+    expect(requestResult['defaultUserAgent'], 'Phase Test Browser/123');
     expect(requestResult['status'], 201);
     expect(
       requestResult['headers'],
