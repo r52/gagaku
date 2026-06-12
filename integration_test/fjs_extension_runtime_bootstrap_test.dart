@@ -637,19 +637,6 @@ globalThis.source.phase2source = {
 '''),
       isNot('accepted'),
     );
-    expect(
-      await runtime.evalForTesting(r'''
-(async () => {
-  try {
-    await fjs.bridge_call({ channel: "decodeImage", bytes: [1, 2, "three"] });
-    return "accepted";
-  } catch (error) {
-    return String(error);
-  }
-})()
-'''),
-      isNot('accepted'),
-    );
     final canvasResult = await runtime.evalForTesting(r'''
 (async () => {
   console.log("phase7 console bridge", { nested: true });

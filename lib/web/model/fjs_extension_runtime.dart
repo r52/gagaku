@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:isolate';
 
 import 'package:collection/collection.dart';
 import 'package:fjs/fjs.dart';
@@ -11,7 +10,6 @@ import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/extension_webview_fallback.dart';
 import 'package:gagaku/web/model/types.dart';
-import 'package:image/image.dart' as image;
 
 enum _RuntimeEvalExecutorState { accepting, closing, closed }
 
@@ -41,145 +39,6 @@ class _RuntimeEvalExecutor {
       _state = _RuntimeEvalExecutorState.closed;
     });
   }
-}
-
-class _DecodedImagePixels {
-  const _DecodedImagePixels({
-    required this.width,
-    required this.height,
-    required this.pixels,
-    required this.workerElapsed,
-  });
-
-  final int width;
-  final int height;
-  final Uint8List pixels;
-  final Duration workerElapsed;
-}
-
-class _ImageDecodeWorker {
-  Future<SendPort>? _sendPortFuture;
-  var _nextId = 0;
-  final _pending = <int, Completer<_DecodedImagePixels>>{};
-
-  Future<_DecodedImagePixels> decode(dynamic payload) async {
-    final messagePayload = switch (payload) {
-      Uint8List bytes => TransferableTypedData.fromList([bytes]),
-      String dataUrl => dataUrl,
-      _ => throw StateError('Invalid decodeImage payload'),
-    };
-    final sendPort = await (_sendPortFuture ??= _start());
-    final completer = Completer<_DecodedImagePixels>();
-    final id = _nextId++;
-    _pending[id] = completer;
-
-    sendPort.send([id, messagePayload]);
-    return completer.future;
-  }
-
-  Future<SendPort> _start() async {
-    final receivePort = ReceivePort();
-    final sendPortCompleter = Completer<SendPort>();
-    receivePort.listen((message) {
-      switch (message) {
-        case SendPort sendPort:
-          sendPortCompleter.complete(sendPort);
-        case List message:
-          _handleWorkerResult(message);
-      }
-    });
-
-    await Isolate.spawn(
-      _imageDecodeWorkerMain,
-      receivePort.sendPort,
-      debugName: 'gagaku image decoder',
-    );
-    return sendPortCompleter.future;
-  }
-
-  void _handleWorkerResult(List<dynamic> message) {
-    final id = message[0] as int;
-    final completer = _pending.remove(id);
-    if (completer == null) {
-      return;
-    }
-
-    final ok = message[1] as bool;
-    if (!ok) {
-      completer.completeError(StateError(message[2] as String));
-      return;
-    }
-
-    final pixels = (message[4] as TransferableTypedData)
-        .materialize()
-        .asUint8List();
-    completer.complete(
-      _DecodedImagePixels(
-        width: message[2] as int,
-        height: message[3] as int,
-        pixels: pixels,
-        workerElapsed: Duration(microseconds: message[5] as int),
-      ),
-    );
-  }
-}
-
-final _imageDecodeWorker = _ImageDecodeWorker();
-
-Uint8List _decodeDataUrlBytes(String dataUrl) {
-  final comma = dataUrl.indexOf(',');
-  if (comma < 0 ||
-      !dataUrl.substring(0, comma).toLowerCase().contains(';base64')) {
-    throw const FormatException('Unsupported image data URL');
-  }
-  return base64Decode(dataUrl.substring(comma + 1));
-}
-
-_DecodedImagePixels _decodeImagePixels(dynamic payload) {
-  final stopwatch = Stopwatch()..start();
-  final bytes = switch (payload) {
-    TransferableTypedData data => data.materialize().asUint8List(),
-    String dataUrl => _decodeDataUrlBytes(dataUrl),
-    Uint8List bytes => bytes,
-    _ => throw const FormatException('Invalid decodeImage payload'),
-  };
-
-  final decoded = image.decodeImage(bytes);
-  if (decoded == null) {
-    throw const FormatException('Unsupported image format');
-  }
-
-  return _DecodedImagePixels(
-    width: decoded.width,
-    height: decoded.height,
-    pixels: decoded.getBytes(order: image.ChannelOrder.rgba),
-    workerElapsed: stopwatch.elapsed,
-  );
-}
-
-void _imageDecodeWorkerMain(SendPort mainPort) {
-  final receivePort = ReceivePort();
-  mainPort.send(receivePort.sendPort);
-  receivePort.listen((message) {
-    if (message is! List || message.length < 2) {
-      return;
-    }
-
-    final id = message[0] as int;
-    try {
-      final decoded = _decodeImagePixels(message[1]);
-      mainPort.send([
-        id,
-        true,
-        decoded.width,
-        decoded.height,
-        TransferableTypedData.fromList([decoded.pixels]),
-        decoded.workerElapsed.inMicroseconds,
-      ]);
-    } catch (error) {
-      mainPort.send([id, false, error.toString()]);
-    }
-  });
 }
 
 class FjsExtensionRuntime implements ExtensionRuntime {
@@ -456,9 +315,6 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     return await fjs.bridge_call(
       JSON.stringify({ handlerName, args })
     );
-  },
-  decodeImage: async (payload) => {
-    return await fjs.bridge_call({ channel: "decodeImage", payload });
   }
 });
 ''';
@@ -650,10 +506,6 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
       );
       return JsResult.ok(const JsValue.none());
     }
-    if (payload['channel'] == 'decodeImage') {
-      return _handleDecodeImage(payload['payload'] ?? payload['bytes']);
-    }
-
     final handlerName = payload['handlerName'];
     final rawArgs = payload['args'];
     if (handlerName is! String || (rawArgs != null && rawArgs is! List)) {
@@ -717,48 +569,6 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
         return JsResult.err(
           JsError.bridge('Unsupported gagaku bridge handler: $handlerName'),
         );
-    }
-  }
-
-  Future<JsResult> _handleDecodeImage(dynamic payload) async {
-    try {
-      final normalizedPayload = switch (payload) {
-        Uint8List bytes => bytes,
-        List values => Uint8List.fromList(values.cast<int>()),
-        String dataUrl => dataUrl,
-        _ => null,
-      };
-      if (normalizedPayload == null) {
-        return const JsResult.err(
-          JsError.bridge('Invalid decodeImage payload'),
-        );
-      }
-
-      final stopwatch = Stopwatch()..start();
-      final decoded = await _imageDecodeWorker.decode(normalizedPayload);
-      final elapsed = stopwatch.elapsed;
-      final inputSize = switch (normalizedPayload) {
-        String dataUrl => dataUrl.length,
-        Uint8List bytes => bytes.lengthInBytes,
-        _ => 0,
-      };
-      debugPrint(
-        'fjs[$sourceId] image.decode '
-        '${decoded.width}x${decoded.height} '
-        '$inputSize input bytes/chars '
-        '${decoded.pixels.lengthInBytes} rgba bytes '
-        'worker=${decoded.workerElapsed.inMilliseconds}ms '
-        'total=${elapsed.inMilliseconds}ms',
-      );
-      return JsResult.ok(
-        JsValue.from({
-          'width': decoded.width,
-          'height': decoded.height,
-          'pixels': decoded.pixels,
-        }),
-      );
-    } catch (error) {
-      return JsResult.err(JsError.bridge(error.toString()));
     }
   }
 
