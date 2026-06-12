@@ -4193,13 +4193,13 @@ ChapterDetails _$ChapterDetailsFromJson(
           return FileChapterDetails.fromJson(
             json
           );
-
+        
           default:
             return ImageChapterDetails.fromJson(
   json
 );
         }
-
+      
 }
 
 /// @nodoc
@@ -4508,7 +4508,7 @@ as PaperbackRequest,
 @override
 @pragma('vm:prefer-inline')
 $PaperbackRequestCopyWith<$Res> get request {
-
+  
   return $PaperbackRequestCopyWith<$Res>(_self.request, (value) {
     return _then(_self.copyWith(request: value));
   });

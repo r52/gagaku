@@ -19,20 +19,14 @@ class _RuntimeEvalExecutor {
   var _state = _RuntimeEvalExecutorState.accepting;
   Future<void> _tail = Future<void>.value();
   Future<void>? _closeFuture;
-  var _pendingOperations = 0;
-
-  bool get hasPendingOperations => _pendingOperations != 0;
 
   Future<T> run<T>(Future<T> Function() action) {
     if (_state != _RuntimeEvalExecutorState.accepting) {
       return Future<T>.error(StateError('fjs extension runtime is closing'));
     }
 
-    _pendingOperations++;
     final operation = _tail.then((_) => action());
-    _tail = operation.then<void>((_) {}, onError: (_, _) {}).whenComplete(() {
-      _pendingOperations--;
-    });
+    _tail = operation.then<void>((_) {}, onError: (_, _) {});
     return operation;
   }
 
@@ -1171,33 +1165,22 @@ return await globalThis.$sourceId.getSearchResults(
 
   Future<void> _dispose() async {
     _activeRuntimes.remove(this);
-    final drainFuture = _evalExecutor.close();
+    await _evalExecutor.close();
 
     final engine = _engine;
-    if (_evalExecutor.hasPendingOperations) {
-      await drainFuture;
-    }
-
     _engine = null;
     _hasAdvancedSearchForm = false;
     _hasSortOps = false;
     _cookies = null;
     _forms.clear();
 
-    await _closeEngine(engine);
-    await drainFuture;
-  }
-
-  Future<void> _closeEngine(JsEngine? engine) async {
     if (engine == null) {
       return;
     }
 
     try {
-      if (!engine.closed) {
-        debugPrint('fjs[$sourceId]: closing engine');
-        await engine.close();
-      }
+      debugPrint('fjs[$sourceId]: closing engine');
+      await engine.close();
     } finally {
       engine.dispose();
     }
