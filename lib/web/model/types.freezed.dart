@@ -6547,7 +6547,7 @@ as SelectorID?,
 /// @nodoc
 mixin _$ExecuteInWebViewSource {
 
- String get html; String get baseUrl; bool get loadCSS; bool get loadImages;
+ String get html; String get baseUrl; bool get loadCSS; bool get loadImages; String? get userAgent;
 /// Create a copy of ExecuteInWebViewSource
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -6560,16 +6560,16 @@ $ExecuteInWebViewSourceCopyWith<ExecuteInWebViewSource> get copyWith => _$Execut
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExecuteInWebViewSource&&(identical(other.html, html) || other.html == html)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.loadCSS, loadCSS) || other.loadCSS == loadCSS)&&(identical(other.loadImages, loadImages) || other.loadImages == loadImages));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExecuteInWebViewSource&&(identical(other.html, html) || other.html == html)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.loadCSS, loadCSS) || other.loadCSS == loadCSS)&&(identical(other.loadImages, loadImages) || other.loadImages == loadImages)&&(identical(other.userAgent, userAgent) || other.userAgent == userAgent));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,html,baseUrl,loadCSS,loadImages);
+int get hashCode => Object.hash(runtimeType,html,baseUrl,loadCSS,loadImages,userAgent);
 
 @override
 String toString() {
-  return 'ExecuteInWebViewSource(html: $html, baseUrl: $baseUrl, loadCSS: $loadCSS, loadImages: $loadImages)';
+  return 'ExecuteInWebViewSource(html: $html, baseUrl: $baseUrl, loadCSS: $loadCSS, loadImages: $loadImages, userAgent: $userAgent)';
 }
 
 
@@ -6580,7 +6580,7 @@ abstract mixin class $ExecuteInWebViewSourceCopyWith<$Res>  {
   factory $ExecuteInWebViewSourceCopyWith(ExecuteInWebViewSource value, $Res Function(ExecuteInWebViewSource) _then) = _$ExecuteInWebViewSourceCopyWithImpl;
 @useResult
 $Res call({
- String html, String baseUrl, bool loadCSS, bool loadImages
+ String html, String baseUrl, bool loadCSS, bool loadImages, String? userAgent
 });
 
 
@@ -6597,13 +6597,14 @@ class _$ExecuteInWebViewSourceCopyWithImpl<$Res>
 
 /// Create a copy of ExecuteInWebViewSource
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? html = null,Object? baseUrl = null,Object? loadCSS = null,Object? loadImages = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? html = null,Object? baseUrl = null,Object? loadCSS = null,Object? loadImages = null,Object? userAgent = freezed,}) {
   return _then(_self.copyWith(
 html: null == html ? _self.html : html // ignore: cast_nullable_to_non_nullable
 as String,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,loadCSS: null == loadCSS ? _self.loadCSS : loadCSS // ignore: cast_nullable_to_non_nullable
 as bool,loadImages: null == loadImages ? _self.loadImages : loadImages // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,userAgent: freezed == userAgent ? _self.userAgent : userAgent // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -6615,13 +6616,14 @@ as bool,
 @JsonSerializable()
 
 class _ExecuteInWebViewSource implements ExecuteInWebViewSource {
-  const _ExecuteInWebViewSource({required this.html, required this.baseUrl, required this.loadCSS, required this.loadImages});
+  const _ExecuteInWebViewSource({required this.html, required this.baseUrl, required this.loadCSS, required this.loadImages, this.userAgent});
   factory _ExecuteInWebViewSource.fromJson(Map<String, dynamic> json) => _$ExecuteInWebViewSourceFromJson(json);
 
 @override final  String html;
 @override final  String baseUrl;
 @override final  bool loadCSS;
 @override final  bool loadImages;
+@override final  String? userAgent;
 
 /// Create a copy of ExecuteInWebViewSource
 /// with the given fields replaced by the non-null parameter values.
@@ -6636,16 +6638,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExecuteInWebViewSource&&(identical(other.html, html) || other.html == html)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.loadCSS, loadCSS) || other.loadCSS == loadCSS)&&(identical(other.loadImages, loadImages) || other.loadImages == loadImages));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExecuteInWebViewSource&&(identical(other.html, html) || other.html == html)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.loadCSS, loadCSS) || other.loadCSS == loadCSS)&&(identical(other.loadImages, loadImages) || other.loadImages == loadImages)&&(identical(other.userAgent, userAgent) || other.userAgent == userAgent));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,html,baseUrl,loadCSS,loadImages);
+int get hashCode => Object.hash(runtimeType,html,baseUrl,loadCSS,loadImages,userAgent);
 
 @override
 String toString() {
-  return 'ExecuteInWebViewSource(html: $html, baseUrl: $baseUrl, loadCSS: $loadCSS, loadImages: $loadImages)';
+  return 'ExecuteInWebViewSource(html: $html, baseUrl: $baseUrl, loadCSS: $loadCSS, loadImages: $loadImages, userAgent: $userAgent)';
 }
 
 
@@ -6656,7 +6658,7 @@ abstract mixin class _$ExecuteInWebViewSourceCopyWith<$Res> implements $ExecuteI
   factory _$ExecuteInWebViewSourceCopyWith(_ExecuteInWebViewSource value, $Res Function(_ExecuteInWebViewSource) _then) = __$ExecuteInWebViewSourceCopyWithImpl;
 @override @useResult
 $Res call({
- String html, String baseUrl, bool loadCSS, bool loadImages
+ String html, String baseUrl, bool loadCSS, bool loadImages, String? userAgent
 });
 
 
@@ -6673,13 +6675,14 @@ class __$ExecuteInWebViewSourceCopyWithImpl<$Res>
 
 /// Create a copy of ExecuteInWebViewSource
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? html = null,Object? baseUrl = null,Object? loadCSS = null,Object? loadImages = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? html = null,Object? baseUrl = null,Object? loadCSS = null,Object? loadImages = null,Object? userAgent = freezed,}) {
   return _then(_ExecuteInWebViewSource(
 html: null == html ? _self.html : html // ignore: cast_nullable_to_non_nullable
 as String,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,loadCSS: null == loadCSS ? _self.loadCSS : loadCSS // ignore: cast_nullable_to_non_nullable
 as bool,loadImages: null == loadImages ? _self.loadImages : loadImages // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,userAgent: freezed == userAgent ? _self.userAgent : userAgent // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

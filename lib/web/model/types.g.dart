@@ -1038,6 +1038,7 @@ _ExecuteInWebViewSource _$ExecuteInWebViewSourceFromJson(
   baseUrl: json['baseUrl'] as String,
   loadCSS: json['loadCSS'] as bool,
   loadImages: json['loadImages'] as bool,
+  userAgent: json['userAgent'] as String?,
 );
 
 Map<String, dynamic> _$ExecuteInWebViewSourceToJson(
@@ -1047,6 +1048,7 @@ Map<String, dynamic> _$ExecuteInWebViewSourceToJson(
   'baseUrl': instance.baseUrl,
   'loadCSS': instance.loadCSS,
   'loadImages': instance.loadImages,
+  'userAgent': instance.userAgent,
 };
 
 _PaperbackCookie _$PaperbackCookieFromJson(Map<String, dynamic> json) =>

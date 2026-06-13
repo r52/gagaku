@@ -11,7 +11,7 @@
     "deploy": "npm run build && node -e \"require('fs').cpSync('./dist/', '../assets/extensionhost/', { recursive: true });\""
   },
   "devDependencies": {
-    "@paperback/types": "1.0.0-alpha.89",
+    "@paperback/types": "1.0.0-alpha.91",
     "@types/md5": "^2.3.6",
     "@types/node": "^25.6.0",
     "buffer": "^6.0.3",

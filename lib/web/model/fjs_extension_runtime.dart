@@ -248,9 +248,9 @@ return JSON.stringify(value);
           label: 'install host bridge',
         ),
       );
-      final startupCookies = await _runInitStep(
-        'load startup cookies',
-        () => _loadStartupCookies(source),
+      final startupBrowserState = await _runInitStep(
+        'load startup browser state',
+        () => _loadStartupBrowserState(source),
       );
       await _runInitStep(
         'evaluate extension host',
@@ -272,8 +272,8 @@ return JSON.stringify(value);
         () => _hydrateExtensionState(source.id),
       );
       await _runInitStep(
-        'save startup cookies',
-        () => _saveCloudflareBypassCookies(source, startupCookies),
+        'notify Cloudflare bypass completion',
+        () => _notifyCloudflareBypassCompleted(source, startupBrowserState),
       );
       await _runInitStep(
         'initialise source',
@@ -320,11 +320,15 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
 ''';
   }
 
-  Future<List<Cookie>> _loadStartupCookies(WebSourceInfo source) async {
+  Future<({List<Cookie> cookies, Map<String, String> localStorage})>
+  _loadStartupBrowserState(WebSourceInfo source) async {
     final baseUrl = source.baseUrl;
     if (baseUrl == null || baseUrl.isEmpty) {
       _cookies = null;
-      return const [];
+      return (
+        cookies: const <Cookie>[],
+        localStorage: const <String, String>{},
+      );
     }
 
     final contentBlockers = <ContentBlocker>[];
@@ -339,17 +343,22 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
       }
     }
 
-    final completer = Completer<List<Cookie>>();
+    final completer =
+        Completer<({List<Cookie> cookies, Map<String, String> localStorage})>();
     final requiresCloudflare = source.hasCapability(
       SourceIntents.cloudflareBypassRequired,
     );
     var latestCookies = <Cookie>[];
+    var latestLocalStorage = <String, String>{};
     Timer? timeout;
     HeadlessInAppWebView? startupView;
 
-    void complete(List<Cookie> cookies) {
+    void complete() {
       if (!completer.isCompleted) {
-        completer.complete(cookies);
+        completer.complete((
+          cookies: latestCookies,
+          localStorage: latestLocalStorage,
+        ));
       }
     }
 
@@ -360,7 +369,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     }
 
     timeout = Timer(const Duration(seconds: 15), () {
-      complete(latestCookies);
+      complete();
     });
 
     try {
@@ -382,12 +391,15 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
               webViewController: controller,
             );
             latestCookies = cookies;
+            if (requiresCloudflare) {
+              latestLocalStorage = await _readLocalStorage(controller);
+            }
 
             final hasClearance = cookies.any(
               (cookie) => cookie.name == 'cf_clearance',
             );
             if (!requiresCloudflare || hasClearance) {
-              complete(cookies);
+              complete();
             }
           } catch (error, stackTrace) {
             completeError(error, stackTrace);
@@ -396,32 +408,65 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
       );
 
       await startupView.run();
-      final cookies = await completer.future;
-      _cookies = cookies;
-      return cookies;
+      final result = await completer.future;
+      _cookies = result.cookies;
+      return result;
     } catch (error, stackTrace) {
       debugPrint(
         'fjs[$sourceId]: failed to load startup cookies\n$error\n$stackTrace',
       );
       _cookies = const [];
-      return const [];
+      return (
+        cookies: const <Cookie>[],
+        localStorage: const <String, String>{},
+      );
     } finally {
       timeout.cancel();
       startupView?.dispose();
     }
   }
 
-  Future<void> _saveCloudflareBypassCookies(
+  Future<Map<String, String>> _readLocalStorage(
+    InAppWebViewController controller,
+  ) async {
+    try {
+      final encoded = await controller.evaluateJavascript(
+        source:
+            'JSON.stringify(Object.fromEntries(Object.entries(localStorage)))',
+      );
+      if (encoded is! String) {
+        return const {};
+      }
+
+      final values = jsonDecode(encoded);
+      if (values is! Map) {
+        return const {};
+      }
+
+      return {
+        for (final MapEntry(:key, :value) in values.entries)
+          key.toString(): value.toString(),
+      };
+    } catch (error, stackTrace) {
+      debugPrint(
+        'fjs[$sourceId]: failed to read Cloudflare local storage\n'
+        '$error\n$stackTrace',
+      );
+      return const {};
+    }
+  }
+
+  Future<void> _notifyCloudflareBypassCompleted(
     WebSourceInfo source,
-    List<Cookie> cookies,
+    ({List<Cookie> cookies, Map<String, String> localStorage}) result,
   ) async {
     if (!source.hasCapability(SourceIntents.cloudflareBypassRequired) ||
-        !cookies.any((cookie) => cookie.name == 'cf_clearance')) {
+        !result.cookies.any((cookie) => cookie.name == 'cf_clearance')) {
       return;
     }
 
     final expectedDomain = Uri.parse(source.baseUrl!).host;
-    final pbCookies = cookies
+    final pbCookies = result.cookies
         .map(
           (cookie) => PaperbackCookie(
             name: cookie.name,
@@ -436,6 +481,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
         .toList();
 
     await _evalScoped("""
+const request = ${jsonEncode({'url': source.baseUrl, 'method': 'GET'})};
 const cookies = ${jsonEncode(pbCookies.map((cookie) => cookie.toJson()).toList())}.map((cookie) => {
   return {
     ...cookie,
@@ -443,7 +489,10 @@ const cookies = ${jsonEncode(pbCookies.map((cookie) => cookie.toJson()).toList()
     expires: cookie.expires ? new Date(cookie.expires) : undefined
   };
 });
-if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
+const localStorage = ${jsonEncode(result.localStorage)};
+if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
+  await globalThis.${source.id}.cloudflareBypassCompleted(request, cookies, localStorage);
+} else if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
   await globalThis.${source.id}.saveCloudflareBypassCookies(cookies);
 }
 """);

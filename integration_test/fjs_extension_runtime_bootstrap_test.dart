@@ -187,7 +187,11 @@ void main() {
             ..path = '/'
             ..expires = DateTime.now().add(const Duration(hours: 1)),
         )
-        ..write('<html>startup</html>');
+        ..write(
+          '<html><script>'
+          'localStorage.setItem("phase6", "startup-storage");'
+          '</script>startup</html>',
+        );
       await request.response.close();
     });
 
@@ -231,6 +235,9 @@ void main() {
     await runtime.init(source, r'''
 globalThis.source ??= {};
 let savedCloudflareCookies = [];
+let cloudflareRequest;
+let cloudflareLocalStorage = {};
+let legacyCloudflareCallbackCalled = false;
 const settingsForm = {
   requiresExplicitSubmission: true,
   formWillAppear: () => {
@@ -458,6 +465,18 @@ globalThis.source.phase2source = {
       savedCloudflareCookies.map((cookie) => cookie.name).join(","),
       "phase6CloudflareCookieNames"
     );
+    Application.setState(
+      `${cloudflareRequest.method}:${cloudflareRequest.url}`,
+      "phase6CloudflareRequest"
+    );
+    Application.setState(
+      cloudflareLocalStorage.phase6,
+      "phase6CloudflareLocalStorage"
+    );
+    Application.setState(
+      legacyCloudflareCallbackCalled,
+      "phase6LegacyCloudflareCallbackCalled"
+    );
     Application.setSecureState("secure-initialized", "phase2");
     Application.setState(
       { nested: [new Date("2026-05-30T12:34:56.789Z")] },
@@ -477,7 +496,13 @@ globalThis.source.phase2source = {
       Application.Selector(responseInterceptorTarget, "run")
     );
   },
+  cloudflareBypassCompleted: async (request, cookies, localStorage) => {
+    cloudflareRequest = request;
+    savedCloudflareCookies = cookies;
+    cloudflareLocalStorage = localStorage;
+  },
   saveCloudflareBypassCookies: async (cookies) => {
+    legacyCloudflareCallbackCalled = true;
     savedCloudflareCookies = cookies;
   },
   getSettingsForm: async () => settingsForm,
@@ -583,6 +608,9 @@ globalThis.source.phase2source = {
       'phase2': 'initialized',
       'phase6CloudflareSavedBeforeInit': true,
       'phase6CloudflareCookieNames': 'cf_clearance',
+      'phase6CloudflareRequest': 'GET:http://127.0.0.1:${server.port}/',
+      'phase6CloudflareLocalStorage': 'startup-storage',
+      'phase6LegacyCloudflareCallbackCalled': false,
       'phase7DateState': {
         'nested': ['2026-05-30T12:34:56.789Z'],
       },
@@ -727,6 +755,9 @@ globalThis.source.phase2source = {
       'phase2': 'initialized',
       'phase6CloudflareSavedBeforeInit': true,
       'phase6CloudflareCookieNames': 'cf_clearance',
+      'phase6CloudflareRequest': 'GET:http://127.0.0.1:${server.port}/',
+      'phase6CloudflareLocalStorage': 'startup-storage',
+      'phase6LegacyCloudflareCallbackCalled': false,
       'phase7DateState': {
         'nested': ['2026-05-30T12:34:56.789Z'],
       },
