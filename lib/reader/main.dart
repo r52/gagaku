@@ -9,6 +9,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/reader/model/config.dart';
 import 'package:gagaku/reader/model/types.dart';
+import 'package:gagaku/reader/widgets/passive_tap_listener.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
@@ -673,68 +674,71 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
               showUI.value = !showUI.value;
             },
           ),
-          _ => PhotoViewGallery.builder(
-            allowImplicitScrolling: true,
-            reverse: settings.direction == ReaderDirection.rightToLeft,
-            scrollPhysics: !settings.swipeGestures
-                ? const NeverScrollableScrollPhysics()
-                : null,
-            backgroundDecoration: const BoxDecoration(color: Colors.black),
-            pageController: pageController,
-            onPageChanged: (int index) {
-              if (index != currentPage.value) {
-                setPageValue(page: index, precacheCount: precacheCount());
+          _ => PassiveTapListener(
+            onTap: (localPosition) {
+              focusNode.requestFocus();
+
+              final taploc = localPosition.dx;
+              final viewport = MediaQuery.sizeOf(context).width;
+              final tapmargin = viewport / 2.5;
+
+              // Tap in the middle 20% (from 40% to 60%).
+              if (taploc > tapmargin && taploc < viewport - tapmargin) {
+                showUI.value = !showUI.value;
+                return;
               }
 
-              if (!focusNode.hasFocus) {
-                focusNode.requestFocus();
+              if (settings.clickToTurn) {
+                if (taploc <= tapmargin) {
+                  onTapLeft(settings: settings, format: format);
+                } else if (taploc >= viewport - tapmargin) {
+                  onTapRight(settings: settings, format: format);
+                }
               }
             },
-            loadingBuilder: (context, event) => Center(
-              child: SizedBox(
-                width: 150,
-                child: LinearProgressIndicator(
-                  value: event != null && event.expectedTotalBytes != null
-                      ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
-                      : null,
+            child: PhotoViewGallery.builder(
+              allowImplicitScrolling: true,
+              reverse: settings.direction == ReaderDirection.rightToLeft,
+              scrollPhysics: !settings.swipeGestures
+                  ? const NeverScrollableScrollPhysics()
+                  : null,
+              backgroundDecoration: const BoxDecoration(color: Colors.black),
+              pageController: pageController,
+              onPageChanged: (int index) {
+                if (index != currentPage.value) {
+                  setPageValue(page: index, precacheCount: precacheCount());
+                }
+
+                if (!focusNode.hasFocus) {
+                  focusNode.requestFocus();
+                }
+              },
+              loadingBuilder: (context, event) => Center(
+                child: SizedBox(
+                  width: 150,
+                  child: LinearProgressIndicator(
+                    value: event != null && event.expectedTotalBytes != null
+                        ? event.cumulativeBytesLoaded /
+                              event.expectedTotalBytes!
+                        : null,
+                  ),
                 ),
               ),
+              itemCount: pageCount,
+              builder: (context, index) {
+                final page = widget.pages[index];
+                return PhotoViewGalleryPageOptions(
+                  heroAttributes: PhotoViewHeroAttributes(tag: page.id),
+                  imageProvider: page.provider,
+                  controller: _getViewController(index),
+                  scaleStateController: _getScaleController(index),
+                  minScale: PhotoViewComputedScale.contained * 1.0,
+                  maxScale: PhotoViewComputedScale.covered * 5.0,
+                  initialScale: PhotoViewComputedScale.contained,
+                  basePosition: Alignment.center,
+                );
+              },
             ),
-            itemCount: pageCount,
-            builder: (context, index) {
-              final page = widget.pages[index];
-              return PhotoViewGalleryPageOptions(
-                heroAttributes: PhotoViewHeroAttributes(tag: page.id),
-                imageProvider: page.provider,
-                controller: _getViewController(index),
-                scaleStateController: _getScaleController(index),
-                minScale: PhotoViewComputedScale.contained * 1.0,
-                maxScale: PhotoViewComputedScale.covered * 5.0,
-                initialScale: PhotoViewComputedScale.contained,
-                basePosition: Alignment.center,
-                onTapUp: (context, details, value) {
-                  focusNode.requestFocus();
-
-                  final taploc = details.localPosition.dx;
-                  final viewport = context.size!.width;
-                  final tapmargin = viewport / 2.5;
-
-                  // Tap in the middle 20% (from 40% to 60%, or depending on tapmargin)
-                  if (taploc > tapmargin && taploc < viewport - tapmargin) {
-                    showUI.value = !showUI.value;
-                    return;
-                  }
-
-                  if (settings.clickToTurn) {
-                    if (taploc <= tapmargin) {
-                      onTapLeft(settings: settings, format: format);
-                    } else if (taploc >= viewport - tapmargin) {
-                      onTapRight(settings: settings, format: format);
-                    }
-                  }
-                },
-              );
-            },
           ),
         },
       ),
