@@ -76,7 +76,9 @@ jobs:
 
       - name: Set up Packages (Windows)
         if: matrix.builder == 'windows'
-        run: flutter config --enable-windows-desktop
+        run: |
+          flutter config --enable-windows-desktop
+          echo "CL=/D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS" >> $env:GITHUB_ENV
 
       - run: flutter pub get
 
