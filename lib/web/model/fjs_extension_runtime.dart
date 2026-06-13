@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:isolate';
 
 import 'package:collection/collection.dart';
 import 'package:fjs/fjs.dart';
@@ -11,7 +10,6 @@ import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/extension_webview_fallback.dart';
 import 'package:gagaku/web/model/types.dart';
-import 'package:image/image.dart' as image;
 
 enum _RuntimeEvalExecutorState { accepting, closing, closed }
 
@@ -19,20 +17,14 @@ class _RuntimeEvalExecutor {
   var _state = _RuntimeEvalExecutorState.accepting;
   Future<void> _tail = Future<void>.value();
   Future<void>? _closeFuture;
-  var _pendingOperations = 0;
-
-  bool get hasPendingOperations => _pendingOperations != 0;
 
   Future<T> run<T>(Future<T> Function() action) {
     if (_state != _RuntimeEvalExecutorState.accepting) {
       return Future<T>.error(StateError('fjs extension runtime is closing'));
     }
 
-    _pendingOperations++;
     final operation = _tail.then((_) => action());
-    _tail = operation.then<void>((_) {}, onError: (_, _) {}).whenComplete(() {
-      _pendingOperations--;
-    });
+    _tail = operation.then<void>((_) {}, onError: (_, _) {});
     return operation;
   }
 
@@ -47,145 +39,6 @@ class _RuntimeEvalExecutor {
       _state = _RuntimeEvalExecutorState.closed;
     });
   }
-}
-
-class _DecodedImagePixels {
-  const _DecodedImagePixels({
-    required this.width,
-    required this.height,
-    required this.pixels,
-    required this.workerElapsed,
-  });
-
-  final int width;
-  final int height;
-  final Uint8List pixels;
-  final Duration workerElapsed;
-}
-
-class _ImageDecodeWorker {
-  Future<SendPort>? _sendPortFuture;
-  var _nextId = 0;
-  final _pending = <int, Completer<_DecodedImagePixels>>{};
-
-  Future<_DecodedImagePixels> decode(dynamic payload) async {
-    final messagePayload = switch (payload) {
-      Uint8List bytes => TransferableTypedData.fromList([bytes]),
-      String dataUrl => dataUrl,
-      _ => throw StateError('Invalid decodeImage payload'),
-    };
-    final sendPort = await (_sendPortFuture ??= _start());
-    final completer = Completer<_DecodedImagePixels>();
-    final id = _nextId++;
-    _pending[id] = completer;
-
-    sendPort.send([id, messagePayload]);
-    return completer.future;
-  }
-
-  Future<SendPort> _start() async {
-    final receivePort = ReceivePort();
-    final sendPortCompleter = Completer<SendPort>();
-    receivePort.listen((message) {
-      switch (message) {
-        case SendPort sendPort:
-          sendPortCompleter.complete(sendPort);
-        case List message:
-          _handleWorkerResult(message);
-      }
-    });
-
-    await Isolate.spawn(
-      _imageDecodeWorkerMain,
-      receivePort.sendPort,
-      debugName: 'gagaku image decoder',
-    );
-    return sendPortCompleter.future;
-  }
-
-  void _handleWorkerResult(List<dynamic> message) {
-    final id = message[0] as int;
-    final completer = _pending.remove(id);
-    if (completer == null) {
-      return;
-    }
-
-    final ok = message[1] as bool;
-    if (!ok) {
-      completer.completeError(StateError(message[2] as String));
-      return;
-    }
-
-    final pixels = (message[4] as TransferableTypedData)
-        .materialize()
-        .asUint8List();
-    completer.complete(
-      _DecodedImagePixels(
-        width: message[2] as int,
-        height: message[3] as int,
-        pixels: pixels,
-        workerElapsed: Duration(microseconds: message[5] as int),
-      ),
-    );
-  }
-}
-
-final _imageDecodeWorker = _ImageDecodeWorker();
-
-Uint8List _decodeDataUrlBytes(String dataUrl) {
-  final comma = dataUrl.indexOf(',');
-  if (comma < 0 ||
-      !dataUrl.substring(0, comma).toLowerCase().contains(';base64')) {
-    throw const FormatException('Unsupported image data URL');
-  }
-  return base64Decode(dataUrl.substring(comma + 1));
-}
-
-_DecodedImagePixels _decodeImagePixels(dynamic payload) {
-  final stopwatch = Stopwatch()..start();
-  final bytes = switch (payload) {
-    TransferableTypedData data => data.materialize().asUint8List(),
-    String dataUrl => _decodeDataUrlBytes(dataUrl),
-    Uint8List bytes => bytes,
-    _ => throw const FormatException('Invalid decodeImage payload'),
-  };
-
-  final decoded = image.decodeImage(bytes);
-  if (decoded == null) {
-    throw const FormatException('Unsupported image format');
-  }
-
-  return _DecodedImagePixels(
-    width: decoded.width,
-    height: decoded.height,
-    pixels: decoded.getBytes(order: image.ChannelOrder.rgba),
-    workerElapsed: stopwatch.elapsed,
-  );
-}
-
-void _imageDecodeWorkerMain(SendPort mainPort) {
-  final receivePort = ReceivePort();
-  mainPort.send(receivePort.sendPort);
-  receivePort.listen((message) {
-    if (message is! List || message.length < 2) {
-      return;
-    }
-
-    final id = message[0] as int;
-    try {
-      final decoded = _decodeImagePixels(message[1]);
-      mainPort.send([
-        id,
-        true,
-        decoded.width,
-        decoded.height,
-        TransferableTypedData.fromList([decoded.pixels]),
-        decoded.workerElapsed.inMicroseconds,
-      ]);
-    } catch (error) {
-      mainPort.send([id, false, error.toString()]);
-    }
-  });
 }
 
 class FjsExtensionRuntime implements ExtensionRuntime {
@@ -395,9 +248,9 @@ return JSON.stringify(value);
           label: 'install host bridge',
         ),
       );
-      final startupCookies = await _runInitStep(
-        'load startup cookies',
-        () => _loadStartupCookies(source),
+      final startupBrowserState = await _runInitStep(
+        'load startup browser state',
+        () => _loadStartupBrowserState(source),
       );
       await _runInitStep(
         'evaluate extension host',
@@ -419,8 +272,8 @@ return JSON.stringify(value);
         () => _hydrateExtensionState(source.id),
       );
       await _runInitStep(
-        'save startup cookies',
-        () => _saveCloudflareBypassCookies(source, startupCookies),
+        'notify Cloudflare bypass completion',
+        () => _notifyCloudflareBypassCompleted(source, startupBrowserState),
       );
       await _runInitStep(
         'initialise source',
@@ -462,19 +315,20 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     return await fjs.bridge_call(
       JSON.stringify({ handlerName, args })
     );
-  },
-  decodeImage: async (payload) => {
-    return await fjs.bridge_call({ channel: "decodeImage", payload });
   }
 });
 ''';
   }
 
-  Future<List<Cookie>> _loadStartupCookies(WebSourceInfo source) async {
+  Future<({List<Cookie> cookies, Map<String, String> localStorage})>
+  _loadStartupBrowserState(WebSourceInfo source) async {
     final baseUrl = source.baseUrl;
     if (baseUrl == null || baseUrl.isEmpty) {
       _cookies = null;
-      return const [];
+      return (
+        cookies: const <Cookie>[],
+        localStorage: const <String, String>{},
+      );
     }
 
     final contentBlockers = <ContentBlocker>[];
@@ -489,17 +343,22 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
       }
     }
 
-    final completer = Completer<List<Cookie>>();
+    final completer =
+        Completer<({List<Cookie> cookies, Map<String, String> localStorage})>();
     final requiresCloudflare = source.hasCapability(
       SourceIntents.cloudflareBypassRequired,
     );
     var latestCookies = <Cookie>[];
+    var latestLocalStorage = <String, String>{};
     Timer? timeout;
     HeadlessInAppWebView? startupView;
 
-    void complete(List<Cookie> cookies) {
+    void complete() {
       if (!completer.isCompleted) {
-        completer.complete(cookies);
+        completer.complete((
+          cookies: latestCookies,
+          localStorage: latestLocalStorage,
+        ));
       }
     }
 
@@ -510,7 +369,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     }
 
     timeout = Timer(const Duration(seconds: 15), () {
-      complete(latestCookies);
+      complete();
     });
 
     try {
@@ -532,12 +391,15 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
               webViewController: controller,
             );
             latestCookies = cookies;
+            if (requiresCloudflare) {
+              latestLocalStorage = await _readLocalStorage(controller);
+            }
 
             final hasClearance = cookies.any(
               (cookie) => cookie.name == 'cf_clearance',
             );
             if (!requiresCloudflare || hasClearance) {
-              complete(cookies);
+              complete();
             }
           } catch (error, stackTrace) {
             completeError(error, stackTrace);
@@ -546,32 +408,65 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
       );
 
       await startupView.run();
-      final cookies = await completer.future;
-      _cookies = cookies;
-      return cookies;
+      final result = await completer.future;
+      _cookies = result.cookies;
+      return result;
     } catch (error, stackTrace) {
       debugPrint(
         'fjs[$sourceId]: failed to load startup cookies\n$error\n$stackTrace',
       );
       _cookies = const [];
-      return const [];
+      return (
+        cookies: const <Cookie>[],
+        localStorage: const <String, String>{},
+      );
     } finally {
       timeout.cancel();
       startupView?.dispose();
     }
   }
 
-  Future<void> _saveCloudflareBypassCookies(
+  Future<Map<String, String>> _readLocalStorage(
+    InAppWebViewController controller,
+  ) async {
+    try {
+      final encoded = await controller.evaluateJavascript(
+        source:
+            'JSON.stringify(Object.fromEntries(Object.entries(localStorage)))',
+      );
+      if (encoded is! String) {
+        return const {};
+      }
+
+      final values = jsonDecode(encoded);
+      if (values is! Map) {
+        return const {};
+      }
+
+      return {
+        for (final MapEntry(:key, :value) in values.entries)
+          key.toString(): value.toString(),
+      };
+    } catch (error, stackTrace) {
+      debugPrint(
+        'fjs[$sourceId]: failed to read Cloudflare local storage\n'
+        '$error\n$stackTrace',
+      );
+      return const {};
+    }
+  }
+
+  Future<void> _notifyCloudflareBypassCompleted(
     WebSourceInfo source,
-    List<Cookie> cookies,
+    ({List<Cookie> cookies, Map<String, String> localStorage}) result,
   ) async {
     if (!source.hasCapability(SourceIntents.cloudflareBypassRequired) ||
-        !cookies.any((cookie) => cookie.name == 'cf_clearance')) {
+        !result.cookies.any((cookie) => cookie.name == 'cf_clearance')) {
       return;
     }
 
     final expectedDomain = Uri.parse(source.baseUrl!).host;
-    final pbCookies = cookies
+    final pbCookies = result.cookies
         .map(
           (cookie) => PaperbackCookie(
             name: cookie.name,
@@ -586,6 +481,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
         .toList();
 
     await _evalScoped("""
+const request = ${jsonEncode({'url': source.baseUrl, 'method': 'GET'})};
 const cookies = ${jsonEncode(pbCookies.map((cookie) => cookie.toJson()).toList())}.map((cookie) => {
   return {
     ...cookie,
@@ -593,7 +489,10 @@ const cookies = ${jsonEncode(pbCookies.map((cookie) => cookie.toJson()).toList()
     expires: cookie.expires ? new Date(cookie.expires) : undefined
   };
 });
-if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
+const localStorage = ${jsonEncode(result.localStorage)};
+if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
+  await globalThis.${source.id}.cloudflareBypassCompleted(request, cookies, localStorage);
+} else if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
   await globalThis.${source.id}.saveCloudflareBypassCookies(cookies);
 }
 """);
@@ -656,10 +555,6 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
       );
       return JsResult.ok(const JsValue.none());
     }
-    if (payload['channel'] == 'decodeImage') {
-      return _handleDecodeImage(payload['payload'] ?? payload['bytes']);
-    }
-
     final handlerName = payload['handlerName'];
     final rawArgs = payload['args'];
     if (handlerName is! String || (rawArgs != null && rawArgs is! List)) {
@@ -723,48 +618,6 @@ if (typeof globalThis.${source.id}.saveCloudflareBypassCookies === "function") {
         return JsResult.err(
           JsError.bridge('Unsupported gagaku bridge handler: $handlerName'),
         );
-    }
-  }
-
-  Future<JsResult> _handleDecodeImage(dynamic payload) async {
-    try {
-      final normalizedPayload = switch (payload) {
-        Uint8List bytes => bytes,
-        List values => Uint8List.fromList(values.cast<int>()),
-        String dataUrl => dataUrl,
-        _ => null,
-      };
-      if (normalizedPayload == null) {
-        return const JsResult.err(
-          JsError.bridge('Invalid decodeImage payload'),
-        );
-      }
-
-      final stopwatch = Stopwatch()..start();
-      final decoded = await _imageDecodeWorker.decode(normalizedPayload);
-      final elapsed = stopwatch.elapsed;
-      final inputSize = switch (normalizedPayload) {
-        String dataUrl => dataUrl.length,
-        Uint8List bytes => bytes.lengthInBytes,
-        _ => 0,
-      };
-      debugPrint(
-        'fjs[$sourceId] image.decode '
-        '${decoded.width}x${decoded.height} '
-        '$inputSize input bytes/chars '
-        '${decoded.pixels.lengthInBytes} rgba bytes '
-        'worker=${decoded.workerElapsed.inMilliseconds}ms '
-        'total=${elapsed.inMilliseconds}ms',
-      );
-      return JsResult.ok(
-        JsValue.from({
-          'width': decoded.width,
-          'height': decoded.height,
-          'pixels': decoded.pixels,
-        }),
-      );
-    } catch (error) {
-      return JsResult.err(JsError.bridge(error.toString()));
     }
   }
 
@@ -1171,33 +1024,22 @@ return await globalThis.$sourceId.getSearchResults(
 
   Future<void> _dispose() async {
     _activeRuntimes.remove(this);
-    final drainFuture = _evalExecutor.close();
+    await _evalExecutor.close();
 
     final engine = _engine;
-    if (_evalExecutor.hasPendingOperations) {
-      await drainFuture;
-    }
-
     _engine = null;
     _hasAdvancedSearchForm = false;
     _hasSortOps = false;
     _cookies = null;
     _forms.clear();
 
-    await _closeEngine(engine);
-    await drainFuture;
-  }
-
-  Future<void> _closeEngine(JsEngine? engine) async {
     if (engine == null) {
       return;
     }
 
     try {
-      if (!engine.closed) {
-        debugPrint('fjs[$sourceId]: closing engine');
-        await engine.close();
-      }
+      debugPrint('fjs[$sourceId]: closing engine');
+      await engine.close();
     } finally {
       engine.dispose();
     }

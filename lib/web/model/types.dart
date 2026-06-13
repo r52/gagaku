@@ -1328,6 +1328,7 @@ abstract class ExecuteInWebViewSource with _$ExecuteInWebViewSource {
     required String baseUrl,
     required bool loadCSS,
     required bool loadImages,
+    String? userAgent,
   }) = _ExecuteInWebViewSource;
 
   factory ExecuteInWebViewSource.fromJson(Map<String, dynamic> json) =>

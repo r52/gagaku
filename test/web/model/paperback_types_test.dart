@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/web/model/types.dart';
 
 void main() {
-  group('Paperback alpha 89 types', () {
+  group('Paperback alpha 91 types', () {
     test('parses image chapter details without an explicit type', () {
       final details = ChapterDetails.fromJson({
         'id': 'chapter-1',
@@ -116,6 +116,26 @@ void main() {
       expect(cookie.path, '/');
       expect(cookie.created, DateTime.parse('2026-06-04T12:00:00.000Z'));
       expect(cookie.expires, DateTime.parse('2026-06-05T12:00:00.000Z'));
+    });
+
+    test('parses the optional execute in WebView user agent', () {
+      final context = ExecuteInWebViewContext.fromJson({
+        'source': {
+          'html': '<html></html>',
+          'baseUrl': 'https://example.com',
+          'loadCSS': false,
+          'loadImages': false,
+          'userAgent': 'Paperback/1.0',
+        },
+        'inject': 'return true',
+        'storage': {'cookies': <dynamic>[]},
+      });
+
+      expect(context.source.userAgent, 'Paperback/1.0');
+      expect(
+        context.toJson()['source'],
+        containsPair('userAgent', 'Paperback/1.0'),
+      );
     });
   });
 }

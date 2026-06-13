@@ -23,6 +23,10 @@ on:
         default: false
         required: false
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     if: ${{ github.event.pull_request.draft == false && (github.event.action != 'closed' || github.event.pull_request.merged == true) }}
@@ -72,7 +76,9 @@ jobs:
 
       - name: Set up Packages (Windows)
         if: matrix.builder == 'windows'
-        run: flutter config --enable-windows-desktop
+        run: |
+          flutter config --enable-windows-desktop
+          echo "CL=/D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS" >> $env:GITHUB_ENV
 
       - run: flutter pub get
 
