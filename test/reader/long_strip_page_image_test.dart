@@ -29,6 +29,17 @@ void main() {
     );
   });
 
+  test('backward precaching remains independent of the forward count', () {
+    expect(
+      readerPrecacheIndices(
+        currentIndex: 20,
+        pageCount: 100,
+        forwardCount: 1,
+      ).toList(),
+      [21, 17, 18, 19],
+    );
+  });
+
   test('ReaderPage retains a valid image aspect ratio', () {
     final page = ReaderPage(provider: _TestImageProvider(null));
 

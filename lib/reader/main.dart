@@ -65,6 +65,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
   final Map<int, PhotoViewScaleStateController> _scaleControllers = {};
   final Map<int, PhotoViewController> _viewControllers = {};
   final Set<ImageProvider<Object>> _precacheInFlight = {};
+  final Set<ImageProvider<Object>> _horizontalPrecacheCompleted = {};
 
   int _cacheScheduleToken = 0;
 
@@ -128,11 +129,17 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
         ? page.provider
         : readerImageProvider(page, cacheWidth: cacheWidth);
 
+    if (cacheWidth == null && _horizontalPrecacheCompleted.contains(provider)) {
+      return;
+    }
     if (!_precacheInFlight.add(provider)) return;
 
     unawaited(
       precacheImage(provider, context).whenComplete(() {
         _precacheInFlight.remove(provider);
+        if (cacheWidth == null) {
+          _horizontalPrecacheCompleted.add(provider);
+        }
       }),
     );
   }
@@ -142,7 +149,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
       currentIndex: currentPage.value,
       pageCount: widget.pages.length,
       forwardCount: precacheCount,
-      backwardCount: min(3, precacheCount),
+      backwardCount: 3,
     )) {
       cachePage(widget.pages[index], cacheWidth: cacheWidth);
     }
@@ -199,6 +206,10 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     }
   }
 
+  @Deprecated(
+    'Progress navigation now jumps directly. Remove during reader controller '
+    'consolidation.',
+  )
   void animateToPage(
     int page, {
     required Duration duration,
@@ -834,18 +845,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                     settings.direction == ReaderDirection.rightToLeft,
                 currentPage: currentPage,
                 itemCount: pageCount,
-                onPageSelected: (index, isDrag) {
-                  if (isDrag) {
-                    jumpToPage(index, format: format);
-                  } else {
-                    animateToPage(
-                      index,
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.easeInOut,
-                      format: format,
-                    );
-                  }
-                },
+                onPageSelected: (index) => jumpToPage(index, format: format),
               ),
             )
           : null,
@@ -865,7 +865,7 @@ class ReaderProgressIndicator extends HookWidget {
 
   final ValueNotifier<int> currentPage;
   final int itemCount;
-  final void Function(int, bool) onPageSelected;
+  final ValueChanged<int> onPageSelected;
   final Color? color;
   final bool reverse;
 
@@ -896,14 +896,14 @@ class ReaderProgressIndicator extends HookWidget {
       [sections, reverse],
     );
 
-    void handleTapOrDrag(Offset localPosition, double totalWidth, bool isDrag) {
+    void handleTapOrDrag(Offset localPosition, double totalWidth) {
       if (totalWidth <= 0) return;
       double dx = localPosition.dx;
       if (reverse) dx = totalWidth - dx;
       final int index = ((dx / totalWidth) * itemCount)
           .clamp(0, itemCount - 1)
           .floor();
-      onPageSelected(index, isDrag);
+      onPageSelected(index);
     }
 
     final page = useValueListenable(currentPage);
@@ -964,8 +964,10 @@ class ReaderProgressIndicator extends HookWidget {
                                           initialItem: page,
                                         ),
                                     itemExtent: 40,
+                                    changeReportingBehavior:
+                                        ChangeReportingBehavior.onScrollEnd,
                                     onSelectedItemChanged: (index) {
-                                      onPageSelected(index, false);
+                                      onPageSelected(index);
                                     },
                                     children: List.generate(itemCount, (index) {
                                       return Center(
@@ -1000,12 +1002,10 @@ class ReaderProgressIndicator extends HookWidget {
                 onTapDown: (details) => handleTapOrDrag(
                   details.localPosition,
                   constraints.maxWidth,
-                  false,
                 ),
                 onHorizontalDragUpdate: (details) => handleTapOrDrag(
                   details.localPosition,
                   constraints.maxWidth,
-                  true,
                 ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints.loose(const Size.fromHeight(30)),
