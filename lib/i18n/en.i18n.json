@@ -176,6 +176,8 @@
     },
     "source": {
       "settings": "Extension Settings",
+      "openWebsite": "Open extension website",
+      "reloadWebsite": "Reload extension website",
       "manager": "Extension Manager",
       "noDataWarning": "No repos nor extensions installed!",
       "refresh": "Refresh repos",
