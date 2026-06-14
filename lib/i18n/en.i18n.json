@@ -178,6 +178,7 @@
       "settings": "Extension Settings",
       "openWebsite": "Open extension website",
       "reloadWebsite": "Reload extension website",
+      "cloudflareManualRequired": "Open the extension website, complete the Cloudflare challenge, then reload the extension.",
       "manager": "Extension Manager",
       "noDataWarning": "No repos nor extensions installed!",
       "refresh": "Refresh repos",

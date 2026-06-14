@@ -50,6 +50,7 @@ class FjsExtensionRuntime implements ExtensionRuntime {
     required this.onSetExtensionSecureState,
     required this.getExtensionState,
     required this.getExtensionSecureState,
+    this.startupBrowserTimeout = const Duration(seconds: 15),
   });
 
   final String sourceId;
@@ -59,6 +60,8 @@ class FjsExtensionRuntime implements ExtensionRuntime {
   final void Function(String, dynamic) onSetExtensionSecureState;
   final dynamic Function(String) getExtensionState;
   final dynamic Function(String) getExtensionSecureState;
+  @visibleForTesting
+  final Duration startupBrowserTimeout;
 
   static Future<void>? _libInit;
   static final Set<FjsExtensionRuntime> _activeRuntimes = {};
@@ -350,6 +353,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     );
     var latestCookies = <Cookie>[];
     var latestLocalStorage = <String, String>{};
+    var challengeObserved = false;
     Timer? timeout;
     HeadlessInAppWebView? startupView;
 
@@ -368,11 +372,28 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
       }
     }
 
-    timeout = Timer(const Duration(seconds: 15), () {
-      complete();
+    timeout = Timer(startupBrowserTimeout, () {
+      if (requiresCloudflare && _cloudflareClearance(latestCookies) == null) {
+        completeError(const CloudflareBypassException(), StackTrace.current);
+      } else {
+        complete();
+      }
     });
 
     try {
+      void markChallengeObserved() {
+        if (!challengeObserved) {
+          challengeObserved = true;
+          debugPrint('fjs[$sourceId]: Cloudflare challenge observed');
+        }
+      }
+
+      void observeUrl(WebUri? url) {
+        if (_isCloudflareChallengeUrl(url)) {
+          markChallengeObserved();
+        }
+      }
+
       startupView = HeadlessInAppWebView(
         initialUrlRequest: URLRequest(url: WebUri(baseUrl)),
         initialSettings: InAppWebViewSettings(
@@ -380,11 +401,30 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
           browserAcceleratorKeysEnabled: false,
           isInspectable: false,
         ),
+        onLoadStart: (controller, url) {
+          observeUrl(url);
+        },
+        onUpdateVisitedHistory: (controller, url, isReload) {
+          observeUrl(url);
+        },
+        onTitleChanged: (controller, title) {
+          if (_isCloudflareChallengeTitle(title)) {
+            markChallengeObserved();
+          }
+        },
+        onReceivedHttpError: (controller, request, errorResponse) {
+          observeUrl(request.url);
+          if (request.isForMainFrame == true &&
+              _isCloudflareChallengeResponse(errorResponse.headers)) {
+            markChallengeObserved();
+          }
+        },
         onLoadStop: (controller, url) async {
           if (url == null) {
             return;
           }
 
+          observeUrl(url);
           try {
             final cookies = await CookieManager.instance().getCookies(
               url: WebUri.uri(url),
@@ -395,11 +435,10 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
               latestLocalStorage = await _readLocalStorage(controller);
             }
 
-            final hasClearance = cookies.any(
-              (cookie) => cookie.name == 'cf_clearance',
-            );
+            final hasClearance = _cloudflareClearance(cookies) != null;
             if (!requiresCloudflare || hasClearance) {
               complete();
+              return;
             }
           } catch (error, stackTrace) {
             completeError(error, stackTrace);
@@ -411,6 +450,9 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
       final result = await completer.future;
       _cookies = result.cookies;
       return result;
+    } on CloudflareBypassException {
+      _cookies = const [];
+      rethrow;
     } catch (error, stackTrace) {
       debugPrint(
         'fjs[$sourceId]: failed to load startup cookies\n$error\n$stackTrace',
@@ -424,6 +466,30 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
       timeout.cancel();
       startupView?.dispose();
     }
+  }
+
+  Cookie? _cloudflareClearance(List<Cookie> cookies) {
+    return cookies.firstWhereOrNull((cookie) => cookie.name == 'cf_clearance');
+  }
+
+  bool _isCloudflareChallengeUrl(WebUri? url) {
+    return url?.queryParameters.keys.any(
+          (name) => name.startsWith('__cf_chl_'),
+        ) ==
+        true;
+  }
+
+  bool _isCloudflareChallengeResponse(Map<String, String>? headers) {
+    return headers?.entries.any(
+          (header) =>
+              header.key.toLowerCase() == 'cf-mitigated' &&
+              header.value.toLowerCase() == 'challenge',
+        ) ==
+        true;
+  }
+
+  bool _isCloudflareChallengeTitle(String? title) {
+    return title?.toLowerCase().contains('just a moment') == true;
   }
 
   Future<Map<String, String>> _readLocalStorage(

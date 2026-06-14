@@ -5,6 +5,7 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
+import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/extension_browser.dart';
 import 'package:gagaku/web/extension_settings.dart';
@@ -113,7 +114,11 @@ class _ExtensionHomeCard extends ConsumerWidget {
         );
       case AsyncError(:final error):
         subtitle = Text(
-          error.toString(),
+          switch (error) {
+            CloudflareBypassException() =>
+              tr.webSources.source.cloudflareManualRequired,
+            _ => error.toString(),
+          },
           style: TextStyle(color: theme.colorScheme.error),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,

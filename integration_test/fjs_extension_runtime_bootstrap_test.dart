@@ -4,7 +4,10 @@ import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart'
+    show CookieManager, WebUri;
 import 'package:gagaku/model/model.dart';
+import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/web/model/fjs_extension_runtime.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:image/image.dart' as img;
@@ -51,7 +54,17 @@ void main() {
       await request.response.close();
     });
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    final baseUrl = 'http://127.0.0.1:${server.port}/';
+    final baseWebUri = WebUri(baseUrl);
+    var startupChallengeRequests = 0;
+    var startupChallengeSolved = false;
     addTearDown(() => server.close(force: true));
+    addTearDown(
+      () => CookieManager.instance().deleteCookie(
+        url: baseWebUri,
+        name: 'cf_clearance',
+      ),
+    );
     server.listen((request) async {
       if (request.uri.path == '/phase5') {
         request.response
@@ -179,21 +192,52 @@ void main() {
         return;
       }
 
+      if (request.uri.path == '/') {
+        final cookie = request.headers.value(HttpHeaders.cookieHeader);
+        if (request.uri.queryParameters.containsKey('__cf_chl_rt_tk')) {
+          startupChallengeSolved = true;
+          request.response
+            ..statusCode = HttpStatus.found
+            ..headers.set(HttpHeaders.locationHeader, '/')
+            ..cookies.add(
+              Cookie('cf_clearance', 'startup-clearance')
+                ..path = '/'
+                ..expires = DateTime.now().add(const Duration(hours: 1)),
+            );
+          await request.response.close();
+          return;
+        }
+
+        if (!startupChallengeSolved &&
+            cookie?.contains('cf_clearance=startup-clearance') != true) {
+          startupChallengeRequests++;
+          request.response
+            ..statusCode = HttpStatus.found
+            ..headers.set(
+              HttpHeaders.locationHeader,
+              '/?__cf_chl_rt_tk=startup-test',
+            );
+          await request.response.close();
+          return;
+        }
+      }
+
       request.response
         ..statusCode = 200
         ..headers.contentType = ContentType.html
-        ..cookies.add(
-          Cookie('cf_clearance', 'startup-clearance')
-            ..path = '/'
-            ..expires = DateTime.now().add(const Duration(hours: 1)),
-        )
         ..write(
-          '<html><script>'
+          '<html><title>Startup</title><script>'
           'localStorage.setItem("phase6", "startup-storage");'
           '</script>startup</html>',
         );
       await request.response.close();
     });
+
+    await CookieManager.instance().setCookie(
+      url: baseWebUri,
+      name: 'cf_clearance',
+      value: 'stale-clearance',
+    );
 
     final runtime = FjsExtensionRuntime(
       sourceId: 'phase2source',
@@ -221,7 +265,7 @@ void main() {
       id: 'phase2source',
       name: 'Phase 2 Source',
       repo: 'phase2',
-      baseUrl: 'http://127.0.0.1:${server.port}/',
+      baseUrl: baseUrl,
       icon: '',
       capabilities: const [
         SourceIntents.mangaChapters,
@@ -466,6 +510,11 @@ globalThis.source.phase2source = {
       "phase6CloudflareCookieNames"
     );
     Application.setState(
+      savedCloudflareCookies.find((cookie) => cookie.name === "cf_clearance")
+        ?.value,
+      "phase6CloudflareClearance"
+    );
+    Application.setState(
       `${cloudflareRequest.method}:${cloudflareRequest.url}`,
       "phase6CloudflareRequest"
     );
@@ -601,6 +650,7 @@ globalThis.source.phase2source = {
 ''');
 
     expect(FjsExtensionRuntime.activeRuntimeCount, 1);
+    expect(startupChallengeRequests, greaterThan(0));
     expect(runtime.hasAdvancedSearchForm, true);
     expect(runtime.hasSortOps, true);
     expect(storedState, {
@@ -608,6 +658,7 @@ globalThis.source.phase2source = {
       'phase2': 'initialized',
       'phase6CloudflareSavedBeforeInit': true,
       'phase6CloudflareCookieNames': 'cf_clearance',
+      'phase6CloudflareClearance': 'startup-clearance',
       'phase6CloudflareRequest': 'GET:http://127.0.0.1:${server.port}/',
       'phase6CloudflareLocalStorage': 'startup-storage',
       'phase6LegacyCloudflareCallbackCalled': false,
@@ -755,6 +806,7 @@ globalThis.source.phase2source = {
       'phase2': 'initialized',
       'phase6CloudflareSavedBeforeInit': true,
       'phase6CloudflareCookieNames': 'cf_clearance',
+      'phase6CloudflareClearance': 'startup-clearance',
       'phase6CloudflareRequest': 'GET:http://127.0.0.1:${server.port}/',
       'phase6CloudflareLocalStorage': 'startup-storage',
       'phase6LegacyCloudflareCallbackCalled': false,
@@ -1139,4 +1191,150 @@ await new Promise((resolve) => setTimeout(() => resolve("drained"), 100));
     await FjsExtensionRuntime.disposeAll();
     expect(FjsExtensionRuntime.activeRuntimeCount, 0);
   });
+
+  test(
+    'fjs runtime preserves an existing valid Cloudflare clearance',
+    () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final baseUrl = 'http://127.0.0.1:${server.port}/';
+      final baseWebUri = WebUri(baseUrl);
+      var basePageRequests = 0;
+      Map<String, dynamic>? storedState;
+
+      addTearDown(() => server.close(force: true));
+      addTearDown(
+        () => CookieManager.instance().deleteCookie(
+          url: baseWebUri,
+          name: 'cf_clearance',
+        ),
+      );
+      server.listen((request) async {
+        if (request.uri.path == '/') {
+          basePageRequests++;
+        }
+        request.response
+          ..statusCode = HttpStatus.ok
+          ..headers.contentType = ContentType.html
+          ..write('<html><title>Ready</title><body>ready</body></html>');
+        await request.response.close();
+      });
+
+      await CookieManager.instance().setCookie(
+        url: baseWebUri,
+        name: 'cf_clearance',
+        value: 'known-good-clearance',
+      );
+
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'knownGoodSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, state) {
+          storedState = Map<String, dynamic>.from(state as Map);
+        },
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+      );
+      addTearDown(runtime.dispose);
+
+      final source = WebSourceInfo(
+        id: 'knownGoodSource',
+        name: 'Known Good Source',
+        repo: 'phase6',
+        baseUrl: baseUrl,
+        icon: '',
+        capabilities: const [SourceIntents.cloudflareBypassRequired],
+      );
+      await runtime.init(source, r'''
+globalThis.source ??= {};
+globalThis.source.knownGoodSource = {
+  cloudflareBypassCompleted: async (request, cookies) => {
+    Application.setState(
+      cookies.find((cookie) => cookie.name === "cf_clearance")?.value,
+      "clearance"
+    );
+  },
+  initialise: async () => {}
+};
+''');
+
+      expect(storedState, {'clearance': 'known-good-clearance'});
+      expect(basePageRequests, 1);
+    },
+  );
+
+  test(
+    'fjs runtime reports a Cloudflare challenge without clearance',
+    () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final baseUrl = 'http://127.0.0.1:${server.port}/';
+      final baseWebUri = WebUri(baseUrl);
+      var challengeServed = false;
+
+      addTearDown(() => server.close(force: true));
+      addTearDown(
+        () => CookieManager.instance().deleteCookie(
+          url: baseWebUri,
+          name: 'cf_clearance',
+        ),
+      );
+      await CookieManager.instance().deleteCookie(
+        url: baseWebUri,
+        name: 'cf_clearance',
+      );
+      server.listen((request) async {
+        if (!challengeServed) {
+          challengeServed = true;
+          request.response
+            ..statusCode = HttpStatus.found
+            ..headers.set(
+              HttpHeaders.locationHeader,
+              '/?__cf_chl_rt_tk=startup-test',
+            );
+        } else {
+          request.response
+            ..statusCode = HttpStatus.ok
+            ..headers.contentType = ContentType.html
+            ..write('<html><title>Ready</title><body>ready</body></html>');
+        }
+        await request.response.close();
+      });
+
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'manualCloudflareSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, _) {},
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+        startupBrowserTimeout: const Duration(milliseconds: 500),
+      );
+      addTearDown(runtime.dispose);
+
+      final source = WebSourceInfo(
+        id: 'manualCloudflareSource',
+        name: 'Manual Cloudflare Source',
+        repo: 'phase6',
+        baseUrl: baseUrl,
+        icon: '',
+        capabilities: const [SourceIntents.cloudflareBypassRequired],
+      );
+
+      await expectLater(
+        runtime.init(source, r'''
+globalThis.source ??= {};
+globalThis.source.manualCloudflareSource = {
+  initialise: async () => {}
+};
+'''),
+        throwsA(isA<CloudflareBypassException>()),
+      );
+    },
+  );
 }

@@ -1681,6 +1681,9 @@ class Translations$webSources$source$en {
 	/// en: 'Reload extension website'
 	String get reloadWebsite => 'Reload extension website';
 
+	/// en: 'Open the extension website, complete the Cloudflare challenge, then reload the extension.'
+	String get cloudflareManualRequired => 'Open the extension website, complete the Cloudflare challenge, then reload the extension.';
+
 	/// en: 'Extension Manager'
 	String get manager => 'Extension Manager';
 
@@ -2079,6 +2082,7 @@ extension on Translations {
 			'webSources.source.settings' => 'Extension Settings',
 			'webSources.source.openWebsite' => 'Open extension website',
 			'webSources.source.reloadWebsite' => 'Reload extension website',
+			'webSources.source.cloudflareManualRequired' => 'Open the extension website, complete the Cloudflare challenge, then reload the extension.',
 			'webSources.source.manager' => 'Extension Manager',
 			'webSources.source.noDataWarning' => 'No repos nor extensions installed!',
 			'webSources.source.refresh' => 'Refresh repos',

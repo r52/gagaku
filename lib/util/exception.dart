@@ -37,6 +37,13 @@ class InvalidDataException implements Exception {
   }
 }
 
+class CloudflareBypassException implements Exception {
+  const CloudflareBypassException();
+
+  @override
+  String toString() => 'Cloudflare challenge requires manual resolution';
+}
+
 class UnknownSourceException implements Exception {
   final String? sourceId;
   final String message;
