@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 import 'package:gagaku/util/riverpod.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/reader/model/config.dart';
 import 'package:gagaku/reader/model/types.dart';
+import 'package:gagaku/reader/widgets/long_strip_page_image.dart';
 import 'package:gagaku/reader/widgets/passive_tap_listener.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -62,6 +64,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
 
   final Map<int, PhotoViewScaleStateController> _scaleControllers = {};
   final Map<int, PhotoViewController> _viewControllers = {};
+  final Set<ImageProvider<Object>> _precacheInFlight = {};
 
   int _cacheScheduleToken = 0;
 
@@ -120,57 +123,44 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     }
   }
 
-  void cachePage(ReaderPage page) {
-    precacheImage(page.provider, context);
-    page.cached = true;
+  void cachePage(ReaderPage page, {int? cacheWidth}) {
+    final provider = cacheWidth == null
+        ? page.provider
+        : readerImageProvider(page, cacheWidth: cacheWidth);
+
+    if (!_precacheInFlight.add(provider)) return;
+
+    unawaited(
+      precacheImage(provider, context).whenComplete(() {
+        _precacheInFlight.remove(provider);
+      }),
+    );
   }
 
-  void cachePages(int precacheCount) {
-    final pageCount = widget.pages.length;
-    final currentIndex = currentPage.value;
-
-    // Forward Caching
-    // Define the range of pages to cache *after* the current one.
-    final forwardStart = currentIndex + 1;
-    final forwardEnd = min(forwardStart + precacheCount, pageCount);
-
-    // Iterate through the forward window and initiate caching for any page
-    // that isn't already cached. This range is only valid if start < end.
-    if (forwardStart < forwardEnd) {
-      for (final page in widget.pages.getRange(forwardStart, forwardEnd)) {
-        if (!page.cached) {
-          cachePage(page);
-        }
-      }
-    }
-
-    // Backward Caching
-    const backCacheAmount = 3;
-    // Define the range of pages to cache *before* the current one.
-    final backwardStart = max(0, currentIndex - backCacheAmount);
-    // The range for back-caching ends at the current page (exclusive).
-    final backwardEnd = currentIndex;
-
-    // Iterate through the backward window and initiate caching.
-    // This range is only valid if start < end.
-    if (backwardStart < backwardEnd) {
-      for (final page in widget.pages.getRange(backwardStart, backwardEnd)) {
-        if (!page.cached) {
-          cachePage(page);
-        }
-      }
+  void cachePages(int precacheCount, {int? cacheWidth}) {
+    for (final index in readerPrecacheIndices(
+      currentIndex: currentPage.value,
+      pageCount: widget.pages.length,
+      forwardCount: precacheCount,
+      backwardCount: min(3, precacheCount),
+    )) {
+      cachePage(widget.pages[index], cacheWidth: cacheWidth);
     }
   }
 
-  void _scheduleCachePages(int precacheCount) {
+  void _scheduleCachePages(int precacheCount, {int? cacheWidth}) {
     final token = ++_cacheScheduleToken;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || token != _cacheScheduleToken) return;
-      cachePages(precacheCount);
+      cachePages(precacheCount, cacheWidth: cacheWidth);
     });
   }
 
-  void setPageValue({required int page, required int precacheCount}) {
+  void setPageValue({
+    required int page,
+    required int precacheCount,
+    int? cacheWidth,
+  }) {
     if (page < 0 || page >= widget.pages.length) return;
 
     if (currentPage.value != page) {
@@ -182,7 +172,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
       subtext.value = nextSubtext;
     }
 
-    _scheduleCachePages(precacheCount);
+    _scheduleCachePages(precacheCount, cacheWidth: cacheWidth);
   }
 
   void jumpToPage(int page, {required ReaderFormat format}) {
@@ -385,39 +375,92 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     final longStripScale = useValueNotifier(
       isPortrait ? LongStripScale.full : LongStripScale.small,
     );
+    final longStripScaleValue = useValueListenable(longStripScale);
+    final longStripDisplayWidth =
+        MediaQuery.sizeOf(context).width * longStripScaleValue.scale;
+    final longStripCacheWidth =
+        (longStripDisplayWidth * MediaQuery.devicePixelRatioOf(context)).ceil();
 
     final precacheCount = useCallback(() {
-      return (settings.precacheCount > 9 || format == ReaderFormat.longstrip)
-          ? pageCount
-          : settings.precacheCount;
+      if (format == ReaderFormat.longstrip) {
+        return max(1, min(settings.precacheCount, 9));
+      }
+
+      return settings.precacheCount > 9 ? pageCount : settings.precacheCount;
     }, [settings.precacheCount, format, pageCount]);
 
+    useEffect(
+      () {
+        if (widget.pages.isEmpty) return null;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          setPageValue(
+            page: currentPage.value,
+            precacheCount: precacheCount(),
+            cacheWidth: format == ReaderFormat.longstrip
+                ? longStripCacheWidth
+                : null,
+          );
+        });
+
+        return null;
+      },
+      [
+        widget.pages.length,
+        settings.precacheCount,
+        format,
+        longStripCacheWidth,
+      ],
+    );
+
     useEffect(() {
-      if (widget.pages.isEmpty) return null;
+      var active = true;
+      var updateScheduled = false;
+      int? pendingPage;
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        setPageValue(page: currentPage.value, precacheCount: precacheCount());
-      });
+      void applyPendingPage(Duration _) {
+        updateScheduled = false;
+        if (!active || !mounted) {
+          pendingPage = null;
+          return;
+        }
 
-      return null;
-    }, [widget.pages.length, settings.precacheCount, format]);
+        final page = pendingPage;
+        pendingPage = null;
+        if (page == null || page == currentPage.value) return;
 
-    useEffect(() {
+        setPageValue(
+          page: page,
+          precacheCount: precacheCount(),
+          cacheWidth: format == ReaderFormat.longstrip
+              ? longStripCacheWidth
+              : null,
+        );
+      }
+
       void listPosCb() {
         if (!listController.isAttached) return;
         final range = listController.visibleRange;
         if (range == null) return;
 
         final min = range.$1;
-        if (min != currentPage.value) {
-          setPageValue(page: min, precacheCount: precacheCount());
-        }
+        if (min == currentPage.value && pendingPage == null) return;
+
+        pendingPage = min;
+        if (updateScheduled) return;
+
+        updateScheduled = true;
+        WidgetsBinding.instance.addPostFrameCallback(applyPendingPage);
       }
 
       listController.addListener(listPosCb);
-      return () => listController.removeListener(listPosCb);
-    }, [listController, settings.precacheCount, format]);
+      return () {
+        active = false;
+        pendingPage = null;
+        listController.removeListener(listPosCb);
+      };
+    }, [listController, settings.precacheCount, format, longStripCacheWidth]);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -512,9 +555,43 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                   title: Text(tr.reader.togglePageSize),
                   onTap: (format == ReaderFormat.longstrip)
                       ? () {
-                          longStripScale.value = toggleLongStripScale(
-                            longStripScale.value,
-                          );
+                          final currentScale = longStripScale.value;
+                          final nextScale = toggleLongStripScale(currentScale);
+                          final currentOffset = scrollController.hasClients
+                              ? scrollController.offset
+                              : null;
+
+                          longStripScale.value = nextScale;
+
+                          if (currentOffset != null) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              if (!mounted) {
+                                return;
+                              }
+
+                              if (listController.isAttached &&
+                                  !listController.isLocked) {
+                                listController.invalidateAllExtents();
+                              }
+
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (!mounted || !scrollController.hasClients) {
+                                  return;
+                                }
+
+                                final target =
+                                    currentOffset *
+                                    nextScale.scale /
+                                    currentScale.scale;
+                                scrollController.jumpTo(
+                                  target.clamp(
+                                    scrollController.position.minScrollExtent,
+                                    scrollController.position.maxScrollExtent,
+                                  ),
+                                );
+                              });
+                            });
+                          }
                         }
                       : () {
                           final currentController = _getScaleController(
@@ -669,7 +746,8 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
             listController: listController,
             scrollController: scrollController,
             pages: widget.pages,
-            scale: longStripScale,
+            displayWidth: longStripDisplayWidth,
+            cacheWidth: longStripCacheWidth,
             onCenterTap: () {
               showUI.value = !showUI.value;
             },
@@ -982,14 +1060,16 @@ class _LongStripView extends StatelessWidget {
   final ListController? listController;
   final ScrollController? scrollController;
   final List<ReaderPage> pages;
-  final ValueNotifier<LongStripScale> scale;
+  final double displayWidth;
+  final int cacheWidth;
   final VoidCallback? onCenterTap;
 
   const _LongStripView({
     this.listController,
     this.scrollController,
     required this.pages,
-    required this.scale,
+    required this.displayWidth,
+    required this.cacheWidth,
     this.onCenterTap,
   });
 
@@ -1012,56 +1092,31 @@ class _LongStripView extends StatelessWidget {
         listController: listController,
         controller: scrollController,
         cacheExtent: mediaSize.height * 3,
+        addAutomaticKeepAlives: false,
+        extentEstimation: (index, _) {
+          if (index == null) return 0;
+          final aspectRatio = pages[index].aspectRatio;
+          return aspectRatio == null
+              ? mediaSize.height
+              : displayWidth / aspectRatio;
+        },
         itemCount: pages.length,
         itemBuilder: (context, index) {
           final page = pages[index];
           return Center(
             key: ValueKey(page.id),
             child: RepaintBoundary(
-              child: _LongStripPage(
-                contextWidth: mediaSize.width,
-                scale: scale,
+              child: LongStripPageImage(
                 page: page,
+                displayWidth: displayWidth,
+                cacheWidth: cacheWidth,
+                onAspectRatioChanged: () {
+                  if (listController case final controller?
+                      when controller.isAttached && !controller.isLocked) {
+                    controller.invalidateExtent(index);
+                  }
+                },
               ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _LongStripPage extends HookWidget {
-  const _LongStripPage({
-    required this.page,
-    required this.contextWidth,
-    required this.scale,
-  });
-
-  final ValueNotifier<LongStripScale> scale;
-  final ReaderPage page;
-  final double contextWidth;
-
-  @override
-  Widget build(BuildContext context) {
-    final scl = useValueListenable(scale);
-    final width = contextWidth * scl.scale;
-    return ConstrainedBox(
-      constraints: BoxConstraints(minWidth: width, maxWidth: width),
-      child: KeepAliveImage(
-        image: page.provider,
-        fit: BoxFit.contain,
-        alignment: Alignment.topCenter,
-        loadingBuilder: (context, child, event) {
-          if (event == null) {
-            return child;
-          }
-
-          return Center(
-            child: CircularProgressIndicator(
-              value: event.expectedTotalBytes != null
-                  ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
-                  : null,
             ),
           );
         },
