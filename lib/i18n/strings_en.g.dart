@@ -1675,6 +1675,15 @@ class Translations$webSources$source$en {
 	/// en: 'Extension Settings'
 	String get settings => 'Extension Settings';
 
+	/// en: 'Open extension website'
+	String get openWebsite => 'Open extension website';
+
+	/// en: 'Reload extension website'
+	String get reloadWebsite => 'Reload extension website';
+
+	/// en: 'Open the extension website, complete the Cloudflare challenge, then reload the extension.'
+	String get cloudflareManualRequired => 'Open the extension website, complete the Cloudflare challenge, then reload the extension.';
+
 	/// en: 'Extension Manager'
 	String get manager => 'Extension Manager';
 
@@ -2071,6 +2080,9 @@ extension on Translations {
 			'webSources.repo.repoExists' => 'Repo already exists',
 			'webSources.repo.missingRepo' => 'Missing Repo',
 			'webSources.source.settings' => 'Extension Settings',
+			'webSources.source.openWebsite' => 'Open extension website',
+			'webSources.source.reloadWebsite' => 'Reload extension website',
+			'webSources.source.cloudflareManualRequired' => 'Open the extension website, complete the Cloudflare challenge, then reload the extension.',
 			'webSources.source.manager' => 'Extension Manager',
 			'webSources.source.noDataWarning' => 'No repos nor extensions installed!',
 			'webSources.source.refresh' => 'Refresh repos',

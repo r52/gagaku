@@ -5,7 +5,9 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
+import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/web/extension_browser.dart';
 import 'package:gagaku/web/extension_settings.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
@@ -26,6 +28,19 @@ class _ExtensionHomeCard extends ConsumerWidget {
     final source = extensionInfo;
     final state = ref.watch(extensionSourceProvider(source.id));
     final theme = Theme.of(context);
+    final baseUrl = source.baseUrl;
+    final browserButton = baseUrl == null || baseUrl.isEmpty
+        ? null
+        : IconButton(
+            icon: const Icon(Icons.public),
+            onPressed: () => nav.push(
+              SlideTransitionRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    ExtensionBrowserPage(source: source),
+              ),
+            ),
+            tooltip: tr.webSources.source.openWebsite,
+          );
 
     Widget? subtitle;
     Widget? trailing;
@@ -42,6 +57,7 @@ class _ExtensionHomeCard extends ConsumerWidget {
         trailing = Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            ?browserButton,
             if (source.hasCapability(SourceIntents.settingsUI))
               IconButton(
                 icon: const Icon(Icons.settings),
@@ -76,6 +92,7 @@ class _ExtensionHomeCard extends ConsumerWidget {
         trailing = Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            ?browserButton,
             if (source.hasCapability(SourceIntents.settingsUI))
               IconButton(
                 icon: const Icon(Icons.settings),
@@ -97,7 +114,11 @@ class _ExtensionHomeCard extends ConsumerWidget {
         );
       case AsyncError(:final error):
         subtitle = Text(
-          error.toString(),
+          switch (error) {
+            CloudflareBypassException() =>
+              tr.webSources.source.cloudflareManualRequired,
+            _ => error.toString(),
+          },
           style: TextStyle(color: theme.colorScheme.error),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
@@ -105,6 +126,7 @@ class _ExtensionHomeCard extends ConsumerWidget {
         trailing = Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            ?browserButton,
             if (source.hasCapability(SourceIntents.settingsUI))
               IconButton(
                 icon: const Icon(Icons.settings),
