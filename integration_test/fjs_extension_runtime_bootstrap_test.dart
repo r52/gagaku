@@ -649,7 +649,6 @@ globalThis.source.phase2source = {
 };
 ''');
 
-    expect(FjsExtensionRuntime.activeRuntimeCount, 1);
     expect(startupChallengeRequests, greaterThan(0));
     expect(runtime.hasAdvancedSearchForm, true);
     expect(runtime.hasSortOps, true);
@@ -1181,15 +1180,6 @@ await new Promise((resolve) => setTimeout(() => resolve("drained"), 100));
     expect(await acceptedEval, 'drained');
     await drainingDispose;
     await drainingProbe.dispose();
-
-    await Future.wait([
-      initializeDisposalProbe('phase9dispose1'),
-      initializeDisposalProbe('phase9dispose2'),
-    ]);
-    expect(FjsExtensionRuntime.activeRuntimeCount, 3);
-
-    await FjsExtensionRuntime.disposeAll();
-    expect(FjsExtensionRuntime.activeRuntimeCount, 0);
   });
 
   test(

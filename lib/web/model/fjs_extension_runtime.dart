@@ -64,7 +64,6 @@ class FjsExtensionRuntime implements ExtensionRuntime {
   final Duration startupBrowserTimeout;
 
   static Future<void>? _libInit;
-  static final Set<FjsExtensionRuntime> _activeRuntimes = {};
   static const _consoleModuleName = 'gagaku/console';
   static const _consoleModuleScript = r'''
 const formatValue = (value) => {
@@ -114,18 +113,6 @@ globalThis.console = Object.fromEntries(
 
   static Future<void> _ensureLibInit() {
     return _libInit ??= LibFjs.init();
-  }
-
-  static int get activeRuntimeCount => _activeRuntimes.length;
-
-  static Future<void> disposeAll() async {
-    final runtimes = _activeRuntimes.toList();
-    if (runtimes.isEmpty) {
-      return;
-    }
-
-    debugPrint('fjs: closing ${runtimes.length} active extension runtime(s)');
-    await Future.wait(runtimes.map((runtime) => runtime.dispose()));
   }
 
   Future<JsValue> _evalGlobal(
@@ -225,7 +212,6 @@ return JSON.stringify(value);
         ),
       );
       _engine = engine;
-      _activeRuntimes.add(this);
 
       await _runInitStep(
         'initialize Dart bridge',
@@ -1089,7 +1075,6 @@ return await globalThis.$sourceId.getSearchResults(
   Future<void> dispose() => _disposeFuture ??= _dispose();
 
   Future<void> _dispose() async {
-    _activeRuntimes.remove(this);
     await _evalExecutor.close();
 
     final engine = _engine;
