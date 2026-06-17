@@ -9,6 +9,7 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/cache.dart';
+import 'package:gagaku/model/maintenance.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/model/types.dart';
 import 'package:gagaku/routes.dart';
@@ -83,6 +84,7 @@ void main() async {
   final gdat = GagakuData();
   await gdat.initData();
   await gdat.initGagakuBoxes();
+  AppMaintenanceService().start();
 
   runApp(ProviderScope(child: TranslationProvider(child: App())));
 }

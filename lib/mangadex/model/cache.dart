@@ -35,8 +35,7 @@ extension MDCacheManagerExt on CacheManager {
       'CacheManager: caching entity list: $key for ${expiry.toString()}',
     );
 
-    // Overwrite any previous entries
-    await put(key, json.encode(list), list, true, expiry: expiry);
+    await put(key, json.encode(list), list, expiry: expiry);
 
     if (resolve) {
       await putAllAPIResolved(list.data, expiry, unserializer);

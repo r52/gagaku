@@ -499,7 +499,7 @@ class MangaDexModel {
       final result = FrontPageData.fromJson(body);
 
       // Cache the data
-      await _cache.put(key, response.data, result, true);
+      await _cache.put(key, response.data, result);
 
       return result;
     }
@@ -1181,7 +1181,7 @@ class MangaDexModel {
       final libMap = mlist.map(decoder);
 
       logger.d("Caching user library of user $userId");
-      await _cache.put(cachekey, json.encode(mlist), libMap, true);
+      await _cache.put(cachekey, json.encode(mlist), libMap);
 
       return libMap;
     }
@@ -1455,7 +1455,6 @@ class MangaDexModel {
         listId,
         json.encode(result.toJson()),
         result,
-        true,
         unserializer: CustomList.fromJson,
       );
     }
@@ -1578,7 +1577,6 @@ class MangaDexModel {
           updated.id,
           json.encode(updated.toJson()),
           updated,
-          true,
           unserializer: CustomList.fromJson,
         );
       }
@@ -1630,7 +1628,6 @@ class MangaDexModel {
           result.id,
           json.encode(result.toJson()),
           result,
-          true,
           unserializer: CustomList.fromJson,
         );
       },
@@ -1664,7 +1661,6 @@ class MangaDexModel {
           result.id,
           json.encode(result.toJson()),
           result,
-          true,
           unserializer: CustomList.fromJson,
         );
       },

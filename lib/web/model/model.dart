@@ -325,7 +325,7 @@ class WebSourceBroker {
     if (manga != null) {
       const expiry = Duration(days: 1);
       logger.d('CacheManager: caching entry $key for ${expiry.toString()}');
-      _cache.put(key, json.encode(manga.toJson()), manga, true, expiry: expiry);
+      _cache.put(key, json.encode(manga.toJson()), manga, expiry: expiry);
     }
 
     return manga;
