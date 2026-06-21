@@ -1,5 +1,20 @@
 part of 'model.dart';
 
+List<CustomList> _replaceListAt(
+  List<CustomList> lists,
+  int index,
+  CustomList replacement,
+) {
+  final result = [...lists];
+  result[index] = replacement;
+  return result;
+}
+
+List<CustomList> _removeListById(List<CustomList> lists, String id) => [
+  for (final list in lists)
+    if (list.id != id) list,
+];
+
 @riverpod
 class UserLists extends _$UserLists
     with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
@@ -37,16 +52,17 @@ class UserLists extends _$UserLists
 
     final oldstate = await future;
     final result = await api.updateMangaInCustomList(list, manga, add);
+    var newState = [...oldstate];
 
     if (result != null) {
       final idx = oldstate.indexWhere((e) => e.id == result.id);
       if (idx >= 0) {
-        oldstate[idx] = result;
+        newState = _replaceListAt(oldstate, idx, result);
         ref.invalidate(listSourceProvider(result.id));
       }
     }
 
-    state = AsyncData([...oldstate]);
+    state = AsyncData(newState);
 
     return result;
   }
@@ -62,12 +78,13 @@ class UserLists extends _$UserLists
     final oldstate = await future;
     final result = await api.editList(list, name, visibility, mangaIds);
     final idx = oldstate.indexWhere((e) => e.id == result.id);
+    var newState = [...oldstate];
     if (idx >= 0) {
-      oldstate[idx] = result;
+      newState = _replaceListAt(oldstate, idx, result);
       ref.invalidate(listSourceProvider(result.id));
     }
 
-    state = AsyncData([...oldstate]);
+    state = AsyncData(newState);
 
     return result;
   }
@@ -77,13 +94,14 @@ class UserLists extends _$UserLists
 
     final oldstate = await future;
     final result = await api.deleteList(list);
+    var newState = [...oldstate];
 
     if (result) {
-      oldstate.removeWhere((e) => e.id == list.id);
+      newState = _removeListById(oldstate, list.id);
       ref.invalidate(listSourceProvider(list.id));
     }
 
-    state = AsyncData([...oldstate]);
+    state = AsyncData(newState);
 
     return list;
   }
@@ -106,11 +124,9 @@ class UserLists extends _$UserLists
   Future<void> replaceList(CustomList list) async {
     final oldstate = await future;
     final idx = oldstate.indexWhere((e) => e.id == list.id);
-    if (idx >= 0) {
-      oldstate[idx] = list;
-    }
-
-    state = AsyncData([...oldstate]);
+    state = AsyncData(
+      idx >= 0 ? _replaceListAt(oldstate, idx, list) : [...oldstate],
+    );
   }
 }
 
@@ -156,19 +172,20 @@ class FollowedLists extends _$FollowedLists
 
     final oldstate = await future;
     final result = await api.setFollowList(list, follow);
+    var newState = [...oldstate];
 
     if (result) {
       if (follow) {
         final idx = oldstate.indexWhere((e) => e.id == list.id);
         if (idx == -1) {
-          oldstate.add(list);
+          newState = [...oldstate, list];
         }
       } else {
-        oldstate.removeWhere((e) => e.id == list.id);
+        newState = _removeListById(oldstate, list.id);
       }
     }
 
-    state = AsyncData([...oldstate]);
+    state = AsyncData(newState);
 
     return result;
   }
@@ -176,11 +193,9 @@ class FollowedLists extends _$FollowedLists
   Future<void> replaceList(CustomList list) async {
     final oldstate = await future;
     final idx = oldstate.indexWhere((e) => e.id == list.id);
-    if (idx >= 0) {
-      oldstate[idx] = list;
-    }
-
-    state = AsyncData([...oldstate]);
+    state = AsyncData(
+      idx >= 0 ? _replaceListAt(oldstate, idx, list) : [...oldstate],
+    );
   }
 }
 

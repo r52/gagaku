@@ -21,16 +21,17 @@ class UserLibrary extends _$UserLibrary with AutoDisposeExpiryMix {
     MangaReadingStatus? status,
   ) async {
     final oldstate = await future;
+    final newState = Map.of(oldstate);
 
     if (status == null) {
-      oldstate.remove(manga.id);
+      newState.remove(manga.id);
     } else {
-      oldstate[manga.id] = status;
+      newState[manga.id] = status;
     }
 
-    state = AsyncData({...oldstate});
+    state = AsyncData(newState);
 
-    return oldstate;
+    return newState;
   }
 
   /// Clears the list and refetch from the beginning

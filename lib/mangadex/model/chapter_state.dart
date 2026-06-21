@@ -98,36 +98,39 @@ class ReadChapters extends _$ReadChapters {
     final oldstate = await future;
 
     bool result = await api.setChaptersRead(manga, read: read, unread: unread);
+    final newState = Map.of(oldstate);
 
     if (result) {
       final keyExists = oldstate.containsKey(manga.id);
 
       // Refresh
       if (keyExists) {
+        final updated = ReadChapterSet.copy(oldstate[manga.id]!);
         if (read != null) {
-          oldstate[manga.id]?.addAll(read.map((e) => e.id));
+          updated.addAll(read.map((e) => e.id));
         }
 
         if (unread != null) {
-          oldstate[manga.id]?.removeAll(unread.map((e) => e.id));
+          updated.removeAll(unread.map((e) => e.id));
         }
+        newState[manga.id] = updated;
       } else {
         if (read != null) {
-          oldstate[manga.id] = ReadChapterSet(
+          newState[manga.id] = ReadChapterSet(
             manga.id,
             read.map((e) => e.id).toSet(),
           );
         }
 
         if (unread != null) {
-          oldstate[manga.id] = ReadChapterSet(manga.id, {});
+          newState[manga.id] = ReadChapterSet(manga.id, {});
         }
       }
     }
 
-    state = AsyncData({...oldstate});
+    state = AsyncData(newState);
 
-    return oldstate;
+    return newState;
   }
 
   /// Invalidate the read chapters of a specific manga
@@ -135,8 +138,8 @@ class ReadChapters extends _$ReadChapters {
     final oldstate = await future;
 
     if (oldstate.containsKey(manga.id)) {
-      oldstate.remove(manga.id);
-      state = AsyncData({...oldstate});
+      final newState = Map.of(oldstate)..remove(manga.id);
+      state = AsyncData(newState);
     }
   }
 }

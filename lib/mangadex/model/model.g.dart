@@ -196,7 +196,7 @@ final class ReadChaptersProvider
   }
 }
 
-String _$readChaptersHash() => r'33654ef31814fa02363110210e5c2dca0eff4b5d';
+String _$readChaptersHash() => r'b4f44906910ca02a54574e24ffc0639f6d7dbacd';
 
 final class ReadChaptersFamily extends $Family
     with
@@ -360,7 +360,7 @@ final class UserListsProvider
   }
 }
 
-String _$userListsHash() => r'd81822ac7862464faac52a965edaf4d105a7f082';
+String _$userListsHash() => r'e6e1391a90c410a96bde6e95a8c68b96f9e09472';
 
 final class UserListsFamily extends $Family
     with
@@ -450,7 +450,7 @@ final class FollowedListsProvider
   }
 }
 
-String _$followedListsHash() => r'54cee419f2a26ec151129216f934f9e248b90445';
+String _$followedListsHash() => r'7031c6b2c5a7faeb523deaea0e561ed7b46eecde';
 
 final class FollowedListsFamily extends $Family
     with
@@ -674,7 +674,7 @@ final class UserLibraryProvider
   }
 }
 
-String _$userLibraryHash() => r'8b20691f9657df387911294aa477b743f16c13cb';
+String _$userLibraryHash() => r'641b8cbffdcb41f4df063940c2c5928871545c18';
 
 final class UserLibraryFamily extends $Family
     with

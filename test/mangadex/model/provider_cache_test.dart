@@ -121,11 +121,13 @@ void main() {
           await container.read(provider.future),
           containsPair(manga.id, MangaReadingStatus.reading),
         );
+        final oldState = await container.read(provider.future);
 
         await container
             .read(provider.notifier)
             .set(manga, MangaReadingStatus.completed);
 
+        expect(oldState[manga.id], MangaReadingStatus.reading);
         expect(
           await container.read(provider.future),
           containsPair(manga.id, MangaReadingStatus.completed),
@@ -159,6 +161,48 @@ void main() {
         containsPair(manga.id, MangaReadingStatus.completed),
       );
     });
+
+    test('read chapter updates do not mutate the previous snapshot', () async {
+      final manga = Manga(id: 'manga-1');
+      final firstChapter = _chapter('chapter-1');
+      final secondChapter = _chapter('chapter-2');
+      api.readChapters[manga.id] = ReadChapterSet(manga.id, {firstChapter.id});
+
+      final provider = readChaptersProvider(api.user.id);
+      final notifier = container.read(provider.notifier);
+      await notifier.get([manga]);
+      final oldState = await container.read(provider.future);
+      final oldReadChapters = oldState[manga.id]!;
+
+      await notifier.set(manga, read: [secondChapter]);
+
+      expect(oldReadChapters.contains(firstChapter.id), isTrue);
+      expect(oldReadChapters.contains(secondChapter.id), isFalse);
+      final newReadChapters = (await container.read(
+        provider.future,
+      ))[manga.id]!;
+      expect(
+        newReadChapters.containsAll([firstChapter.id, secondChapter.id]),
+        isTrue,
+      );
+      expect(newReadChapters, isNot(same(oldReadChapters)));
+    });
+
+    test('custom list replacement does not mutate the previous list', () async {
+      final original = _customList('list-1', name: 'Original');
+      final replacement = _customList('list-1', name: 'Replacement');
+      api.userLists = [original];
+
+      final provider = userListsProvider(api.user.id);
+      final subscription = container.listen(provider, (_, _) {});
+      addTearDown(subscription.close);
+      final oldState = await container.read(provider.future);
+
+      await container.read(provider.notifier).replaceList(replacement);
+
+      expect(oldState, [original]);
+      expect(await container.read(provider.future), [replacement]);
+    });
   });
 }
 
@@ -182,12 +226,23 @@ Chapter _chapter(String id) {
   );
 }
 
+CustomList _customList(String id, {required String name}) => CustomList(
+  id: id,
+  attributes: CustomListAttributes(
+    name: name,
+    visibility: CustomListVisibility.private,
+    version: 1,
+  ),
+  relationships: [],
+);
+
 class _FakeMangaDexModel implements MangaDexModel {
   final User user = User(id: 'user-1');
   final Map<String, MangaStatistics> mangaStatistics = {};
   final Map<String, ChapterStatistics> chapterStatistics = {};
   final ReadChaptersMap readChapters = {};
   final Map<String, MangaReadingStatus> userLibrary = {};
+  List<CustomList> userLists = [];
 
   final List<List<String>> statisticsRequests = [];
   final List<List<String>> chapterStatisticsRequests = [];
@@ -227,6 +282,13 @@ class _FakeMangaDexModel implements MangaDexModel {
   }
 
   @override
+  Future<bool> setChaptersRead(
+    Manga manga, {
+    Iterable<Chapter>? read,
+    Iterable<Chapter>? unread,
+  }) async => true;
+
+  @override
   Future<Map<String, MangaReadingStatus>> fetchUserLibrary(
     String userId,
   ) async {
@@ -243,6 +305,12 @@ class _FakeMangaDexModel implements MangaDexModel {
     Manga manga,
     MangaReadingStatus? status,
   ) async => true;
+
+  @override
+  Future<List<CustomList>> fetchUserList({
+    required FeedInfo feed,
+    int offset = 0,
+  }) async => [...userLists];
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
