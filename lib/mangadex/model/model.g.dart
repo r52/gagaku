@@ -978,7 +978,7 @@ final class StatisticsProvider
   Statistics create() => Statistics();
 }
 
-String _$statisticsHash() => r'263fcd74d0dfe6ecfe2c906508863ed724c43489';
+String _$statisticsHash() => r'1c8e48610f92e6f16117312b477ece642c2b5e13';
 
 abstract class _$Statistics
     extends $AsyncNotifier<Map<String, MangaStatistics>> {
@@ -1107,7 +1107,7 @@ final class ChapterStatsProvider
   ChapterStats create() => ChapterStats();
 }
 
-String _$chapterStatsHash() => r'1898d92ddb47ef7ca62042a080b7a4e7b96e54d9';
+String _$chapterStatsHash() => r'f333a50c91233b7647eed8491db68c28764de5ad';
 
 abstract class _$ChapterStats
     extends $AsyncNotifier<Map<String, ChapterStatistics>> {

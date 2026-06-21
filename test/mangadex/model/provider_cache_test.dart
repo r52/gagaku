@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:gagaku/log.dart';
@@ -41,13 +43,18 @@ void main() {
 
         final notifier = container.read(statisticsProvider.notifier);
 
-        await notifier.get([first, second]);
-        await notifier.get([first, third]);
+        final firstResult = await notifier.get([first, second]);
+        final secondResult = await notifier.get([first, third]);
 
         expect(api.statisticsRequests, [
           [first.id, second.id],
           [third.id],
         ]);
+        expect(firstResult.keys, unorderedEquals([first.id, second.id]));
+        expect(
+          secondResult.keys,
+          unorderedEquals([first.id, second.id, third.id]),
+        );
         expect(
           await container.read(statisticsProvider.future),
           containsPair(third.id, api.mangaStatistics[third.id]),
@@ -68,17 +75,62 @@ void main() {
 
       final notifier = container.read(chapterStatsProvider.notifier);
 
-      await notifier.get([first, second]);
-      await notifier.get([second, third]);
+      final firstResult = await notifier.get([first, second]);
+      final secondResult = await notifier.get([second, third]);
 
       expect(api.chapterStatisticsRequests, [
         [first.id, second.id],
         [third.id],
       ]);
+      expect(firstResult.keys, unorderedEquals([first.id, second.id]));
+      expect(
+        secondResult.keys,
+        unorderedEquals([first.id, second.id, third.id]),
+      );
       expect(
         await container.read(chapterStatsProvider.future),
         containsPair(third.id, api.chapterStatistics[third.id]),
       );
+    });
+
+    test('statistics keeps cached data available while fetching', () async {
+      final first = Manga(id: 'manga-1');
+      final second = Manga(id: 'manga-2');
+      api.mangaStatistics.addAll({
+        first.id: _mangaStatistics(1),
+        second.id: _mangaStatistics(2),
+      });
+
+      final notifier = container.read(statisticsProvider.notifier);
+      await notifier.get([first]);
+
+      final gate = Completer<void>();
+      api.statisticsGate = gate;
+      final pending = notifier.get([second]);
+      await Future<void>.delayed(Duration.zero);
+
+      final stateWhileFetching = container.read(statisticsProvider);
+      expect(stateWhileFetching.hasValue, isTrue);
+      expect(stateWhileFetching.value, contains(first.id));
+      expect(stateWhileFetching.isLoading, isFalse);
+
+      gate.complete();
+      await pending;
+    });
+
+    test('statistics failure preserves the existing cache state', () async {
+      final first = Manga(id: 'manga-1');
+      final second = Manga(id: 'manga-2');
+      api.mangaStatistics[first.id] = _mangaStatistics(1);
+
+      final notifier = container.read(statisticsProvider.notifier);
+      final oldState = await notifier.get([first]);
+      api.statisticsError = StateError('statistics failed');
+
+      await expectLater(notifier.get([second]), throwsStateError);
+
+      expect(container.read(statisticsProvider).hasError, isFalse);
+      expect(await container.read(statisticsProvider.future), same(oldState));
     });
 
     test(
@@ -248,6 +300,8 @@ class _FakeMangaDexModel implements MangaDexModel {
   final List<List<String>> chapterStatisticsRequests = [];
   final List<List<String>> readChapterRequests = [];
   int userLibraryRequests = 0;
+  Completer<void>? statisticsGate;
+  Object? statisticsError;
 
   @override
   Stream<AuthenticationStatus> get authenticationStatus =>
@@ -262,6 +316,11 @@ class _FakeMangaDexModel implements MangaDexModel {
   ) async {
     final ids = mangas.map((manga) => manga.id).toList();
     statisticsRequests.add(ids);
+    await statisticsGate?.future;
+    final error = statisticsError;
+    if (error != null) {
+      throw error;
+    }
     return {for (final id in ids) id: mangaStatistics[id]!};
   }
 

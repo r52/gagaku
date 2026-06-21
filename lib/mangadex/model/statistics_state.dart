@@ -20,24 +20,22 @@ class Statistics extends _$Statistics {
     return {};
   }
 
-  /// Fetch statistics for the provided list of mangas
+  /// Fetches missing statistics and returns the complete updated cache.
+  ///
+  /// Existing cache data remains available while the request is in flight and
+  /// is preserved if the request fails.
   Future<Map<String, MangaStatistics>> get(Iterable<Manga> mangas) async {
     final oldstate = await future;
+    final missing = mangas.where((m) => !oldstate.containsKey(m.id));
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final mg = mangas.where((m) => !oldstate.containsKey(m.id));
+    if (missing.isEmpty) {
+      return oldstate;
+    }
 
-      if (mg.isEmpty) {
-        // No change
-        return oldstate;
-      }
-
-      final map = await _fetchStatistics(mg);
-      return {...oldstate, ...map};
-    });
-
-    return state.value!;
+    final fetched = await _fetchStatistics(missing);
+    final newState = {...oldstate, ...fetched};
+    state = AsyncData(newState);
+    return newState;
   }
 }
 
@@ -75,20 +73,22 @@ class ChapterStats extends _$ChapterStats {
     return {};
   }
 
-  /// Fetch statistics for the provided list of mangas
+  /// Fetches missing statistics and returns the complete updated cache.
+  ///
+  /// Existing cache data remains available while the request is in flight and
+  /// is preserved if the request fails.
   Future<Map<String, ChapterStatistics>> get(Iterable<Chapter> chapters) async {
     final oldstate = await future;
-    final mg = chapters.where((c) => !oldstate.containsKey(c.id));
+    final missing = chapters.where((c) => !oldstate.containsKey(c.id));
 
-    if (mg.isEmpty) {
-      // No change
+    if (missing.isEmpty) {
       return oldstate;
     }
 
-    final map = await _fetchStatistics(mg);
-    state = AsyncData({...oldstate, ...map});
-
-    return map;
+    final fetched = await _fetchStatistics(missing);
+    final newState = {...oldstate, ...fetched};
+    state = AsyncData(newState);
+    return newState;
   }
 }
 

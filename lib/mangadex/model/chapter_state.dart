@@ -41,7 +41,10 @@ class ReadChapters extends _$ReadChapters {
     return _fetchReadChapters([]);
   }
 
-  /// Fetch read chapters for the provided list of mangas
+  /// Fetches missing or expired entries and returns the complete updated cache.
+  ///
+  /// Existing cache data remains available while the request is in flight and
+  /// is preserved if the request fails.
   Future<ReadChaptersMap> get(Iterable<Manga> mangas) async {
     if (userId == null) {
       return {};
