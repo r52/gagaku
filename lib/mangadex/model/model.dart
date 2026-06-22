@@ -616,6 +616,14 @@ class MangaDexModel {
     return false;
   }
 
+  Future<void> _requireAuthentication(String operation) async {
+    if (!await loggedIn()) {
+      throw StateError(
+        "$operation called on invalid token/login. Shouldn't ever get here",
+      );
+    }
+  }
+
   String _requestCacheKey({required String namespace, required Uri uri}) {
     final queryParameters = SplayTreeMap<String, List<String>>();
     for (final MapEntry(:key, value: values)
@@ -675,10 +683,8 @@ class MangaDexModel {
     required FutureOr<T> Function(Response<dynamic>) parse,
     FutureOr<T> Function(Response<dynamic>)? onRejectedResponse,
   }) async {
-    if (authenticated && !await loggedIn()) {
-      throw StateError(
-        "$operation called on invalid token/login. Shouldn't ever get here",
-      );
+    if (authenticated) {
+      await _requireAuthentication(operation);
     }
 
     final response = switch (method) {
@@ -885,43 +891,6 @@ class MangaDexModel {
     return result;
   }
 
-  /// Generic stats/ratings fetch helper.
-  ///
-  /// Parameters:
-  /// - [endpoint]: API path (e.g. `/statistics/manga`)
-  /// - [queryParamKey]: Query param key for IDs (e.g. `manga[]`)
-  /// - [ids]: IDs to fetch
-  /// - [fromJson]: Parser for the response body
-  /// - [errorLog]: Factory for error log message
-  /// - [preProcess]: Optional pre-parse check; return true to yield empty map
-  Future<Map<String, T>> _fetchStats<T>({
-    required String endpoint,
-    required String queryParamKey,
-    required Iterable<String> ids,
-    required Map<String, T> Function(Map<String, dynamic>) fromJson,
-    required String Function() errorLog,
-    bool Function(Map<String, dynamic>)? preProcess,
-  }) async {
-    if (ids.isEmpty) return {};
-
-    final queryParams = {queryParamKey: ids.toList()};
-
-    final uri = MangaDexEndpoints.api.replace(
-      path: endpoint,
-      queryParameters: queryParams,
-    );
-
-    final response = await _transport.getUri(uri);
-
-    if (response.statusCode == 200) {
-      final data = response.data as Map<String, dynamic>;
-      if (preProcess != null && preProcess(data)) return {};
-      return fromJson(data);
-    } else {
-      throw createException(errorLog(), response);
-    }
-  }
-
   /// Fetches chapter data of the given chapter [uuids]
   Future<List<Chapter>> fetchChapters(Iterable<String> uuids) async {
     final settings = ref.read(mdConfigProvider);
@@ -1073,28 +1042,18 @@ class MangaDexModel {
 
   /// Gets whether or not the user is following [manga]
   Future<bool> getMangaFollowing(Manga manga) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "getMangaFollowing() called on invalid token/login. Shouldn't ever get here",
-      );
-    }
-
     final uri = MangaDexEndpoints.api.replace(
       path: MangaDexEndpoints.follows.replaceFirst('{id}', manga.id),
     );
 
-    final response = await _transport.getUri(uri);
-
-    if (response.statusCode == 200) {
-      // User follows the manga
-      return true;
-    } else if (response.statusCode == 404) {
-      // User doesn't follow the manga
-      return false;
-    }
-
-    // Throw if failure
-    throw createException("getMangaFollowing() failed.", response);
+    return _request(
+      method: _MangaDexRequestMethod.get,
+      uri: uri,
+      authenticated: true,
+      acceptedStatusCodes: const {200, 404},
+      operation: 'getMangaFollowing()',
+      parse: (response) => response.statusCode == 200,
+    );
   }
 
   /// Sets the manga's following status [setFollow] of the [manga]
@@ -1119,36 +1078,33 @@ class MangaDexModel {
 
   /// Gets the user's reading status for [manga]
   Future<MangaReadingStatus?> getMangaReadingStatus(Manga manga) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "getMangaReadingStatus() called on invalid token/login. Shouldn't ever get here",
-      );
-    }
-
     final uri = MangaDexEndpoints.api.replace(
       path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id),
     );
 
-    final response = await _transport.getUri(uri);
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> body = response.data;
-
-      if (body['result'] == 'ok') {
-        MangaReadingStatus? status;
-
-        if (body['status'] != null) {
-          status = MangaReadingStatus.values.byName(body['status']);
+    return _request(
+      method: _MangaDexRequestMethod.get,
+      uri: uri,
+      authenticated: true,
+      acceptedStatusCodes: const {200, 404},
+      operation: 'getMangaReadingStatus()',
+      parse: (response) {
+        if (response.statusCode == 404) {
+          return null;
         }
 
-        return status;
-      }
-    } else if (response.statusCode == 404) {
-      return null;
-    }
+        final body = response.data as Map<String, dynamic>;
+        if (body['result'] != 'ok') {
+          throw const FormatException('Expected result: ok');
+        }
 
-    // Throw if failure
-    throw createException("getMangaReadingStatus() failed.", response);
+        final status = body['status'];
+        if (status == null) {
+          return null;
+        }
+        return MangaReadingStatus.values.byName(status as String);
+      },
+    );
   }
 
   /// Sets the manga's reading status [status] of the [manga]
@@ -1184,37 +1140,42 @@ class MangaDexModel {
   /// Do not use directly. Prefer [readChaptersProvider] for its caching and
   /// state management.
   Future<ReadChaptersMap> fetchReadChapters(Iterable<Manga> mangas) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "fetchReadChapters() called on invalid token/login. Shouldn't ever get here",
-      );
+    await _requireAuthentication('fetchReadChapters()');
+    final mangaList = mangas.toList();
+    if (mangaList.isEmpty) {
+      return {};
     }
 
-    final fetch = mangas.map((e) => e.id);
+    final queryParams = {
+      'ids[]': mangaList.map((manga) => manga.id).toList(),
+      'grouped': 'true',
+    };
 
-    if (fetch.isNotEmpty) {
-      final queryParams = {'ids[]': fetch, 'grouped': 'true'};
+    final uri = MangaDexEndpoints.api.replace(
+      path: MangaDexEndpoints.getRead,
+      queryParameters: queryParams,
+    );
 
-      final uri = MangaDexEndpoints.api.replace(
-        path: MangaDexEndpoints.getRead,
-        queryParameters: queryParams,
-      );
-
-      final response = await _transport.getUri(uri);
-
-      if (response.statusCode == 200) {
+    return _request(
+      method: _MangaDexRequestMethod.get,
+      uri: uri,
+      authenticated: false,
+      operation: 'fetchReadChapters()',
+      parse: (response) {
         final Map<String, dynamic> body = response.data;
 
         if (body['data'] is List) {
           // Since grouped = true, if the api returns a List, then the result
           // is null for all queried manga. Return empty sets for all.
-
-          return {for (var m in mangas) m.id: ReadChapterSet(m.id, {})};
+          return {
+            for (final manga in mangaList)
+              manga.id: ReadChapterSet(manga.id, {}),
+          };
         }
 
         final cmap = body['data'] as Map<String, dynamic>;
 
-        final readmap = cmap.map(
+        return cmap.map(
           (key, value) => MapEntry(
             key,
             ReadChapterSet(
@@ -1223,15 +1184,8 @@ class MangaDexModel {
             ),
           ),
         );
-
-        return readmap;
-      } else {
-        // Throw if failure
-        throw createException("fetchReadChapters() failed.", response);
-      }
-    }
-
-    return {};
+      },
+    );
   }
 
   /// Sets the given chapters as [read] or [unread]
@@ -1281,37 +1235,25 @@ class MangaDexModel {
       path: MangaDexEndpoints.server.replaceFirst('{id}', chapter.id),
     );
 
-    final response = await _transport.getUri(uri);
-
-    if (response.statusCode == 200) {
-      final apidat = ChapterAPI.fromJson(response.data);
-
-      final chapterUrl = apidat.getUrl(settings.dataSaver);
-
-      var plist = apidat.chapter.data;
-
-      if (settings.dataSaver) {
-        plist = apidat.chapter.dataSaver;
-      }
-
-      final data = PageData(chapterUrl, plist);
-
-      return data;
-    }
-
-    // Throw if failure
-    throw createException("getChapterServer() failed.", response);
+    return _request(
+      method: _MangaDexRequestMethod.get,
+      uri: uri,
+      operation: 'getChapterServer()',
+      parse: (response) {
+        final apidat = ChapterAPI.fromJson(response.data);
+        final chapterUrl = apidat.getUrl(settings.dataSaver);
+        final pages = settings.dataSaver
+            ? apidat.chapter.dataSaver
+            : apidat.chapter.data;
+        return PageData(chapterUrl, pages);
+      },
+    );
   }
 
   /// Fetches the user's manga library
   Future<LibraryMap> fetchUserLibrary(String userId) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "fetchUserLibrary() called on invalid token/login. Shouldn't ever get here",
-      );
-    }
-
     const feed = MangaDexFeeds.library;
+    await _requireAuthentication('fetchUserLibrary()');
 
     decoder(String key, value) =>
         MapEntry(key, MangaReadingStatus.values.byName(value));
@@ -1328,28 +1270,25 @@ class MangaDexModel {
 
     final uri = MangaDexEndpoints.api.replace(path: feed.path);
 
-    final response = await _transport.getUri(uri);
+    final libMap = await _request(
+      method: _MangaDexRequestMethod.get,
+      uri: uri,
+      authenticated: false,
+      operation: 'fetchUserLibrary()',
+      parse: (response) {
+        final body = response.data as Map<String, dynamic>;
+        if (body['statuses'] is List) {
+          return <String, MangaReadingStatus>{};
+        }
+        return (body['statuses'] as Map<String, dynamic>).map(decoder);
+      },
+    );
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> body = response.data;
+    logger.d("Caching user library of user $userId");
+    final serialized = libMap.map((key, value) => MapEntry(key, value.name));
+    await _cache.put(cachekey, json.encode(serialized), libMap);
 
-      if (body['statuses'] is List) {
-        // If the api returns a List, then the result is null
-        return {};
-      }
-
-      final mlist = body['statuses'] as Map<String, dynamic>;
-
-      final libMap = mlist.map(decoder);
-
-      logger.d("Caching user library of user $userId");
-      await _cache.put(cachekey, json.encode(mlist), libMap);
-
-      return libMap;
-    }
-
-    // Throw if failure
-    throw createException("fetchUserLibrary() failed.", response);
+    return libMap;
   }
 
   /// Retrieve all MangaDex tags
@@ -1373,13 +1312,23 @@ class MangaDexModel {
   Future<Map<String, MangaStatistics>> fetchStatistics(
     Iterable<Manga> mangas,
   ) async {
-    final ids = mangas.map((e) => e.id);
-    return _fetchStats(
-      endpoint: MangaDexEndpoints.statistics,
-      queryParamKey: 'manga[]',
-      ids: ids,
-      fromJson: (data) => MangaStatisticsResponse.fromJson(data).statistics,
-      errorLog: () => "fetchStatistics() failed.",
+    final ids = mangas.map((manga) => manga.id).toList();
+    if (ids.isEmpty) {
+      return {};
+    }
+
+    final uri = MangaDexEndpoints.api.replace(
+      path: MangaDexEndpoints.statistics,
+      queryParameters: {'manga[]': ids},
+    );
+
+    return _request(
+      method: _MangaDexRequestMethod.get,
+      uri: uri,
+      operation: 'fetchStatistics()',
+      parse: (response) => MangaStatisticsResponse.fromJson(
+        response.data as Map<String, dynamic>,
+      ).statistics,
     );
   }
 
@@ -1390,13 +1339,23 @@ class MangaDexModel {
   Future<Map<String, ChapterStatistics>> fetchChapterStats(
     Iterable<Chapter> chapters,
   ) async {
-    final ids = chapters.map((e) => e.id);
-    return _fetchStats(
-      endpoint: MangaDexEndpoints.chapterStats,
-      queryParamKey: 'chapter[]',
-      ids: ids,
-      fromJson: (data) => ChapterStatisticsResponse.fromJson(data).statistics,
-      errorLog: () => "fetchChapterStats() failed.",
+    final ids = chapters.map((chapter) => chapter.id).toList();
+    if (ids.isEmpty) {
+      return {};
+    }
+
+    final uri = MangaDexEndpoints.api.replace(
+      path: MangaDexEndpoints.chapterStats,
+      queryParameters: {'chapter[]': ids},
+    );
+
+    return _request(
+      method: _MangaDexRequestMethod.get,
+      uri: uri,
+      operation: 'fetchChapterStats()',
+      parse: (response) => ChapterStatisticsResponse.fromJson(
+        response.data as Map<String, dynamic>,
+      ).statistics,
     );
   }
 
@@ -1432,14 +1391,29 @@ class MangaDexModel {
   /// Do not use directly. Prefer [ratingsProvider] for its caching and
   /// state management.
   Future<Map<String, SelfRating>> fetchRatings(Iterable<Manga> mangas) async {
-    final ids = mangas.map((e) => e.id);
-    return _fetchStats(
-      endpoint: MangaDexEndpoints.getRating,
-      queryParamKey: 'manga[]',
-      ids: ids,
-      fromJson: (data) => SelfRatingResponse.fromJson(data).ratings,
-      errorLog: () => "fetchRating() failed.",
-      preProcess: (data) => (data['ratings'] as dynamic) is List,
+    await _requireAuthentication('fetchRatings()');
+    final ids = mangas.map((manga) => manga.id).toList();
+    if (ids.isEmpty) {
+      return {};
+    }
+
+    final uri = MangaDexEndpoints.api.replace(
+      path: MangaDexEndpoints.getRating,
+      queryParameters: {'manga[]': ids},
+    );
+
+    return _request(
+      method: _MangaDexRequestMethod.get,
+      uri: uri,
+      authenticated: false,
+      operation: 'fetchRatings()',
+      parse: (response) {
+        final data = response.data as Map<String, dynamic>;
+        if (data['ratings'] is List) {
+          return <String, SelfRating>{};
+        }
+        return SelfRatingResponse.fromJson(data).ratings;
+      },
     );
   }
 
@@ -1530,26 +1504,30 @@ class MangaDexModel {
       path: MangaDexEndpoints.modifyList.replaceFirst('{id}', listId),
     );
 
-    final response = await _transport.getUri(uri);
+    final result = await _request<CustomList?>(
+      method: _MangaDexRequestMethod.get,
+      uri: uri,
+      acceptedStatusCodes: const {200, 404},
+      operation: 'fetchListById()',
+      parse: (response) {
+        if (response.statusCode == 404) {
+          return null;
+        }
+        final body = response.data as Map<String, dynamic>;
+        return CustomList.fromJson(body['data']);
+      },
+    );
 
-    if (response.statusCode == 200) {
-      final body = response.data as Map<String, dynamic>;
-      final result = CustomList.fromJson(body['data']);
-      return await _cache.put(
-        listId,
-        json.encode(result.toJson()),
-        result,
-        unserializer: CustomList.fromJson,
-      );
-    }
-
-    if (response.statusCode == 404) {
-      // List not found
+    if (result == null) {
       return null;
     }
 
-    // Throw if unknown code
-    throw createException("fetchListById() failed.", response);
+    return _cache.put(
+      listId,
+      json.encode(result.toJson()),
+      result,
+      unserializer: CustomList.fromJson,
+    );
   }
 
   /// Adds/removes a [CustomList] from user followed list
@@ -1765,28 +1743,20 @@ class MangaDexModel {
 
   /// Get logged in user details
   Future<User> getLoggedUser() async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "getLoggedUser() called on invalid token/login. Shouldn't ever get here",
-      );
-    }
-
     final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.me);
 
-    final response = await _transport.getUri(uri);
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> body = response.data;
-
-      if (body['result'] == 'ok') {
-        // Process new list
-        final user = User.fromJson(body['data']);
-
-        return user;
-      }
-    }
-
-    // Throw if failure
-    throw createException("getLoggedUser() failed.", response);
+    return _request(
+      method: _MangaDexRequestMethod.get,
+      uri: uri,
+      authenticated: true,
+      operation: 'getLoggedUser()',
+      parse: (response) {
+        final body = response.data as Map<String, dynamic>;
+        if (body['result'] != 'ok') {
+          throw const FormatException('Expected result: ok');
+        }
+        return User.fromJson(body['data']);
+      },
+    );
   }
 }

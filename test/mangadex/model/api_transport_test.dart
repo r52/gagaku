@@ -306,6 +306,191 @@ void main() {
       expect(transport.requests, isEmpty);
     });
 
+    test('ratings require authentication even for empty input', () async {
+      final unauthenticated = container.read(
+        Provider(
+          (ref) => MangaDexModel(
+            ref,
+            transport: transport,
+            cache: cache,
+            authenticationCheck: () async => false,
+          ),
+        ),
+      );
+
+      await expectLater(unauthenticated.fetchRatings([]), throwsStateError);
+      expect(transport.requests, isEmpty);
+    });
+
+    test('normal authenticated 404 responses map to absence', () async {
+      final manga = Manga(id: 'manga-1');
+      transport
+        ..enqueue(statusCode: 404, data: {'result': 'error'})
+        ..enqueue(statusCode: 404, data: {'result': 'error'});
+
+      expect(await model.getMangaFollowing(manga), isFalse);
+      expect(await model.getMangaReadingStatus(manga), isNull);
+      expect(transport.requests, hasLength(2));
+    });
+
+    test('list lookup preserves cache and normal 404 behavior', () async {
+      final list = _customList('list-1', name: 'List');
+      transport
+        ..enqueue(
+          statusCode: 200,
+          data: {'result': 'ok', 'data': list.toJson()},
+        )
+        ..enqueue(statusCode: 404, data: {'result': 'error'});
+
+      expect(await model.fetchListById(list.id), list);
+      expect(await model.fetchListById(list.id), list);
+      expect(await model.fetchListById('missing-list'), isNull);
+      expect(transport.requests, hasLength(2));
+      expect(cache.values[list.id], list);
+    });
+
+    test('chapter server projects normal and data-saver pages', () async {
+      final chapter = _chapter('chapter-1');
+      final apiData = ChapterAPI(
+        baseUrl: 'https://uploads.example',
+        chapter: const ChapterAPIData(
+          hash: 'hash',
+          data: ['page-1.jpg'],
+          dataSaver: ['page-1-small.jpg'],
+        ),
+      );
+      transport
+        ..enqueue(statusCode: 200, data: apiData.toJson())
+        ..enqueue(statusCode: 200, data: apiData.toJson());
+
+      final normal = await model.getChapterServer(chapter);
+
+      final dataSaverContainer = ProviderContainer(
+        overrides: [
+          mdConfigProvider.overrideWithValue(MangaDexConfig(dataSaver: true)),
+        ],
+      );
+      addTearDown(dataSaverContainer.dispose);
+      final dataSaverModel = dataSaverContainer.read(
+        Provider(
+          (ref) => MangaDexModel(
+            ref,
+            transport: transport,
+            cache: cache,
+            authenticationCheck: () async => true,
+          ),
+        ),
+      );
+      final dataSaver = await dataSaverModel.getChapterServer(chapter);
+
+      expect(normal.baseUrl, 'https://uploads.example/data/hash/');
+      expect(normal.pages, ['page-1.jpg']);
+      expect(dataSaver.baseUrl, 'https://uploads.example/data-saver/hash/');
+      expect(dataSaver.pages, ['page-1-small.jpg']);
+      expect(transport.requests, hasLength(2));
+      expect(
+        transport.requests.first.uri.path,
+        '/at-home/server/${chapter.id}',
+      );
+    });
+
+    test('external chapters skip the chapter-server request', () async {
+      final result = await model.getChapterServer(
+        _chapter('chapter-1', externalUrl: 'https://example.com/chapter'),
+      );
+
+      expect(result.baseUrl, isEmpty);
+      expect(result.pages, isEmpty);
+      expect(transport.requests, isEmpty);
+    });
+
+    test('statistics requests retain endpoint-specific queries', () async {
+      final manga = Manga(id: 'manga-1');
+      final chapter = _chapter('chapter-1');
+      transport
+        ..enqueue(
+          statusCode: 200,
+          data: {
+            'statistics': {
+              manga.id: {
+                'rating': {'bayesian': 1.5},
+                'follows': 2,
+              },
+            },
+          },
+        )
+        ..enqueue(
+          statusCode: 200,
+          data: {
+            'statistics': {chapter.id: <String, dynamic>{}},
+          },
+        );
+
+      final mangaStats = await model.fetchStatistics([manga]);
+      final chapterStats = await model.fetchChapterStats([chapter]);
+
+      expect(mangaStats[manga.id]?.follows, 2);
+      expect(chapterStats, contains(chapter.id));
+      expect(transport.requests[0].uri.path, MangaDexEndpoints.statistics);
+      expect(transport.requests[0].uri.queryParametersAll['manga[]'], [
+        manga.id,
+      ]);
+      expect(transport.requests[1].uri.path, MangaDexEndpoints.chapterStats);
+      expect(transport.requests[1].uri.queryParametersAll['chapter[]'], [
+        chapter.id,
+      ]);
+    });
+
+    test('ratings normalize a list-shaped empty response', () async {
+      final manga = Manga(id: 'manga-1');
+      transport.enqueue(statusCode: 200, data: {'ratings': <dynamic>[]});
+
+      expect(await model.fetchRatings([manga]), isEmpty);
+      final request = transport.requests.single;
+      expect(request.uri.path, MangaDexEndpoints.getRating);
+      expect(request.uri.queryParametersAll['manga[]'], [manga.id]);
+    });
+
+    test('user library uses authenticated request parsing and cache', () async {
+      transport.enqueue(
+        statusCode: 200,
+        data: {
+          'statuses': {'manga-1': MangaReadingStatus.reading.name},
+        },
+      );
+
+      final first = await model.fetchUserLibrary('user-1');
+      final second = await model.fetchUserLibrary('user-1');
+
+      expect(first, {'manga-1': MangaReadingStatus.reading});
+      expect(second, first);
+      expect(transport.requests, hasLength(1));
+      expect(transport.requests.single.uri.path, MangaDexEndpoints.library);
+      expect(cache.values['UserLibrary(user-1)'], first);
+    });
+
+    test('user library cache hits remain authentication gated', () async {
+      cache.values['UserLibrary(user-1)'] = {
+        'manga-1': MangaReadingStatus.reading,
+      };
+      final unauthenticated = container.read(
+        Provider(
+          (ref) => MangaDexModel(
+            ref,
+            transport: transport,
+            cache: cache,
+            authenticationCheck: () async => false,
+          ),
+        ),
+      );
+
+      await expectLater(
+        unauthenticated.fetchUserLibrary('user-1'),
+        throwsStateError,
+      );
+      expect(transport.requests, isEmpty);
+    });
+
     test('transport errors are deterministic and remain local', () async {
       final error = StateError('local transport failure');
       transport.enqueueError(error);
@@ -963,12 +1148,13 @@ CustomList _customList(String id, {required String name}) => CustomList(
   relationships: const [],
 );
 
-Chapter _chapter(String id) {
+Chapter _chapter(String id, {String? externalUrl}) {
   final now = DateTime.utc(2026);
   return Chapter(
     id: id,
     attributes: ChapterAttributes(
       translatedLanguage: Language.en,
+      externalUrl: externalUrl,
       version: 1,
       createdAt: now,
       updatedAt: now,
