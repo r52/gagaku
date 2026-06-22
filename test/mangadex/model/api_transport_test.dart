@@ -7,6 +7,7 @@ import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/util/authentication.dart';
+import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/http.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -158,6 +159,187 @@ void main() {
       expect(transport.requests, hasLength(1));
     });
 
+    test('shared executor returns and caches a successful GET', () async {
+      transport.enqueue(
+        statusCode: 200,
+        data: {
+          'result': 'ok',
+          'response': 'collection',
+          'data': <dynamic>[],
+          'limit': 100,
+          'offset': 0,
+          'total': 0,
+        },
+      );
+
+      final result = await model.getTagList();
+
+      expect(result.data, isEmpty);
+      expect(cache.values[MangaDexFeeds.tags.key], result);
+      final request = transport.requests.single;
+      expect(request.method, _HttpMethod.get);
+      expect(request.uri.path, MangaDexEndpoints.tag);
+    });
+
+    test('shared executor parses MangaDex error responses', () async {
+      transport.enqueue(
+        statusCode: 400,
+        statusMessage: 'Bad Request',
+        data: {
+          'result': 'error',
+          'errors': [
+            {
+              'id': 'error-1',
+              'status': 400,
+              'title': 'Invalid request',
+              'detail': 'The request was invalid.',
+            },
+          ],
+        },
+      );
+
+      await expectLater(
+        model.getTagList(),
+        throwsA(
+          isA<MangaDexException>()
+              .having(
+                (error) => error.message,
+                'message',
+                'getTagList() failed.',
+              )
+              .having(
+                (error) => error.errors?.single.status,
+                'API error status',
+                400,
+              ),
+        ),
+      );
+    });
+
+    test(
+      'shared executor falls back safely for malformed error bodies',
+      () async {
+        transport
+          ..enqueue(statusCode: 400, statusMessage: 'Bad Request', data: null)
+          ..enqueue(
+            statusCode: 418,
+            statusMessage: "I'm a teapot",
+            data: '<html>not a MangaDex error</html>',
+          );
+
+        await expectLater(
+          model.getTagList(),
+          throwsA(
+            isA<ApiException>()
+                .having((error) => error.statusCode, 'status code', 400)
+                .having(
+                  (error) => error.statusMessage,
+                  'status message',
+                  'Bad Request',
+                ),
+          ),
+        );
+        await expectLater(
+          model.getTagList(),
+          throwsA(
+            isA<ApiException>()
+                .having(
+                  (error) => error.message,
+                  'message',
+                  'getTagList() failed.',
+                )
+                .having((error) => error.statusCode, 'status code', 418)
+                .having(
+                  (error) => error.statusMessage,
+                  'status message',
+                  "I'm a teapot",
+                ),
+          ),
+        );
+      },
+    );
+
+    test('shared executor handles maintenance and null statuses', () async {
+      transport
+        ..enqueue(statusCode: 503, data: null)
+        ..enqueue(statusCode: null, data: null);
+
+      await expectLater(
+        model.getTagList(),
+        throwsA(
+          isA<ApiException>()
+              .having(
+                (error) => error.message,
+                'message',
+                'MangaDex is down for maintenance',
+              )
+              .having((error) => error.statusCode, 'status code', 503),
+        ),
+      );
+      await expectLater(
+        model.getTagList(),
+        throwsA(
+          isA<ApiException>()
+              .having(
+                (error) => error.message,
+                'message',
+                'getTagList() failed.',
+              )
+              .having((error) => error.statusCode, 'status code', isNull),
+        ),
+      );
+    });
+
+    test('shared executor attributes malformed success responses', () async {
+      transport.enqueue(statusCode: 200, data: {'result': 'ok'});
+
+      await expectLater(
+        model.getTagList(),
+        throwsA(
+          isA<ApiException>()
+              .having(
+                (error) => error.message,
+                'message',
+                contains('getTagList() failed to parse successful response'),
+              )
+              .having((error) => error.statusCode, 'status code', 200),
+        ),
+      );
+    });
+
+    test('shared executor handles an authenticated mutation', () async {
+      final list = _customList('list-1', name: 'Delete me');
+      cache.values[list.id] = list;
+      transport.enqueue(statusCode: 200, data: {'result': 'ok'});
+
+      expect(await model.deleteList(list), isTrue);
+      expect(cache.values, isNot(contains(list.id)));
+
+      final request = transport.requests.single;
+      expect(request.method, _HttpMethod.delete);
+      expect(request.uri.path, '/list/${list.id}');
+      expect(request.data, isNull);
+    });
+
+    test('shared executor enforces mutation authentication', () async {
+      final unauthenticated = container.read(
+        Provider(
+          (ref) => MangaDexModel(
+            ref,
+            transport: transport,
+            cache: cache,
+            authenticationCheck: () async => false,
+          ),
+        ),
+      );
+
+      await expectLater(
+        unauthenticated.deleteList(_customList('list-1', name: 'Keep me')),
+        throwsStateError,
+      );
+      expect(transport.requests, isEmpty);
+    });
+
     test('production construction retains its Dio stack', () {
       final production = container.read(
         Provider(
@@ -192,12 +374,19 @@ class _RecordedRequest {
 }
 
 class _QueuedResponse {
-  const _QueuedResponse.response({required this.statusCode, required this.data})
-    : error = null;
+  const _QueuedResponse.response({
+    required this.statusCode,
+    required this.data,
+    this.statusMessage,
+  }) : error = null;
 
-  const _QueuedResponse.error(this.error) : statusCode = null, data = null;
+  const _QueuedResponse.error(this.error)
+    : statusCode = null,
+      statusMessage = null,
+      data = null;
 
   final int? statusCode;
+  final String? statusMessage;
   final dynamic data;
   final Object? error;
 }
@@ -206,9 +395,17 @@ class _RecordingTransport implements MangaDexTransport {
   final Queue<_QueuedResponse> _responses = Queue();
   final List<_RecordedRequest> requests = [];
 
-  void enqueue({required int? statusCode, required dynamic data}) {
+  void enqueue({
+    required int? statusCode,
+    required dynamic data,
+    String? statusMessage,
+  }) {
     _responses.add(
-      _QueuedResponse.response(statusCode: statusCode, data: data),
+      _QueuedResponse.response(
+        statusCode: statusCode,
+        statusMessage: statusMessage,
+        data: data,
+      ),
     );
   }
 
@@ -236,6 +433,7 @@ class _RecordingTransport implements MangaDexTransport {
       requestOptions: RequestOptions(path: uri.toString()),
       data: response.data,
       statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
     );
   }
 

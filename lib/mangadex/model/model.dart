@@ -154,6 +154,8 @@ abstract interface class MangaDexTransport {
   Future<Response<dynamic>> deleteUri(Uri uri, {Object? data});
 }
 
+enum _MangaDexRequestMethod { get, post, put, delete }
+
 class _DioMangaDexTransport implements MangaDexTransport {
   const _DioMangaDexTransport(this.dio);
 
@@ -550,21 +552,101 @@ class MangaDexModel {
 
     final message =
         "$msg\nServer returned ${response.statusCode}: ${response.statusMessage}";
+    final details = _describeResponseData(response.data);
 
-    if (response.statusCode! >= 500) {
-      logger.e(message);
-      return ApiException(
+    if (response.statusCode == null || response.statusCode! >= 500) {
+      final exception = ApiException(
         message: msg,
         statusCode: response.statusCode,
         statusMessage: response.statusMessage,
       );
+      logger.e('$message\nResponse: $details', error: exception);
+      return exception;
     }
 
-    // MD API error
-    final err = ErrorResponse.fromJson(response.data);
-    final ex = MangaDexException(msg, err.errors);
-    logger.e(msg, error: ex);
-    return ex;
+    try {
+      final data = Map<String, dynamic>.from(response.data as Map);
+      final error = ErrorResponse.fromJson(data);
+      if (error.errors.isNotEmpty) {
+        final exception = MangaDexException(msg, error.errors);
+        logger.e('$message\nResponse: $details', error: exception);
+        return exception;
+      }
+    } catch (_) {
+      // Non-MangaDex and malformed response bodies fall through to the safe
+      // generic API exception below.
+    }
+
+    final exception = ApiException(
+      message: msg,
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+    );
+    logger.e('$message\nResponse: $details', error: exception);
+    return exception;
+  }
+
+  String _describeResponseData(Object? data) {
+    try {
+      final description = data is String ? data : json.encode(data);
+      const maxLength = 500;
+      return description.length <= maxLength
+          ? description
+          : '${description.substring(0, maxLength)}…';
+    } catch (_) {
+      try {
+        return data.toString();
+      } catch (_) {
+        return '<unprintable response>';
+      }
+    }
+  }
+
+  Future<T> _request<T>({
+    required _MangaDexRequestMethod method,
+    required Uri uri,
+    Object? data,
+    bool authenticated = false,
+    Set<int> acceptedStatusCodes = const {200},
+    required String operation,
+    required FutureOr<T> Function(Response<dynamic>) parse,
+  }) async {
+    if (authenticated && !await loggedIn()) {
+      throw StateError(
+        "$operation called on invalid token/login. Shouldn't ever get here",
+      );
+    }
+
+    final response = switch (method) {
+      _MangaDexRequestMethod.get => await _transport.getUri(uri),
+      _MangaDexRequestMethod.post => await _transport.postUri(uri, data: data),
+      _MangaDexRequestMethod.put => await _transport.putUri(uri, data: data),
+      _MangaDexRequestMethod.delete => await _transport.deleteUri(
+        uri,
+        data: data,
+      ),
+    };
+
+    if (!acceptedStatusCodes.contains(response.statusCode)) {
+      throw createException('$operation failed.', response);
+    }
+
+    try {
+      return await parse(response);
+    } catch (error, stackTrace) {
+      final exception = ApiException(
+        message: '$operation failed to parse successful response: $error',
+        statusCode: response.statusCode,
+        statusMessage: response.statusMessage,
+      );
+      logger.e(
+        '$operation failed while parsing a successful response.\n'
+        'Response: ${_describeResponseData(response.data)}',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      throw exception;
+    }
   }
 
   /// Fetches MangaDex frontpage data
@@ -1284,24 +1366,22 @@ class MangaDexModel {
 
     final uri = MangaDexEndpoints.api.replace(path: MangaDexFeeds.tags.path);
 
-    final response = await _transport.getUri(uri);
+    final result = await _request(
+      method: _MangaDexRequestMethod.get,
+      uri: uri,
+      operation: 'getTagList()',
+      parse: (response) => MDEntityList.fromJson(response.data),
+    );
 
-    if (response.statusCode == 200) {
-      final result = MDEntityList.fromJson(response.data);
+    // Cache the data and list
+    await _cache.putEntityList(
+      MangaDexFeeds.tags.key,
+      result,
+      resolve: false,
+      expiry: const Duration(days: 1),
+    );
 
-      // Cache the data and list
-      await _cache.putEntityList(
-        MangaDexFeeds.tags.key,
-        result,
-        resolve: false,
-        expiry: const Duration(days: 1),
-      );
-
-      return result;
-    }
-
-    // Throw if failure
-    throw createException("getTagList() failed.", response);
+    return result;
   }
 
   /// Fetches statistics of given [mangas]
@@ -1680,18 +1760,26 @@ class MangaDexModel {
   /// Deletes a [CustomList]
   Future<bool> deleteList(CustomList list) async {
     final id = list.id;
+    final uri = MangaDexEndpoints.api.replace(
+      path: MangaDexEndpoints.modifyList.replaceFirst('{id}', id),
+    );
 
-    final result = await _customListCrud<bool>(
-      method: 'DELETE',
-      endpoint: MangaDexEndpoints.modifyList.replaceFirst('{id}', id),
-      data: () => null,
-      parse: (_) => true,
-      logPrefix: 'deleteList($id)',
-      cache: (_) async {
-        _cache.remove(id);
+    final result = await _request(
+      method: _MangaDexRequestMethod.delete,
+      uri: uri,
+      authenticated: true,
+      operation: 'deleteList($id)',
+      parse: (response) {
+        final body = response.data as Map<String, dynamic>;
+        if (body['result'] != 'ok') {
+          throw const FormatException('Expected result: ok');
+        }
+
+        return true;
       },
     );
 
+    await _cache.remove(id);
     return result;
   }
 
