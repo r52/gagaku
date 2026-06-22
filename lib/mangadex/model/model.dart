@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:async/async.dart';
+import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:gagaku/util/authentication.dart';
@@ -615,6 +616,21 @@ class MangaDexModel {
     return false;
   }
 
+  String _requestCacheKey({required String namespace, required Uri uri}) {
+    final queryParameters = SplayTreeMap<String, List<String>>();
+    for (final MapEntry(:key, value: values)
+        in uri.queryParametersAll.entries) {
+      queryParameters[key] = [...values]..sort();
+    }
+
+    final canonicalUri = uri.replace(queryParameters: queryParameters);
+    final digest = sha256.convert(utf8.encode(canonicalUri.toString()));
+    return '$namespace:v2:$digest';
+  }
+
+  String _feedCacheNamespace(String feedKey, [MangaDexUUID? entity]) =>
+      entity == null ? feedKey : '$feedKey(${entity.id})';
+
   Future<T> _request<T>({
     required _MangaDexRequestMethod method,
     required Uri uri,
@@ -713,13 +729,6 @@ class MangaDexModel {
     ChapterFilterOrder order = ChapterFilterOrder.publishAt_desc,
     bool ignoreOriginalLanguage = false,
   }) async {
-    final key =
-        '$feedKey(${entity != null ? '${entity.id},' : ''}$order,$offset)';
-
-    if (await _cache.exists(key)) {
-      return await _cache.getEntityList(key);
-    }
-
     final settings = ref.read(mdConfigProvider);
 
     // Download missing data
@@ -750,6 +759,14 @@ class MangaDexModel {
       path: path,
       queryParameters: queryParams,
     );
+    final key = _requestCacheKey(
+      namespace: _feedCacheNamespace(feedKey, entity),
+      uri: uri,
+    );
+
+    if (await _cache.exists(key)) {
+      return await _cache.getEntityList(key);
+    }
 
     final response = await _transport.getUri(uri);
 
@@ -928,13 +945,6 @@ class MangaDexModel {
     MangaFilterOrder order = MangaFilterOrder.latestUploadedChapter_desc,
     Map<String, dynamic>? extraParams,
   }) async {
-    final key =
-        '$feedKey(${entity != null ? '${entity.id},' : ''}$order,$offset)';
-
-    if (await _cache.exists(key)) {
-      return await _cache.getEntityList(key);
-    }
-
     final settings = ref.read(mdConfigProvider);
 
     var queryParams = <String, dynamic>{
@@ -973,6 +983,14 @@ class MangaDexModel {
       path: MangaDexEndpoints.manga,
       queryParameters: queryParams,
     );
+    final key = _requestCacheKey(
+      namespace: _feedCacheNamespace(feedKey, entity),
+      uri: uri,
+    );
+
+    if (await _cache.exists(key)) {
+      return await _cache.getEntityList(key);
+    }
 
     final response = await _transport.getUri(uri);
 

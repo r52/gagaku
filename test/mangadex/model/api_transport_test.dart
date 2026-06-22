@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'package:dio/dio.dart';
 import 'package:fresh_dio/fresh_dio.dart';
 import 'package:gagaku/log.dart';
+import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/model/cache.dart';
@@ -29,7 +30,18 @@ void main() {
     setUp(() {
       transport = _RecordingTransport();
       cache = _MemoryCacheManager();
-      container = ProviderContainer();
+      container = ProviderContainer(
+        overrides: [
+          mdConfigProvider.overrideWithValue(
+            MangaDexConfig(
+              translatedLanguages: {Language.en},
+              originalLanguage: {Language.ja},
+              contentRating: {ContentRating.safe},
+              groupBlacklist: {'blocked-group'},
+            ),
+          ),
+        ],
+      );
       model = container.read(
         Provider(
           (ref) => MangaDexModel(
@@ -325,6 +337,182 @@ void main() {
       final request = transport.requests.single;
       expect(request.method, _HttpMethod.get);
       expect(request.uri.path, MangaDexEndpoints.tag);
+    });
+
+    test(
+      'equivalent manga feed requests share a canonical cache key',
+      () async {
+        transport.enqueue(statusCode: 200, data: _emptyEntityListData());
+
+        final first = await model.fetchMangaList(
+          limit: 10,
+          feedKey: 'CanonicalMangaFeed',
+          extraParams: {
+            'originalLanguage[]': ['ja', 'en'],
+            'hasAvailableChapters': 'true',
+          },
+        );
+        final second = await model.fetchMangaList(
+          limit: 10,
+          feedKey: 'CanonicalMangaFeed',
+          extraParams: {
+            'hasAvailableChapters': 'true',
+            'originalLanguage[]': ['en', 'ja'],
+          },
+        );
+
+        expect(second, same(first));
+        expect(transport.requests, hasLength(1));
+        final keys = cache.values.keys
+            .where((key) => key.startsWith('CanonicalMangaFeed:v2:'))
+            .toList();
+        expect(keys, hasLength(1));
+        expect(keys.single.length, lessThanOrEqualTo(255));
+      },
+    );
+
+    test('effective request changes produce different cache keys', () async {
+      for (var i = 0; i < 4; i++) {
+        transport.enqueue(statusCode: 200, data: _emptyEntityListData());
+      }
+
+      await model.fetchMangaList(limit: 10, feedKey: 'DistinctMangaFeed');
+      await model.fetchMangaList(limit: 20, feedKey: 'DistinctMangaFeed');
+      await model.fetchMangaList(
+        limit: 10,
+        feedKey: 'DistinctMangaFeed',
+        offset: 10,
+      );
+      await model.fetchMangaList(
+        limit: 10,
+        feedKey: 'DistinctMangaFeed',
+        extraParams: const {'hasAvailableChapters': 'true'},
+      );
+
+      expect(transport.requests, hasLength(4));
+      expect(
+        cache.values.keys
+            .where((key) => key.startsWith('DistinctMangaFeed:v2:'))
+            .toSet(),
+        hasLength(4),
+      );
+    });
+
+    test(
+      'chapter feed path and original-language policy affect keys',
+      () async {
+        for (var i = 0; i < 3; i++) {
+          transport.enqueue(statusCode: 200, data: _emptyEntityListData());
+        }
+
+        await model.fetchChapterFeed(
+          path: MangaDexEndpoints.chapter,
+          feedKey: 'DistinctChapterFeed',
+          limit: 10,
+        );
+        await model.fetchChapterFeed(
+          path: MangaDexEndpoints.chapter,
+          feedKey: 'DistinctChapterFeed',
+          limit: 10,
+          ignoreOriginalLanguage: true,
+        );
+        await model.fetchChapterFeed(
+          path: '/manga/manga-1/feed',
+          feedKey: 'DistinctChapterFeed',
+          limit: 10,
+        );
+
+        expect(transport.requests, hasLength(3));
+        expect(
+          cache.values.keys
+              .where((key) => key.startsWith('DistinctChapterFeed:v2:'))
+              .toSet(),
+          hasLength(3),
+        );
+      },
+    );
+
+    test('MangaDex settings changes produce different feed keys', () async {
+      transport
+        ..enqueue(statusCode: 200, data: _emptyEntityListData())
+        ..enqueue(statusCode: 200, data: _emptyEntityListData());
+
+      await model.fetchChapterFeed(
+        path: MangaDexEndpoints.chapter,
+        feedKey: 'SettingsChapterFeed',
+        limit: 10,
+      );
+
+      final alternateContainer = ProviderContainer(
+        overrides: [
+          mdConfigProvider.overrideWithValue(
+            MangaDexConfig(
+              translatedLanguages: {Language.fr},
+              originalLanguage: {Language.ko},
+              contentRating: {ContentRating.suggestive},
+              groupBlacklist: {'another-blocked-group'},
+            ),
+          ),
+        ],
+      );
+      addTearDown(alternateContainer.dispose);
+      final alternateModel = alternateContainer.read(
+        Provider(
+          (ref) => MangaDexModel(
+            ref,
+            transport: transport,
+            cache: cache,
+            authenticationCheck: () async => true,
+          ),
+        ),
+      );
+
+      await alternateModel.fetchChapterFeed(
+        path: MangaDexEndpoints.chapter,
+        feedKey: 'SettingsChapterFeed',
+        limit: 10,
+      );
+
+      expect(transport.requests, hasLength(2));
+      expect(
+        cache.values.keys
+            .where((key) => key.startsWith('SettingsChapterFeed:v2:'))
+            .toSet(),
+        hasLength(2),
+      );
+    });
+
+    test('feed namespace invalidation clears every cached page', () async {
+      final manga = Manga(id: 'manga-1');
+      transport
+        ..enqueue(statusCode: 200, data: _emptyEntityListData())
+        ..enqueue(statusCode: 200, data: _emptyEntityListData());
+
+      await model.fetchChapterFeed(
+        path: '/manga/${manga.id}/feed',
+        feedKey: 'PagedChapterFeed',
+        limit: 10,
+        entity: manga,
+      );
+      await model.fetchChapterFeed(
+        path: '/manga/${manga.id}/feed',
+        feedKey: 'PagedChapterFeed',
+        limit: 10,
+        offset: 10,
+        entity: manga,
+      );
+      cache.values['OtherFeed:v2:keep'] = 'keep';
+
+      final prefix = 'PagedChapterFeed(${manga.id}';
+      expect(
+        cache.values.keys.where((key) => key.startsWith(prefix)),
+        hasLength(2),
+      );
+
+      await model.invalidateAll(prefix);
+
+      expect(cache.values.keys.where((key) => key.startsWith(prefix)), isEmpty);
+      expect(cache.values['OtherFeed:v2:keep'], 'keep');
     });
 
     test('shared executor parses MangaDex error responses', () async {
@@ -665,6 +853,14 @@ class _MemoryCacheManager implements CacheManager {
   }
 
   @override
+  Future<void> invalidateAll(String startsWith) async {
+    values.removeWhere((key, _) => key.startsWith(startsWith));
+  }
+
+  @override
+  Future<void> putAll(Map<String, CacheEntry> map) async {}
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
@@ -709,3 +905,12 @@ Chapter _chapter(String id) {
     relationships: const [],
   );
 }
+
+Map<String, dynamic> _emptyEntityListData() => {
+  'result': 'ok',
+  'response': 'collection',
+  'data': <dynamic>[],
+  'limit': 10,
+  'offset': 0,
+  'total': 0,
+};
