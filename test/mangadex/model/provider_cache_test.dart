@@ -93,6 +93,63 @@ void main() {
       );
     });
 
+    test('statistics coalesces simultaneous cache misses', () async {
+      final first = Manga(id: 'manga-1');
+      final second = Manga(id: 'manga-2');
+      api.mangaStatistics.addAll({
+        first.id: _mangaStatistics(1),
+        second.id: _mangaStatistics(2),
+      });
+
+      final notifier = container.read(statisticsProvider.notifier);
+      final results = await Future.wait([
+        notifier.get([first]),
+        notifier.get([first, second]),
+      ]);
+
+      expect(api.statisticsRequests, hasLength(1));
+      expect(
+        api.statisticsRequests.single,
+        unorderedEquals([first.id, second.id]),
+      );
+      for (final result in results) {
+        expect(result.keys, unorderedEquals([first.id, second.id]));
+      }
+    });
+
+    test('statistics drains misses queued during an active request', () async {
+      final first = Manga(id: 'manga-1');
+      final second = Manga(id: 'manga-2');
+      api.mangaStatistics.addAll({
+        first.id: _mangaStatistics(1),
+        second.id: _mangaStatistics(2),
+      });
+
+      final gate = Completer<void>();
+      api.statisticsGate = gate;
+      final notifier = container.read(statisticsProvider.notifier);
+      final firstResult = notifier.get([first]);
+      while (api.statisticsRequests.isEmpty) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      expect(api.statisticsRequests, [
+        [first.id],
+      ]);
+
+      final secondResult = notifier.get([second]);
+      api.statisticsGate = null;
+      gate.complete();
+
+      final results = await Future.wait([firstResult, secondResult]);
+      expect(api.statisticsRequests, [
+        [first.id],
+        [second.id],
+      ]);
+      for (final result in results) {
+        expect(result.keys, unorderedEquals([first.id, second.id]));
+      }
+    });
+
     test('statistics keeps cached data available while fetching', () async {
       final first = Manga(id: 'manga-1');
       final second = Manga(id: 'manga-2');

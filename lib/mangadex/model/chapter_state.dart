@@ -12,9 +12,14 @@ class MangaChaptersListSort extends _$MangaChaptersListSort {
 
 @Riverpod(keepAlive: true)
 class ReadChapters extends _$ReadChapters {
-  Completer<ReadChaptersMap>? _batchCompleter;
-  Timer? _batchTimer;
-  final Set<Manga> _batchQueue = {};
+  late final _cache = _BatchCacheCoordinator<Manga, ReadChapterSet>(
+    keyOf: (manga) => manga.id,
+    fetch: _fetchReadChapters,
+    read: () => future,
+    write: (value) => state = AsyncData(value),
+    isExpired: (value) => value.isExpired,
+    batchDelay: const Duration(milliseconds: 50),
+  );
 
   Future<ReadChaptersMap> _fetchReadChapters(Iterable<Manga> mangas) async {
     if (mangas.isEmpty) {
@@ -50,41 +55,7 @@ class ReadChapters extends _$ReadChapters {
       return {};
     }
 
-    final oldstate = await future;
-    final mg = mangas.where(
-      (m) => !oldstate.containsKey(m.id) || oldstate[m.id]?.isExpired == true,
-    );
-
-    if (mg.isEmpty) {
-      // No change
-      return oldstate;
-    }
-
-    _batchQueue.addAll(mg);
-
-    if (_batchTimer == null) {
-      _batchCompleter = Completer<ReadChaptersMap>();
-      _batchTimer = Timer(const Duration(milliseconds: 50), () async {
-        final currentBatch = _batchQueue.toList();
-        final completer = _batchCompleter!;
-
-        _batchQueue.clear();
-        _batchCompleter = null;
-        _batchTimer = null;
-
-        try {
-          final map = await _fetchReadChapters(currentBatch);
-          final currentState = await future;
-          state = AsyncData({...currentState, ...map});
-
-          completer.complete(state.value!);
-        } catch (e, st) {
-          completer.completeError(e, st);
-        }
-      });
-    }
-
-    return _batchCompleter!.future;
+    return _cache.get(mangas);
   }
 
   /// Sets a list of chapters for a manga read or unread

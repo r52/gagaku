@@ -2,6 +2,13 @@ part of 'model.dart';
 
 @Riverpod(keepAlive: true)
 class Statistics extends _$Statistics {
+  late final _cache = _BatchCacheCoordinator<Manga, MangaStatistics>(
+    keyOf: (manga) => manga.id,
+    fetch: _fetchStatistics,
+    read: () => future,
+    write: (value) => state = AsyncData(value),
+  );
+
   Future<Map<String, MangaStatistics>> _fetchStatistics(
     Iterable<Manga> mangas,
   ) async {
@@ -24,19 +31,8 @@ class Statistics extends _$Statistics {
   ///
   /// Existing cache data remains available while the request is in flight and
   /// is preserved if the request fails.
-  Future<Map<String, MangaStatistics>> get(Iterable<Manga> mangas) async {
-    final oldstate = await future;
-    final missing = mangas.where((m) => !oldstate.containsKey(m.id));
-
-    if (missing.isEmpty) {
-      return oldstate;
-    }
-
-    final fetched = await _fetchStatistics(missing);
-    final newState = {...oldstate, ...fetched};
-    state = AsyncData(newState);
-    return newState;
-  }
+  Future<Map<String, MangaStatistics>> get(Iterable<Manga> mangas) =>
+      _cache.get(mangas);
 }
 
 @riverpod
@@ -55,6 +51,13 @@ Future<MangaStatistics> mangaStatistics(Ref ref, Manga manga) async {
 
 @Riverpod(keepAlive: true)
 class ChapterStats extends _$ChapterStats {
+  late final _cache = _BatchCacheCoordinator<Chapter, ChapterStatistics>(
+    keyOf: (chapter) => chapter.id,
+    fetch: _fetchStatistics,
+    read: () => future,
+    write: (value) => state = AsyncData(value),
+  );
+
   Future<Map<String, ChapterStatistics>> _fetchStatistics(
     Iterable<Chapter> chapters,
   ) async {
@@ -77,19 +80,8 @@ class ChapterStats extends _$ChapterStats {
   ///
   /// Existing cache data remains available while the request is in flight and
   /// is preserved if the request fails.
-  Future<Map<String, ChapterStatistics>> get(Iterable<Chapter> chapters) async {
-    final oldstate = await future;
-    final missing = chapters.where((c) => !oldstate.containsKey(c.id));
-
-    if (missing.isEmpty) {
-      return oldstate;
-    }
-
-    final fetched = await _fetchStatistics(missing);
-    final newState = {...oldstate, ...fetched};
-    state = AsyncData(newState);
-    return newState;
-  }
+  Future<Map<String, ChapterStatistics>> get(Iterable<Chapter> chapters) =>
+      _cache.get(chapters);
 }
 
 @riverpod

@@ -30,6 +30,7 @@ import 'package:http/http.dart' as http;
 
 part 'model.g.dart';
 part 'auth_state.dart';
+part 'batch_cache.dart';
 part 'chapter_state.dart';
 part 'custom_list_state.dart';
 part 'history_state.dart';
