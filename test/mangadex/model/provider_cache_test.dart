@@ -307,10 +307,81 @@ void main() {
       addTearDown(subscription.close);
       final oldState = await container.read(provider.future);
 
-      await container.read(provider.notifier).replaceList(replacement);
+      await userListModifyMutation(api.user.id).run(container, (tsx) async {
+        await tsx
+            .get(customListCommandsProvider(api.user.id))
+            .synchronizeFetched(tsx, replacement);
+        return replacement;
+      });
 
       expect(oldState, [original]);
       expect(await container.read(provider.future), [replacement]);
+    });
+
+    test('custom list edits synchronize active list stores', () async {
+      final original = _customList('list-1', name: 'Original');
+      api.userLists = [original];
+      api.followedLists = [original];
+
+      final userProvider = userListsProvider(api.user.id);
+      final followedProvider = followedListsProvider(api.user.id);
+      final userSubscription = container.listen(userProvider, (_, _) {});
+      final followedSubscription = container.listen(
+        followedProvider,
+        (_, _) {},
+      );
+      addTearDown(userSubscription.close);
+      addTearDown(followedSubscription.close);
+      await Future.wait([
+        container.read(userProvider.future),
+        container.read(followedProvider.future),
+      ]);
+
+      final edited = await userListModifyMutation(api.user.id).run(
+        container,
+        (tsx) => tsx
+            .get(customListCommandsProvider(api.user.id))
+            .editList(
+              tsx,
+              original,
+              'Edited',
+              CustomListVisibility.public,
+              const [],
+            ),
+      );
+
+      expect(await container.read(userProvider.future), [edited]);
+      expect(await container.read(followedProvider.future), [edited]);
+    });
+
+    test('custom list deletion removes the list from active stores', () async {
+      final list = _customList('list-1', name: 'List');
+      api.userLists = [list];
+      api.followedLists = [list];
+
+      final userProvider = userListsProvider(api.user.id);
+      final followedProvider = followedListsProvider(api.user.id);
+      final userSubscription = container.listen(userProvider, (_, _) {});
+      final followedSubscription = container.listen(
+        followedProvider,
+        (_, _) {},
+      );
+      addTearDown(userSubscription.close);
+      addTearDown(followedSubscription.close);
+      await Future.wait([
+        container.read(userProvider.future),
+        container.read(followedProvider.future),
+      ]);
+
+      await userListDeleteMutation(api.user.id).run(
+        container,
+        (tsx) => tsx
+            .get(customListCommandsProvider(api.user.id))
+            .deleteList(tsx, list),
+      );
+
+      expect(await container.read(userProvider.future), isEmpty);
+      expect(await container.read(followedProvider.future), isEmpty);
     });
   });
 }
@@ -352,6 +423,7 @@ class _FakeMangaDexModel implements MangaDexModel {
   final ReadChaptersMap readChapters = {};
   final Map<String, MangaReadingStatus> userLibrary = {};
   List<CustomList> userLists = [];
+  List<CustomList> followedLists = [];
 
   final List<List<String>> statisticsRequests = [];
   final List<List<String>> chapterStatisticsRequests = [];
@@ -426,7 +498,26 @@ class _FakeMangaDexModel implements MangaDexModel {
   Future<List<CustomList>> fetchUserList({
     required FeedInfo feed,
     int offset = 0,
-  }) async => [...userLists];
+  }) async => [
+    ...(feed == MangaDexFeeds.followedLists ? followedLists : userLists),
+  ];
+
+  @override
+  Future<CustomList> editList(
+    CustomList list,
+    String name,
+    CustomListVisibility visibility,
+    Iterable<String> mangaIds,
+  ) async => list.copyWith(
+    attributes: list.attributes.copyWith(
+      name: name,
+      visibility: visibility,
+      version: list.attributes.version + 1,
+    ),
+  );
+
+  @override
+  Future<bool> deleteList(CustomList list) async => true;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

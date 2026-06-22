@@ -16,6 +16,156 @@ List<CustomList> _removeListById(List<CustomList> lists, String id) => [
 ];
 
 @riverpod
+CustomListCommands customListCommands(Ref ref, String? userId) =>
+    CustomListCommands(ref, userId);
+
+class CustomListCommands {
+  CustomListCommands(this.ref, this.userId);
+
+  final Ref ref;
+  final String? userId;
+
+  Future<CustomList?> updateList(
+    MutationTransaction transaction,
+    CustomList list,
+    Manga manga,
+    bool add,
+  ) async {
+    final api = transaction.get(mangadexProvider);
+    final result = await api.updateMangaInCustomList(list, manga, add);
+
+    if (result != null) {
+      await _upsert(transaction, result);
+    }
+
+    return result;
+  }
+
+  Future<CustomList> editList(
+    MutationTransaction transaction,
+    CustomList list,
+    String name,
+    CustomListVisibility visibility,
+    Iterable<String> mangaIds,
+  ) async {
+    final api = transaction.get(mangadexProvider);
+    final result = await api.editList(list, name, visibility, mangaIds);
+    await _upsert(transaction, result);
+    return result;
+  }
+
+  Future<CustomList> deleteList(
+    MutationTransaction transaction,
+    CustomList list,
+  ) async {
+    final api = transaction.get(mangadexProvider);
+    final result = await api.deleteList(list);
+
+    if (result) {
+      await _remove(transaction, list.id);
+    }
+
+    return list;
+  }
+
+  Future<CustomList> newList(
+    MutationTransaction transaction,
+    String name,
+    CustomListVisibility visibility,
+    Iterable<String> mangaIds,
+  ) async {
+    final api = transaction.get(mangadexProvider);
+    final result = await api.createNewList(name, visibility, mangaIds);
+    await _upsert(transaction, result, addToUserLists: true);
+    return result;
+  }
+
+  Future<bool> setFollow(
+    MutationTransaction transaction,
+    CustomList list,
+    bool follow,
+  ) async {
+    final api = transaction.get(mangadexProvider);
+    final result = await api.setFollowList(list, follow);
+
+    if (result) {
+      await _setFollowed(transaction, list, follow);
+    }
+
+    return result;
+  }
+
+  Future<void> synchronizeFetched(
+    MutationTransaction transaction,
+    CustomList list,
+  ) => _upsert(transaction, list, invalidateSource: false);
+
+  Future<void> _upsert(
+    MutationTransaction transaction,
+    CustomList list, {
+    bool addToUserLists = false,
+    bool invalidateSource = true,
+  }) async {
+    final userId = this.userId;
+    if (invalidateSource) {
+      ref.invalidate(listSourceProvider(list.id));
+    }
+    if (userId == null) {
+      return;
+    }
+
+    if (ref.exists(userListsProvider(userId))) {
+      await transaction
+          .get(userListsProvider(userId).notifier)
+          ._upsert(list, addIfMissing: addToUserLists);
+    }
+    if (ref.exists(followedListsProvider(userId))) {
+      await transaction
+          .get(followedListsProvider(userId).notifier)
+          ._upsert(list);
+    }
+  }
+
+  Future<void> _remove(MutationTransaction transaction, String listId) async {
+    ref.invalidate(listSourceProvider(listId));
+
+    final userId = this.userId;
+    if (userId == null) {
+      return;
+    }
+
+    if (ref.exists(userListsProvider(userId))) {
+      await transaction.get(userListsProvider(userId).notifier)._remove(listId);
+    }
+    if (ref.exists(followedListsProvider(userId))) {
+      await transaction
+          .get(followedListsProvider(userId).notifier)
+          ._remove(listId);
+    }
+  }
+
+  Future<void> _setFollowed(
+    MutationTransaction transaction,
+    CustomList list,
+    bool follow,
+  ) async {
+    final userId = this.userId;
+    if (userId == null || !ref.exists(followedListsProvider(userId))) {
+      return;
+    }
+
+    final followedLists = transaction.get(
+      followedListsProvider(userId).notifier,
+    );
+    if (follow) {
+      await followedLists._upsert(list, addIfMissing: true);
+    } else {
+      await followedLists._remove(list.id);
+    }
+  }
+}
+
+@riverpod
 class UserLists extends _$UserLists
     with AutoDisposeExpiryMix, ListBasedInfiniteScrollMix {
   static const info = MangaDexFeeds.userLists;
@@ -47,86 +197,21 @@ class UserLists extends _$UserLists
     return fetchData(0);
   }
 
-  Future<CustomList?> updateList(CustomList list, Manga manga, bool add) async {
-    final api = ref.watch(mangadexProvider);
-
-    final oldstate = await future;
-    final result = await api.updateMangaInCustomList(list, manga, add);
-    var newState = [...oldstate];
-
-    if (result != null) {
-      final idx = oldstate.indexWhere((e) => e.id == result.id);
-      if (idx >= 0) {
-        newState = _replaceListAt(oldstate, idx, result);
-        ref.invalidate(listSourceProvider(result.id));
-      }
-    }
-
-    state = AsyncData(newState);
-
-    return result;
-  }
-
-  Future<CustomList> editList(
-    CustomList list,
-    String name,
-    CustomListVisibility visibility,
-    Iterable<String> mangaIds,
-  ) async {
-    final api = ref.watch(mangadexProvider);
-
-    final oldstate = await future;
-    final result = await api.editList(list, name, visibility, mangaIds);
-    final idx = oldstate.indexWhere((e) => e.id == result.id);
-    var newState = [...oldstate];
-    if (idx >= 0) {
-      newState = _replaceListAt(oldstate, idx, result);
-      ref.invalidate(listSourceProvider(result.id));
-    }
-
-    state = AsyncData(newState);
-
-    return result;
-  }
-
-  Future<CustomList> deleteList(CustomList list) async {
-    final api = ref.watch(mangadexProvider);
-
-    final oldstate = await future;
-    final result = await api.deleteList(list);
-    var newState = [...oldstate];
-
-    if (result) {
-      newState = _removeListById(oldstate, list.id);
-      ref.invalidate(listSourceProvider(list.id));
-    }
-
-    state = AsyncData(newState);
-
-    return list;
-  }
-
-  Future<CustomList> newList(
-    String name,
-    CustomListVisibility visibility,
-    Iterable<String> mangaIds,
-  ) async {
-    final api = ref.watch(mangadexProvider);
-
-    final oldstate = await future;
-    final result = await api.createNewList(name, visibility, mangaIds);
-
-    state = AsyncData([...oldstate, result]);
-
-    return result;
-  }
-
-  Future<void> replaceList(CustomList list) async {
+  Future<void> _upsert(CustomList list, {bool addIfMissing = false}) async {
     final oldstate = await future;
     final idx = oldstate.indexWhere((e) => e.id == list.id);
     state = AsyncData(
-      idx >= 0 ? _replaceListAt(oldstate, idx, list) : [...oldstate],
+      idx >= 0
+          ? _replaceListAt(oldstate, idx, list)
+          : addIfMissing
+          ? [...oldstate, list]
+          : [...oldstate],
     );
+  }
+
+  Future<void> _remove(String listId) async {
+    final oldstate = await future;
+    state = AsyncData(_removeListById(oldstate, listId));
   }
 }
 
@@ -167,35 +252,21 @@ class FollowedLists extends _$FollowedLists
     return fetchData(0);
   }
 
-  Future<bool> setFollow(CustomList list, bool follow) async {
-    final api = ref.watch(mangadexProvider);
-
-    final oldstate = await future;
-    final result = await api.setFollowList(list, follow);
-    var newState = [...oldstate];
-
-    if (result) {
-      if (follow) {
-        final idx = oldstate.indexWhere((e) => e.id == list.id);
-        if (idx == -1) {
-          newState = [...oldstate, list];
-        }
-      } else {
-        newState = _removeListById(oldstate, list.id);
-      }
-    }
-
-    state = AsyncData(newState);
-
-    return result;
-  }
-
-  Future<void> replaceList(CustomList list) async {
+  Future<void> _upsert(CustomList list, {bool addIfMissing = false}) async {
     final oldstate = await future;
     final idx = oldstate.indexWhere((e) => e.id == list.id);
     state = AsyncData(
-      idx >= 0 ? _replaceListAt(oldstate, idx, list) : [...oldstate],
+      idx >= 0
+          ? _replaceListAt(oldstate, idx, list)
+          : addIfMissing
+          ? [...oldstate, list]
+          : [...oldstate],
     );
+  }
+
+  Future<void> _remove(String listId) async {
+    final oldstate = await future;
+    state = AsyncData(_removeListById(oldstate, listId));
   }
 }
 
@@ -235,15 +306,9 @@ class ListSource extends _$ListSource {
       final me = await ref.watch(loggedUserProvider.future);
       if (me != null) {
         await ref.run((tsx) async {
-          if (ref.exists(userListsProvider(me.id))) {
-            await tsx.get(userListsProvider(me.id).notifier).replaceList(list);
-          }
-
-          if (ref.exists(followedListsProvider(me.id))) {
-            await tsx
-                .get(followedListsProvider(me.id).notifier)
-                .replaceList(list);
-          }
+          await tsx
+              .get(customListCommandsProvider(me.id))
+              .synchronizeFetched(tsx, list);
         });
       }
     }

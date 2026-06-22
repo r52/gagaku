@@ -319,6 +319,90 @@ final class MangaReadChaptersFamily extends $Family
   String toString() => r'mangaReadChaptersProvider';
 }
 
+@ProviderFor(customListCommands)
+final customListCommandsProvider = CustomListCommandsFamily._();
+
+final class CustomListCommandsProvider
+    extends
+        $FunctionalProvider<
+          CustomListCommands,
+          CustomListCommands,
+          CustomListCommands
+        >
+    with $Provider<CustomListCommands> {
+  CustomListCommandsProvider._({
+    required CustomListCommandsFamily super.from,
+    required String? super.argument,
+  }) : super(
+         retry: null,
+         name: r'customListCommandsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$customListCommandsHash();
+
+  @override
+  String toString() {
+    return r'customListCommandsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<CustomListCommands> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  CustomListCommands create(Ref ref) {
+    final argument = this.argument as String?;
+    return customListCommands(ref, argument);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(CustomListCommands value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<CustomListCommands>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CustomListCommandsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$customListCommandsHash() =>
+    r'4a068a47bb1f8df466a806899dcad57ab2c4d4f6';
+
+final class CustomListCommandsFamily extends $Family
+    with $FunctionalFamilyOverride<CustomListCommands, String?> {
+  CustomListCommandsFamily._()
+    : super(
+        retry: null,
+        name: r'customListCommandsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  CustomListCommandsProvider call(String? userId) =>
+      CustomListCommandsProvider._(argument: userId, from: this);
+
+  @override
+  String toString() => r'customListCommandsProvider';
+}
+
 @ProviderFor(UserLists)
 final userListsProvider = UserListsFamily._();
 
@@ -360,7 +444,7 @@ final class UserListsProvider
   }
 }
 
-String _$userListsHash() => r'e6e1391a90c410a96bde6e95a8c68b96f9e09472';
+String _$userListsHash() => r'7ad166c899a1dc66c76f2f951a887d45869cfeb9';
 
 final class UserListsFamily extends $Family
     with
@@ -450,7 +534,7 @@ final class FollowedListsProvider
   }
 }
 
-String _$followedListsHash() => r'7031c6b2c5a7faeb523deaea0e561ed7b46eecde';
+String _$followedListsHash() => r'6cefe71c14e061835361dfabe56e9332c659304c';
 
 final class FollowedListsFamily extends $Family
     with
@@ -540,7 +624,7 @@ final class ListSourceProvider
   }
 }
 
-String _$listSourceHash() => r'fa3af4ce278d3a4407fefcdc4b1f2aaef8f91ef1';
+String _$listSourceHash() => r'0cf67741a00f21b6b365521a7a79292c99dcd227';
 
 final class ListSourceFamily extends $Family
     with

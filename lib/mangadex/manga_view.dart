@@ -1492,10 +1492,10 @@ class _UserListsMenu extends ConsumerWidget {
               closeOnActivate: false,
               value: list.set.contains(manga.id),
               onChanged: (bool? value) async {
-                userListModifyMutation(me?.id).run(ref, (ref) async {
-                  return await ref
-                      .get(userListsProvider(me?.id).notifier)
-                      .updateList(list, manga, value == true);
+                userListModifyMutation(me?.id).run(ref, (tsx) async {
+                  return await tsx
+                      .get(customListCommandsProvider(me?.id))
+                      .updateList(tsx, list, manga, value == true);
                 });
               },
               child: Text(list.attributes.name),
@@ -1587,10 +1587,10 @@ class _UserListsMenu extends ConsumerWidget {
             );
 
             if (result != null) {
-              userListNewMutation(me?.id).run(ref, (ref) async {
-                return await ref
-                    .get(userListsProvider(me?.id).notifier)
-                    .newList(result.$1, result.$2, []);
+              userListNewMutation(me?.id).run(ref, (tsx) async {
+                return await tsx
+                    .get(customListCommandsProvider(me?.id))
+                    .newList(tsx, result.$1, result.$2, []);
               });
             }
           },

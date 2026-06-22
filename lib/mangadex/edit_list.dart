@@ -139,10 +139,11 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                               if (list != null) {
                                 success = userListModifyMutation(me?.id).run(
                                   ref,
-                                  (ref) async {
-                                    return await ref
-                                        .get(userListsProvider(me?.id).notifier)
+                                  (tsx) async {
+                                    return await tsx
+                                        .get(customListCommandsProvider(me?.id))
                                         .editList(
+                                          tsx,
                                           list!,
                                           listNameController.text,
                                           vis,
@@ -152,11 +153,12 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                                 );
                               } else {
                                 success = userListNewMutation(me?.id).run(ref, (
-                                  ref,
+                                  tsx,
                                 ) async {
-                                  return await ref
-                                      .get(userListsProvider(me?.id).notifier)
+                                  return await tsx
+                                      .get(customListCommandsProvider(me?.id))
                                       .newList(
+                                        tsx,
                                         listNameController.text,
                                         vis,
                                         selected.state,
