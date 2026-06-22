@@ -631,6 +631,40 @@ class MangaDexModel {
   String _feedCacheNamespace(String feedKey, [MangaDexUUID? entity]) =>
       entity == null ? feedKey : '$feedKey(${entity.id})';
 
+  Future<MDEntityList> _getEntityList({
+    required Uri uri,
+    required String operation,
+    required bool authenticated,
+    required String? cacheKey,
+    required bool resolveEntities,
+    required Duration expiry,
+  }) async {
+    if (cacheKey != null && await _cache.exists(cacheKey)) {
+      return _cache.getEntityList(cacheKey);
+    }
+
+    final result = await _request(
+      method: _MangaDexRequestMethod.get,
+      uri: uri,
+      authenticated: authenticated,
+      operation: operation,
+      parse: (response) => MDEntityList.fromJson(response.data),
+    );
+
+    if (cacheKey != null) {
+      await _cache.putEntityList(
+        cacheKey,
+        result,
+        resolve: resolveEntities,
+        expiry: expiry,
+      );
+    } else if (resolveEntities) {
+      await _cache.putAllAPIResolved(result.data, expiry);
+    }
+
+    return result;
+  }
+
   Future<T> _request<T>({
     required _MangaDexRequestMethod method,
     required Uri uri,
@@ -764,23 +798,14 @@ class MangaDexModel {
       uri: uri,
     );
 
-    if (await _cache.exists(key)) {
-      return await _cache.getEntityList(key);
-    }
-
-    final response = await _transport.getUri(uri);
-
-    if (response.statusCode == 200) {
-      final result = MDEntityList.fromJson(response.data);
-
-      // Cache the data and list
-      await _cache.putEntityList(key, result, resolve: true);
-
-      return result;
-    }
-
-    // Throw if failure
-    throw createException("$feedKey() failed.", response);
+    return _getEntityList(
+      uri: uri,
+      operation: '$feedKey()',
+      authenticated: false,
+      cacheKey: key,
+      resolveEntities: true,
+      expiry: const Duration(minutes: 15),
+    );
   }
 
   /// Generic chunked fetch by IDs.
@@ -988,23 +1013,14 @@ class MangaDexModel {
       uri: uri,
     );
 
-    if (await _cache.exists(key)) {
-      return await _cache.getEntityList(key);
-    }
-
-    final response = await _transport.getUri(uri);
-
-    if (response.statusCode == 200) {
-      final result = MDEntityList.fromJson(response.data);
-
-      // Cache the data
-      await _cache.putEntityList(key, result, resolve: true);
-
-      return result;
-    } else {
-      // Throw if failure
-      throw createException("fetchManga() failed.", response);
-    }
+    return _getEntityList(
+      uri: uri,
+      operation: 'fetchManga()',
+      authenticated: false,
+      cacheKey: key,
+      resolveEntities: true,
+      expiry: const Duration(minutes: 15),
+    );
   }
 
   /// Searches for manga using the MangaDex API with the search term [searchTerm].
@@ -1045,19 +1061,14 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _transport.getUri(uri);
-
-    if (response.statusCode == 200) {
-      final result = MDEntityList.fromJson(response.data);
-
-      // Cache the data
-      await _cache.putAllAPIResolved(result.data);
-
-      return result;
-    }
-
-    // Throw if failure
-    throw createException("searchManga() failed.", response);
+    return _getEntityList(
+      uri: uri,
+      operation: 'searchManga()',
+      authenticated: false,
+      cacheKey: null,
+      resolveEntities: true,
+      expiry: const Duration(minutes: 15),
+    );
   }
 
   /// Gets whether or not the user is following [manga]
@@ -1343,28 +1354,16 @@ class MangaDexModel {
 
   /// Retrieve all MangaDex tags
   Future<MDEntityList> getTagList() async {
-    if (await _cache.exists(MangaDexFeeds.tags.key)) {
-      return await _cache.getEntityList(MangaDexFeeds.tags.key);
-    }
-
     final uri = MangaDexEndpoints.api.replace(path: MangaDexFeeds.tags.path);
 
-    final result = await _request(
-      method: _MangaDexRequestMethod.get,
+    return _getEntityList(
       uri: uri,
       operation: 'getTagList()',
-      parse: (response) => MDEntityList.fromJson(response.data),
-    );
-
-    // Cache the data and list
-    await _cache.putEntityList(
-      MangaDexFeeds.tags.key,
-      result,
-      resolve: false,
+      authenticated: false,
+      cacheKey: MangaDexFeeds.tags.key,
+      resolveEntities: false,
       expiry: const Duration(days: 1),
     );
-
-    return result;
   }
 
   /// Fetches statistics of given [mangas]
@@ -1407,10 +1406,6 @@ class MangaDexModel {
 
     final key = '${info.key}(${manga.id},$offset)';
 
-    if (await _cache.exists(key)) {
-      return await _cache.getEntityList(key);
-    }
-
     final queryParams = {
       'limit': info.limit.toString(),
       'offset': offset.toString(),
@@ -1422,19 +1417,14 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _transport.getUri(uri);
-
-    if (response.statusCode == 200) {
-      final result = MDEntityList.fromJson(response.data);
-
-      // Cache the data
-      await _cache.putEntityList(key, result, resolve: false);
-
-      return result;
-    }
-
-    // Throw if failure
-    throw createException("getCoverList() failed.", response);
+    return _getEntityList(
+      uri: uri,
+      operation: 'getCoverList()',
+      authenticated: false,
+      cacheKey: key,
+      resolveEntities: false,
+      expiry: const Duration(minutes: 15),
+    );
   }
 
   /// Fetches the user's self-rating of given [mangas]
@@ -1514,18 +1504,15 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _transport.getUri(uri);
-
-    if (response.statusCode == 200) {
-      final result = MDEntityList.fromJson(response.data);
-
-      // Cache the data
-      await _cache.putAllAPIResolved(result.data);
-      return result.data.cast<CreatorType>();
-    }
-
-    // Throw if failure
-    throw createException("fetchCreators() failed.", response);
+    final result = await _getEntityList(
+      uri: uri,
+      operation: 'fetchCreators()',
+      authenticated: false,
+      cacheKey: null,
+      resolveEntities: true,
+      expiry: const Duration(minutes: 15),
+    );
+    return result.data.cast<CreatorType>();
   }
 
   /// Fetches a [CustomList] by id
@@ -1597,12 +1584,6 @@ class MangaDexModel {
     required FeedInfo feed,
     int offset = 0,
   }) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "fetchUserList() called on invalid token/login. Shouldn't ever get here",
-      );
-    }
-
     final queryParams = {
       'limit': feed.limit.toString(),
       'offset': offset.toString(),
@@ -1613,25 +1594,21 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _transport.getUri(uri);
+    final result = await _getEntityList(
+      uri: uri,
+      operation: 'fetchUserList()',
+      authenticated: true,
+      cacheKey: null,
+      resolveEntities: true,
+      expiry: const Duration(minutes: 15),
+    );
 
-    if (response.statusCode == 200) {
-      final result = MDEntityList.fromJson(response.data);
-
-      // Cache entries
-      await _cache.putAllAPIResolved(result.data);
-
-      final list = <CustomList>[];
-
-      for (final e in result.data) {
-        list.add(_cache.get<CustomList>(e.id, CustomList.fromJson));
-      }
-
-      return list;
+    final list = <CustomList>[];
+    for (final entity in result.data) {
+      list.add(_cache.get<CustomList>(entity.id, CustomList.fromJson));
     }
 
-    // Throw if failure
-    throw createException("fetchUserList() failed.", response);
+    return list;
   }
 
   /// Adds/removes a [Manga] from a [CustomList]

@@ -318,25 +318,91 @@ void main() {
     });
 
     test('shared executor returns and caches a successful GET', () async {
+      final entity = Manga(id: 'manga-1');
       transport.enqueue(
         statusCode: 200,
-        data: {
-          'result': 'ok',
-          'response': 'collection',
-          'data': <dynamic>[],
-          'limit': 100,
-          'offset': 0,
-          'total': 0,
-        },
+        data: _emptyEntityListData(entities: [entity]),
       );
 
       final result = await model.getTagList();
 
-      expect(result.data, isEmpty);
+      expect(result.data, [entity]);
       expect(cache.values[MangaDexFeeds.tags.key], result);
+      expect(cache.values, isNot(contains(entity.id)));
+      expect(cache.expiries[MangaDexFeeds.tags.key], const Duration(days: 1));
       final request = transport.requests.single;
       expect(request.method, _HttpMethod.get);
       expect(request.uri.path, MangaDexEndpoints.tag);
+    });
+
+    test(
+      'uncached entity-list GET resolves entities without a list key',
+      () async {
+        final manga = Manga(id: 'manga-1');
+        transport.enqueue(
+          statusCode: 200,
+          data: _emptyEntityListData(entities: [manga]),
+        );
+
+        final result = await model.searchManga(
+          'needle',
+          limit: 12,
+          filter: const MangaFilters(),
+          offset: 4,
+        );
+
+        expect(result.data, [manga]);
+        expect(cache.values[manga.id], manga);
+        expect(cache.values, hasLength(1));
+        final request = transport.requests.single;
+        expect(request.method, _HttpMethod.get);
+        expect(request.uri.path, MangaDexEndpoints.manga);
+        expect(request.uri.queryParameters['title'], 'needle');
+        expect(request.uri.queryParameters['limit'], '12');
+        expect(request.uri.queryParameters['offset'], '4');
+      },
+    );
+
+    test(
+      'authenticated entity-list GET preserves query and resolution',
+      () async {
+        final list = _customList('list-1', name: 'List');
+        transport.enqueue(
+          statusCode: 200,
+          data: _emptyEntityListData(entities: [list]),
+        );
+
+        final result = await model.fetchUserList(
+          feed: MangaDexFeeds.userLists,
+          offset: 100,
+        );
+
+        expect(result, [list]);
+        expect(cache.values[list.id], list);
+        final request = transport.requests.single;
+        expect(request.method, _HttpMethod.get);
+        expect(request.uri.path, MangaDexEndpoints.userList);
+        expect(request.uri.queryParameters, {'limit': '100', 'offset': '100'});
+      },
+    );
+
+    test('authenticated entity-list GET is guarded before transport', () async {
+      final unauthenticated = container.read(
+        Provider(
+          (ref) => MangaDexModel(
+            ref,
+            transport: transport,
+            cache: cache,
+            authenticationCheck: () async => false,
+          ),
+        ),
+      );
+
+      await expectLater(
+        unauthenticated.fetchUserList(feed: MangaDexFeeds.userLists),
+        throwsStateError,
+      );
+      expect(transport.requests, isEmpty);
     });
 
     test(
@@ -822,6 +888,7 @@ class _RecordingTransport implements MangaDexTransport {
 
 class _MemoryCacheManager implements CacheManager {
   final Map<String, Object?> values = {};
+  final Map<String, Duration> expiries = {};
   Completer<void>? putGate;
   Completer<void>? removeGate;
 
@@ -842,6 +909,7 @@ class _MemoryCacheManager implements CacheManager {
     await putGate?.future;
     putGate = null;
     values[key] = reference;
+    expiries[key] = expiry;
     return reference;
   }
 
@@ -858,7 +926,11 @@ class _MemoryCacheManager implements CacheManager {
   }
 
   @override
-  Future<void> putAll(Map<String, CacheEntry> map) async {}
+  Future<void> putAll(Map<String, CacheEntry> map) async {
+    for (final MapEntry(:key, :value) in map.entries) {
+      values[key] = value.get();
+    }
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -906,11 +978,13 @@ Chapter _chapter(String id) {
   );
 }
 
-Map<String, dynamic> _emptyEntityListData() => {
+Map<String, dynamic> _emptyEntityListData({
+  List<MangaDexEntity> entities = const [],
+}) => {
   'result': 'ok',
   'response': 'collection',
-  'data': <dynamic>[],
+  'data': entities.map((entity) => entity.toJson()).toList(),
   'limit': 10,
   'offset': 0,
-  'total': 0,
+  'total': entities.length,
 };
