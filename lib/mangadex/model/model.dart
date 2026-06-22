@@ -144,6 +144,37 @@ class FeedInfo {
   final String? path;
 }
 
+abstract interface class MangaDexTransport {
+  Future<Response<dynamic>> getUri(Uri uri);
+
+  Future<Response<dynamic>> postUri(Uri uri, {Object? data});
+
+  Future<Response<dynamic>> putUri(Uri uri, {Object? data});
+
+  Future<Response<dynamic>> deleteUri(Uri uri, {Object? data});
+}
+
+class _DioMangaDexTransport implements MangaDexTransport {
+  const _DioMangaDexTransport(this.dio);
+
+  final Dio dio;
+
+  @override
+  Future<Response<dynamic>> getUri(Uri uri) => dio.getUri(uri);
+
+  @override
+  Future<Response<dynamic>> postUri(Uri uri, {Object? data}) =>
+      dio.postUri(uri, data: data);
+
+  @override
+  Future<Response<dynamic>> putUri(Uri uri, {Object? data}) =>
+      dio.putUri(uri, data: data);
+
+  @override
+  Future<Response<dynamic>> deleteUri(Uri uri, {Object? data}) =>
+      dio.deleteUri(uri, data: data);
+}
+
 abstract class MangaDexFeeds {
   static const recentlyAdded = FeedInfo(
     'RecentlyAdded',
@@ -256,9 +287,19 @@ MangaDexModel mangadex(Ref ref) {
 }
 
 class MangaDexModel {
-  MangaDexModel(this.ref)
-    : _cache = ref.read(cacheProvider),
-      _dio =
+  MangaDexModel(
+    this.ref, {
+    MangaDexTransport? transport,
+    MangaDexTransport? externalTransport,
+    CacheManager? cache,
+    Future<bool> Function()? authenticationCheck,
+    TokenStorage<OIDAuthToken>? tokenStorage,
+  }) : _cache = cache ?? ref.read(cacheProvider),
+       _authenticationCheck = authenticationCheck {
+    if (transport != null) {
+      _transport = transport;
+    } else {
+      final dio =
           Dio(
               BaseOptions(
                 connectTimeout: const Duration(seconds: 5),
@@ -269,37 +310,52 @@ class MangaDexModel {
             ..httpClientAdapter = NativeAdapter(
               createCronetEngine: () => createCronetEngine(getUserAgent(true)),
             )
-            ..interceptors.add(RateLimitingInterceptor()) {
-    _fresh = Fresh.oAuth2<OIDAuthToken>(
-      httpClient: _dio.clone(),
-      tokenStorage: MangaDexTokenStorage(),
-      refreshToken: (token, httpClient) => refreshToken(token),
-      shouldRefreshBeforeRequest: (requestOptions, token) {
-        if (token == null) {
-          return false;
-        }
+            ..interceptors.add(RateLimitingInterceptor());
 
-        final expiresAt = token.expiresAt;
-        if (expiresAt == null) {
-          // Freshly read tokens needs to be refreshed
-          return true;
-        }
+      _fresh = Fresh.oAuth2<OIDAuthToken>(
+        httpClient: dio.clone(),
+        tokenStorage: tokenStorage ?? MangaDexTokenStorage(),
+        refreshToken: (token, httpClient) => refreshToken(token),
+        shouldRefreshBeforeRequest: (requestOptions, token) {
+          if (token == null) {
+            return false;
+          }
 
-        return expiresAt.difference(DateTime.now()).inSeconds < 30;
-      },
-    );
+          final expiresAt = token.expiresAt;
+          if (expiresAt == null) {
+            // Freshly read tokens needs to be refreshed
+            return true;
+          }
 
-    _dio.interceptors.add(_fresh);
+          return expiresAt.difference(DateTime.now()).inSeconds < 30;
+        },
+      );
+
+      dio.interceptors.add(_fresh!);
+      _transport = _DioMangaDexTransport(dio);
+    }
+
+    _externalTransport =
+        externalTransport ?? transport ?? _DioMangaDexTransport(Dio());
   }
 
   final Ref ref;
   final CacheManager _cache;
-  final Dio _dio;
+  final Future<bool> Function()? _authenticationCheck;
+
+  late final MangaDexTransport _transport;
+  late final MangaDexTransport _externalTransport;
 
   OIDAuthToken? _token;
   Credential? _credential;
 
-  late final Fresh<OIDAuthToken> _fresh;
+  Fresh<OIDAuthToken>? _fresh;
+
+  @visibleForTesting
+  Dio? get debugProductionDio => switch (_transport) {
+    _DioMangaDexTransport(:final dio) => dio,
+    _ => null,
+  };
 
   // void _urlLauncher(String url) async {
   //   var uri = Uri.parse(url);
@@ -310,10 +366,32 @@ class MangaDexModel {
   //   }
   // }
 
-  Stream<AuthenticationStatus> get authenticationStatus =>
-      _fresh.authenticationStatus;
+  Stream<AuthenticationStatus> get authenticationStatus {
+    final fresh = _fresh;
+    if (fresh != null) {
+      return fresh.authenticationStatus;
+    }
+
+    final authenticationCheck = _authenticationCheck;
+    if (authenticationCheck != null) {
+      return Stream.fromFuture(authenticationCheck()).map(
+        (authenticated) => authenticated
+            ? AuthenticationStatus.authenticated
+            : AuthenticationStatus.unauthenticated,
+      );
+    }
+
+    throw StateError(
+      'An authentication check is required with an injected transport.',
+    );
+  }
 
   Future<bool> loggedIn() async {
+    final authenticationCheck = _authenticationCheck;
+    if (authenticationCheck != null) {
+      return authenticationCheck();
+    }
+
     final status = await authenticationStatus.firstWhere(
       (status) => status != AuthenticationStatus.initial,
     );
@@ -399,7 +477,7 @@ class MangaDexModel {
     if (token.isValid) {
       await _saveCredentials(user, clientId, clientSecret);
       _token = OIDAuthToken.fromTokenResponse(token);
-      await _fresh.setToken(_token);
+      await _fresh!.setToken(_token);
       _credential = credential;
 
       logger.i("authenticate(): MangaDex user logged in");
@@ -438,7 +516,7 @@ class MangaDexModel {
 
         if (response.statusCode == 200) {
           _token = null;
-          await _fresh.setToken(null);
+          await _fresh!.setToken(null);
           _credential = null;
 
           logger.i("logout(): MangaDex user logged out");
@@ -500,7 +578,7 @@ class MangaDexModel {
     final uri = Uri.parse(
       'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/mangadex.json',
     );
-    final response = await Dio().getUri(uri);
+    final response = await _externalTransport.getUri(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.data);
@@ -574,7 +652,7 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _dio.getUri(uri);
+    final response = await _transport.getUri(uri);
 
     if (response.statusCode == 200) {
       final result = MDEntityList.fromJson(response.data);
@@ -634,7 +712,7 @@ class MangaDexModel {
       );
 
       futures.add(
-        _dio.getUri(uri).then((response) async {
+        _transport.getUri(uri).then((response) async {
           if (response.statusCode == 200) {
             final parsed = MDEntityList.fromJson(response.data);
             await _cache.putAllAPIResolved(parsed.data);
@@ -681,9 +759,9 @@ class MangaDexModel {
     Response response;
 
     if (enable) {
-      response = await _dio.postUri(uri, data: postData);
+      response = await _transport.postUri(uri, data: postData);
     } else {
-      response = await _dio.deleteUri(uri);
+      response = await _transport.deleteUri(uri);
     }
 
     if (response.statusCode == 200) {
@@ -725,7 +803,7 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _dio.getUri(uri);
+    final response = await _transport.getUri(uri);
 
     if (response.statusCode == 200) {
       final data = response.data as Map<String, dynamic>;
@@ -830,7 +908,7 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _dio.getUri(uri);
+    final response = await _transport.getUri(uri);
 
     if (response.statusCode == 200) {
       final result = MDEntityList.fromJson(response.data);
@@ -883,7 +961,7 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _dio.getUri(uri);
+    final response = await _transport.getUri(uri);
 
     if (response.statusCode == 200) {
       final result = MDEntityList.fromJson(response.data);
@@ -910,7 +988,7 @@ class MangaDexModel {
       path: MangaDexEndpoints.follows.replaceFirst('{id}', manga.id),
     );
 
-    final response = await _dio.getUri(uri);
+    final response = await _transport.getUri(uri);
 
     if (response.statusCode == 200) {
       // User follows the manga
@@ -955,7 +1033,7 @@ class MangaDexModel {
       path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id),
     );
 
-    final response = await _dio.getUri(uri);
+    final response = await _transport.getUri(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = response.data;
@@ -998,7 +1076,7 @@ class MangaDexModel {
       path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id),
     );
 
-    final response = await _dio.postUri(uri, data: params);
+    final response = await _transport.postUri(uri, data: params);
 
     if (response.statusCode == 200) {
       Map<String, dynamic> body = response.data;
@@ -1038,7 +1116,7 @@ class MangaDexModel {
         queryParameters: queryParams,
       );
 
-      final response = await _dio.getUri(uri);
+      final response = await _transport.getUri(uri);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = response.data;
@@ -1098,7 +1176,7 @@ class MangaDexModel {
       path: MangaDexEndpoints.setRead.replaceFirst('{id}', manga.id),
     );
 
-    final response = await _dio.postUri(uri, data: params);
+    final response = await _transport.postUri(uri, data: params);
 
     if (response.statusCode == 200) {
       // Success
@@ -1127,7 +1205,7 @@ class MangaDexModel {
       path: MangaDexEndpoints.server.replaceFirst('{id}', chapter.id),
     );
 
-    final response = await _dio.getUri(uri);
+    final response = await _transport.getUri(uri);
 
     if (response.statusCode == 200) {
       final apidat = ChapterAPI.fromJson(response.data);
@@ -1174,7 +1252,7 @@ class MangaDexModel {
 
     final uri = MangaDexEndpoints.api.replace(path: feed.path);
 
-    final response = await _dio.getUri(uri);
+    final response = await _transport.getUri(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = response.data;
@@ -1206,7 +1284,7 @@ class MangaDexModel {
 
     final uri = MangaDexEndpoints.api.replace(path: MangaDexFeeds.tags.path);
 
-    final response = await _dio.getUri(uri);
+    final response = await _transport.getUri(uri);
 
     if (response.statusCode == 200) {
       final result = MDEntityList.fromJson(response.data);
@@ -1281,7 +1359,7 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _dio.getUri(uri);
+    final response = await _transport.getUri(uri);
 
     if (response.statusCode == 200) {
       final result = MDEntityList.fromJson(response.data);
@@ -1372,7 +1450,7 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _dio.getUri(uri);
+    final response = await _transport.getUri(uri);
 
     if (response.statusCode == 200) {
       final result = MDEntityList.fromJson(response.data);
@@ -1406,16 +1484,16 @@ class MangaDexModel {
 
     switch (method) {
       case 'GET':
-        response = await _dio.getUri(uri);
+        response = await _transport.getUri(uri);
         break;
       case 'POST':
-        response = await _dio.postUri(uri, data: reqData);
+        response = await _transport.postUri(uri, data: reqData);
         break;
       case 'PUT':
-        response = await _dio.putUri(uri, data: reqData);
+        response = await _transport.putUri(uri, data: reqData);
         break;
       case 'DELETE':
-        response = await _dio.deleteUri(uri);
+        response = await _transport.deleteUri(uri);
         break;
       default:
         throw ArgumentError('Unsupported method: $method');
@@ -1454,7 +1532,7 @@ class MangaDexModel {
       path: MangaDexEndpoints.modifyList.replaceFirst('{id}', listId),
     );
 
-    final response = await _dio.getUri(uri);
+    final response = await _transport.getUri(uri);
 
     if (response.statusCode == 200) {
       final body = response.data as Map<String, dynamic>;
@@ -1523,7 +1601,7 @@ class MangaDexModel {
       queryParameters: queryParams,
     );
 
-    final response = await _dio.getUri(uri);
+    final response = await _transport.getUri(uri);
 
     if (response.statusCode == 200) {
       final result = MDEntityList.fromJson(response.data);
@@ -1562,7 +1640,9 @@ class MangaDexModel {
         .replaceFirst('{listId}', id);
 
     final uri = MangaDexEndpoints.api.replace(path: endpoint);
-    final response = await (add ? _dio.postUri(uri) : _dio.deleteUri(uri));
+    final response = await (add
+        ? _transport.postUri(uri)
+        : _transport.deleteUri(uri));
 
     if (response.statusCode == 200) {
       final body = response.data as Map<String, dynamic>;
@@ -1687,7 +1767,7 @@ class MangaDexModel {
 
     final uri = MangaDexEndpoints.api.replace(path: MangaDexEndpoints.me);
 
-    final response = await _dio.getUri(uri);
+    final response = await _transport.getUri(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = response.data;
