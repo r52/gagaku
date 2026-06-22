@@ -602,6 +602,19 @@ class MangaDexModel {
     }
   }
 
+  bool _hasOkResult(Response<dynamic> response) {
+    final body = response.data;
+    return body is Map && body['result'] == 'ok';
+  }
+
+  bool _logRejectedMutation(String operation, Response<dynamic> response) {
+    logger.w(
+      '$operation returned code ${response.statusCode}',
+      error: response.data,
+    );
+    return false;
+  }
+
   Future<T> _request<T>({
     required _MangaDexRequestMethod method,
     required Uri uri,
@@ -610,6 +623,7 @@ class MangaDexModel {
     Set<int> acceptedStatusCodes = const {200},
     required String operation,
     required FutureOr<T> Function(Response<dynamic>) parse,
+    FutureOr<T> Function(Response<dynamic>)? onRejectedResponse,
   }) async {
     if (authenticated && !await loggedIn()) {
       throw StateError(
@@ -628,6 +642,9 @@ class MangaDexModel {
     };
 
     if (!acceptedStatusCodes.contains(response.statusCode)) {
+      if (onRejectedResponse != null) {
+        return await onRejectedResponse(response);
+      }
       throw createException('$operation failed.', response);
     }
 
@@ -824,39 +841,6 @@ class MangaDexModel {
     }
 
     return result;
-  }
-
-  /// Generic toggle helper for POST/DELETE endpoints.
-  ///
-  /// [uri] must already be fully constructed (including path params).
-  /// [enable] determines POST (true) vs DELETE (false).
-  /// [postData] optional body for POST requests.
-  /// [logPrefix] used in failure log messages.
-  Future<bool> _toggleEndpoint({
-    required Uri uri,
-    required bool enable,
-    Map<String, dynamic>? postData,
-    required String logPrefix,
-  }) async {
-    Response response;
-
-    if (enable) {
-      response = await _transport.postUri(uri, data: postData);
-    } else {
-      response = await _transport.deleteUri(uri);
-    }
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> body = response.data;
-      if (body['result'] == 'ok') return true;
-    }
-
-    logger.w(
-      '$logPrefix returned code ${response.statusCode}',
-      error: response.data,
-    );
-
-    return false;
   }
 
   /// Generic stats/ratings fetch helper.
@@ -1086,20 +1070,21 @@ class MangaDexModel {
 
   /// Sets the manga's following status [setFollow] of the [manga]
   Future<bool> setMangaFollowing(Manga manga, bool setFollow) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "setMangaFollowing() called on invalid token/login. Shouldn't ever get here",
-      );
-    }
-
     final uri = MangaDexEndpoints.api.replace(
       path: MangaDexEndpoints.setFollow.replaceFirst('{id}', manga.id),
     );
+    final operation = 'setMangaFollowing(${manga.id}, $setFollow)';
 
-    return await _toggleEndpoint(
+    return _request(
+      method: setFollow
+          ? _MangaDexRequestMethod.post
+          : _MangaDexRequestMethod.delete,
       uri: uri,
-      enable: setFollow,
-      logPrefix: 'setMangaFollowing(${manga.id}, $setFollow)',
+      authenticated: true,
+      operation: operation,
+      parse: _hasOkResult,
+      onRejectedResponse: (response) =>
+          _logRejectedMutation(operation, response),
     );
   }
 
@@ -1142,12 +1127,6 @@ class MangaDexModel {
     Manga manga,
     MangaReadingStatus? status,
   ) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "setMangaReadingStatus() called on invalid token/login. Shouldn't ever get here",
-      );
-    }
-
     final params = {
       'status': (status != null && status != MangaReadingStatus.remove)
           ? status.name
@@ -1157,24 +1136,18 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api.replace(
       path: MangaDexEndpoints.status.replaceFirst('{id}', manga.id),
     );
+    final operation = 'setMangaReadingStatus(${manga.id}, $status)';
 
-    final response = await _transport.postUri(uri, data: params);
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> body = response.data;
-
-      if (body['result'] == 'ok') {
-        return true;
-      }
-    }
-
-    // Log the failure
-    logger.w(
-      "setMangaReadingStatus(${manga.id}, $status) returned code ${response.statusCode}",
-      error: response.data,
+    return _request(
+      method: _MangaDexRequestMethod.post,
+      uri: uri,
+      data: params,
+      authenticated: true,
+      operation: operation,
+      parse: _hasOkResult,
+      onRejectedResponse: (response) =>
+          _logRejectedMutation(operation, response),
     );
-
-    return false;
   }
 
   /// Fetches read chapter data of given [mangas]
@@ -1238,12 +1211,6 @@ class MangaDexModel {
     Iterable<Chapter>? read,
     Iterable<Chapter>? unread,
   }) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "setChaptersRead() called on invalid token/login. Shouldn't ever get here",
-      );
-    }
-
     Map<String, dynamic> params = {};
 
     if (read != null && read.isNotEmpty) {
@@ -1257,21 +1224,19 @@ class MangaDexModel {
     final uri = MangaDexEndpoints.api.replace(
       path: MangaDexEndpoints.setRead.replaceFirst('{id}', manga.id),
     );
+    final operation =
+        'setChaptersRead(${manga.id}, ${read.toString()}, ${unread.toString()})';
 
-    final response = await _transport.postUri(uri, data: params);
-
-    if (response.statusCode == 200) {
-      // Success
-      return true;
-    }
-
-    // Log the failure
-    logger.w(
-      "setChaptersRead(${manga.id}, ${read.toString()}, ${unread.toString()}) returned code ${response.statusCode}",
-      error: response.data,
+    return _request(
+      method: _MangaDexRequestMethod.post,
+      uri: uri,
+      data: params,
+      authenticated: true,
+      operation: operation,
+      parse: (_) => true,
+      onRejectedResponse: (response) =>
+          _logRejectedMutation(operation, response),
     );
-
-    return false;
   }
 
   /// Fetches the relay server for [chapter] pages
@@ -1472,21 +1437,22 @@ class MangaDexModel {
 
   /// Sets the [manga]'s self-rating
   Future<bool> setMangaRating(Manga manga, int? rating) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "setMangaRating() called on invalid token/login. Shouldn't ever get here",
-      );
-    }
-
     final uri = MangaDexEndpoints.api.replace(
       path: MangaDexEndpoints.setRating.replaceFirst('{id}', manga.id),
     );
+    final operation = 'setMangaRating(${manga.id}, $rating)';
 
-    return await _toggleEndpoint(
+    return _request(
+      method: rating != null
+          ? _MangaDexRequestMethod.post
+          : _MangaDexRequestMethod.delete,
       uri: uri,
-      enable: rating != null,
-      postData: rating != null ? {'rating': rating} : null,
-      logPrefix: 'setMangaRating(${manga.id}, $rating)',
+      data: rating != null ? {'rating': rating} : null,
+      authenticated: true,
+      operation: operation,
+      parse: _hasOkResult,
+      onRejectedResponse: (response) =>
+          _logRejectedMutation(operation, response),
     );
   }
 
@@ -1544,59 +1510,6 @@ class MangaDexModel {
     throw createException("fetchCreators() failed.", response);
   }
 
-  /// Generic CRUD helper for CustomList operations.
-  @protected
-  Future<T> _customListCrud<T>({
-    required String method,
-    required String endpoint,
-    required Map<String, dynamic>? Function() data,
-    required T Function(Map<String, dynamic>) parse,
-    required String logPrefix,
-    required Future<void> Function(T) cache,
-  }) async {
-    if (!await loggedIn()) {
-      throw StateError('$logPrefix() called on invalid token/login.');
-    }
-
-    final uri = MangaDexEndpoints.api.replace(path: endpoint);
-    Response response;
-    final reqData = data();
-
-    switch (method) {
-      case 'GET':
-        response = await _transport.getUri(uri);
-        break;
-      case 'POST':
-        response = await _transport.postUri(uri, data: reqData);
-        break;
-      case 'PUT':
-        response = await _transport.putUri(uri, data: reqData);
-        break;
-      case 'DELETE':
-        response = await _transport.deleteUri(uri);
-        break;
-      default:
-        throw ArgumentError('Unsupported method: $method');
-    }
-
-    if (response.statusCode == 200 ||
-        (response.statusCode! >= 200 && response.statusCode! <= 299)) {
-      final body = response.data as Map<String, dynamic>;
-      if (body['result'] == 'ok') {
-        final result = parse(body);
-        await cache(result);
-        return result;
-      }
-    }
-
-    logger.w(
-      '$logPrefix returned code ${response.statusCode}',
-      error: response.data,
-    );
-
-    throw createException('$logPrefix() failed.', response);
-  }
-
   /// Fetches a [CustomList] by id
   Future<CustomList?> fetchListById(String listId) async {
     if (listId.isEmpty) {
@@ -1636,22 +1549,23 @@ class MangaDexModel {
 
   /// Adds/removes a [CustomList] from user followed list
   Future<bool> setFollowList(CustomList list, bool follow) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        "setFollowList() called on invalid token/login. Shouldn't ever get here",
-      );
-    }
-
     final id = list.id;
 
     final uri = MangaDexEndpoints.api.replace(
       path: MangaDexEndpoints.followList.replaceFirst('{id}', list.id),
     );
+    final operation = 'setFollowList($id, $follow)';
 
-    return await _toggleEndpoint(
+    return _request(
+      method: follow
+          ? _MangaDexRequestMethod.post
+          : _MangaDexRequestMethod.delete,
       uri: uri,
-      enable: follow,
-      logPrefix: 'setFollowList($id, $follow)',
+      authenticated: true,
+      operation: operation,
+      parse: _hasOkResult,
+      onRejectedResponse: (response) =>
+          _logRejectedMutation(operation, response),
     );
   }
 
@@ -1708,53 +1622,42 @@ class MangaDexModel {
     Manga manga,
     bool add,
   ) async {
-    if (!await loggedIn()) {
-      throw StateError(
-        'updateMangaInCustomList() called on invalid token/login.',
-      );
-    }
-
     final id = list.id;
     final endpoint = MangaDexEndpoints.updateMangaInList
         .replaceFirst('{id}', manga.id)
         .replaceFirst('{listId}', id);
 
     final uri = MangaDexEndpoints.api.replace(path: endpoint);
-    final response = await (add
-        ? _transport.postUri(uri)
-        : _transport.deleteUri(uri));
+    final operation = 'updateMangaInCustomList($id, ${manga.id}, $add)';
+    final succeeded = await _request<bool>(
+      method: add ? _MangaDexRequestMethod.post : _MangaDexRequestMethod.delete,
+      uri: uri,
+      authenticated: true,
+      operation: operation,
+      parse: _hasOkResult,
+      onRejectedResponse: (response) =>
+          _logRejectedMutation(operation, response),
+    );
 
-    if (response.statusCode == 200) {
-      final body = response.data as Map<String, dynamic>;
-      if (body['result'] == 'ok') {
-        final relationships = [...list.relationships];
-        if (add) {
-          relationships.add(Manga(id: manga.id));
-        } else {
-          relationships.removeWhere((e) => e.id == manga.id);
-        }
-
-        final updated = list.copyWith(
-          attributes: list.attributes.copyWith(
-            version: list.attributes.version + 1,
-          ),
-          relationships: relationships,
-        );
-
-        return await _cache.put(
-          updated.id,
-          json.encode(updated.toJson()),
-          updated,
-          unserializer: CustomList.fromJson,
-        );
-      }
+    if (!succeeded) {
+      return null;
     }
 
-    logger.w(
-      'updateMangaInCustomList($id, ${manga.id}, $add) returned code ${response.statusCode}',
-      error: response.data,
+    final relationships = [...list.relationships];
+    if (add) {
+      relationships.add(Manga(id: manga.id));
+    } else {
+      relationships.removeWhere((e) => e.id == manga.id);
+    }
+
+    final updated = list.copyWith(relationships: relationships);
+
+    return _cache.put(
+      updated.id,
+      json.encode(updated.toJson()),
+      updated,
+      unserializer: CustomList.fromJson,
     );
-    return null;
   }
 
   /// Deletes a [CustomList]
@@ -1789,27 +1692,38 @@ class MangaDexModel {
     CustomListVisibility visibility,
     Iterable<String> mangaIds,
   ) async {
-    final result = await _customListCrud<CustomList>(
-      method: 'POST',
-      endpoint: MangaDexEndpoints.createList,
-      data: () => {
-        'name': name,
-        'visibility': visibility.name,
-        'manga': mangaIds.toList(),
-      },
-      parse: (body) => CustomList.fromJson(body['data']),
-      logPrefix: 'createNewList($name, ${visibility.name})',
-      cache: (result) async {
-        await _cache.put(
-          result.id,
-          json.encode(result.toJson()),
-          result,
-          unserializer: CustomList.fromJson,
-        );
+    final data = {
+      'name': name,
+      'visibility': visibility.name,
+      'manga': mangaIds.toList(),
+    };
+    final uri = MangaDexEndpoints.api.replace(
+      path: MangaDexEndpoints.createList,
+    );
+    final operation = 'createNewList($name, ${visibility.name})';
+
+    final result = await _request<CustomList>(
+      method: _MangaDexRequestMethod.post,
+      uri: uri,
+      data: data,
+      authenticated: true,
+      acceptedStatusCodes: const {200, 201},
+      operation: operation,
+      parse: (response) {
+        final body = response.data as Map<String, dynamic>;
+        if (body['result'] != 'ok') {
+          throw const FormatException('Expected result: ok');
+        }
+        return CustomList.fromJson(body['data']);
       },
     );
 
-    return result;
+    return _cache.put(
+      result.id,
+      json.encode(result.toJson()),
+      result,
+      unserializer: CustomList.fromJson,
+    );
   }
 
   /// Edits an existing [CustomList]
@@ -1820,29 +1734,38 @@ class MangaDexModel {
     Iterable<String> mangaIds,
   ) async {
     final id = list.id;
+    final data = {
+      'name': name,
+      'visibility': visibility.name,
+      'manga': mangaIds.toList(),
+      'version': list.attributes.version,
+    };
+    final uri = MangaDexEndpoints.api.replace(
+      path: MangaDexEndpoints.modifyList.replaceFirst('{id}', id),
+    );
+    final operation = 'editList($id, ${visibility.name})';
 
-    final result = await _customListCrud<CustomList>(
-      method: 'PUT',
-      endpoint: MangaDexEndpoints.modifyList.replaceFirst('{id}', id),
-      data: () => {
-        'name': name,
-        'visibility': visibility.name,
-        'manga': mangaIds.toList(),
-        'version': list.attributes.version,
-      },
-      parse: (body) => CustomList.fromJson(body['data']),
-      logPrefix: 'editList($id, ${visibility.name})',
-      cache: (result) async {
-        await _cache.put(
-          result.id,
-          json.encode(result.toJson()),
-          result,
-          unserializer: CustomList.fromJson,
-        );
+    final result = await _request<CustomList>(
+      method: _MangaDexRequestMethod.put,
+      uri: uri,
+      data: data,
+      authenticated: true,
+      operation: operation,
+      parse: (response) {
+        final body = response.data as Map<String, dynamic>;
+        if (body['result'] != 'ok') {
+          throw const FormatException('Expected result: ok');
+        }
+        return CustomList.fromJson(body['data']);
       },
     );
 
-    return result;
+    return _cache.put(
+      result.id,
+      json.encode(result.toJson()),
+      result,
+      unserializer: CustomList.fromJson,
+    );
   }
 
   /// Get logged in user details

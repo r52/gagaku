@@ -46,25 +46,26 @@ class MangaDexListsWidget extends HookConsumerWidget {
         useScrollController();
     final view = useState(_ListViewType.self);
     final me = ref.watch(loggedUserProvider).value;
-    final deleteList = ref.watch(userListDeleteMutation(me?.id));
     final userGetNextPage = ref.watch(userListNextPageMutation(me?.id));
 
     final followGetNextPage = ref.watch(followedListNextPageMutation(me?.id));
 
-    if (deleteList is MutationError) {
-      Styles.showSnackBar(
-        messenger,
-        content: t.mangadex.deleteListError(
-          error: (deleteList as MutationError).error.toString(),
-        ),
-      );
-    } else if (deleteList is MutationSuccess) {
-      Styles.showSnackBar(
-        messenger,
-        content: t.mangadex.deleteListOk,
-        color: Colors.green,
-      );
-    }
+    ref.listen(userListDeleteMutation(me?.id), (_, next) {
+      if (next is MutationError) {
+        Styles.showSnackBar(
+          messenger,
+          content: t.mangadex.deleteListError(
+            error: (next as MutationError).error.toString(),
+          ),
+        );
+      } else if (next is MutationSuccess) {
+        Styles.showSnackBar(
+          messenger,
+          content: t.mangadex.deleteListOk,
+          color: Colors.green,
+        );
+      }
+    });
 
     useEffect(() {
       void controllerAtEdge() {

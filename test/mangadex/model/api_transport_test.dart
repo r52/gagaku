@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:dio/dio.dart';
@@ -93,6 +94,78 @@ void main() {
       expect(request.data, isNull);
     });
 
+    test('boolean mutations preserve false-on-failure contracts', () async {
+      final manga = Manga(id: 'manga-1');
+      final list = _customList('list-1', name: 'List');
+      transport
+        ..enqueue(statusCode: 200, data: {'result': 'not-ok'})
+        ..enqueue(statusCode: 404, data: {'result': 'error'})
+        ..enqueue(statusCode: 403, data: {'result': 'error'})
+        ..enqueue(statusCode: 200, data: {'result': 'not-ok'});
+
+      expect(await model.setMangaFollowing(manga, true), isFalse);
+      expect(await model.setMangaRating(manga, 8), isFalse);
+      expect(await model.setFollowList(list, false), isFalse);
+      expect(
+        await model.setMangaReadingStatus(manga, MangaReadingStatus.reading),
+        isFalse,
+      );
+
+      expect(transport.requests.map((request) => request.method), [
+        _HttpMethod.post,
+        _HttpMethod.post,
+        _HttpMethod.delete,
+        _HttpMethod.post,
+      ]);
+    });
+
+    test('rating and list-follow toggles preserve verbs and bodies', () async {
+      final manga = Manga(id: 'manga-1');
+      final list = _customList('list-1', name: 'List');
+      for (var i = 0; i < 4; i++) {
+        transport.enqueue(statusCode: 200, data: {'result': 'ok'});
+      }
+
+      expect(await model.setMangaRating(manga, 9), isTrue);
+      expect(await model.setMangaRating(manga, null), isTrue);
+      expect(await model.setFollowList(list, true), isTrue);
+      expect(await model.setFollowList(list, false), isTrue);
+
+      expect(transport.requests[0].method, _HttpMethod.post);
+      expect(transport.requests[0].uri.path, '/rating/${manga.id}');
+      expect(transport.requests[0].data, {'rating': 9});
+      expect(transport.requests[1].method, _HttpMethod.delete);
+      expect(transport.requests[1].data, isNull);
+      expect(transport.requests[2].method, _HttpMethod.post);
+      expect(transport.requests[2].uri.path, '/list/${list.id}/follow');
+      expect(transport.requests[3].method, _HttpMethod.delete);
+    });
+
+    test('reading and chapter markers preserve request bodies', () async {
+      final manga = Manga(id: 'manga-1');
+      final read = _chapter('chapter-1');
+      final unread = _chapter('chapter-2');
+      transport
+        ..enqueue(statusCode: 200, data: {'result': 'ok'})
+        ..enqueue(statusCode: 200, data: {'result': 'ignored'});
+
+      expect(
+        await model.setMangaReadingStatus(manga, MangaReadingStatus.remove),
+        isTrue,
+      );
+      expect(
+        await model.setChaptersRead(manga, read: [read], unread: [unread]),
+        isTrue,
+      );
+
+      expect(transport.requests[0].data, {'status': null});
+      expect(transport.requests[1].uri.path, '/manga/${manga.id}/read');
+      expect(transport.requests[1].data, {
+        'chapterIdsRead': [read.id],
+        'chapterIdsUnread': [unread.id],
+      });
+    });
+
     test('records PUT body and completes the cache write', () async {
       final original = _customList('list-1', name: 'Original');
       final edited = original.copyWith(
@@ -127,6 +200,79 @@ void main() {
         'version': original.attributes.version,
       });
       expect(cache.values[edited.id], edited);
+    });
+
+    test('creates a list with an explicit payload and caches it', () async {
+      final created = _customList('list-1', name: 'Created');
+      transport.enqueue(
+        statusCode: 201,
+        data: {'result': 'ok', 'data': created.toJson()},
+      );
+
+      expect(
+        await model.createNewList(
+          'Created',
+          CustomListVisibility.private,
+          const ['manga-1'],
+        ),
+        created,
+      );
+
+      final request = transport.requests.single;
+      expect(request.method, _HttpMethod.post);
+      expect(request.uri.path, MangaDexEndpoints.createList);
+      expect(request.data, {
+        'name': 'Created',
+        'visibility': CustomListVisibility.private.name,
+        'manga': ['manga-1'],
+      });
+      expect(cache.values[created.id], created);
+    });
+
+    test('custom-list CRUD throws structured API errors', () async {
+      transport.enqueue(
+        statusCode: 400,
+        data: {
+          'result': 'error',
+          'errors': [
+            {'id': 'error-1', 'status': 400, 'title': 'Invalid list'},
+          ],
+        },
+      );
+
+      await expectLater(
+        model.createNewList('Invalid', CustomListVisibility.private, const []),
+        throwsA(isA<MangaDexException>()),
+      );
+    });
+
+    test('list membership projects and caches add/remove results', () async {
+      final manga = Manga(id: 'manga-1');
+      final original = _customList('list-1', name: 'List');
+      transport
+        ..enqueue(statusCode: 200, data: {'result': 'ok'})
+        ..enqueue(statusCode: 200, data: {'result': 'ok'});
+
+      final added = await model.updateMangaInCustomList(original, manga, true);
+      final removed = await model.updateMangaInCustomList(added!, manga, false);
+
+      expect(
+        added.relationships.map((entity) => entity.id),
+        contains(manga.id),
+      );
+      expect(
+        removed!.relationships.map((entity) => entity.id),
+        isNot(contains(manga.id)),
+      );
+      expect(added.attributes.version, original.attributes.version);
+      expect(removed.attributes.version, original.attributes.version);
+      expect(cache.values[original.id], removed);
+      expect(transport.requests[0].method, _HttpMethod.post);
+      expect(
+        transport.requests[0].uri.path,
+        '/manga/${manga.id}/list/${original.id}',
+      );
+      expect(transport.requests[1].method, _HttpMethod.delete);
     });
 
     test('authentication can be denied without issuing a request', () async {
@@ -321,6 +467,38 @@ void main() {
       expect(request.data, isNull);
     });
 
+    test('custom-list cache writes and removals are awaited', () async {
+      final created = _customList('list-1', name: 'Created');
+      final putGate = Completer<void>();
+      cache.putGate = putGate;
+      transport.enqueue(
+        statusCode: 200,
+        data: {'result': 'ok', 'data': created.toJson()},
+      );
+
+      var createCompleted = false;
+      final create = model
+          .createNewList('Created', CustomListVisibility.private, const [])
+          .whenComplete(() => createCompleted = true);
+      await Future<void>.delayed(Duration.zero);
+      expect(createCompleted, isFalse);
+      putGate.complete();
+      expect(await create, created);
+
+      final removeGate = Completer<void>();
+      cache.removeGate = removeGate;
+      transport.enqueue(statusCode: 200, data: {'result': 'ok'});
+
+      var deleteCompleted = false;
+      final delete = model
+          .deleteList(created)
+          .whenComplete(() => deleteCompleted = true);
+      await Future<void>.delayed(Duration.zero);
+      expect(deleteCompleted, isFalse);
+      removeGate.complete();
+      expect(await delete, isTrue);
+    });
+
     test('shared executor enforces mutation authentication', () async {
       final unauthenticated = container.read(
         Provider(
@@ -456,6 +634,8 @@ class _RecordingTransport implements MangaDexTransport {
 
 class _MemoryCacheManager implements CacheManager {
   final Map<String, Object?> values = {};
+  Completer<void>? putGate;
+  Completer<void>? removeGate;
 
   @override
   Future<bool> exists(String key) async => values.containsKey(key);
@@ -471,12 +651,16 @@ class _MemoryCacheManager implements CacheManager {
     Duration expiry = const Duration(minutes: 15),
     UnserializeCallback? unserializer,
   }) async {
+    await putGate?.future;
+    putGate = null;
     values[key] = reference;
     return reference;
   }
 
   @override
   Future<void> remove(String key) async {
+    await removeGate?.future;
+    removeGate = null;
     values.remove(key);
   }
 
@@ -510,3 +694,18 @@ CustomList _customList(String id, {required String name}) => CustomList(
   ),
   relationships: const [],
 );
+
+Chapter _chapter(String id) {
+  final now = DateTime.utc(2026);
+  return Chapter(
+    id: id,
+    attributes: ChapterAttributes(
+      translatedLanguage: Language.en,
+      version: 1,
+      createdAt: now,
+      updatedAt: now,
+      publishAt: now,
+    ),
+    relationships: const [],
+  );
+}
