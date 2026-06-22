@@ -238,7 +238,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
     const expiry = Duration(days: 1);
 
     logger.d('CacheManager: caching entry $feedKey for ${expiry.toString()}');
-    cache.put(feedKey, json.encode(mangas), mangas, true, expiry: expiry);
+    cache.put(feedKey, json.encode(mangas), mangas, expiry: expiry);
 
     await NotificationService().updateProgressNotification(
       title: tr.chapterFeed.updatingFeed,

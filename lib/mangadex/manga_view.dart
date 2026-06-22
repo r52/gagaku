@@ -834,21 +834,10 @@ class _MangaCoversView extends HookWidget {
     final currentSelected = selectedLocales.value ?? {};
 
     final filteredState = useMemoized(() {
-      if (state.pages == null) return state;
       if (currentSelected.isEmpty) return state;
 
-      final newPages = state.pages!.map((page) {
-        return page.where((item) {
-          return currentSelected.contains(item.attributes?.locale);
-        }).toList();
-      }).toList();
-
-      return PagingState<int, CoverArt>(
-        error: state.error,
-        pages: newPages,
-        keys: state.keys,
-        hasNextPage: state.hasNextPage,
-        isLoading: state.isLoading,
+      return state.filterItems(
+        (item) => currentSelected.contains(item.attributes?.locale),
       );
     }, [state, currentSelected]);
 
@@ -962,24 +951,6 @@ class _MangaCoversView extends HookWidget {
   }
 }
 
-enum _ChapterListElementType { header, chapter }
-
-class _ChapterListElement {
-  const _ChapterListElement(
-    this.type, {
-    this.header,
-    this.chapter,
-    this.bold = false,
-    this.isIndented = false,
-  }) : assert(header != null || chapter != null);
-
-  final _ChapterListElementType type;
-  final String? header;
-  final Chapter? chapter;
-  final bool bold;
-  final bool isIndented;
-}
-
 class _ChapterListSliver extends HookWidget {
   const _ChapterListSliver({
     required this.state,
@@ -990,8 +961,6 @@ class _ChapterListSliver extends HookWidget {
   final PagingState<int, Chapter> state;
   final NextPageCallback fetchNextPage;
   final Manga manga;
-
-  static const _noVolumeKey = 'none';
 
   @override
   Widget build(BuildContext context) {
@@ -1006,123 +975,82 @@ class _ChapterListSliver extends HookWidget {
 
     final chapters = state.items;
 
-    final builtItems = useMemoized(() {
+    final orderedChapters = useMemoized(() {
       if (chapters == null) {
         return null;
       }
 
-      final keysGrouped = chapters.groupListsBy(
-        (chapter) => chapter.attributes.volume ?? _noVolumeKey,
-      );
-
-      var items = <_ChapterListElement>[];
-
-      for (final vol in keysGrouped.keys) {
-        if (vol == _noVolumeKey) {
-          items.add(
-            _ChapterListElement(
-              _ChapterListElementType.header,
-              header: tr.mangaView.noVolume,
-              bold: true,
-            ),
-          );
-        } else {
-          items.add(
-            _ChapterListElement(
-              _ChapterListElementType.header,
-              header: tr.mangaView.volume(n: vol),
-              bold: true,
-            ),
-          );
-        }
-
-        items = keysGrouped[vol]!.foldIndexed(items, (index, list, chapter) {
-          final volumeChapters = keysGrouped[vol]!;
-          final currentChapter = chapter.attributes.chapter;
-
-          // If next chapter is the same number
-          // AND previous chapter isn't (or doesnt exist)
-          final nextIsSame =
-              index < volumeChapters.length - 1 &&
-              volumeChapters[index + 1].attributes.chapter == currentChapter;
-          final prevIsNotSame =
-              index == 0 ||
-              (index > 0 &&
-                  volumeChapters[index - 1].attributes.chapter !=
-                      currentChapter);
-
-          if (nextIsSame && prevIsNotSame) {
-            list.add(
-              _ChapterListElement(
-                _ChapterListElementType.header,
-                header: currentChapter != null
-                    ? tr.mangaView.chapter(n: currentChapter)
-                    : chapter.title,
-              ),
-            );
-          }
-
-          list.add(
-            _ChapterListElement(
-              _ChapterListElementType.chapter,
-              chapter: chapter,
-              isIndented: nextIsSame || !prevIsNotSame,
-            ),
-          );
-          return list;
-        });
-      }
-
-      return items;
-    }, [state, tr.$meta.locale.languageCode]);
-
-    final newState = useMemoized(() {
-      return PagingState<int, _ChapterListElement>(
-        error: state.error,
-        pages: state.keys == null
-            ? null
-            : List.generate(
-                state.keys!.length,
-                (i) => i == 0 ? builtItems! : [],
-              ),
-        keys: state.keys,
-        hasNextPage: state.hasNextPage,
-        isLoading: state.isLoading,
-      );
-    }, [builtItems, state]);
+      return chapters
+          .groupListsBy((chapter) => chapter.attributes.volume)
+          .values
+          .expand((volumeChapters) => volumeChapters)
+          .toList(growable: false);
+    }, [state]);
 
     return PagedSliverList.separated(
-      state: newState,
+      state: state,
       fetchNextPage: fetchNextPage,
       separatorBuilder: (_, index) => const SizedBox(height: 4.0),
-      builderDelegate: PagedChildBuilderDelegate<_ChapterListElement>(
-        itemBuilder: (context, item, index) {
-          if (item.type == _ChapterListElementType.header) {
-            return _ChapterListHeader(
-              key: ValueKey(item.header!),
-              text: item.header!,
-              bold: item.bold,
-            );
-          }
+      builderDelegate: PagedChildBuilderDelegate<Chapter>(
+        itemBuilder: (context, _, index) {
+          final chapter = orderedChapters![index];
+          final previousChapter = index > 0 ? orderedChapters[index - 1] : null;
+          final nextChapter = index < orderedChapters.length - 1
+              ? orderedChapters[index + 1]
+              : null;
+          final volume = chapter.attributes.volume;
+          final chapterNumber = chapter.attributes.chapter;
+          final startsVolume =
+              previousChapter == null ||
+              previousChapter.attributes.volume != volume;
+          final previousIsDifferentChapter =
+              startsVolume ||
+              previousChapter.attributes.chapter != chapterNumber;
+          final nextIsSameChapter =
+              nextChapter != null &&
+              nextChapter.attributes.volume == volume &&
+              nextChapter.attributes.chapter == chapterNumber;
+          final startsDuplicateChapterGroup =
+              nextIsSameChapter && previousIsDifferentChapter;
+          final isIndented = nextIsSameChapter || !previousIsDifferentChapter;
 
-          // is chapter beyond this point
-          final chapbtn = ChapterButtonWidget(
-            key: ValueKey(item.chapter!.id),
-            chapter: item.chapter!,
-            manga: manga,
-          );
+          final chapbtn = ChapterButtonWidget(chapter: chapter, manga: manga);
 
-          if (item.isIndented) {
-            return Row(
-              key: ValueKey(item.chapter!.id),
-              children: [
-                const Icon(Icons.subdirectory_arrow_right, size: 15.0),
-                Flexible(child: chapbtn),
+          final chapterWidget = isIndented
+              ? Row(
+                  children: [
+                    const Icon(Icons.subdirectory_arrow_right, size: 15.0),
+                    Flexible(child: chapbtn),
+                  ],
+                )
+              : chapbtn;
+
+          return Column(
+            key: ValueKey(chapter.id),
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (startsVolume) ...[
+                _ChapterListHeader(
+                  text: volume == null
+                      ? tr.mangaView.noVolume
+                      : tr.mangaView.volume(n: volume),
+                  bold: true,
+                ),
+                const SizedBox(height: 4.0),
               ],
-            );
-          }
-
-          return chapbtn;
+              if (startsDuplicateChapterGroup) ...[
+                _ChapterListHeader(
+                  text: chapterNumber != null
+                      ? tr.mangaView.chapter(n: chapterNumber)
+                      : chapter.title,
+                  bold: false,
+                ),
+                const SizedBox(height: 4.0),
+              ],
+              chapterWidget,
+            ],
+          );
         },
       ),
     );
@@ -1133,7 +1061,7 @@ class _ChapterListHeader extends HookWidget {
   final String text;
   final bool bold;
 
-  const _ChapterListHeader({super.key, required this.text, required this.bold});
+  const _ChapterListHeader({required this.text, required this.bold});
 
   @override
   Widget build(BuildContext context) {
@@ -1564,10 +1492,10 @@ class _UserListsMenu extends ConsumerWidget {
               closeOnActivate: false,
               value: list.set.contains(manga.id),
               onChanged: (bool? value) async {
-                userListModifyMutation(me?.id).run(ref, (ref) async {
-                  return await ref
-                      .get(userListsProvider(me?.id).notifier)
-                      .updateList(list, manga, value == true);
+                userListModifyMutation(me?.id).run(ref, (tsx) async {
+                  return await tsx
+                      .get(customListCommandsProvider(me?.id))
+                      .updateList(tsx, list, manga, value == true);
                 });
               },
               child: Text(list.attributes.name),
@@ -1659,10 +1587,10 @@ class _UserListsMenu extends ConsumerWidget {
             );
 
             if (result != null) {
-              userListNewMutation(me?.id).run(ref, (ref) async {
-                return await ref
-                    .get(userListsProvider(me?.id).notifier)
-                    .newList(result.$1, result.$2, []);
+              userListNewMutation(me?.id).run(ref, (tsx) async {
+                return await tsx
+                    .get(customListCommandsProvider(me?.id))
+                    .newList(tsx, result.$1, result.$2, []);
               });
             }
           },

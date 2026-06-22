@@ -1,0 +1,136 @@
+part of 'model.dart';
+
+@Riverpod(keepAlive: true)
+class Statistics extends _$Statistics {
+  late final _cache = _BatchCacheCoordinator<Manga, MangaStatistics>(
+    keyOf: (manga) => manga.id,
+    fetch: _fetchStatistics,
+    read: () => future,
+    write: (value) => state = AsyncData(value),
+  );
+
+  Future<Map<String, MangaStatistics>> _fetchStatistics(
+    Iterable<Manga> mangas,
+  ) async {
+    if (mangas.isEmpty) {
+      return {};
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final map = await api.fetchStatistics(mangas);
+
+    return map;
+  }
+
+  @override
+  Future<Map<String, MangaStatistics>> build() async {
+    return {};
+  }
+
+  /// Fetches missing statistics and returns the complete updated cache.
+  ///
+  /// Existing cache data remains available while the request is in flight and
+  /// is preserved if the request fails.
+  Future<Map<String, MangaStatistics>> get(Iterable<Manga> mangas) =>
+      _cache.get(mangas);
+}
+
+@riverpod
+Future<MangaStatistics> mangaStatistics(Ref ref, Manga manga) async {
+  // Makes the assumption that globalCache[manga.id] should never
+  // be null after get(). And should be true unless the server is broken
+  final globalCache = await ref.watch(statisticsProvider.future);
+
+  if (globalCache.containsKey(manga.id)) {
+    return globalCache[manga.id]!;
+  }
+
+  final map = await ref.read(statisticsProvider.notifier).get([manga]);
+  return map[manga.id]!;
+}
+
+@Riverpod(keepAlive: true)
+class ChapterStats extends _$ChapterStats {
+  late final _cache = _BatchCacheCoordinator<Chapter, ChapterStatistics>(
+    keyOf: (chapter) => chapter.id,
+    fetch: _fetchStatistics,
+    read: () => future,
+    write: (value) => state = AsyncData(value),
+  );
+
+  Future<Map<String, ChapterStatistics>> _fetchStatistics(
+    Iterable<Chapter> chapters,
+  ) async {
+    if (chapters.isEmpty) {
+      return {};
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final map = await api.fetchChapterStats(chapters);
+
+    return map;
+  }
+
+  @override
+  Future<Map<String, ChapterStatistics>> build() async {
+    return {};
+  }
+
+  /// Fetches missing statistics and returns the complete updated cache.
+  ///
+  /// Existing cache data remains available while the request is in flight and
+  /// is preserved if the request fails.
+  Future<Map<String, ChapterStatistics>> get(Iterable<Chapter> chapters) =>
+      _cache.get(chapters);
+}
+
+@riverpod
+class Ratings extends _$Ratings with AutoDisposeExpiryMix {
+  Future<Map<String, SelfRating>> _fetchRatings(Iterable<Manga> mangas) async {
+    if (mangas.isEmpty) {
+      return {};
+    }
+
+    final api = ref.watch(mangadexProvider);
+    final map = await api.fetchRatings(mangas);
+    return map;
+  }
+
+  @override
+  Future<SelfRating?> build(Manga manga) async {
+    disposeAfter(const Duration(minutes: 5));
+
+    final result = await _fetchRatings([manga]);
+
+    if (result.containsKey(manga.id)) {
+      return result[manga.id];
+    }
+
+    return null;
+  }
+
+  /// Sets a self-rating for a manga
+  Future<bool> set(int? rating) async {
+    final api = ref.watch(mangadexProvider);
+    SelfRating? updated = await future;
+
+    bool result = await api.setMangaRating(manga, rating);
+
+    if (result) {
+      switch (rating) {
+        case null:
+          updated = null;
+          break;
+        case _:
+          updated = SelfRating(rating: rating, createdAt: DateTime.now());
+          break;
+      }
+    }
+
+    state = AsyncData(updated);
+
+    return result;
+  }
+}
+
+final ratingsMutation = Mutation<void>();

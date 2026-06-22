@@ -1062,6 +1062,11 @@ class ChapterFeedItemData {
 class ReadChapterSet with ExpiringData {
   ReadChapterSet(this.mangaId, this._chapters);
 
+  ReadChapterSet.copy(ReadChapterSet other)
+    : mangaId = other.mangaId,
+      _chapters = Set.of(other._chapters),
+      expiry = other.expiry;
+
   final String mangaId;
   final Set<String> _chapters;
 

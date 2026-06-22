@@ -92,8 +92,8 @@ class MangaDexListViewPage extends HookConsumerWidget {
                       ),
                       onPressed: () => ref.run((tsx) async {
                         return await tsx
-                            .get(followedListsProvider(me?.id).notifier)
-                            .setFollow(list, idx == -1);
+                            .get(customListCommandsProvider(me?.id))
+                            .setFollow(tsx, list, idx == -1);
                       }),
                       icon: Icon(
                         idx == -1 ? Icons.bookmark_border : Icons.bookmark,

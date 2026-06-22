@@ -46,25 +46,26 @@ class MangaDexListsWidget extends HookConsumerWidget {
         useScrollController();
     final view = useState(_ListViewType.self);
     final me = ref.watch(loggedUserProvider).value;
-    final deleteList = ref.watch(userListDeleteMutation(me?.id));
     final userGetNextPage = ref.watch(userListNextPageMutation(me?.id));
 
     final followGetNextPage = ref.watch(followedListNextPageMutation(me?.id));
 
-    if (deleteList is MutationError) {
-      Styles.showSnackBar(
-        messenger,
-        content: t.mangadex.deleteListError(
-          error: (deleteList as MutationError).error.toString(),
-        ),
-      );
-    } else if (deleteList is MutationSuccess) {
-      Styles.showSnackBar(
-        messenger,
-        content: t.mangadex.deleteListOk,
-        color: Colors.green,
-      );
-    }
+    ref.listen(userListDeleteMutation(me?.id), (_, next) {
+      if (next is MutationError) {
+        Styles.showSnackBar(
+          messenger,
+          content: t.mangadex.deleteListError(
+            error: (next as MutationError).error.toString(),
+          ),
+        );
+      } else if (next is MutationSuccess) {
+        Styles.showSnackBar(
+          messenger,
+          content: t.mangadex.deleteListOk,
+          color: Colors.green,
+        );
+      }
+    });
 
     useEffect(() {
       void controllerAtEdge() {
@@ -237,11 +238,11 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                       onPressed: () => ref.run((tsx) async {
                                         return await tsx
                                             .get(
-                                              followedListsProvider(
+                                              customListCommandsProvider(
                                                 me?.id,
-                                              ).notifier,
+                                              ),
                                             )
-                                            .setFollow(item, idx == -1);
+                                            .setFollow(tsx, item, idx == -1);
                                       }),
                                       child: Text(
                                         idx == -1 ? t.ui.follow : t.ui.unfollow,
@@ -257,15 +258,15 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                     );
                                     if (result == true) {
                                       userListDeleteMutation(me?.id).run(ref, (
-                                        ref,
+                                        tsx,
                                       ) async {
-                                        return await ref
+                                        return await tsx
                                             .get(
-                                              userListsProvider(
+                                              customListCommandsProvider(
                                                 me?.id,
-                                              ).notifier,
+                                              ),
                                             )
-                                            .deleteList(item);
+                                            .deleteList(tsx, item);
                                       });
                                     }
                                   },
@@ -369,11 +370,9 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                     ref.run((tsx) async {
                                       return await tsx
                                           .get(
-                                            followedListsProvider(
-                                              me?.id,
-                                            ).notifier,
+                                            customListCommandsProvider(me?.id),
                                           )
-                                          .setFollow(item, false);
+                                          .setFollow(tsx, item, false);
                                     });
                                   },
                                   child: Text(t.ui.unfollow),
@@ -389,15 +388,15 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                       );
                                       if (result == true) {
                                         userListDeleteMutation(me.id).run(ref, (
-                                          ref,
+                                          tsx,
                                         ) async {
-                                          return await ref
+                                          return await tsx
                                               .get(
-                                                userListsProvider(
+                                                customListCommandsProvider(
                                                   me.id,
-                                                ).notifier,
+                                                ),
                                               )
-                                              .deleteList(item);
+                                              .deleteList(tsx, item);
                                         });
                                       }
                                     },

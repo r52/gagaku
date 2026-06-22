@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/painting.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/model.dart';
-import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/util/util.dart';
-import 'package:gagaku/web/model/types.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -21,7 +18,9 @@ typedef UnserializeCallback<T extends Object> =
 
 @Riverpod(keepAlive: true)
 CacheManager cache(Ref ref) {
-  return CacheManager();
+  final manager = CacheManager();
+  ref.onDispose(manager.dispose);
+  return manager;
 }
 
 class CacheEntryAdapter extends TypeAdapter<CacheEntry> {
@@ -90,46 +89,60 @@ class CacheManager {
   final LazyBox<CacheEntry> _box;
   // ignore: unused_field
   Timer? _pruneSchedule;
+  bool _pruneInProgress = false;
 
   /// Cache of API data
   final Map<String, CacheEntry> _cache = <String, CacheEntry>{};
 
   CacheManager() : _box = Hive.lazyBox(gagakuCache) {
-    _pruneSchedule = Timer.periodic(const Duration(minutes: 15), (timer) async {
-      await _checkForPrune();
+    _pruneSchedule = Timer.periodic(const Duration(minutes: 15), (timer) {
+      unawaited(_checkForPrune());
     });
   }
 
   Future<void> _checkForPrune() async {
-    if (_cache.length > _preferredMaxEntries) {
-      _pruneExpiredMemory();
+    if (_pruneInProgress) {
+      return;
     }
 
-    if (_box.length > _preferredMaxDiskEntries) {
-      _pruneExpiredDisk();
+    _pruneInProgress = true;
+    try {
+      await _pruneExpiredMemory();
+      await _pruneExpiredDisk();
+
+      _pruneMemoryToLimit();
+      await _pruneDiskToLimit();
+    } finally {
+      _pruneInProgress = false;
+    }
+  }
+
+  void dispose() {
+    _pruneSchedule?.cancel();
+    _pruneSchedule = null;
+  }
+
+  void _pruneMemoryToLimit() {
+    final excess = _cache.length - _preferredMaxEntries;
+    if (excess <= 0) {
+      return;
     }
 
-    final imageCache = PaintingBinding.instance.imageCache;
-    if (imageCache.currentSize >= imageCache.maximumSize) {
-      imageCache.clear();
+    logger.d('CacheManager: pruning $excess memory entries...');
+    final matchingKeys = _cache.keys.take(excess).toSet();
+    _cache.removeWhere((key, value) => matchingKeys.contains(key));
+  }
+
+  Future<void> _pruneDiskToLimit() async {
+    final excess = _box.length - _preferredMaxDiskEntries;
+    if (excess <= 0) {
+      return;
     }
 
-    // clean stale HistoryLinks
-    GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
-      final box = store.box<HistoryLink>();
-
-      final builder = box.query();
-      builder.backlinkMany(WebFavoritesList_.list);
-      final inuseLinksQuery = builder.build();
-      final inuseLinks = inuseLinksQuery.findIds();
-      inuseLinksQuery.close();
-
-      final notInuseQuery = box
-          .query(HistoryLink_.dbid.notOneOf(inuseLinks))
-          .build();
-      notInuseQuery.remove();
-      notInuseQuery.close();
-    }, null);
+    logger.d('CacheManager: pruning $excess disk entries...');
+    final matchingKeys = _box.keys.cast<String>().take(excess).toSet();
+    _cache.removeWhere((key, value) => matchingKeys.contains(key));
+    await _box.deleteAll(matchingKeys);
   }
 
   /// Prunes all expired entries
@@ -176,9 +189,14 @@ class CacheManager {
     logger.d('CacheManager: removing all entries starting with: $startsWith');
 
     final matchingKeys = <String>{};
-    for (final e in _cache.entries) {
-      if (e.key.startsWith(startsWith)) {
-        matchingKeys.add(e.key);
+    for (final key in _cache.keys) {
+      if (key.startsWith(startsWith)) {
+        matchingKeys.add(key);
+      }
+    }
+    for (final key in _box.keys.cast<String>()) {
+      if (key.startsWith(startsWith)) {
+        matchingKeys.add(key);
       }
     }
 
@@ -219,14 +237,11 @@ class CacheManager {
   T get<T>(String key, [UnserializeCallback? unserializer]) =>
       _cache[key]!.get(unserializer);
 
-  /// Inserts a single entry into the cache if it doesn't [exists]
-  /// If [overwrite] is true, then the entry is inserted regardless, overwriting
-  /// existing values
+  /// Inserts a single entry into the cache, overwriting any existing value.
   Future<T> put<T>(
     String key,
     String data,
-    T reference,
-    bool overwrite, {
+    T reference, {
     Duration expiry = const Duration(minutes: 15),
     UnserializeCallback? unserializer,
   }) async {
@@ -236,12 +251,8 @@ class CacheManager {
       reference: reference,
       unserializer: unserializer,
     );
-    if (!await exists(key)) {
-      _cache.putIfAbsent(key, () => entry);
-    } else if (overwrite) {
-      _cache[key] = entry;
-    }
 
+    _cache[key] = entry;
     await _box.put(key, entry);
 
     logger.d(
@@ -254,14 +265,7 @@ class CacheManager {
   /// Inserts all provided entries into the cache, overwriting any existing
   /// entries
   Future<void> putAll(Map<String, CacheEntry> map) async {
-    for (var MapEntry(:key, value: entry) in map.entries) {
-      if (!await exists(key)) {
-        _cache.putIfAbsent(key, () => entry);
-      } else {
-        _cache[key] = entry;
-      }
-    }
-
+    _cache.addAll(map);
     await _box.putAll(map);
 
     logger.d(

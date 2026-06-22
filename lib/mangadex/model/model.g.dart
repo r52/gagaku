@@ -9,46 +9,98 @@ part of 'model.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(mangadex)
-final mangadexProvider = MangadexProvider._();
+@ProviderFor(LoggedUser)
+final loggedUserProvider = LoggedUserProvider._();
 
-final class MangadexProvider
-    extends $FunctionalProvider<MangaDexModel, MangaDexModel, MangaDexModel>
-    with $Provider<MangaDexModel> {
-  MangadexProvider._()
+final class LoggedUserProvider
+    extends $AsyncNotifierProvider<LoggedUser, User?> {
+  LoggedUserProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'mangadexProvider',
+        name: r'loggedUserProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$mangadexHash();
+  String debugGetCreateSourceHash() => _$loggedUserHash();
 
   @$internal
   @override
-  $ProviderElement<MangaDexModel> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(pointer);
+  LoggedUser create() => LoggedUser();
+}
 
+String _$loggedUserHash() => r'8ab1dc95c56b57c32b0b37a2beafb587da10c795';
+
+abstract class _$LoggedUser extends $AsyncNotifier<User?> {
+  FutureOr<User?> build();
+  @$mustCallSuper
   @override
-  MangaDexModel create(Ref ref) {
-    return mangadex(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(MangaDexModel value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<MangaDexModel>(value),
-    );
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<User?>, User?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<User?>, User?>,
+              AsyncValue<User?>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
   }
 }
 
-String _$mangadexHash() => r'4f95e2d6037a2e23987c4eafa80322c88c003f20';
+@ProviderFor(AuthControl)
+final authControlProvider = AuthControlProvider._();
+
+final class AuthControlProvider
+    extends $StreamNotifierProvider<AuthControl, AuthenticationStatus> {
+  AuthControlProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'authControlProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$authControlHash();
+
+  @$internal
+  @override
+  AuthControl create() => AuthControl();
+}
+
+String _$authControlHash() => r'beaad8eb7b740107caff5efd97bec0ac0d849857';
+
+abstract class _$AuthControl extends $StreamNotifier<AuthenticationStatus> {
+  Stream<AuthenticationStatus> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref
+            as $Ref<AsyncValue<AuthenticationStatus>, AuthenticationStatus>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<AuthenticationStatus>,
+                AuthenticationStatus
+              >,
+              AsyncValue<AuthenticationStatus>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
 
 @ProviderFor(MangaChaptersListSort)
 final mangaChaptersListSortProvider = MangaChaptersListSortProvider._();
@@ -144,7 +196,7 @@ final class ReadChaptersProvider
   }
 }
 
-String _$readChaptersHash() => r'33654ef31814fa02363110210e5c2dca0eff4b5d';
+String _$readChaptersHash() => r'862a3afe6522059c307e52497b72dc7e6d5e43b9';
 
 final class ReadChaptersFamily extends $Family
     with
@@ -267,40 +319,61 @@ final class MangaReadChaptersFamily extends $Family
   String toString() => r'mangaReadChaptersProvider';
 }
 
-@ProviderFor(UserLibrary)
-final userLibraryProvider = UserLibraryFamily._();
+@ProviderFor(customListCommands)
+final customListCommandsProvider = CustomListCommandsFamily._();
 
-final class UserLibraryProvider
+final class CustomListCommandsProvider
     extends
-        $AsyncNotifierProvider<UserLibrary, Map<String, MangaReadingStatus>> {
-  UserLibraryProvider._({
-    required UserLibraryFamily super.from,
+        $FunctionalProvider<
+          CustomListCommands,
+          CustomListCommands,
+          CustomListCommands
+        >
+    with $Provider<CustomListCommands> {
+  CustomListCommandsProvider._({
+    required CustomListCommandsFamily super.from,
     required String? super.argument,
   }) : super(
          retry: null,
-         name: r'userLibraryProvider',
+         name: r'customListCommandsProvider',
          isAutoDispose: true,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
 
   @override
-  String debugGetCreateSourceHash() => _$userLibraryHash();
+  String debugGetCreateSourceHash() => _$customListCommandsHash();
 
   @override
   String toString() {
-    return r'userLibraryProvider'
+    return r'customListCommandsProvider'
         ''
         '($argument)';
   }
 
   @$internal
   @override
-  UserLibrary create() => UserLibrary();
+  $ProviderElement<CustomListCommands> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  CustomListCommands create(Ref ref) {
+    final argument = this.argument as String?;
+    return customListCommands(ref, argument);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(CustomListCommands value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<CustomListCommands>(value),
+    );
+  }
 
   @override
   bool operator ==(Object other) {
-    return other is UserLibraryProvider && other.argument == argument;
+    return other is CustomListCommandsProvider && other.argument == argument;
   }
 
   @override
@@ -309,61 +382,25 @@ final class UserLibraryProvider
   }
 }
 
-String _$userLibraryHash() => r'8b20691f9657df387911294aa477b743f16c13cb';
+String _$customListCommandsHash() =>
+    r'4a068a47bb1f8df466a806899dcad57ab2c4d4f6';
 
-final class UserLibraryFamily extends $Family
-    with
-        $ClassFamilyOverride<
-          UserLibrary,
-          AsyncValue<Map<String, MangaReadingStatus>>,
-          Map<String, MangaReadingStatus>,
-          FutureOr<Map<String, MangaReadingStatus>>,
-          String?
-        > {
-  UserLibraryFamily._()
+final class CustomListCommandsFamily extends $Family
+    with $FunctionalFamilyOverride<CustomListCommands, String?> {
+  CustomListCommandsFamily._()
     : super(
         retry: null,
-        name: r'userLibraryProvider',
+        name: r'customListCommandsProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
-  UserLibraryProvider call(String? userId) =>
-      UserLibraryProvider._(argument: userId, from: this);
+  CustomListCommandsProvider call(String? userId) =>
+      CustomListCommandsProvider._(argument: userId, from: this);
 
   @override
-  String toString() => r'userLibraryProvider';
-}
-
-abstract class _$UserLibrary
-    extends $AsyncNotifier<Map<String, MangaReadingStatus>> {
-  late final _$args = ref.$arg as String?;
-  String? get userId => _$args;
-
-  FutureOr<Map<String, MangaReadingStatus>> build(String? userId);
-  @$mustCallSuper
-  @override
-  void runBuild() {
-    final ref =
-        this.ref
-            as $Ref<
-              AsyncValue<Map<String, MangaReadingStatus>>,
-              Map<String, MangaReadingStatus>
-            >;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<
-                AsyncValue<Map<String, MangaReadingStatus>>,
-                Map<String, MangaReadingStatus>
-              >,
-              AsyncValue<Map<String, MangaReadingStatus>>,
-              Object?,
-              Object?
-            >;
-    element.handleCreate(ref, () => build(_$args));
-  }
+  String toString() => r'customListCommandsProvider';
 }
 
 @ProviderFor(UserLists)
@@ -407,7 +444,7 @@ final class UserListsProvider
   }
 }
 
-String _$userListsHash() => r'd81822ac7862464faac52a965edaf4d105a7f082';
+String _$userListsHash() => r'7ad166c899a1dc66c76f2f951a887d45869cfeb9';
 
 final class UserListsFamily extends $Family
     with
@@ -497,7 +534,7 @@ final class FollowedListsProvider
   }
 }
 
-String _$followedListsHash() => r'54cee419f2a26ec151129216f934f9e248b90445';
+String _$followedListsHash() => r'6cefe71c14e061835361dfabe56e9332c659304c';
 
 final class FollowedListsFamily extends $Family
     with
@@ -587,7 +624,7 @@ final class ListSourceProvider
   }
 }
 
-String _$listSourceHash() => r'fa3af4ce278d3a4407fefcdc4b1f2aaef8f91ef1';
+String _$listSourceHash() => r'0cf67741a00f21b6b365521a7a79292c99dcd227';
 
 final class ListSourceFamily extends $Family
     with
@@ -635,96 +672,43 @@ abstract class _$ListSource extends $AsyncNotifier<CustomList?> {
   }
 }
 
-@ProviderFor(TagList)
-final tagListProvider = TagListProvider._();
+@ProviderFor(MangaDexHistory)
+final mangaDexHistoryProvider = MangaDexHistoryProvider._();
 
-final class TagListProvider
-    extends $AsyncNotifierProvider<TagList, Iterable<Tag>> {
-  TagListProvider._()
+final class MangaDexHistoryProvider
+    extends $AsyncNotifierProvider<MangaDexHistory, Queue<Chapter>> {
+  MangaDexHistoryProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'tagListProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$tagListHash();
-
-  @$internal
-  @override
-  TagList create() => TagList();
-}
-
-String _$tagListHash() => r'0196fc7cdaa7989fc6255d343c1c3b2e19c37d1f';
-
-abstract class _$TagList extends $AsyncNotifier<Iterable<Tag>> {
-  FutureOr<Iterable<Tag>> build();
-  @$mustCallSuper
-  @override
-  void runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<Iterable<Tag>>, Iterable<Tag>>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<AsyncValue<Iterable<Tag>>, Iterable<Tag>>,
-              AsyncValue<Iterable<Tag>>,
-              Object?,
-              Object?
-            >;
-    element.handleCreate(ref, build);
-  }
-}
-
-@ProviderFor(Statistics)
-final statisticsProvider = StatisticsProvider._();
-
-final class StatisticsProvider
-    extends $AsyncNotifierProvider<Statistics, Map<String, MangaStatistics>> {
-  StatisticsProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'statisticsProvider',
+        name: r'mangaDexHistoryProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$statisticsHash();
+  String debugGetCreateSourceHash() => _$mangaDexHistoryHash();
 
   @$internal
   @override
-  Statistics create() => Statistics();
+  MangaDexHistory create() => MangaDexHistory();
 }
 
-String _$statisticsHash() => r'263fcd74d0dfe6ecfe2c906508863ed724c43489';
+String _$mangaDexHistoryHash() => r'f53a33c95e663c7c440b47c01f3c74036b08630c';
 
-abstract class _$Statistics
-    extends $AsyncNotifier<Map<String, MangaStatistics>> {
-  FutureOr<Map<String, MangaStatistics>> build();
+abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
+  FutureOr<Queue<Chapter>> build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref =
-        this.ref
-            as $Ref<
-              AsyncValue<Map<String, MangaStatistics>>,
-              Map<String, MangaStatistics>
-            >;
+    final ref = this.ref as $Ref<AsyncValue<Queue<Chapter>>, Queue<Chapter>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<
-                AsyncValue<Map<String, MangaStatistics>>,
-                Map<String, MangaStatistics>
-              >,
-              AsyncValue<Map<String, MangaStatistics>>,
+              AnyNotifier<AsyncValue<Queue<Chapter>>, Queue<Chapter>>,
+              AsyncValue<Queue<Chapter>>,
               Object?,
               Object?
             >;
@@ -732,53 +716,40 @@ abstract class _$Statistics
   }
 }
 
-@ProviderFor(mangaStatistics)
-final mangaStatisticsProvider = MangaStatisticsFamily._();
+@ProviderFor(UserLibrary)
+final userLibraryProvider = UserLibraryFamily._();
 
-final class MangaStatisticsProvider
+final class UserLibraryProvider
     extends
-        $FunctionalProvider<
-          AsyncValue<MangaStatistics>,
-          MangaStatistics,
-          FutureOr<MangaStatistics>
-        >
-    with $FutureModifier<MangaStatistics>, $FutureProvider<MangaStatistics> {
-  MangaStatisticsProvider._({
-    required MangaStatisticsFamily super.from,
-    required Manga super.argument,
+        $AsyncNotifierProvider<UserLibrary, Map<String, MangaReadingStatus>> {
+  UserLibraryProvider._({
+    required UserLibraryFamily super.from,
+    required String? super.argument,
   }) : super(
          retry: null,
-         name: r'mangaStatisticsProvider',
+         name: r'userLibraryProvider',
          isAutoDispose: true,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
 
   @override
-  String debugGetCreateSourceHash() => _$mangaStatisticsHash();
+  String debugGetCreateSourceHash() => _$userLibraryHash();
 
   @override
   String toString() {
-    return r'mangaStatisticsProvider'
+    return r'userLibraryProvider'
         ''
         '($argument)';
   }
 
   @$internal
   @override
-  $FutureProviderElement<MangaStatistics> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<MangaStatistics> create(Ref ref) {
-    final argument = this.argument as Manga;
-    return mangaStatistics(ref, argument);
-  }
+  UserLibrary create() => UserLibrary();
 
   @override
   bool operator ==(Object other) {
-    return other is MangaStatisticsProvider && other.argument == argument;
+    return other is UserLibraryProvider && other.argument == argument;
   }
 
   @override
@@ -787,162 +758,56 @@ final class MangaStatisticsProvider
   }
 }
 
-String _$mangaStatisticsHash() => r'85f095879af719ed506a0b58e3895197db304241';
+String _$userLibraryHash() => r'641b8cbffdcb41f4df063940c2c5928871545c18';
 
-final class MangaStatisticsFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<MangaStatistics>, Manga> {
-  MangaStatisticsFamily._()
-    : super(
-        retry: null,
-        name: r'mangaStatisticsProvider',
-        dependencies: null,
-        $allTransitiveDependencies: null,
-        isAutoDispose: true,
-      );
-
-  MangaStatisticsProvider call(Manga manga) =>
-      MangaStatisticsProvider._(argument: manga, from: this);
-
-  @override
-  String toString() => r'mangaStatisticsProvider';
-}
-
-@ProviderFor(ChapterStats)
-final chapterStatsProvider = ChapterStatsProvider._();
-
-final class ChapterStatsProvider
-    extends
-        $AsyncNotifierProvider<ChapterStats, Map<String, ChapterStatistics>> {
-  ChapterStatsProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'chapterStatsProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$chapterStatsHash();
-
-  @$internal
-  @override
-  ChapterStats create() => ChapterStats();
-}
-
-String _$chapterStatsHash() => r'1898d92ddb47ef7ca62042a080b7a4e7b96e54d9';
-
-abstract class _$ChapterStats
-    extends $AsyncNotifier<Map<String, ChapterStatistics>> {
-  FutureOr<Map<String, ChapterStatistics>> build();
-  @$mustCallSuper
-  @override
-  void runBuild() {
-    final ref =
-        this.ref
-            as $Ref<
-              AsyncValue<Map<String, ChapterStatistics>>,
-              Map<String, ChapterStatistics>
-            >;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<
-                AsyncValue<Map<String, ChapterStatistics>>,
-                Map<String, ChapterStatistics>
-              >,
-              AsyncValue<Map<String, ChapterStatistics>>,
-              Object?,
-              Object?
-            >;
-    element.handleCreate(ref, build);
-  }
-}
-
-@ProviderFor(Ratings)
-final ratingsProvider = RatingsFamily._();
-
-final class RatingsProvider
-    extends $AsyncNotifierProvider<Ratings, SelfRating?> {
-  RatingsProvider._({
-    required RatingsFamily super.from,
-    required Manga super.argument,
-  }) : super(
-         retry: null,
-         name: r'ratingsProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         $allTransitiveDependencies: null,
-       );
-
-  @override
-  String debugGetCreateSourceHash() => _$ratingsHash();
-
-  @override
-  String toString() {
-    return r'ratingsProvider'
-        ''
-        '($argument)';
-  }
-
-  @$internal
-  @override
-  Ratings create() => Ratings();
-
-  @override
-  bool operator ==(Object other) {
-    return other is RatingsProvider && other.argument == argument;
-  }
-
-  @override
-  int get hashCode {
-    return argument.hashCode;
-  }
-}
-
-String _$ratingsHash() => r'ec9c2ef2313b39c267e288eb96c7cdd614e5c15e';
-
-final class RatingsFamily extends $Family
+final class UserLibraryFamily extends $Family
     with
         $ClassFamilyOverride<
-          Ratings,
-          AsyncValue<SelfRating?>,
-          SelfRating?,
-          FutureOr<SelfRating?>,
-          Manga
+          UserLibrary,
+          AsyncValue<Map<String, MangaReadingStatus>>,
+          Map<String, MangaReadingStatus>,
+          FutureOr<Map<String, MangaReadingStatus>>,
+          String?
         > {
-  RatingsFamily._()
+  UserLibraryFamily._()
     : super(
         retry: null,
-        name: r'ratingsProvider',
+        name: r'userLibraryProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
-  RatingsProvider call(Manga manga) =>
-      RatingsProvider._(argument: manga, from: this);
+  UserLibraryProvider call(String? userId) =>
+      UserLibraryProvider._(argument: userId, from: this);
 
   @override
-  String toString() => r'ratingsProvider';
+  String toString() => r'userLibraryProvider';
 }
 
-abstract class _$Ratings extends $AsyncNotifier<SelfRating?> {
-  late final _$args = ref.$arg as Manga;
-  Manga get manga => _$args;
+abstract class _$UserLibrary
+    extends $AsyncNotifier<Map<String, MangaReadingStatus>> {
+  late final _$args = ref.$arg as String?;
+  String? get userId => _$args;
 
-  FutureOr<SelfRating?> build(Manga manga);
+  FutureOr<Map<String, MangaReadingStatus>> build(String? userId);
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<SelfRating?>, SelfRating?>;
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<Map<String, MangaReadingStatus>>,
+              Map<String, MangaReadingStatus>
+            >;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<SelfRating?>, SelfRating?>,
-              AsyncValue<SelfRating?>,
+              AnyNotifier<
+                AsyncValue<Map<String, MangaReadingStatus>>,
+                Map<String, MangaReadingStatus>
+              >,
+              AsyncValue<Map<String, MangaReadingStatus>>,
               Object?,
               Object?
             >;
@@ -1129,43 +994,43 @@ abstract class _$FollowingStatus extends $AsyncNotifier<bool> {
   }
 }
 
-@ProviderFor(MangaDexHistory)
-final mangaDexHistoryProvider = MangaDexHistoryProvider._();
+@ProviderFor(TagList)
+final tagListProvider = TagListProvider._();
 
-final class MangaDexHistoryProvider
-    extends $AsyncNotifierProvider<MangaDexHistory, Queue<Chapter>> {
-  MangaDexHistoryProvider._()
+final class TagListProvider
+    extends $AsyncNotifierProvider<TagList, Iterable<Tag>> {
+  TagListProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'mangaDexHistoryProvider',
-        isAutoDispose: false,
+        name: r'tagListProvider',
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$mangaDexHistoryHash();
+  String debugGetCreateSourceHash() => _$tagListHash();
 
   @$internal
   @override
-  MangaDexHistory create() => MangaDexHistory();
+  TagList create() => TagList();
 }
 
-String _$mangaDexHistoryHash() => r'f53a33c95e663c7c440b47c01f3c74036b08630c';
+String _$tagListHash() => r'0196fc7cdaa7989fc6255d343c1c3b2e19c37d1f';
 
-abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
-  FutureOr<Queue<Chapter>> build();
+abstract class _$TagList extends $AsyncNotifier<Iterable<Tag>> {
+  FutureOr<Iterable<Tag>> build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<Queue<Chapter>>, Queue<Chapter>>;
+    final ref = this.ref as $Ref<AsyncValue<Iterable<Tag>>, Iterable<Tag>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<Queue<Chapter>>, Queue<Chapter>>,
-              AsyncValue<Queue<Chapter>>,
+              AnyNotifier<AsyncValue<Iterable<Tag>>, Iterable<Tag>>,
+              AsyncValue<Iterable<Tag>>,
               Object?,
               Object?
             >;
@@ -1173,95 +1038,314 @@ abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
   }
 }
 
-@ProviderFor(LoggedUser)
-final loggedUserProvider = LoggedUserProvider._();
+@ProviderFor(Statistics)
+final statisticsProvider = StatisticsProvider._();
 
-final class LoggedUserProvider
-    extends $AsyncNotifierProvider<LoggedUser, User?> {
-  LoggedUserProvider._()
+final class StatisticsProvider
+    extends $AsyncNotifierProvider<Statistics, Map<String, MangaStatistics>> {
+  StatisticsProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'loggedUserProvider',
+        name: r'statisticsProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$loggedUserHash();
+  String debugGetCreateSourceHash() => _$statisticsHash();
 
   @$internal
   @override
-  LoggedUser create() => LoggedUser();
+  Statistics create() => Statistics();
 }
 
-String _$loggedUserHash() => r'8ab1dc95c56b57c32b0b37a2beafb587da10c795';
+String _$statisticsHash() => r'b0b46587dbbbccb6eb10c96e57b42e989a5b06f0';
 
-abstract class _$LoggedUser extends $AsyncNotifier<User?> {
-  FutureOr<User?> build();
-  @$mustCallSuper
-  @override
-  void runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<User?>, User?>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<AsyncValue<User?>, User?>,
-              AsyncValue<User?>,
-              Object?,
-              Object?
-            >;
-    element.handleCreate(ref, build);
-  }
-}
-
-@ProviderFor(AuthControl)
-final authControlProvider = AuthControlProvider._();
-
-final class AuthControlProvider
-    extends $StreamNotifierProvider<AuthControl, AuthenticationStatus> {
-  AuthControlProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'authControlProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$authControlHash();
-
-  @$internal
-  @override
-  AuthControl create() => AuthControl();
-}
-
-String _$authControlHash() => r'beaad8eb7b740107caff5efd97bec0ac0d849857';
-
-abstract class _$AuthControl extends $StreamNotifier<AuthenticationStatus> {
-  Stream<AuthenticationStatus> build();
+abstract class _$Statistics
+    extends $AsyncNotifier<Map<String, MangaStatistics>> {
+  FutureOr<Map<String, MangaStatistics>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final ref =
         this.ref
-            as $Ref<AsyncValue<AuthenticationStatus>, AuthenticationStatus>;
+            as $Ref<
+              AsyncValue<Map<String, MangaStatistics>>,
+              Map<String, MangaStatistics>
+            >;
     final element =
         ref.element
             as $ClassProviderElement<
               AnyNotifier<
-                AsyncValue<AuthenticationStatus>,
-                AuthenticationStatus
+                AsyncValue<Map<String, MangaStatistics>>,
+                Map<String, MangaStatistics>
               >,
-              AsyncValue<AuthenticationStatus>,
+              AsyncValue<Map<String, MangaStatistics>>,
               Object?,
               Object?
             >;
     element.handleCreate(ref, build);
   }
 }
+
+@ProviderFor(mangaStatistics)
+final mangaStatisticsProvider = MangaStatisticsFamily._();
+
+final class MangaStatisticsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<MangaStatistics>,
+          MangaStatistics,
+          FutureOr<MangaStatistics>
+        >
+    with $FutureModifier<MangaStatistics>, $FutureProvider<MangaStatistics> {
+  MangaStatisticsProvider._({
+    required MangaStatisticsFamily super.from,
+    required Manga super.argument,
+  }) : super(
+         retry: null,
+         name: r'mangaStatisticsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$mangaStatisticsHash();
+
+  @override
+  String toString() {
+    return r'mangaStatisticsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<MangaStatistics> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<MangaStatistics> create(Ref ref) {
+    final argument = this.argument as Manga;
+    return mangaStatistics(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is MangaStatisticsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$mangaStatisticsHash() => r'85f095879af719ed506a0b58e3895197db304241';
+
+final class MangaStatisticsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<MangaStatistics>, Manga> {
+  MangaStatisticsFamily._()
+    : super(
+        retry: null,
+        name: r'mangaStatisticsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  MangaStatisticsProvider call(Manga manga) =>
+      MangaStatisticsProvider._(argument: manga, from: this);
+
+  @override
+  String toString() => r'mangaStatisticsProvider';
+}
+
+@ProviderFor(ChapterStats)
+final chapterStatsProvider = ChapterStatsProvider._();
+
+final class ChapterStatsProvider
+    extends
+        $AsyncNotifierProvider<ChapterStats, Map<String, ChapterStatistics>> {
+  ChapterStatsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'chapterStatsProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$chapterStatsHash();
+
+  @$internal
+  @override
+  ChapterStats create() => ChapterStats();
+}
+
+String _$chapterStatsHash() => r'5c8ddd2f4f550026744dae14f00996cbeda56c83';
+
+abstract class _$ChapterStats
+    extends $AsyncNotifier<Map<String, ChapterStatistics>> {
+  FutureOr<Map<String, ChapterStatistics>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<Map<String, ChapterStatistics>>,
+              Map<String, ChapterStatistics>
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<Map<String, ChapterStatistics>>,
+                Map<String, ChapterStatistics>
+              >,
+              AsyncValue<Map<String, ChapterStatistics>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(Ratings)
+final ratingsProvider = RatingsFamily._();
+
+final class RatingsProvider
+    extends $AsyncNotifierProvider<Ratings, SelfRating?> {
+  RatingsProvider._({
+    required RatingsFamily super.from,
+    required Manga super.argument,
+  }) : super(
+         retry: null,
+         name: r'ratingsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$ratingsHash();
+
+  @override
+  String toString() {
+    return r'ratingsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  Ratings create() => Ratings();
+
+  @override
+  bool operator ==(Object other) {
+    return other is RatingsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$ratingsHash() => r'ec9c2ef2313b39c267e288eb96c7cdd614e5c15e';
+
+final class RatingsFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          Ratings,
+          AsyncValue<SelfRating?>,
+          SelfRating?,
+          FutureOr<SelfRating?>,
+          Manga
+        > {
+  RatingsFamily._()
+    : super(
+        retry: null,
+        name: r'ratingsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  RatingsProvider call(Manga manga) =>
+      RatingsProvider._(argument: manga, from: this);
+
+  @override
+  String toString() => r'ratingsProvider';
+}
+
+abstract class _$Ratings extends $AsyncNotifier<SelfRating?> {
+  late final _$args = ref.$arg as Manga;
+  Manga get manga => _$args;
+
+  FutureOr<SelfRating?> build(Manga manga);
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<SelfRating?>, SelfRating?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<SelfRating?>, SelfRating?>,
+              AsyncValue<SelfRating?>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, () => build(_$args));
+  }
+}
+
+@ProviderFor(mangadex)
+final mangadexProvider = MangadexProvider._();
+
+final class MangadexProvider
+    extends $FunctionalProvider<MangaDexModel, MangaDexModel, MangaDexModel>
+    with $Provider<MangaDexModel> {
+  MangadexProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'mangadexProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$mangadexHash();
+
+  @$internal
+  @override
+  $ProviderElement<MangaDexModel> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  MangaDexModel create(Ref ref) {
+    return mangadex(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(MangaDexModel value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<MangaDexModel>(value),
+    );
+  }
+}
+
+String _$mangadexHash() => r'4f95e2d6037a2e23987c4eafa80322c88c003f20';
