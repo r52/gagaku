@@ -16,6 +16,34 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader.g.dart';
 
+@visibleForTesting
+SourceHandler proxyReaderRouteHandle({
+  required String proxy,
+  required String code,
+  required String chapter,
+}) {
+  return SourceHandler(
+    type: SourceType.proxy,
+    sourceId: proxy,
+    location: code,
+    chapter: chapter.replaceFirst('-', '.'),
+  );
+}
+
+@visibleForTesting
+SourceHandler extensionReaderRouteHandle({
+  required String sourceId,
+  required String mangaId,
+  required String chapterId,
+}) {
+  return SourceHandler(
+    type: SourceType.source,
+    sourceId: sourceId,
+    location: mangaId,
+    chapter: chapterId,
+  );
+}
+
 @Riverpod(retry: noRetry)
 Future<WebReaderData> _fetchWebChapterInfo(
   Ref ref,
@@ -147,11 +175,10 @@ class ProxyWebSourceReaderPage extends StatelessWidget {
       );
     }
 
-    final handle = SourceHandler(
-      type: SourceType.proxy,
-      sourceId: proxy,
-      location: code,
-      chapter: chapter.replaceFirst('-', '.'),
+    final handle = proxyReaderRouteHandle(
+      proxy: proxy,
+      code: code,
+      chapter: chapter,
     );
 
     return DataProviderWhenWidget(
@@ -205,11 +232,10 @@ class ExtensionReaderPage extends StatelessWidget {
       );
     }
 
-    final handle = SourceHandler(
-      type: SourceType.source,
+    final handle = extensionReaderRouteHandle(
       sourceId: sourceId,
-      location: mangaId,
-      chapter: chapterId,
+      mangaId: mangaId,
+      chapterId: chapterId,
     );
 
     return DataProviderWhenWidget(

@@ -108,13 +108,45 @@ WebSourceBroker webSourceBroker(Ref ref) {
   return WebSourceBroker(ref);
 }
 
+abstract interface class WebSourceTransport {
+  Future<Response<dynamic>> getUri(Uri uri, {bool followRedirects = true});
+}
+
+class _DioWebSourceTransport implements WebSourceTransport {
+  _DioWebSourceTransport(this.dio);
+
+  final Dio dio;
+
+  @override
+  Future<Response<dynamic>> getUri(Uri uri, {bool followRedirects = true}) {
+    return dio.getUri(uri, options: Options(followRedirects: followRedirects));
+  }
+}
+
 class WebSourceBroker {
-  WebSourceBroker(this.ref) : _cache = ref.read(cacheProvider);
+  WebSourceBroker(
+    this.ref, {
+    WebSourceTransport? transport,
+    CacheManager? cache,
+    Future<bool> Function(String sourceId)? extensionExists,
+    Future<WebManga?> Function(String sourceId, String mangaId)?
+    extensionMangaFetcher,
+    void Function(HistoryLink link)? historySink,
+  }) : _cache = cache ?? ref.read(cacheProvider),
+       _extensionExists = extensionExists,
+       _extensionMangaFetcher = extensionMangaFetcher,
+       _historySink = historySink {
+    _transport = transport ?? _DioWebSourceTransport(_createDio());
+  }
 
   final Ref ref;
   final CacheManager _cache;
+  final Future<bool> Function(String sourceId)? _extensionExists;
+  final Future<WebManga?> Function(String sourceId, String mangaId)?
+  _extensionMangaFetcher;
+  final void Function(HistoryLink link)? _historySink;
 
-  late final Dio _dio = _createDio();
+  late final WebSourceTransport _transport;
 
   static const _imgurHost = 'imgur.com';
   static const _imgurAlbumUrlPrefix = '/a/';
@@ -148,6 +180,12 @@ class WebSourceBroker {
   }
 
   void syncAndLogHistory(HistoryLink link) {
+    final historySink = _historySink;
+    if (historySink != null) {
+      historySink(link);
+      return;
+    }
+
     if (ref.read(webConfigProvider).preserveHistory) {
       WebHistoryManager().add(link);
     } else {
@@ -207,8 +245,21 @@ class WebSourceBroker {
 
     final srcId = parts[0];
 
-    WebSourceInfo? src;
+    final extensionExists = _extensionExists;
+    if (extensionExists != null) {
+      if (!await extensionExists(srcId)) {
+        logger.w('Extension not found. url: ${uri.toString()}');
+        return null;
+      }
 
+      return SourceHandler(
+        type: SourceType.source,
+        sourceId: srcId,
+        location: parts[1],
+      );
+    }
+
+    WebSourceInfo? src;
     try {
       src = await ref.readAsync(extensionSourceProvider(srcId).future);
     } catch (e) {
@@ -267,10 +318,7 @@ class WebSourceBroker {
     if (!uri.path.startsWith(_cubariReadPrefix)) {
       logger.d('ProxyHandler: retrieving url ${uri.toString()}');
 
-      final response = await _dio.getUri(
-        uri,
-        options: Options(followRedirects: false),
-      );
+      final response = await _transport.getUri(uri, followRedirects: false);
 
       if (response.statusCode != 302 ||
           response.headers.value('location') == null ||
@@ -335,6 +383,11 @@ class WebSourceBroker {
     switch (handle.type) {
       case SourceType.source:
         return _fetchWithCache(handle.getKey(), () async {
+          final extensionMangaFetcher = _extensionMangaFetcher;
+          if (extensionMangaFetcher != null) {
+            return extensionMangaFetcher(handle.sourceId, handle.location);
+          }
+
           await ref.readAsync(extensionSourceProvider(handle.sourceId).future);
           return await ref
               .read(extensionSourceProvider(handle.sourceId).notifier)
@@ -350,7 +403,7 @@ class WebSourceBroker {
     final url = "$_cubariApiBase/${handle.sourceId}/series/${handle.location}/";
 
     return _fetchWithCache(handle.getKey(), () async {
-      final response = await _dio.getUri(Uri.parse(url));
+      final response = await _transport.getUri(Uri.parse(url));
 
       if (response.statusCode == 200) {
         final data = response.data;
@@ -369,7 +422,7 @@ class WebSourceBroker {
   Future<dynamic> getProxyAPI(String path) async {
     final url = "https://cubari.moe$path";
 
-    final response = await _dio.getUri(Uri.parse(url));
+    final response = await _transport.getUri(Uri.parse(url));
 
     if (response.statusCode == 200) {
       return response.data;
