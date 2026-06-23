@@ -158,7 +158,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
     for (final link in linksToUpdate) {
       final handledLink = await api.handleLink(link);
 
-      if (handledLink.handle != null) {
+      if (handledLink.series != null) {
         // Add links that didn't fail
         links.add(handledLink);
       }
@@ -186,7 +186,9 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
 
       logger.d('Update progress: $processedCount/${links.length}');
 
-      final manga = await api.getMangaFromSource(link.handle!);
+      final manga = await api.getMangaFromSource(
+        link.requireSeries.toLegacySourceHandler(),
+      );
       processedCount++;
 
       if (manga != null) {

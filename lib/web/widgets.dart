@@ -346,9 +346,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
               final tr = context.t;
               final item = items![index];
               final sourceIcon =
-                  extIcons[item.handle?.sourceId] ??
+                  extIcons[item.series?.sourceId] ??
                   Text(
-                    item.handle?.sourceId ?? '',
+                    item.series?.sourceId ?? '',
                     style: CommonTextStyles.twelve,
                   );
 
@@ -380,7 +380,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                   final result = await api.handleLink(item);
 
                   if (!context.mounted) return;
-                  if (result.handle == null) {
+                  if (result.series == null) {
                     messenger
                       ..removeCurrentSnackBar()
                       ..showSnackBar(
@@ -390,7 +390,10 @@ class WebMangaListViewSliver extends ConsumerWidget {
                         ),
                       );
                   } else {
-                    openWebSource(context, result.handle!);
+                    openWebSource(
+                      context,
+                      result.series!.toLegacySourceHandler(),
+                    );
                   }
                 },
               );
@@ -458,7 +461,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                       final result = await api.handleLink(item);
 
                       if (!context.mounted) return;
-                      if (result.handle == null) {
+                      if (result.series == null) {
                         messenger
                           ..removeCurrentSnackBar()
                           ..showSnackBar(
@@ -468,7 +471,10 @@ class WebMangaListViewSliver extends ConsumerWidget {
                             ),
                           );
                       } else {
-                        openWebSource(context, result.handle!);
+                        openWebSource(
+                          context,
+                          result.series!.toLegacySourceHandler(),
+                        );
                       }
                     },
                   );
@@ -527,7 +533,7 @@ class GridMangaItem extends HookConsumerWidget {
     );
     final theme = Theme.of(context);
 
-    final sourceId = link.handle?.sourceId ?? '';
+    final sourceId = link.series?.sourceId ?? '';
     final extIcons = ref.watch(_extensionIconProvider);
     final headers = ref.watch(sourceHeadersProvider(sourceId));
     final imageCache = ref.watch(extensionImageCacheProvider);
@@ -622,7 +628,7 @@ class GridMangaItem extends HookConsumerWidget {
         final result = await api.handleLink(link);
 
         if (!context.mounted) return;
-        if (result.handle == null) {
+        if (result.series == null) {
           messenger
             ..removeCurrentSnackBar()
             ..showSnackBar(
@@ -632,7 +638,7 @@ class GridMangaItem extends HookConsumerWidget {
               ),
             );
         } else {
-          openWebSource(context, result.handle!);
+          openWebSource(context, result.series!.toLegacySourceHandler());
         }
       },
       onHover: (hovering) {
@@ -957,12 +963,12 @@ class ChapterFeedItem extends StatelessWidget {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     final titleBtn = _MangaTitle(
-      key: ValueKey('_MangaTitle(${state.link.handle!.getKey()})'),
+      key: ValueKey('_MangaTitle(${state.link.requireSeries.key})'),
       link: state.link,
     );
 
     final coverBtn = _CoverButton(
-      key: ValueKey('_CoverButton(${state.link.handle!.getKey()})'),
+      key: ValueKey('_CoverButton(${state.link.requireSeries.key})'),
       link: state.link,
     );
 
@@ -988,7 +994,8 @@ class ChapterFeedItem extends StatelessWidget {
                               ChapterButtonWidget(
                                 data: item,
                                 manga: state.manga,
-                                handle: state.link.handle!,
+                                handle: state.link.requireSeries
+                                    .toLegacySourceHandler(),
                               ),
                           ],
                         ),
@@ -1012,7 +1019,8 @@ class ChapterFeedItem extends StatelessWidget {
                           ChapterButtonWidget(
                             data: item,
                             manga: state.manga,
-                            handle: state.link.handle!,
+                            handle: state.link.requireSeries
+                                .toLegacySourceHandler(),
                           ),
                       ],
                     ),
@@ -1032,7 +1040,7 @@ class _CoverButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final sourceId = link.handle?.sourceId ?? '';
+    final sourceId = link.series?.sourceId ?? '';
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final headers = ref.watch(sourceHeadersProvider(sourceId));
     final imageCache = ref.watch(extensionImageCacheProvider);
@@ -1046,7 +1054,7 @@ class _CoverButton extends ConsumerWidget {
           final result = await api.handleLink(link);
 
           if (!context.mounted) return;
-          if (result.handle == null) {
+          if (result.series == null) {
             messenger
               ..removeCurrentSnackBar()
               ..showSnackBar(
@@ -1056,7 +1064,7 @@ class _CoverButton extends ConsumerWidget {
                 ),
               );
           } else {
-            openWebSource(context, result.handle!);
+            openWebSource(context, result.series!.toLegacySourceHandler());
           }
         },
         child: Padding(
@@ -1115,7 +1123,7 @@ class _MangaTitle extends ConsumerWidget {
           final result = await api.handleLink(link);
 
           if (!context.mounted) return;
-          if (result.handle == null) {
+          if (result.series == null) {
             messenger
               ..removeCurrentSnackBar()
               ..showSnackBar(
@@ -1125,7 +1133,7 @@ class _MangaTitle extends ConsumerWidget {
                 ),
               );
           } else {
-            openWebSource(context, result.handle!);
+            openWebSource(context, result.series!.toLegacySourceHandler());
           }
         },
         child: Padding(

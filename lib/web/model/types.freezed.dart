@@ -834,7 +834,7 @@ $WebMangaCopyWith<$Res> get manga {
 /// @nodoc
 mixin _$HistoryLink {
 
- int get dbid; set dbid(int value); String get title; set title(String value); String get url; set url(String value); String? get cover; set cover(String? value); SourceHandler? get handle; set handle(SourceHandler? value); DateTime? get lastAccessed; set lastAccessed(DateTime? value); dynamic get lists;
+ int get dbid; set dbid(int value); String get title; set title(String value); String get url; set url(String value); String? get cover; set cover(String? value); WebSeriesRef? get series; set series(WebSeriesRef? value); DateTime? get lastAccessed; set lastAccessed(DateTime? value); dynamic get lists;
 /// Create a copy of HistoryLink
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -847,7 +847,7 @@ $HistoryLinkCopyWith<HistoryLink> get copyWith => _$HistoryLinkCopyWithImpl<Hist
 
 @override
 String toString() {
-  return 'HistoryLink(dbid: $dbid, title: $title, url: $url, cover: $cover, handle: $handle, lastAccessed: $lastAccessed, lists: $lists)';
+  return 'HistoryLink(dbid: $dbid, title: $title, url: $url, cover: $cover, series: $series, lastAccessed: $lastAccessed, lists: $lists)';
 }
 
 
@@ -858,7 +858,7 @@ abstract mixin class $HistoryLinkCopyWith<$Res>  {
   factory $HistoryLinkCopyWith(HistoryLink value, $Res Function(HistoryLink) _then) = _$HistoryLinkCopyWithImpl;
 @useResult
 $Res call({
- int dbid, String title, String url, String? cover, SourceHandler? handle, DateTime? lastAccessed
+ int dbid, String title, String url, String? cover, WebSeriesRef? series, DateTime? lastAccessed
 });
 
 
@@ -875,14 +875,14 @@ class _$HistoryLinkCopyWithImpl<$Res>
 
 /// Create a copy of HistoryLink
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? dbid = null,Object? title = null,Object? url = null,Object? cover = freezed,Object? handle = freezed,Object? lastAccessed = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? dbid = null,Object? title = null,Object? url = null,Object? cover = freezed,Object? series = freezed,Object? lastAccessed = freezed,}) {
   return _then(HistoryLink(
 dbid: null == dbid ? _self.dbid : dbid // ignore: cast_nullable_to_non_nullable
 as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String,cover: freezed == cover ? _self.cover : cover // ignore: cast_nullable_to_non_nullable
-as String?,handle: freezed == handle ? _self.handle : handle // ignore: cast_nullable_to_non_nullable
-as SourceHandler?,lastAccessed: freezed == lastAccessed ? _self.lastAccessed : lastAccessed // ignore: cast_nullable_to_non_nullable
+as String?,series: freezed == series ? _self.series : series // ignore: cast_nullable_to_non_nullable
+as WebSeriesRef?,lastAccessed: freezed == lastAccessed ? _self.lastAccessed : lastAccessed // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
 }

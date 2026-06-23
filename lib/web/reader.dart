@@ -8,6 +8,7 @@ import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/extension_image.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
@@ -53,14 +54,14 @@ Future<WebReaderData> _fetchWebChapterInfo(
   final manga = await api.getMangaFromSource(handle);
 
   if (manga != null) {
-    api.syncAndLogHistory(
-      HistoryLink(
+    await WebHistoryManager().record(
+      HistoryLink.fromSeries(
         title: manga.title,
-        url: handle.getURL(),
         cover: manga.cover,
-        handle: handle,
+        series: WebSeriesRef.fromLegacySourceHandler(handle),
         lastAccessed: DateTime.now(),
       ),
+      preserveHistory: ref.read(webConfigProvider).preserveHistory,
     );
 
     final chapter = manga.getChapter(handle.chapter!);

@@ -304,7 +304,7 @@ class HistoryLink with _$HistoryLink {
     required this.title,
     required this.url,
     this.cover,
-    this.handle,
+    this.series,
     this.lastAccessed,
   });
 
@@ -325,7 +325,12 @@ class HistoryLink with _$HistoryLink {
 
   @override
   @Transient()
-  SourceHandler? handle;
+  @JsonKey(
+    fromJson: _historySeriesFromJson,
+    toJson: _historySeriesToJson,
+    readValue: _readHistorySeries,
+  )
+  WebSeriesRef? series;
 
   @override
   @Property(type: PropertyType.date)
@@ -336,11 +341,18 @@ class HistoryLink with _$HistoryLink {
   final lists = ToMany<WebFavoritesList>();
 
   @JsonKey(includeFromJson: false, includeToJson: false)
-  String? get dbHandle => handle == null ? null : json.encode(handle?.toJson());
+  String? get dbHandle =>
+      series == null ? null : json.encode(_HistorySeriesCodec.encode(series!));
 
   set dbHandle(String? value) {
-    handle = value == null ? null : SourceHandler.fromJson(json.decode(value));
+    series = value == null
+        ? null
+        : _HistorySeriesCodec.decode(json.decode(value));
   }
+
+  WebSeriesRef get requireSeries =>
+      series ??
+      (throw StateError('HistoryLink "$url" has no series reference'));
 
   void resolveDb({Store? store, bool copyParams = false}) {
     final actualStore = store ?? GagakuData().store;
@@ -365,18 +377,29 @@ class HistoryLink with _$HistoryLink {
 
   Map<String, Object?> toJson() => _$HistoryLinkToJson(this);
 
+  factory HistoryLink.fromSeries({
+    int dbid = 0,
+    required String title,
+    required WebSeriesRef series,
+    String? url,
+    String? cover,
+    DateTime? lastAccessed,
+  }) => HistoryLink(
+    dbid: dbid,
+    title: title,
+    url: url ?? series.externalUrl,
+    cover: cover,
+    series: series,
+    lastAccessed: lastAccessed,
+  );
+
   factory HistoryLink.fromSearchReultItem(
     WebSourceInfo source,
     SearchResultItem item,
-  ) => HistoryLink(
+  ) => HistoryLink.fromSeries(
     title: item.title,
-    url: '${source.id}/${item.mangaId}',
     cover: item.imageUrl,
-    handle: SourceHandler(
-      type: SourceType.source,
-      sourceId: source.id,
-      location: item.mangaId,
-    ),
+    series: WebSeriesRef.extension(sourceId: source.id, mangaId: item.mangaId),
   );
 
   factory HistoryLink.fromDiscoverySectionItem(
@@ -387,44 +410,36 @@ class HistoryLink with _$HistoryLink {
       GenresCarouselItem() => throw UnsupportedError(
         'Unsupported section type',
       ),
-      ChapterUpdatesCarouselItem() => HistoryLink(
+      ChapterUpdatesCarouselItem() => HistoryLink.fromSeries(
         title: item.title,
-        url: '${source.id}/${item.mangaId}',
         cover: item.imageUrl,
-        handle: SourceHandler(
-          type: SourceType.source,
+        series: WebSeriesRef.extension(
           sourceId: source.id,
-          location: item.mangaId,
+          mangaId: item.mangaId,
         ),
       ),
-      ProminentCarouselItem() => HistoryLink(
+      ProminentCarouselItem() => HistoryLink.fromSeries(
         title: item.title,
-        url: '${source.id}/${item.mangaId}',
         cover: item.imageUrl,
-        handle: SourceHandler(
-          type: SourceType.source,
+        series: WebSeriesRef.extension(
           sourceId: source.id,
-          location: item.mangaId,
+          mangaId: item.mangaId,
         ),
       ),
-      SimpleCarouselItem() => HistoryLink(
+      SimpleCarouselItem() => HistoryLink.fromSeries(
         title: item.title,
-        url: '${source.id}/${item.mangaId}',
         cover: item.imageUrl,
-        handle: SourceHandler(
-          type: SourceType.source,
+        series: WebSeriesRef.extension(
           sourceId: source.id,
-          location: item.mangaId,
+          mangaId: item.mangaId,
         ),
       ),
-      FeaturedCarouselItem() => HistoryLink(
+      FeaturedCarouselItem() => HistoryLink.fromSeries(
         title: item.title,
-        url: '${source.id}/${item.mangaId}',
         cover: item.imageUrl,
-        handle: SourceHandler(
-          type: SourceType.source,
+        series: WebSeriesRef.extension(
           sourceId: source.id,
-          location: item.mangaId,
+          mangaId: item.mangaId,
         ),
       ),
     };
@@ -434,7 +449,7 @@ class HistoryLink with _$HistoryLink {
     return this == other &&
         title == other.title &&
         cover == other.cover &&
-        handle == other.handle;
+        series == other.series;
   }
 
   @override
@@ -463,6 +478,45 @@ class HistoryLink with _$HistoryLink {
     }
 
     return a.lastAccessed!.compareTo(b.lastAccessed!);
+  }
+}
+
+Object? _readHistorySeries(Map<dynamic, dynamic> json, String key) =>
+    json[key] ?? json['handle'];
+
+WebSeriesRef? _historySeriesFromJson(Object? value) =>
+    value == null ? null : _HistorySeriesCodec.decode(value);
+
+Object? _historySeriesToJson(WebSeriesRef? value) =>
+    value == null ? null : _HistorySeriesCodec.encode(value);
+
+abstract final class _HistorySeriesCodec {
+  static const version = 2;
+
+  static Map<String, Object?> encode(WebSeriesRef series) => {
+    'version': version,
+    'series': series.toJson(),
+  };
+
+  static WebSeriesRef decode(Object? value) {
+    if (value is! Map) {
+      throw const FormatException('Invalid persisted web series reference');
+    }
+
+    final data = Map<String, dynamic>.from(value);
+    if (data['version'] == version) {
+      final series = data['series'];
+      if (series is! Map) {
+        throw const FormatException('Missing persisted web series reference');
+      }
+      return WebSeriesRef.fromJson(Map<String, dynamic>.from(series));
+    }
+
+    if (data.containsKey('sourceId') && data.containsKey('location')) {
+      return WebSeriesRef.fromLegacySourceHandler(SourceHandler.fromJson(data));
+    }
+
+    return WebSeriesRef.fromJson(data);
   }
 }
 

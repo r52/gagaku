@@ -131,11 +131,9 @@ class WebSourceBroker {
     Future<bool> Function(String sourceId)? extensionExists,
     Future<WebManga?> Function(String sourceId, String mangaId)?
     extensionMangaFetcher,
-    void Function(HistoryLink link)? historySink,
   }) : _cache = cache ?? ref.read(cacheProvider),
        _extensionExists = extensionExists,
-       _extensionMangaFetcher = extensionMangaFetcher,
-       _historySink = historySink {
+       _extensionMangaFetcher = extensionMangaFetcher {
     _transport = transport ?? _DioWebSourceTransport(_createDio());
   }
 
@@ -144,7 +142,6 @@ class WebSourceBroker {
   final Future<bool> Function(String sourceId)? _extensionExists;
   final Future<WebManga?> Function(String sourceId, String mangaId)?
   _extensionMangaFetcher;
-  final void Function(HistoryLink link)? _historySink;
 
   late final WebSourceTransport _transport;
 
@@ -179,25 +176,8 @@ class WebSourceBroker {
     await _cache.invalidateAll(startsWith);
   }
 
-  void syncAndLogHistory(HistoryLink link) {
-    final historySink = _historySink;
-    if (historySink != null) {
-      historySink(link);
-      return;
-    }
-
-    if (ref.read(webConfigProvider).preserveHistory) {
-      WebHistoryManager().add(link);
-    } else {
-      link.resolveDb();
-      if (link.dbid > 0) {
-        GagakuData().store.box<HistoryLink>().put(link);
-      }
-    }
-  }
-
   Future<HistoryLink> handleLink(HistoryLink link) async {
-    if (link.handle != null) {
+    if (link.series != null) {
       return link;
     }
 
@@ -208,32 +188,17 @@ class WebSourceBroker {
       return link;
     }
 
-    final updatedLink = link.copyWith(handle: handle);
-
-    syncAndLogHistory(updatedLink);
-
-    return updatedLink;
+    return link.copyWith(series: WebSeriesRef.fromLegacySourceHandler(handle));
   }
 
   SourceHandler _handleImgurUrl(Uri uri) {
     final src = uri.path.substring(_imgurAlbumUrlPrefix.length);
-    final handle = SourceHandler(
+    return SourceHandler(
       type: SourceType.proxy,
       sourceId: 'imgur',
       location: src,
       chapter: '1',
     );
-
-    syncAndLogHistory(
-      HistoryLink(
-        title: uri.toString(),
-        url: uri.toString(),
-        handle: handle,
-        lastAccessed: DateTime.now(),
-      ),
-    );
-
-    return handle;
   }
 
   Future<SourceHandler?> _handleExtensionUrl(Uri uri) async {
@@ -488,6 +453,7 @@ class WebFavoritesManager extends ChangeNotifier {
   }
 
   Future<void> add(WebFavoritesList list, HistoryLink link) async {
+    link.requireSeries;
     await GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
       final linkBox = store.box<HistoryLink>();
       final listBox = store.box<WebFavoritesList>();
@@ -582,7 +548,30 @@ class WebHistoryManager {
     }, null);
   }
 
+  Future<void> record(HistoryLink link, {required bool preserveHistory}) async {
+    if (link.series == null) {
+      throw ArgumentError.value(
+        link,
+        'link',
+        'History records require a series reference',
+      );
+    }
+
+    if (preserveHistory) {
+      await add(link);
+      return;
+    }
+
+    await GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
+      link.resolveDb(store: store);
+      if (link.dbid > 0) {
+        store.box<HistoryLink>().put(link);
+      }
+    }, null);
+  }
+
   Future<void> add(HistoryLink link) async {
+    link.requireSeries;
     await GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
       final listBox = store.box<WebFavoritesList>();
       final linkBox = store.box<HistoryLink>();

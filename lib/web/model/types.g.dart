@@ -10,9 +10,7 @@ HistoryLink _$HistoryLinkFromJson(Map<String, dynamic> json) => HistoryLink(
   title: json['title'] as String,
   url: json['url'] as String,
   cover: json['cover'] as String?,
-  handle: json['handle'] == null
-      ? null
-      : SourceHandler.fromJson(json['handle'] as Map<String, dynamic>),
+  series: _historySeriesFromJson(_readHistorySeries(json, 'series')),
   lastAccessed: json['lastAccessed'] == null
       ? null
       : DateTime.parse(json['lastAccessed'] as String),
@@ -23,7 +21,7 @@ Map<String, dynamic> _$HistoryLinkToJson(HistoryLink instance) =>
       'title': instance.title,
       'url': instance.url,
       'cover': instance.cover,
-      'handle': instance.handle?.toJson(),
+      'series': _historySeriesToJson(instance.series),
       'lastAccessed': instance.lastAccessed?.toIso8601String(),
     };
 

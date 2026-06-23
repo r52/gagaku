@@ -21,14 +21,12 @@ void main() {
   group('WebSourceBroker link handling', () {
     late _RecordingWebSourceTransport transport;
     late _MemoryCacheManager cache;
-    late List<HistoryLink> history;
     late ProviderContainer container;
     late WebSourceBroker broker;
 
     setUp(() {
       transport = _RecordingWebSourceTransport();
       cache = _MemoryCacheManager();
-      history = [];
 
       final provider = Provider<WebSourceBroker>((ref) {
         return WebSourceBroker(
@@ -38,7 +36,6 @@ void main() {
           extensionExists: (sourceId) async => sourceId == 'installed',
           extensionMangaFetcher: (sourceId, mangaId) async =>
               _cubariManga(title: '$sourceId/$mangaId'),
-          historySink: history.add,
         );
       });
       container = ProviderContainer();
@@ -60,7 +57,6 @@ void main() {
           ),
         );
         expect(transport.requests, isEmpty);
-        expect(history, isEmpty);
       },
     );
 
@@ -96,6 +92,21 @@ void main() {
         ),
       );
       expect(transport.requests, isEmpty);
+    });
+
+    test('aggregate link resolution discards a direct chapter', () async {
+      final link = HistoryLink(
+        title: 'Series',
+        url: 'https://cubari.moe/read/gist/series-1/7/',
+      );
+
+      final resolved = await broker.handleLink(link);
+
+      expect(
+        resolved.series,
+        const WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1'),
+      );
+      expect(resolved.requireSeries.toLegacySourceHandler().chapter, isNull);
     });
 
     test(
@@ -154,9 +165,6 @@ void main() {
           chapter: '1',
         ),
       );
-      expect(history, hasLength(1));
-      expect(history.single.url, 'https://imgur.com/a/album-1');
-      expect(history.single.handle, handle);
     });
   });
 
@@ -182,7 +190,6 @@ void main() {
             extensionFetches++;
             return _cubariManga(title: '$sourceId/$mangaId');
           },
-          historySink: (_) {},
         );
       });
       container = ProviderContainer();
@@ -293,21 +300,21 @@ void main() {
     setUp(() {
       store.box<HistoryLink>().removeAll();
       store.box<WebFavoritesList>().removeAll();
+      store.box<WebFavoritesList>().put(
+        WebFavoritesList(id: historyListUUID, name: 'extension_history'),
+      );
     });
 
     tearDownAll(() {
       store.close();
     });
 
-    test('ObjectBox round-trip preserves the legacy handler payload', () {
-      final link = HistoryLink(
+    test('ObjectBox round-trip writes the versioned series payload', () {
+      final link = HistoryLink.fromSeries(
         title: 'Series',
-        url: 'source-1/manga-1',
-        handle: SourceHandler(
-          type: SourceType.source,
+        series: const WebSeriesRef.extension(
           sourceId: 'source-1',
-          location: 'manga-1',
-          chapter: 'temporary-chapter',
+          mangaId: 'manga-1',
         ),
       );
 
@@ -315,11 +322,129 @@ void main() {
       final restored = store.box<HistoryLink>().get(link.dbid);
 
       expect(restored, isNotNull);
-      expect(restored!.handle, link.handle);
-      expect(restored.dbHandle, json.encode(link.handle!.toJson()));
+      expect(restored!.series, link.series);
+      expect(json.decode(restored.dbHandle!), {
+        'version': 2,
+        'series': {
+          'sourceId': 'source-1',
+          'mangaId': 'manga-1',
+          'type': 'extension',
+        },
+      });
     });
 
-    test('normal extension factories create series-level handlers', () {
+    test('legacy chapter-bearing DB payload decodes as series-only', () {
+      final link = HistoryLink(title: 'Series', url: 'source-1/manga-1')
+        ..dbHandle = json.encode(
+          SourceHandler(
+            type: SourceType.source,
+            sourceId: 'source-1',
+            location: 'manga-1',
+            chapter: 'temporary-chapter',
+          ).toJson(),
+        );
+
+      expect(
+        link.series,
+        const WebSeriesRef.extension(sourceId: 'source-1', mangaId: 'manga-1'),
+      );
+      expect(link.dbHandle, isNot(contains('temporary-chapter')));
+    });
+
+    test('legacy backup JSON decodes and rewrites as a typed series', () {
+      final link = HistoryLink.fromJson({
+        'title': 'Series',
+        'url': 'source-1/manga-1',
+        'handle': {
+          'type': 'source',
+          'sourceId': 'source-1',
+          'location': 'manga-1',
+          'chapter': 'temporary-chapter',
+        },
+        'lastAccessed': null,
+      });
+
+      expect(
+        link.series,
+        const WebSeriesRef.extension(sourceId: 'source-1', mangaId: 'manga-1'),
+      );
+      expect(link.toJson(), isNot(contains('handle')));
+      expect(json.encode(link.toJson()), isNot(contains('temporary-chapter')));
+    });
+
+    test(
+      'history recording rejects links without a series reference',
+      () async {
+        final link = HistoryLink(
+          title: 'Unresolved',
+          url: 'https://example.com/unresolved',
+        );
+
+        await expectLater(
+          WebHistoryManager().record(link, preserveHistory: false),
+          throwsArgumentError,
+        );
+      },
+    );
+
+    test('history recording applies the preserve-history policy', () async {
+      final manager = WebHistoryManager();
+      final recorded = HistoryLink.fromSeries(
+        title: 'Recorded',
+        series: const WebSeriesRef.extension(
+          sourceId: 'source-1',
+          mangaId: 'recorded',
+        ),
+      );
+      final omitted = HistoryLink.fromSeries(
+        title: 'Omitted',
+        series: const WebSeriesRef.extension(
+          sourceId: 'source-1',
+          mangaId: 'omitted',
+        ),
+      );
+      final existing = HistoryLink.fromSeries(
+        title: 'Old title',
+        series: const WebSeriesRef.extension(
+          sourceId: 'source-1',
+          mangaId: 'existing',
+        ),
+      );
+      store.box<HistoryLink>().put(existing);
+      final updated = HistoryLink.fromSeries(
+        title: 'Updated title',
+        series: existing.requireSeries,
+      );
+
+      await manager.record(recorded, preserveHistory: true);
+      await manager.record(omitted, preserveHistory: false);
+      await manager.record(updated, preserveHistory: false);
+
+      final listQuery = store
+          .box<WebFavoritesList>()
+          .query(WebFavoritesList_.id.equals(historyListUUID))
+          .build();
+      final history = listQuery.findUnique()!;
+      listQuery.close();
+
+      expect(history.list, contains(recorded));
+      expect(history.list, isNot(contains(omitted)));
+      final omittedQuery = store
+          .box<HistoryLink>()
+          .query(HistoryLink_.url.equals(omitted.url))
+          .build();
+      expect(omittedQuery.findUnique(), isNull);
+      omittedQuery.close();
+
+      final updatedQuery = store
+          .box<HistoryLink>()
+          .query(HistoryLink_.url.equals(updated.url))
+          .build();
+      expect(updatedQuery.findUnique()?.title, 'Updated title');
+      updatedQuery.close();
+    });
+
+    test('normal extension factories create series-level references', () {
       final source = WebSourceInfo(
         id: 'source-1',
         name: 'Source',
@@ -337,9 +462,8 @@ void main() {
         ),
       );
 
-      expect(link.handle?.chapter, isNull);
       expect(link.url, 'source-1/manga-1');
-      expect(link.handle?.getKey(), link.url);
+      expect(link.series?.key, link.url);
     });
   });
 }

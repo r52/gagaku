@@ -48,9 +48,10 @@ class WebSourceHistoryPage extends HookConsumerWidget {
       if (stream.data != null) {
         final sourceIds = stream.data!
             .map(
-              (e) => e.handle?.type == SourceType.source
-                  ? e.handle?.sourceId
-                  : null,
+              (e) => switch (e.series) {
+                ExtensionSeriesRef(:final sourceId) => sourceId,
+                _ => null,
+              },
             )
             .whereType<String>()
             .toSet();

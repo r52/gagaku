@@ -183,10 +183,13 @@ void main() {
       final historylist = lists.firstWhere((e) => e.id == historyListUUID);
       expect(historylist.list.length, 1);
       expect(historylist.list.first.url, "FakeExtension/fake_location_1");
-      expect(historylist.list.first.handle?.type, SourceType.source);
-      expect(historylist.list.first.handle?.sourceId, "FakeExtension");
-      expect(historylist.list.first.handle?.location, "fake_location_1");
-      expect(historylist.list.first.handle?.chapter, isNull);
+      expect(
+        historylist.list.first.series,
+        const WebSeriesRef.extension(
+          sourceId: "FakeExtension",
+          mangaId: "fake_location_1",
+        ),
+      );
 
       final favlists = lists.where((e) => e.id != historyListUUID).toList();
       expect(favlists.length, 1);
@@ -221,10 +224,13 @@ void main() {
 
       expect(restored.title, 'Legacy Series');
       expect(restored.url, 'LegacyExtension/legacy_location');
-      expect(restored.handle?.type, SourceType.source);
-      expect(restored.handle?.sourceId, 'LegacyExtension');
-      expect(restored.handle?.location, 'legacy_location');
-      expect(restored.handle?.chapter, isNull);
+      expect(
+        restored.series,
+        const WebSeriesRef.extension(
+          sourceId: 'LegacyExtension',
+          mangaId: 'legacy_location',
+        ),
+      );
     });
   });
 }

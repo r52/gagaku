@@ -11,6 +11,7 @@ import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
@@ -31,11 +32,11 @@ Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
   final manga = await api.getMangaFromSource(handle);
 
   if (manga != null) {
-    final link = HistoryLink(
+    final series = WebSeriesRef.fromLegacySourceHandler(handle);
+    final link = HistoryLink.fromSeries(
       title: manga.title,
-      url: handle.getURL(),
       cover: manga.cover,
-      handle: handle,
+      series: series,
       lastAccessed: DateTime.now(),
     );
 
@@ -125,14 +126,15 @@ class WebMangaViewWidget extends HookConsumerWidget {
         },
       ),
     );
-    final api = ref.watch(webSourceBrokerProvider);
-
     useEffect(() {
       Future.delayed(Duration.zero, () async {
-        api.syncAndLogHistory(link);
+        await WebHistoryManager().record(
+          link,
+          preserveHistory: ref.read(webConfigProvider).preserveHistory,
+        );
       });
       return null;
-    }, []);
+    }, [link]);
 
     // Declared unconditionally (hooks rule).
     final chapterScrollController = useScrollController();
