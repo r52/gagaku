@@ -359,15 +359,6 @@ class MangaDexModel {
     _ => null,
   };
 
-  // void _urlLauncher(String url) async {
-  //   var uri = Uri.parse(url);
-  //   if (await canLaunchUrl(uri) || Platform.isAndroid) {
-  //     await launchUrl(uri);
-  //   } else {
-  //     throw 'Could not launch $url';
-  //   }
-  // }
-
   Stream<AuthenticationStatus> get authenticationStatus {
     final fresh = _fresh;
     if (fresh != null) {
@@ -545,7 +536,7 @@ class MangaDexModel {
     await _cache.invalidateAll(startsWith);
   }
 
-  Exception createException(String msg, Response response) {
+  Exception _createException(String msg, Response response) {
     if (response.statusCode == 503) {
       msg = 'MangaDex is down for maintenance';
     }
@@ -700,7 +691,7 @@ class MangaDexModel {
       if (onRejectedResponse != null) {
         return await onRejectedResponse(response);
       }
-      throw createException('$operation failed.', response);
+      throw _createException('$operation failed.', response);
     }
 
     try {
@@ -732,20 +723,20 @@ class MangaDexModel {
     final uri = Uri.parse(
       'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/mangadex.json',
     );
+    // This document is hosted outside MangaDex and intentionally bypasses the
+    // authenticated MangaDex transport.
     final response = await _externalTransport.getUri(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.data);
       final result = FrontPageData.fromJson(body);
 
-      // Cache the data
       await _cache.put(key, response.data, result);
 
       return result;
     }
 
-    // Throw if failure
-    throw createException("fetchFrontPageData() failed.", response);
+    throw _createException("fetchFrontPageData() failed.", response);
   }
 
   /// Fetches a generic [Chapter] list feed based on given parameters, respecting
@@ -770,7 +761,6 @@ class MangaDexModel {
   }) async {
     final settings = ref.read(mdConfigProvider);
 
-    // Download missing data
     final ord = order.json;
     final queryParams = {
       'limit': limit.toString(),
@@ -815,8 +805,10 @@ class MangaDexModel {
 
   /// Generic chunked fetch by IDs.
   ///
-  /// Filters out cached IDs, chunks the remainder, fires parallel GET requests,
-  /// caches results, and returns all requested entities from the cache.
+  /// Deduplicates IDs, fetches uncached IDs in parallel chunks, and returns
+  /// cached entities in request order. IDs omitted by successful responses are
+  /// omitted from the result, while any failed chunk is rethrown after all
+  /// chunks settle.
   Future<List<T>> _fetchByIds<T>({
     required String endpoint,
     required Iterable<String> ids,
@@ -982,7 +974,7 @@ class MangaDexModel {
 
     return _getEntityList(
       uri: uri,
-      operation: 'fetchManga()',
+      operation: 'fetchMangaList()',
       authenticated: false,
       cacheKey: key,
       resolveEntities: true,
@@ -1007,9 +999,6 @@ class MangaDexModel {
     Map<String, dynamic> queryParams = {
       'limit': limit.toString(),
       'offset': offset.toString(),
-      // 'availableTranslatedLanguage[]': settings.translatedLanguages
-      //     .map(const LanguageConverter().toJson)
-      //     .toList(),
       'originalLanguage[]': settings.originalLanguage
           .map(const LanguageConverter().toJson)
           .toList(),
