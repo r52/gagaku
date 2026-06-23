@@ -19,6 +19,7 @@ import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/fjs_extension_runtime.dart';
 import 'package:gagaku/web/model/extension_repository.dart';
+import 'package:gagaku/web/model/link_resolver.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -108,6 +109,27 @@ WebSourceBroker webSourceBroker(Ref ref) {
   return WebSourceBroker(ref);
 }
 
+@Riverpod(keepAlive: true)
+WebSourceTransport webSourceTransport(Ref ref) {
+  return _DioWebSourceTransport(_createWebSourceDio());
+}
+
+@Riverpod(keepAlive: true)
+WebLinkResolver webLinkResolver(Ref ref) {
+  return WebLinkResolver(
+    extensionExists: (sourceId) async {
+      final box = GagakuData().store.box<WebSourceInfo>();
+      final query = box.query(WebSourceInfo_.id.equals(sourceId)).build();
+      final source = query.findUnique();
+      query.close();
+      return source != null;
+    },
+    redirectTransport: _WebSourceRedirectTransport(
+      ref.watch(webSourceTransportProvider),
+    ),
+  );
+}
+
 abstract interface class WebSourceTransport {
   Future<Response<dynamic>> getUri(Uri uri, {bool followRedirects = true});
 }
@@ -123,48 +145,65 @@ class _DioWebSourceTransport implements WebSourceTransport {
   }
 }
 
+class _WebSourceRedirectTransport implements WebLinkRedirectTransport {
+  _WebSourceRedirectTransport(this.transport);
+
+  final WebSourceTransport transport;
+
+  @override
+  Future<Uri?> resolveRedirect(Uri uri) async {
+    logger.d('WebLinkResolver: retrieving redirect for ${uri.toString()}');
+
+    final response = await transport.getUri(uri, followRedirects: false);
+    if (response.statusCode != 302) {
+      return null;
+    }
+
+    final location = response.headers.value('location');
+    if (location == null || location.isEmpty) {
+      return null;
+    }
+
+    logger.d('WebLinkResolver: redirect location $location');
+    return Uri.tryParse(location);
+  }
+}
+
+Dio _createWebSourceDio() {
+  final dio = Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 5),
+      receiveTimeout: const Duration(seconds: 5),
+      validateStatus: (status) => true,
+    ),
+  );
+  dio.httpClientAdapter = NativeAdapter(
+    createCronetEngine: () => createCronetEngine(getUserAgent(false)),
+  );
+  dio.interceptors.add(RateLimitingInterceptor());
+  return dio;
+}
+
 class WebSourceBroker {
   WebSourceBroker(
     this.ref, {
     WebSourceTransport? transport,
     CacheManager? cache,
-    Future<bool> Function(String sourceId)? extensionExists,
     Future<WebManga?> Function(String sourceId, String mangaId)?
     extensionMangaFetcher,
   }) : _cache = cache ?? ref.read(cacheProvider),
-       _extensionExists = extensionExists,
        _extensionMangaFetcher = extensionMangaFetcher {
-    _transport = transport ?? _DioWebSourceTransport(_createDio());
+    _transport = transport ?? ref.read(webSourceTransportProvider);
   }
 
   final Ref ref;
   final CacheManager _cache;
-  final Future<bool> Function(String sourceId)? _extensionExists;
   final Future<WebManga?> Function(String sourceId, String mangaId)?
   _extensionMangaFetcher;
 
   late final WebSourceTransport _transport;
 
-  static const _imgurHost = 'imgur.com';
-  static const _imgurAlbumUrlPrefix = '/a/';
-  static const _cubariHost = 'cubari.moe';
-  static const _cubariReadPrefix = '/read/';
   static const _cubariApiBase = 'https://cubari.moe/read/api';
-
-  Dio _createDio() {
-    final dio = Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 5),
-        validateStatus: (status) => true,
-      ),
-    );
-    dio.httpClientAdapter = NativeAdapter(
-      createCronetEngine: () => createCronetEngine(getUserAgent(false)),
-    );
-    dio.interceptors.add(RateLimitingInterceptor());
-    return dio;
-  }
 
   Future<void> invalidateCacheItem(String item) async {
     if (await _cache.exists(item)) {
@@ -174,149 +213,6 @@ class WebSourceBroker {
 
   Future<void> invalidateAll(String startsWith) async {
     await _cache.invalidateAll(startsWith);
-  }
-
-  Future<HistoryLink> handleLink(HistoryLink link) async {
-    if (link.series != null) {
-      return link;
-    }
-
-    final handle = await handleUrl(url: link.url);
-
-    if (handle == null) {
-      logger.w('Failed to process url ${link.url}');
-      return link;
-    }
-
-    return link.copyWith(series: WebSeriesRef.fromLegacySourceHandler(handle));
-  }
-
-  SourceHandler _handleImgurUrl(Uri uri) {
-    final src = uri.path.substring(_imgurAlbumUrlPrefix.length);
-    return SourceHandler(
-      type: SourceType.proxy,
-      sourceId: 'imgur',
-      location: src,
-      chapter: '1',
-    );
-  }
-
-  Future<SourceHandler?> _handleExtensionUrl(Uri uri) async {
-    final parts = uri.pathSegments.toList();
-    if (parts.length != 2) {
-      logger.w('Invalid extension url ${uri.toString()}');
-      return null;
-    }
-
-    final srcId = parts[0];
-
-    final extensionExists = _extensionExists;
-    if (extensionExists != null) {
-      if (!await extensionExists(srcId)) {
-        logger.w('Extension not found. url: ${uri.toString()}');
-        return null;
-      }
-
-      return SourceHandler(
-        type: SourceType.source,
-        sourceId: srcId,
-        location: parts[1],
-      );
-    }
-
-    WebSourceInfo? src;
-    try {
-      src = await ref.readAsync(extensionSourceProvider(srcId).future);
-    } catch (e) {
-      logger.w('extensionSourceProvider($srcId) failed');
-      src = null;
-    }
-
-    if (src == null) {
-      logger.w('Extension not found. url: ${uri.toString()}');
-      return null;
-    }
-
-    final loc = parts[1];
-    final handle = SourceHandler(
-      type: SourceType.source,
-      sourceId: src.id,
-      location: loc,
-    );
-
-    return handle;
-  }
-
-  Future<SourceHandler?> _parseCubariReadPath(Uri uri) async {
-    if (uri.path.isEmpty || uri.pathSegments.isEmpty) {
-      return null;
-    }
-
-    var proxy = uri.pathSegments.toList();
-    proxy.removeWhere((element) => element.isEmpty);
-
-    if (proxy.length < 2) {
-      return null;
-    }
-
-    if (proxy[0] != 'read') {
-      return null;
-    }
-
-    if (proxy.length >= 4) {
-      return SourceHandler(
-        type: SourceType.proxy,
-        sourceId: proxy[1],
-        location: proxy[2],
-        chapter: proxy[3],
-      );
-    }
-
-    return SourceHandler(
-      type: SourceType.proxy,
-      sourceId: proxy[1],
-      location: proxy[2],
-    );
-  }
-
-  Future<SourceHandler?> _handleProxyUrl(Uri uri) async {
-    if (!uri.path.startsWith(_cubariReadPrefix)) {
-      logger.d('ProxyHandler: retrieving url ${uri.toString()}');
-
-      final response = await _transport.getUri(uri, followRedirects: false);
-
-      if (response.statusCode != 302 ||
-          response.headers.value('location') == null ||
-          response.headers['location']!.isEmpty) {
-        return null;
-      }
-
-      final location = response.headers['location']!.first;
-
-      if (!location.startsWith(_cubariReadPrefix)) {
-        return null;
-      }
-
-      logger.d('ProxyHandler: location $location');
-
-      uri = Uri.parse(location);
-    }
-
-    return _parseCubariReadPath(uri);
-  }
-
-  Future<SourceHandler?> handleUrl({required String url}) async {
-    final uri = Uri.parse(url);
-
-    if (uri.host == _imgurHost && uri.path.startsWith(_imgurAlbumUrlPrefix)) {
-      return _handleImgurUrl(uri);
-    }
-
-    if (uri.host == _cubariHost) {
-      return _handleProxyUrl(uri);
-    }
-
-    return _handleExtensionUrl(uri);
   }
 
   Future<WebManga?> _fetchWithCache(

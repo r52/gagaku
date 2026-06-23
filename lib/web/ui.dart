@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/web/model/link_resolver.dart';
 import 'package:gagaku/web/model/model.dart';
 
-Future<void> openLinkDialog(BuildContext context, WebSourceBroker api) async {
+Future<void> openLinkDialog(
+  BuildContext context,
+  WebLinkResolver resolver,
+) async {
   final tr = context.t;
   final messenger = ScaffoldMessenger.of(context);
   final result = await showDialog<String>(
@@ -15,10 +19,10 @@ Future<void> openLinkDialog(BuildContext context, WebSourceBroker api) async {
   );
 
   if (result != null && context.mounted) {
-    final parseResult = await api.handleUrl(url: result);
+    final resolved = await resolver.resolve(result);
 
     if (!context.mounted) return;
-    if (parseResult == null) {
+    if (resolved == null) {
       messenger
         ..removeCurrentSnackBar()
         ..showSnackBar(
@@ -28,7 +32,7 @@ Future<void> openLinkDialog(BuildContext context, WebSourceBroker api) async {
           ),
         );
     } else {
-      openWebSource(context, parseResult);
+      openWebSource(context, resolved.toLegacySourceHandler());
     }
   }
 }

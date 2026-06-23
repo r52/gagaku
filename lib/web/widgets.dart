@@ -67,7 +67,7 @@ class WebSourceSliverAppBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final nav = Navigator.of(context);
-    final api = ref.watch(webSourceBrokerProvider);
+    final resolver = ref.watch(webLinkResolverProvider);
 
     return SliverAppBar.medium(
       pinned: true,
@@ -135,7 +135,7 @@ class WebSourceSliverAppBar extends ConsumerWidget {
                 ),
                 MenuItemButton(
                   leadingIcon: const Icon(Icons.open_in_browser),
-                  onPressed: () => openLinkDialog(context, api),
+                  onPressed: () => openLinkDialog(context, resolver),
                   child: Text(tr.webSources.openLink),
                 ),
                 MenuItemButton(
@@ -318,9 +318,10 @@ class WebMangaListViewSliver extends ConsumerWidget {
           //               onTap: () async {
           //                 final tr = context.t;
           //                 final messenger = ScaffoldMessenger.of(context);
-          //                 final result = await api.handleLink(item);
+          //                 final resolver = ref.read(webLinkResolverProvider);
+          //                 final result = await resolver.resolveHistoryLink(item);
           //                 if (!context.mounted) return;
-          //                 if (result.handle == null) {
+          //                 if (result.series == null) {
           //                   messenger
           //                     ..removeCurrentSnackBar()
           //                     ..showSnackBar(
@@ -330,7 +331,10 @@ class WebMangaListViewSliver extends ConsumerWidget {
           //                       ),
           //                     );
           //                 } else {
-          //                   openWebSource(context, result.handle!);
+          //                   openWebSource(
+          //                     context,
+          //                     result.series!.toLegacySourceHandler(),
+          //                   );
           //                 }
           //               },
           //               trailing: sourceIcon,
@@ -375,9 +379,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
                 textColor: theme.colorScheme.onSurface,
                 onTap: () async {
                   final tr = context.t;
-                  final api = ref.read(webSourceBrokerProvider);
+                  final resolver = ref.read(webLinkResolverProvider);
                   final messenger = ScaffoldMessenger.of(context);
-                  final result = await api.handleLink(item);
+                  final result = await resolver.resolveHistoryLink(item);
 
                   if (!context.mounted) return;
                   if (result.series == null) {
@@ -456,9 +460,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
                     textColor: theme.colorScheme.onSurface,
                     onTap: () async {
                       final tr = context.t;
-                      final api = ref.read(webSourceBrokerProvider);
+                      final resolver = ref.read(webLinkResolverProvider);
                       final messenger = ScaffoldMessenger.of(context);
-                      final result = await api.handleLink(item);
+                      final result = await resolver.resolveHistoryLink(item);
 
                       if (!context.mounted) return;
                       if (result.series == null) {
@@ -623,9 +627,9 @@ class GridMangaItem extends HookConsumerWidget {
 
     return InkWell(
       onTap: () async {
-        final api = ref.read(webSourceBrokerProvider);
+        final resolver = ref.read(webLinkResolverProvider);
         final messenger = ScaffoldMessenger.of(context);
-        final result = await api.handleLink(link);
+        final result = await resolver.resolveHistoryLink(link);
 
         if (!context.mounted) return;
         if (result.series == null) {
@@ -1049,9 +1053,9 @@ class _CoverButton extends ConsumerWidget {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () async {
-          final api = ref.read(webSourceBrokerProvider);
+          final resolver = ref.read(webLinkResolverProvider);
           final messenger = ScaffoldMessenger.of(context);
-          final result = await api.handleLink(link);
+          final result = await resolver.resolveHistoryLink(link);
 
           if (!context.mounted) return;
           if (result.series == null) {
@@ -1118,9 +1122,9 @@ class _MangaTitle extends ConsumerWidget {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () async {
-          final api = ref.read(webSourceBrokerProvider);
+          final resolver = ref.read(webLinkResolverProvider);
           final messenger = ScaffoldMessenger.of(context);
-          final result = await api.handleLink(link);
+          final result = await resolver.resolveHistoryLink(link);
 
           if (!context.mounted) return;
           if (result.series == null) {
