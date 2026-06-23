@@ -30,29 +30,32 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'model.g.dart';
 
 const historyListUUID = 'd6f79229-6f8e-4872-9610-5200a54aef8f';
-void openWebSource(BuildContext context, SourceHandler handle) {
-  if (handle.chapter != null) {
-    WebReaderData? readerData;
-
-    if (handle.sourceId == 'imgur') {
-      final code = '/read/api/imgur/chapter/${handle.location}';
-      readerData = WebReaderData(source: code, handle: handle);
+void openWebSource(BuildContext context, ResolvedWebLink link) {
+  final initialChapter = link.initialChapter;
+  if (initialChapter != null) {
+    switch (initialChapter.series) {
+      case ProxySeriesRef(:final proxyId, :final seriesId):
+        ProxyWebSourceReaderRoute(
+          proxy: proxyId,
+          code: seriesId,
+          chapter: initialChapter.chapterId,
+          page: '1',
+        ).push(context);
+      case ExtensionSeriesRef(:final sourceId, :final mangaId):
+        ExtensionReaderRoute(
+          sourceId: sourceId,
+          mangaId: mangaId,
+          chapterId: initialChapter.chapterId,
+        ).push(context);
     }
-
-    ProxyWebSourceReaderRoute(
-      proxy: handle.sourceId,
-      code: handle.location,
-      chapter: handle.chapter!,
-      page: '1',
-      $extra: readerData,
-    ).push(context);
-  } else {
-    WebMangaViewRoute(
-      sourceId: handle.sourceId,
-      mangaId: handle.location,
-      handle: handle,
-    ).push(context);
+    return;
   }
+
+  WebMangaViewRoute(
+    sourceId: link.series.sourceId,
+    mangaId: link.series.location,
+    handle: link.series.toLegacySourceHandler(),
+  ).push(context);
 }
 
 String _processReferrer(String? baseUrl) {

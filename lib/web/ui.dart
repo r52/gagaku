@@ -32,7 +32,7 @@ Future<void> openLinkDialog(
           ),
         );
     } else {
-      openWebSource(context, resolved.toLegacySourceHandler());
+      openWebSource(context, resolved);
     }
   }
 }

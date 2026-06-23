@@ -1034,7 +1034,6 @@ mixin $ProxyWebSourceReaderRoute on GoRouteData {
         code: state.pathParameters['code']!,
         chapter: state.pathParameters['chapter']!,
         page: state.pathParameters['page'],
-        $extra: state.extra as WebReaderData?,
       );
 
   ProxyWebSourceReaderRoute get _self => this as ProxyWebSourceReaderRoute;
@@ -1045,19 +1044,17 @@ mixin $ProxyWebSourceReaderRoute on GoRouteData {
   );
 
   @override
-  void go(BuildContext context) => context.go(location, extra: _self.$extra);
+  void go(BuildContext context) => context.go(location);
 
   @override
-  Future<T?> push<T>(BuildContext context) =>
-      context.push<T>(location, extra: _self.$extra);
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
   void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location, extra: _self.$extra);
+      context.pushReplacement(location);
 
   @override
-  void replace(BuildContext context) =>
-      context.replace(location, extra: _self.$extra);
+  void replace(BuildContext context) => context.replace(location);
 }
 
 RouteBase get $extensionReaderRoute => GoRouteData.$route(
@@ -1071,7 +1068,6 @@ mixin $ExtensionReaderRoute on GoRouteData {
         sourceId: state.pathParameters['sourceId']!,
         mangaId: state.pathParameters['mangaId']!,
         chapterId: state.pathParameters['chapterId']!,
-        $extra: state.extra as WebReaderData?,
       );
 
   ExtensionReaderRoute get _self => this as ExtensionReaderRoute;
@@ -1082,19 +1078,17 @@ mixin $ExtensionReaderRoute on GoRouteData {
   );
 
   @override
-  void go(BuildContext context) => context.go(location, extra: _self.$extra);
+  void go(BuildContext context) => context.go(location);
 
   @override
-  Future<T?> push<T>(BuildContext context) =>
-      context.push<T>(location, extra: _self.$extra);
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
   void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location, extra: _self.$extra);
+      context.pushReplacement(location);
 
   @override
-  void replace(BuildContext context) =>
-      context.replace(location, extra: _self.$extra);
+  void replace(BuildContext context) => context.replace(location);
 }
 
 RouteBase get $extensionSearchRoute => GoRouteData.$route(

@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/config.dart';
-import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
@@ -333,7 +332,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
           //                 } else {
           //                   openWebSource(
           //                     context,
-          //                     result.series!.toLegacySourceHandler(),
+          //                     ResolvedWebLink(series: result.series!),
           //                   );
           //                 }
           //               },
@@ -396,7 +395,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                   } else {
                     openWebSource(
                       context,
-                      result.series!.toLegacySourceHandler(),
+                      ResolvedWebLink(series: result.series!),
                     );
                   }
                 },
@@ -477,7 +476,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
                       } else {
                         openWebSource(
                           context,
-                          result.series!.toLegacySourceHandler(),
+                          ResolvedWebLink(series: result.series!),
                         );
                       }
                     },
@@ -642,7 +641,7 @@ class GridMangaItem extends HookConsumerWidget {
               ),
             );
         } else {
-          openWebSource(context, result.series!.toLegacySourceHandler());
+          openWebSource(context, ResolvedWebLink(series: result.series!));
         }
       },
       onHover: (hovering) {
@@ -747,13 +746,11 @@ class ChapterButtonWidget extends HookConsumerWidget {
     required this.data,
     required this.manga,
     required this.handle,
-    this.onLinkPressed,
   });
 
   final WebChapterItem data;
   final WebManga manga;
   final SourceHandler handle;
-  final CtxCallback? onLinkPressed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -762,11 +759,11 @@ class ChapterButtonWidget extends HookConsumerWidget {
 
     final title = data.title;
     final date = data.date;
-    final (chapterkey, groupKey, sourceValue) = switch (data) {
+    final (chapterkey, groupKey, extensionChapter) = switch (data) {
       WebChapterItemCubari(:final entry) => (
         entry.name,
         entry.chapter.groups.entries.first.key,
-        entry.chapter.groups.entries.first.value,
+        null,
       ),
       WebChapterItemExtension(:final chapter) => (
         chapter.chapNum.toString(),
@@ -800,8 +797,8 @@ class ChapterButtonWidget extends HookConsumerWidget {
       [date, lang],
     );
 
-    final language = sourceValue is Chapter
-        ? CountryFlag(flag: sourceValue.langCode, size: 12)
+    final language = extensionChapter != null
+        ? CountryFlag(flag: extensionChapter.langCode, size: 12)
         : null;
 
     final textstyle = TextStyle(
@@ -839,28 +836,17 @@ class ChapterButtonWidget extends HookConsumerWidget {
       ),
     );
 
-    final readerData = WebReaderData(
-      source: sourceValue,
-      title: title,
-      link: manga.title,
-      handle: handle,
-      readKey: chapterkey,
-      onLinkPressed: onLinkPressed,
-    );
-
     final route = switch (data) {
       WebChapterItemCubari() => ProxyWebSourceReaderRoute(
         proxy: handle.sourceId,
         code: handle.location,
         chapter: chapterkey,
         page: '1',
-        $extra: readerData,
       ),
       WebChapterItemExtension(:final chapter) => ExtensionReaderRoute(
         sourceId: handle.sourceId,
         mangaId: handle.location,
         chapterId: chapter.chapterId,
-        $extra: readerData,
       ),
     };
 
@@ -1068,7 +1054,7 @@ class _CoverButton extends ConsumerWidget {
                 ),
               );
           } else {
-            openWebSource(context, result.series!.toLegacySourceHandler());
+            openWebSource(context, ResolvedWebLink(series: result.series!));
           }
         },
         child: Padding(
@@ -1137,7 +1123,7 @@ class _MangaTitle extends ConsumerWidget {
                 ),
               );
           } else {
-            openWebSource(context, result.series!.toLegacySourceHandler());
+            openWebSource(context, ResolvedWebLink(series: result.series!));
           }
         },
         child: Padding(

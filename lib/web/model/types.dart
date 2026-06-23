@@ -6,7 +6,6 @@ import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
-import 'package:gagaku/reader/main.dart' show CtxCallback;
 import 'package:gagaku/util/freezed.dart';
 import 'package:uuid/uuid.dart';
 
@@ -16,24 +15,6 @@ import 'package:objectbox/objectbox.dart';
 
 part 'types.freezed.dart';
 part 'types.g.dart';
-
-class WebReaderData {
-  const WebReaderData({
-    required this.source,
-    this.title,
-    this.link,
-    required this.handle,
-    this.readKey,
-    this.onLinkPressed,
-  });
-
-  final dynamic source;
-  final String? title;
-  final String? link;
-  final SourceHandler handle;
-  final String? readKey;
-  final CtxCallback? onLinkPressed;
-}
 
 @Entity()
 class ReadMarkersDB {

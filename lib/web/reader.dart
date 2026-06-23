@@ -17,230 +17,159 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader.g.dart';
 
-@visibleForTesting
-SourceHandler proxyReaderRouteHandle({
+WebChapterRef proxyReaderRouteRef({
   required String proxy,
   required String code,
   required String chapter,
 }) {
-  return SourceHandler(
-    type: SourceType.proxy,
-    sourceId: proxy,
-    location: code,
-    chapter: chapter.replaceFirst('-', '.'),
+  return WebChapterRef(
+    series: WebSeriesRef.proxy(proxyId: proxy, seriesId: code),
+    chapterId: chapter.replaceFirst('-', '.'),
   );
 }
 
-@visibleForTesting
-SourceHandler extensionReaderRouteHandle({
+WebChapterRef extensionReaderRouteRef({
   required String sourceId,
   required String mangaId,
   required String chapterId,
 }) {
-  return SourceHandler(
-    type: SourceType.source,
-    sourceId: sourceId,
-    location: mangaId,
-    chapter: chapterId,
+  return WebChapterRef(
+    series: WebSeriesRef.extension(sourceId: sourceId, mangaId: mangaId),
+    chapterId: chapterId,
   );
 }
 
-@Riverpod(retry: noRetry)
-Future<WebReaderData> _fetchWebChapterInfo(
-  Ref ref,
-  SourceHandler handle,
-) async {
-  final api = ref.watch(webSourceBrokerProvider);
-  final series = WebSeriesRef.fromLegacySourceHandler(handle);
-  final manga = await api.getManga(series);
-
-  if (manga != null) {
-    await WebHistoryManager().record(
-      HistoryLink.fromSeries(
-        title: manga.title,
-        cover: manga.cover,
-        series: series,
-        lastAccessed: DateTime.now(),
-      ),
-      preserveHistory: ref.read(webConfigProvider).preserveHistory,
-    );
-
-    final chapter = manga.getChapter(handle.chapter!);
-
-    if (chapter != null) {
-      return switch (chapter) {
-        WebChapterItemCubari(:final entry) => WebReaderData(
-          source: entry.chapter.groups.entries.first.value,
-          title: chapter.title,
-          link: manga.title,
-          handle: handle,
-          readKey: handle.chapter,
-        ),
-        WebChapterItemExtension(chapter: final extChapter) => WebReaderData(
-          source: extChapter,
-          title: chapter.title,
-          link: manga.title,
-          handle: handle,
-          readKey: handle.chapter,
-        ),
-      };
-    }
-  }
-
-  throw InvalidDataException('Invalid WebChapter link. Data not found.');
-}
-
-@Riverpod(retry: noRetry)
-Future<List<ReaderPage>> _getPages(Ref ref, dynamic data) async {
-  List<String> links;
-
-  if (data is String &&
-      (data.startsWith('/read/') || data.startsWith('/proxy/'))) {
-    final api = ref.watch(webSourceBrokerProvider);
-    data = await api.getProxyAPI(data);
-  }
-
-  if (data is! List) {
-    throw InvalidDataException('Unknown page data type ($data)');
-  }
-
-  if (data.first is! String) {
-    final imgurlist = data.map((e) => ImgurPage.fromJson(e)).toList();
-    links = imgurlist.map((e) => e.src).toList();
-  } else {
-    links = List<String>.from(data);
-  }
-
-  final pages = links
-      .map((e) => ReaderPage(provider: NetworkImage(e)))
-      .toList();
-
-  ref.onDispose(() {
-    pages.clear();
-  });
-
-  return pages;
-}
-
-@Riverpod(retry: noRetry)
-Future<List<ReaderPage>> _getSourcePages(
-  Ref ref,
-  dynamic chapter,
-  SourceHandler handle,
-) async {
-  final api = ref.watch(webSourceBrokerProvider);
-  final series = WebSeriesRef.fromLegacySourceHandler(handle);
-  if (series is! ExtensionSeriesRef) {
-    throw InvalidDataException('Expected an extension series reference.');
-  }
-  final result = await api.getExtensionChapterPages(series, chapter as Chapter);
-
-  final pages = result.links
-      .map((e) => ReaderPage(provider: ExtensionImage(e, result.runtime)))
-      .toList();
-
-  ref.onDispose(() {
-    pages.clear();
-  });
-
-  return pages;
-}
-
-class ProxyWebSourceReaderPage extends StatelessWidget {
-  const ProxyWebSourceReaderPage({
-    super.key,
-    required this.proxy,
-    required this.code,
+class ResolvedWebChapter {
+  const ResolvedWebChapter({
     required this.chapter,
-    this.page,
-    this.readerData,
+    required this.title,
+    required this.seriesTitle,
+    required this.readMarkerKey,
+    required this.pages,
   });
 
-  final String proxy;
-  final String code;
-  final String chapter;
-  final String? page;
-
-  final WebReaderData? readerData;
-
-  @override
-  Widget build(BuildContext context) {
-    if (readerData != null) {
-      return WebSourceReaderWidget(
-        source: readerData!.source,
-        title: readerData!.title,
-        link: readerData!.link,
-        handle: readerData!.handle,
-        readKey: readerData!.readKey,
-        onLinkPressed: readerData!.onLinkPressed,
-      );
-    }
-
-    final handle = proxyReaderRouteHandle(
-      proxy: proxy,
-      code: code,
-      chapter: chapter,
-    );
-
-    return DataProviderWhenWidget(
-      provider: _fetchWebChapterInfoProvider(handle),
-      loadingBuilder: (context, progress) => Scaffold(
-        appBar: AppBar(leading: const BackButton()),
-        body: Center(
-          child: CircularProgressIndicator(value: progress?.toDouble()),
-        ),
-      ),
-      errorBuilder: (context, child, _, _) => Scaffold(
-        appBar: AppBar(leading: const BackButton()),
-        body: child,
-      ),
-      builder: (context, data) => WebSourceReaderWidget(
-        source: data.source,
-        title: data.title,
-        link: data.link,
-        handle: data.handle,
-        readKey: data.readKey,
-        onLinkPressed: data.onLinkPressed,
-      ),
-    );
-  }
+  final WebChapterRef chapter;
+  final String title;
+  final String? seriesTitle;
+  final String readMarkerKey;
+  final List<ReaderPage> pages;
 }
 
-class ExtensionReaderPage extends StatelessWidget {
-  const ExtensionReaderPage({
-    super.key,
-    required this.sourceId,
-    required this.mangaId,
-    required this.chapterId,
-    this.readerData,
-  });
+@Riverpod(retry: noRetry)
+Future<ResolvedWebChapter> resolveWebChapter(
+  Ref ref,
+  WebChapterRef chapterRef,
+) async {
+  final api = ref.watch(webSourceBrokerProvider);
+  final series = chapterRef.series;
 
-  final String sourceId;
-  final String mangaId;
-  final String chapterId;
-  final WebReaderData? readerData;
+  if (series case ProxySeriesRef(proxyId: 'imgur', :final seriesId)) {
+    final data = await api.getProxyAPI('/read/api/imgur/chapter/$seriesId');
+    return ResolvedWebChapter(
+      chapter: chapterRef,
+      title: seriesId,
+      seriesTitle: null,
+      readMarkerKey: chapterRef.chapterId,
+      pages: await _networkReaderPages(ref, data),
+    );
+  }
+
+  final manga = await api.getManga(series);
+  if (manga == null) {
+    throw InvalidDataException('Invalid WebManga link. Data not found.');
+  }
+
+  await WebHistoryManager().record(
+    HistoryLink.fromSeries(
+      title: manga.title,
+      cover: manga.cover,
+      series: series,
+      lastAccessed: DateTime.now(),
+    ),
+    preserveHistory: ref.read(webConfigProvider).preserveHistory,
+  );
+
+  final chapter = manga.getChapter(chapterRef.chapterId);
+  if (chapter == null) {
+    throw InvalidDataException('Invalid WebChapter link. Data not found.');
+  }
+
+  final (readMarkerKey, pages) = switch (chapter) {
+    WebChapterItemCubari(:final entry) => (
+      entry.name,
+      await _networkReaderPages(ref, entry.chapter.groups.entries.first.value),
+    ),
+    WebChapterItemExtension(chapter: final extensionChapter) => (
+      extensionChapter.chapNum.toString(),
+      await _extensionReaderPages(
+        ref,
+        series as ExtensionSeriesRef,
+        extensionChapter,
+      ),
+    ),
+  };
+
+  return ResolvedWebChapter(
+    chapter: chapterRef,
+    title: chapter.title,
+    seriesTitle: manga.title,
+    readMarkerKey: readMarkerKey,
+    pages: pages,
+  );
+}
+
+Future<List<ReaderPage>> _networkReaderPages(Ref ref, Object? source) async {
+  if (source is String &&
+      (source.startsWith('/read/') || source.startsWith('/proxy/'))) {
+    source = await ref.watch(webSourceBrokerProvider).getProxyAPI(source);
+  }
+
+  if (source is! List) {
+    throw InvalidDataException('Unknown page data type ($source)');
+  }
+
+  final links = source.isEmpty
+      ? <String>[]
+      : source.first is String
+      ? List<String>.from(source)
+      : source
+            .map((page) => ImgurPage.fromJson(Map<String, dynamic>.from(page)))
+            .map((page) => page.src)
+            .toList();
+  final pages = [
+    for (final link in links) ReaderPage(provider: NetworkImage(link)),
+  ];
+
+  ref.onDispose(pages.clear);
+  return pages;
+}
+
+Future<List<ReaderPage>> _extensionReaderPages(
+  Ref ref,
+  ExtensionSeriesRef series,
+  Chapter chapter,
+) async {
+  final result = await ref
+      .watch(webSourceBrokerProvider)
+      .getExtensionChapterPages(series, chapter);
+  final pages = [
+    for (final link in result.links)
+      ReaderPage(provider: ExtensionImage(link, result.runtime)),
+  ];
+
+  ref.onDispose(pages.clear);
+  return pages;
+}
+
+class WebSourceReaderPage extends StatelessWidget {
+  const WebSourceReaderPage({super.key, required this.chapter});
+
+  final WebChapterRef chapter;
 
   @override
   Widget build(BuildContext context) {
-    if (readerData != null) {
-      return WebSourceReaderWidget(
-        source: readerData!.source,
-        title: readerData!.title,
-        link: readerData!.link,
-        handle: readerData!.handle,
-        readKey: readerData!.readKey,
-        onLinkPressed: readerData!.onLinkPressed,
-      );
-    }
-
-    final handle = extensionReaderRouteHandle(
-      sourceId: sourceId,
-      mangaId: mangaId,
-      chapterId: chapterId,
-    );
-
     return DataProviderWhenWidget(
-      provider: _fetchWebChapterInfoProvider(handle),
+      provider: resolveWebChapterProvider(chapter),
       loadingBuilder: (context, progress) => Scaffold(
         appBar: AppBar(leading: const BackButton()),
         body: Center(
@@ -251,84 +180,38 @@ class ExtensionReaderPage extends StatelessWidget {
         appBar: AppBar(leading: const BackButton()),
         body: child,
       ),
-      builder: (context, data) => WebSourceReaderWidget(
-        source: data.source,
-        title: data.title,
-        link: data.link,
-        handle: data.handle,
-        readKey: data.readKey,
-        onLinkPressed: data.onLinkPressed,
-      ),
+      builder: (context, data) => WebSourceReaderWidget(data: data),
     );
   }
 }
 
 class WebSourceReaderWidget extends HookConsumerWidget {
-  const WebSourceReaderWidget({
-    super.key,
-    required this.source,
-    this.title,
-    this.link,
-    required this.handle,
-    this.readKey,
-    this.onLinkPressed,
-  });
+  const WebSourceReaderWidget({super.key, required this.data});
 
-  final dynamic source;
-  final String? title;
-  final String? link;
-  final SourceHandler handle;
-  final String? readKey;
-  final CtxCallback? onLinkPressed;
+  final ResolvedWebChapter data;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final timer = useRef<Timer?>(null);
-    String name = '';
-
-    if (title != null) {
-      name = title!;
-    } else if (source is String) {
-      name = source;
-    }
 
     useEffect(() {
-      if (timer.value?.isActive ?? false) timer.value?.cancel();
-
-      timer.value = Timer(const Duration(milliseconds: 2000), () async {
-        if (readKey != null) {
-          ref.run((tsx) async {
-            return await tsx
-                .get(webReadMarkersProvider.notifier)
-                .set(handle.getKey(), readKey!, true);
-          });
-        }
+      timer.value?.cancel();
+      timer.value = Timer(const Duration(milliseconds: 2000), () {
+        ref.run((tsx) async {
+          return tsx
+              .get(webReadMarkersProvider.notifier)
+              .set(data.chapter.series.key, data.readMarkerKey, true);
+        });
       });
 
       return () => timer.value?.cancel();
-    }, []);
+    }, [data.chapter, data.readMarkerKey]);
 
-    return DataProviderWhenWidget(
-      provider: handle.type == SourceType.proxy
-          ? _getPagesProvider(source)
-          : _getSourcePagesProvider(source, handle),
-      loadingBuilder: (context, progress) => Scaffold(
-        appBar: AppBar(leading: const BackButton()),
-        body: Center(
-          child: CircularProgressIndicator(value: progress?.toDouble()),
-        ),
-      ),
-      errorBuilder: (context, child, _, _) => Scaffold(
-        appBar: AppBar(leading: const BackButton()),
-        body: child,
-      ),
-      builder: (context, pages) => ReaderWidget(
-        pages: pages,
-        title: name,
-        longstrip: false,
-        drawerHeader: link,
-        onHeaderPressed: onLinkPressed,
-      ),
+    return ReaderWidget(
+      pages: data.pages,
+      title: data.title,
+      longstrip: false,
+      drawerHeader: data.seriesTitle,
     );
   }
 }

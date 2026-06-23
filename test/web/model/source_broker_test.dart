@@ -103,31 +103,39 @@ void main() {
   });
 
   group('reader route reconstruction', () {
-    test('proxy parameters are temporarily packed into SourceHandler', () {
-      final handle = proxyReaderRouteHandle(
+    test('proxy route parameters reconstruct a typed chapter reference', () {
+      final chapter = proxyReaderRouteRef(
         proxy: 'gist',
         code: 'series-1',
         chapter: '12-5',
       );
 
-      expect(handle.type, SourceType.proxy);
-      expect(handle.sourceId, 'gist');
-      expect(handle.location, 'series-1');
-      expect(handle.chapter, '12.5');
-    });
-
-    test('extension parameters are temporarily packed into SourceHandler', () {
-      final handle = extensionReaderRouteHandle(
-        sourceId: 'source-1',
-        mangaId: 'manga-1',
-        chapterId: 'chapter-1',
+      expect(
+        chapter.series,
+        const WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1'),
       );
-
-      expect(handle.type, SourceType.source);
-      expect(handle.sourceId, 'source-1');
-      expect(handle.location, 'manga-1');
-      expect(handle.chapter, 'chapter-1');
+      expect(chapter.chapterId, '12.5');
     });
+
+    test(
+      'extension route parameters reconstruct a typed chapter reference',
+      () {
+        final chapter = extensionReaderRouteRef(
+          sourceId: 'source-1',
+          mangaId: 'manga-1',
+          chapterId: 'chapter-1',
+        );
+
+        expect(
+          chapter.series,
+          const WebSeriesRef.extension(
+            sourceId: 'source-1',
+            mangaId: 'manga-1',
+          ),
+        );
+        expect(chapter.chapterId, 'chapter-1');
+      },
+    );
   });
 
   group('HistoryLink legacy persistence', () {
