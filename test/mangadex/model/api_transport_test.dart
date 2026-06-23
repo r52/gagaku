@@ -849,6 +849,14 @@ void main() {
       ]);
     });
 
+    test('creator fetch rejects calls without a mode', () async {
+      await expectLater(
+        model.fetchCreators(),
+        throwsA(anyOf(isA<AssertionError>(), isA<ArgumentError>())),
+      );
+      expect(transport.requests, isEmpty);
+    });
+
     test('shared executor parses MangaDex error responses', () async {
       transport.enqueue(
         statusCode: 400,

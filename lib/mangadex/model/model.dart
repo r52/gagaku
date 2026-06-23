@@ -1454,7 +1454,10 @@ class MangaDexModel {
     Iterable<String>? uuids,
     String? name,
   }) async {
-    assert(uuids != null || name != null);
+    if (uuids == null && name == null) {
+      assert(false, 'fetchCreators() requires either uuids or name.');
+      throw ArgumentError('fetchCreators() requires either uuids or name.');
+    }
 
     if (uuids != null) {
       return _fetchByIds<CreatorType>(
