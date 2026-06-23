@@ -77,27 +77,6 @@ Map<String, dynamic> _$RepoDataToJson(RepoData instance) => <String, dynamic>{
   'version': _$SupportedVersionEnumMap[instance.version]!,
 };
 
-_SourceHandler _$SourceHandlerFromJson(Map<String, dynamic> json) =>
-    _SourceHandler(
-      type: $enumDecode(_$SourceTypeEnumMap, json['type']),
-      sourceId: json['sourceId'] as String,
-      location: json['location'] as String,
-      chapter: json['chapter'] as String?,
-    );
-
-Map<String, dynamic> _$SourceHandlerToJson(_SourceHandler instance) =>
-    <String, dynamic>{
-      'type': _$SourceTypeEnumMap[instance.type]!,
-      'sourceId': instance.sourceId,
-      'location': instance.location,
-      'chapter': instance.chapter,
-    };
-
-const _$SourceTypeEnumMap = {
-  SourceType.proxy: 'proxy',
-  SourceType.source: 'source',
-};
-
 ProxySeriesRef _$ProxySeriesRefFromJson(Map<String, dynamic> json) =>
     ProxySeriesRef(
       proxyId: json['proxyId'] as String,

@@ -39,37 +39,14 @@ void main() {
       expect(WebSeriesRef.fromJson(reference.toJson()), reference);
     });
 
-    test('legacy conversion deliberately discards chapter state', () {
-      final legacy = SourceHandler(
-        type: SourceType.proxy,
-        sourceId: 'gist',
-        location: 'series-1',
-        chapter: '7',
+    test('legacy handle JSON is not part of the public model', () {
+      const reference = WebSeriesRef.proxy(
+        proxyId: 'gist',
+        seriesId: 'series-1',
       );
 
-      final reference = WebSeriesRef.fromLegacySourceHandler(legacy);
-
-      expect(
-        reference,
-        const WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1'),
-      );
-      expect(reference.toLegacySourceHandler().chapter, isNull);
-    });
-
-    test('legacy round trips preserve series fields for both variants', () {
-      final references = <WebSeriesRef>[
-        const WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1'),
-        const WebSeriesRef.extension(sourceId: 'source-1', mangaId: 'manga-1'),
-      ];
-
-      for (final reference in references) {
-        expect(
-          WebSeriesRef.fromLegacySourceHandler(
-            reference.toLegacySourceHandler(),
-          ),
-          reference,
-        );
-      }
+      expect(reference.toJson(), isNot(containsPair('sourceId', 'gist')));
+      expect(reference.toJson(), isNot(containsPair('location', 'series-1')));
     });
   });
 
@@ -96,48 +73,25 @@ void main() {
       expect(WebChapterRef.fromJson(reference.toJson()), reference);
     });
 
-    test('converts a chapter-bearing legacy handler', () {
-      final legacy = SourceHandler(
-        type: SourceType.proxy,
-        sourceId: 'gist',
-        location: 'series-1',
-        chapter: '7',
+    test('does not expose legacy handle conversion', () {
+      const reference = WebChapterRef(
+        series: WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1'),
+        chapterId: '7',
       );
 
-      final reference = WebChapterRef.fromLegacySourceHandler(legacy);
-
-      expect(
-        reference.series,
-        const WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1'),
-      );
-      expect(reference.chapterId, '7');
-      expect(reference.toLegacySourceHandler(), legacy);
-    });
-
-    test('rejects a series-only legacy handler', () {
-      final legacy = SourceHandler(
-        type: SourceType.source,
-        sourceId: 'source-1',
-        location: 'manga-1',
-      );
-
-      expect(
-        () => WebChapterRef.fromLegacySourceHandler(legacy),
-        throwsArgumentError,
-      );
+      expect(reference.toJson(), {
+        'series': {'type': 'proxy', 'proxyId': 'gist', 'seriesId': 'series-1'},
+        'chapterId': '7',
+      });
     });
   });
 
   group('ResolvedWebLink', () {
     test('preserves a direct chapter only as initial navigation state', () {
-      final legacy = SourceHandler(
-        type: SourceType.proxy,
-        sourceId: 'imgur',
-        location: 'album-1',
-        chapter: '1',
+      const resolved = ResolvedWebLink(
+        series: WebSeriesRef.proxy(proxyId: 'imgur', seriesId: 'album-1'),
+        initialChapterId: '1',
       );
-
-      final resolved = ResolvedWebLink.fromLegacySourceHandler(legacy);
 
       expect(
         resolved.series,
@@ -151,7 +105,6 @@ void main() {
           chapterId: '1',
         ),
       );
-      expect(resolved.toLegacySourceHandler(), legacy);
       expect(ResolvedWebLink.fromJson(resolved.toJson()), resolved);
     });
 
@@ -165,7 +118,14 @@ void main() {
 
       expect(resolved.initialChapterId, isNull);
       expect(resolved.initialChapter, isNull);
-      expect(resolved.toLegacySourceHandler().chapter, isNull);
+      expect(resolved.toJson(), {
+        'series': {
+          'type': 'extension',
+          'sourceId': 'source-1',
+          'mangaId': 'manga-1',
+        },
+        'initialChapterId': null,
+      });
     });
   });
 }

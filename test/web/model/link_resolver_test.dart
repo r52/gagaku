@@ -158,7 +158,7 @@ void main() {
       resolved.series,
       const WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1'),
     );
-    expect(resolved.requireSeries.toLegacySourceHandler().chapter, isNull);
+    expect(resolved.dbHandle, isNot(contains('chapter')));
   });
 
   test(

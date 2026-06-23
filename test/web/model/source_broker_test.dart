@@ -187,14 +187,12 @@ void main() {
 
     test('legacy chapter-bearing DB payload decodes as series-only', () {
       final link = HistoryLink(title: 'Series', url: 'source-1/manga-1')
-        ..dbHandle = json.encode(
-          SourceHandler(
-            type: SourceType.source,
-            sourceId: 'source-1',
-            location: 'manga-1',
-            chapter: 'temporary-chapter',
-          ).toJson(),
-        );
+        ..dbHandle = json.encode({
+          'type': 'source',
+          'sourceId': 'source-1',
+          'location': 'manga-1',
+          'chapter': 'temporary-chapter',
+        });
 
       expect(
         link.series,

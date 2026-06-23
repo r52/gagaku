@@ -79,46 +79,6 @@ class WebFavoritesList {
   int get hashCode => Object.hash(runtimeType, id, name, list);
 }
 
-enum SourceType { proxy, source }
-
-@unfreezed
-abstract class SourceHandler with _$SourceHandler {
-  SourceHandler._();
-
-  factory SourceHandler({
-    required SourceType type,
-    required String sourceId,
-    required String location,
-    String? chapter,
-  }) = _SourceHandler;
-
-  String getURL() => type == SourceType.proxy
-      ? 'https://cubari.moe/read/$sourceId/$location/'
-      : '$sourceId/$location';
-  String getKey() => '$sourceId/$location';
-
-  factory SourceHandler.fromJson(Map<String, dynamic> json) =>
-      _$SourceHandlerFromJson(json);
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is SourceHandler &&
-            (identical(other.type, type) || other.type == type) &&
-            (identical(other.sourceId, sourceId) ||
-                other.sourceId == sourceId) &&
-            (identical(other.location, location) ||
-                other.location == location) &&
-            (identical(other.chapter, chapter) || other.chapter == chapter));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, type, sourceId, location, chapter);
-}
-
 @Freezed(unionKey: 'type')
 sealed class WebSeriesRef with _$WebSeriesRef {
   const WebSeriesRef._();
@@ -135,19 +95,6 @@ sealed class WebSeriesRef with _$WebSeriesRef {
 
   factory WebSeriesRef.fromJson(Map<String, dynamic> json) =>
       _$WebSeriesRefFromJson(json);
-
-  factory WebSeriesRef.fromLegacySourceHandler(SourceHandler handle) {
-    return switch (handle.type) {
-      SourceType.proxy => WebSeriesRef.proxy(
-        proxyId: handle.sourceId,
-        seriesId: handle.location,
-      ),
-      SourceType.source => WebSeriesRef.extension(
-        sourceId: handle.sourceId,
-        mangaId: handle.location,
-      ),
-    };
-  }
 
   String get key => switch (this) {
     ProxySeriesRef(:final proxyId, :final seriesId) => '$proxyId/$seriesId',
@@ -169,23 +116,6 @@ sealed class WebSeriesRef with _$WebSeriesRef {
       'https://cubari.moe/read/$proxyId/$seriesId/',
     ExtensionSeriesRef(:final sourceId, :final mangaId) => '$sourceId/$mangaId',
   };
-
-  SourceHandler toLegacySourceHandler({String? chapter}) {
-    return switch (this) {
-      ProxySeriesRef(:final proxyId, :final seriesId) => SourceHandler(
-        type: SourceType.proxy,
-        sourceId: proxyId,
-        location: seriesId,
-        chapter: chapter,
-      ),
-      ExtensionSeriesRef(:final sourceId, :final mangaId) => SourceHandler(
-        type: SourceType.source,
-        sourceId: sourceId,
-        location: mangaId,
-        chapter: chapter,
-      ),
-    };
-  }
 }
 
 @freezed
@@ -200,25 +130,6 @@ abstract class WebChapterRef with _$WebChapterRef {
 
   factory WebChapterRef.fromJson(Map<String, dynamic> json) =>
       _$WebChapterRefFromJson(json);
-
-  factory WebChapterRef.fromLegacySourceHandler(SourceHandler handle) {
-    final chapter = handle.chapter;
-    if (chapter == null) {
-      throw ArgumentError.value(
-        handle,
-        'handle',
-        'A chapter-bearing SourceHandler is required',
-      );
-    }
-
-    return WebChapterRef(
-      series: WebSeriesRef.fromLegacySourceHandler(handle),
-      chapterId: chapter,
-    );
-  }
-
-  SourceHandler toLegacySourceHandler() =>
-      series.toLegacySourceHandler(chapter: chapterId);
 }
 
 @freezed
@@ -234,20 +145,10 @@ abstract class ResolvedWebLink with _$ResolvedWebLink {
   factory ResolvedWebLink.fromJson(Map<String, dynamic> json) =>
       _$ResolvedWebLinkFromJson(json);
 
-  factory ResolvedWebLink.fromLegacySourceHandler(SourceHandler handle) {
-    return ResolvedWebLink(
-      series: WebSeriesRef.fromLegacySourceHandler(handle),
-      initialChapterId: handle.chapter,
-    );
-  }
-
   WebChapterRef? get initialChapter => switch (initialChapterId) {
     final chapterId? => WebChapterRef(series: series, chapterId: chapterId),
     null => null,
   };
-
-  SourceHandler toLegacySourceHandler() =>
-      series.toLegacySourceHandler(chapter: initialChapterId);
 }
 
 @freezed
@@ -260,21 +161,6 @@ abstract class UpdateFeedItem with _$UpdateFeedItem {
   factory UpdateFeedItem.fromJson(Map<String, dynamic> json) =>
       _$UpdateFeedItemFromJson(json);
 }
-
-// class _SourceHandleToOneConverter
-//     implements JsonConverter<ToOne<SourceHandler>, Map<String, dynamic>?> {
-//   const _SourceHandleToOneConverter();
-
-//   @override
-//   ToOne<SourceHandler> fromJson(Map<String, dynamic>? json) =>
-//       ToOne<SourceHandler>(
-//         target: json == null ? null : SourceHandler.fromJson(json),
-//       );
-
-//   @override
-//   Map<String, dynamic>? toJson(ToOne<SourceHandler> rel) =>
-//       rel.target?.toJson();
-// }
 
 @unfreezed
 @JsonSerializable()
@@ -494,10 +380,26 @@ abstract final class _HistorySeriesCodec {
     }
 
     if (data.containsKey('sourceId') && data.containsKey('location')) {
-      return WebSeriesRef.fromLegacySourceHandler(SourceHandler.fromJson(data));
+      return _legacySeriesFromJson(data);
     }
 
     return WebSeriesRef.fromJson(data);
+  }
+
+  static WebSeriesRef _legacySeriesFromJson(Map<String, dynamic> data) {
+    final type = data['type'];
+    final sourceId = data['sourceId'];
+    final location = data['location'];
+
+    if (sourceId is! String || location is! String) {
+      throw const FormatException('Invalid legacy web source reference');
+    }
+
+    return switch (type) {
+      'proxy' => WebSeriesRef.proxy(proxyId: sourceId, seriesId: location),
+      'source' => WebSeriesRef.extension(sourceId: sourceId, mangaId: location),
+      _ => throw FormatException('Unknown legacy web source type: $type'),
+    };
   }
 }
 
