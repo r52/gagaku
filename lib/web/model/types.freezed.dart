@@ -140,6 +140,523 @@ as String?,
 
 }
 
+WebSeriesRef _$WebSeriesRefFromJson(
+  Map<String, dynamic> json
+) {
+        switch (json['type']) {
+                  case 'proxy':
+          return ProxySeriesRef.fromJson(
+            json
+          );
+                case 'extension':
+          return ExtensionSeriesRef.fromJson(
+            json
+          );
+
+          default:
+            throw CheckedFromJsonException(
+  json,
+  'type',
+  'WebSeriesRef',
+  'Invalid union type "${json['type']}"!'
+);
+        }
+
+}
+
+/// @nodoc
+mixin _$WebSeriesRef {
+
+
+
+  /// Serializes this WebSeriesRef to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebSeriesRef);
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'WebSeriesRef()';
+}
+
+
+}
+
+/// @nodoc
+class $WebSeriesRefCopyWith<$Res>  {
+$WebSeriesRefCopyWith(WebSeriesRef _, $Res Function(WebSeriesRef) __);
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class ProxySeriesRef extends WebSeriesRef {
+  const ProxySeriesRef({required this.proxyId, required this.seriesId, final  String? $type}): $type = $type ?? 'proxy',super._();
+  factory ProxySeriesRef.fromJson(Map<String, dynamic> json) => _$ProxySeriesRefFromJson(json);
+
+ final  String proxyId;
+ final  String seriesId;
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of WebSeriesRef
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ProxySeriesRefCopyWith<ProxySeriesRef> get copyWith => _$ProxySeriesRefCopyWithImpl<ProxySeriesRef>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ProxySeriesRefToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProxySeriesRef&&(identical(other.proxyId, proxyId) || other.proxyId == proxyId)&&(identical(other.seriesId, seriesId) || other.seriesId == seriesId));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,proxyId,seriesId);
+
+@override
+String toString() {
+  return 'WebSeriesRef.proxy(proxyId: $proxyId, seriesId: $seriesId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ProxySeriesRefCopyWith<$Res> implements $WebSeriesRefCopyWith<$Res> {
+  factory $ProxySeriesRefCopyWith(ProxySeriesRef value, $Res Function(ProxySeriesRef) _then) = _$ProxySeriesRefCopyWithImpl;
+@useResult
+$Res call({
+ String proxyId, String seriesId
+});
+
+
+
+
+}
+/// @nodoc
+class _$ProxySeriesRefCopyWithImpl<$Res>
+    implements $ProxySeriesRefCopyWith<$Res> {
+  _$ProxySeriesRefCopyWithImpl(this._self, this._then);
+
+  final ProxySeriesRef _self;
+  final $Res Function(ProxySeriesRef) _then;
+
+/// Create a copy of WebSeriesRef
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? proxyId = null,Object? seriesId = null,}) {
+  return _then(ProxySeriesRef(
+proxyId: null == proxyId ? _self.proxyId : proxyId // ignore: cast_nullable_to_non_nullable
+as String,seriesId: null == seriesId ? _self.seriesId : seriesId // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class ExtensionSeriesRef extends WebSeriesRef {
+  const ExtensionSeriesRef({required this.sourceId, required this.mangaId, final  String? $type}): $type = $type ?? 'extension',super._();
+  factory ExtensionSeriesRef.fromJson(Map<String, dynamic> json) => _$ExtensionSeriesRefFromJson(json);
+
+ final  String sourceId;
+ final  String mangaId;
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of WebSeriesRef
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ExtensionSeriesRefCopyWith<ExtensionSeriesRef> get copyWith => _$ExtensionSeriesRefCopyWithImpl<ExtensionSeriesRef>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ExtensionSeriesRefToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExtensionSeriesRef&&(identical(other.sourceId, sourceId) || other.sourceId == sourceId)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,sourceId,mangaId);
+
+@override
+String toString() {
+  return 'WebSeriesRef.extension(sourceId: $sourceId, mangaId: $mangaId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ExtensionSeriesRefCopyWith<$Res> implements $WebSeriesRefCopyWith<$Res> {
+  factory $ExtensionSeriesRefCopyWith(ExtensionSeriesRef value, $Res Function(ExtensionSeriesRef) _then) = _$ExtensionSeriesRefCopyWithImpl;
+@useResult
+$Res call({
+ String sourceId, String mangaId
+});
+
+
+
+
+}
+/// @nodoc
+class _$ExtensionSeriesRefCopyWithImpl<$Res>
+    implements $ExtensionSeriesRefCopyWith<$Res> {
+  _$ExtensionSeriesRefCopyWithImpl(this._self, this._then);
+
+  final ExtensionSeriesRef _self;
+  final $Res Function(ExtensionSeriesRef) _then;
+
+/// Create a copy of WebSeriesRef
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? sourceId = null,Object? mangaId = null,}) {
+  return _then(ExtensionSeriesRef(
+sourceId: null == sourceId ? _self.sourceId : sourceId // ignore: cast_nullable_to_non_nullable
+as String,mangaId: null == mangaId ? _self.mangaId : mangaId // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$WebChapterRef {
+
+ WebSeriesRef get series; String get chapterId;
+/// Create a copy of WebChapterRef
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WebChapterRefCopyWith<WebChapterRef> get copyWith => _$WebChapterRefCopyWithImpl<WebChapterRef>(this as WebChapterRef, _$identity);
+
+  /// Serializes this WebChapterRef to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapterRef&&(identical(other.series, series) || other.series == series)&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,series,chapterId);
+
+@override
+String toString() {
+  return 'WebChapterRef(series: $series, chapterId: $chapterId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WebChapterRefCopyWith<$Res>  {
+  factory $WebChapterRefCopyWith(WebChapterRef value, $Res Function(WebChapterRef) _then) = _$WebChapterRefCopyWithImpl;
+@useResult
+$Res call({
+ WebSeriesRef series, String chapterId
+});
+
+
+$WebSeriesRefCopyWith<$Res> get series;
+
+}
+/// @nodoc
+class _$WebChapterRefCopyWithImpl<$Res>
+    implements $WebChapterRefCopyWith<$Res> {
+  _$WebChapterRefCopyWithImpl(this._self, this._then);
+
+  final WebChapterRef _self;
+  final $Res Function(WebChapterRef) _then;
+
+/// Create a copy of WebChapterRef
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? series = null,Object? chapterId = null,}) {
+  return _then(_self.copyWith(
+series: null == series ? _self.series : series // ignore: cast_nullable_to_non_nullable
+as WebSeriesRef,chapterId: null == chapterId ? _self.chapterId : chapterId // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+/// Create a copy of WebChapterRef
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebSeriesRefCopyWith<$Res> get series {
+
+  return $WebSeriesRefCopyWith<$Res>(_self.series, (value) {
+    return _then(_self.copyWith(series: value));
+  });
+}
+}
+
+
+
+/// @nodoc
+
+@JsonSerializable(explicitToJson: true)
+class _WebChapterRef extends WebChapterRef {
+  const _WebChapterRef({required this.series, required this.chapterId}): super._();
+  factory _WebChapterRef.fromJson(Map<String, dynamic> json) => _$WebChapterRefFromJson(json);
+
+@override final  WebSeriesRef series;
+@override final  String chapterId;
+
+/// Create a copy of WebChapterRef
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WebChapterRefCopyWith<_WebChapterRef> get copyWith => __$WebChapterRefCopyWithImpl<_WebChapterRef>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$WebChapterRefToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebChapterRef&&(identical(other.series, series) || other.series == series)&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,series,chapterId);
+
+@override
+String toString() {
+  return 'WebChapterRef(series: $series, chapterId: $chapterId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WebChapterRefCopyWith<$Res> implements $WebChapterRefCopyWith<$Res> {
+  factory _$WebChapterRefCopyWith(_WebChapterRef value, $Res Function(_WebChapterRef) _then) = __$WebChapterRefCopyWithImpl;
+@override @useResult
+$Res call({
+ WebSeriesRef series, String chapterId
+});
+
+
+@override $WebSeriesRefCopyWith<$Res> get series;
+
+}
+/// @nodoc
+class __$WebChapterRefCopyWithImpl<$Res>
+    implements _$WebChapterRefCopyWith<$Res> {
+  __$WebChapterRefCopyWithImpl(this._self, this._then);
+
+  final _WebChapterRef _self;
+  final $Res Function(_WebChapterRef) _then;
+
+/// Create a copy of WebChapterRef
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? series = null,Object? chapterId = null,}) {
+  return _then(_WebChapterRef(
+series: null == series ? _self.series : series // ignore: cast_nullable_to_non_nullable
+as WebSeriesRef,chapterId: null == chapterId ? _self.chapterId : chapterId // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+/// Create a copy of WebChapterRef
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebSeriesRefCopyWith<$Res> get series {
+
+  return $WebSeriesRefCopyWith<$Res>(_self.series, (value) {
+    return _then(_self.copyWith(series: value));
+  });
+}
+}
+
+
+/// @nodoc
+mixin _$ResolvedWebLink {
+
+ WebSeriesRef get series; String? get initialChapterId;
+/// Create a copy of ResolvedWebLink
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ResolvedWebLinkCopyWith<ResolvedWebLink> get copyWith => _$ResolvedWebLinkCopyWithImpl<ResolvedWebLink>(this as ResolvedWebLink, _$identity);
+
+  /// Serializes this ResolvedWebLink to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ResolvedWebLink&&(identical(other.series, series) || other.series == series)&&(identical(other.initialChapterId, initialChapterId) || other.initialChapterId == initialChapterId));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,series,initialChapterId);
+
+@override
+String toString() {
+  return 'ResolvedWebLink(series: $series, initialChapterId: $initialChapterId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ResolvedWebLinkCopyWith<$Res>  {
+  factory $ResolvedWebLinkCopyWith(ResolvedWebLink value, $Res Function(ResolvedWebLink) _then) = _$ResolvedWebLinkCopyWithImpl;
+@useResult
+$Res call({
+ WebSeriesRef series, String? initialChapterId
+});
+
+
+$WebSeriesRefCopyWith<$Res> get series;
+
+}
+/// @nodoc
+class _$ResolvedWebLinkCopyWithImpl<$Res>
+    implements $ResolvedWebLinkCopyWith<$Res> {
+  _$ResolvedWebLinkCopyWithImpl(this._self, this._then);
+
+  final ResolvedWebLink _self;
+  final $Res Function(ResolvedWebLink) _then;
+
+/// Create a copy of ResolvedWebLink
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? series = null,Object? initialChapterId = freezed,}) {
+  return _then(_self.copyWith(
+series: null == series ? _self.series : series // ignore: cast_nullable_to_non_nullable
+as WebSeriesRef,initialChapterId: freezed == initialChapterId ? _self.initialChapterId : initialChapterId // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+/// Create a copy of ResolvedWebLink
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebSeriesRefCopyWith<$Res> get series {
+
+  return $WebSeriesRefCopyWith<$Res>(_self.series, (value) {
+    return _then(_self.copyWith(series: value));
+  });
+}
+}
+
+
+
+/// @nodoc
+
+@JsonSerializable(explicitToJson: true)
+class _ResolvedWebLink extends ResolvedWebLink {
+  const _ResolvedWebLink({required this.series, this.initialChapterId}): super._();
+  factory _ResolvedWebLink.fromJson(Map<String, dynamic> json) => _$ResolvedWebLinkFromJson(json);
+
+@override final  WebSeriesRef series;
+@override final  String? initialChapterId;
+
+/// Create a copy of ResolvedWebLink
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ResolvedWebLinkCopyWith<_ResolvedWebLink> get copyWith => __$ResolvedWebLinkCopyWithImpl<_ResolvedWebLink>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ResolvedWebLinkToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ResolvedWebLink&&(identical(other.series, series) || other.series == series)&&(identical(other.initialChapterId, initialChapterId) || other.initialChapterId == initialChapterId));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,series,initialChapterId);
+
+@override
+String toString() {
+  return 'ResolvedWebLink(series: $series, initialChapterId: $initialChapterId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ResolvedWebLinkCopyWith<$Res> implements $ResolvedWebLinkCopyWith<$Res> {
+  factory _$ResolvedWebLinkCopyWith(_ResolvedWebLink value, $Res Function(_ResolvedWebLink) _then) = __$ResolvedWebLinkCopyWithImpl;
+@override @useResult
+$Res call({
+ WebSeriesRef series, String? initialChapterId
+});
+
+
+@override $WebSeriesRefCopyWith<$Res> get series;
+
+}
+/// @nodoc
+class __$ResolvedWebLinkCopyWithImpl<$Res>
+    implements _$ResolvedWebLinkCopyWith<$Res> {
+  __$ResolvedWebLinkCopyWithImpl(this._self, this._then);
+
+  final _ResolvedWebLink _self;
+  final $Res Function(_ResolvedWebLink) _then;
+
+/// Create a copy of ResolvedWebLink
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? series = null,Object? initialChapterId = freezed,}) {
+  return _then(_ResolvedWebLink(
+series: null == series ? _self.series : series // ignore: cast_nullable_to_non_nullable
+as WebSeriesRef,initialChapterId: freezed == initialChapterId ? _self.initialChapterId : initialChapterId // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+/// Create a copy of ResolvedWebLink
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebSeriesRefCopyWith<$Res> get series {
+
+  return $WebSeriesRefCopyWith<$Res>(_self.series, (value) {
+    return _then(_self.copyWith(series: value));
+  });
+}
+}
+
 
 /// @nodoc
 mixin _$UpdateFeedItem {
@@ -206,7 +723,7 @@ as WebManga,
 @override
 @pragma('vm:prefer-inline')
 $HistoryLinkCopyWith<$Res> get link {
-  
+
   return $HistoryLinkCopyWith<$Res>(_self.link, (value) {
     return _then(_self.copyWith(link: value));
   });
@@ -215,7 +732,7 @@ $HistoryLinkCopyWith<$Res> get link {
 @override
 @pragma('vm:prefer-inline')
 $WebMangaCopyWith<$Res> get manga {
-  
+
   return $WebMangaCopyWith<$Res>(_self.manga, (value) {
     return _then(_self.copyWith(manga: value));
   });
@@ -297,7 +814,7 @@ as WebManga,
 @override
 @pragma('vm:prefer-inline')
 $HistoryLinkCopyWith<$Res> get link {
-  
+
   return $HistoryLinkCopyWith<$Res>(_self.link, (value) {
     return _then(_self.copyWith(link: value));
   });
@@ -306,7 +823,7 @@ $HistoryLinkCopyWith<$Res> get link {
 @override
 @pragma('vm:prefer-inline')
 $WebMangaCopyWith<$Res> get manga {
-  
+
   return $WebMangaCopyWith<$Res>(_self.manga, (value) {
     return _then(_self.copyWith(manga: value));
   });
@@ -440,7 +957,7 @@ as CubariChapter,
 @override
 @pragma('vm:prefer-inline')
 $CubariChapterCopyWith<$Res> get chapter {
-  
+
   return $CubariChapterCopyWith<$Res>(_self.chapter, (value) {
     return _then(_self.copyWith(chapter: value));
   });
@@ -522,7 +1039,7 @@ as CubariChapter,
 @override
 @pragma('vm:prefer-inline')
 $CubariChapterCopyWith<$Res> get chapter {
-  
+
   return $CubariChapterCopyWith<$Res>(_self.chapter, (value) {
     return _then(_self.copyWith(chapter: value));
   });
@@ -565,7 +1082,7 @@ $WebChapterItemCopyWith(WebChapterItem _, $Res Function(WebChapterItem) __);
 
 class WebChapterItemCubari extends WebChapterItem {
   const WebChapterItemCubari(this.entry): super._();
-  
+
 
  final  CubariChapterEntry entry;
 
@@ -628,7 +1145,7 @@ as CubariChapterEntry,
 @override
 @pragma('vm:prefer-inline')
 $CubariChapterEntryCopyWith<$Res> get entry {
-  
+
   return $CubariChapterEntryCopyWith<$Res>(_self.entry, (value) {
     return _then(_self.copyWith(entry: value));
   });
@@ -640,7 +1157,7 @@ $CubariChapterEntryCopyWith<$Res> get entry {
 
 class WebChapterItemExtension extends WebChapterItem {
   const WebChapterItemExtension(this.chapter): super._();
-  
+
 
  final  Chapter chapter;
 
@@ -703,7 +1220,7 @@ as Chapter,
 @override
 @pragma('vm:prefer-inline')
 $ChapterCopyWith<$Res> get chapter {
-  
+
   return $ChapterCopyWith<$Res>(_self.chapter, (value) {
     return _then(_self.copyWith(chapter: value));
   });
@@ -722,7 +1239,7 @@ WebManga _$WebMangaFromJson(
           return WebMangaExtension.fromJson(
             json
           );
-        
+
           default:
             throw CheckedFromJsonException(
   json,
@@ -731,7 +1248,7 @@ WebManga _$WebMangaFromJson(
   'Invalid union type "${json['source_type']}"!'
 );
         }
-      
+
 }
 
 /// @nodoc
@@ -949,7 +1466,7 @@ as List<Chapter>,
 @override
 @pragma('vm:prefer-inline')
 $SourceMangaCopyWith<$Res> get data {
-  
+
   return $SourceMangaCopyWith<$Res>(_self.data, (value) {
     return _then(_self.copyWith(data: value));
   });
@@ -2116,7 +2633,7 @@ as RepositoryDescription?,
 @override
 @pragma('vm:prefer-inline')
 $BuiltWithCopyWith<$Res> get builtWith {
-  
+
   return $BuiltWithCopyWith<$Res>(_self.builtWith, (value) {
     return _then(_self.copyWith(builtWith: value));
   });
@@ -2220,7 +2737,7 @@ as RepositoryDescription?,
 @override
 @pragma('vm:prefer-inline')
 $BuiltWithCopyWith<$Res> get builtWith {
-  
+
   return $BuiltWithCopyWith<$Res>(_self.builtWith, (value) {
     return _then(_self.copyWith(builtWith: value));
   });
@@ -2386,7 +2903,7 @@ OAuthResponseType _$OAuthResponseTypeFromJson(
           return OAuthPKCEResponse.fromJson(
             json
           );
-        
+
           default:
             throw CheckedFromJsonException(
   json,
@@ -2395,7 +2912,7 @@ OAuthResponseType _$OAuthResponseTypeFromJson(
   'Invalid union type "${json['type']}"!'
 );
         }
-      
+
 }
 
 /// @nodoc
@@ -3251,7 +3768,7 @@ as MangaInfo,
 @override
 @pragma('vm:prefer-inline')
 $MangaInfoCopyWith<$Res> get mangaInfo {
-  
+
   return $MangaInfoCopyWith<$Res>(_self.mangaInfo, (value) {
     return _then(_self.copyWith(mangaInfo: value));
   });
@@ -3333,7 +3850,7 @@ as MangaInfo,
 @override
 @pragma('vm:prefer-inline')
 $MangaInfoCopyWith<$Res> get mangaInfo {
-  
+
   return $MangaInfoCopyWith<$Res>(_self.mangaInfo, (value) {
     return _then(_self.copyWith(mangaInfo: value));
   });
@@ -3904,7 +4421,7 @@ as num?,
 @override
 @pragma('vm:prefer-inline')
 $SourceMangaCopyWith<$Res> get sourceManga {
-  
+
   return $SourceMangaCopyWith<$Res>(_self.sourceManga, (value) {
     return _then(_self.copyWith(sourceManga: value));
   });
@@ -4012,7 +4529,7 @@ as num?,
 @override
 @pragma('vm:prefer-inline')
 $SourceMangaCopyWith<$Res> get sourceManga {
-  
+
   return $SourceMangaCopyWith<$Res>(_self.sourceManga, (value) {
     return _then(_self.copyWith(sourceManga: value));
   });
@@ -4193,13 +4710,13 @@ ChapterDetails _$ChapterDetailsFromJson(
           return FileChapterDetails.fromJson(
             json
           );
-        
+
           default:
             return ImageChapterDetails.fromJson(
   json
 );
         }
-      
+
 }
 
 /// @nodoc
@@ -4508,7 +5025,7 @@ as PaperbackRequest,
 @override
 @pragma('vm:prefer-inline')
 $PaperbackRequestCopyWith<$Res> get request {
-  
+
   return $PaperbackRequestCopyWith<$Res>(_self.request, (value) {
     return _then(_self.copyWith(request: value));
   });
@@ -4682,7 +5199,7 @@ DiscoverSectionItem _$DiscoverSectionItemFromJson(
           return FeaturedCarouselItem.fromJson(
             json
           );
-        
+
           default:
             throw CheckedFromJsonException(
   json,
@@ -4691,7 +5208,7 @@ DiscoverSectionItem _$DiscoverSectionItemFromJson(
   'Invalid union type "${json['type']}"!'
 );
         }
-      
+
 }
 
 /// @nodoc
@@ -4840,7 +5357,7 @@ as ContentRating?,
 @override
 @pragma('vm:prefer-inline')
 $SearchQueryCopyWith<$Res> get searchQuery {
-  
+
   return $SearchQueryCopyWith<$Res>(_self.searchQuery, (value) {
     return _then(_self.copyWith(searchQuery: value));
   });
@@ -5508,7 +6025,7 @@ FormItemElement _$FormItemElementFromJson(
           return WebViewRowElement.fromJson(
             json
           );
-        
+
           default:
             throw CheckedFromJsonException(
   json,
@@ -5517,7 +6034,7 @@ FormItemElement _$FormItemElementFromJson(
   'Invalid union type "${json['type']}"!'
 );
         }
-      
+
 }
 
 /// @nodoc
@@ -6191,7 +6708,7 @@ as List<String>?,
 @override
 @pragma('vm:prefer-inline')
 $OAuthResponseTypeCopyWith<$Res> get responseType {
-  
+
   return $OAuthResponseTypeCopyWith<$Res>(_self.responseType, (value) {
     return _then(_self.copyWith(responseType: value));
   });
@@ -6283,13 +6800,13 @@ FormSectionElement _$FormSectionElementFromJson(
           return ListSectionElement.fromJson(
             json
           );
-        
+
           default:
             return FlowSectionElement.fromJson(
   json
 );
         }
-      
+
 }
 
 /// @nodoc
@@ -7045,7 +7562,7 @@ as WebViewStorage,
 @override
 @pragma('vm:prefer-inline')
 $ExecuteInWebViewSourceCopyWith<$Res> get source {
-  
+
   return $ExecuteInWebViewSourceCopyWith<$Res>(_self.source, (value) {
     return _then(_self.copyWith(source: value));
   });
@@ -7054,7 +7571,7 @@ $ExecuteInWebViewSourceCopyWith<$Res> get source {
 @override
 @pragma('vm:prefer-inline')
 $WebViewStorageCopyWith<$Res> get storage {
-  
+
   return $WebViewStorageCopyWith<$Res>(_self.storage, (value) {
     return _then(_self.copyWith(storage: value));
   });
@@ -7138,7 +7655,7 @@ as WebViewStorage,
 @override
 @pragma('vm:prefer-inline')
 $ExecuteInWebViewSourceCopyWith<$Res> get source {
-  
+
   return $ExecuteInWebViewSourceCopyWith<$Res>(_self.source, (value) {
     return _then(_self.copyWith(source: value));
   });
@@ -7147,7 +7664,7 @@ $ExecuteInWebViewSourceCopyWith<$Res> get source {
 @override
 @pragma('vm:prefer-inline')
 $WebViewStorageCopyWith<$Res> get storage {
-  
+
   return $WebViewStorageCopyWith<$Res>(_self.storage, (value) {
     return _then(_self.copyWith(storage: value));
   });
@@ -7220,7 +7737,7 @@ as WebViewStorage,
 @override
 @pragma('vm:prefer-inline')
 $WebViewStorageCopyWith<$Res> get storage {
-  
+
   return $WebViewStorageCopyWith<$Res>(_self.storage, (value) {
     return _then(_self.copyWith(storage: value));
   });
@@ -7302,7 +7819,7 @@ as WebViewStorage,
 @override
 @pragma('vm:prefer-inline')
 $WebViewStorageCopyWith<$Res> get storage {
-  
+
   return $WebViewStorageCopyWith<$Res>(_self.storage, (value) {
     return _then(_self.copyWith(storage: value));
   });

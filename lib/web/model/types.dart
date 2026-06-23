@@ -138,6 +138,137 @@ abstract class SourceHandler with _$SourceHandler {
       Object.hash(runtimeType, type, sourceId, location, chapter);
 }
 
+@Freezed(unionKey: 'type')
+sealed class WebSeriesRef with _$WebSeriesRef {
+  const WebSeriesRef._();
+
+  const factory WebSeriesRef.proxy({
+    required String proxyId,
+    required String seriesId,
+  }) = ProxySeriesRef;
+
+  const factory WebSeriesRef.extension({
+    required String sourceId,
+    required String mangaId,
+  }) = ExtensionSeriesRef;
+
+  factory WebSeriesRef.fromJson(Map<String, dynamic> json) =>
+      _$WebSeriesRefFromJson(json);
+
+  factory WebSeriesRef.fromLegacySourceHandler(SourceHandler handle) {
+    return switch (handle.type) {
+      SourceType.proxy => WebSeriesRef.proxy(
+        proxyId: handle.sourceId,
+        seriesId: handle.location,
+      ),
+      SourceType.source => WebSeriesRef.extension(
+        sourceId: handle.sourceId,
+        mangaId: handle.location,
+      ),
+    };
+  }
+
+  String get key => switch (this) {
+    ProxySeriesRef(:final proxyId, :final seriesId) => '$proxyId/$seriesId',
+    ExtensionSeriesRef(:final sourceId, :final mangaId) => '$sourceId/$mangaId',
+  };
+
+  String get sourceId => switch (this) {
+    ProxySeriesRef(:final proxyId) => proxyId,
+    ExtensionSeriesRef(:final sourceId) => sourceId,
+  };
+
+  String get location => switch (this) {
+    ProxySeriesRef(:final seriesId) => seriesId,
+    ExtensionSeriesRef(:final mangaId) => mangaId,
+  };
+
+  String get externalUrl => switch (this) {
+    ProxySeriesRef(:final proxyId, :final seriesId) =>
+      'https://cubari.moe/read/$proxyId/$seriesId/',
+    ExtensionSeriesRef(:final sourceId, :final mangaId) => '$sourceId/$mangaId',
+  };
+
+  SourceHandler toLegacySourceHandler({String? chapter}) {
+    return switch (this) {
+      ProxySeriesRef(:final proxyId, :final seriesId) => SourceHandler(
+        type: SourceType.proxy,
+        sourceId: proxyId,
+        location: seriesId,
+        chapter: chapter,
+      ),
+      ExtensionSeriesRef(:final sourceId, :final mangaId) => SourceHandler(
+        type: SourceType.source,
+        sourceId: sourceId,
+        location: mangaId,
+        chapter: chapter,
+      ),
+    };
+  }
+}
+
+@freezed
+abstract class WebChapterRef with _$WebChapterRef {
+  const WebChapterRef._();
+
+  @JsonSerializable(explicitToJson: true)
+  const factory WebChapterRef({
+    required WebSeriesRef series,
+    required String chapterId,
+  }) = _WebChapterRef;
+
+  factory WebChapterRef.fromJson(Map<String, dynamic> json) =>
+      _$WebChapterRefFromJson(json);
+
+  factory WebChapterRef.fromLegacySourceHandler(SourceHandler handle) {
+    final chapter = handle.chapter;
+    if (chapter == null) {
+      throw ArgumentError.value(
+        handle,
+        'handle',
+        'A chapter-bearing SourceHandler is required',
+      );
+    }
+
+    return WebChapterRef(
+      series: WebSeriesRef.fromLegacySourceHandler(handle),
+      chapterId: chapter,
+    );
+  }
+
+  SourceHandler toLegacySourceHandler() =>
+      series.toLegacySourceHandler(chapter: chapterId);
+}
+
+@freezed
+abstract class ResolvedWebLink with _$ResolvedWebLink {
+  const ResolvedWebLink._();
+
+  @JsonSerializable(explicitToJson: true)
+  const factory ResolvedWebLink({
+    required WebSeriesRef series,
+    String? initialChapterId,
+  }) = _ResolvedWebLink;
+
+  factory ResolvedWebLink.fromJson(Map<String, dynamic> json) =>
+      _$ResolvedWebLinkFromJson(json);
+
+  factory ResolvedWebLink.fromLegacySourceHandler(SourceHandler handle) {
+    return ResolvedWebLink(
+      series: WebSeriesRef.fromLegacySourceHandler(handle),
+      initialChapterId: handle.chapter,
+    );
+  }
+
+  WebChapterRef? get initialChapter => switch (initialChapterId) {
+    final chapterId? => WebChapterRef(series: series, chapterId: chapterId),
+    null => null,
+  };
+
+  SourceHandler toLegacySourceHandler() =>
+      series.toLegacySourceHandler(chapter: initialChapterId);
+}
+
 @freezed
 abstract class UpdateFeedItem with _$UpdateFeedItem {
   const factory UpdateFeedItem({

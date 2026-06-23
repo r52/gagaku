@@ -1,0 +1,171 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:gagaku/web/model/types.dart';
+
+void main() {
+  group('WebSeriesRef', () {
+    test('proxy references expose stable series identity', () {
+      const reference = WebSeriesRef.proxy(
+        proxyId: 'imgur',
+        seriesId: 'album-1',
+      );
+
+      expect(reference.key, 'imgur/album-1');
+      expect(reference.sourceId, 'imgur');
+      expect(reference.location, 'album-1');
+      expect(reference.externalUrl, 'https://cubari.moe/read/imgur/album-1/');
+      expect(reference.toJson(), {
+        'type': 'proxy',
+        'proxyId': 'imgur',
+        'seriesId': 'album-1',
+      });
+      expect(WebSeriesRef.fromJson(reference.toJson()), reference);
+    });
+
+    test('extension references expose stable series identity', () {
+      const reference = WebSeriesRef.extension(
+        sourceId: 'source-1',
+        mangaId: 'manga-1',
+      );
+
+      expect(reference.key, 'source-1/manga-1');
+      expect(reference.sourceId, 'source-1');
+      expect(reference.location, 'manga-1');
+      expect(reference.externalUrl, 'source-1/manga-1');
+      expect(reference.toJson(), {
+        'type': 'extension',
+        'sourceId': 'source-1',
+        'mangaId': 'manga-1',
+      });
+      expect(WebSeriesRef.fromJson(reference.toJson()), reference);
+    });
+
+    test('legacy conversion deliberately discards chapter state', () {
+      final legacy = SourceHandler(
+        type: SourceType.proxy,
+        sourceId: 'gist',
+        location: 'series-1',
+        chapter: '7',
+      );
+
+      final reference = WebSeriesRef.fromLegacySourceHandler(legacy);
+
+      expect(
+        reference,
+        const WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1'),
+      );
+      expect(reference.toLegacySourceHandler().chapter, isNull);
+    });
+
+    test('legacy round trips preserve series fields for both variants', () {
+      final references = <WebSeriesRef>[
+        const WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1'),
+        const WebSeriesRef.extension(sourceId: 'source-1', mangaId: 'manga-1'),
+      ];
+
+      for (final reference in references) {
+        expect(
+          WebSeriesRef.fromLegacySourceHandler(
+            reference.toLegacySourceHandler(),
+          ),
+          reference,
+        );
+      }
+    });
+  });
+
+  group('WebChapterRef', () {
+    test('separates transient chapter identity from the series', () {
+      const reference = WebChapterRef(
+        series: WebSeriesRef.extension(
+          sourceId: 'source-1',
+          mangaId: 'manga-1',
+        ),
+        chapterId: 'chapter-1',
+      );
+
+      expect(reference.series.key, 'source-1/manga-1');
+      expect(reference.chapterId, 'chapter-1');
+      expect(reference.toJson(), {
+        'series': {
+          'type': 'extension',
+          'sourceId': 'source-1',
+          'mangaId': 'manga-1',
+        },
+        'chapterId': 'chapter-1',
+      });
+      expect(WebChapterRef.fromJson(reference.toJson()), reference);
+    });
+
+    test('converts a chapter-bearing legacy handler', () {
+      final legacy = SourceHandler(
+        type: SourceType.proxy,
+        sourceId: 'gist',
+        location: 'series-1',
+        chapter: '7',
+      );
+
+      final reference = WebChapterRef.fromLegacySourceHandler(legacy);
+
+      expect(
+        reference.series,
+        const WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1'),
+      );
+      expect(reference.chapterId, '7');
+      expect(reference.toLegacySourceHandler(), legacy);
+    });
+
+    test('rejects a series-only legacy handler', () {
+      final legacy = SourceHandler(
+        type: SourceType.source,
+        sourceId: 'source-1',
+        location: 'manga-1',
+      );
+
+      expect(
+        () => WebChapterRef.fromLegacySourceHandler(legacy),
+        throwsArgumentError,
+      );
+    });
+  });
+
+  group('ResolvedWebLink', () {
+    test('preserves a direct chapter only as initial navigation state', () {
+      final legacy = SourceHandler(
+        type: SourceType.proxy,
+        sourceId: 'imgur',
+        location: 'album-1',
+        chapter: '1',
+      );
+
+      final resolved = ResolvedWebLink.fromLegacySourceHandler(legacy);
+
+      expect(
+        resolved.series,
+        const WebSeriesRef.proxy(proxyId: 'imgur', seriesId: 'album-1'),
+      );
+      expect(resolved.initialChapterId, '1');
+      expect(
+        resolved.initialChapter,
+        const WebChapterRef(
+          series: WebSeriesRef.proxy(proxyId: 'imgur', seriesId: 'album-1'),
+          chapterId: '1',
+        ),
+      );
+      expect(resolved.toLegacySourceHandler(), legacy);
+      expect(ResolvedWebLink.fromJson(resolved.toJson()), resolved);
+    });
+
+    test('series links do not synthesize a chapter request', () {
+      const resolved = ResolvedWebLink(
+        series: WebSeriesRef.extension(
+          sourceId: 'source-1',
+          mangaId: 'manga-1',
+        ),
+      );
+
+      expect(resolved.initialChapterId, isNull);
+      expect(resolved.initialChapter, isNull);
+      expect(resolved.toLegacySourceHandler().chapter, isNull);
+    });
+  });
+}

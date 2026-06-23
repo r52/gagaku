@@ -100,6 +100,58 @@ const _$SourceTypeEnumMap = {
   SourceType.source: 'source',
 };
 
+ProxySeriesRef _$ProxySeriesRefFromJson(Map<String, dynamic> json) =>
+    ProxySeriesRef(
+      proxyId: json['proxyId'] as String,
+      seriesId: json['seriesId'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$ProxySeriesRefToJson(ProxySeriesRef instance) =>
+    <String, dynamic>{
+      'proxyId': instance.proxyId,
+      'seriesId': instance.seriesId,
+      'type': instance.$type,
+    };
+
+ExtensionSeriesRef _$ExtensionSeriesRefFromJson(Map<String, dynamic> json) =>
+    ExtensionSeriesRef(
+      sourceId: json['sourceId'] as String,
+      mangaId: json['mangaId'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$ExtensionSeriesRefToJson(ExtensionSeriesRef instance) =>
+    <String, dynamic>{
+      'sourceId': instance.sourceId,
+      'mangaId': instance.mangaId,
+      'type': instance.$type,
+    };
+
+_WebChapterRef _$WebChapterRefFromJson(Map<String, dynamic> json) =>
+    _WebChapterRef(
+      series: WebSeriesRef.fromJson(json['series'] as Map<String, dynamic>),
+      chapterId: json['chapterId'] as String,
+    );
+
+Map<String, dynamic> _$WebChapterRefToJson(_WebChapterRef instance) =>
+    <String, dynamic>{
+      'series': instance.series.toJson(),
+      'chapterId': instance.chapterId,
+    };
+
+_ResolvedWebLink _$ResolvedWebLinkFromJson(Map<String, dynamic> json) =>
+    _ResolvedWebLink(
+      series: WebSeriesRef.fromJson(json['series'] as Map<String, dynamic>),
+      initialChapterId: json['initialChapterId'] as String?,
+    );
+
+Map<String, dynamic> _$ResolvedWebLinkToJson(_ResolvedWebLink instance) =>
+    <String, dynamic>{
+      'series': instance.series.toJson(),
+      'initialChapterId': instance.initialChapterId,
+    };
+
 _UpdateFeedItem _$UpdateFeedItemFromJson(Map<String, dynamic> json) =>
     _UpdateFeedItem(
       link: HistoryLink.fromJson(json['link'] as Map<String, dynamic>),
