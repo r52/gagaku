@@ -54,7 +54,7 @@ void openWebSource(BuildContext context, ResolvedWebLink link) {
   WebMangaViewRoute(
     sourceId: link.series.sourceId,
     mangaId: link.series.location,
-    handle: link.series.toLegacySourceHandler(),
+    $extra: link.series,
   ).push(context);
 }
 

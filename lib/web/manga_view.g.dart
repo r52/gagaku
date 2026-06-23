@@ -24,7 +24,7 @@ final class _FetchWebMangaInfoProvider
         $FutureProvider<(WebManga, HistoryLink)> {
   _FetchWebMangaInfoProvider._({
     required _FetchWebMangaInfoFamily super.from,
-    required SourceHandler super.argument,
+    required WebSeriesRef super.argument,
   }) : super(
          retry: noRetry,
          name: r'_fetchWebMangaInfoProvider',
@@ -51,7 +51,7 @@ final class _FetchWebMangaInfoProvider
 
   @override
   FutureOr<(WebManga, HistoryLink)> create(Ref ref) {
-    final argument = this.argument as SourceHandler;
+    final argument = this.argument as WebSeriesRef;
     return _fetchWebMangaInfo(ref, argument);
   }
 
@@ -67,13 +67,13 @@ final class _FetchWebMangaInfoProvider
 }
 
 String _$_fetchWebMangaInfoHash() =>
-    r'10754ad31928512cfa546e87e76464799a7ba5a3';
+    r'03b92d838dec755f87219e318c54e75b0f295669';
 
 final class _FetchWebMangaInfoFamily extends $Family
     with
         $FunctionalFamilyOverride<
           FutureOr<(WebManga, HistoryLink)>,
-          SourceHandler
+          WebSeriesRef
         > {
   _FetchWebMangaInfoFamily._()
     : super(
@@ -84,8 +84,8 @@ final class _FetchWebMangaInfoFamily extends $Family
         isAutoDispose: true,
       );
 
-  _FetchWebMangaInfoProvider call(SourceHandler handle) =>
-      _FetchWebMangaInfoProvider._(argument: handle, from: this);
+  _FetchWebMangaInfoProvider call(WebSeriesRef series) =>
+      _FetchWebMangaInfoProvider._(argument: series, from: this);
 
   @override
   String toString() => r'_fetchWebMangaInfoProvider';

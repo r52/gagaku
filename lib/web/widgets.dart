@@ -745,12 +745,12 @@ class ChapterButtonWidget extends HookConsumerWidget {
     super.key,
     required this.data,
     required this.manga,
-    required this.handle,
+    required this.series,
   });
 
   final WebChapterItem data;
   final WebManga manga;
-  final SourceHandler handle;
+  final WebSeriesRef series;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -767,12 +767,12 @@ class ChapterButtonWidget extends HookConsumerWidget {
       ),
       WebChapterItemExtension(:final chapter) => (
         chapter.chapNum.toString(),
-        chapter.version ?? handle.sourceId,
+        chapter.version ?? series.sourceId,
         chapter,
       ),
     };
 
-    final mangakey = handle.getKey();
+    final mangakey = series.key;
 
     final isRead = ref.watch(
       webReadMarkersProvider.select(
@@ -837,17 +837,29 @@ class ChapterButtonWidget extends HookConsumerWidget {
     );
 
     final route = switch (data) {
-      WebChapterItemCubari() => ProxyWebSourceReaderRoute(
-        proxy: handle.sourceId,
-        code: handle.location,
-        chapter: chapterkey,
-        page: '1',
-      ),
-      WebChapterItemExtension(:final chapter) => ExtensionReaderRoute(
-        sourceId: handle.sourceId,
-        mangaId: handle.location,
-        chapterId: chapter.chapterId,
-      ),
+      WebChapterItemCubari() => switch (series) {
+        ProxySeriesRef(:final proxyId, :final seriesId) =>
+          ProxyWebSourceReaderRoute(
+            proxy: proxyId,
+            code: seriesId,
+            chapter: chapterkey,
+            page: '1',
+          ),
+        ExtensionSeriesRef() => throw StateError(
+          'Cubari chapter cannot be routed for extension series ${series.key}.',
+        ),
+      },
+      WebChapterItemExtension(:final chapter) => switch (series) {
+        ExtensionSeriesRef(:final sourceId, :final mangaId) =>
+          ExtensionReaderRoute(
+            sourceId: sourceId,
+            mangaId: mangaId,
+            chapterId: chapter.chapterId,
+          ),
+        ProxySeriesRef() => throw StateError(
+          'Extension chapter cannot be routed for proxy series ${series.key}.',
+        ),
+      },
     };
 
     final tile = Column(
@@ -984,8 +996,7 @@ class ChapterFeedItem extends StatelessWidget {
                               ChapterButtonWidget(
                                 data: item,
                                 manga: state.manga,
-                                handle: state.link.requireSeries
-                                    .toLegacySourceHandler(),
+                                series: state.link.requireSeries,
                               ),
                           ],
                         ),
@@ -1009,8 +1020,7 @@ class ChapterFeedItem extends StatelessWidget {
                           ChapterButtonWidget(
                             data: item,
                             manga: state.manga,
-                            handle: state.link.requireSeries
-                                .toLegacySourceHandler(),
+                            series: state.link.requireSeries,
                           ),
                       ],
                     ),

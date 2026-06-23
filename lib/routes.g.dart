@@ -991,11 +991,7 @@ mixin $WebMangaViewRoute on GoRouteData {
   static WebMangaViewRoute _fromState(GoRouterState state) => WebMangaViewRoute(
     sourceId: state.pathParameters['sourceId']!,
     mangaId: state.pathParameters['mangaId']!,
-    handle: _$convertMapValue('handle', state.uri.queryParameters, (
-      String json0,
-    ) {
-      return SourceHandler.fromJson(jsonDecode(json0) as Map<String, dynamic>);
-    }),
+    $extra: state.extra as WebSeriesRef?,
   );
 
   WebMangaViewRoute get _self => this as WebMangaViewRoute;
@@ -1003,23 +999,22 @@ mixin $WebMangaViewRoute on GoRouteData {
   @override
   String get location => GoRouteData.$location(
     '/read/${Uri.encodeComponent(_self.sourceId)}/${Uri.encodeComponent(_self.mangaId)}',
-    queryParams: {
-      if (_self.handle != null) 'handle': jsonEncode(_self.handle!.toJson()),
-    },
   );
 
   @override
-  void go(BuildContext context) => context.go(location);
+  void go(BuildContext context) => context.go(location, extra: _self.$extra);
 
   @override
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+  Future<T?> push<T>(BuildContext context) =>
+      context.push<T>(location, extra: _self.$extra);
 
   @override
   void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
+      context.pushReplacement(location, extra: _self.$extra);
 
   @override
-  void replace(BuildContext context) => context.replace(location);
+  void replace(BuildContext context) =>
+      context.replace(location, extra: _self.$extra);
 }
 
 RouteBase get $proxyWebSourceReaderRoute => GoRouteData.$route(

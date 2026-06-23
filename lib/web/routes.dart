@@ -109,12 +109,12 @@ class WebMangaViewRoute extends GoRouteData with $WebMangaViewRoute {
   const WebMangaViewRoute({
     required this.sourceId,
     required this.mangaId,
-    this.handle,
+    this.$extra,
   });
 
   final String sourceId;
   final String mangaId;
-  final SourceHandler? handle;
+  final WebSeriesRef? $extra;
 
   @override
   CustomTransitionPage<void> buildPage(
@@ -126,7 +126,7 @@ class WebMangaViewRoute extends GoRouteData with $WebMangaViewRoute {
       child: WebMangaViewPage(
         sourceId: sourceId,
         mangaId: mangaId,
-        handle: handle,
+        series: $extra,
       ),
       transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
     );
