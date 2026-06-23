@@ -179,7 +179,7 @@ final class WebSourceBrokerProvider
   }
 }
 
-String _$webSourceBrokerHash() => r'587c0d0309a44162d76625ffe14361300f779d67';
+String _$webSourceBrokerHash() => r'b5062a6c7286c11ce3538c4785265c0cc049f330';
 
 @ProviderFor(webSourceTransport)
 final webSourceTransportProvider = WebSourceTransportProvider._();

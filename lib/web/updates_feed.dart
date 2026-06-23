@@ -187,9 +187,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
 
       logger.d('Update progress: $processedCount/${links.length}');
 
-      final manga = await api.getMangaFromSource(
-        link.requireSeries.toLegacySourceHandler(),
-      );
+      final manga = await api.getManga(link.requireSeries);
       processedCount++;
 
       if (manga != null) {

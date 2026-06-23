@@ -51,14 +51,15 @@ Future<WebReaderData> _fetchWebChapterInfo(
   SourceHandler handle,
 ) async {
   final api = ref.watch(webSourceBrokerProvider);
-  final manga = await api.getMangaFromSource(handle);
+  final series = WebSeriesRef.fromLegacySourceHandler(handle);
+  final manga = await api.getManga(series);
 
   if (manga != null) {
     await WebHistoryManager().record(
       HistoryLink.fromSeries(
         title: manga.title,
         cover: manga.cover,
-        series: WebSeriesRef.fromLegacySourceHandler(handle),
+        series: series,
         lastAccessed: DateTime.now(),
       ),
       preserveHistory: ref.read(webConfigProvider).preserveHistory,
@@ -127,16 +128,15 @@ Future<List<ReaderPage>> _getSourcePages(
   dynamic chapter,
   SourceHandler handle,
 ) async {
-  final sourceId = handle.sourceId;
+  final api = ref.watch(webSourceBrokerProvider);
+  final series = WebSeriesRef.fromLegacySourceHandler(handle);
+  if (series is! ExtensionSeriesRef) {
+    throw InvalidDataException('Expected an extension series reference.');
+  }
+  final result = await api.getExtensionChapterPages(series, chapter as Chapter);
 
-  final sourceProvider = extensionSourceProvider(sourceId);
-  await ref.readAsync(sourceProvider.future);
-  final notifier = ref.read(sourceProvider.notifier);
-  final runtime = await notifier.getRuntime();
-  final links = await notifier.getChapterPages(chapter as Chapter);
-
-  final pages = links
-      .map((e) => ReaderPage(provider: ExtensionImage(e, runtime)))
+  final pages = result.links
+      .map((e) => ReaderPage(provider: ExtensionImage(e, result.runtime)))
       .toList();
 
   ref.onDispose(() {

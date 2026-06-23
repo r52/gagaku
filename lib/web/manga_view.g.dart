@@ -67,7 +67,7 @@ final class _FetchWebMangaInfoProvider
 }
 
 String _$_fetchWebMangaInfoHash() =>
-    r'888337b882f7c700e16b2e161c2565588e1faa62';
+    r'10754ad31928512cfa546e87e76464799a7ba5a3';
 
 final class _FetchWebMangaInfoFamily extends $Family
     with

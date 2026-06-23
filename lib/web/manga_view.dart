@@ -29,10 +29,10 @@ Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
   SourceHandler handle,
 ) async {
   final api = ref.watch(webSourceBrokerProvider);
-  final manga = await api.getMangaFromSource(handle);
+  final series = WebSeriesRef.fromLegacySourceHandler(handle);
+  final manga = await api.getManga(series);
 
   if (manga != null) {
-    final series = WebSeriesRef.fromLegacySourceHandler(handle);
     final link = HistoryLink.fromSeries(
       title: manga.title,
       cover: manga.cover,

@@ -20,6 +20,7 @@ import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/fjs_extension_runtime.dart';
 import 'package:gagaku/web/model/extension_repository.dart';
 import 'package:gagaku/web/model/link_resolver.dart';
+import 'package:gagaku/web/model/source_adapter.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -106,7 +107,28 @@ Map<String, String> sourceHeaders(Ref ref, String sourceId) {
 
 @Riverpod(keepAlive: true)
 WebSourceBroker webSourceBroker(Ref ref) {
-  return WebSourceBroker(ref);
+  final transport = ref.watch(webSourceTransportProvider);
+  return WebSourceBroker(
+    cache: ref.watch(cacheProvider),
+    proxyAdapter: ProxyWebSourceAdapter(transport: transport),
+    extensionAdapter: ExtensionWebSourceAdapter(
+      fetchManga: (sourceId, mangaId) async {
+        await ref.readAsync(extensionSourceProvider(sourceId).future);
+        return ref
+            .read(extensionSourceProvider(sourceId).notifier)
+            .getManga(mangaId);
+      },
+      fetchChapterPages: (sourceId, chapter) async {
+        final provider = extensionSourceProvider(sourceId);
+        await ref.readAsync(provider.future);
+        final notifier = ref.read(provider.notifier);
+        return ExtensionChapterPages(
+          runtime: await notifier.getRuntime(),
+          links: await notifier.getChapterPages(chapter),
+        );
+      },
+    ),
+  );
 }
 
 @Riverpod(keepAlive: true)
@@ -128,10 +150,6 @@ WebLinkResolver webLinkResolver(Ref ref) {
       ref.watch(webSourceTransportProvider),
     ),
   );
-}
-
-abstract interface class WebSourceTransport {
-  Future<Response<dynamic>> getUri(Uri uri, {bool followRedirects = true});
 }
 
 class _DioWebSourceTransport implements WebSourceTransport {
@@ -185,25 +203,17 @@ Dio _createWebSourceDio() {
 }
 
 class WebSourceBroker {
-  WebSourceBroker(
-    this.ref, {
-    WebSourceTransport? transport,
-    CacheManager? cache,
-    Future<WebManga?> Function(String sourceId, String mangaId)?
-    extensionMangaFetcher,
-  }) : _cache = cache ?? ref.read(cacheProvider),
-       _extensionMangaFetcher = extensionMangaFetcher {
-    _transport = transport ?? ref.read(webSourceTransportProvider);
-  }
+  WebSourceBroker({
+    required CacheManager cache,
+    required ProxyWebSourceAdapter proxyAdapter,
+    required ExtensionWebSourceAdapter extensionAdapter,
+  }) : _cache = cache,
+       _proxyAdapter = proxyAdapter,
+       _extensionAdapter = extensionAdapter;
 
-  final Ref ref;
   final CacheManager _cache;
-  final Future<WebManga?> Function(String sourceId, String mangaId)?
-  _extensionMangaFetcher;
-
-  late final WebSourceTransport _transport;
-
-  static const _cubariApiBase = 'https://cubari.moe/read/api';
+  final ProxyWebSourceAdapter _proxyAdapter;
+  final ExtensionWebSourceAdapter _extensionAdapter;
 
   Future<void> invalidateCacheItem(String item) async {
     if (await _cache.exists(item)) {
@@ -240,61 +250,24 @@ class WebSourceBroker {
     return manga;
   }
 
-  Future<WebManga?> getMangaFromSource(SourceHandler handle) async {
-    switch (handle.type) {
-      case SourceType.source:
-        return _fetchWithCache(handle.getKey(), () async {
-          final extensionMangaFetcher = _extensionMangaFetcher;
-          if (extensionMangaFetcher != null) {
-            return extensionMangaFetcher(handle.sourceId, handle.location);
-          }
-
-          await ref.readAsync(extensionSourceProvider(handle.sourceId).future);
-          return await ref
-              .read(extensionSourceProvider(handle.sourceId).notifier)
-              .getManga(handle.location);
-        });
-
-      case SourceType.proxy:
-        return await _getMangaFromProxy(handle);
-    }
-  }
-
-  Future<WebManga?> _getMangaFromProxy(SourceHandler handle) async {
-    final url = "$_cubariApiBase/${handle.sourceId}/series/${handle.location}/";
-
-    return _fetchWithCache(handle.getKey(), () async {
-      final response = await _transport.getUri(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        data['source_type'] = 'cubari';
-        return WebManga.fromJson(data);
-      }
-
-      logger.d(
-        "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.statusMessage}",
-      );
-
-      return null;
-    });
-  }
-
-  Future<dynamic> getProxyAPI(String path) async {
-    final url = "https://cubari.moe$path";
-
-    final response = await _transport.getUri(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      return response.data;
-    }
-
-    throw ApiException(
-      message: 'Failed to download API data',
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
+  Future<WebManga?> getManga(WebSeriesRef series) {
+    return _fetchWithCache(
+      series.key,
+      () => switch (series) {
+        ProxySeriesRef() => _proxyAdapter.fetchManga(series),
+        ExtensionSeriesRef() => _extensionAdapter.fetchManga(series),
+      },
     );
   }
+
+  Future<ExtensionChapterPages> getExtensionChapterPages(
+    ExtensionSeriesRef series,
+    Chapter chapter,
+  ) {
+    return _extensionAdapter.fetchChapterPages(series, chapter);
+  }
+
+  Future<dynamic> getProxyAPI(String path) => _proxyAdapter.fetchApiPath(path);
 }
 
 class WebFavoritesManager extends ChangeNotifier {

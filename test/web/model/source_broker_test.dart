@@ -8,9 +8,9 @@ import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/source_adapter.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/reader.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
 void main() {
@@ -21,7 +21,6 @@ void main() {
   group('WebSourceBroker execution dispatch', () {
     late _RecordingWebSourceTransport transport;
     late _MemoryCacheManager cache;
-    late ProviderContainer container;
     late WebSourceBroker broker;
     var extensionFetches = 0;
 
@@ -30,39 +29,35 @@ void main() {
       cache = _MemoryCacheManager();
       extensionFetches = 0;
 
-      final provider = Provider<WebSourceBroker>((ref) {
-        return WebSourceBroker(
-          ref,
-          transport: transport,
-          cache: cache,
-          extensionMangaFetcher: (sourceId, mangaId) async {
+      broker = WebSourceBroker(
+        cache: cache,
+        proxyAdapter: ProxyWebSourceAdapter(transport: transport),
+        extensionAdapter: ExtensionWebSourceAdapter(
+          fetchManga: (sourceId, mangaId) async {
             extensionFetches++;
             return _cubariManga(title: '$sourceId/$mangaId');
           },
-        );
-      });
-      container = ProviderContainer();
-      addTearDown(container.dispose);
-      broker = container.read(provider);
+          fetchChapterPages: (_, _) => throw UnimplementedError(),
+        ),
+      );
     });
 
     test(
       'dispatches extension manga fetches and caches by series key',
       () async {
-        final handle = SourceHandler(
-          type: SourceType.source,
+        const series = WebSeriesRef.extension(
           sourceId: 'source-1',
-          location: 'manga-1',
+          mangaId: 'manga-1',
         );
 
-        final first = await broker.getMangaFromSource(handle);
-        final second = await broker.getMangaFromSource(handle);
+        final first = await broker.getManga(series);
+        final second = await broker.getManga(series);
 
         expect(first?.title, 'source-1/manga-1');
         expect(second, same(first));
         expect(extensionFetches, 1);
         expect(transport.requests, isEmpty);
-        expect(cache.values, contains(handle.getKey()));
+        expect(cache.values, contains(series.key));
       },
     );
 
@@ -70,20 +65,20 @@ void main() {
       'dispatches proxy manga fetches through the local transport',
       () async {
         transport.enqueue(statusCode: 200, data: _cubariResponse());
-        final handle = SourceHandler(
-          type: SourceType.proxy,
-          sourceId: 'gist',
-          location: 'series-1',
+        const series = WebSeriesRef.proxy(
+          proxyId: 'gist',
+          seriesId: 'series-1',
         );
 
-        final manga = await broker.getMangaFromSource(handle);
+        final manga = await broker.getManga(series);
 
         expect(manga?.title, 'Proxy series');
         expect(
           transport.requests.single.uri.toString(),
           'https://cubari.moe/read/api/gist/series/series-1/',
         );
-        expect(cache.values, contains(handle.getKey()));
+        expect(cache.values, contains(series.key));
+        expect(extensionFetches, 0);
       },
     );
 
