@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:async/async.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:fresh_dio/fresh_dio.dart';
@@ -825,64 +824,63 @@ class MangaDexModel {
     required int chunkSize,
     required Map<String, dynamic> Function() buildQueryParams,
   }) async {
-    // 1. Filter uncached IDs
-    final uncached = (await ids.whereAsync(
-      (id) async => !await _cache.exists(id),
-    )).toList();
-
-    final result = <T>[];
-
-    if (uncached.isEmpty) {
-      // All cached — just read from cache
-      for (final id in ids) {
-        if (await _cache.exists(id)) {
-          result.add(_cache.get<T>(id, fromJson));
-        }
-      }
-      return result;
+    if (chunkSize <= 0) {
+      throw ArgumentError.value(chunkSize, 'chunkSize', 'Must be positive');
     }
 
-    // 2. Chunk and fire parallel requests
+    final requestedIds = LinkedHashSet<String>.from(ids).toList();
+    final uncached = <String>[];
+    for (final id in requestedIds) {
+      if (!await _cache.exists(id)) {
+        uncached.add(id);
+      }
+    }
+
     final futures = <Future<void>>[];
-    int start = 0, end = 0;
-
-    while (end < uncached.length) {
-      start = end;
-      end += min(uncached.length - start, chunkSize);
-
+    for (var start = 0; start < uncached.length; start += chunkSize) {
+      final end = min(start + chunkSize, uncached.length);
       final chunkParams = Map<String, dynamic>.from(buildQueryParams());
-      chunkParams['ids[]'] = uncached.getRange(start, end);
+      chunkParams['ids[]'] = uncached.sublist(start, end);
 
       final uri = MangaDexEndpoints.api.replace(
         path: endpoint,
         queryParameters: chunkParams,
       );
 
-      futures.add(
-        _transport.getUri(uri).then((response) async {
-          if (response.statusCode == 200) {
-            final parsed = MDEntityList.fromJson(response.data);
-            await _cache.putAllAPIResolved(parsed.data);
-          } else {
-            throw createException(
-              "$_fetchByIds() failed for $endpoint.",
-              response,
-            );
+      futures.add(() async {
+        await _getEntityList(
+          uri: uri,
+          operation: '_fetchByIds($endpoint)',
+          authenticated: false,
+          cacheKey: null,
+          resolveEntities: true,
+          expiry: const Duration(minutes: 15),
+        );
+      }());
+    }
+
+    final failures = <(Object, StackTrace)>[];
+    await Future.wait([
+      for (final future in futures)
+        () async {
+          try {
+            await future;
+          } catch (error, stackTrace) {
+            failures.add((error, stackTrace));
           }
-        }),
-      );
-    }
+        }(),
+    ]);
 
-    // 3. Tolerate partial failures
-    final results = await Result.captureAll(futures);
-    for (final result in results) {
-      if (result.isError) {
-        logger.w("A chunk failed to fetch", error: result.asError!.error);
+    if (failures.isNotEmpty) {
+      for (final (error, _) in failures.skip(1)) {
+        logger.w('An additional ID chunk failed to fetch', error: error);
       }
+      final (error, stackTrace) = failures.first;
+      Error.throwWithStackTrace(error, stackTrace);
     }
 
-    // 4. Re-read all original IDs from cache
-    for (final id in ids) {
+    final result = <T>[];
+    for (final id in requestedIds) {
       if (await _cache.exists(id)) {
         result.add(_cache.get<T>(id, fromJson));
       }

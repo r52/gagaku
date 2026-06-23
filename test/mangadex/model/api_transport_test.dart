@@ -766,6 +766,89 @@ void main() {
       expect(cache.values['OtherFeed:v2:keep'], 'keep');
     });
 
+    test(
+      'ID fetch tolerates entities omitted by a successful response',
+      () async {
+        final first = Manga(id: 'manga-1');
+        final missing = Manga(id: 'manga-missing');
+        transport.enqueue(
+          statusCode: 200,
+          data: _emptyEntityListData(entities: [first]),
+        );
+
+        final result = await model.fetchMangaById(
+          limit: 50,
+          ids: [first.id, missing.id],
+        );
+
+        expect(result, [first]);
+        expect(cache.values[first.id], first);
+        expect(cache.values, isNot(contains(missing.id)));
+      },
+    );
+
+    test(
+      'ID fetch reports failed chunks after caching successful chunks',
+      () async {
+        final mangas = [
+          for (var index = 1; index <= 4; index++) Manga(id: 'manga-$index'),
+        ];
+        transport
+          ..enqueue(
+            statusCode: 200,
+            data: _emptyEntityListData(entities: mangas.take(2).toList()),
+          )
+          ..enqueue(statusCode: 500, data: null);
+
+        await expectLater(
+          model.fetchMangaById(limit: 2, ids: mangas.map((manga) => manga.id)),
+          throwsA(isA<ApiException>()),
+        );
+
+        expect(cache.values[mangas[0].id], mangas[0]);
+        expect(cache.values[mangas[1].id], mangas[1]);
+        expect(cache.values, isNot(contains(mangas[2].id)));
+        expect(transport.requests, hasLength(2));
+
+        transport.enqueue(
+          statusCode: 200,
+          data: _emptyEntityListData(entities: mangas.skip(2).toList()),
+        );
+
+        final retry = await model.fetchMangaById(
+          limit: 2,
+          ids: mangas.map((manga) => manga.id),
+        );
+
+        expect(retry, mangas);
+        expect(transport.requests, hasLength(3));
+        expect(
+          transport.requests.last.uri.queryParametersAll['ids[]'],
+          mangas.skip(2).map((manga) => manga.id),
+        );
+      },
+    );
+
+    test('ID fetch materializes and deduplicates input once', () async {
+      final first = Manga(id: 'manga-1');
+      final second = Manga(id: 'manga-2');
+      transport.enqueue(
+        statusCode: 200,
+        data: _emptyEntityListData(entities: [first, second]),
+      );
+
+      final result = await model.fetchMangaById(
+        limit: 50,
+        ids: _SingleUseIterable([first.id, first.id, second.id]),
+      );
+
+      expect(result, [first, second]);
+      expect(transport.requests.single.uri.queryParametersAll['ids[]'], [
+        first.id,
+        second.id,
+      ]);
+    });
+
     test('shared executor parses MangaDex error responses', () async {
       transport.enqueue(
         statusCode: 400,
@@ -1006,6 +1089,22 @@ class _QueuedResponse {
   final String? statusMessage;
   final dynamic data;
   final Object? error;
+}
+
+class _SingleUseIterable extends IterableBase<String> {
+  _SingleUseIterable(this.values);
+
+  final List<String> values;
+  bool _iterated = false;
+
+  @override
+  Iterator<String> get iterator {
+    if (_iterated) {
+      throw StateError('Iterable was consumed more than once');
+    }
+    _iterated = true;
+    return values.iterator;
+  }
 }
 
 class _RecordingTransport implements MangaDexTransport {
