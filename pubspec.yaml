@@ -64,14 +64,14 @@ dependencies:
   uuid: ^4.4.0
   permission_handler: ^12.0.0
   intl: ^0.20.0
-  flutter_inappwebview: ^6.2.0-beta.2
+  flutter_inappwebview: ^6.2.0-beta.3
   mime: ^2.0.0
   expansion_tile_list: ^2.0.0
   infinite_scroll_pagination: ^5.0.0
   flutter_markdown_plus: ^1.0.3
   slang: ^4.6.0
   slang_flutter: ^4.6.0
-  cronet_http: ^1.7.0
+  cronet_http: ^1.9.0
   dio: ^5.8.0+1
   fresh_dio: ^0.6.0
   native_dio_adapter: ^1.4.0

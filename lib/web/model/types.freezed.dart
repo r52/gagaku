@@ -23,7 +23,7 @@ WebSeriesRef _$WebSeriesRefFromJson(
           return ExtensionSeriesRef.fromJson(
             json
           );
-
+        
           default:
             throw CheckedFromJsonException(
   json,
@@ -32,7 +32,7 @@ WebSeriesRef _$WebSeriesRefFromJson(
   'Invalid union type "${json['type']}"!'
 );
         }
-
+      
 }
 
 /// @nodoc
@@ -284,7 +284,7 @@ as String,
 @override
 @pragma('vm:prefer-inline')
 $WebSeriesRefCopyWith<$Res> get series {
-
+  
   return $WebSeriesRefCopyWith<$Res>(_self.series, (value) {
     return _then(_self.copyWith(series: value));
   });
@@ -366,7 +366,7 @@ as String,
 @override
 @pragma('vm:prefer-inline')
 $WebSeriesRefCopyWith<$Res> get series {
-
+  
   return $WebSeriesRefCopyWith<$Res>(_self.series, (value) {
     return _then(_self.copyWith(series: value));
   });
@@ -439,7 +439,7 @@ as String?,
 @override
 @pragma('vm:prefer-inline')
 $WebSeriesRefCopyWith<$Res> get series {
-
+  
   return $WebSeriesRefCopyWith<$Res>(_self.series, (value) {
     return _then(_self.copyWith(series: value));
   });
@@ -521,7 +521,7 @@ as String?,
 @override
 @pragma('vm:prefer-inline')
 $WebSeriesRefCopyWith<$Res> get series {
-
+  
   return $WebSeriesRefCopyWith<$Res>(_self.series, (value) {
     return _then(_self.copyWith(series: value));
   });
@@ -594,7 +594,7 @@ as WebManga,
 @override
 @pragma('vm:prefer-inline')
 $HistoryLinkCopyWith<$Res> get link {
-
+  
   return $HistoryLinkCopyWith<$Res>(_self.link, (value) {
     return _then(_self.copyWith(link: value));
   });
@@ -603,7 +603,7 @@ $HistoryLinkCopyWith<$Res> get link {
 @override
 @pragma('vm:prefer-inline')
 $WebMangaCopyWith<$Res> get manga {
-
+  
   return $WebMangaCopyWith<$Res>(_self.manga, (value) {
     return _then(_self.copyWith(manga: value));
   });
@@ -685,7 +685,7 @@ as WebManga,
 @override
 @pragma('vm:prefer-inline')
 $HistoryLinkCopyWith<$Res> get link {
-
+  
   return $HistoryLinkCopyWith<$Res>(_self.link, (value) {
     return _then(_self.copyWith(link: value));
   });
@@ -694,7 +694,7 @@ $HistoryLinkCopyWith<$Res> get link {
 @override
 @pragma('vm:prefer-inline')
 $WebMangaCopyWith<$Res> get manga {
-
+  
   return $WebMangaCopyWith<$Res>(_self.manga, (value) {
     return _then(_self.copyWith(manga: value));
   });
@@ -828,7 +828,7 @@ as CubariChapter,
 @override
 @pragma('vm:prefer-inline')
 $CubariChapterCopyWith<$Res> get chapter {
-
+  
   return $CubariChapterCopyWith<$Res>(_self.chapter, (value) {
     return _then(_self.copyWith(chapter: value));
   });
@@ -910,7 +910,7 @@ as CubariChapter,
 @override
 @pragma('vm:prefer-inline')
 $CubariChapterCopyWith<$Res> get chapter {
-
+  
   return $CubariChapterCopyWith<$Res>(_self.chapter, (value) {
     return _then(_self.copyWith(chapter: value));
   });
@@ -953,7 +953,7 @@ $WebChapterItemCopyWith(WebChapterItem _, $Res Function(WebChapterItem) __);
 
 class WebChapterItemCubari extends WebChapterItem {
   const WebChapterItemCubari(this.entry): super._();
-
+  
 
  final  CubariChapterEntry entry;
 
@@ -1016,7 +1016,7 @@ as CubariChapterEntry,
 @override
 @pragma('vm:prefer-inline')
 $CubariChapterEntryCopyWith<$Res> get entry {
-
+  
   return $CubariChapterEntryCopyWith<$Res>(_self.entry, (value) {
     return _then(_self.copyWith(entry: value));
   });
@@ -1028,7 +1028,7 @@ $CubariChapterEntryCopyWith<$Res> get entry {
 
 class WebChapterItemExtension extends WebChapterItem {
   const WebChapterItemExtension(this.chapter): super._();
-
+  
 
  final  Chapter chapter;
 
@@ -1091,7 +1091,7 @@ as Chapter,
 @override
 @pragma('vm:prefer-inline')
 $ChapterCopyWith<$Res> get chapter {
-
+  
   return $ChapterCopyWith<$Res>(_self.chapter, (value) {
     return _then(_self.copyWith(chapter: value));
   });
@@ -1110,7 +1110,7 @@ WebManga _$WebMangaFromJson(
           return WebMangaExtension.fromJson(
             json
           );
-
+        
           default:
             throw CheckedFromJsonException(
   json,
@@ -1119,7 +1119,7 @@ WebManga _$WebMangaFromJson(
   'Invalid union type "${json['source_type']}"!'
 );
         }
-
+      
 }
 
 /// @nodoc
@@ -1337,7 +1337,7 @@ as List<Chapter>,
 @override
 @pragma('vm:prefer-inline')
 $SourceMangaCopyWith<$Res> get data {
-
+  
   return $SourceMangaCopyWith<$Res>(_self.data, (value) {
     return _then(_self.copyWith(data: value));
   });
@@ -2504,7 +2504,7 @@ as RepositoryDescription?,
 @override
 @pragma('vm:prefer-inline')
 $BuiltWithCopyWith<$Res> get builtWith {
-
+  
   return $BuiltWithCopyWith<$Res>(_self.builtWith, (value) {
     return _then(_self.copyWith(builtWith: value));
   });
@@ -2608,7 +2608,7 @@ as RepositoryDescription?,
 @override
 @pragma('vm:prefer-inline')
 $BuiltWithCopyWith<$Res> get builtWith {
-
+  
   return $BuiltWithCopyWith<$Res>(_self.builtWith, (value) {
     return _then(_self.copyWith(builtWith: value));
   });
@@ -2774,7 +2774,7 @@ OAuthResponseType _$OAuthResponseTypeFromJson(
           return OAuthPKCEResponse.fromJson(
             json
           );
-
+        
           default:
             throw CheckedFromJsonException(
   json,
@@ -2783,7 +2783,7 @@ OAuthResponseType _$OAuthResponseTypeFromJson(
   'Invalid union type "${json['type']}"!'
 );
         }
-
+      
 }
 
 /// @nodoc
@@ -3639,7 +3639,7 @@ as MangaInfo,
 @override
 @pragma('vm:prefer-inline')
 $MangaInfoCopyWith<$Res> get mangaInfo {
-
+  
   return $MangaInfoCopyWith<$Res>(_self.mangaInfo, (value) {
     return _then(_self.copyWith(mangaInfo: value));
   });
@@ -3721,7 +3721,7 @@ as MangaInfo,
 @override
 @pragma('vm:prefer-inline')
 $MangaInfoCopyWith<$Res> get mangaInfo {
-
+  
   return $MangaInfoCopyWith<$Res>(_self.mangaInfo, (value) {
     return _then(_self.copyWith(mangaInfo: value));
   });
@@ -4292,7 +4292,7 @@ as num?,
 @override
 @pragma('vm:prefer-inline')
 $SourceMangaCopyWith<$Res> get sourceManga {
-
+  
   return $SourceMangaCopyWith<$Res>(_self.sourceManga, (value) {
     return _then(_self.copyWith(sourceManga: value));
   });
@@ -4400,7 +4400,7 @@ as num?,
 @override
 @pragma('vm:prefer-inline')
 $SourceMangaCopyWith<$Res> get sourceManga {
-
+  
   return $SourceMangaCopyWith<$Res>(_self.sourceManga, (value) {
     return _then(_self.copyWith(sourceManga: value));
   });
@@ -4581,13 +4581,13 @@ ChapterDetails _$ChapterDetailsFromJson(
           return FileChapterDetails.fromJson(
             json
           );
-
+        
           default:
             return ImageChapterDetails.fromJson(
   json
 );
         }
-
+      
 }
 
 /// @nodoc
@@ -4896,7 +4896,7 @@ as PaperbackRequest,
 @override
 @pragma('vm:prefer-inline')
 $PaperbackRequestCopyWith<$Res> get request {
-
+  
   return $PaperbackRequestCopyWith<$Res>(_self.request, (value) {
     return _then(_self.copyWith(request: value));
   });
@@ -5070,7 +5070,7 @@ DiscoverSectionItem _$DiscoverSectionItemFromJson(
           return FeaturedCarouselItem.fromJson(
             json
           );
-
+        
           default:
             throw CheckedFromJsonException(
   json,
@@ -5079,7 +5079,7 @@ DiscoverSectionItem _$DiscoverSectionItemFromJson(
   'Invalid union type "${json['type']}"!'
 );
         }
-
+      
 }
 
 /// @nodoc
@@ -5228,7 +5228,7 @@ as ContentRating?,
 @override
 @pragma('vm:prefer-inline')
 $SearchQueryCopyWith<$Res> get searchQuery {
-
+  
   return $SearchQueryCopyWith<$Res>(_self.searchQuery, (value) {
     return _then(_self.copyWith(searchQuery: value));
   });
@@ -5896,7 +5896,7 @@ FormItemElement _$FormItemElementFromJson(
           return WebViewRowElement.fromJson(
             json
           );
-
+        
           default:
             throw CheckedFromJsonException(
   json,
@@ -5905,7 +5905,7 @@ FormItemElement _$FormItemElementFromJson(
   'Invalid union type "${json['type']}"!'
 );
         }
-
+      
 }
 
 /// @nodoc
@@ -6579,7 +6579,7 @@ as List<String>?,
 @override
 @pragma('vm:prefer-inline')
 $OAuthResponseTypeCopyWith<$Res> get responseType {
-
+  
   return $OAuthResponseTypeCopyWith<$Res>(_self.responseType, (value) {
     return _then(_self.copyWith(responseType: value));
   });
@@ -6671,13 +6671,13 @@ FormSectionElement _$FormSectionElementFromJson(
           return ListSectionElement.fromJson(
             json
           );
-
+        
           default:
             return FlowSectionElement.fromJson(
   json
 );
         }
-
+      
 }
 
 /// @nodoc
@@ -7433,7 +7433,7 @@ as WebViewStorage,
 @override
 @pragma('vm:prefer-inline')
 $ExecuteInWebViewSourceCopyWith<$Res> get source {
-
+  
   return $ExecuteInWebViewSourceCopyWith<$Res>(_self.source, (value) {
     return _then(_self.copyWith(source: value));
   });
@@ -7442,7 +7442,7 @@ $ExecuteInWebViewSourceCopyWith<$Res> get source {
 @override
 @pragma('vm:prefer-inline')
 $WebViewStorageCopyWith<$Res> get storage {
-
+  
   return $WebViewStorageCopyWith<$Res>(_self.storage, (value) {
     return _then(_self.copyWith(storage: value));
   });
@@ -7526,7 +7526,7 @@ as WebViewStorage,
 @override
 @pragma('vm:prefer-inline')
 $ExecuteInWebViewSourceCopyWith<$Res> get source {
-
+  
   return $ExecuteInWebViewSourceCopyWith<$Res>(_self.source, (value) {
     return _then(_self.copyWith(source: value));
   });
@@ -7535,7 +7535,7 @@ $ExecuteInWebViewSourceCopyWith<$Res> get source {
 @override
 @pragma('vm:prefer-inline')
 $WebViewStorageCopyWith<$Res> get storage {
-
+  
   return $WebViewStorageCopyWith<$Res>(_self.storage, (value) {
     return _then(_self.copyWith(storage: value));
   });
@@ -7608,7 +7608,7 @@ as WebViewStorage,
 @override
 @pragma('vm:prefer-inline')
 $WebViewStorageCopyWith<$Res> get storage {
-
+  
   return $WebViewStorageCopyWith<$Res>(_self.storage, (value) {
     return _then(_self.copyWith(storage: value));
   });
@@ -7690,7 +7690,7 @@ as WebViewStorage,
 @override
 @pragma('vm:prefer-inline')
 $WebViewStorageCopyWith<$Res> get storage {
-
+  
   return $WebViewStorageCopyWith<$Res>(_self.storage, (value) {
     return _then(_self.copyWith(storage: value));
   });
