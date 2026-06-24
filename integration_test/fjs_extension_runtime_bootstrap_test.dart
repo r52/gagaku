@@ -282,12 +282,40 @@ let savedCloudflareCookies = [];
 let cloudflareRequest;
 let cloudflareLocalStorage = {};
 let legacyCloudflareCallbackCalled = false;
+let settingsNestedFormVersion = 0;
+const createSettingsNestedForm = () => {
+  const version = ++settingsNestedFormVersion;
+  return {
+    requiresExplicitSubmission: true,
+    getSections: () => [],
+    formDidSubmit: async () => {
+      Application.setState(
+        (Application.getState("phase2-nested-submit-count") ?? 0) + 1,
+        "phase2-nested-submit-count"
+      );
+      Application.setState(version, "phase2-nested-submit-version");
+    }
+  };
+};
+const settingsNestedRow = {
+  id: "phase2-nested",
+  type: "navigationRow",
+  isHidden: false,
+  title: "Nested",
+  form: createSettingsNestedForm()
+};
 const settingsForm = {
   requiresExplicitSubmission: true,
   formWillAppear: () => {
     Application.setState("appeared", "phase2-appeared");
   },
-  getSections: () => [],
+  getSections: () => [
+    {
+      id: "phase2-settings",
+      type: "flowSection",
+      items: [settingsNestedRow]
+    }
+  ],
   formDidSubmit: async () => {
     Application.setState("submitted", "phase2-submitted");
   },
@@ -796,8 +824,25 @@ globalThis.source.phase2source = {
         capabilities: const [SourceIntents.settingsUI],
       ),
     );
-    expect(await form.sections, isEmpty);
+    final settingsSections = await form.sections;
+    expect(settingsSections, hasLength(1));
+    final settingsNavRow =
+        settingsSections.single.items.single as NavigationRowElement;
+    expect(settingsNavRow.form, 'phase2-nested');
     expect(form.requiresExplicitSubmission, true);
+    final nestedForm = await runtime.getForm(source, settingsNavRow.form);
+    await nestedForm.formDidSubmit();
+    expect(storedState['phase2-nested-submit-count'], 1);
+    expect(storedState['phase2-nested-submit-version'], 1);
+    await form.reloadForm();
+    await form.sections;
+    final reloadedNestedForm = await runtime.getForm(
+      source,
+      settingsNavRow.form,
+    );
+    await reloadedNestedForm.formDidSubmit();
+    expect(storedState['phase2-nested-submit-count'], 2);
+    expect(storedState['phase2-nested-submit-version'], 1);
     await form.formDidSubmit();
     expect(await form.getSearchQueryMetadata(), {'from': 'settings'});
     expect(storedState, {
@@ -814,6 +859,8 @@ globalThis.source.phase2source = {
       },
       'phase7BridgeState': {'nullable': null},
       'phase2-appeared': 'appeared',
+      'phase2-nested-submit-count': 2,
+      'phase2-nested-submit-version': 1,
       'phase2-submitted': 'submitted',
     });
 

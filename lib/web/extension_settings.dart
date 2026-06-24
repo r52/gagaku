@@ -501,8 +501,6 @@ class NavigationRowBuilder extends HookConsumerWidget {
     }
 
     if (future.data != null) {
-      final data = future.data!;
-
       body = Card(
         child: ListTile(
           title: Text(element.title),
@@ -523,12 +521,19 @@ class NavigationRowBuilder extends HookConsumerWidget {
             ],
           ),
           onTap: () async {
+            final currentForm = await ref
+                .read(extensionSourceProvider(source.id).notifier)
+                .getForm(element.form);
             await nav.push(
               PageTransitionRouteBuilder(
                 pageTransitionsBuilder:
                     const FadeForwardsPageTransitionsBuilder(),
                 pageBuilder: (context, animation, secondaryAnimation) =>
-                    FormBuilder(source: source, form: data, isTopLevel: false),
+                    FormBuilder(
+                      source: source,
+                      form: currentForm,
+                      isTopLevel: false,
+                    ),
               ),
             );
             form.reloadForm();
