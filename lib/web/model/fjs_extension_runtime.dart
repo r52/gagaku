@@ -359,7 +359,9 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     }
 
     timeout = Timer(startupBrowserTimeout, () {
-      if (requiresCloudflare && _cloudflareClearance(latestCookies) == null) {
+      if (requiresCloudflare &&
+          challengeObserved &&
+          _cloudflareClearance(latestCookies) == null) {
         completeError(const CloudflareBypassException(), StackTrace.current);
       } else {
         complete();
@@ -422,7 +424,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
             }
 
             final hasClearance = _cloudflareClearance(cookies) != null;
-            if (!requiresCloudflare || hasClearance) {
+            if (!requiresCloudflare || hasClearance || !challengeObserved) {
               complete();
               return;
             }

@@ -1304,6 +1304,94 @@ globalThis.source.knownGoodSource = {
   );
 
   test(
+    'fjs runtime accepts a Cloudflare-capable page without a challenge',
+    () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final baseUrl = 'http://127.0.0.1:${server.port}/';
+      final baseWebUri = WebUri(baseUrl);
+      var basePageRequests = 0;
+      Map<String, dynamic>? storedState;
+
+      addTearDown(() => server.close(force: true));
+      addTearDown(
+        () => CookieManager.instance().deleteCookie(
+          url: baseWebUri,
+          name: 'cf_clearance',
+        ),
+      );
+      await CookieManager.instance().deleteCookie(
+        url: baseWebUri,
+        name: 'cf_clearance',
+      );
+      server.listen((request) async {
+        if (request.uri.path == '/') {
+          basePageRequests++;
+        }
+        request.response
+          ..statusCode = HttpStatus.ok
+          ..headers.contentType = ContentType.html
+          ..write(
+            '<html><title>Ready</title><script>'
+            'localStorage.setItem("phase6", "loaded");'
+            '</script><body>ready</body></html>',
+          );
+        await request.response.close();
+      });
+
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'unchallengedCloudflareSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, state) {
+          storedState = Map<String, dynamic>.from(state as Map);
+        },
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+        startupBrowserTimeout: const Duration(milliseconds: 500),
+      );
+      addTearDown(runtime.dispose);
+
+      final source = WebSourceInfo(
+        id: 'unchallengedCloudflareSource',
+        name: 'Unchallenged Cloudflare Source',
+        repo: 'phase6',
+        baseUrl: baseUrl,
+        icon: '',
+        capabilities: const [SourceIntents.cloudflareBypassRequired],
+      );
+      await runtime.init(source, r'''
+globalThis.source ??= {};
+globalThis.source.unchallengedCloudflareSource = {
+  cloudflareBypassCompleted: async () => {
+    Application.setState(true, "unexpected-bypass-callback");
+  },
+  initialise: async () => {
+    Application.setState("initialized", "status");
+  }
+};
+''');
+
+      expect(storedState, {'status': 'initialized'});
+      expect(basePageRequests, 1);
+      expect(
+        runtime.getCookies(),
+        isNot(
+          contains(
+            isA<Object>().having(
+              (cookie) => (cookie as dynamic).name,
+              'name',
+              'cf_clearance',
+            ),
+          ),
+        ),
+      );
+    },
+  );
+
+  test(
     'fjs runtime reports a Cloudflare challenge without clearance',
     () async {
       final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
