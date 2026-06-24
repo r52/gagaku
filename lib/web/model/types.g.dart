@@ -10,9 +10,7 @@ HistoryLink _$HistoryLinkFromJson(Map<String, dynamic> json) => HistoryLink(
   title: json['title'] as String,
   url: json['url'] as String,
   cover: json['cover'] as String?,
-  handle: json['handle'] == null
-      ? null
-      : SourceHandler.fromJson(json['handle'] as Map<String, dynamic>),
+  series: _historySeriesFromJson(_readHistorySeries(json, 'series')),
   lastAccessed: json['lastAccessed'] == null
       ? null
       : DateTime.parse(json['lastAccessed'] as String),
@@ -23,7 +21,7 @@ Map<String, dynamic> _$HistoryLinkToJson(HistoryLink instance) =>
       'title': instance.title,
       'url': instance.url,
       'cover': instance.cover,
-      'handle': instance.handle?.toJson(),
+      'series': _historySeriesToJson(instance.series),
       'lastAccessed': instance.lastAccessed?.toIso8601String(),
     };
 
@@ -79,26 +77,57 @@ Map<String, dynamic> _$RepoDataToJson(RepoData instance) => <String, dynamic>{
   'version': _$SupportedVersionEnumMap[instance.version]!,
 };
 
-_SourceHandler _$SourceHandlerFromJson(Map<String, dynamic> json) =>
-    _SourceHandler(
-      type: $enumDecode(_$SourceTypeEnumMap, json['type']),
-      sourceId: json['sourceId'] as String,
-      location: json['location'] as String,
-      chapter: json['chapter'] as String?,
+ProxySeriesRef _$ProxySeriesRefFromJson(Map<String, dynamic> json) =>
+    ProxySeriesRef(
+      proxyId: json['proxyId'] as String,
+      seriesId: json['seriesId'] as String,
+      $type: json['type'] as String?,
     );
 
-Map<String, dynamic> _$SourceHandlerToJson(_SourceHandler instance) =>
+Map<String, dynamic> _$ProxySeriesRefToJson(ProxySeriesRef instance) =>
     <String, dynamic>{
-      'type': _$SourceTypeEnumMap[instance.type]!,
-      'sourceId': instance.sourceId,
-      'location': instance.location,
-      'chapter': instance.chapter,
+      'proxyId': instance.proxyId,
+      'seriesId': instance.seriesId,
+      'type': instance.$type,
     };
 
-const _$SourceTypeEnumMap = {
-  SourceType.proxy: 'proxy',
-  SourceType.source: 'source',
-};
+ExtensionSeriesRef _$ExtensionSeriesRefFromJson(Map<String, dynamic> json) =>
+    ExtensionSeriesRef(
+      sourceId: json['sourceId'] as String,
+      mangaId: json['mangaId'] as String,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$ExtensionSeriesRefToJson(ExtensionSeriesRef instance) =>
+    <String, dynamic>{
+      'sourceId': instance.sourceId,
+      'mangaId': instance.mangaId,
+      'type': instance.$type,
+    };
+
+_WebChapterRef _$WebChapterRefFromJson(Map<String, dynamic> json) =>
+    _WebChapterRef(
+      series: WebSeriesRef.fromJson(json['series'] as Map<String, dynamic>),
+      chapterId: json['chapterId'] as String,
+    );
+
+Map<String, dynamic> _$WebChapterRefToJson(_WebChapterRef instance) =>
+    <String, dynamic>{
+      'series': instance.series.toJson(),
+      'chapterId': instance.chapterId,
+    };
+
+_ResolvedWebLink _$ResolvedWebLinkFromJson(Map<String, dynamic> json) =>
+    _ResolvedWebLink(
+      series: WebSeriesRef.fromJson(json['series'] as Map<String, dynamic>),
+      initialChapterId: json['initialChapterId'] as String?,
+    );
+
+Map<String, dynamic> _$ResolvedWebLinkToJson(_ResolvedWebLink instance) =>
+    <String, dynamic>{
+      'series': instance.series.toJson(),
+      'initialChapterId': instance.initialChapterId,
+    };
 
 _UpdateFeedItem _$UpdateFeedItemFromJson(Map<String, dynamic> json) =>
     _UpdateFeedItem(

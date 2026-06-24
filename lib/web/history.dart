@@ -21,7 +21,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final api = ref.watch(webSourceBrokerProvider);
+    final resolver = ref.watch(webLinkResolverProvider);
     final cfg = ref.watch(webConfigProvider);
 
     final scrollController =
@@ -48,9 +48,10 @@ class WebSourceHistoryPage extends HookConsumerWidget {
       if (stream.data != null) {
         final sourceIds = stream.data!
             .map(
-              (e) => e.handle?.type == SourceType.source
-                  ? e.handle?.sourceId
-                  : null,
+              (e) => switch (e.series) {
+                ExtensionSeriesRef(:final sourceId) => sourceId,
+                _ => null,
+              },
             )
             .whereType<String>()
             .toSet();
@@ -103,7 +104,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
                     saveHistoryRow,
                     Text(tr.webSources.historyHere),
                     ElevatedButton.icon(
-                      onPressed: () => openLinkDialog(context, api),
+                      onPressed: () => openLinkDialog(context, resolver),
                       icon: const Icon(Icons.link),
                       label: Text(tr.webSources.openLink),
                     ),

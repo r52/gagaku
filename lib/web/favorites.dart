@@ -137,8 +137,10 @@ class WebSourceFavoriteTab extends HookConsumerWidget {
     useEffect(() {
       final sourceIds = items
           .map(
-            (e) =>
-                e.handle?.type == SourceType.source ? e.handle?.sourceId : null,
+            (e) => switch (e.series) {
+              ExtensionSeriesRef(:final sourceId) => sourceId,
+              _ => null,
+            },
           )
           .whereType<String>()
           .toSet();

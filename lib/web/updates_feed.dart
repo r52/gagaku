@@ -52,6 +52,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
     final tr = context.t;
     final cache = ref.watch(cacheProvider);
     final api = ref.watch(webSourceBrokerProvider);
+    final resolver = ref.watch(webLinkResolverProvider);
 
     if (await cache.exists(feedKey)) {
       logger.d('CacheManager: retrieving entry $feedKey');
@@ -156,9 +157,9 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
 
     List<HistoryLink> links = [];
     for (final link in linksToUpdate) {
-      final handledLink = await api.handleLink(link);
+      final handledLink = await resolver.resolveHistoryLink(link);
 
-      if (handledLink.handle != null) {
+      if (handledLink.series != null) {
         // Add links that didn't fail
         links.add(handledLink);
       }
@@ -186,7 +187,7 @@ class _WebSourceUpdatesPageState extends ConsumerState<WebSourceUpdatesPage> {
 
       logger.d('Update progress: $processedCount/${links.length}');
 
-      final manga = await api.getMangaFromSource(link.handle!);
+      final manga = await api.getManga(link.requireSeries);
       processedCount++;
 
       if (manga != null) {

@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:async/async.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:fresh_dio/fresh_dio.dart';
@@ -360,15 +359,6 @@ class MangaDexModel {
     _ => null,
   };
 
-  // void _urlLauncher(String url) async {
-  //   var uri = Uri.parse(url);
-  //   if (await canLaunchUrl(uri) || Platform.isAndroid) {
-  //     await launchUrl(uri);
-  //   } else {
-  //     throw 'Could not launch $url';
-  //   }
-  // }
-
   Stream<AuthenticationStatus> get authenticationStatus {
     final fresh = _fresh;
     if (fresh != null) {
@@ -546,7 +536,7 @@ class MangaDexModel {
     await _cache.invalidateAll(startsWith);
   }
 
-  Exception createException(String msg, Response response) {
+  Exception _createException(String msg, Response response) {
     if (response.statusCode == 503) {
       msg = 'MangaDex is down for maintenance';
     }
@@ -701,7 +691,7 @@ class MangaDexModel {
       if (onRejectedResponse != null) {
         return await onRejectedResponse(response);
       }
-      throw createException('$operation failed.', response);
+      throw _createException('$operation failed.', response);
     }
 
     try {
@@ -733,20 +723,20 @@ class MangaDexModel {
     final uri = Uri.parse(
       'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/mangadex.json',
     );
+    // This document is hosted outside MangaDex and intentionally bypasses the
+    // authenticated MangaDex transport.
     final response = await _externalTransport.getUri(uri);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = json.decode(response.data);
       final result = FrontPageData.fromJson(body);
 
-      // Cache the data
       await _cache.put(key, response.data, result);
 
       return result;
     }
 
-    // Throw if failure
-    throw createException("fetchFrontPageData() failed.", response);
+    throw _createException("fetchFrontPageData() failed.", response);
   }
 
   /// Fetches a generic [Chapter] list feed based on given parameters, respecting
@@ -771,7 +761,6 @@ class MangaDexModel {
   }) async {
     final settings = ref.read(mdConfigProvider);
 
-    // Download missing data
     final ord = order.json;
     final queryParams = {
       'limit': limit.toString(),
@@ -816,8 +805,10 @@ class MangaDexModel {
 
   /// Generic chunked fetch by IDs.
   ///
-  /// Filters out cached IDs, chunks the remainder, fires parallel GET requests,
-  /// caches results, and returns all requested entities from the cache.
+  /// Deduplicates IDs, fetches uncached IDs in parallel chunks, and returns
+  /// cached entities in request order. IDs omitted by successful responses are
+  /// omitted from the result, while any failed chunk is rethrown after all
+  /// chunks settle.
   Future<List<T>> _fetchByIds<T>({
     required String endpoint,
     required Iterable<String> ids,
@@ -825,64 +816,63 @@ class MangaDexModel {
     required int chunkSize,
     required Map<String, dynamic> Function() buildQueryParams,
   }) async {
-    // 1. Filter uncached IDs
-    final uncached = (await ids.whereAsync(
-      (id) async => !await _cache.exists(id),
-    )).toList();
-
-    final result = <T>[];
-
-    if (uncached.isEmpty) {
-      // All cached — just read from cache
-      for (final id in ids) {
-        if (await _cache.exists(id)) {
-          result.add(_cache.get<T>(id, fromJson));
-        }
-      }
-      return result;
+    if (chunkSize <= 0) {
+      throw ArgumentError.value(chunkSize, 'chunkSize', 'Must be positive');
     }
 
-    // 2. Chunk and fire parallel requests
+    final requestedIds = LinkedHashSet<String>.from(ids).toList();
+    final uncached = <String>[];
+    for (final id in requestedIds) {
+      if (!await _cache.exists(id)) {
+        uncached.add(id);
+      }
+    }
+
     final futures = <Future<void>>[];
-    int start = 0, end = 0;
-
-    while (end < uncached.length) {
-      start = end;
-      end += min(uncached.length - start, chunkSize);
-
+    for (var start = 0; start < uncached.length; start += chunkSize) {
+      final end = min(start + chunkSize, uncached.length);
       final chunkParams = Map<String, dynamic>.from(buildQueryParams());
-      chunkParams['ids[]'] = uncached.getRange(start, end);
+      chunkParams['ids[]'] = uncached.sublist(start, end);
 
       final uri = MangaDexEndpoints.api.replace(
         path: endpoint,
         queryParameters: chunkParams,
       );
 
-      futures.add(
-        _transport.getUri(uri).then((response) async {
-          if (response.statusCode == 200) {
-            final parsed = MDEntityList.fromJson(response.data);
-            await _cache.putAllAPIResolved(parsed.data);
-          } else {
-            throw createException(
-              "$_fetchByIds() failed for $endpoint.",
-              response,
-            );
+      futures.add(() async {
+        await _getEntityList(
+          uri: uri,
+          operation: '_fetchByIds($endpoint)',
+          authenticated: false,
+          cacheKey: null,
+          resolveEntities: true,
+          expiry: const Duration(minutes: 15),
+        );
+      }());
+    }
+
+    final failures = <(Object, StackTrace)>[];
+    await Future.wait([
+      for (final future in futures)
+        () async {
+          try {
+            await future;
+          } catch (error, stackTrace) {
+            failures.add((error, stackTrace));
           }
-        }),
-      );
-    }
+        }(),
+    ]);
 
-    // 3. Tolerate partial failures
-    final results = await Result.captureAll(futures);
-    for (final result in results) {
-      if (result.isError) {
-        logger.w("A chunk failed to fetch", error: result.asError!.error);
+    if (failures.isNotEmpty) {
+      for (final (error, _) in failures.skip(1)) {
+        logger.w('An additional ID chunk failed to fetch', error: error);
       }
+      final (error, stackTrace) = failures.first;
+      Error.throwWithStackTrace(error, stackTrace);
     }
 
-    // 4. Re-read all original IDs from cache
-    for (final id in ids) {
+    final result = <T>[];
+    for (final id in requestedIds) {
       if (await _cache.exists(id)) {
         result.add(_cache.get<T>(id, fromJson));
       }
@@ -984,7 +974,7 @@ class MangaDexModel {
 
     return _getEntityList(
       uri: uri,
-      operation: 'fetchManga()',
+      operation: 'fetchMangaList()',
       authenticated: false,
       cacheKey: key,
       resolveEntities: true,
@@ -1009,9 +999,6 @@ class MangaDexModel {
     Map<String, dynamic> queryParams = {
       'limit': limit.toString(),
       'offset': offset.toString(),
-      // 'availableTranslatedLanguage[]': settings.translatedLanguages
-      //     .map(const LanguageConverter().toJson)
-      //     .toList(),
       'originalLanguage[]': settings.originalLanguage
           .map(const LanguageConverter().toJson)
           .toList(),
@@ -1456,7 +1443,10 @@ class MangaDexModel {
     Iterable<String>? uuids,
     String? name,
   }) async {
-    assert(uuids != null || name != null);
+    if (uuids == null && name == null) {
+      assert(false, 'fetchCreators() requires either uuids or name.');
+      throw ArgumentError('fetchCreators() requires either uuids or name.');
+    }
 
     if (uuids != null) {
       return _fetchByIds<CreatorType>(

@@ -109,12 +109,12 @@ class WebMangaViewRoute extends GoRouteData with $WebMangaViewRoute {
   const WebMangaViewRoute({
     required this.sourceId,
     required this.mangaId,
-    this.handle,
+    this.$extra,
   });
 
   final String sourceId;
   final String mangaId;
-  final SourceHandler? handle;
+  final WebSeriesRef? $extra;
 
   @override
   CustomTransitionPage<void> buildPage(
@@ -126,7 +126,7 @@ class WebMangaViewRoute extends GoRouteData with $WebMangaViewRoute {
       child: WebMangaViewPage(
         sourceId: sourceId,
         mangaId: mangaId,
-        handle: handle,
+        series: $extra,
       ),
       transitionsBuilder: Styles.scaledSharedAxisTransitionBuilder,
     );
@@ -141,15 +141,12 @@ class ProxyWebSourceReaderRoute extends GoRouteData
     required this.code,
     required this.chapter,
     this.page,
-    this.$extra,
   });
 
   final String proxy;
   final String code;
   final String chapter;
   final String? page;
-
-  final WebReaderData? $extra;
 
   @override
   CustomTransitionPage<void> buildPage(
@@ -158,12 +155,12 @@ class ProxyWebSourceReaderRoute extends GoRouteData
   ) {
     return CustomTransitionPage<void>(
       key: state.pageKey,
-      child: ProxyWebSourceReaderPage(
-        proxy: proxy,
-        code: code,
-        chapter: chapter,
-        page: page,
-        readerData: $extra,
+      child: WebSourceReaderPage(
+        chapter: proxyReaderRouteRef(
+          proxy: proxy,
+          code: code,
+          chapter: chapter,
+        ),
       ),
       transitionsBuilder: Styles.slideTransitionBuilder,
     );
@@ -176,14 +173,11 @@ class ExtensionReaderRoute extends GoRouteData with $ExtensionReaderRoute {
     required this.sourceId,
     required this.mangaId,
     required this.chapterId,
-    this.$extra,
   });
 
   final String sourceId;
   final String mangaId;
   final String chapterId;
-  final WebReaderData? $extra;
-
   @override
   CustomTransitionPage<void> buildPage(
     BuildContext context,
@@ -191,11 +185,12 @@ class ExtensionReaderRoute extends GoRouteData with $ExtensionReaderRoute {
   ) {
     return CustomTransitionPage<void>(
       key: state.pageKey,
-      child: ExtensionReaderPage(
-        sourceId: sourceId,
-        mangaId: mangaId,
-        chapterId: chapterId,
-        readerData: $extra,
+      child: WebSourceReaderPage(
+        chapter: extensionReaderRouteRef(
+          sourceId: sourceId,
+          mangaId: mangaId,
+          chapterId: chapterId,
+        ),
       ),
       transitionsBuilder: Styles.slideTransitionBuilder,
     );

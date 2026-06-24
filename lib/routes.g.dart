@@ -991,11 +991,7 @@ mixin $WebMangaViewRoute on GoRouteData {
   static WebMangaViewRoute _fromState(GoRouterState state) => WebMangaViewRoute(
     sourceId: state.pathParameters['sourceId']!,
     mangaId: state.pathParameters['mangaId']!,
-    handle: _$convertMapValue('handle', state.uri.queryParameters, (
-      String json0,
-    ) {
-      return SourceHandler.fromJson(jsonDecode(json0) as Map<String, dynamic>);
-    }),
+    $extra: state.extra as WebSeriesRef?,
   );
 
   WebMangaViewRoute get _self => this as WebMangaViewRoute;
@@ -1003,9 +999,43 @@ mixin $WebMangaViewRoute on GoRouteData {
   @override
   String get location => GoRouteData.$location(
     '/read/${Uri.encodeComponent(_self.sourceId)}/${Uri.encodeComponent(_self.mangaId)}',
-    queryParams: {
-      if (_self.handle != null) 'handle': jsonEncode(_self.handle!.toJson()),
-    },
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location, extra: _self.$extra);
+
+  @override
+  Future<T?> push<T>(BuildContext context) =>
+      context.push<T>(location, extra: _self.$extra);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location, extra: _self.$extra);
+
+  @override
+  void replace(BuildContext context) =>
+      context.replace(location, extra: _self.$extra);
+}
+
+RouteBase get $proxyWebSourceReaderRoute => GoRouteData.$route(
+  path: '/read/:proxy/:code/:chapter/:page',
+  factory: $ProxyWebSourceReaderRoute._fromState,
+);
+
+mixin $ProxyWebSourceReaderRoute on GoRouteData {
+  static ProxyWebSourceReaderRoute _fromState(GoRouterState state) =>
+      ProxyWebSourceReaderRoute(
+        proxy: state.pathParameters['proxy']!,
+        code: state.pathParameters['code']!,
+        chapter: state.pathParameters['chapter']!,
+        page: state.pathParameters['page'],
+      );
+
+  ProxyWebSourceReaderRoute get _self => this as ProxyWebSourceReaderRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/read/${Uri.encodeComponent(_self.proxy)}/${Uri.encodeComponent(_self.code)}/${Uri.encodeComponent(_self.chapter)}/${Uri.encodeComponent(_self.page ?? '')}',
   );
 
   @override
@@ -1022,44 +1052,6 @@ mixin $WebMangaViewRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
-RouteBase get $proxyWebSourceReaderRoute => GoRouteData.$route(
-  path: '/read/:proxy/:code/:chapter/:page',
-  factory: $ProxyWebSourceReaderRoute._fromState,
-);
-
-mixin $ProxyWebSourceReaderRoute on GoRouteData {
-  static ProxyWebSourceReaderRoute _fromState(GoRouterState state) =>
-      ProxyWebSourceReaderRoute(
-        proxy: state.pathParameters['proxy']!,
-        code: state.pathParameters['code']!,
-        chapter: state.pathParameters['chapter']!,
-        page: state.pathParameters['page'],
-        $extra: state.extra as WebReaderData?,
-      );
-
-  ProxyWebSourceReaderRoute get _self => this as ProxyWebSourceReaderRoute;
-
-  @override
-  String get location => GoRouteData.$location(
-    '/read/${Uri.encodeComponent(_self.proxy)}/${Uri.encodeComponent(_self.code)}/${Uri.encodeComponent(_self.chapter)}/${Uri.encodeComponent(_self.page ?? '')}',
-  );
-
-  @override
-  void go(BuildContext context) => context.go(location, extra: _self.$extra);
-
-  @override
-  Future<T?> push<T>(BuildContext context) =>
-      context.push<T>(location, extra: _self.$extra);
-
-  @override
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location, extra: _self.$extra);
-
-  @override
-  void replace(BuildContext context) =>
-      context.replace(location, extra: _self.$extra);
-}
-
 RouteBase get $extensionReaderRoute => GoRouteData.$route(
   path: '/read-chapter/:sourceId/:mangaId/:chapterId',
   factory: $ExtensionReaderRoute._fromState,
@@ -1071,7 +1063,6 @@ mixin $ExtensionReaderRoute on GoRouteData {
         sourceId: state.pathParameters['sourceId']!,
         mangaId: state.pathParameters['mangaId']!,
         chapterId: state.pathParameters['chapterId']!,
-        $extra: state.extra as WebReaderData?,
       );
 
   ExtensionReaderRoute get _self => this as ExtensionReaderRoute;
@@ -1082,19 +1073,17 @@ mixin $ExtensionReaderRoute on GoRouteData {
   );
 
   @override
-  void go(BuildContext context) => context.go(location, extra: _self.$extra);
+  void go(BuildContext context) => context.go(location);
 
   @override
-  Future<T?> push<T>(BuildContext context) =>
-      context.push<T>(location, extra: _self.$extra);
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
   void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location, extra: _self.$extra);
+      context.pushReplacement(location);
 
   @override
-  void replace(BuildContext context) =>
-      context.replace(location, extra: _self.$extra);
+  void replace(BuildContext context) => context.replace(location);
 }
 
 RouteBase get $extensionSearchRoute => GoRouteData.$route(

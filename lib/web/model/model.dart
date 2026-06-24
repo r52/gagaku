@@ -19,6 +19,8 @@ import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/fjs_extension_runtime.dart';
 import 'package:gagaku/web/model/extension_repository.dart';
+import 'package:gagaku/web/model/link_resolver.dart';
+import 'package:gagaku/web/model/source_adapter.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -28,29 +30,32 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'model.g.dart';
 
 const historyListUUID = 'd6f79229-6f8e-4872-9610-5200a54aef8f';
-void openWebSource(BuildContext context, SourceHandler handle) {
-  if (handle.chapter != null) {
-    WebReaderData? readerData;
-
-    if (handle.sourceId == 'imgur') {
-      final code = '/read/api/imgur/chapter/${handle.location}';
-      readerData = WebReaderData(source: code, handle: handle);
+void openWebSource(BuildContext context, ResolvedWebLink link) {
+  final initialChapter = link.initialChapter;
+  if (initialChapter != null) {
+    switch (initialChapter.series) {
+      case ProxySeriesRef(:final proxyId, :final seriesId):
+        ProxyWebSourceReaderRoute(
+          proxy: proxyId,
+          code: seriesId,
+          chapter: initialChapter.chapterId,
+          page: '1',
+        ).push(context);
+      case ExtensionSeriesRef(:final sourceId, :final mangaId):
+        ExtensionReaderRoute(
+          sourceId: sourceId,
+          mangaId: mangaId,
+          chapterId: initialChapter.chapterId,
+        ).push(context);
     }
-
-    ProxyWebSourceReaderRoute(
-      proxy: handle.sourceId,
-      code: handle.location,
-      chapter: handle.chapter!,
-      page: '1',
-      $extra: readerData,
-    ).push(context);
-  } else {
-    WebMangaViewRoute(
-      sourceId: handle.sourceId,
-      mangaId: handle.location,
-      handle: handle,
-    ).push(context);
+    return;
   }
+
+  WebMangaViewRoute(
+    sourceId: link.series.sourceId,
+    mangaId: link.series.location,
+    $extra: link.series,
+  ).push(context);
 }
 
 String _processReferrer(String? baseUrl) {
@@ -105,37 +110,113 @@ Map<String, String> sourceHeaders(Ref ref, String sourceId) {
 
 @Riverpod(keepAlive: true)
 WebSourceBroker webSourceBroker(Ref ref) {
-  return WebSourceBroker(ref);
+  final transport = ref.watch(webSourceTransportProvider);
+  return WebSourceBroker(
+    cache: ref.watch(cacheProvider),
+    proxyAdapter: ProxyWebSourceAdapter(transport: transport),
+    extensionAdapter: ExtensionWebSourceAdapter(
+      fetchManga: (sourceId, mangaId) async {
+        await ref.readAsync(extensionSourceProvider(sourceId).future);
+        return ref
+            .read(extensionSourceProvider(sourceId).notifier)
+            .getManga(mangaId);
+      },
+      fetchChapterPages: (sourceId, chapter) async {
+        final provider = extensionSourceProvider(sourceId);
+        await ref.readAsync(provider.future);
+        final notifier = ref.read(provider.notifier);
+        return ExtensionChapterPages(
+          runtime: await notifier.getRuntime(),
+          links: await notifier.getChapterPages(chapter),
+        );
+      },
+    ),
+  );
+}
+
+@Riverpod(keepAlive: true)
+WebSourceTransport webSourceTransport(Ref ref) {
+  return _DioWebSourceTransport(_createWebSourceDio());
+}
+
+@Riverpod(keepAlive: true)
+WebLinkResolver webLinkResolver(Ref ref) {
+  return WebLinkResolver(
+    extensionExists: (sourceId) async {
+      final box = GagakuData().store.box<WebSourceInfo>();
+      final query = box.query(WebSourceInfo_.id.equals(sourceId)).build();
+      final source = query.findUnique();
+      query.close();
+      return source != null;
+    },
+    redirectTransport: _WebSourceRedirectTransport(
+      ref.watch(webSourceTransportProvider),
+    ),
+  );
+}
+
+class _DioWebSourceTransport implements WebSourceTransport {
+  _DioWebSourceTransport(this.dio);
+
+  final Dio dio;
+
+  @override
+  Future<Response<dynamic>> getUri(Uri uri, {bool followRedirects = true}) {
+    return dio.getUri(uri, options: Options(followRedirects: followRedirects));
+  }
+}
+
+class _WebSourceRedirectTransport implements WebLinkRedirectTransport {
+  _WebSourceRedirectTransport(this.transport);
+
+  final WebSourceTransport transport;
+
+  @override
+  Future<Uri?> resolveRedirect(Uri uri) async {
+    logger.d('WebLinkResolver: retrieving redirect for ${uri.toString()}');
+
+    final response = await transport.getUri(uri, followRedirects: false);
+    if (response.statusCode != 302) {
+      return null;
+    }
+
+    final location = response.headers.value('location');
+    if (location == null || location.isEmpty) {
+      return null;
+    }
+
+    logger.d('WebLinkResolver: redirect location $location');
+    return Uri.tryParse(location);
+  }
+}
+
+Dio _createWebSourceDio() {
+  final dio = Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 5),
+      receiveTimeout: const Duration(seconds: 5),
+      validateStatus: (status) => true,
+    ),
+  );
+  dio.httpClientAdapter = NativeAdapter(
+    createCronetEngine: () => createCronetEngine(getUserAgent(false)),
+  );
+  dio.interceptors.add(RateLimitingInterceptor());
+  return dio;
 }
 
 class WebSourceBroker {
-  WebSourceBroker(this.ref) : _cache = ref.read(cacheProvider);
+  WebSourceBroker({
+    required CacheManager cache,
+    required ProxyWebSourceAdapter proxyAdapter,
+    required ExtensionWebSourceAdapter extensionAdapter,
+  }) : _cache = cache,
+       _proxyAdapter = proxyAdapter,
+       _extensionAdapter = extensionAdapter;
 
-  final Ref ref;
   final CacheManager _cache;
-
-  late final Dio _dio = _createDio();
-
-  static const _imgurHost = 'imgur.com';
-  static const _imgurAlbumUrlPrefix = '/a/';
-  static const _cubariHost = 'cubari.moe';
-  static const _cubariReadPrefix = '/read/';
-  static const _cubariApiBase = 'https://cubari.moe/read/api';
-
-  Dio _createDio() {
-    final dio = Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 5),
-        validateStatus: (status) => true,
-      ),
-    );
-    dio.httpClientAdapter = NativeAdapter(
-      createCronetEngine: () => createCronetEngine(getUserAgent(false)),
-    );
-    dio.interceptors.add(RateLimitingInterceptor());
-    return dio;
-  }
+  final ProxyWebSourceAdapter _proxyAdapter;
+  final ExtensionWebSourceAdapter _extensionAdapter;
 
   Future<void> invalidateCacheItem(String item) async {
     if (await _cache.exists(item)) {
@@ -145,165 +226,6 @@ class WebSourceBroker {
 
   Future<void> invalidateAll(String startsWith) async {
     await _cache.invalidateAll(startsWith);
-  }
-
-  void syncAndLogHistory(HistoryLink link) {
-    if (ref.read(webConfigProvider).preserveHistory) {
-      WebHistoryManager().add(link);
-    } else {
-      link.resolveDb();
-      if (link.dbid > 0) {
-        GagakuData().store.box<HistoryLink>().put(link);
-      }
-    }
-  }
-
-  Future<HistoryLink> handleLink(HistoryLink link) async {
-    if (link.handle != null) {
-      return link;
-    }
-
-    final handle = await handleUrl(url: link.url);
-
-    if (handle == null) {
-      logger.w('Failed to process url ${link.url}');
-      return link;
-    }
-
-    final updatedLink = link.copyWith(handle: handle);
-
-    syncAndLogHistory(updatedLink);
-
-    return updatedLink;
-  }
-
-  SourceHandler _handleImgurUrl(Uri uri) {
-    final src = uri.path.substring(_imgurAlbumUrlPrefix.length);
-    final handle = SourceHandler(
-      type: SourceType.proxy,
-      sourceId: 'imgur',
-      location: src,
-      chapter: '1',
-    );
-
-    syncAndLogHistory(
-      HistoryLink(
-        title: uri.toString(),
-        url: uri.toString(),
-        handle: handle,
-        lastAccessed: DateTime.now(),
-      ),
-    );
-
-    return handle;
-  }
-
-  Future<SourceHandler?> _handleExtensionUrl(Uri uri) async {
-    final parts = uri.pathSegments.toList();
-    if (parts.length != 2) {
-      logger.w('Invalid extension url ${uri.toString()}');
-      return null;
-    }
-
-    final srcId = parts[0];
-
-    WebSourceInfo? src;
-
-    try {
-      src = await ref.readAsync(extensionSourceProvider(srcId).future);
-    } catch (e) {
-      logger.w('extensionSourceProvider($srcId) failed');
-      src = null;
-    }
-
-    if (src == null) {
-      logger.w('Extension not found. url: ${uri.toString()}');
-      return null;
-    }
-
-    final loc = parts[1];
-    final handle = SourceHandler(
-      type: SourceType.source,
-      sourceId: src.id,
-      location: loc,
-    );
-
-    return handle;
-  }
-
-  Future<SourceHandler?> _parseCubariReadPath(Uri uri) async {
-    if (uri.path.isEmpty || uri.pathSegments.isEmpty) {
-      return null;
-    }
-
-    var proxy = uri.pathSegments.toList();
-    proxy.removeWhere((element) => element.isEmpty);
-
-    if (proxy.length < 2) {
-      return null;
-    }
-
-    if (proxy[0] != 'read') {
-      return null;
-    }
-
-    if (proxy.length >= 4) {
-      return SourceHandler(
-        type: SourceType.proxy,
-        sourceId: proxy[1],
-        location: proxy[2],
-        chapter: proxy[3],
-      );
-    }
-
-    return SourceHandler(
-      type: SourceType.proxy,
-      sourceId: proxy[1],
-      location: proxy[2],
-    );
-  }
-
-  Future<SourceHandler?> _handleProxyUrl(Uri uri) async {
-    if (!uri.path.startsWith(_cubariReadPrefix)) {
-      logger.d('ProxyHandler: retrieving url ${uri.toString()}');
-
-      final response = await _dio.getUri(
-        uri,
-        options: Options(followRedirects: false),
-      );
-
-      if (response.statusCode != 302 ||
-          response.headers.value('location') == null ||
-          response.headers['location']!.isEmpty) {
-        return null;
-      }
-
-      final location = response.headers['location']!.first;
-
-      if (!location.startsWith(_cubariReadPrefix)) {
-        return null;
-      }
-
-      logger.d('ProxyHandler: location $location');
-
-      uri = Uri.parse(location);
-    }
-
-    return _parseCubariReadPath(uri);
-  }
-
-  Future<SourceHandler?> handleUrl({required String url}) async {
-    final uri = Uri.parse(url);
-
-    if (uri.host == _imgurHost && uri.path.startsWith(_imgurAlbumUrlPrefix)) {
-      return _handleImgurUrl(uri);
-    }
-
-    if (uri.host == _cubariHost) {
-      return _handleProxyUrl(uri);
-    }
-
-    return _handleExtensionUrl(uri);
   }
 
   Future<WebManga?> _fetchWithCache(
@@ -331,56 +253,24 @@ class WebSourceBroker {
     return manga;
   }
 
-  Future<WebManga?> getMangaFromSource(SourceHandler handle) async {
-    switch (handle.type) {
-      case SourceType.source:
-        return _fetchWithCache(handle.getKey(), () async {
-          await ref.readAsync(extensionSourceProvider(handle.sourceId).future);
-          return await ref
-              .read(extensionSourceProvider(handle.sourceId).notifier)
-              .getManga(handle.location);
-        });
-
-      case SourceType.proxy:
-        return await _getMangaFromProxy(handle);
-    }
-  }
-
-  Future<WebManga?> _getMangaFromProxy(SourceHandler handle) async {
-    final url = "$_cubariApiBase/${handle.sourceId}/series/${handle.location}/";
-
-    return _fetchWithCache(handle.getKey(), () async {
-      final response = await _dio.getUri(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        data['source_type'] = 'cubari';
-        return WebManga.fromJson(data);
-      }
-
-      logger.d(
-        "Failed to download manga data.\nServer returned response code ${response.statusCode}: ${response.statusMessage}",
-      );
-
-      return null;
-    });
-  }
-
-  Future<dynamic> getProxyAPI(String path) async {
-    final url = "https://cubari.moe$path";
-
-    final response = await _dio.getUri(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      return response.data;
-    }
-
-    throw ApiException(
-      message: 'Failed to download API data',
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
+  Future<WebManga?> getManga(WebSeriesRef series) {
+    return _fetchWithCache(
+      series.key,
+      () => switch (series) {
+        ProxySeriesRef() => _proxyAdapter.fetchManga(series),
+        ExtensionSeriesRef() => _extensionAdapter.fetchManga(series),
+      },
     );
   }
+
+  Future<ExtensionChapterPages> getExtensionChapterPages(
+    ExtensionSeriesRef series,
+    Chapter chapter,
+  ) {
+    return _extensionAdapter.fetchChapterPages(series, chapter);
+  }
+
+  Future<dynamic> getProxyAPI(String path) => _proxyAdapter.fetchApiPath(path);
 }
 
 class WebFavoritesManager extends ChangeNotifier {
@@ -435,6 +325,7 @@ class WebFavoritesManager extends ChangeNotifier {
   }
 
   Future<void> add(WebFavoritesList list, HistoryLink link) async {
+    link.requireSeries;
     await GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
       final linkBox = store.box<HistoryLink>();
       final listBox = store.box<WebFavoritesList>();
@@ -529,7 +420,30 @@ class WebHistoryManager {
     }, null);
   }
 
+  Future<void> record(HistoryLink link, {required bool preserveHistory}) async {
+    if (link.series == null) {
+      throw ArgumentError.value(
+        link,
+        'link',
+        'History records require a series reference',
+      );
+    }
+
+    if (preserveHistory) {
+      await add(link);
+      return;
+    }
+
+    await GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
+      link.resolveDb(store: store);
+      if (link.dbid > 0) {
+        store.box<HistoryLink>().put(link);
+      }
+    }, null);
+  }
+
   Future<void> add(HistoryLink link) async {
+    link.requireSeries;
     await GagakuData().store.runInTransactionAsync(TxMode.write, (store, _) {
       final listBox = store.box<WebFavoritesList>();
       final linkBox = store.box<HistoryLink>();

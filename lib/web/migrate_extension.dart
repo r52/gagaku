@@ -140,11 +140,14 @@ class MigrateExtensionDialog extends HookConsumerWidget {
                         '${newId.value}/',
                       );
                     }
-                    if (link.handle != null) {
-                      link.handle = link.handle!.copyWith(
-                        sourceId: newId.value!,
-                      );
-                    }
+                    link.series = switch (link.series) {
+                      ExtensionSeriesRef(:final mangaId) =>
+                        WebSeriesRef.extension(
+                          sourceId: newId.value!,
+                          mangaId: mangaId,
+                        ),
+                      final series => series,
+                    };
                   }
                   historyBox.putMany(links);
 

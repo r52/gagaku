@@ -179,7 +179,97 @@ final class WebSourceBrokerProvider
   }
 }
 
-String _$webSourceBrokerHash() => r'587c0d0309a44162d76625ffe14361300f779d67';
+String _$webSourceBrokerHash() => r'b5062a6c7286c11ce3538c4785265c0cc049f330';
+
+@ProviderFor(webSourceTransport)
+final webSourceTransportProvider = WebSourceTransportProvider._();
+
+final class WebSourceTransportProvider
+    extends
+        $FunctionalProvider<
+          WebSourceTransport,
+          WebSourceTransport,
+          WebSourceTransport
+        >
+    with $Provider<WebSourceTransport> {
+  WebSourceTransportProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'webSourceTransportProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$webSourceTransportHash();
+
+  @$internal
+  @override
+  $ProviderElement<WebSourceTransport> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  WebSourceTransport create(Ref ref) {
+    return webSourceTransport(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(WebSourceTransport value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<WebSourceTransport>(value),
+    );
+  }
+}
+
+String _$webSourceTransportHash() =>
+    r'9a639821d13753e27ade897ce341fdea04d916d4';
+
+@ProviderFor(webLinkResolver)
+final webLinkResolverProvider = WebLinkResolverProvider._();
+
+final class WebLinkResolverProvider
+    extends
+        $FunctionalProvider<WebLinkResolver, WebLinkResolver, WebLinkResolver>
+    with $Provider<WebLinkResolver> {
+  WebLinkResolverProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'webLinkResolverProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$webLinkResolverHash();
+
+  @$internal
+  @override
+  $ProviderElement<WebLinkResolver> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  WebLinkResolver create(Ref ref) {
+    return webLinkResolver(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(WebLinkResolver value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<WebLinkResolver>(value),
+    );
+  }
+}
+
+String _$webLinkResolverHash() => r'5371a46160caaa2af0637a94783b45e72252d2a4';
 
 @ProviderFor(WebReadMarkers)
 final webReadMarkersProvider = WebReadMarkersProvider._();

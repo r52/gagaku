@@ -11,6 +11,7 @@ import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
@@ -25,17 +26,16 @@ enum _ChapterDivider { none, divider }
 @Riverpod(retry: noRetry)
 Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
   Ref ref,
-  SourceHandler handle,
+  WebSeriesRef series,
 ) async {
   final api = ref.watch(webSourceBrokerProvider);
-  final manga = await api.getMangaFromSource(handle);
+  final manga = await api.getManga(series);
 
   if (manga != null) {
-    final link = HistoryLink(
+    final link = HistoryLink.fromSeries(
       title: manga.title,
-      url: handle.getURL(),
       cover: manga.cover,
-      handle: handle,
+      series: series,
       lastAccessed: DateTime.now(),
     );
 
@@ -52,29 +52,25 @@ class WebMangaViewPage extends ConsumerWidget {
     super.key,
     required this.sourceId,
     required this.mangaId,
-    this.handle,
+    this.series,
   });
 
   final String sourceId;
   final String mangaId;
-  final SourceHandler? handle;
+  final WebSeriesRef? series;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final installed = GagakuData().store.box<WebSourceInfo>().getAll();
 
-    final hndl =
-        handle ??
-        SourceHandler(
-          type: (installed.indexWhere((e) => e.id == sourceId) > -1)
-              ? SourceType.source
-              : SourceType.proxy,
-          sourceId: sourceId,
-          location: mangaId,
-        );
+    final resolvedSeries =
+        series ??
+        ((installed.indexWhere((e) => e.id == sourceId) > -1)
+            ? WebSeriesRef.extension(sourceId: sourceId, mangaId: mangaId)
+            : WebSeriesRef.proxy(proxyId: sourceId, seriesId: mangaId));
 
     return DataProviderWhenWidget(
-      provider: _fetchWebMangaInfoProvider(hndl),
+      provider: _fetchWebMangaInfoProvider(resolvedSeries),
       loadingBuilder: (context, progress) => Scaffold(
         appBar: AppBar(leading: const BackButton()),
         body: Center(
@@ -89,16 +85,21 @@ class WebMangaViewPage extends ConsumerWidget {
             final api = ref.watch(webSourceBrokerProvider);
             return RefreshIndicator(
               onRefresh: () async {
-                await api.invalidateAll(hndl.getKey());
-                return ref.refresh(_fetchWebMangaInfoProvider(hndl).future);
+                await api.invalidateAll(resolvedSeries.key);
+                return ref.refresh(
+                  _fetchWebMangaInfoProvider(resolvedSeries).future,
+                );
               },
               child: child!,
             );
           },
         ),
       ),
-      builder: (context, data) =>
-          WebMangaViewWidget(manga: data.$1, handle: hndl, link: data.$2),
+      builder: (context, data) => WebMangaViewWidget(
+        manga: data.$1,
+        series: resolvedSeries,
+        link: data.$2,
+      ),
     );
   }
 }
@@ -107,32 +108,36 @@ class WebMangaViewWidget extends HookConsumerWidget {
   const WebMangaViewWidget({
     super.key,
     required this.manga,
-    required this.handle,
+    required this.series,
     required this.link,
   });
 
   final WebManga manga;
-  final SourceHandler handle;
+  final WebSeriesRef series;
   final HistoryLink link;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final source = ref.watch(
-      getExtensionFromIdProvider(handle.sourceId).select(
-        (value) => switch (value) {
-          AsyncValue(value: final data?) => data,
-          _ => null,
-        },
+    final source = switch (series) {
+      ExtensionSeriesRef(:final sourceId) => ref.watch(
+        getExtensionFromIdProvider(sourceId).select(
+          (value) => switch (value) {
+            AsyncValue(value: final data?) => data,
+            _ => null,
+          },
+        ),
       ),
-    );
-    final api = ref.watch(webSourceBrokerProvider);
-
+      ProxySeriesRef() => null,
+    };
     useEffect(() {
       Future.delayed(Duration.zero, () async {
-        api.syncAndLogHistory(link);
+        await WebHistoryManager().record(
+          link,
+          preserveHistory: ref.read(webConfigProvider).preserveHistory,
+        );
       });
       return null;
-    }, []);
+    }, [link]);
 
     // Declared unconditionally (hooks rule).
     final chapterScrollController = useScrollController();
@@ -142,7 +147,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
     if (useWideLayout) {
       return _WebMangaWideLayout(
         manga: manga,
-        handle: handle,
+        series: series,
         link: link,
         source: source,
         chapterScrollController: chapterScrollController,
@@ -150,7 +155,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
     } else {
       return _WebMangaNarrowLayout(
         manga: manga,
-        handle: handle,
+        series: series,
         link: link,
         source: source,
         chapterScrollController: chapterScrollController,
@@ -162,13 +167,13 @@ class WebMangaViewWidget extends HookConsumerWidget {
 class _WebActionBar extends ConsumerWidget {
   const _WebActionBar({
     required this.manga,
-    required this.handle,
+    required this.series,
     required this.link,
     required this.source,
   });
 
   final WebManga manga;
-  final SourceHandler handle;
+  final WebSeriesRef series;
   final HistoryLink link;
   final WebSourceInfo? source;
 
@@ -212,7 +217,7 @@ class _WebActionBar extends ConsumerWidget {
           menuChildren: [
             MenuItemButton(
               onPressed: () async {
-                final key = handle.getKey();
+                final key = series.key;
                 final result = await showDialog<bool>(
                   context: context,
                   builder: (BuildContext context) {
@@ -279,12 +284,12 @@ class _WebActionBar extends ConsumerWidget {
 class _WebMetadataList extends StatelessWidget {
   const _WebMetadataList({
     required this.manga,
-    required this.handle,
+    required this.series,
     required this.source,
   });
 
   final WebManga manga;
-  final SourceHandler handle;
+  final WebSeriesRef series;
   final WebSourceInfo? source;
 
   @override
@@ -401,19 +406,15 @@ class _WebMetadataList extends StatelessWidget {
             MultiChildExpansionTile(
               title: tr.tracking.links,
               children: [
-                if (handle.type == SourceType.proxy)
+                if (series case ProxySeriesRef())
                   ButtonChip(
                     onPressed: () async {
-                      final route = GoRouterState.of(context).uri;
-                      await Styles.tryLaunchUrl(
-                        context,
-                        'http://cubari.moe${route.path}',
-                      );
+                      await Styles.tryLaunchUrl(context, series.externalUrl);
                     },
                     text: tr.mangaView.openOn(arg: 'cubari.moe'),
                   ),
                 if (extdata != null)
-                  _WebShareChip(handle: handle, extdata: extdata),
+                  _WebShareChip(series: series, extdata: extdata),
               ],
             ),
           ],
@@ -424,46 +425,58 @@ class _WebMetadataList extends StatelessWidget {
 }
 
 class _WebShareChip extends HookConsumerWidget {
-  const _WebShareChip({required this.handle, required this.extdata});
+  const _WebShareChip({required this.series, required this.extdata});
 
-  final SourceHandler handle;
+  final WebSeriesRef series;
   final SourceManga extdata;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (handle.type != SourceType.source) return const SizedBox.shrink();
-
     final tr = context.t;
     final shareUrlHint = extdata.mangaInfo.shareUrl;
 
+    final (sourceId, mangaId) = switch (series) {
+      ExtensionSeriesRef(:final sourceId, :final mangaId) => (
+        sourceId,
+        mangaId,
+      ),
+      ProxySeriesRef() => (null, null),
+    };
+
     final shareUrlFuture = useMemoized(
-      () => shareUrlHint != null || handle.sourceId == 'gist'
+      () =>
+          sourceId == null ||
+              mangaId == null ||
+              shareUrlHint != null ||
+              sourceId == 'gist'
           ? null
           : ref
-                .read(extensionSourceProvider(handle.sourceId).notifier)
-                .getMangaURL(handle.location),
-      [handle, shareUrlHint],
+                .read(extensionSourceProvider(sourceId).notifier)
+                .getMangaURL(mangaId),
+      [series, shareUrlHint],
     );
     final shareUrl = useFuture(shareUrlFuture);
 
-    final url = shareUrlHint ?? shareUrl.data;
+    final url = sourceId == null ? null : shareUrlHint ?? shareUrl.data;
 
-    if (url == null) return const SizedBox.shrink();
+    if (url == null || sourceId == null) return const SizedBox.shrink();
+
+    final label = sourceId;
 
     return ButtonChip(
       onPressed: () async {
         await Styles.tryLaunchUrl(context, url);
       },
-      text: tr.mangaView.openOn(arg: handle.sourceId),
+      text: tr.mangaView.openOn(arg: label),
     );
   }
 }
 
 class _WebChapterHeader extends ConsumerWidget {
-  const _WebChapterHeader({required this.manga, required this.handle});
+  const _WebChapterHeader({required this.manga, required this.series});
 
   final WebManga manga;
-  final SourceHandler handle;
+  final WebSeriesRef series;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -479,7 +492,7 @@ class _WebChapterHeader extends ConsumerWidget {
             const Spacer(),
             Consumer(
               builder: (context, ref, child) {
-                final mangakey = handle.getKey();
+                final mangakey = series.key;
                 final chapterkeys = manga.chapters.map(
                   (e) => switch (e) {
                     WebChapterItemCubari(:final entry) => entry.name,
@@ -553,10 +566,10 @@ class _WebChapterHeader extends ConsumerWidget {
 }
 
 class _WebChapterList extends HookWidget {
-  const _WebChapterList({required this.manga, required this.handle});
+  const _WebChapterList({required this.manga, required this.series});
 
   final WebManga manga;
-  final SourceHandler handle;
+  final WebSeriesRef series;
 
   @override
   Widget build(BuildContext context) {
@@ -616,7 +629,7 @@ class _WebChapterList extends HookWidget {
           key: ValueKey(current.hashCode),
           data: current,
           manga: manga,
-          handle: handle,
+          series: series,
         );
       },
       itemCount: manga.chapters.length,
@@ -627,14 +640,14 @@ class _WebChapterList extends HookWidget {
 class _WebMangaWideLayout extends ConsumerWidget {
   const _WebMangaWideLayout({
     required this.manga,
-    required this.handle,
+    required this.series,
     required this.link,
     required this.source,
     required this.chapterScrollController,
   });
 
   final WebManga manga;
-  final SourceHandler handle;
+  final WebSeriesRef series;
   final HistoryLink link;
   final WebSourceInfo? source;
   final ScrollController chapterScrollController;
@@ -642,7 +655,7 @@ class _WebMangaWideLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(webSourceBrokerProvider);
-    final headers = ref.watch(sourceHeadersProvider(handle.sourceId));
+    final headers = ref.watch(sourceHeadersProvider(series.sourceId));
     final imageCache = ref.watch(extensionImageCacheProvider);
     final leftWidth = (MediaQuery.sizeOf(context).width * 0.35).clamp(
       240.0,
@@ -682,7 +695,7 @@ class _WebMangaWideLayout extends ConsumerWidget {
         actions: [
           _WebActionBar(
             manga: manga,
-            handle: handle,
+            series: series,
             link: link,
             source: source,
           ),
@@ -690,8 +703,8 @@ class _WebMangaWideLayout extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await api.invalidateAll(handle.getKey());
-          return ref.refresh(_fetchWebMangaInfoProvider(handle).future);
+          await api.invalidateAll(series.key);
+          return ref.refresh(_fetchWebMangaInfoProvider(series).future);
         },
         notificationPredicate: (notification) => notification.depth == 0,
         child: Row(
@@ -716,7 +729,7 @@ class _WebMangaWideLayout extends ConsumerWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                handle.sourceId,
+                                series.sourceId,
                                 style: CommonTextStyles.twelveBold,
                               ),
                               const SizedBox(width: 6),
@@ -735,13 +748,13 @@ class _WebMangaWideLayout extends ConsumerWidget {
                             vertical: 4.0,
                           ),
                           child: Text(
-                            handle.sourceId,
+                            series.sourceId,
                             style: CommonTextStyles.twelveBold,
                           ),
                         ),
                       _WebMetadataList(
                         manga: manga,
-                        handle: handle,
+                        series: series,
                         source: source,
                       ),
                     ],
@@ -753,13 +766,13 @@ class _WebMangaWideLayout extends ConsumerWidget {
             Expanded(
               child: Column(
                 children: [
-                  _WebChapterHeader(manga: manga, handle: handle),
+                  _WebChapterHeader(manga: manga, series: series),
                   Expanded(
                     child: CustomScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       controller: chapterScrollController,
                       scrollBehavior: const MouseTouchScrollBehavior(),
-                      slivers: [_WebChapterList(manga: manga, handle: handle)],
+                      slivers: [_WebChapterList(manga: manga, series: series)],
                     ),
                   ),
                 ],
@@ -776,14 +789,14 @@ class _WebMangaWideLayout extends ConsumerWidget {
 class _WebMangaNarrowLayout extends ConsumerWidget {
   const _WebMangaNarrowLayout({
     required this.manga,
-    required this.handle,
+    required this.series,
     required this.link,
     required this.source,
     required this.chapterScrollController,
   });
 
   final WebManga manga;
-  final SourceHandler handle;
+  final WebSeriesRef series;
   final HistoryLink link;
   final WebSourceInfo? source;
   final ScrollController chapterScrollController;
@@ -791,7 +804,7 @@ class _WebMangaNarrowLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final api = ref.watch(webSourceBrokerProvider);
-    final headers = ref.watch(sourceHeadersProvider(handle.sourceId));
+    final headers = ref.watch(sourceHeadersProvider(series.sourceId));
     final imageCache = ref.watch(extensionImageCacheProvider);
 
     final isPhoneLandscape =
@@ -803,8 +816,8 @@ class _WebMangaNarrowLayout extends ConsumerWidget {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
-          await api.invalidateAll(handle.getKey());
-          return ref.refresh(_fetchWebMangaInfoProvider(handle).future);
+          await api.invalidateAll(series.key);
+          return ref.refresh(_fetchWebMangaInfoProvider(series).future);
         },
         notificationPredicate: (notification) {
           // Depth 1 is the top of the NestedScrollView
@@ -873,7 +886,7 @@ class _WebMangaNarrowLayout extends ConsumerWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              handle.sourceId,
+                              series.sourceId,
                               style: CommonTextStyles.twelveBold,
                             ),
                             if (source != null && source!.icon.isNotEmpty)
@@ -892,7 +905,7 @@ class _WebMangaNarrowLayout extends ConsumerWidget {
               actions: [
                 _WebActionBar(
                   manga: manga,
-                  handle: handle,
+                  series: series,
                   link: link,
                   source: source,
                 ),
@@ -901,14 +914,14 @@ class _WebMangaNarrowLayout extends ConsumerWidget {
             SliverToBoxAdapter(
               child: _WebMetadataList(
                 manga: manga,
-                handle: handle,
+                series: series,
                 source: source,
               ),
             ),
             SliverPersistentHeader(
               pinned: true,
               delegate: _PinnedHeaderDelegate(
-                child: _WebChapterHeader(manga: manga, handle: handle),
+                child: _WebChapterHeader(manga: manga, series: series),
                 height: 56.0,
               ),
             ),
@@ -919,7 +932,7 @@ class _WebMangaNarrowLayout extends ConsumerWidget {
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               scrollBehavior: const MouseTouchScrollBehavior(),
-              slivers: [_WebChapterList(manga: manga, handle: handle)],
+              slivers: [_WebChapterList(manga: manga, series: series)],
             ),
           ),
         ),

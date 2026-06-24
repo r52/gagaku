@@ -145,25 +145,21 @@ void main() {
       final historyBox = store.box<HistoryLink>();
 
       // Seed history links for old and unrelated extensions
-      final oldHandle = SourceHandler(
-        type: SourceType.source,
+      const oldSeries = WebSeriesRef.extension(
         sourceId: 'old_ext',
-        location: 'item_1',
+        mangaId: 'item_1',
       );
-      final link1 = HistoryLink(
+      final link1 = HistoryLink.fromSeries(
         title: 'Manga 1',
-        url: 'old_ext/item_1',
         cover: 'cover.jpg',
-        handle: oldHandle,
+        series: oldSeries,
       );
-      final link2 = HistoryLink(
+      final link2 = HistoryLink.fromSeries(
         title: 'Unrelated',
-        url: 'unrelated/item_2',
         cover: 'cover.jpg',
-        handle: SourceHandler(
-          type: SourceType.source,
+        series: const WebSeriesRef.extension(
           sourceId: 'unrelated',
-          location: 'item_2',
+          mangaId: 'item_2',
         ),
       );
 
@@ -176,7 +172,12 @@ void main() {
       final query = historyBox.query().build();
       final links = query
           .find()
-          .where((link) => link.handle?.sourceId == oldId)
+          .where(
+            (link) => switch (link.series) {
+              ExtensionSeriesRef(:final sourceId) => sourceId == oldId,
+              _ => false,
+            },
+          )
           .toList();
       query.close();
 
@@ -184,9 +185,13 @@ void main() {
         if (link.url.startsWith('$oldId/')) {
           link.url = link.url.replaceFirst('$oldId/', '$newId/');
         }
-        if (link.handle != null) {
-          link.handle = link.handle!.copyWith(sourceId: newId);
-        }
+        link.series = switch (link.series) {
+          ExtensionSeriesRef(:final mangaId) => WebSeriesRef.extension(
+            sourceId: newId,
+            mangaId: mangaId,
+          ),
+          final series => series,
+        };
       }
       historyBox.putMany(links);
 
@@ -199,7 +204,7 @@ void main() {
 
       expect(migratedLink, isNotNull);
       expect(migratedLink?.url, 'new_ext/item_1');
-      expect(migratedLink?.handle?.sourceId, 'new_ext');
+      expect(migratedLink?.series?.sourceId, 'new_ext');
 
       final unrelatedQuery = historyBox
           .query(HistoryLink_.url.equals('unrelated/item_2'))
@@ -209,7 +214,7 @@ void main() {
 
       expect(unrelatedLink, isNotNull);
       expect(unrelatedLink?.url, 'unrelated/item_2');
-      expect(unrelatedLink?.handle?.sourceId, 'unrelated');
+      expect(unrelatedLink?.series?.sourceId, 'unrelated');
     });
   });
 }

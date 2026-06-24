@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/config.dart';
-import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
@@ -67,7 +66,7 @@ class WebSourceSliverAppBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final nav = Navigator.of(context);
-    final api = ref.watch(webSourceBrokerProvider);
+    final resolver = ref.watch(webLinkResolverProvider);
 
     return SliverAppBar.medium(
       pinned: true,
@@ -135,7 +134,7 @@ class WebSourceSliverAppBar extends ConsumerWidget {
                 ),
                 MenuItemButton(
                   leadingIcon: const Icon(Icons.open_in_browser),
-                  onPressed: () => openLinkDialog(context, api),
+                  onPressed: () => openLinkDialog(context, resolver),
                   child: Text(tr.webSources.openLink),
                 ),
                 MenuItemButton(
@@ -318,9 +317,10 @@ class WebMangaListViewSliver extends ConsumerWidget {
           //               onTap: () async {
           //                 final tr = context.t;
           //                 final messenger = ScaffoldMessenger.of(context);
-          //                 final result = await api.handleLink(item);
+          //                 final resolver = ref.read(webLinkResolverProvider);
+          //                 final result = await resolver.resolveHistoryLink(item);
           //                 if (!context.mounted) return;
-          //                 if (result.handle == null) {
+          //                 if (result.series == null) {
           //                   messenger
           //                     ..removeCurrentSnackBar()
           //                     ..showSnackBar(
@@ -330,7 +330,10 @@ class WebMangaListViewSliver extends ConsumerWidget {
           //                       ),
           //                     );
           //                 } else {
-          //                   openWebSource(context, result.handle!);
+          //                   openWebSource(
+          //                     context,
+          //                     ResolvedWebLink(series: result.series!),
+          //                   );
           //                 }
           //               },
           //               trailing: sourceIcon,
@@ -346,9 +349,9 @@ class WebMangaListViewSliver extends ConsumerWidget {
               final tr = context.t;
               final item = items![index];
               final sourceIcon =
-                  extIcons[item.handle?.sourceId] ??
+                  extIcons[item.series?.sourceId] ??
                   Text(
-                    item.handle?.sourceId ?? '',
+                    item.series?.sourceId ?? '',
                     style: CommonTextStyles.twelve,
                   );
 
@@ -375,12 +378,12 @@ class WebMangaListViewSliver extends ConsumerWidget {
                 textColor: theme.colorScheme.onSurface,
                 onTap: () async {
                   final tr = context.t;
-                  final api = ref.read(webSourceBrokerProvider);
+                  final resolver = ref.read(webLinkResolverProvider);
                   final messenger = ScaffoldMessenger.of(context);
-                  final result = await api.handleLink(item);
+                  final result = await resolver.resolveHistoryLink(item);
 
                   if (!context.mounted) return;
-                  if (result.handle == null) {
+                  if (result.series == null) {
                     messenger
                       ..removeCurrentSnackBar()
                       ..showSnackBar(
@@ -390,7 +393,10 @@ class WebMangaListViewSliver extends ConsumerWidget {
                         ),
                       );
                   } else {
-                    openWebSource(context, result.handle!);
+                    openWebSource(
+                      context,
+                      ResolvedWebLink(series: result.series!),
+                    );
                   }
                 },
               );
@@ -453,12 +459,12 @@ class WebMangaListViewSliver extends ConsumerWidget {
                     textColor: theme.colorScheme.onSurface,
                     onTap: () async {
                       final tr = context.t;
-                      final api = ref.read(webSourceBrokerProvider);
+                      final resolver = ref.read(webLinkResolverProvider);
                       final messenger = ScaffoldMessenger.of(context);
-                      final result = await api.handleLink(item);
+                      final result = await resolver.resolveHistoryLink(item);
 
                       if (!context.mounted) return;
-                      if (result.handle == null) {
+                      if (result.series == null) {
                         messenger
                           ..removeCurrentSnackBar()
                           ..showSnackBar(
@@ -468,7 +474,10 @@ class WebMangaListViewSliver extends ConsumerWidget {
                             ),
                           );
                       } else {
-                        openWebSource(context, result.handle!);
+                        openWebSource(
+                          context,
+                          ResolvedWebLink(series: result.series!),
+                        );
                       }
                     },
                   );
@@ -527,7 +536,7 @@ class GridMangaItem extends HookConsumerWidget {
     );
     final theme = Theme.of(context);
 
-    final sourceId = link.handle?.sourceId ?? '';
+    final sourceId = link.series?.sourceId ?? '';
     final extIcons = ref.watch(_extensionIconProvider);
     final headers = ref.watch(sourceHeadersProvider(sourceId));
     final imageCache = ref.watch(extensionImageCacheProvider);
@@ -617,12 +626,12 @@ class GridMangaItem extends HookConsumerWidget {
 
     return InkWell(
       onTap: () async {
-        final api = ref.read(webSourceBrokerProvider);
+        final resolver = ref.read(webLinkResolverProvider);
         final messenger = ScaffoldMessenger.of(context);
-        final result = await api.handleLink(link);
+        final result = await resolver.resolveHistoryLink(link);
 
         if (!context.mounted) return;
-        if (result.handle == null) {
+        if (result.series == null) {
           messenger
             ..removeCurrentSnackBar()
             ..showSnackBar(
@@ -632,7 +641,7 @@ class GridMangaItem extends HookConsumerWidget {
               ),
             );
         } else {
-          openWebSource(context, result.handle!);
+          openWebSource(context, ResolvedWebLink(series: result.series!));
         }
       },
       onHover: (hovering) {
@@ -736,14 +745,12 @@ class ChapterButtonWidget extends HookConsumerWidget {
     super.key,
     required this.data,
     required this.manga,
-    required this.handle,
-    this.onLinkPressed,
+    required this.series,
   });
 
   final WebChapterItem data;
   final WebManga manga;
-  final SourceHandler handle;
-  final CtxCallback? onLinkPressed;
+  final WebSeriesRef series;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -752,20 +759,20 @@ class ChapterButtonWidget extends HookConsumerWidget {
 
     final title = data.title;
     final date = data.date;
-    final (chapterkey, groupKey, sourceValue) = switch (data) {
+    final (chapterkey, groupKey, extensionChapter) = switch (data) {
       WebChapterItemCubari(:final entry) => (
         entry.name,
         entry.chapter.groups.entries.first.key,
-        entry.chapter.groups.entries.first.value,
+        null,
       ),
       WebChapterItemExtension(:final chapter) => (
         chapter.chapNum.toString(),
-        chapter.version ?? handle.sourceId,
+        chapter.version ?? series.sourceId,
         chapter,
       ),
     };
 
-    final mangakey = handle.getKey();
+    final mangakey = series.key;
 
     final isRead = ref.watch(
       webReadMarkersProvider.select(
@@ -790,8 +797,8 @@ class ChapterButtonWidget extends HookConsumerWidget {
       [date, lang],
     );
 
-    final language = sourceValue is Chapter
-        ? CountryFlag(flag: sourceValue.langCode, size: 12)
+    final language = extensionChapter != null
+        ? CountryFlag(flag: extensionChapter.langCode, size: 12)
         : null;
 
     final textstyle = TextStyle(
@@ -829,29 +836,30 @@ class ChapterButtonWidget extends HookConsumerWidget {
       ),
     );
 
-    final readerData = WebReaderData(
-      source: sourceValue,
-      title: title,
-      link: manga.title,
-      handle: handle,
-      readKey: chapterkey,
-      onLinkPressed: onLinkPressed,
-    );
-
     final route = switch (data) {
-      WebChapterItemCubari() => ProxyWebSourceReaderRoute(
-        proxy: handle.sourceId,
-        code: handle.location,
-        chapter: chapterkey,
-        page: '1',
-        $extra: readerData,
-      ),
-      WebChapterItemExtension(:final chapter) => ExtensionReaderRoute(
-        sourceId: handle.sourceId,
-        mangaId: handle.location,
-        chapterId: chapter.chapterId,
-        $extra: readerData,
-      ),
+      WebChapterItemCubari() => switch (series) {
+        ProxySeriesRef(:final proxyId, :final seriesId) =>
+          ProxyWebSourceReaderRoute(
+            proxy: proxyId,
+            code: seriesId,
+            chapter: chapterkey,
+            page: '1',
+          ),
+        ExtensionSeriesRef() => throw StateError(
+          'Cubari chapter cannot be routed for extension series ${series.key}.',
+        ),
+      },
+      WebChapterItemExtension(:final chapter) => switch (series) {
+        ExtensionSeriesRef(:final sourceId, :final mangaId) =>
+          ExtensionReaderRoute(
+            sourceId: sourceId,
+            mangaId: mangaId,
+            chapterId: chapter.chapterId,
+          ),
+        ProxySeriesRef() => throw StateError(
+          'Extension chapter cannot be routed for proxy series ${series.key}.',
+        ),
+      },
     };
 
     final tile = Column(
@@ -957,12 +965,12 @@ class ChapterFeedItem extends StatelessWidget {
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     final titleBtn = _MangaTitle(
-      key: ValueKey('_MangaTitle(${state.link.handle!.getKey()})'),
+      key: ValueKey('_MangaTitle(${state.link.requireSeries.key})'),
       link: state.link,
     );
 
     final coverBtn = _CoverButton(
-      key: ValueKey('_CoverButton(${state.link.handle!.getKey()})'),
+      key: ValueKey('_CoverButton(${state.link.requireSeries.key})'),
       link: state.link,
     );
 
@@ -988,7 +996,7 @@ class ChapterFeedItem extends StatelessWidget {
                               ChapterButtonWidget(
                                 data: item,
                                 manga: state.manga,
-                                handle: state.link.handle!,
+                                series: state.link.requireSeries,
                               ),
                           ],
                         ),
@@ -1012,7 +1020,7 @@ class ChapterFeedItem extends StatelessWidget {
                           ChapterButtonWidget(
                             data: item,
                             manga: state.manga,
-                            handle: state.link.handle!,
+                            series: state.link.requireSeries,
                           ),
                       ],
                     ),
@@ -1032,7 +1040,7 @@ class _CoverButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final sourceId = link.handle?.sourceId ?? '';
+    final sourceId = link.series?.sourceId ?? '';
     final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final headers = ref.watch(sourceHeadersProvider(sourceId));
     final imageCache = ref.watch(extensionImageCacheProvider);
@@ -1041,12 +1049,12 @@ class _CoverButton extends ConsumerWidget {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () async {
-          final api = ref.read(webSourceBrokerProvider);
+          final resolver = ref.read(webLinkResolverProvider);
           final messenger = ScaffoldMessenger.of(context);
-          final result = await api.handleLink(link);
+          final result = await resolver.resolveHistoryLink(link);
 
           if (!context.mounted) return;
-          if (result.handle == null) {
+          if (result.series == null) {
             messenger
               ..removeCurrentSnackBar()
               ..showSnackBar(
@@ -1056,7 +1064,7 @@ class _CoverButton extends ConsumerWidget {
                 ),
               );
           } else {
-            openWebSource(context, result.handle!);
+            openWebSource(context, ResolvedWebLink(series: result.series!));
           }
         },
         child: Padding(
@@ -1110,12 +1118,12 @@ class _MangaTitle extends ConsumerWidget {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () async {
-          final api = ref.read(webSourceBrokerProvider);
+          final resolver = ref.read(webLinkResolverProvider);
           final messenger = ScaffoldMessenger.of(context);
-          final result = await api.handleLink(link);
+          final result = await resolver.resolveHistoryLink(link);
 
           if (!context.mounted) return;
-          if (result.handle == null) {
+          if (result.series == null) {
             messenger
               ..removeCurrentSnackBar()
               ..showSnackBar(
@@ -1125,7 +1133,7 @@ class _MangaTitle extends ConsumerWidget {
                 ),
               );
           } else {
-            openWebSource(context, result.handle!);
+            openWebSource(context, ResolvedWebLink(series: result.series!));
           }
         },
         child: Padding(
