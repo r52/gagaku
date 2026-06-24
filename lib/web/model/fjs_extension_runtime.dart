@@ -359,7 +359,9 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     }
 
     timeout = Timer(startupBrowserTimeout, () {
-      if (requiresCloudflare && _cloudflareClearance(latestCookies) == null) {
+      if (requiresCloudflare &&
+          challengeObserved &&
+          _cloudflareClearance(latestCookies) == null) {
         completeError(const CloudflareBypassException(), StackTrace.current);
       } else {
         complete();
@@ -422,7 +424,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
             }
 
             final hasClearance = _cloudflareClearance(cookies) != null;
-            if (!requiresCloudflare || hasClearance) {
+            if (!requiresCloudflare || hasClearance || !challengeObserved) {
               complete();
               return;
             }
@@ -1132,20 +1134,17 @@ if (typeof form === "undefined") {
   return [];
 }
 
-const sections = form.getSections().map((e) => {
-  return {
-    id: e.id,
-    header: e.header,
-    footer: e.footer,
-    items: e.items
-  };
-});
+const sections = form.getSections().map((section) => ({
+  ...section,
+  items: section.items.map((item) => ({ ...item }))
+}));
 
 for (const section of sections) {
   for (const item of section.items) {
-    if ("form" in item) {
-      await globalThis.Application.initializeForm(item.id, item.form);
-      item.form = item.id;
+    if ("form" in item && typeof item.form === "object" && item.form !== null) {
+      const formId = item.id;
+      await globalThis.Application.initializeForm(formId, item.form);
+      item.form = formId;
     }
   }
 }

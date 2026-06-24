@@ -282,12 +282,40 @@ let savedCloudflareCookies = [];
 let cloudflareRequest;
 let cloudflareLocalStorage = {};
 let legacyCloudflareCallbackCalled = false;
+let settingsNestedFormVersion = 0;
+const createSettingsNestedForm = () => {
+  const version = ++settingsNestedFormVersion;
+  return {
+    requiresExplicitSubmission: true,
+    getSections: () => [],
+    formDidSubmit: async () => {
+      Application.setState(
+        (Application.getState("phase2-nested-submit-count") ?? 0) + 1,
+        "phase2-nested-submit-count"
+      );
+      Application.setState(version, "phase2-nested-submit-version");
+    }
+  };
+};
+const settingsNestedRow = {
+  id: "phase2-nested",
+  type: "navigationRow",
+  isHidden: false,
+  title: "Nested",
+  form: createSettingsNestedForm()
+};
 const settingsForm = {
   requiresExplicitSubmission: true,
   formWillAppear: () => {
     Application.setState("appeared", "phase2-appeared");
   },
-  getSections: () => [],
+  getSections: () => [
+    {
+      id: "phase2-settings",
+      type: "flowSection",
+      items: [settingsNestedRow]
+    }
+  ],
   formDidSubmit: async () => {
     Application.setState("submitted", "phase2-submitted");
   },
@@ -796,8 +824,25 @@ globalThis.source.phase2source = {
         capabilities: const [SourceIntents.settingsUI],
       ),
     );
-    expect(await form.sections, isEmpty);
+    final settingsSections = await form.sections;
+    expect(settingsSections, hasLength(1));
+    final settingsNavRow =
+        settingsSections.single.items.single as NavigationRowElement;
+    expect(settingsNavRow.form, 'phase2-nested');
     expect(form.requiresExplicitSubmission, true);
+    final nestedForm = await runtime.getForm(source, settingsNavRow.form);
+    await nestedForm.formDidSubmit();
+    expect(storedState['phase2-nested-submit-count'], 1);
+    expect(storedState['phase2-nested-submit-version'], 1);
+    await form.reloadForm();
+    await form.sections;
+    final reloadedNestedForm = await runtime.getForm(
+      source,
+      settingsNavRow.form,
+    );
+    await reloadedNestedForm.formDidSubmit();
+    expect(storedState['phase2-nested-submit-count'], 2);
+    expect(storedState['phase2-nested-submit-version'], 1);
     await form.formDidSubmit();
     expect(await form.getSearchQueryMetadata(), {'from': 'settings'});
     expect(storedState, {
@@ -814,6 +859,8 @@ globalThis.source.phase2source = {
       },
       'phase7BridgeState': {'nullable': null},
       'phase2-appeared': 'appeared',
+      'phase2-nested-submit-count': 2,
+      'phase2-nested-submit-version': 1,
       'phase2-submitted': 'submitted',
     });
 
@@ -1253,6 +1300,94 @@ globalThis.source.knownGoodSource = {
 
       expect(storedState, {'clearance': 'known-good-clearance'});
       expect(basePageRequests, 1);
+    },
+  );
+
+  test(
+    'fjs runtime accepts a Cloudflare-capable page without a challenge',
+    () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final baseUrl = 'http://127.0.0.1:${server.port}/';
+      final baseWebUri = WebUri(baseUrl);
+      var basePageRequests = 0;
+      Map<String, dynamic>? storedState;
+
+      addTearDown(() => server.close(force: true));
+      addTearDown(
+        () => CookieManager.instance().deleteCookie(
+          url: baseWebUri,
+          name: 'cf_clearance',
+        ),
+      );
+      await CookieManager.instance().deleteCookie(
+        url: baseWebUri,
+        name: 'cf_clearance',
+      );
+      server.listen((request) async {
+        if (request.uri.path == '/') {
+          basePageRequests++;
+        }
+        request.response
+          ..statusCode = HttpStatus.ok
+          ..headers.contentType = ContentType.html
+          ..write(
+            '<html><title>Ready</title><script>'
+            'localStorage.setItem("phase6", "loaded");'
+            '</script><body>ready</body></html>',
+          );
+        await request.response.close();
+      });
+
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'unchallengedCloudflareSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, state) {
+          storedState = Map<String, dynamic>.from(state as Map);
+        },
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+        startupBrowserTimeout: const Duration(milliseconds: 500),
+      );
+      addTearDown(runtime.dispose);
+
+      final source = WebSourceInfo(
+        id: 'unchallengedCloudflareSource',
+        name: 'Unchallenged Cloudflare Source',
+        repo: 'phase6',
+        baseUrl: baseUrl,
+        icon: '',
+        capabilities: const [SourceIntents.cloudflareBypassRequired],
+      );
+      await runtime.init(source, r'''
+globalThis.source ??= {};
+globalThis.source.unchallengedCloudflareSource = {
+  cloudflareBypassCompleted: async () => {
+    Application.setState(true, "unexpected-bypass-callback");
+  },
+  initialise: async () => {
+    Application.setState("initialized", "status");
+  }
+};
+''');
+
+      expect(storedState, {'status': 'initialized'});
+      expect(basePageRequests, 1);
+      expect(
+        runtime.getCookies(),
+        isNot(
+          contains(
+            isA<Object>().having(
+              (cookie) => (cookie as dynamic).name,
+              'name',
+              'cf_clearance',
+            ),
+          ),
+        ),
+      );
     },
   );
 
