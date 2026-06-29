@@ -23,24 +23,11 @@ class _ExtensionHomeCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nav = Navigator.of(context);
     final tr = context.t;
     final source = extensionInfo;
     final state = ref.watch(extensionSourceProvider(source.id));
     final theme = Theme.of(context);
-    final baseUrl = source.baseUrl;
-    final browserButton = baseUrl == null || baseUrl.isEmpty
-        ? null
-        : IconButton(
-            icon: const Icon(Icons.public),
-            onPressed: () => nav.push(
-              SlideTransitionRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    ExtensionBrowserPage(source: source),
-              ),
-            ),
-            tooltip: tr.webSources.source.openWebsite,
-          );
+    final hasSearch = source.hasCapability(SourceIntents.mangaSearch);
 
     Widget? subtitle;
     Widget? trailing;
@@ -57,25 +44,9 @@ class _ExtensionHomeCard extends ConsumerWidget {
         trailing = Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ?browserButton,
-            if (source.hasCapability(SourceIntents.settingsUI))
-              IconButton(
-                icon: const Icon(Icons.settings),
-                onPressed: () => nav.push(
-                  SlideTransitionRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        ExtensionSettingsPage(source: source),
-                  ),
-                ),
-                tooltip: tr.webSources.source.settings,
-              ),
-            if (source.hasCapability(SourceIntents.mangaSearch))
-              IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: () =>
-                    ExtensionSearchRoute(initialSource: source).push(context),
-                tooltip: tr.search.arg(arg: source.name),
-              ),
+            if (hasSearch)
+              _ExtensionHomeSearchButton(source: source, enabled: true),
+            _ExtensionHomeActionMenu(source: source, canReload: true),
           ],
         );
       case AsyncLoading():
@@ -92,24 +63,9 @@ class _ExtensionHomeCard extends ConsumerWidget {
         trailing = Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ?browserButton,
-            if (source.hasCapability(SourceIntents.settingsUI))
-              IconButton(
-                icon: const Icon(Icons.settings),
-                onPressed: () => nav.push(
-                  SlideTransitionRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        ExtensionSettingsPage(source: source),
-                  ),
-                ),
-                tooltip: tr.webSources.source.settings,
-              ),
-            if (source.hasCapability(SourceIntents.mangaSearch))
-              IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: null,
-                tooltip: tr.search.arg(arg: source.name),
-              ),
+            if (hasSearch)
+              _ExtensionHomeSearchButton(source: source, enabled: false),
+            _ExtensionHomeActionMenu(source: source, canReload: false),
           ],
         );
       case AsyncError(:final error):
@@ -126,25 +82,11 @@ class _ExtensionHomeCard extends ConsumerWidget {
         trailing = Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ?browserButton,
-            if (source.hasCapability(SourceIntents.settingsUI))
-              IconButton(
-                icon: const Icon(Icons.settings),
-                onPressed: () => nav.push(
-                  SlideTransitionRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        ExtensionSettingsPage(source: source),
-                  ),
-                ),
-                tooltip: tr.webSources.source.settings,
-              ),
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () => ref.invalidate(
-                extensionSourceProvider(source.id),
-                asReload: true,
-              ),
-              tooltip: tr.ui.retry,
+            _ExtensionHomeRetryButton(source: source),
+            _ExtensionHomeActionMenu(
+              source: source,
+              canReload: true,
+              includeReload: false,
             ),
           ],
         );
@@ -160,6 +102,118 @@ class _ExtensionHomeCard extends ConsumerWidget {
         onTap: onTap,
         trailing: trailing,
       ),
+    );
+  }
+}
+
+class _ExtensionHomeSearchButton extends StatelessWidget {
+  final WebSourceInfo source;
+  final bool enabled;
+
+  const _ExtensionHomeSearchButton({
+    required this.source,
+    required this.enabled,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final tr = context.t;
+    return IconButton(
+      icon: const Icon(Icons.search),
+      onPressed: enabled
+          ? () => ExtensionSearchRoute(initialSource: source).push(context)
+          : null,
+      tooltip: tr.search.arg(arg: source.name),
+    );
+  }
+}
+
+class _ExtensionHomeRetryButton extends ConsumerWidget {
+  final WebSourceInfo source;
+
+  const _ExtensionHomeRetryButton({required this.source});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
+    return IconButton(
+      icon: const Icon(Icons.refresh),
+      onPressed: () =>
+          ref.invalidate(extensionSourceProvider(source.id), asReload: true),
+      tooltip: tr.ui.retry,
+    );
+  }
+}
+
+class _ExtensionHomeActionMenu extends ConsumerWidget {
+  final WebSourceInfo source;
+  final bool canReload;
+  final bool includeReload;
+
+  const _ExtensionHomeActionMenu({
+    required this.source,
+    required this.canReload,
+    this.includeReload = true,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
+    final hasWebsite = source.baseUrl?.isNotEmpty == true;
+    final hasSettings = source.hasCapability(SourceIntents.settingsUI);
+    final menuChildren = [
+      if (includeReload)
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.refresh),
+          onPressed: canReload
+              ? () => ref.invalidate(
+                  extensionSourceProvider(source.id),
+                  asReload: true,
+                )
+              : null,
+          child: Text(tr.webSources.source.reload),
+        ),
+      if (hasWebsite)
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.public),
+          onPressed: () => Navigator.of(context).push(
+            SlideTransitionRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  ExtensionBrowserPage(source: source),
+            ),
+          ),
+          child: Text(tr.webSources.source.openWebsite),
+        ),
+      if (hasSettings)
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.settings),
+          onPressed: () => Navigator.of(context).push(
+            SlideTransitionRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  ExtensionSettingsPage(source: source),
+            ),
+          ),
+          child: Text(tr.webSources.source.settings),
+        ),
+    ];
+
+    if (menuChildren.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return MenuAnchor(
+      builder: (context, controller, child) => IconButton(
+        icon: const Icon(Icons.more_vert),
+        tooltip: MaterialLocalizations.of(context).showMenuTooltip,
+        onPressed: () {
+          if (controller.isOpen) {
+            controller.close();
+          } else {
+            controller.open();
+          }
+        },
+      ),
+      menuChildren: menuChildren,
     );
   }
 }

@@ -65,7 +65,7 @@ final class _GetDirectoryPagesProvider
 }
 
 String _$_getDirectoryPagesHash() =>
-    r'599be990d7fb9529e4c9f52cd1d9057e839a3eab';
+    r'427c34b9fb4c323550833b406081459ab07e0cd2';
 
 final class _GetDirectoryPagesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, String> {

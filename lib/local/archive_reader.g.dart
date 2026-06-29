@@ -64,7 +64,7 @@ final class _GetArchivePagesProvider
   }
 }
 
-String _$_getArchivePagesHash() => r'a1e7575662cd6f4c098bd314d1b7308a3e29b50a';
+String _$_getArchivePagesHash() => r'562b4e2949443e77f2b5ee8c0a5a2c682ffb8a62';
 
 final class _GetArchivePagesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ReaderPage>>, String> {

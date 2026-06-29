@@ -1678,6 +1678,9 @@ class Translations$webSources$source$en {
 	/// en: 'Open extension website'
 	String get openWebsite => 'Open extension website';
 
+	/// en: 'Reload extension'
+	String get reload => 'Reload extension';
+
 	/// en: 'Reload extension website'
 	String get reloadWebsite => 'Reload extension website';
 
@@ -2081,6 +2084,7 @@ extension on Translations {
 			'webSources.repo.missingRepo' => 'Missing Repo',
 			'webSources.source.settings' => 'Extension Settings',
 			'webSources.source.openWebsite' => 'Open extension website',
+			'webSources.source.reload' => 'Reload extension',
 			'webSources.source.reloadWebsite' => 'Reload extension website',
 			'webSources.source.cloudflareManualRequired' => 'Open the extension website, complete the Cloudflare challenge, then reload the extension.',
 			'webSources.source.manager' => 'Extension Manager',
