@@ -337,9 +337,12 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     final requiresCloudflare = source.hasCapability(
       SourceIntents.cloudflareBypassRequired,
     );
+    final baseWebUri = WebUri(baseUrl);
+    final cookieManager = CookieManager.instance();
     var latestCookies = <Cookie>[];
     var latestLocalStorage = <String, String>{};
     var challengeObserved = false;
+    String? initialCloudflareClearance;
     Timer? timeout;
     HeadlessInAppWebView? startupView;
 
@@ -361,7 +364,10 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     timeout = Timer(startupBrowserTimeout, () {
       if (requiresCloudflare &&
           challengeObserved &&
-          _cloudflareClearance(latestCookies) == null) {
+          !_hasNewCloudflareClearance(
+            latestCookies,
+            initialCloudflareClearance,
+          )) {
         completeError(const CloudflareBypassException(), StackTrace.current);
       } else {
         complete();
@@ -382,8 +388,13 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
         }
       }
 
+      if (requiresCloudflare) {
+        latestCookies = await cookieManager.getCookies(url: baseWebUri);
+        initialCloudflareClearance = _cloudflareClearance(latestCookies)?.value;
+      }
+
       startupView = HeadlessInAppWebView(
-        initialUrlRequest: URLRequest(url: WebUri(baseUrl)),
+        initialUrlRequest: URLRequest(url: baseWebUri),
         initialSettings: InAppWebViewSettings(
           contentBlockers: contentBlockers.isEmpty ? null : contentBlockers,
           browserAcceleratorKeysEnabled: false,
@@ -414,7 +425,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
 
           observeUrl(url);
           try {
-            final cookies = await CookieManager.instance().getCookies(
+            final cookies = await cookieManager.getCookies(
               url: WebUri.uri(url),
               webViewController: controller,
             );
@@ -424,7 +435,13 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
             }
 
             final hasClearance = _cloudflareClearance(cookies) != null;
-            if (!requiresCloudflare || hasClearance || !challengeObserved) {
+            if (!requiresCloudflare ||
+                !challengeObserved ||
+                (hasClearance &&
+                    _hasNewCloudflareClearance(
+                      cookies,
+                      initialCloudflareClearance,
+                    ))) {
               complete();
               return;
             }
@@ -458,6 +475,14 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
 
   Cookie? _cloudflareClearance(List<Cookie> cookies) {
     return cookies.firstWhereOrNull((cookie) => cookie.name == 'cf_clearance');
+  }
+
+  bool _hasNewCloudflareClearance(
+    List<Cookie> cookies,
+    String? initialClearance,
+  ) {
+    final clearance = _cloudflareClearance(cookies);
+    return clearance != null && clearance.value != initialClearance;
   }
 
   bool _isCloudflareChallengeUrl(WebUri? url) {

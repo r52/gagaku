@@ -1392,6 +1392,100 @@ globalThis.source.unchallengedCloudflareSource = {
   );
 
   test(
+    'fjs runtime rejects stale Cloudflare clearance after a challenge starts',
+    () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final baseUrl = 'http://127.0.0.1:${server.port}/';
+      final baseWebUri = WebUri(baseUrl);
+      var challengePageRequests = 0;
+      Map<String, dynamic>? storedState;
+
+      addTearDown(() => server.close(force: true));
+      addTearDown(
+        () => CookieManager.instance().deleteCookie(
+          url: baseWebUri,
+          name: 'cf_clearance',
+        ),
+      );
+      await CookieManager.instance().deleteCookie(
+        url: baseWebUri,
+        name: 'cf_clearance',
+      );
+      server.listen((request) async {
+        if (!request.uri.queryParameters.containsKey('__cf_chl_rt_tk')) {
+          request.response
+            ..statusCode = HttpStatus.found
+            ..headers.set(
+              HttpHeaders.locationHeader,
+              '/?__cf_chl_rt_tk=startup-test',
+            );
+          await request.response.close();
+          return;
+        }
+
+        challengePageRequests++;
+        request.response
+          ..statusCode = HttpStatus.ok
+          ..headers.contentType = ContentType.html
+          ..write(
+            '<html><title>Just a moment...</title>'
+            '<body>challenge</body></html>',
+          );
+        await request.response.close();
+      });
+
+      await CookieManager.instance().setCookie(
+        url: baseWebUri,
+        name: 'cf_clearance',
+        value: 'stale-clearance',
+      );
+
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'staleClearanceSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, state) {
+          storedState = Map<String, dynamic>.from(state as Map);
+        },
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+        startupBrowserTimeout: const Duration(milliseconds: 500),
+      );
+      addTearDown(runtime.dispose);
+
+      final source = WebSourceInfo(
+        id: 'staleClearanceSource',
+        name: 'Stale Clearance Source',
+        repo: 'phase6',
+        baseUrl: baseUrl,
+        icon: '',
+        capabilities: const [SourceIntents.cloudflareBypassRequired],
+      );
+
+      await expectLater(
+        runtime.init(source, r'''
+globalThis.source ??= {};
+globalThis.source.staleClearanceSource = {
+  cloudflareBypassCompleted: async (request, cookies) => {
+    Application.setState(
+      cookies.find((cookie) => cookie.name === "cf_clearance")?.value,
+      "clearance"
+    );
+  },
+  initialise: async () => {}
+};
+'''),
+        throwsA(isA<CloudflareBypassException>()),
+      );
+      expect(challengePageRequests, greaterThan(0));
+      expect(storedState, isNull);
+    },
+  );
+
+  test(
     'fjs runtime reports a Cloudflare challenge without clearance',
     () async {
       final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
