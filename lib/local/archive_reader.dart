@@ -49,8 +49,9 @@ class _ExtractInfo {
 Future<List<ReaderPage>> _getArchivePages(Ref ref, String path) async {
   final formats = await ref.watch(supportedFormatsProvider.future);
   var type = ArchiveType.zip;
+  final lowerPath = path.toLowerCase();
 
-  if (path.endsWith('.cbt') || path.endsWith('.tar')) {
+  if (lowerPath.endsWith('.cbt') || lowerPath.endsWith('.tar')) {
     type = ArchiveType.tar;
   }
 
@@ -84,11 +85,7 @@ Future<List<ReaderPage>> _extractArchive(_ExtractInfo info) async {
   final pages = <ReaderPage>[];
 
   for (final file in archive) {
-    if (file.isFile &&
-        (file.name.endsWith(".jpg") ||
-            file.name.endsWith(".png") ||
-            file.name.endsWith(".jpeg") ||
-            (info.formats.avif && file.name.endsWith(".avif")))) {
+    if (file.isFile && isSupportedLocalImagePath(file.name, info.formats)) {
       pages.add(
         ReaderPage(provider: MemoryImage(file.content), sortKey: file.name),
       );

@@ -37,12 +37,7 @@ Future<String?> _extractThumbnail(String archivePath, String destPath) async {
 
   final imageFiles = archive.where((f) {
     if (!f.isFile) return false;
-    final name = f.name.toLowerCase();
-    return name.endsWith('.jpg') ||
-        name.endsWith('.jpeg') ||
-        name.endsWith('.png') ||
-        name.endsWith('.webp') ||
-        name.endsWith('.avif');
+    return isSupportedLocalImagePath(f.name, const FormatInfo(avif: true));
   }).toList();
 
   if (imageFiles.isEmpty) {

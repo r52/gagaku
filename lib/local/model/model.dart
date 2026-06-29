@@ -143,6 +143,10 @@ class LocalLibraryItem {
     sort = type;
     children.sort(_libraryCompare[sort]);
   }
+
+  List<LocalLibraryItem> sortedChildren(LibrarySort type) {
+    return [...children]..sort(_libraryCompare[type]);
+  }
 }
 
 class _ScanArgs {
@@ -167,10 +171,17 @@ Future<LocalLibraryItem?> _processFileIsolate(
       lpath.endsWith('.zip') ||
       lpath.endsWith('.cbt') ||
       lpath.endsWith('.tar')) {
+    DateTime modified;
+    try {
+      modified = await file.lastModified();
+    } on FileSystemException {
+      return null;
+    }
+
     return LocalLibraryItem(
       path: file.path,
       type: LibraryItemType.archive,
-      modified: await file.lastModified(),
+      modified: modified,
       name: file.uri.pathSegments.last,
       isReadable: true,
       thumbnail: file.path,
@@ -180,19 +191,34 @@ Future<LocalLibraryItem?> _processFileIsolate(
   return null;
 }
 
+Future<List<FileSystemEntity>?> _listDirectory(Directory dir) async {
+  try {
+    return await dir.list().toList();
+  } on FileSystemException {
+    return null;
+  }
+}
+
 Future<LocalLibraryItem?> _processDirectoryIsolate(
   Directory dir,
   LocalLibraryItem? parent,
   FormatInfo formats,
   LibrarySort currentSort,
 ) async {
-  final entities = await dir.list().toList();
+  final entities = await _listDirectory(dir);
+  if (entities == null) return null;
+
   final files = entities.whereType<File>();
   final name = (dir.uri.pathSegments.length - 2 >= 0)
       ? dir.uri.pathSegments.elementAt(dir.uri.pathSegments.length - 2)
       : dir.path;
 
-  final stats = dir.statSync();
+  FileStat stats;
+  try {
+    stats = await dir.stat();
+  } on FileSystemException {
+    return null;
+  }
 
   final res = LocalLibraryItem(
     path: dir.path,
@@ -202,14 +228,9 @@ Future<LocalLibraryItem?> _processDirectoryIsolate(
     parent: parent,
   );
 
-  final imageFiles = files.where((element) {
-    final lowerPath = element.path.toLowerCase();
-    return lowerPath.endsWith(".jpg") ||
-        lowerPath.endsWith(".png") ||
-        lowerPath.endsWith(".jpeg") ||
-        lowerPath.endsWith(".webp") ||
-        (formats.avif && lowerPath.endsWith(".avif"));
-  }).toList();
+  final imageFiles = files
+      .where((element) => isSupportedLocalImagePath(element.path, formats))
+      .toList();
 
   res.isReadable = imageFiles.isNotEmpty;
 
@@ -256,7 +277,13 @@ Future<void> _isolateWorker(_ScanArgs args) async {
     return;
   }
 
-  final entities = await dir.list().toList();
+  final entities = await _listDirectory(dir);
+  if (entities == null) {
+    args.sendPort.send(top);
+    args.sendPort.send(true);
+    return;
+  }
+
   final stopwatch = Stopwatch()..start();
 
   for (final e in entities) {
@@ -328,27 +355,38 @@ class LocalLibrary extends _$LocalLibrary {
 
       yield top;
 
-      final receivePort = ReceivePort();
-      await Isolate.spawn(
-        _isolateWorker,
-        _ScanArgs(
-          libDir: libDir,
-          formats: formats,
-          currentSort: currentSort,
-          sendPort: receivePort.sendPort,
-        ),
-      );
-
       LocalLibraryItem? lastItem;
+      final receivePort = ReceivePort();
+      Isolate? isolate;
 
-      await for (final message in receivePort) {
-        if (message is LocalLibraryItem) {
-          lastItem = message;
-          yield lastItem;
-        } else if (message == true) {
-          receivePort.close();
-          break;
+      try {
+        isolate = await Isolate.spawn(
+          _isolateWorker,
+          _ScanArgs(
+            libDir: libDir,
+            formats: formats,
+            currentSort: currentSort,
+            sendPort: receivePort.sendPort,
+          ),
+          onError: receivePort.sendPort,
+          onExit: receivePort.sendPort,
+        );
+
+        await for (final message in receivePort) {
+          if (message is LocalLibraryItem) {
+            lastItem = message;
+            yield lastItem;
+          } else if (message == true) {
+            break;
+          } else if (message == null) {
+            break;
+          } else if (message is List && message.isNotEmpty) {
+            throw Exception('Local library scan isolate failed: ${message[0]}');
+          }
         }
+      } finally {
+        receivePort.close();
+        isolate?.kill(priority: Isolate.immediate);
       }
 
       lastItem ??= top;
@@ -384,6 +422,15 @@ class FormatInfo {
   const FormatInfo({required this.avif});
 
   final bool avif;
+}
+
+bool isSupportedLocalImagePath(String path, FormatInfo formats) {
+  final lowerPath = path.toLowerCase();
+  return lowerPath.endsWith('.jpg') ||
+      lowerPath.endsWith('.jpeg') ||
+      lowerPath.endsWith('.png') ||
+      lowerPath.endsWith('.webp') ||
+      (formats.avif && lowerPath.endsWith('.avif'));
 }
 
 @Riverpod(keepAlive: true)

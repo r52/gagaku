@@ -41,13 +41,7 @@ Future<List<ReaderPage>> _getDirectoryPages(Ref ref, String path) async {
   final files = entities.whereType<File>();
 
   final pageFiles = files
-      .where(
-        (element) =>
-            element.path.endsWith('.png') ||
-            element.path.endsWith('.jpg') ||
-            element.path.endsWith('.jpeg') ||
-            (formats.avif && element.path.endsWith(".avif")),
-      )
+      .where((element) => isSupportedLocalImagePath(element.path, formats))
       .toList();
 
   pageFiles.sort(

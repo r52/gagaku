@@ -114,15 +114,6 @@ class LocalLibraryHomeScreen extends StatelessWidget {
             return null;
           }, [libraryProvider]);
 
-          useEffect(() {
-            if (currentItem.value != null &&
-                currentItem.value?.sort != null &&
-                currentItem.value?.sort != sort) {
-              currentItem.value?.setSortType(sort);
-            }
-            return null;
-          }, [currentItem.value, sort]);
-
           if (libDir.isEmpty) {
             return Center(
               child: Column(

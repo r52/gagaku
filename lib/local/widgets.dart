@@ -11,7 +11,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 typedef LibraryItemTapCallback = void Function(LocalLibraryItem);
 
-class LibraryListWidget extends ConsumerWidget {
+class LibraryListWidget extends HookConsumerWidget {
   const LibraryListWidget({
     super.key,
     required this.title,
@@ -32,6 +32,9 @@ class LibraryListWidget extends ConsumerWidget {
     final gridExtent = ref.watch(
       gagakuSettingsProvider.select((c) => c.gridAlbumExtent),
     );
+    final sort = ref.watch(librarySortTypeProvider);
+    final children = useMemoized(() => item.sortedChildren(sort), [item, sort]);
+
     return CustomScrollView(
       scrollBehavior: const MouseTouchScrollBehavior(),
       physics: physics,
@@ -97,14 +100,14 @@ class LibraryListWidget extends ConsumerWidget {
           ),
           findChildIndexCallback: (key) {
             final valueKey = key as ValueKey<int>;
-            final val = item.children.indexWhere((i) => i.id == valueKey.value);
+            final val = children.indexWhere((i) => i.id == valueKey.value);
             return val >= 0 ? val : null;
           },
           itemBuilder: (context, index) {
-            final i = item.children[index];
+            final i = children[index];
             return _GridLibraryItem(key: ValueKey(i.id), item: i, onTap: onTap);
           },
-          itemCount: item.children.length,
+          itemCount: children.length,
         ),
       ],
     );
