@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:fjs/fjs.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart'
@@ -1215,18 +1216,32 @@ globalThis.source.$sourceId = {
       return disposalProbe;
     }
 
-    final drainingProbe = await initializeDisposalProbe('phase11drain');
-    final acceptedEval = drainingProbe.evalForTesting('''
-await new Promise((resolve) => setTimeout(() => resolve("drained"), 100));
-''');
-    final drainingDispose = drainingProbe.dispose();
+    final cancellingProbe = await initializeDisposalProbe('phase11cancel');
+    final activeEvalCancelled = expectLater(
+      cancellingProbe.evalForTesting('''
+await new Promise((resolve) => setTimeout(() => resolve("cancelled"), 1000));
+'''),
+      throwsA(
+        isA<JsError>().having(
+          (error) => error.toString(),
+          'message',
+          contains('Cancelled'),
+        ),
+      ),
+    );
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+
+    final disposeStopwatch = Stopwatch()..start();
+    final cancellingDispose = cancellingProbe.dispose();
     await expectLater(
-      drainingProbe.evalForTesting('"rejected"'),
+      cancellingProbe.evalForTesting('"rejected"'),
       throwsStateError,
     );
-    expect(await acceptedEval, 'drained');
-    await drainingDispose;
-    await drainingProbe.dispose();
+    await cancellingDispose;
+    disposeStopwatch.stop();
+    expect(disposeStopwatch.elapsed, lessThan(const Duration(seconds: 1)));
+    await activeEvalCancelled;
+    await cancellingProbe.dispose();
   });
 
   test(
