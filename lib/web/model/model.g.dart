@@ -179,7 +179,7 @@ final class WebSourceBrokerProvider
   }
 }
 
-String _$webSourceBrokerHash() => r'b5062a6c7286c11ce3538c4785265c0cc049f330';
+String _$webSourceBrokerHash() => r'd0423fd57936f967e9985ee646d246f933678cdd';
 
 @ProviderFor(webSourceTransport)
 final webSourceTransportProvider = WebSourceTransportProvider._();
@@ -397,7 +397,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'03f607a3808b201f343da16fb14a6f64d1d17af6';
+String _$extensionSourceHash() => r'6fa4fec849ef16f9d217b285104abee3f2f87abf';
 
 final class ExtensionSourceFamily extends $Family
     with

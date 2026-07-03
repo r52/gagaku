@@ -121,13 +121,14 @@ WebSourceBroker webSourceBroker(Ref ref) {
             .read(extensionSourceProvider(sourceId).notifier)
             .getManga(mangaId);
       },
-      fetchChapterPages: (sourceId, chapter) async {
+      fetchChapterContent: (sourceId, chapter) async {
         final provider = extensionSourceProvider(sourceId);
-        await ref.readAsync(provider.future);
+        final source = await ref.readAsync(provider.future);
         final notifier = ref.read(provider.notifier);
-        return ExtensionChapterPages(
+        return ExtensionChapterContent(
           runtime: await notifier.getRuntime(),
-          links: await notifier.getChapterPages(chapter),
+          details: await notifier.getChapterDetails(chapter),
+          sourceBaseUrl: source.baseUrl,
         );
       },
     ),
@@ -263,11 +264,11 @@ class WebSourceBroker {
     );
   }
 
-  Future<ExtensionChapterPages> getExtensionChapterPages(
+  Future<ExtensionChapterContent> getExtensionChapterContent(
     ExtensionSeriesRef series,
     Chapter chapter,
   ) {
-    return _extensionAdapter.fetchChapterPages(series, chapter);
+    return _extensionAdapter.fetchChapterContent(series, chapter);
   }
 
   Future<dynamic> getProxyAPI(String path) => _proxyAdapter.fetchApiPath(path);
@@ -804,9 +805,9 @@ class ExtensionSource extends _$ExtensionSource {
     return await _runtime!.getManga(mangaId);
   }
 
-  Future<List<String>> getChapterPages(Chapter chapter) async {
+  Future<ChapterDetails> getChapterDetails(Chapter chapter) async {
     await future;
-    return await _runtime!.getChapterPages(chapter);
+    return await _runtime!.getChapterDetails(chapter);
   }
 
   Future<String?> getMangaURL(String mangaId) async {

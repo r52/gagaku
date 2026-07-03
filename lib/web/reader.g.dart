@@ -66,7 +66,7 @@ final class ResolveWebChapterProvider
   }
 }
 
-String _$resolveWebChapterHash() => r'b179d3e1c0ad5dde4137ababa9c4fa8c008c0811';
+String _$resolveWebChapterHash() => r'7473fa1d722c20ae01421799eaee4937af12481b';
 
 final class ResolveWebChapterFamily extends $Family
     with

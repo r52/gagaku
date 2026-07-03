@@ -758,24 +758,15 @@ return id;
   }
 
   @override
-  Future<List<String>> getChapterPages(Chapter chapter) async {
+  Future<ChapterDetails> getChapterDetails(Chapter chapter) async {
     final detailsJson = await _evalJsonScoped('''
 const chapter = ${_json(chapter.toJson())};
 return await globalThis.$sourceId.getChapterDetails(chapter);
-''', label: 'get chapter pages');
+''', label: 'get chapter details');
 
-    final details = ChapterDetails.fromJson(
+    return ChapterDetails.fromJson(
       _normalizeBridgeJsonMap(detailsJson, 'getChapterDetails'),
     );
-    return switch (details) {
-      ImageChapterDetails(:final pages) => pages,
-      HtmlChapterDetails() => throw UnsupportedError(
-        'Text novel chapters are not supported',
-      ),
-      FileChapterDetails() => throw UnsupportedError(
-        'File chapters are not supported',
-      ),
-    };
   }
 
   @override

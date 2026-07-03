@@ -667,14 +667,25 @@ globalThis.source.phase2source = {
       publishDate: new Date("2026-05-30T12:34:56.789Z")
     }
   ],
-  getChapterDetails: async (chapter) => ({
-    id: chapter.chapterId,
-    mangaId: chapter.sourceManga.mangaId,
-    pages: [
-      `https://example.com/${chapter.chapterId}/1.jpg`,
-      `https://example.com/${chapter.chapterId}/2.jpg`
-    ]
-  })
+  getChapterDetails: async (chapter) => {
+    if (chapter.chapterId === "chapter-html") {
+      return {
+        type: "html",
+        id: chapter.chapterId,
+        mangaId: chapter.sourceManga.mangaId,
+        html: `<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body><p>Chapter text</p><img src="/chapters/${chapter.chapterId}/illustration.jpg" /></body></html>`
+      };
+    }
+
+    return {
+      id: chapter.chapterId,
+      mangaId: chapter.sourceManga.mangaId,
+      pages: [
+        `https://example.com/${chapter.chapterId}/1.jpg`,
+        `https://example.com/${chapter.chapterId}/2.jpg`
+      ]
+    };
+  }
 };
 ''');
 
@@ -1052,10 +1063,32 @@ globalThis.phase11ActiveEvals--;
       chapters.first.publishDate,
       DateTime.parse('2026-05-30T12:34:56.789Z'),
     );
-    expect(await runtime.getChapterPages(chapters.first), [
-      'https://example.com/chapter-10/1.jpg',
-      'https://example.com/chapter-10/2.jpg',
-    ]);
+    final imageDetails = await runtime.getChapterDetails(chapters.first);
+    expect(imageDetails, isA<ImageChapterDetails>());
+    expect(
+      switch (imageDetails) {
+        ImageChapterDetails(:final pages) => pages,
+        HtmlChapterDetails() ||
+        FileChapterDetails() => fail('Expected image chapter details'),
+      },
+      [
+        'https://example.com/chapter-10/1.jpg',
+        'https://example.com/chapter-10/2.jpg',
+      ],
+    );
+
+    final htmlDetails = await runtime.getChapterDetails(
+      chapters.first.copyWith(chapterId: 'chapter-html'),
+    );
+    expect(htmlDetails, isA<HtmlChapterDetails>());
+    expect(
+      switch (htmlDetails) {
+        HtmlChapterDetails(:final html) => html,
+        ImageChapterDetails() ||
+        FileChapterDetails() => fail('Expected HTML chapter details'),
+      },
+      allOf(contains('<p>Chapter text</p>'), contains('<img src="/chapters/')),
+    );
 
     final emptySearch = await runtime.searchManga(
       const SearchQuery(title: ''),

@@ -37,7 +37,7 @@ void main() {
             extensionFetches++;
             return _cubariManga(title: '$sourceId/$mangaId');
           },
-          fetchChapterPages: (_, _) => throw UnimplementedError(),
+          fetchChapterContent: (_, _) => throw UnimplementedError(),
         ),
       );
     });
