@@ -8,6 +8,7 @@ import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:gagaku/web/html_reader.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/extension_image.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -45,14 +46,34 @@ class ResolvedWebChapter {
     required this.title,
     required this.seriesTitle,
     required this.readMarkerKey,
-    required this.pages,
+    required this.content,
   });
 
   final WebChapterRef chapter;
   final String title;
   final String? seriesTitle;
   final String readMarkerKey;
+  final ResolvedWebChapterContent content;
+}
+
+sealed class ResolvedWebChapterContent {
+  const ResolvedWebChapterContent();
+}
+
+final class ResolvedImageWebChapterContent extends ResolvedWebChapterContent {
+  const ResolvedImageWebChapterContent(this.pages);
+
   final List<ReaderPage> pages;
+}
+
+final class ResolvedHtmlWebChapterContent extends ResolvedWebChapterContent {
+  const ResolvedHtmlWebChapterContent({
+    required this.html,
+    required this.sourceBaseUrl,
+  });
+
+  final String html;
+  final String? sourceBaseUrl;
 }
 
 @Riverpod(retry: noRetry)
@@ -70,7 +91,9 @@ Future<ResolvedWebChapter> resolveWebChapter(
       title: seriesId,
       seriesTitle: null,
       readMarkerKey: chapterRef.chapterId,
-      pages: await _networkReaderPages(ref, data),
+      content: ResolvedImageWebChapterContent(
+        await _networkReaderPages(ref, api, data),
+      ),
     );
   }
 
@@ -94,15 +117,22 @@ Future<ResolvedWebChapter> resolveWebChapter(
     throw InvalidDataException('Invalid WebChapter link. Data not found.');
   }
 
-  final (readMarkerKey, pages) = switch (chapter) {
+  final (readMarkerKey, content) = switch (chapter) {
     WebChapterItemCubari(:final entry) => (
       entry.name,
-      await _networkReaderPages(ref, entry.chapter.groups.entries.first.value),
+      ResolvedImageWebChapterContent(
+        await _networkReaderPages(
+          ref,
+          api,
+          entry.chapter.groups.entries.first.value,
+        ),
+      ),
     ),
     WebChapterItemExtension(chapter: final extensionChapter) => (
-      extensionChapter.chapNum.toString(),
-      await _extensionReaderPages(
+      chapter.readMarkerKey,
+      await _extensionReaderContent(
         ref,
+        api,
         series as ExtensionSeriesRef,
         extensionChapter,
       ),
@@ -114,14 +144,18 @@ Future<ResolvedWebChapter> resolveWebChapter(
     title: chapter.title,
     seriesTitle: manga.title,
     readMarkerKey: readMarkerKey,
-    pages: pages,
+    content: content,
   );
 }
 
-Future<List<ReaderPage>> _networkReaderPages(Ref ref, Object? source) async {
+Future<List<ReaderPage>> _networkReaderPages(
+  Ref ref,
+  WebSourceBroker api,
+  Object? source,
+) async {
   if (source is String &&
       (source.startsWith('/read/') || source.startsWith('/proxy/'))) {
-    source = await ref.watch(webSourceBrokerProvider).getProxyAPI(source);
+    source = await api.getProxyAPI(source);
   }
 
   if (source is! List) {
@@ -144,21 +178,31 @@ Future<List<ReaderPage>> _networkReaderPages(Ref ref, Object? source) async {
   return pages;
 }
 
-Future<List<ReaderPage>> _extensionReaderPages(
+Future<ResolvedWebChapterContent> _extensionReaderContent(
   Ref ref,
+  WebSourceBroker api,
   ExtensionSeriesRef series,
   Chapter chapter,
 ) async {
-  final result = await ref
-      .watch(webSourceBrokerProvider)
-      .getExtensionChapterPages(series, chapter);
-  final pages = [
-    for (final link in result.links)
-      ReaderPage(provider: ExtensionImage(link, result.runtime)),
-  ];
+  final result = await api.getExtensionChapterContent(series, chapter);
+  return switch (result.details) {
+    ImageChapterDetails(:final pages) => () {
+      final readerPages = [
+        for (final link in pages)
+          ReaderPage(provider: ExtensionImage(link, result.runtime)),
+      ];
 
-  ref.onDispose(pages.clear);
-  return pages;
+      ref.onDispose(readerPages.clear);
+      return ResolvedImageWebChapterContent(readerPages);
+    }(),
+    HtmlChapterDetails(:final html) => ResolvedHtmlWebChapterContent(
+      html: html,
+      sourceBaseUrl: result.sourceBaseUrl,
+    ),
+    FileChapterDetails() => throw UnsupportedError(
+      'File chapters are not supported',
+    ),
+  };
 }
 
 class WebSourceReaderPage extends StatelessWidget {
@@ -207,11 +251,20 @@ class WebSourceReaderWidget extends HookConsumerWidget {
       return () => timer.value?.cancel();
     }, [data.chapter, data.readMarkerKey]);
 
-    return ReaderWidget(
-      pages: data.pages,
-      title: data.title,
-      longstrip: false,
-      drawerHeader: data.seriesTitle,
-    );
+    return switch (data.content) {
+      ResolvedImageWebChapterContent(:final pages) => ReaderWidget(
+        pages: pages,
+        title: data.title,
+        longstrip: false,
+        drawerHeader: data.seriesTitle,
+      ),
+      ResolvedHtmlWebChapterContent(:final html, :final sourceBaseUrl) =>
+        HtmlChapterReaderWidget(
+          html: html,
+          title: data.title,
+          seriesTitle: data.seriesTitle,
+          sourceBaseUrl: sourceBaseUrl,
+        ),
+    };
   }
 }

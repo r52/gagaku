@@ -11,33 +11,29 @@ import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/extension_webview_fallback.dart';
 import 'package:gagaku/web/model/types.dart';
 
-enum _RuntimeEvalExecutorState { accepting, closing, closed }
+enum _RuntimeEvalExecutorState { accepting, closed }
 
 class _RuntimeEvalExecutor {
   var _state = _RuntimeEvalExecutorState.accepting;
   Future<void> _tail = Future<void>.value();
-  Future<void>? _closeFuture;
 
   Future<T> run<T>(Future<T> Function() action) {
     if (_state != _RuntimeEvalExecutorState.accepting) {
       return Future<T>.error(StateError('fjs extension runtime is closing'));
     }
 
-    final operation = _tail.then((_) => action());
+    final operation = _tail.then((_) {
+      if (_state != _RuntimeEvalExecutorState.accepting) {
+        throw StateError('fjs extension runtime is closing');
+      }
+      return action();
+    });
     _tail = operation.then<void>((_) {}, onError: (_, _) {});
     return operation;
   }
 
-  Future<void> close() {
-    final closeFuture = _closeFuture;
-    if (closeFuture != null) {
-      return closeFuture;
-    }
-
-    _state = _RuntimeEvalExecutorState.closing;
-    return _closeFuture = _tail.whenComplete(() {
-      _state = _RuntimeEvalExecutorState.closed;
-    });
+  void close() {
+    _state = _RuntimeEvalExecutorState.closed;
   }
 }
 
@@ -762,24 +758,15 @@ return id;
   }
 
   @override
-  Future<List<String>> getChapterPages(Chapter chapter) async {
+  Future<ChapterDetails> getChapterDetails(Chapter chapter) async {
     final detailsJson = await _evalJsonScoped('''
 const chapter = ${_json(chapter.toJson())};
 return await globalThis.$sourceId.getChapterDetails(chapter);
-''', label: 'get chapter pages');
+''', label: 'get chapter details');
 
-    final details = ChapterDetails.fromJson(
+    return ChapterDetails.fromJson(
       _normalizeBridgeJsonMap(detailsJson, 'getChapterDetails'),
     );
-    return switch (details) {
-      ImageChapterDetails(:final pages) => pages,
-      HtmlChapterDetails() => throw UnsupportedError(
-        'Text novel chapters are not supported',
-      ),
-      FileChapterDetails() => throw UnsupportedError(
-        'File chapters are not supported',
-      ),
-    };
   }
 
   @override
@@ -901,9 +888,7 @@ return await globalThis.$sourceId.getChapters(manga);
           ),
         )
         .toList();
-    chapters.sort(
-      (a, b) => compareNatural(b.chapNum.toString(), a.chapNum.toString()),
-    );
+    chapters.sort(WebManga.compareExtensionChaptersDescending);
 
     return WebManga.extension(data: sourceManga, chaptersList: chapters);
   }
@@ -1102,7 +1087,7 @@ return await globalThis.$sourceId.getSearchResults(
   Future<void> dispose() => _disposeFuture ??= _dispose();
 
   Future<void> _dispose() async {
-    await _evalExecutor.close();
+    _evalExecutor.close();
 
     final engine = _engine;
     _engine = null;

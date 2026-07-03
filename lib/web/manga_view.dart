@@ -17,11 +17,14 @@ import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'manga_view.g.dart';
 
 enum _ChapterDivider { none, divider }
+
+enum _WebMangaTab { chapters, art }
 
 @Riverpod(retry: noRetry)
 Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
@@ -141,6 +144,12 @@ class WebMangaViewWidget extends HookConsumerWidget {
 
     // Declared unconditionally (hooks rule).
     final chapterScrollController = useScrollController();
+    final artworkUrls = manga.artworkUrls;
+    final hasArtwork = artworkUrls.isNotEmpty;
+    final tabController = useTabController(
+      initialLength: hasArtwork ? _WebMangaTab.values.length : 1,
+      keys: [hasArtwork],
+    );
 
     final useWideLayout = DeviceContext.useNavigationRail(context);
 
@@ -151,6 +160,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
         link: link,
         source: source,
         chapterScrollController: chapterScrollController,
+        artworkUrls: artworkUrls,
+        tabController: tabController,
       );
     } else {
       return _WebMangaNarrowLayout(
@@ -159,6 +170,8 @@ class WebMangaViewWidget extends HookConsumerWidget {
         link: link,
         source: source,
         chapterScrollController: chapterScrollController,
+        artworkUrls: artworkUrls,
+        tabController: tabController,
       );
     }
   }
@@ -493,18 +506,13 @@ class _WebChapterHeader extends ConsumerWidget {
             Consumer(
               builder: (context, ref, child) {
                 final mangakey = series.key;
-                final chapterkeys = manga.chapters.map(
-                  (e) => switch (e) {
-                    WebChapterItemCubari(:final entry) => entry.name,
-                    WebChapterItemExtension(:final chapter) =>
-                      chapter.chapNum.toString(),
-                  },
-                );
                 final allRead = ref.watch(
                   webReadMarkersProvider.select(
                     (value) => switch (value) {
-                      AsyncValue(value: final db?) =>
-                        db.markers[mangakey]?.containsAll(chapterkeys) ?? false,
+                      AsyncValue(value: final db?) => manga.hasAllReadMarkers(
+                        db,
+                        mangakey,
+                      ),
                       _ => false,
                     },
                   ),
@@ -548,8 +556,10 @@ class _WebChapterHeader extends ConsumerWidget {
                             .get(webReadMarkersProvider.notifier)
                             .setBulk(
                               mangakey,
-                              read: !allRead ? chapterkeys : null,
-                              unread: allRead ? chapterkeys : null,
+                              read: !allRead ? manga.readMarkerKeys : null,
+                              unread: allRead
+                                  ? manga.removableReadMarkerKeys
+                                  : null,
                             );
                       });
                     }
@@ -575,10 +585,7 @@ class _WebChapterList extends HookWidget {
   Widget build(BuildContext context) {
     final separators = useMemoized(() {
       final chapters = manga.chapters;
-      String getName(WebChapterItem c) => switch (c) {
-        WebChapterItemCubari(:final entry) => entry.name,
-        WebChapterItemExtension(:final chapter) => chapter.chapNum.toString(),
-      };
+      String getName(WebChapterItem c) => c.groupingKey;
 
       return List.generate(chapters.length, (index) {
         final currentName = getName(chapters[index]);
@@ -637,13 +644,15 @@ class _WebChapterList extends HookWidget {
   }
 }
 
-class _WebMangaWideLayout extends ConsumerWidget {
+class _WebMangaWideLayout extends HookConsumerWidget {
   const _WebMangaWideLayout({
     required this.manga,
     required this.series,
     required this.link,
     required this.source,
     required this.chapterScrollController,
+    required this.artworkUrls,
+    required this.tabController,
   });
 
   final WebManga manga;
@@ -651,12 +660,20 @@ class _WebMangaWideLayout extends ConsumerWidget {
   final HistoryLink link;
   final WebSourceInfo? source;
   final ScrollController chapterScrollController;
+  final List<String> artworkUrls;
+  final TabController tabController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final api = ref.watch(webSourceBrokerProvider);
     final headers = ref.watch(sourceHeadersProvider(series.sourceId));
     final imageCache = ref.watch(extensionImageCacheProvider);
+    final hasArtwork = artworkUrls.isNotEmpty;
+    final activeTab = useListenableSelector(
+      tabController,
+      () => _WebMangaTab.values[tabController.index],
+    );
     final leftWidth = (MediaQuery.sizeOf(context).width * 0.35).clamp(
       240.0,
       360.0,
@@ -766,14 +783,47 @@ class _WebMangaWideLayout extends ConsumerWidget {
             Expanded(
               child: Column(
                 children: [
-                  _WebChapterHeader(manga: manga, series: series),
-                  Expanded(
-                    child: CustomScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      controller: chapterScrollController,
-                      scrollBehavior: const MouseTouchScrollBehavior(),
-                      slivers: [_WebChapterList(manga: manga, series: series)],
+                  if (hasArtwork)
+                    Material(
+                      elevation: 2,
+                      child: TabBar(
+                        controller: tabController,
+                        tabs: [
+                          Tab(text: tr.mangaView.chapters),
+                          Tab(text: tr.mangaView.art),
+                        ],
+                      ),
                     ),
+                  if (!hasArtwork || activeTab == _WebMangaTab.chapters)
+                    _WebChapterHeader(manga: manga, series: series),
+                  Expanded(
+                    child: hasArtwork
+                        ? TabBarView(
+                            controller: tabController,
+                            children: [
+                              CustomScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                controller: chapterScrollController,
+                                scrollBehavior:
+                                    const MouseTouchScrollBehavior(),
+                                slivers: [
+                                  _WebChapterList(manga: manga, series: series),
+                                ],
+                              ),
+                              _WebMangaCoversView(
+                                series: series,
+                                artworkUrls: artworkUrls,
+                              ),
+                            ],
+                          )
+                        : CustomScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            controller: chapterScrollController,
+                            scrollBehavior: const MouseTouchScrollBehavior(),
+                            slivers: [
+                              _WebChapterList(manga: manga, series: series),
+                            ],
+                          ),
                   ),
                 ],
               ),
@@ -781,18 +831,24 @@ class _WebMangaWideLayout extends ConsumerWidget {
           ],
         ),
       ),
-      floatingActionButton: ScrollToTopFab(controller: chapterScrollController),
+      floatingActionButton: ScrollToTopFab(
+        controller: chapterScrollController,
+        visibleCondition: () =>
+            !hasArtwork || activeTab == _WebMangaTab.chapters,
+      ),
     );
   }
 }
 
-class _WebMangaNarrowLayout extends ConsumerWidget {
+class _WebMangaNarrowLayout extends HookConsumerWidget {
   const _WebMangaNarrowLayout({
     required this.manga,
     required this.series,
     required this.link,
     required this.source,
     required this.chapterScrollController,
+    required this.artworkUrls,
+    required this.tabController,
   });
 
   final WebManga manga;
@@ -800,12 +856,20 @@ class _WebMangaNarrowLayout extends ConsumerWidget {
   final HistoryLink link;
   final WebSourceInfo? source;
   final ScrollController chapterScrollController;
+  final List<String> artworkUrls;
+  final TabController tabController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final api = ref.watch(webSourceBrokerProvider);
     final headers = ref.watch(sourceHeadersProvider(series.sourceId));
     final imageCache = ref.watch(extensionImageCacheProvider);
+    final hasArtwork = artworkUrls.isNotEmpty;
+    final activeTab = useListenableSelector(
+      tabController,
+      () => _WebMangaTab.values[tabController.index],
+    );
 
     final isPhoneLandscape =
         !DeviceContext.isPortraitMode(context) &&
@@ -918,29 +982,252 @@ class _WebMangaNarrowLayout extends ConsumerWidget {
                 source: source,
               ),
             ),
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _PinnedHeaderDelegate(
-                child: _WebChapterHeader(manga: manga, series: series),
-                height: 56.0,
+            if (hasArtwork)
+              SliverToBoxAdapter(
+                child: Material(
+                  elevation: 2,
+                  child: TabBar(
+                    controller: tabController,
+                    tabs: [
+                      Tab(text: tr.mangaView.chapters),
+                      Tab(text: tr.mangaView.art),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            if (!hasArtwork || activeTab == _WebMangaTab.chapters)
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _PinnedHeaderDelegate(
+                  child: _WebChapterHeader(manga: manga, series: series),
+                  height: 56.0,
+                ),
+              ),
           ],
           body: SafeArea(
             top: false,
             bottom: true,
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              scrollBehavior: const MouseTouchScrollBehavior(),
-              slivers: [_WebChapterList(manga: manga, series: series)],
-            ),
+            child: hasArtwork
+                ? TabBarView(
+                    controller: tabController,
+                    children: [
+                      CustomScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        scrollBehavior: const MouseTouchScrollBehavior(),
+                        slivers: [
+                          _WebChapterList(manga: manga, series: series),
+                        ],
+                      ),
+                      _WebMangaCoversView(
+                        series: series,
+                        artworkUrls: artworkUrls,
+                      ),
+                    ],
+                  )
+                : CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    scrollBehavior: const MouseTouchScrollBehavior(),
+                    slivers: [_WebChapterList(manga: manga, series: series)],
+                  ),
           ),
         ),
       ),
-      floatingActionButton: ScrollToTopFab(controller: chapterScrollController),
+      floatingActionButton: ScrollToTopFab(
+        controller: chapterScrollController,
+        visibleCondition: () =>
+            !hasArtwork || activeTab == _WebMangaTab.chapters,
+      ),
     );
   }
 }
+
+class _WebMangaCoversView extends StatelessWidget {
+  const _WebMangaCoversView({required this.series, required this.artworkUrls});
+
+  final WebSeriesRef series;
+  final List<String> artworkUrls;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      scrollBehavior: const MouseTouchScrollBehavior(),
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.all(8.0),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 256,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 0.7,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => _WebCoverArtItem(
+                key: ValueKey(
+                  _webArtworkHeroTag(series, index, artworkUrls[index]),
+                ),
+                series: series,
+                artworkUrls: artworkUrls,
+                page: index,
+              ),
+              childCount: artworkUrls.length,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _WebCoverArtItem extends HookConsumerWidget {
+  const _WebCoverArtItem({
+    super.key,
+    required this.series,
+    required this.artworkUrls,
+    required this.page,
+  });
+
+  final WebSeriesRef series;
+  final List<String> artworkUrls;
+  final int page;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final aniController = useAnimationController(
+      duration: const Duration(milliseconds: 100),
+    );
+    final headers = ref.watch(sourceHeadersProvider(series.sourceId));
+    final imageCache = ref.watch(extensionImageCacheProvider);
+    final url = artworkUrls[page];
+    final heroTag = _webArtworkHeroTag(series, page, url);
+
+    final image = GridAlbumImage(
+      animation: aniController.drive(Styles.coverArtGradientTween),
+      child: CachedNetworkImage(
+        imageUrl: url,
+        httpHeaders: headers,
+        cacheManager: imageCache,
+        width: 256.0,
+        progressIndicatorBuilder: (context, url, downloadProgress) =>
+            const Center(child: CircularProgressIndicator()),
+        errorBuilder: (context, error, stacktrace) =>
+            Tooltip(message: error.toString(), child: const Icon(Icons.error)),
+        fit: BoxFit.cover,
+      ),
+    );
+
+    return Hero(
+      tag: heroTag,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () async {
+            await Navigator.push(
+              context,
+              TransparentOverlay(
+                builder: (context) => _WebCoverArtPagedOverlay(
+                  index: page,
+                  series: series,
+                  items: artworkUrls,
+                ),
+              ),
+            );
+          },
+          onHover: (hovering) {
+            if (hovering) {
+              aniController.forward();
+            } else {
+              aniController.reverse();
+            }
+          },
+          child: image,
+        ),
+      ),
+    );
+  }
+}
+
+class _WebCoverArtPagedOverlay extends HookConsumerWidget {
+  const _WebCoverArtPagedOverlay({
+    required this.index,
+    required this.series,
+    required this.items,
+  });
+
+  final int index;
+  final WebSeriesRef series;
+  final List<String> items;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = usePageController(initialPage: index);
+    final headers = ref.watch(sourceHeadersProvider(series.sourceId));
+    final imageCache = ref.watch(extensionImageCacheProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        leading: CloseButton(
+          style: IconButton.styleFrom(backgroundColor: Colors.black),
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      body: PageView.builder(
+        scrollBehavior: const MouseTouchScrollBehavior(),
+        itemBuilder: (BuildContext context, int id) {
+          final url = items[id];
+          final heroTag = _webArtworkHeroTag(series, id, url);
+
+          return Hero(
+            key: ValueKey(heroTag),
+            tag: heroTag,
+            child: Container(
+              padding: const EdgeInsets.all(10.0),
+              color: Colors.transparent,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: CachedNetworkImage(
+                  cacheManager: imageCache,
+                  httpHeaders: headers,
+                  imageUrl: url,
+                  imageBuilder: (context, imageProvider) {
+                    return PhotoView(
+                      backgroundDecoration: const BoxDecoration(
+                        color: Colors.transparent,
+                      ),
+                      imageProvider: imageProvider,
+                      minScale: PhotoViewComputedScale.contained * 0.8,
+                      maxScale: PhotoViewComputedScale.covered * 5.0,
+                      initialScale: PhotoViewComputedScale.contained,
+                    );
+                  },
+                  fit: BoxFit.contain,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      const Center(child: CircularProgressIndicator()),
+                  errorBuilder: (context, error, stacktrace) => Tooltip(
+                    message: error.toString(),
+                    child: const Icon(Icons.error),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+        itemCount: items.length,
+        controller: controller,
+        scrollDirection: Axis.horizontal,
+      ),
+    );
+  }
+}
+
+String _webArtworkHeroTag(WebSeriesRef series, int index, String url) =>
+    '${series.key}/artwork/$index/$url';
 
 class _PinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
   const _PinnedHeaderDelegate({required this.child, required this.height});

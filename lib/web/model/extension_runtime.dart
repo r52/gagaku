@@ -36,7 +36,7 @@ abstract interface class ExtensionRuntime {
 
   Future<WebManga?> getManga(String mangaId);
 
-  Future<List<String>> getChapterPages(Chapter chapter);
+  Future<ChapterDetails> getChapterDetails(Chapter chapter);
 
   Future<String?> getMangaURL(String mangaId);
 

@@ -17,36 +17,44 @@ class ExtensionWebSourceAdapter
   ExtensionWebSourceAdapter({
     required Future<WebManga?> Function(String sourceId, String mangaId)
     fetchManga,
-    required Future<ExtensionChapterPages> Function(
+    required Future<ExtensionChapterContent> Function(
       String sourceId,
       Chapter chapter,
     )
-    fetchChapterPages,
+    fetchChapterContent,
   }) : _fetchManga = fetchManga,
-       _fetchChapterPages = fetchChapterPages;
+       _fetchChapterContent = fetchChapterContent;
 
   final Future<WebManga?> Function(String sourceId, String mangaId) _fetchManga;
-  final Future<ExtensionChapterPages> Function(String sourceId, Chapter chapter)
-  _fetchChapterPages;
+  final Future<ExtensionChapterContent> Function(
+    String sourceId,
+    Chapter chapter,
+  )
+  _fetchChapterContent;
 
   @override
   Future<WebManga?> fetchManga(ExtensionSeriesRef series) {
     return _fetchManga(series.sourceId, series.mangaId);
   }
 
-  Future<ExtensionChapterPages> fetchChapterPages(
+  Future<ExtensionChapterContent> fetchChapterContent(
     ExtensionSeriesRef series,
     Chapter chapter,
   ) {
-    return _fetchChapterPages(series.sourceId, chapter);
+    return _fetchChapterContent(series.sourceId, chapter);
   }
 }
 
-class ExtensionChapterPages {
-  const ExtensionChapterPages({required this.runtime, required this.links});
+class ExtensionChapterContent {
+  const ExtensionChapterContent({
+    required this.runtime,
+    required this.details,
+    required this.sourceBaseUrl,
+  });
 
   final ExtensionRuntime runtime;
-  final List<String> links;
+  final ChapterDetails details;
+  final String? sourceBaseUrl;
 }
 
 class ProxyWebSourceAdapter implements WebSourceAdapter<ProxySeriesRef> {

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:fjs/fjs.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart'
@@ -666,14 +667,25 @@ globalThis.source.phase2source = {
       publishDate: new Date("2026-05-30T12:34:56.789Z")
     }
   ],
-  getChapterDetails: async (chapter) => ({
-    id: chapter.chapterId,
-    mangaId: chapter.sourceManga.mangaId,
-    pages: [
-      `https://example.com/${chapter.chapterId}/1.jpg`,
-      `https://example.com/${chapter.chapterId}/2.jpg`
-    ]
-  })
+  getChapterDetails: async (chapter) => {
+    if (chapter.chapterId === "chapter-html") {
+      return {
+        type: "html",
+        id: chapter.chapterId,
+        mangaId: chapter.sourceManga.mangaId,
+        html: `<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body><p>Chapter text</p><img src="/chapters/${chapter.chapterId}/illustration.jpg" /></body></html>`
+      };
+    }
+
+    return {
+      id: chapter.chapterId,
+      mangaId: chapter.sourceManga.mangaId,
+      pages: [
+        `https://example.com/${chapter.chapterId}/1.jpg`,
+        `https://example.com/${chapter.chapterId}/2.jpg`
+      ]
+    };
+  }
 };
 ''');
 
@@ -1051,10 +1063,32 @@ globalThis.phase11ActiveEvals--;
       chapters.first.publishDate,
       DateTime.parse('2026-05-30T12:34:56.789Z'),
     );
-    expect(await runtime.getChapterPages(chapters.first), [
-      'https://example.com/chapter-10/1.jpg',
-      'https://example.com/chapter-10/2.jpg',
-    ]);
+    final imageDetails = await runtime.getChapterDetails(chapters.first);
+    expect(imageDetails, isA<ImageChapterDetails>());
+    expect(
+      switch (imageDetails) {
+        ImageChapterDetails(:final pages) => pages,
+        HtmlChapterDetails() ||
+        FileChapterDetails() => fail('Expected image chapter details'),
+      },
+      [
+        'https://example.com/chapter-10/1.jpg',
+        'https://example.com/chapter-10/2.jpg',
+      ],
+    );
+
+    final htmlDetails = await runtime.getChapterDetails(
+      chapters.first.copyWith(chapterId: 'chapter-html'),
+    );
+    expect(htmlDetails, isA<HtmlChapterDetails>());
+    expect(
+      switch (htmlDetails) {
+        HtmlChapterDetails(:final html) => html,
+        ImageChapterDetails() ||
+        FileChapterDetails() => fail('Expected HTML chapter details'),
+      },
+      allOf(contains('<p>Chapter text</p>'), contains('<img src="/chapters/')),
+    );
 
     final emptySearch = await runtime.searchManga(
       const SearchQuery(title: ''),
@@ -1215,18 +1249,32 @@ globalThis.source.$sourceId = {
       return disposalProbe;
     }
 
-    final drainingProbe = await initializeDisposalProbe('phase11drain');
-    final acceptedEval = drainingProbe.evalForTesting('''
-await new Promise((resolve) => setTimeout(() => resolve("drained"), 100));
-''');
-    final drainingDispose = drainingProbe.dispose();
+    final cancellingProbe = await initializeDisposalProbe('phase11cancel');
+    final activeEvalCancelled = expectLater(
+      cancellingProbe.evalForTesting('''
+await new Promise((resolve) => setTimeout(() => resolve("cancelled"), 1000));
+'''),
+      throwsA(
+        isA<JsError>().having(
+          (error) => error.toString(),
+          'message',
+          contains('Cancelled'),
+        ),
+      ),
+    );
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+
+    final disposeStopwatch = Stopwatch()..start();
+    final cancellingDispose = cancellingProbe.dispose();
     await expectLater(
-      drainingProbe.evalForTesting('"rejected"'),
+      cancellingProbe.evalForTesting('"rejected"'),
       throwsStateError,
     );
-    expect(await acceptedEval, 'drained');
-    await drainingDispose;
-    await drainingProbe.dispose();
+    await cancellingDispose;
+    disposeStopwatch.stop();
+    expect(disposeStopwatch.elapsed, lessThan(const Duration(seconds: 1)));
+    await activeEvalCancelled;
+    await cancellingProbe.dispose();
   });
 
   test(

@@ -472,12 +472,40 @@ sealed class WebChapterItem with _$WebChapterItem {
     WebChapterItemExtension(:final chapter) => chapter.publishDate,
   };
 
+  String get readMarkerKey => switch (this) {
+    WebChapterItemCubari(:final entry) => entry.name,
+    WebChapterItemExtension(:final chapter) => chapter.chapterId,
+  };
+
+  String? get legacyReadMarkerKey => switch (this) {
+    WebChapterItemCubari() => null,
+    WebChapterItemExtension(:final chapter) => chapter.chapNum.toString(),
+  };
+
+  String get groupingKey => switch (this) {
+    WebChapterItemCubari(:final entry) => entry.name,
+    WebChapterItemExtension(:final chapter) =>
+      chapter.sourceManga.mangaInfo.contentType == MangaContentType.novel
+          ? (chapter.volume ??
+                    chapter.sortingIndex ??
+                    chapter.title ??
+                    chapter.chapterId)
+                .toString()
+          : chapter.chapNum.toString(),
+  };
+
   String get title => switch (this) {
     WebChapterItemCubari(:final entry) =>
       (entry.chapter.title?.isNotEmpty == true &&
               entry.chapter.title != entry.name)
           ? '${entry.name}: ${entry.chapter.title}'
           : entry.name,
+    WebChapterItemExtension(:final chapter)
+        when chapter.sourceManga.mangaInfo.contentType ==
+            MangaContentType.novel =>
+      chapter.title?.isNotEmpty == true
+          ? chapter.title!
+          : (chapter.volume ?? chapter.chapNum).toString(),
     WebChapterItemExtension(:final chapter) =>
       (chapter.title?.isNotEmpty == true &&
               chapter.title != chapter.chapNum.toString())
@@ -522,6 +550,11 @@ sealed class WebManga with _$WebManga {
     WebMangaExtension(:final data) => data.mangaInfo.thumbnailUrl,
   };
 
+  List<String> get artworkUrls => switch (this) {
+    WebMangaCubari() => const [],
+    WebMangaExtension(:final data) => data.mangaInfo.artworkUrls ?? const [],
+  };
+
   String get author => switch (this) {
     WebMangaCubari(:final author) => author,
     WebMangaExtension(:final data) => data.mangaInfo.author ?? '',
@@ -542,6 +575,61 @@ sealed class WebManga with _$WebManga {
     WebMangaExtension() => null,
   };
 
+  Iterable<String> readMarkerKeysFor(WebChapterItem chapter) sync* {
+    yield chapter.readMarkerKey;
+
+    final legacyKey = chapter.legacyReadMarkerKey;
+    if (legacyKey == null || legacyKey == chapter.readMarkerKey) {
+      return;
+    }
+
+    if (_legacyReadMarkerKeyCounts[legacyKey] == 1) {
+      yield legacyKey;
+    }
+  }
+
+  bool hasReadMarker(
+    ReadMarkersDB db,
+    String mangaKey,
+    WebChapterItem chapter,
+  ) {
+    final readChapters = db.markers[mangaKey];
+    if (readChapters == null) {
+      return false;
+    }
+
+    return readMarkerKeysFor(chapter).any(readChapters.contains);
+  }
+
+  bool hasAllReadMarkers(ReadMarkersDB db, String mangaKey) {
+    final readChapters = db.markers[mangaKey];
+    if (readChapters == null) {
+      return false;
+    }
+
+    return chapters.every(
+      (chapter) => readMarkerKeysFor(chapter).any(readChapters.contains),
+    );
+  }
+
+  Iterable<String> get readMarkerKeys =>
+      chapters.map((chapter) => chapter.readMarkerKey);
+
+  Iterable<String> get removableReadMarkerKeys =>
+      chapters.expand(readMarkerKeysFor);
+
+  Map<String, int> get _legacyReadMarkerKeyCounts => switch (this) {
+    WebMangaCubari() => const {},
+    WebMangaExtension(:final chaptersList) => chaptersList.fold(
+      <String, int>{},
+      (counts, chapter) {
+        final key = chapter.chapNum.toString();
+        counts[key] = (counts[key] ?? 0) + 1;
+        return counts;
+      },
+    ),
+  };
+
   /// Get chapters as a unified list interface
   List<WebChapterItem> get chapters => switch (this) {
     WebMangaCubari(:final cubariChapters) =>
@@ -560,6 +648,37 @@ sealed class WebManga with _$WebManga {
         final match = chaptersList.firstWhereOrNull((c) => c.chapterId == id);
         return match != null ? WebChapterItem.extension(match) : null;
     }
+  }
+
+  static int compareExtensionChaptersDescending(Chapter a, Chapter b) {
+    final sortingIndexCompare = _compareNullableNumDescending(
+      a.sortingIndex,
+      b.sortingIndex,
+    );
+    if (sortingIndexCompare != 0) {
+      return sortingIndexCompare;
+    }
+
+    final volumeCompare = _compareNullableNumDescending(a.volume, b.volume);
+    if (volumeCompare != 0) {
+      return volumeCompare;
+    }
+
+    final chapterCompare = _compareNullableNumDescending(a.chapNum, b.chapNum);
+    if (chapterCompare != 0) {
+      return chapterCompare;
+    }
+
+    return compareNatural(b.chapterId, a.chapterId);
+  }
+
+  static int _compareNullableNumDescending(num? a, num? b) {
+    return switch ((a, b)) {
+      (final num left, final num right) => right.compareTo(left),
+      (final num _, null) => -1,
+      (null, final num _) => 1,
+      _ => 0,
+    };
   }
 }
 
