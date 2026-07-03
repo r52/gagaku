@@ -91,6 +91,7 @@ void main() {
         primaryTitle: 'Novel Series',
         secondaryTitles: [],
         contentRating: ContentRating.EVERYONE,
+        contentType: MangaContentType.novel,
       ),
     );
     const chapter = Chapter(
@@ -134,9 +135,9 @@ void main() {
     );
 
     expect(resolved.chapter, chapterRef);
-    expect(resolved.title, '1: Chapter One');
+    expect(resolved.title, 'Chapter One');
     expect(resolved.seriesTitle, 'Novel Series');
-    expect(resolved.readMarkerKey, '1');
+    expect(resolved.readMarkerKey, 'chapter-1');
     final content = resolved.content;
     expect(content, isA<ResolvedHtmlWebChapterContent>());
     final htmlContent = content as ResolvedHtmlWebChapterContent;

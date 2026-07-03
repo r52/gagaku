@@ -759,14 +759,14 @@ class ChapterButtonWidget extends HookConsumerWidget {
 
     final title = data.title;
     final date = data.date;
-    final (chapterkey, groupKey, extensionChapter) = switch (data) {
+    final (readMarkerKey, groupKey, extensionChapter) = switch (data) {
       WebChapterItemCubari(:final entry) => (
-        entry.name,
+        data.readMarkerKey,
         entry.chapter.groups.entries.first.key,
         null,
       ),
       WebChapterItemExtension(:final chapter) => (
-        chapter.chapNum.toString(),
+        data.readMarkerKey,
         chapter.version ?? series.sourceId,
         chapter,
       ),
@@ -777,8 +777,11 @@ class ChapterButtonWidget extends HookConsumerWidget {
     final isRead = ref.watch(
       webReadMarkersProvider.select(
         (value) => switch (value) {
-          AsyncValue(value: final db?) =>
-            db.markers[mangakey]?.contains(chapterkey) ?? false,
+          AsyncValue(value: final db?) => manga.hasReadMarker(
+            db,
+            mangakey,
+            data,
+          ),
           _ => false,
         },
       ),
@@ -812,9 +815,15 @@ class ChapterButtonWidget extends HookConsumerWidget {
           bool set = !isRead;
 
           ref.run((tsx) async {
-            return await tsx
-                .get(webReadMarkersProvider.notifier)
-                .set(mangakey, chapterkey, set);
+            final notifier = tsx.get(webReadMarkersProvider.notifier);
+            if (set) {
+              return await notifier.set(mangakey, readMarkerKey, true);
+            }
+
+            return await notifier.setBulk(
+              mangakey,
+              unread: manga.readMarkerKeysFor(data),
+            );
           });
         },
         child: Tooltip(
@@ -842,7 +851,7 @@ class ChapterButtonWidget extends HookConsumerWidget {
           ProxyWebSourceReaderRoute(
             proxy: proxyId,
             code: seriesId,
-            chapter: chapterkey,
+            chapter: readMarkerKey,
             page: '1',
           ),
         ExtensionSeriesRef() => throw StateError(

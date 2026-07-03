@@ -493,18 +493,13 @@ class _WebChapterHeader extends ConsumerWidget {
             Consumer(
               builder: (context, ref, child) {
                 final mangakey = series.key;
-                final chapterkeys = manga.chapters.map(
-                  (e) => switch (e) {
-                    WebChapterItemCubari(:final entry) => entry.name,
-                    WebChapterItemExtension(:final chapter) =>
-                      chapter.chapNum.toString(),
-                  },
-                );
                 final allRead = ref.watch(
                   webReadMarkersProvider.select(
                     (value) => switch (value) {
-                      AsyncValue(value: final db?) =>
-                        db.markers[mangakey]?.containsAll(chapterkeys) ?? false,
+                      AsyncValue(value: final db?) => manga.hasAllReadMarkers(
+                        db,
+                        mangakey,
+                      ),
                       _ => false,
                     },
                   ),
@@ -548,8 +543,10 @@ class _WebChapterHeader extends ConsumerWidget {
                             .get(webReadMarkersProvider.notifier)
                             .setBulk(
                               mangakey,
-                              read: !allRead ? chapterkeys : null,
-                              unread: allRead ? chapterkeys : null,
+                              read: !allRead ? manga.readMarkerKeys : null,
+                              unread: allRead
+                                  ? manga.removableReadMarkerKeys
+                                  : null,
                             );
                       });
                     }
@@ -575,10 +572,7 @@ class _WebChapterList extends HookWidget {
   Widget build(BuildContext context) {
     final separators = useMemoized(() {
       final chapters = manga.chapters;
-      String getName(WebChapterItem c) => switch (c) {
-        WebChapterItemCubari(:final entry) => entry.name,
-        WebChapterItemExtension(:final chapter) => chapter.chapNum.toString(),
-      };
+      String getName(WebChapterItem c) => c.groupingKey;
 
       return List.generate(chapters.length, (index) {
         final currentName = getName(chapters[index]);

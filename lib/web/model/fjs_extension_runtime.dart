@@ -888,9 +888,7 @@ return await globalThis.$sourceId.getChapters(manga);
           ),
         )
         .toList();
-    chapters.sort(
-      (a, b) => compareNatural(b.chapNum.toString(), a.chapNum.toString()),
-    );
+    chapters.sort(WebManga.compareExtensionChaptersDescending);
 
     return WebManga.extension(data: sourceManga, chaptersList: chapters);
   }

@@ -129,7 +129,7 @@ Future<ResolvedWebChapter> resolveWebChapter(
       ),
     ),
     WebChapterItemExtension(chapter: final extensionChapter) => (
-      extensionChapter.chapNum.toString(),
+      chapter.readMarkerKey,
       await _extensionReaderContent(
         ref,
         api,

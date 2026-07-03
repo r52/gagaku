@@ -100,6 +100,157 @@ void main() {
       );
     });
 
+    test('extension chapter read keys preserve unique chapNum aliases', () {
+      const sourceManga = SourceManga(
+        mangaId: 'manga-1',
+        mangaInfo: MangaInfo(
+          thumbnailUrl: 'https://example.com/cover.jpg',
+          synopsis: 'Synopsis',
+          primaryTitle: 'Title',
+          secondaryTitles: [],
+          contentRating: ContentRating.EVERYONE,
+          contentType: MangaContentType.comic,
+        ),
+      );
+      const chapter = Chapter(
+        chapterId: 'chapter-2',
+        sourceManga: sourceManga,
+        langCode: 'en',
+        chapNum: 2,
+        title: 'Start',
+      );
+      const manga = WebManga.extension(
+        data: sourceManga,
+        chaptersList: [chapter],
+      );
+      final item = manga.chapters.single;
+      final legacyDb = ReadMarkersDB(
+        markers: {
+          'source-1/manga-1': {'2'},
+        },
+      );
+
+      expect(item.title, '2: Start');
+      expect(item.readMarkerKey, 'chapter-2');
+      expect(manga.readMarkerKeysFor(item), ['chapter-2', '2']);
+      expect(manga.hasReadMarker(legacyDb, 'source-1/manga-1', item), isTrue);
+    });
+
+    test('novel chapters use chapterId keys when chapNum is duplicated', () {
+      const sourceManga = SourceManga(
+        mangaId: 'novel-1',
+        mangaInfo: MangaInfo(
+          thumbnailUrl: 'https://example.com/cover.jpg',
+          synopsis: 'Synopsis',
+          primaryTitle: 'Novel',
+          secondaryTitles: [],
+          contentRating: ContentRating.EVERYONE,
+          contentType: MangaContentType.novel,
+        ),
+      );
+      const volume25 = Chapter(
+        chapterId: '/book/25',
+        sourceManga: sourceManga,
+        langCode: 'en',
+        chapNum: 1,
+        title: 'Volume 25',
+        volume: 25,
+        sortingIndex: 24,
+      );
+      const volume26 = Chapter(
+        chapterId: '/book/26',
+        sourceManga: sourceManga,
+        langCode: 'en',
+        chapNum: 1,
+        title: 'Volume 26',
+        volume: 26,
+        sortingIndex: 25,
+      );
+      const manga = WebManga.extension(
+        data: sourceManga,
+        chaptersList: [volume25, volume26],
+      );
+      final first = manga.chapters.first;
+      final second = manga.chapters.last;
+      final ambiguousLegacyDb = ReadMarkersDB(
+        markers: {
+          'source-1/novel-1': {'1'},
+        },
+      );
+      final canonicalDb = ReadMarkersDB(
+        markers: {
+          'source-1/novel-1': {'/book/25'},
+        },
+      );
+
+      expect(first.title, 'Volume 25');
+      expect(first.groupingKey, '25');
+      expect(first.readMarkerKey, '/book/25');
+      expect(manga.readMarkerKeysFor(first), ['/book/25']);
+      expect(manga.readMarkerKeysFor(second), ['/book/26']);
+      expect(
+        manga.hasReadMarker(ambiguousLegacyDb, 'source-1/novel-1', first),
+        isFalse,
+      );
+      expect(
+        manga.hasReadMarker(ambiguousLegacyDb, 'source-1/novel-1', second),
+        isFalse,
+      );
+      expect(
+        manga.hasReadMarker(canonicalDb, 'source-1/novel-1', first),
+        isTrue,
+      );
+      expect(
+        manga.hasReadMarker(canonicalDb, 'source-1/novel-1', second),
+        isFalse,
+      );
+    });
+
+    test('extension chapters sort by sorting index before chapNum', () {
+      const sourceManga = SourceManga(
+        mangaId: 'novel-1',
+        mangaInfo: MangaInfo(
+          thumbnailUrl: 'https://example.com/cover.jpg',
+          synopsis: 'Synopsis',
+          primaryTitle: 'Novel',
+          secondaryTitles: [],
+          contentRating: ContentRating.EVERYONE,
+          contentType: MangaContentType.novel,
+        ),
+      );
+      final chapters = [
+        const Chapter(
+          chapterId: '/book/25',
+          sourceManga: sourceManga,
+          langCode: 'en',
+          chapNum: 1,
+          volume: 25,
+          sortingIndex: 24,
+        ),
+        const Chapter(
+          chapterId: '/book/26',
+          sourceManga: sourceManga,
+          langCode: 'en',
+          chapNum: 1,
+          volume: 26,
+          sortingIndex: 25,
+        ),
+        const Chapter(
+          chapterId: '/book/24',
+          sourceManga: sourceManga,
+          langCode: 'en',
+          chapNum: 24,
+          volume: 24,
+        ),
+      ]..sort(WebManga.compareExtensionChaptersDescending);
+
+      expect(chapters.map((chapter) => chapter.chapterId), [
+        '/book/26',
+        '/book/25',
+        '/book/24',
+      ]);
+    });
+
     test('parses Paperback API cookies', () {
       final cookie = PaperbackCookie.fromJson({
         'name': 'session',
