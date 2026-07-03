@@ -550,6 +550,11 @@ sealed class WebManga with _$WebManga {
     WebMangaExtension(:final data) => data.mangaInfo.thumbnailUrl,
   };
 
+  List<String> get artworkUrls => switch (this) {
+    WebMangaCubari() => const [],
+    WebMangaExtension(:final data) => data.mangaInfo.artworkUrls ?? const [],
+  };
+
   String get author => switch (this) {
     WebMangaCubari(:final author) => author,
     WebMangaExtension(:final data) => data.mangaInfo.author ?? '',

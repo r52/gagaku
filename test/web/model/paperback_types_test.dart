@@ -70,7 +70,15 @@ void main() {
         'secondaryTitles': <String>[],
         'contentRating': 'EVERYONE',
         'contentType': 'novel',
+        'artworkUrls': [
+          'https://example.com/cover-1.webp',
+          'https://example.com/cover-2.webp',
+        ],
       });
+      final manga = WebManga.extension(
+        data: SourceManga(mangaId: 'manga-1', mangaInfo: mangaInfo),
+        chaptersList: const [],
+      );
       final featured = DiscoverSectionItem.fromJson({
         'type': 'featuredCarouselItem',
         'mangaId': 'manga-1',
@@ -83,6 +91,14 @@ void main() {
       });
 
       expect(mangaInfo.contentType, MangaContentType.novel);
+      expect(mangaInfo.artworkUrls, [
+        'https://example.com/cover-1.webp',
+        'https://example.com/cover-2.webp',
+      ]);
+      expect(manga.artworkUrls, [
+        'https://example.com/cover-1.webp',
+        'https://example.com/cover-2.webp',
+      ]);
       expect(featured, isA<FeaturedCarouselItem>());
       expect(
         switch (featured) {
