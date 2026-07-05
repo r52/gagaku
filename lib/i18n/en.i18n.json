@@ -580,6 +580,8 @@
     "freqWeekly": "Once per week",
     "freqMonthly": "Once per month",
     "updateAvailableTitle": "Update Available",
+    "updateAvailableSnack": "Update available",
+    "viewUpdate": "View",
     "updateAvailableBody": "A new version is available.\nCurrent: $currentVersion\nAvailable: $newVersion",
     "updateAvailableBetaBody": "A new dev-preview is available.\nYour build: $currentVersion\nLatest: $latestVersion",
     "download": "Download",

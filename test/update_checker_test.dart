@@ -33,6 +33,18 @@ void main() {
       expect(client.requests, isEmpty);
     });
 
+    test('stays quiet and does not fetch outside release builds', () async {
+      final client = _RecordingClient((_) => _stableRelease(version: 'v1.0.1'));
+      final container = _container(client: client, isReleaseBuild: false);
+      addTearDown(container.dispose);
+
+      final result = await container.read(updateCheckerProvider.future);
+
+      expect(result, isA<UpdateResultUpToDate>());
+      expect((result as UpdateResultUpToDate).checked, isFalse);
+      expect(client.requests, isEmpty);
+    });
+
     test('stays quiet and does not fetch during the cooldown window', () async {
       final now = DateTime(2026, 7, 5, 12);
       final client = _RecordingClient();
@@ -258,6 +270,107 @@ void main() {
   });
 
   group('update dialog UX', () {
+    testWidgets('snackbar View opens the update dialog', (tester) async {
+      await LocaleSettings.setLocale(AppLocale.en);
+      var dismissed = 0;
+      var snoozed = 0;
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: TranslationProvider(
+            child: MaterialApp(
+              home: Scaffold(
+                body: Builder(
+                  builder: (context) {
+                    return TextButton(
+                      onPressed: () {
+                        showUpdateSnackBar(
+                          context,
+                          UpdateInfo(
+                            version: '1.0.1',
+                            releaseUrl: 'https://example.com/release',
+                            publishedAt: DateTime(2026, 7, 5),
+                          ),
+                          onDismissed: () {
+                            dismissed++;
+                          },
+                          onNotNow: () {
+                            snoozed++;
+                          },
+                        );
+                      },
+                      child: const Text('Show update snackbar'),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Show update snackbar'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('View'));
+      await tester.pumpAndSettle();
+
+      expect(dismissed, 0);
+      expect(find.text('Update Available'), findsOneWidget);
+
+      await tester.tap(find.text('Not Now'));
+      await tester.pumpAndSettle();
+
+      expect(snoozed, 1);
+      expect(find.text('Update Available'), findsNothing);
+    });
+
+    testWidgets('dismissed snackbar snoozes the available update', (
+      tester,
+    ) async {
+      await LocaleSettings.setLocale(AppLocale.en);
+      var dismissed = 0;
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: TranslationProvider(
+            child: MaterialApp(
+              home: Scaffold(
+                body: Builder(
+                  builder: (context) {
+                    return TextButton(
+                      onPressed: () {
+                        showUpdateSnackBar(
+                          context,
+                          UpdateInfo(
+                            version: '1.0.1',
+                            releaseUrl: 'https://example.com/release',
+                            publishedAt: DateTime(2026, 7, 5),
+                          ),
+                          onDismissed: () {
+                            dismissed++;
+                          },
+                        );
+                      },
+                      child: const Text('Show update snackbar'),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Show update snackbar'));
+      await tester.pump();
+      ScaffoldMessenger.of(
+        tester.element(find.text('Show update snackbar')),
+      ).hideCurrentSnackBar();
+      await tester.pumpAndSettle();
+
+      expect(dismissed, 1);
+    });
+
     testWidgets('Not Now snoozes the available update dialog', (tester) async {
       await LocaleSettings.setLocale(AppLocale.en);
       var snoozed = 0;
@@ -306,6 +419,7 @@ ProviderContainer _container({
   GagakuConfig? settings,
   _RecordingClient? client,
   DateTime? now,
+  bool isReleaseBuild = true,
 }) {
   final updateClient = client ?? _RecordingClient();
   return ProviderContainer(
@@ -315,6 +429,7 @@ ProviderContainer _container({
         () => updateClient,
       ),
       updateCheckerNowProvider.overrideWithValue(() => now ?? DateTime.now()),
+      updateCheckerIsReleaseBuildProvider.overrideWithValue(isReleaseBuild),
     ],
   );
 }

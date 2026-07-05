@@ -1423,6 +1423,12 @@ class Translations$updates$en {
 	/// en: 'Update Available'
 	String get updateAvailableTitle => 'Update Available';
 
+	/// en: 'Update available'
+	String get updateAvailableSnack => 'Update available';
+
+	/// en: 'View'
+	String get viewUpdate => 'View';
+
 	/// en: 'A new version is available. Current: $currentVersion Available: $newVersion'
 	String updateAvailableBody({required Object currentVersion, required Object newVersion}) => 'A new version is available.\nCurrent: ${currentVersion}\nAvailable: ${newVersion}';
 
@@ -2425,6 +2431,8 @@ extension on Translations {
 			'updates.freqWeekly' => 'Once per week',
 			'updates.freqMonthly' => 'Once per month',
 			'updates.updateAvailableTitle' => 'Update Available',
+			'updates.updateAvailableSnack' => 'Update available',
+			'updates.viewUpdate' => 'View',
 			'updates.updateAvailableBody' => ({required Object currentVersion, required Object newVersion}) => 'A new version is available.\nCurrent: ${currentVersion}\nAvailable: ${newVersion}',
 			'updates.updateAvailableBetaBody' => ({required Object currentVersion, required Object latestVersion}) => 'A new dev-preview is available.\nYour build: ${currentVersion}\nLatest: ${latestVersion}',
 			'updates.download' => 'Download',

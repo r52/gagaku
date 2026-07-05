@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
@@ -70,6 +71,10 @@ final updateCheckerNowProvider = Provider<DateTime Function()>(
   (ref) => DateTime.now,
 );
 
+final updateCheckerIsReleaseBuildProvider = Provider<bool>(
+  (ref) => kReleaseMode,
+);
+
 // ---------------------------------------------------------------------------
 // Provider
 // ---------------------------------------------------------------------------
@@ -86,6 +91,10 @@ class UpdateChecker extends _$UpdateChecker {
 
     // If checking is disabled, skip.
     if (!settings.checkForUpdates) {
+      return const UpdateResultUpToDate();
+    }
+
+    if (!ref.read(updateCheckerIsReleaseBuildProvider)) {
       return const UpdateResultUpToDate();
     }
 
@@ -274,6 +283,44 @@ String normalizeStableVersion(String version) {
 // ---------------------------------------------------------------------------
 // Dialog
 // ---------------------------------------------------------------------------
+
+ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showUpdateSnackBar(
+  BuildContext context,
+  UpdateInfo info, {
+  FutureOr<void> Function()? onDismissed,
+  FutureOr<void> Function()? onNotNow,
+  FutureOr<void> Function()? onDownload,
+}) {
+  final t = context.t;
+  final messenger = ScaffoldMessenger.of(context);
+
+  final controller = messenger.showSnackBar(
+    SnackBar(
+      content: Text(t.updates.updateAvailableSnack),
+      action: SnackBarAction(
+        label: t.updates.viewUpdate,
+        onPressed: () {
+          showUpdateDialog(
+            context,
+            info,
+            onNotNow: onNotNow,
+            onDownload: onDownload,
+          );
+        },
+      ),
+    ),
+  );
+
+  unawaited(
+    controller.closed.then((reason) async {
+      if (reason != SnackBarClosedReason.action) {
+        await onDismissed?.call();
+      }
+    }),
+  );
+
+  return controller;
+}
 
 /// Show the update available dialog.
 void showUpdateDialog(

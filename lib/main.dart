@@ -132,16 +132,17 @@ class App extends HookConsumerWidget {
       });
     }
 
-    // Trigger dialog when an update is available.
+    // Surface updates without blocking startup.
     useEffect(() {
       switch (updateResult) {
         case AsyncData(value: UpdateResultAvailable(:final info)):
           WidgetsBinding.instance.addPostFrameCallback((_) {
             final navContext = rootNavigatorKey.currentContext;
             if (navContext != null && navContext.mounted) {
-              showUpdateDialog(
+              showUpdateSnackBar(
                 navContext,
                 info,
+                onDismissed: recordUpdateCheck,
                 onNotNow: recordUpdateCheck,
                 onDownload: recordUpdateCheck,
               );
