@@ -25,11 +25,14 @@ import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:native_dio_adapter/native_dio_adapter.dart' hide URLRequest;
+import 'package:pool/pool.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
 
 const historyListUUID = 'd6f79229-6f8e-4872-9610-5200a54aef8f';
+final _extensionSourceInitPool = Pool(2);
+
 void openWebSource(BuildContext context, ResolvedWebLink link) {
   final initialChapter = link.initialChapter;
   if (initialChapter != null) {
@@ -735,7 +738,7 @@ class ExtensionSource extends _$ExtensionSource {
           .getExtensionState(id);
     }
 
-    _runtime = FjsExtensionRuntime(
+    final runtime = FjsExtensionRuntime(
       sourceId: sourceId,
       extensionHost: GagakuData().extensionHost,
       onResetAllState: onResetAllState,
@@ -744,13 +747,20 @@ class ExtensionSource extends _$ExtensionSource {
       getExtensionState: getExtensionState,
       getExtensionSecureState: getExtensionSecureState,
     );
+    _runtime = runtime;
 
     ref.onDispose(() {
-      _runtime?.dispose();
-      _runtime = null;
+      runtime.dispose();
+      if (identical(_runtime, runtime)) {
+        _runtime = null;
+      }
     });
 
-    await _runtime!.init(source, body);
+    await _extensionSourceInitPool.withResource(() async {
+      if (identical(_runtime, runtime)) {
+        await runtime.init(source, body);
+      }
+    });
 
     return source;
   }
