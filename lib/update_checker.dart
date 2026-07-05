@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
@@ -9,6 +10,7 @@ import 'package:gagaku/util/http.dart';
 import 'package:gagaku/version.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:pub_semver/pub_semver.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -61,6 +63,18 @@ class UpdateResultIgnored extends UpdateResult {
 const _githubApiBase = 'https://api.github.com';
 const _githubRepo = 'r52/gagaku';
 
+final updateCheckerHttpClientFactoryProvider = Provider<http.Client Function()>(
+  (ref) => RateLimitedClient.new,
+);
+
+final updateCheckerNowProvider = Provider<DateTime Function()>(
+  (ref) => DateTime.now,
+);
+
+final updateCheckerIsReleaseBuildProvider = Provider<bool>(
+  (ref) => kReleaseMode,
+);
+
 // ---------------------------------------------------------------------------
 // Provider
 // ---------------------------------------------------------------------------
@@ -80,8 +94,12 @@ class UpdateChecker extends _$UpdateChecker {
       return const UpdateResultUpToDate();
     }
 
+    if (!ref.read(updateCheckerIsReleaseBuildProvider)) {
+      return const UpdateResultUpToDate();
+    }
+
     // Check cooldown.
-    final now = DateTime.now();
+    final now = ref.read(updateCheckerNowProvider)();
     final lastCheck = settings.lastUpdateCheck;
     if (lastCheck != null) {
       final elapsed = now.difference(lastCheck);
@@ -130,7 +148,7 @@ class UpdateChecker extends _$UpdateChecker {
 
   /// Fetch the latest release from GitHub based on the selected channel.
   Future<UpdateInfo?> _fetchLatestRelease(String channel) async {
-    final client = RateLimitedClient();
+    final client = ref.read(updateCheckerHttpClientFactoryProvider)();
     try {
       if (channel == 'stable') {
         return await _fetchStableRelease(client);
@@ -162,7 +180,7 @@ class UpdateChecker extends _$UpdateChecker {
     }
 
     final data = json.decode(response.body) as Map<String, dynamic>;
-    final tagName = (data['tag_name'] as String).replaceAll('v', '');
+    final tagName = normalizeStableVersion(data['tag_name'] as String);
     final htmlUrl = data['html_url'] as String;
     final publishedAt = DateTime.parse(data['published_at'] as String);
 
@@ -228,7 +246,7 @@ class UpdateChecker extends _$UpdateChecker {
   /// Compare the latest release with the current app version.
   bool _isUpdateAvailable(String channel, UpdateInfo info) {
     if (channel == 'stable') {
-      return _compareStable(info.version) > 0;
+      return isStableUpdateAvailable(remoteVersion: info.version);
     } else {
       // Beta: compare commit SHA.
       if (kCommitSha == 'unknown' || info.commitSha == null) {
@@ -237,37 +255,80 @@ class UpdateChecker extends _$UpdateChecker {
       return kCommitSha != info.commitSha;
     }
   }
+}
 
-  /// Compare two semver strings.
-  /// Returns positive if [remote] is newer, negative if [local] is newer, 0 if equal.
-  int _compareStable(String remote) {
-    final localParts = _parseSemver(kPackageVersion);
-    final remoteParts = _parseSemver(remote);
+bool shouldRecordUpdateCheck(UpdateResult result) => switch (result) {
+  UpdateResultUpToDate(checked: true) || UpdateResultIgnored() => true,
+  _ => false,
+};
 
-    final length = math.max(localParts.length, remoteParts.length);
+bool isStableUpdateAvailable({
+  String currentVersion = kPackageVersion,
+  required String remoteVersion,
+}) {
+  final current = parseStableVersionForPrecedence(currentVersion);
+  final remote = parseStableVersionForPrecedence(remoteVersion);
+  return remote > current;
+}
 
-    for (var i = 0; i < length; i++) {
-      final l = localParts.length > i ? localParts[i] : 0;
-      final r = remoteParts.length > i ? remoteParts[i] : 0;
-      if (r > l) return 1;
-      if (r < l) return -1;
-    }
-    return 0;
-  }
+Version parseStableVersionForPrecedence(String version) {
+  final normalized = normalizeStableVersion(version);
+  return Version.parse(normalized.split('+').first);
+}
 
-  List<int> _parseSemver(String version) {
-    // Strip pre-release suffix for basic comparison.
-    final base = version.split('-').first;
-    return base.split('.').map((part) => int.tryParse(part) ?? 0).toList();
-  }
+String normalizeStableVersion(String version) {
+  return version.trim().replaceFirst(RegExp(r'^[vV]'), '');
 }
 
 // ---------------------------------------------------------------------------
 // Dialog
 // ---------------------------------------------------------------------------
 
+ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showUpdateSnackBar(
+  BuildContext context,
+  UpdateInfo info, {
+  FutureOr<void> Function()? onDismissed,
+  FutureOr<void> Function()? onNotNow,
+  FutureOr<void> Function()? onDownload,
+}) {
+  final t = context.t;
+  final messenger = ScaffoldMessenger.of(context);
+
+  final controller = messenger.showSnackBar(
+    SnackBar(
+      content: Text(t.updates.updateAvailableSnack),
+      action: SnackBarAction(
+        label: t.updates.viewUpdate,
+        onPressed: () {
+          showUpdateDialog(
+            context,
+            info,
+            onNotNow: onNotNow,
+            onDownload: onDownload,
+          );
+        },
+      ),
+    ),
+  );
+
+  unawaited(
+    controller.closed.then((reason) async {
+      if (reason != SnackBarClosedReason.action) {
+        await onDismissed?.call();
+      }
+    }),
+  );
+
+  return controller;
+}
+
 /// Show the update available dialog.
-void showUpdateDialog(BuildContext context, UpdateInfo info) {
+void showUpdateDialog(
+  BuildContext context,
+  UpdateInfo info, {
+  FutureOr<void> Function()? onNotNow,
+  FutureOr<void> Function()? onDownload,
+}) {
   final t = context.t;
 
   showDialog(
@@ -301,7 +362,12 @@ void showUpdateDialog(BuildContext context, UpdateInfo info) {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
+            onPressed: () async {
+              await onNotNow?.call();
+              if (dialogContext.mounted) {
+                Navigator.of(dialogContext).pop();
+              }
+            },
             child: Text(t.updates.notNow),
           ),
           Consumer(
@@ -314,6 +380,7 @@ void showUpdateDialog(BuildContext context, UpdateInfo info) {
                       ...cfg.ignoredUpdates,
                       info.commitSha ?? info.version,
                     ],
+                    lastUpdateCheck: ref.read(updateCheckerNowProvider)(),
                   );
                   ref.read(gagakuSettingsProvider.notifier).save(updated);
                   Navigator.of(dialogContext).pop();
@@ -329,6 +396,7 @@ void showUpdateDialog(BuildContext context, UpdateInfo info) {
               if (await canLaunchUrl(uri)) {
                 await launchUrl(uri, mode: LaunchMode.externalApplication);
               }
+              await onDownload?.call();
               if (dialogContext.mounted) {
                 Navigator.of(dialogContext).pop();
               }

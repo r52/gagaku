@@ -4,17 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
+import 'package:gagaku/model/config.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.dart';
+import 'package:gagaku/update_checker.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/version.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class MainDrawer extends ConsumerWidget {
+class MainDrawer extends ConsumerStatefulWidget {
   const MainDrawer({super.key});
 
+  @override
+  ConsumerState<MainDrawer> createState() => _MainDrawerState();
+}
+
+class _MainDrawerState extends ConsumerState<MainDrawer> {
   static int _calculateSelectedIndex(BuildContext context) {
     final route = GoRouterState.of(context).uri;
     final path = route.path;
@@ -39,7 +46,7 @@ class MainDrawer extends ConsumerWidget {
     }
   }
 
-  void _onItemTapped(int index, BuildContext context) {
+  void _onItemTapped(int index) {
     Navigator.pop(context);
 
     switch (index) {
@@ -58,22 +65,44 @@ class MainDrawer extends ConsumerWidget {
     }
   }
 
+  Future<void> _recordUpdateCheck() async {
+    final config = ref.read(gagakuSettingsProvider);
+    final updatedConfig = config.copyWith(
+      lastUpdateCheck: ref.read(updateCheckerNowProvider)(),
+    );
+    ref.read(gagakuSettingsProvider.notifier).save(updatedConfig);
+  }
+
+  void _showAvailableUpdateDialog(UpdateInfo info) {
+    final navContext = rootNavigatorKey.currentContext;
+    if (navContext != null && navContext.mounted) {
+      showUpdateDialog(
+        navContext,
+        info,
+        onNotNow: _recordUpdateCheck,
+        onDownload: _recordUpdateCheck,
+      );
+    }
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final t = context.t;
     final theme = Theme.of(context);
     final index = _calculateSelectedIndex(context);
     final me = ref.watch(loggedUserProvider).value;
     final imageCache = ref.watch(extensionImageCacheProvider);
     final avatarUrl = me?.getUserAvatar(quality: CoverArtQuality.small);
+    final updateInfo = switch (ref.watch(updateCheckerProvider)) {
+      AsyncData(value: UpdateResultAvailable(:final info)) => info,
+      _ => null,
+    };
     const appicon = CircleAvatar(
       foregroundImage: AssetImage('assets/icon.png'),
     );
 
     return NavigationDrawer(
-      onDestinationSelected: (index) {
-        _onItemTapped(index, context);
-      },
+      onDestinationSelected: (index) => _onItemTapped(index),
       selectedIndex: index,
       children: [
         DrawerHeader(
@@ -159,12 +188,32 @@ class MainDrawer extends ConsumerWidget {
         ),
         const Divider(),
         AboutListTile(
-          icon: const Icon(Icons.info),
+          icon: updateInfo == null
+              ? const Icon(Icons.info)
+              : const Badge(child: Icon(Icons.info)),
           applicationIcon: appicon,
           applicationName: kPackageName,
           applicationVersion: kPackageVersion,
           applicationLegalese: '\u{a9} 2025 r52',
           aboutBoxChildren: [
+            if (updateInfo != null) ...[
+              Builder(
+                builder: (dialogContext) {
+                  return Align(
+                    alignment: Alignment.centerLeft,
+                    child: FilledButton.tonalIcon(
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop();
+                        _showAvailableUpdateDialog(updateInfo);
+                      },
+                      icon: const Icon(Icons.system_update),
+                      label: Text(t.updates.updateAvailableTitle),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 4),
+            ],
             const SizedBox(height: 4),
             const Text('Flutter: $kFlutterFrameworkVersion'),
             const SizedBox(height: 4),

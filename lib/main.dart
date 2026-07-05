@@ -122,28 +122,35 @@ class App extends HookConsumerWidget {
     final config = ref.watch(gagakuSettingsProvider);
     final updateResult = ref.watch(updateCheckerProvider);
 
-    // Trigger dialog when an update is available.
+    Future<void> recordUpdateCheck() async {
+      final config = ref.read(gagakuSettingsProvider);
+      final updatedConfig = config.copyWith(
+        lastUpdateCheck: ref.read(updateCheckerNowProvider)(),
+      );
+      await ref.run((tsx) async {
+        return tsx.get(gagakuSettingsProvider.notifier).save(updatedConfig);
+      });
+    }
+
+    // Surface updates without blocking startup.
     useEffect(() {
       switch (updateResult) {
         case AsyncData(value: UpdateResultAvailable(:final info)):
           WidgetsBinding.instance.addPostFrameCallback((_) {
             final navContext = rootNavigatorKey.currentContext;
             if (navContext != null && navContext.mounted) {
-              showUpdateDialog(navContext, info);
+              showUpdateSnackBar(
+                navContext,
+                info,
+                onDismissed: recordUpdateCheck,
+                onNotNow: recordUpdateCheck,
+                onDownload: recordUpdateCheck,
+              );
             }
           });
-        case AsyncData(value: UpdateResultUpToDate(checked: true)) ||
-            AsyncData(value: UpdateResultIgnored()):
-          Future.delayed(Duration.zero, () async {
-            final updatedConfig = config.copyWith(
-              lastUpdateCheck: DateTime.now(),
-            );
-            ref.run((tsx) async {
-              return tsx
-                  .get(gagakuSettingsProvider.notifier)
-                  .save(updatedConfig);
-            });
-          });
+        case AsyncData(value: final result)
+            when shouldRecordUpdateCheck(result):
+          Future.delayed(Duration.zero, recordUpdateCheck);
         default:
           break;
       }
