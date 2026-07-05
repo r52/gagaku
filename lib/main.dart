@@ -122,6 +122,16 @@ class App extends HookConsumerWidget {
     final config = ref.watch(gagakuSettingsProvider);
     final updateResult = ref.watch(updateCheckerProvider);
 
+    Future<void> recordUpdateCheck() async {
+      final config = ref.read(gagakuSettingsProvider);
+      final updatedConfig = config.copyWith(
+        lastUpdateCheck: ref.read(updateCheckerNowProvider)(),
+      );
+      await ref.run((tsx) async {
+        return tsx.get(gagakuSettingsProvider.notifier).save(updatedConfig);
+      });
+    }
+
     // Trigger dialog when an update is available.
     useEffect(() {
       switch (updateResult) {
@@ -129,21 +139,17 @@ class App extends HookConsumerWidget {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             final navContext = rootNavigatorKey.currentContext;
             if (navContext != null && navContext.mounted) {
-              showUpdateDialog(navContext, info);
+              showUpdateDialog(
+                navContext,
+                info,
+                onNotNow: recordUpdateCheck,
+                onDownload: recordUpdateCheck,
+              );
             }
           });
-        case AsyncData(value: UpdateResultUpToDate(checked: true)) ||
-            AsyncData(value: UpdateResultIgnored()):
-          Future.delayed(Duration.zero, () async {
-            final updatedConfig = config.copyWith(
-              lastUpdateCheck: DateTime.now(),
-            );
-            ref.run((tsx) async {
-              return tsx
-                  .get(gagakuSettingsProvider.notifier)
-                  .save(updatedConfig);
-            });
-          });
+        case AsyncData(value: final result)
+            when shouldRecordUpdateCheck(result):
+          Future.delayed(Duration.zero, recordUpdateCheck);
         default:
           break;
       }
