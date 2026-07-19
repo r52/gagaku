@@ -82,7 +82,9 @@ jobs:
 
       - run: flutter pub get
 
-      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: |
+          dart run build_runner build --delete-conflicting-outputs
+          dart run slang
 
       # - working-directory: extension/
       #   run: |

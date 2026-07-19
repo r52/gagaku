@@ -2,6 +2,7 @@ targets:
   $default:
     builders:
       slang_build_runner:
+        enabled: false
         options:
           base_locale: en
           fallback_strategy: base_locale
@@ -22,7 +23,7 @@ builders:
     build_extensions: { ".dart": [".dart_xxx"] }
     auto_apply: all_packages
 
-global_options: 
+global_options:
   freezed:
     runs_before:
       - riverpod_generator
