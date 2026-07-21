@@ -37,8 +37,11 @@ List<RouteBase> get $appRoutes => [
   $installExtensionsRoute,
 ];
 
-RouteBase get $appSettingsRoute =>
-    GoRouteData.$route(path: '/config', factory: $AppSettingsRoute._fromState);
+RouteBase get $appSettingsRoute => GoRouteData.$route(
+  path: '/config',
+  hasOverriddenOnExit: false,
+  factory: $AppSettingsRoute._fromState,
+);
 
 mixin $AppSettingsRoute on GoRouteData {
   static AppSettingsRoute _fromState(GoRouterState state) =>
@@ -63,6 +66,7 @@ mixin $AppSettingsRoute on GoRouteData {
 
 RouteBase get $localLibraryHomeRoute => GoRouteData.$route(
   path: '/local',
+  hasOverriddenOnExit: false,
   factory: $LocalLibraryHomeRoute._fromState,
 );
 
@@ -90,21 +94,29 @@ mixin $LocalLibraryHomeRoute on GoRouteData {
 RouteBase get $mangaDexHomeRouteData => ShellRouteData.$route(
   factory: $MangaDexHomeRouteDataExtension._fromState,
   routes: [
-    GoRouteData.$route(path: '/', factory: $MangaDexFrontRoute._fromState),
+    GoRouteData.$route(
+      path: '/',
+      hasOverriddenOnExit: false,
+      factory: $MangaDexFrontRoute._fromState,
+    ),
     GoRouteData.$route(
       path: '/titles/feed',
+      hasOverriddenOnExit: false,
       factory: $MangaDexChapterFeedRoute._fromState,
     ),
     GoRouteData.$route(
       path: '/titles/follows',
+      hasOverriddenOnExit: false,
       factory: $MangaDexLibraryRoute._fromState,
     ),
     GoRouteData.$route(
       path: '/my/lists',
+      hasOverriddenOnExit: false,
       factory: $MangaDexListsRoute._fromState,
     ),
     GoRouteData.$route(
       path: '/my/history',
+      hasOverriddenOnExit: false,
       factory: $MangaDexHistoryFeedRoute._fromState,
     ),
   ],
@@ -222,6 +234,7 @@ mixin $MangaDexHistoryFeedRoute on GoRouteData {
 
 RouteBase get $mangaDexReaderRoute => GoRouteData.$route(
   path: '/chapter/:chapterId',
+  hasOverriddenOnExit: false,
   factory: $MangaDexReaderRoute._fromState,
 );
 
@@ -256,6 +269,7 @@ mixin $MangaDexReaderRoute on GoRouteData {
 
 RouteBase get $mangaDexRecentFeedRoute => GoRouteData.$route(
   path: '/titles/recent',
+  hasOverriddenOnExit: false,
   factory: $MangaDexRecentFeedRoute._fromState,
 );
 
@@ -282,6 +296,7 @@ mixin $MangaDexRecentFeedRoute on GoRouteData {
 
 RouteBase get $mangaDexSearchRoute => GoRouteData.$route(
   path: '/titles',
+  hasOverriddenOnExit: false,
   factory: $MangaDexSearchRoute._fromState,
 );
 
@@ -351,6 +366,7 @@ bool _$boolConverter(String value) {
 
 RouteBase get $mangaDexTagViewRoute => GoRouteData.$route(
   path: '/tag/:tagId',
+  hasOverriddenOnExit: false,
   factory: $MangaDexTagViewRoute._fromState,
 );
 
@@ -391,6 +407,7 @@ mixin $MangaDexTagViewRoute on GoRouteData {
 
 RouteBase get $mangaDexTagViewAltRoute => GoRouteData.$route(
   path: '/tag/:tagId/:name',
+  hasOverriddenOnExit: false,
   factory: $MangaDexTagViewAltRoute._fromState,
 );
 
@@ -432,6 +449,7 @@ mixin $MangaDexTagViewAltRoute on GoRouteData {
 
 RouteBase get $mangaDexMangaViewRoute => GoRouteData.$route(
   path: '/title/:mangaId',
+  hasOverriddenOnExit: false,
   factory: $MangaDexMangaViewRoute._fromState,
 );
 
@@ -472,6 +490,7 @@ mixin $MangaDexMangaViewRoute on GoRouteData {
 
 RouteBase get $mangaDexMangaViewAltRoute => GoRouteData.$route(
   path: '/title/:mangaId/:name',
+  hasOverriddenOnExit: false,
   factory: $MangaDexMangaViewAltRoute._fromState,
 );
 
@@ -513,6 +532,7 @@ mixin $MangaDexMangaViewAltRoute on GoRouteData {
 
 RouteBase get $mangaDexCreateListRoute => GoRouteData.$route(
   path: '/create/list',
+  hasOverriddenOnExit: false,
   factory: $MangaDexCreateListRoute._fromState,
 );
 
@@ -539,6 +559,7 @@ mixin $MangaDexCreateListRoute on GoRouteData {
 
 RouteBase get $mangaDexEditListRoute => GoRouteData.$route(
   path: '/list/edit/:listId',
+  hasOverriddenOnExit: false,
   factory: $MangaDexEditListRoute._fromState,
 );
 
@@ -579,6 +600,7 @@ mixin $MangaDexEditListRoute on GoRouteData {
 
 RouteBase get $mangaDexListViewRoute => GoRouteData.$route(
   path: '/list/:listId',
+  hasOverriddenOnExit: false,
   factory: $MangaDexListViewRoute._fromState,
 );
 
@@ -608,6 +630,7 @@ mixin $MangaDexListViewRoute on GoRouteData {
 
 RouteBase get $mangaDexListViewAltRoute => GoRouteData.$route(
   path: '/list/:listId/:name',
+  hasOverriddenOnExit: false,
   factory: $MangaDexListViewAltRoute._fromState,
 );
 
@@ -641,6 +664,7 @@ mixin $MangaDexListViewAltRoute on GoRouteData {
 
 RouteBase get $mangaDexCreatorViewRoute => GoRouteData.$route(
   path: '/author/:creatorId',
+  hasOverriddenOnExit: false,
   factory: $MangaDexCreatorViewRoute._fromState,
 );
 
@@ -675,6 +699,7 @@ mixin $MangaDexCreatorViewRoute on GoRouteData {
 
 RouteBase get $mangaDexCreatorViewAltRoute => GoRouteData.$route(
   path: '/author/:creatorId/:name',
+  hasOverriddenOnExit: false,
   factory: $MangaDexCreatorViewAltRoute._fromState,
 );
 
@@ -711,6 +736,7 @@ mixin $MangaDexCreatorViewAltRoute on GoRouteData {
 
 RouteBase get $mangaDexGroupViewRoute => GoRouteData.$route(
   path: '/group/:groupId',
+  hasOverriddenOnExit: false,
   factory: $MangaDexGroupViewRoute._fromState,
 );
 
@@ -745,6 +771,7 @@ mixin $MangaDexGroupViewRoute on GoRouteData {
 
 RouteBase get $mangaDexGroupViewAltRoute => GoRouteData.$route(
   path: '/group/:groupId/:name',
+  hasOverriddenOnExit: false,
   factory: $MangaDexGroupViewAltRoute._fromState,
 );
 
@@ -781,6 +808,7 @@ mixin $MangaDexGroupViewAltRoute on GoRouteData {
 
 RouteBase get $mangaDexGlobalFeedRoute => GoRouteData.$route(
   path: '/titles/latest',
+  hasOverriddenOnExit: false,
   factory: $MangaDexGlobalFeedRoute._fromState,
 );
 
@@ -805,8 +833,11 @@ mixin $MangaDexGlobalFeedRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
-RouteBase get $mangaDexLoginRoute =>
-    GoRouteData.$route(path: '/login', factory: $MangaDexLoginRoute._fromState);
+RouteBase get $mangaDexLoginRoute => GoRouteData.$route(
+  path: '/login',
+  hasOverriddenOnExit: false,
+  factory: $MangaDexLoginRoute._fromState,
+);
 
 mixin $MangaDexLoginRoute on GoRouteData {
   static MangaDexLoginRoute _fromState(GoRouterState state) =>
@@ -834,18 +865,22 @@ RouteBase get $webSourceHomeRouteData => ShellRouteData.$route(
   routes: [
     GoRouteData.$route(
       path: '/extensions',
+      hasOverriddenOnExit: false,
       factory: $WebSourceFrontRoute._fromState,
     ),
     GoRouteData.$route(
       path: '/extensions/updates',
+      hasOverriddenOnExit: false,
       factory: $WebSourceUpdatesRoute._fromState,
     ),
     GoRouteData.$route(
       path: '/extensions/saved',
+      hasOverriddenOnExit: false,
       factory: $WebSourceFavoritesRoute._fromState,
     ),
     GoRouteData.$route(
       path: '/extensions/history',
+      hasOverriddenOnExit: false,
       factory: $WebSourceHistoryRoute._fromState,
     ),
   ],
@@ -942,6 +977,7 @@ mixin $WebSourceHistoryRoute on GoRouteData {
 
 RouteBase get $extensionHomeRoute => GoRouteData.$route(
   path: '/extensions/:sourceId/home',
+  hasOverriddenOnExit: false,
   factory: $ExtensionHomeRoute._fromState,
 );
 
@@ -984,6 +1020,7 @@ mixin $ExtensionHomeRoute on GoRouteData {
 
 RouteBase get $webMangaViewRoute => GoRouteData.$route(
   path: '/read/:sourceId/:mangaId',
+  hasOverriddenOnExit: false,
   factory: $WebMangaViewRoute._fromState,
 );
 
@@ -1019,6 +1056,7 @@ mixin $WebMangaViewRoute on GoRouteData {
 
 RouteBase get $proxyWebSourceReaderRoute => GoRouteData.$route(
   path: '/read/:proxy/:code/:chapter/:page',
+  hasOverriddenOnExit: false,
   factory: $ProxyWebSourceReaderRoute._fromState,
 );
 
@@ -1054,6 +1092,7 @@ mixin $ProxyWebSourceReaderRoute on GoRouteData {
 
 RouteBase get $extensionReaderRoute => GoRouteData.$route(
   path: '/read-chapter/:sourceId/:mangaId/:chapterId',
+  hasOverriddenOnExit: false,
   factory: $ExtensionReaderRoute._fromState,
 );
 
@@ -1088,6 +1127,7 @@ mixin $ExtensionReaderRoute on GoRouteData {
 
 RouteBase get $extensionSearchRoute => GoRouteData.$route(
   path: '/extensions/search',
+  hasOverriddenOnExit: false,
   factory: $ExtensionSearchRoute._fromState,
 );
 
@@ -1140,6 +1180,7 @@ mixin $ExtensionSearchRoute on GoRouteData {
 
 RouteBase get $addRepoRoute => GoRouteData.$route(
   path: '/extensions/addrepo',
+  hasOverriddenOnExit: false,
   factory: $AddRepoRoute._fromState,
 );
 
@@ -1173,6 +1214,7 @@ mixin $AddRepoRoute on GoRouteData {
 
 RouteBase get $installExtensionsRoute => GoRouteData.$route(
   path: '/extensions/install',
+  hasOverriddenOnExit: false,
   factory: $InstallExtensionsRoute._fromState,
 );
 
