@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_spinbox/flutter_spinbox.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/web/extension_stepper.dart';
 import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
@@ -578,7 +579,7 @@ class ToggleRowBuilder extends HookConsumerWidget {
   }
 }
 
-class StepperRowBuilder extends HookConsumerWidget {
+class StepperRowBuilder extends ConsumerStatefulWidget {
   const StepperRowBuilder({
     super.key,
     required this.source,
@@ -589,22 +590,70 @@ class StepperRowBuilder extends HookConsumerWidget {
   final StepperRowElement element;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentVal = useState(element.value);
+  ConsumerState<StepperRowBuilder> createState() => _StepperRowBuilderState();
+}
+
+class _StepperRowBuilderState extends ConsumerState<StepperRowBuilder> {
+  late num _currentValue;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentValue = widget.element.value;
+    _logInvalidConfiguration();
+  }
+
+  @override
+  void didUpdateWidget(covariant StepperRowBuilder oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.element.value != widget.element.value) {
+      _currentValue = widget.element.value;
+    }
+    if (oldWidget.source.id != widget.source.id ||
+        oldWidget.element != widget.element) {
+      _logInvalidConfiguration();
+    }
+  }
+
+  void _logInvalidConfiguration() {
+    final source = widget.source;
+    final element = widget.element;
+    final isValidConfiguration = PaperbackStepper.isValidConfiguration(
+      value: element.value,
+      minValue: element.minValue,
+      maxValue: element.maxValue,
+      stepValue: element.stepValue,
+    );
+
+    if (!isValidConfiguration) {
+      logger.w(
+        'Invalid Paperback stepper ${element.id} for source ${source.id}: '
+        'value=${element.value}, min=${element.minValue}, '
+        'max=${element.maxValue}, step=${element.stepValue}',
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final source = widget.source;
+    final element = widget.element;
 
     return ComplexSettingBlock(
       title: Text(element.title),
-      child: SpinBox(
-        value: currentVal.value.toDouble(),
-        min: element.minValue.toDouble(),
-        max: element.maxValue.toDouble(),
-        step: element.stepValue.toDouble(),
+      child: PaperbackStepper(
+        value: _currentValue,
+        minValue: element.minValue,
+        maxValue: element.maxValue,
+        stepValue: element.stepValue,
+        loopOver: element.loopOver,
         onChanged: (value) {
           ref.read(extensionSourceProvider(source.id).notifier).callBinding(
             element.onValueChange,
             [value],
           );
-          currentVal.value = value;
+          setState(() => _currentValue = value);
         },
       ),
     );

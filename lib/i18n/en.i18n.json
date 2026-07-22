@@ -40,7 +40,9 @@
     "selected": "$count Selected",
     "unknown": "Unknown",
     "sureContinue": "Are you sure you want to continue?",
-    "scrollToTop": "Scroll to top"
+    "scrollToTop": "Scroll to top",
+    "decrease": "Decrease",
+    "increase": "Increase"
   },
   "errors": {
     "generic": "Error",

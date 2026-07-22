@@ -235,6 +235,12 @@ class Translations$ui$en {
 
 	/// en: 'Scroll to top'
 	String get scrollToTop => 'Scroll to top';
+
+	/// en: 'Decrease'
+	String get decrease => 'Decrease';
+
+	/// en: 'Increase'
+	String get increase => 'Increase';
 }
 
 // Path: errors
@@ -1979,6 +1985,8 @@ extension on Translations {
 			'ui.unknown' => 'Unknown',
 			'ui.sureContinue' => 'Are you sure you want to continue?',
 			'ui.scrollToTop' => 'Scroll to top',
+			'ui.decrease' => 'Decrease',
+			'ui.increase' => 'Increase',
 			'errors.generic' => 'Error',
 			'errors.noresults' => 'No results',
 			'errors.notitles' => 'No titles',
