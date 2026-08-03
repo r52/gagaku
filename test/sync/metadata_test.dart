@@ -18,8 +18,10 @@ void main() {
       lastBaselinePayloadHash: 'sha256:baseline',
       lastAppliedRevision: 'revision-applied',
       lastAppliedPayloadHash: 'sha256:applied',
+      lastAppliedAt: DateTime.utc(2026, 1, 2, 3, 4, 5),
       lastPublishedRevision: 'revision-published',
       lastPublishedPayloadHash: 'sha256:published',
+      lastPublishedAt: DateTime.utc(2026, 1, 2, 3, 5, 6),
       retryPending: true,
       lastError: 'synthetic unavailable',
     );

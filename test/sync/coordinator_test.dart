@@ -68,6 +68,40 @@ void main() {
     expect(head.payload, _payload('changed'));
   });
 
+  test('device name changes publish without a logical data change', () async {
+    final store = MemorySyncStore();
+    final repository = _repository(store, 'device-a');
+    final first = await repository.publish(_payload('same'));
+    final metadata = _metadata(
+      'device-a',
+      lastSeen: first.snapshot.seen,
+      baselineHash: first.snapshot.payloadHash,
+    );
+    final changes = StreamController<Object?>.broadcast(sync: true);
+    final data = _FakeData(_payload('same'));
+    final coordinator = SyncCoordinator(
+      repository: repository,
+      metadataStore: metadata,
+      exportData: data.export,
+      importData: data.import,
+      entityChanges: changes.stream,
+      operationTimeout: const Duration(seconds: 2),
+    );
+    addTearDown(() async {
+      await coordinator.dispose();
+      await changes.close();
+    });
+
+    await coordinator.start();
+    await coordinator.renameDevice('Fictional Tablet');
+
+    final head = (await repository.discover()).deviceHeads['device-a']!;
+    expect(head.deviceSequence, 2);
+    expect(head.payload, _payload('same'));
+    expect(head.extra['deviceName'], 'Fictional Tablet');
+    expect(metadata.state.deviceName, 'Fictional Tablet');
+  });
+
   test(
     'operations separated by the quiet period publish independently',
     () async {

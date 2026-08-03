@@ -6,6 +6,7 @@ import 'package:gagaku/sync/repository.dart';
 
 typedef SyncExportData = Future<Map<String, dynamic>> Function();
 typedef SyncImportData = Future<void> Function(Map<String, dynamic> payload);
+typedef SyncCoordinatorNow = DateTime Function();
 
 enum SyncCoordinatorPhase {
   disabled,
@@ -45,7 +46,8 @@ final class SyncCoordinator {
     required this.entityChanges,
     this.debounceDuration = const Duration(milliseconds: 1500),
     this.operationTimeout = const Duration(seconds: 5),
-  });
+    SyncCoordinatorNow? now,
+  }) : _now = now ?? DateTime.now;
 
   final SyncRepository repository;
   final SyncMetadataStore metadataStore;
@@ -54,6 +56,7 @@ final class SyncCoordinator {
   final Stream<Object?> entityChanges;
   final Duration debounceDuration;
   final Duration operationTimeout;
+  final SyncCoordinatorNow _now;
 
   final StreamController<SyncCoordinatorStatus> _statuses =
       StreamController.broadcast();
@@ -117,6 +120,22 @@ final class SyncCoordinator {
 
   Future<void> resolveFork(SyncSnapshot selected) async {
     _requestedResolution = selected;
+    await requestSync();
+  }
+
+  Future<void> renameDevice(String name) async {
+    final state = _state;
+    if (state == null || !state.enabled || _disposed) {
+      throw StateError('Sync coordinator is not active');
+    }
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) {
+      throw ArgumentError.value(name, 'name', 'must not be empty');
+    }
+    await _generationTail;
+    state.deviceName = trimmed;
+    repository.deviceName = trimmed;
+    await metadataStore.write(state);
     await requestSync();
   }
 
@@ -188,6 +207,7 @@ final class SyncCoordinator {
     }
 
     final discovery = await repository.discover();
+    final identityOutdated = _identityOutdated(discovery);
     final localDirty =
         _isDirty(state) ||
         (state.lastBaselinePayloadHash != null &&
@@ -213,6 +233,15 @@ final class SyncCoordinator {
         }
       case CanonicalSyncHead(:final head):
         if (head.payloadHash == payloadHash) {
+          if (identityOutdated) {
+            await _publish(
+              payload,
+              SyncClock.join([state.lastSeen, head.seen]),
+              startGeneration,
+              branch: false,
+            );
+            return;
+          }
           await _recordCanonical(
             head,
             startGeneration,
@@ -223,6 +252,7 @@ final class SyncCoordinator {
         }
         if (!localDirty) {
           await _apply(head, startGeneration);
+          if (identityOutdated) _passRequested = true;
           return;
         }
         final remoteAdvanced = _remoteAdvanced(state, head.seen);
@@ -272,6 +302,14 @@ final class SyncCoordinator {
         _requestedResolution = null;
         await _resolveFork(requested, heads, payloadHash, startGeneration);
     }
+  }
+
+  bool _identityOutdated(SyncDiscovery discovery) {
+    final name = repository.deviceName.trim();
+    if (name.isEmpty) return false;
+    final published =
+        discovery.deviceHeads[repository.deviceId]?.extra['deviceName'];
+    return published is! String || published.trim() != name;
   }
 
   Future<void> _publish(
@@ -356,12 +394,14 @@ final class SyncCoordinator {
     if (applied) {
       state
         ..lastAppliedRevision = head.revisionId
-        ..lastAppliedPayloadHash = head.payloadHash;
+        ..lastAppliedPayloadHash = head.payloadHash
+        ..lastAppliedAt = _now().toUtc();
     }
     if (published) {
       state
         ..lastPublishedRevision = head.revisionId
-        ..lastPublishedPayloadHash = head.payloadHash;
+        ..lastPublishedPayloadHash = head.payloadHash
+        ..lastPublishedAt = _now().toUtc();
     }
     await metadataStore.write(state);
     if (state.dirtyGeneration > generation) _passRequested = true;
@@ -383,8 +423,13 @@ final class SyncCoordinator {
       ..lastBaselinePayloadHash = snapshot.payloadHash
       ..lastPublishedRevision = snapshot.revisionId
       ..lastPublishedPayloadHash = snapshot.payloadHash
+      ..lastPublishedAt = _now().toUtc()
       ..lastPublishedGeneration = generation;
-    if (appliedRevision != null) state.lastAppliedRevision = appliedRevision;
+    if (appliedRevision != null) {
+      state
+        ..lastAppliedRevision = appliedRevision
+        ..lastAppliedAt = _now().toUtc();
+    }
     if (appliedHash != null) state.lastAppliedPayloadHash = appliedHash;
     await metadataStore.write(state);
     if (state.dirtyGeneration > generation) _passRequested = true;

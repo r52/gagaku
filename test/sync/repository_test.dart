@@ -85,6 +85,27 @@ void main() {
       );
     });
 
+    test('publishes an optional user-facing device name', () async {
+      final store = MemorySyncStore();
+      final repository = SyncRepository(
+        store: store,
+        profileId: 'profile-fixture',
+        deviceId: 'device-a',
+        deviceName: 'Fictional Tablet',
+        revisionIdFactory: () => 'revision-a1',
+        now: () => DateTime.utc(2026, 1, 2, 3, 4, 5),
+      );
+
+      final publication = await repository.publish(_payload('first'));
+      final discovered = await repository.discover();
+
+      expect(publication.snapshot.extra['deviceName'], 'Fictional Tablet');
+      expect(
+        discovered.deviceHeads['device-a']?.extra['deviceName'],
+        'Fictional Tablet',
+      );
+    });
+
     test('retains only the newest two valid local snapshots', () async {
       final store = MemorySyncStore();
       final repository = _repository(store, 'device-a', [

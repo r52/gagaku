@@ -100,6 +100,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$colors$en colors = Translations$colors$en.internal(_root);
 	late final Translations$cache$en cache = Translations$cache$en.internal(_root);
 	late final Translations$backup$en backup = Translations$backup$en.internal(_root);
+	late final Translations$sync$en sync = Translations$sync$en.internal(_root);
 	late final Translations$chapterFeed$en chapterFeed = Translations$chapterFeed$en.internal(_root);
 	late final Translations$permissions$en permissions = Translations$permissions$en.internal(_root);
 	late final Translations$updates$en updates = Translations$updates$en.internal(_root);
@@ -1321,11 +1322,221 @@ class Translations$backup$en {
 	/// en: 'Database Directory'
 	String get dataLocation => 'Database Directory';
 
-	/// en: 'Changes the directory where gagaku reads and stores its database. Requires app restart to take effect.'
-	String get dataLocSub => 'Changes the directory where gagaku reads and stores its database.\nRequires app restart to take effect.';
+	/// en: 'Moves the live ObjectBox database after restart. This is not safe for concurrent multi-device synchronization; use Database Sync instead.'
+	String get dataLocSub => 'Moves the live ObjectBox database after restart. This is not safe for concurrent multi-device synchronization; use Database Sync instead.';
 
 	/// en: 'Default'
 	String get dataLocDefault => 'Default';
+}
+
+// Path: sync
+class Translations$sync$en {
+	Translations$sync$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Database Sync'
+	String get title => 'Database Sync';
+
+	/// en: 'Automatically synchronizes all ObjectBox data through storage you control. Hive settings, credentials, local-library paths, and caches remain device-local.'
+	String get description => 'Automatically synchronizes all ObjectBox data through storage you control. Hive settings, credentials, local-library paths, and caches remain device-local.';
+
+	/// en: 'Disabled'
+	String get disabled => 'Disabled';
+
+	/// en: 'Configured'
+	String get configured => 'Configured';
+
+	/// en: 'Filesystem directory'
+	String get filesystem => 'Filesystem directory';
+
+	/// en: 'Create New Profile'
+	String get create => 'Create New Profile';
+
+	/// en: 'Choose an empty directory and publish this device's data.'
+	String get createSub => 'Choose an empty directory and publish this device\'s data.';
+
+	/// en: 'Join Existing Profile'
+	String get join => 'Join Existing Profile';
+
+	/// en: 'Choose a directory containing a Gagaku sync profile.'
+	String get joinSub => 'Choose a directory containing a Gagaku sync profile.';
+
+	/// en: 'Device Name'
+	String get deviceName => 'Device Name';
+
+	/// en: 'Gagaku Device'
+	String get defaultDeviceName => 'Gagaku Device';
+
+	/// en: 'Save'
+	String get save => 'Save';
+
+	/// en: 'Sync Status'
+	String get status => 'Sync Status';
+
+	/// en: 'Disabled'
+	String get statusDisabled => 'Disabled';
+
+	/// en: 'Initializing'
+	String get statusInitializing => 'Initializing';
+
+	/// en: 'Synchronized'
+	String get statusClean => 'Synchronized';
+
+	/// en: 'Local changes pending'
+	String get statusPending => 'Local changes pending';
+
+	/// en: 'Publishing'
+	String get statusPublishing => 'Publishing';
+
+	/// en: 'Applying remote data'
+	String get statusPulling => 'Applying remote data';
+
+	/// en: 'Storage unavailable; retry pending'
+	String get statusOffline => 'Storage unavailable; retry pending';
+
+	/// en: 'Incompatible or corrupt profile'
+	String get statusIncompatible => 'Incompatible or corrupt profile';
+
+	/// en: 'No valid snapshot found'
+	String get statusNoValidSnapshot => 'No valid snapshot found';
+
+	/// en: 'Conflict requires resolution'
+	String get statusForked => 'Conflict requires resolution';
+
+	/// en: 'Synchronized with cleanup warning'
+	String get statusCleanupWarning => 'Synchronized with cleanup warning';
+
+	/// en: 'Stopped'
+	String get statusDisposed => 'Stopped';
+
+	/// en: 'Profile: $id'
+	String profileId({required Object id}) => 'Profile: ${id}';
+
+	/// en: 'Device: $id'
+	String deviceId({required Object id}) => 'Device: ${id}';
+
+	/// en: 'Directory: $path'
+	String location({required Object path}) => 'Directory: ${path}';
+
+	/// en: 'Last pull: $time'
+	String lastPull({required Object time}) => 'Last pull: ${time}';
+
+	/// en: 'Last publication: $time'
+	String lastPublish({required Object time}) => 'Last publication: ${time}';
+
+	/// en: 'Never'
+	String get never => 'Never';
+
+	/// en: '$count local change(s) pending'
+	String pending({required Object count}) => '${count} local change(s) pending';
+
+	/// en: 'Error: $message'
+	String error({required Object message}) => 'Error: ${message}';
+
+	/// en: 'Sync Now'
+	String get syncNow => 'Sync Now';
+
+	/// en: 'Retry Now'
+	String get retryNow => 'Retry Now';
+
+	/// en: 'Resolve Conflict'
+	String get conflict => 'Resolve Conflict';
+
+	/// en: 'Choose one complete snapshot. Timestamps are informational and never decide the winner.'
+	String get conflictSub => 'Choose one complete snapshot. Timestamps are informational and never decide the winner.';
+
+	/// en: 'Device: $device'
+	String branchDevice({required Object device}) => 'Device: ${device}';
+
+	/// en: 'Revision: $revision'
+	String branchRevision({required Object revision}) => 'Revision: ${revision}';
+
+	/// en: 'Created: $time'
+	String branchCreated({required Object time}) => 'Created: ${time}';
+
+	/// en: 'Payload: $hash'
+	String branchHash({required Object hash}) => 'Payload: ${hash}';
+
+	/// en: 'Use This Snapshot'
+	String get useBranch => 'Use This Snapshot';
+
+	/// en: 'Use this complete snapshot and publish a resolution that supersedes every branch?'
+	String get useBranchConfirm => 'Use this complete snapshot and publish a resolution that supersedes every branch?';
+
+	/// en: 'Export Backup'
+	String get exportBranch => 'Export Backup';
+
+	/// en: 'Conflict snapshot exported'
+	String get exportSuccess => 'Conflict snapshot exported';
+
+	/// en: 'Known Devices'
+	String get devices => 'Known Devices';
+
+	/// en: 'This device'
+	String get thisDevice => 'This device';
+
+	/// en: 'Retire Device'
+	String get retire => 'Retire Device';
+
+	/// en: 'Delete this device's remote snapshot namespace? An offline installation may recreate it later.'
+	String get retireConfirm => 'Delete this device\'s remote snapshot namespace? An offline installation may recreate it later.';
+
+	/// en: 'Disable Sync'
+	String get disable => 'Disable Sync';
+
+	/// en: 'Stops automatic synchronization but keeps this device identity and profile configuration.'
+	String get disableSub => 'Stops automatic synchronization but keeps this device identity and profile configuration.';
+
+	/// en: 'Disable synchronization on this device without deleting remote data?'
+	String get disableConfirm => 'Disable synchronization on this device without deleting remote data?';
+
+	/// en: 'Resume Sync'
+	String get resume => 'Resume Sync';
+
+	/// en: 'Reconnect using this device's existing identity and profile configuration.'
+	String get resumeSub => 'Reconnect using this device\'s existing identity and profile configuration.';
+
+	/// en: 'Forget Sync Configuration'
+	String get forget => 'Forget Sync Configuration';
+
+	/// en: 'Keep remote data but remove this device's saved profile and identity.'
+	String get forgetSub => 'Keep remote data but remove this device\'s saved profile and identity.';
+
+	/// en: 'Forget this device's sync configuration? Joining later will create a new device identity; remote data will not be deleted.'
+	String get forgetConfirm => 'Forget this device\'s sync configuration? Joining later will create a new device identity; remote data will not be deleted.';
+
+	/// en: 'Repair / Clean Remote Files'
+	String get repair => 'Repair / Clean Remote Files';
+
+	/// en: 'Delete invalid snapshots and snapshots beyond the newest two for every device in this validated profile?'
+	String get repairConfirm => 'Delete invalid snapshots and snapshots beyond the newest two for every device in this validated profile?';
+
+	/// en: 'Delete Remote Profile'
+	String get reset => 'Delete Remote Profile';
+
+	/// en: 'Permanently delete every Gagaku snapshot and profile metadata in this validated sync directory?'
+	String get resetConfirm => 'Permanently delete every Gagaku snapshot and profile metadata in this validated sync directory?';
+
+	/// en: 'Sync operation completed'
+	String get operationSuccess => 'Sync operation completed';
+
+	/// en: 'Deleted $count remote object(s)'
+	String deletedCount({required Object count}) => 'Deleted ${count} remote object(s)';
+
+	/// en: '$count object(s) could not be deleted'
+	String failureCount({required Object count}) => '${count} object(s) could not be deleted';
+
+	/// en: 'Sync operation failed: $error'
+	String operationFailed({required Object error}) => 'Sync operation failed: ${error}';
+
+	/// en: 'Choose a filesystem directory'
+	String get directoryRequired => 'Choose a filesystem directory';
+
+	/// en: 'Working…'
+	String get busy => 'Working…';
 }
 
 // Path: chapterFeed
@@ -2412,8 +2623,77 @@ extension on Translations {
 			'backup.restoreCancelled' => 'Backup restore cancelled',
 			'backup.restoreFail' => 'Backup restore failed',
 			'backup.dataLocation' => 'Database Directory',
-			'backup.dataLocSub' => 'Changes the directory where gagaku reads and stores its database.\nRequires app restart to take effect.',
+			'backup.dataLocSub' => 'Moves the live ObjectBox database after restart. This is not safe for concurrent multi-device synchronization; use Database Sync instead.',
 			'backup.dataLocDefault' => 'Default',
+			'sync.title' => 'Database Sync',
+			'sync.description' => 'Automatically synchronizes all ObjectBox data through storage you control. Hive settings, credentials, local-library paths, and caches remain device-local.',
+			'sync.disabled' => 'Disabled',
+			'sync.configured' => 'Configured',
+			'sync.filesystem' => 'Filesystem directory',
+			'sync.create' => 'Create New Profile',
+			'sync.createSub' => 'Choose an empty directory and publish this device\'s data.',
+			'sync.join' => 'Join Existing Profile',
+			'sync.joinSub' => 'Choose a directory containing a Gagaku sync profile.',
+			'sync.deviceName' => 'Device Name',
+			'sync.defaultDeviceName' => 'Gagaku Device',
+			'sync.save' => 'Save',
+			'sync.status' => 'Sync Status',
+			'sync.statusDisabled' => 'Disabled',
+			'sync.statusInitializing' => 'Initializing',
+			'sync.statusClean' => 'Synchronized',
+			'sync.statusPending' => 'Local changes pending',
+			'sync.statusPublishing' => 'Publishing',
+			'sync.statusPulling' => 'Applying remote data',
+			'sync.statusOffline' => 'Storage unavailable; retry pending',
+			'sync.statusIncompatible' => 'Incompatible or corrupt profile',
+			'sync.statusNoValidSnapshot' => 'No valid snapshot found',
+			'sync.statusForked' => 'Conflict requires resolution',
+			'sync.statusCleanupWarning' => 'Synchronized with cleanup warning',
+			'sync.statusDisposed' => 'Stopped',
+			'sync.profileId' => ({required Object id}) => 'Profile: ${id}',
+			'sync.deviceId' => ({required Object id}) => 'Device: ${id}',
+			'sync.location' => ({required Object path}) => 'Directory: ${path}',
+			'sync.lastPull' => ({required Object time}) => 'Last pull: ${time}',
+			'sync.lastPublish' => ({required Object time}) => 'Last publication: ${time}',
+			'sync.never' => 'Never',
+			'sync.pending' => ({required Object count}) => '${count} local change(s) pending',
+			'sync.error' => ({required Object message}) => 'Error: ${message}',
+			'sync.syncNow' => 'Sync Now',
+			'sync.retryNow' => 'Retry Now',
+			'sync.conflict' => 'Resolve Conflict',
+			'sync.conflictSub' => 'Choose one complete snapshot. Timestamps are informational and never decide the winner.',
+			'sync.branchDevice' => ({required Object device}) => 'Device: ${device}',
+			'sync.branchRevision' => ({required Object revision}) => 'Revision: ${revision}',
+			'sync.branchCreated' => ({required Object time}) => 'Created: ${time}',
+			'sync.branchHash' => ({required Object hash}) => 'Payload: ${hash}',
+			'sync.useBranch' => 'Use This Snapshot',
+			_ => null,
+		} ?? switch (path) {
+			'sync.useBranchConfirm' => 'Use this complete snapshot and publish a resolution that supersedes every branch?',
+			'sync.exportBranch' => 'Export Backup',
+			'sync.exportSuccess' => 'Conflict snapshot exported',
+			'sync.devices' => 'Known Devices',
+			'sync.thisDevice' => 'This device',
+			'sync.retire' => 'Retire Device',
+			'sync.retireConfirm' => 'Delete this device\'s remote snapshot namespace? An offline installation may recreate it later.',
+			'sync.disable' => 'Disable Sync',
+			'sync.disableSub' => 'Stops automatic synchronization but keeps this device identity and profile configuration.',
+			'sync.disableConfirm' => 'Disable synchronization on this device without deleting remote data?',
+			'sync.resume' => 'Resume Sync',
+			'sync.resumeSub' => 'Reconnect using this device\'s existing identity and profile configuration.',
+			'sync.forget' => 'Forget Sync Configuration',
+			'sync.forgetSub' => 'Keep remote data but remove this device\'s saved profile and identity.',
+			'sync.forgetConfirm' => 'Forget this device\'s sync configuration? Joining later will create a new device identity; remote data will not be deleted.',
+			'sync.repair' => 'Repair / Clean Remote Files',
+			'sync.repairConfirm' => 'Delete invalid snapshots and snapshots beyond the newest two for every device in this validated profile?',
+			'sync.reset' => 'Delete Remote Profile',
+			'sync.resetConfirm' => 'Permanently delete every Gagaku snapshot and profile metadata in this validated sync directory?',
+			'sync.operationSuccess' => 'Sync operation completed',
+			'sync.deletedCount' => ({required Object count}) => 'Deleted ${count} remote object(s)',
+			'sync.failureCount' => ({required Object count}) => '${count} object(s) could not be deleted',
+			'sync.operationFailed' => ({required Object error}) => 'Sync operation failed: ${error}',
+			'sync.directoryRequired' => 'Choose a filesystem directory',
+			'sync.busy' => 'Working…',
 			'chapterFeed.latestUpdates' => 'Latest Updates',
 			'chapterFeed.updates' => 'Updates',
 			'chapterFeed.updatingFeed' => 'Updating Feed',

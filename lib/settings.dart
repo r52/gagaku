@@ -13,6 +13,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/model/types.dart';
 import 'package:gagaku/settings/convert.dart';
 import 'package:gagaku/settings/refresh.dart';
+import 'package:gagaku/settings/sync.dart';
 import 'package:gagaku/sync/metadata.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hive_ce/hive.dart';
@@ -406,6 +407,7 @@ class AppSettingsPage extends HookConsumerWidget {
                 }
               },
             ),
+            const SyncSettingsSection(),
             HookBuilder(
               builder: (context) {
                 final isLoading = useState(false);
@@ -504,9 +506,8 @@ class AppSettingsPage extends HookConsumerWidget {
             SettingTile(
               title: Text(t.backup.dataLocation, style: titleStyle),
               subtitle: Text(
-                dataLocation.value != null
-                    ? dataLocation.value!
-                    : t.backup.dataLocDefault,
+                '${dataLocation.value ?? t.backup.dataLocDefault}\n'
+                '${t.backup.dataLocSub}',
               ),
               trailing: const Icon(Icons.folder_open),
               onTap: () async {

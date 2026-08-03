@@ -51,6 +51,7 @@ final class SyncRepository {
     required this.store,
     required this.profileId,
     required this.deviceId,
+    this.deviceName = '',
     SyncRevisionIdFactory? revisionIdFactory,
     SyncNow? now,
   }) : _revisionIdFactory = revisionIdFactory ?? const Uuid().v4,
@@ -59,6 +60,7 @@ final class SyncRepository {
   final SyncStore store;
   final String profileId;
   final String deviceId;
+  String deviceName;
   final SyncRevisionIdFactory _revisionIdFactory;
   final SyncNow _now;
 
@@ -204,6 +206,9 @@ final class SyncRepository {
       createdAt: _now().toUtc(),
       seen: seen,
       payload: payload,
+      extra: {
+        if (deviceName.trim().isNotEmpty) 'deviceName': deviceName.trim(),
+      },
     );
 
     await store.create(snapshot.key, SyncSnapshotCodec.encode(snapshot));

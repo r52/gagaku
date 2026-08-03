@@ -18,8 +18,10 @@ final class SyncLocalState {
     this.lastBaselinePayloadHash,
     this.lastAppliedRevision,
     this.lastAppliedPayloadHash,
+    this.lastAppliedAt,
     this.lastPublishedRevision,
     this.lastPublishedPayloadHash,
+    this.lastPublishedAt,
     this.retryPending = false,
     this.lastError,
   });
@@ -36,10 +38,15 @@ final class SyncLocalState {
   String? lastBaselinePayloadHash;
   String? lastAppliedRevision;
   String? lastAppliedPayloadHash;
+  DateTime? lastAppliedAt;
   String? lastPublishedRevision;
   String? lastPublishedPayloadHash;
+  DateTime? lastPublishedAt;
   bool retryPending;
   String? lastError;
+
+  bool get hasConfiguration =>
+      locator.isNotEmpty && profileId.isNotEmpty && deviceId.isNotEmpty;
 
   factory SyncLocalState.fromJson(Map<String, dynamic> json) {
     Map<String, int> readClock(Object? value) {
@@ -61,6 +68,11 @@ final class SyncLocalState {
     String? readOptionalString(String key) =>
         json[key] is String ? json[key] as String : null;
 
+    DateTime? readDate(String key) {
+      final value = readOptionalString(key);
+      return value == null ? null : DateTime.tryParse(value)?.toUtc();
+    }
+
     final dirtyGeneration = readGeneration('dirtyGeneration');
     final lastPublishedGeneration = readGeneration('lastPublishedGeneration');
     return SyncLocalState(
@@ -78,8 +90,10 @@ final class SyncLocalState {
       lastBaselinePayloadHash: readOptionalString('lastBaselinePayloadHash'),
       lastAppliedRevision: readOptionalString('lastAppliedRevision'),
       lastAppliedPayloadHash: readOptionalString('lastAppliedPayloadHash'),
+      lastAppliedAt: readDate('lastAppliedAt'),
       lastPublishedRevision: readOptionalString('lastPublishedRevision'),
       lastPublishedPayloadHash: readOptionalString('lastPublishedPayloadHash'),
+      lastPublishedAt: readDate('lastPublishedAt'),
       retryPending: json['retryPending'] == true,
       lastError: readOptionalString('lastError'),
     );
@@ -98,8 +112,10 @@ final class SyncLocalState {
     'lastBaselinePayloadHash': lastBaselinePayloadHash,
     'lastAppliedRevision': lastAppliedRevision,
     'lastAppliedPayloadHash': lastAppliedPayloadHash,
+    'lastAppliedAt': lastAppliedAt?.toUtc().toIso8601String(),
     'lastPublishedRevision': lastPublishedRevision,
     'lastPublishedPayloadHash': lastPublishedPayloadHash,
+    'lastPublishedAt': lastPublishedAt?.toUtc().toIso8601String(),
     'retryPending': retryPending,
     'lastError': lastError,
   };
