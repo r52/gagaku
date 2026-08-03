@@ -62,7 +62,7 @@ dependencies:
   device_info_plus: ^13.1.0
   super_sliver_list: ^0.4.0
   uuid: ^4.4.0
-  permission_handler: ^12.0.0
+  permission_handler: ^13.0.0
   intl: ^0.20.0
   flutter_inappwebview: ^6.2.0-beta.3
   mime: ^2.0.0
