@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
@@ -491,38 +492,13 @@ base class GagakuBackupDataV2 extends GagakuBackupBase {
   static const _linkCacheKey = "link-cache";
 
   @override
-  Future<void> read(Map<String, dynamic> data) async {
-    await GagakuData().store.runInTransactionAsync(TxMode.write, (store, data) {
-      importExtensionState(store, data);
-      importExtensionSecureState(store, data);
-      importGagakuConfig(store, data);
-      importReaderConfig(store, data);
-      importMangadexConfig(store, data);
-      importMangadexHistory(store, data);
-      importWebReadHistory(store, data);
-      importWebConfigFavoritesHistory(store, data);
-    }, data);
-  }
+  Future<void> read(Map<String, dynamic> data) =>
+      const GagakuDataCodec().import(data);
 
   @override
   Future<String> write(Map<String, dynamic> data) async {
     data[_versionKey] = 2;
-
-    data = await GagakuData().store.runInTransactionAsync(TxMode.write, (
-      store,
-      data,
-    ) {
-      writeExtensionState(store, data);
-      writeExtensionSecureState(store, data);
-      writeGagakuConfig(store, data);
-      writeReaderConfig(store, data);
-      writeMangadexConfig(store, data);
-      writeMangadexHistory(store, data);
-      writeWebReadHistory(store, data);
-      writeWebConfigFavoritesHistory(store, data);
-      return data;
-    }, data);
-
+    data = await const GagakuDataCodec().export(seed: data);
     return json.encode(data);
   }
 
@@ -717,7 +693,68 @@ base class GagakuBackupDataV2 extends GagakuBackupBase {
 
     // fav lists
     data[_webfavoritesKey] = favlists
-        .map((e) => FavoriteListExport.fromList(e))
+        .map((e) => FavoriteListExport.fromList(e).toJson())
         .toList();
+  }
+}
+
+typedef GagakuDataImportRefresh = FutureOr<void> Function();
+
+/// Transactional logical ObjectBox import/export used by backups and sync.
+///
+/// Hive settings and caches are deliberately outside this codec.
+final class GagakuDataCodec {
+  const GagakuDataCodec({this.store});
+
+  final Store? store;
+
+  static const objectBoxEntityTypes = <Type>{
+    GagakuConfig,
+    ReaderConfig,
+    MangaDexConfig,
+    MangaDexHistoryDB,
+    ExtensionConfig,
+    ExtensionStateDB,
+    ReadMarkersDB,
+    HistoryLink,
+    WebFavoritesList,
+    WebSourceInfo,
+    RepoInfo,
+  };
+
+  Store get _store => store ?? GagakuData().store;
+
+  Future<Map<String, dynamic>> export({Map<String, dynamic> seed = const {}}) {
+    return _store.runInTransactionAsync(TxMode.read, (store, data) {
+      const converter = GagakuBackupDataV2();
+      converter.writeExtensionState(store, data);
+      converter.writeExtensionSecureState(store, data);
+      converter.writeGagakuConfig(store, data);
+      converter.writeReaderConfig(store, data);
+      converter.writeMangadexConfig(store, data);
+      converter.writeMangadexHistory(store, data);
+      converter.writeWebReadHistory(store, data);
+      converter.writeWebConfigFavoritesHistory(store, data);
+      return data;
+    }, Map<String, dynamic>.of(seed));
+  }
+
+  Future<void> import(
+    Map<String, dynamic> data, {
+    GagakuDataImportRefresh? refresh,
+  }) async {
+    await _store.runInTransactionAsync(TxMode.write, (store, data) {
+      const converter = GagakuBackupDataV2();
+      converter.importExtensionState(store, data);
+      converter.importExtensionSecureState(store, data);
+      converter.importGagakuConfig(store, data);
+      converter.importReaderConfig(store, data);
+      converter.importMangadexConfig(store, data);
+      converter.importMangadexHistory(store, data);
+      converter.importWebReadHistory(store, data);
+      converter.importWebConfigFavoritesHistory(store, data);
+    }, data);
+
+    await refresh?.call();
   }
 }

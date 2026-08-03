@@ -99,7 +99,14 @@ globalThis.console = Object.fromEntries(
   List<Cookie>? _cookies;
   final Map<String, FjsExtensionForm> _forms = {};
   final _evalExecutor = _RuntimeEvalExecutor();
+  final _debugClock = Stopwatch()..start();
   Future<void>? _disposeFuture;
+
+  void _debugLog(String message) {
+    final timestamp = DateTime.now().toUtc().toIso8601String();
+    final elapsedMicroseconds = _debugClock.elapsedMicroseconds;
+    debugPrint('[$timestamp +${elapsedMicroseconds}us] $message');
+  }
 
   @override
   bool get hasAdvancedSearchForm => _hasAdvancedSearchForm;
@@ -121,13 +128,26 @@ globalThis.console = Object.fromEntries(
         throw StateError('fjs extension runtime is not initialized');
       }
 
+      final startedAt = _debugClock.elapsedMicroseconds;
+      if (kDebugMode) {
+        _debugLog('fjs[$sourceId] eval start: $label');
+      }
       try {
-        return await engine.eval(
+        final result = await engine.eval(
           source: JsCode.code(source),
           options: JsEvalOptions.withPromise(),
         );
+        if (kDebugMode) {
+          final durationMicroseconds =
+              _debugClock.elapsedMicroseconds - startedAt;
+          _debugLog(
+            'fjs[$sourceId] eval complete: $label '
+            'duration=${durationMicroseconds}us',
+          );
+        }
+        return result;
       } catch (error, stackTrace) {
-        debugPrint('fjs[$sourceId] eval failed: $label\n$error\n$stackTrace');
+        _debugLog('fjs[$sourceId] eval failed: $label\n$error\n$stackTrace');
         rethrow;
       }
     });
@@ -278,11 +298,11 @@ return JSON.stringify(value);
   }
 
   Future<T> _runInitStep<T>(String label, Future<T> Function() action) async {
-    debugPrint('fjs[$sourceId] init: $label');
+    _debugLog('fjs[$sourceId] init: $label');
     try {
       return await action();
     } catch (error, stackTrace) {
-      debugPrint('fjs[$sourceId] init failed: $label\n$error\n$stackTrace');
+      _debugLog('fjs[$sourceId] init failed: $label\n$error\n$stackTrace');
       rethrow;
     }
   }
@@ -374,7 +394,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
       void markChallengeObserved() {
         if (!challengeObserved) {
           challengeObserved = true;
-          debugPrint('fjs[$sourceId]: Cloudflare challenge observed');
+          _debugLog('fjs[$sourceId]: Cloudflare challenge observed');
         }
       }
 
@@ -455,7 +475,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
       _cookies = const [];
       rethrow;
     } catch (error, stackTrace) {
-      debugPrint(
+      _debugLog(
         'fjs[$sourceId]: failed to load startup cookies\n$error\n$stackTrace',
       );
       _cookies = const [];
@@ -523,7 +543,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
           key.toString(): value.toString(),
       };
     } catch (error, stackTrace) {
-      debugPrint(
+      _debugLog(
         'fjs[$sourceId]: failed to read Cloudflare local storage\n'
         '$error\n$stackTrace',
       );
@@ -624,7 +644,7 @@ if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
     if (payload['channel'] == 'console') {
       final level = payload['level'] ?? 'log';
       final values = payload['values'];
-      debugPrint(
+      _debugLog(
         'fjs[$sourceId] console.$level: '
         '${values is List ? values.join(' ') : values}',
       );
@@ -639,7 +659,7 @@ if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
     }
     final args = rawArgs as List? ?? const [];
     if (kDebugMode) {
-      debugPrint('fjs[$sourceId] bridge: $handlerName(${jsonEncode(args)})');
+      _debugLog('fjs[$sourceId] bridge: $handlerName(${jsonEncode(args)})');
     }
 
     switch (handlerName) {
@@ -1032,7 +1052,7 @@ return new Uint8Array(body);
       _ => null,
     };
     final failed = statusCode != null && statusCode >= 400;
-    debugPrint(
+    _debugLog(
       'fjs[$sourceId] image.request${failed ? ' failed' : ''} '
       'status=${statusCode ?? 'unknown'} '
       '${bytesLength ?? 'unknown'} bytes '
@@ -1101,7 +1121,7 @@ return await globalThis.$sourceId.getSearchResults(
     }
 
     try {
-      debugPrint('fjs[$sourceId]: closing engine');
+      _debugLog('fjs[$sourceId]: closing engine');
       await engine.close();
     } finally {
       engine.dispose();

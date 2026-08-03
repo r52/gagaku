@@ -1288,8 +1288,8 @@ class Translations$backup$en {
 	/// en: 'Backup Data'
 	String get data => 'Backup Data';
 
-	/// en: 'Backup all gagaku data and settings (excludes MangaDex login, local library files) NOTE: when restoring, restart the app for changes to take effect'
-	String get dataSub => 'Backup all gagaku data and settings (excludes MangaDex login, local library files)\nNOTE: when restoring, restart the app for changes to take effect';
+	/// en: 'Backup all gagaku data and settings (excludes MangaDex login and local library files)'
+	String get dataSub => 'Backup all gagaku data and settings (excludes MangaDex login and local library files)';
 
 	/// en: 'Restore Backup'
 	String get restore => 'Restore Backup';
@@ -1306,8 +1306,8 @@ class Translations$backup$en {
 	/// en: 'Backup saved'
 	String get success => 'Backup saved';
 
-	/// en: 'Backup restored. Restart gagaku for changes to take effect'
-	String get restoreSuccess => 'Backup restored. Restart gagaku for changes to take effect';
+	/// en: 'Backup restored'
+	String get restoreSuccess => 'Backup restored';
 
 	/// en: 'Backup cancelled'
 	String get cancelled => 'Backup cancelled';
@@ -2401,13 +2401,13 @@ extension on Translations {
 			'cache.clearWarning' => 'Are you sure you want to delete all cached data?',
 			'cache.clearSuccess' => 'Cache cleared',
 			'backup.data' => 'Backup Data',
-			'backup.dataSub' => 'Backup all gagaku data and settings (excludes MangaDex login, local library files)\nNOTE: when restoring, restart the app for changes to take effect',
+			'backup.dataSub' => 'Backup all gagaku data and settings (excludes MangaDex login and local library files)',
 			'backup.restore' => 'Restore Backup',
 			'backup.restoreWarning' => 'Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?',
 			'backup.toFile' => 'Backup Data to File',
 			'backup.fromFile' => 'Restore Data from File',
 			'backup.success' => 'Backup saved',
-			'backup.restoreSuccess' => 'Backup restored. Restart gagaku for changes to take effect',
+			'backup.restoreSuccess' => 'Backup restored',
 			'backup.cancelled' => 'Backup cancelled',
 			'backup.restoreCancelled' => 'Backup restore cancelled',
 			'backup.restoreFail' => 'Backup restore failed',
