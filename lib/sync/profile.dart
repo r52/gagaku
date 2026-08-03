@@ -100,9 +100,19 @@ final class SyncProfileManager {
   final String Function() _idFactory;
   final DateTime Function() _now;
 
+  static const _permittedSyncthingEntries = {
+    '.stfolder',
+    '.stignore',
+    '.stversion',
+    '.stversions',
+  };
+
   Future<SyncProfile> create() async {
     final existing = await store.list('');
-    if (existing.isNotEmpty) {
+    final incompatible = existing.where(
+      (object) => !_isPermittedSyncthingEntry(object.key),
+    );
+    if (incompatible.isNotEmpty) {
       throw StateError('Selected sync profile directory is not empty');
     }
     await probe();
@@ -117,6 +127,11 @@ final class SyncProfileManager {
     }
     return validated;
   }
+
+  static bool _isPermittedSyncthingEntry(String key) =>
+      _permittedSyncthingEntries.any(
+        (entry) => key == entry || key.startsWith('$entry/'),
+      );
 
   Future<SyncProfile> join() async =>
       SyncProfileCodec.decode(await store.read(SyncProfileCodec.key));

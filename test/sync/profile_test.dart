@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:gagaku/sync/filesystem_store.dart';
 import 'package:gagaku/sync/profile.dart';
 import 'package:gagaku/sync/protocol.dart';
 import 'package:gagaku/sync/store.dart';
@@ -53,6 +55,35 @@ void main() {
       SyncProfileManager(store: incompatible).join(),
       throwsA(isA<SyncValidationException>()),
     );
+  });
+
+  test('creates beside Syncthing metadata without modifying it', () async {
+    final root = await Directory.systemTemp.createTemp(
+      'gagaku-sync-syncthing-metadata-',
+    );
+    addTearDown(() => root.delete(recursive: true));
+    final marker = File('${root.path}/.stfolder/marker')
+      ..createSync(recursive: true)
+      ..writeAsStringSync('synthetic marker');
+    final version = File('${root.path}/.stversion/state')
+      ..createSync(recursive: true)
+      ..writeAsStringSync('synthetic version state');
+    File(
+      '${root.path}/.stignore',
+    ).writeAsStringSync('// synthetic ignore rules');
+    var idIndex = 0;
+
+    final profile = await SyncProfileManager(
+      store: FilesystemSyncStore(root.path),
+      idFactory: () => ['probe-fixture', 'profile-fixture'][idIndex++],
+      now: () => DateTime.utc(2026, 1, 2, 3, 4, 5),
+    ).create();
+
+    expect(profile.profileId, 'profile-fixture');
+    expect(marker.readAsStringSync(), 'synthetic marker');
+    expect(version.readAsStringSync(), 'synthetic version state');
+    expect(File('${root.path}/.stignore').existsSync(), isTrue);
+    expect(File('${root.path}/${SyncProfileCodec.key}').existsSync(), isTrue);
   });
 
   test(
