@@ -149,6 +149,16 @@ final class SyncRepository {
     return _publish(selected.payload, joined, discovery);
   }
 
+  /// Publishes a local branch from a previously synchronized clock.
+  ///
+  /// This deliberately does not join newly discovered remote advancement. It
+  /// is used when local data changed concurrently, so both complete branches
+  /// remain visible for explicit resolution.
+  Future<SyncPublication> publishFromClock(
+    Map<String, dynamic> payload,
+    Map<String, int> baseClock,
+  ) async => _publish(payload, baseClock, await discover());
+
   Future<List<String>> retireDevice(String retiredDeviceId) async {
     if (retiredDeviceId.isEmpty || retiredDeviceId.contains('/')) {
       throw ArgumentError.value(

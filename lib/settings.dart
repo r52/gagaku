@@ -6,28 +6,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
-import 'package:gagaku/mangadex/model/config.dart';
-import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/model/types.dart';
-import 'package:gagaku/reader/model/config.dart';
 import 'package:gagaku/settings/convert.dart';
+import 'package:gagaku/settings/refresh.dart';
+import 'package:gagaku/sync/metadata.dart';
 import 'package:gagaku/util/ui.dart';
-import 'package:gagaku/web/model/config.dart';
-import 'package:gagaku/web/model/model.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-const _backupExcludeKeys = [
+const gagakuBackupExcludedLocalKeys = [
   'mangadex_credentials',
   'mangadex_tokens',
   'locallib',
   'data_location',
+  syncMetadataHiveKey,
 ];
 
 class AppSettingsPage extends HookConsumerWidget {
@@ -38,7 +36,7 @@ class AppSettingsPage extends HookConsumerWidget {
     final gbox = Hive.box(gagakuLocalBox);
 
     for (final key in gbox.keys) {
-      if (_backupExcludeKeys.contains(key)) {
+      if (gagakuBackupExcludedLocalKeys.contains(key)) {
         continue;
       }
 
@@ -141,24 +139,14 @@ class AppSettingsPage extends HookConsumerWidget {
     final gbox = Hive.box(gagakuLocalBox);
 
     for (final key in gbox.keys) {
-      if (_backupExcludeKeys.contains(key)) {
+      if (gagakuBackupExcludedLocalKeys.contains(key)) {
         continue;
       }
 
       await gbox.delete(key);
     }
 
-    providerContainer
-      ..invalidate(gagakuSettingsProvider)
-      ..invalidate(readerSettingsProvider)
-      ..invalidate(mdConfigProvider)
-      ..invalidate(webConfigProvider)
-      ..invalidate(extensionStateProvider)
-      ..invalidate(extensionSecureStateProvider)
-      ..invalidate(mangaDexHistoryProvider)
-      ..invalidate(webReadMarkersProvider)
-      ..invalidate(installedSourcesProvider)
-      ..invalidate(extensionSourceProvider, asReload: true);
+    refreshImportedGagakuData(providerContainer);
 
     return true;
   }

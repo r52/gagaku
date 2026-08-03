@@ -164,7 +164,7 @@ abstract final class SyncSnapshotCodec {
       revisionId: revisionId,
       createdAt: createdAt.toUtc(),
       seen: UnmodifiableMapView(SyncClock._sortedClock(Map.of(seen))),
-      payloadHash: '$hashAlgorithm:${sha256.convert(payloadBytes)}',
+      payloadHash: payloadHash(payload),
       payloadLength: payloadBytes.length,
       payload: UnmodifiableMapView(Map.of(payload)),
       extra: UnmodifiableMapView(Map.of(extra)),
@@ -256,6 +256,9 @@ abstract final class SyncSnapshotCodec {
   static List<int> canonicalJsonBytes(Object? value) =>
       utf8.encode(_canonicalJson(value));
 
+  static String payloadHash(Map<String, dynamic> payload) =>
+      '$hashAlgorithm:${sha256.convert(canonicalJsonBytes(payload))}';
+
   static String _canonicalJson(Object? value) {
     return switch (value) {
       null || bool() || String() => jsonEncode(value),
@@ -317,7 +320,7 @@ abstract final class SyncSnapshotCodec {
     if (payloadBytes.length != snapshot.payloadLength) {
       throw const SyncValidationException('payload length mismatch');
     }
-    final expectedHash = '$hashAlgorithm:${sha256.convert(payloadBytes)}';
+    final expectedHash = payloadHash(snapshot.payload);
     if (snapshot.payloadHash != expectedHash) {
       throw const SyncValidationException('payload hash mismatch');
     }
