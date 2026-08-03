@@ -288,10 +288,8 @@ abstract final class SyncSnapshotCodec {
       throw const SyncValidationException('profile ID mismatch');
     }
     if (snapshot.profileId.isEmpty ||
-        snapshot.deviceId.isEmpty ||
-        snapshot.revisionId.isEmpty ||
-        snapshot.deviceId.contains('/') ||
-        snapshot.revisionId.contains('/')) {
+        !_isSafeIdentitySegment(snapshot.deviceId) ||
+        !_isSafeIdentitySegment(snapshot.revisionId)) {
       throw const SyncValidationException('invalid snapshot identity');
     }
     if (snapshot.deviceSequence <= 0) {
@@ -350,6 +348,15 @@ abstract final class SyncSnapshotCodec {
     }
     return value;
   }
+
+  static bool _isSafeIdentitySegment(String value) =>
+      value.isNotEmpty &&
+      value != '.' &&
+      value != '..' &&
+      !value.contains('/') &&
+      !value.contains(r'\') &&
+      !value.contains(':') &&
+      !value.contains('\u0000');
 }
 
 sealed class SyncHeadSelection {

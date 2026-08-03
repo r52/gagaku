@@ -158,6 +158,23 @@ void main() {
         throwsA(isA<SyncValidationException>()),
       );
     });
+
+    test('rejects identities that are unsafe filesystem path segments', () {
+      for (final deviceId in ['..', 'device/child', r'device\child', 'C:']) {
+        expect(
+          () => SyncSnapshotCodec.create(
+            profileId: 'synthetic-profile',
+            deviceId: deviceId,
+            deviceSequence: 1,
+            revisionId: 'revision-1',
+            createdAt: DateTime.utc(2026, 1, 1),
+            seen: {deviceId: 1},
+            payload: const {'synthetic': 'value'},
+          ),
+          throwsA(isA<SyncValidationException>()),
+        );
+      }
+    });
   });
 
   group('SyncHeadSelector', () {
