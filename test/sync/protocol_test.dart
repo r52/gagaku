@@ -141,6 +141,24 @@ void main() {
           ),
           throwsA(isA<SyncValidationException>()),
         );
+        const marker = 'synthetic-sensitive-marker';
+        expect(
+          () => SyncSnapshotCodec.decode(
+            snapshot.key,
+            utf8.encode('{"payload":"$marker"'),
+            expectedProfileId: 'synthetic-profile',
+          ),
+          throwsA(
+            isA<SyncValidationException>().having(
+              (error) => error.toString(),
+              'sanitized message',
+              allOf(
+                contains('invalid snapshot encoding'),
+                isNot(contains(marker)),
+              ),
+            ),
+          ),
+        );
       },
     );
 

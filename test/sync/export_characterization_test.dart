@@ -1,10 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/settings/convert.dart';
+import 'package:gagaku/sync/protocol.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart' show historyListUUID;
 import 'package:gagaku/web/model/types.dart';
@@ -56,17 +55,27 @@ void main() {
     );
     store.box<ExtensionStateDB>().put(extensionState);
 
-    final stopwatch = Stopwatch()..start();
-    final payload = await const GagakuBackupDataV2().write({});
-    stopwatch.stop();
+    final codec = GagakuDataCodec(store: store);
+    for (var run = 1; run <= 3; run++) {
+      final exportStopwatch = Stopwatch()..start();
+      final payload = await codec.export();
+      exportStopwatch.stop();
 
-    final bytes = utf8.encode(payload).length;
-    // ignore: avoid_print
-    print(
-      'PHASE0_EXPORT bytes=$bytes '
-      'microseconds=${stopwatch.elapsedMicroseconds}',
-    );
-    expect(jsonDecode(payload), isA<Map<String, dynamic>>());
-    expect(bytes, greaterThan(100000));
+      final hashStopwatch = Stopwatch()..start();
+      final hash = SyncSnapshotCodec.payloadHash(payload);
+      final bytes = SyncSnapshotCodec.canonicalJsonBytes(payload).length;
+      hashStopwatch.stop();
+
+      // Characterization output only; timing is deliberately not asserted.
+      // ignore: avoid_print
+      print(
+        'PHASE8_EXPORT run=$run bytes=$bytes '
+        'exportMicroseconds=${exportStopwatch.elapsedMicroseconds} '
+        'canonicalizeAndHashMicroseconds=${hashStopwatch.elapsedMicroseconds}',
+      );
+      expect(payload, isA<Map<String, dynamic>>());
+      expect(hash, startsWith('sha256:'));
+      expect(bytes, greaterThan(100000));
+    }
   });
 }

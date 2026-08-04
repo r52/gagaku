@@ -64,8 +64,8 @@ abstract final class SyncProfileCodec {
       return profile;
     } on SyncValidationException {
       rethrow;
-    } catch (error) {
-      throw SyncValidationException(error.toString(), key: key);
+    } catch (_) {
+      throw const SyncValidationException('invalid profile encoding', key: key);
     }
   }
 

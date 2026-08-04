@@ -248,8 +248,8 @@ abstract final class SyncSnapshotCodec {
       return snapshot;
     } on SyncValidationException catch (error) {
       throw SyncValidationException(error.message, key: key);
-    } catch (error) {
-      throw SyncValidationException(error.toString(), key: key);
+    } catch (_) {
+      throw SyncValidationException('invalid snapshot encoding', key: key);
     }
   }
 
