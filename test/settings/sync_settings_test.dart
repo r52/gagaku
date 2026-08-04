@@ -77,6 +77,36 @@ void main() {
     expect(find.text('Join Existing Profile'), findsNothing);
   });
 
+  testWidgets('missing remote profile presents safe recovery choices', (
+    tester,
+  ) async {
+    final metadata = MemorySyncMetadataStore(
+      SyncLocalState(
+        enabled: false,
+        locator: '/synthetic/filesystem/profile',
+        profileId: 'profile-fixture',
+        deviceId: 'device-fixture',
+        deviceName: 'Fictional Device',
+        profileMissing: true,
+      ),
+    );
+    final service = GagakuSyncService.withMetadata(metadata);
+
+    await _pump(tester, service);
+
+    expect(find.text('Resume Sync'), findsOneWidget);
+    expect(
+      find.text(
+        'Sync was paused because the established remote profile disappeared. '
+        'Restore it and resume, or forget this configuration if deletion was '
+        'intentional.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Forget Sync Configuration'), findsOneWidget);
+    expect(find.text('Create New Profile'), findsNothing);
+  });
+
   testWidgets('device name dialog survives cancel and save transitions', (
     tester,
   ) async {

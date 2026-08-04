@@ -28,6 +28,7 @@ void main() {
     expect(created.profileId, 'profile-fixture');
     expect(joined.profileId, created.profileId);
     expect(joined.createdAt, DateTime.utc(2026, 1, 2, 3, 4, 5));
+    expect(await manager.hasExpectedProfile(created.profileId), isTrue);
     expect(store.objects.keys, [SyncProfileCodec.key]);
   });
 

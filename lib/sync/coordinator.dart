@@ -7,6 +7,7 @@ import 'package:gagaku/sync/repository.dart';
 typedef SyncExportData = Future<Map<String, dynamic>> Function();
 typedef SyncImportData = Future<void> Function(Map<String, dynamic> payload);
 typedef SyncCoordinatorNow = DateTime Function();
+typedef SyncProfileValidator = Future<bool> Function();
 
 enum SyncCoordinatorPhase {
   disabled,
@@ -18,6 +19,7 @@ enum SyncCoordinatorPhase {
   offline,
   incompatible,
   noValidSnapshot,
+  profileMissing,
   forked,
   cleanupWarning,
   disposed,
@@ -44,6 +46,7 @@ final class SyncCoordinator {
     required this.exportData,
     required this.importData,
     required this.entityChanges,
+    this.validateProfile,
     this.debounceDuration = const Duration(milliseconds: 1500),
     this.operationTimeout = const Duration(seconds: 5),
     SyncCoordinatorNow? now,
@@ -54,6 +57,7 @@ final class SyncCoordinator {
   final SyncExportData exportData;
   final SyncImportData importData;
   final Stream<Object?> entityChanges;
+  final SyncProfileValidator? validateProfile;
   final Duration debounceDuration;
   final Duration operationTimeout;
   final SyncCoordinatorNow _now;
@@ -195,6 +199,11 @@ final class SyncCoordinator {
 
   Future<void> _synchronize() async {
     final state = _state!;
+    final validator = validateProfile;
+    if (validator != null && !await validator()) {
+      await _suspendForMissingProfile();
+      return;
+    }
     await repository.discover();
     final startGeneration = state.dirtyGeneration;
     final payload = await exportData();
@@ -221,16 +230,11 @@ final class SyncCoordinator {
           );
           return;
         }
-        if (state.lastBaselinePayloadHash == null || localDirty) {
-          await _publish(
-            payload,
-            state.lastSeen,
-            startGeneration,
-            branch: false,
-          );
-        } else {
-          await _settleGeneration(startGeneration);
+        if (state.lastBaselinePayloadHash != null) {
+          await _suspendForMissingProfile();
+          return;
         }
+        await _publish(payload, state.lastSeen, startGeneration, branch: false);
       case CanonicalSyncHead(:final head):
         if (head.payloadHash == payloadHash) {
           if (identityOutdated) {
@@ -302,6 +306,21 @@ final class SyncCoordinator {
         _requestedResolution = null;
         await _resolveFork(requested, heads, payloadHash, startGeneration);
     }
+  }
+
+  Future<void> _suspendForMissingProfile() async {
+    _debounce?.cancel();
+    _debounce = null;
+    await _changesSubscription?.cancel();
+    _changesSubscription = null;
+    final state = _state!;
+    state
+      ..enabled = false
+      ..profileMissing = true
+      ..retryPending = false
+      ..lastError = null;
+    await metadataStore.write(state);
+    _emit(const SyncCoordinatorStatus(SyncCoordinatorPhase.profileMissing));
   }
 
   bool _identityOutdated(SyncDiscovery discovery) {
@@ -443,14 +462,6 @@ final class SyncCoordinator {
         ),
       );
     }
-  }
-
-  Future<void> _settleGeneration(int generation) async {
-    final state = _state!;
-    state.lastPublishedGeneration = generation;
-    await metadataStore.write(state);
-    if (state.dirtyGeneration > generation) _passRequested = true;
-    _emit(const SyncCoordinatorStatus(SyncCoordinatorPhase.clean));
   }
 
   Future<void> _recordFailure(Object error, SyncCoordinatorPhase phase) async {

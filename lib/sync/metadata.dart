@@ -22,6 +22,7 @@ final class SyncLocalState {
     this.lastPublishedRevision,
     this.lastPublishedPayloadHash,
     this.lastPublishedAt,
+    this.profileMissing = false,
     this.retryPending = false,
     this.lastError,
   });
@@ -42,6 +43,7 @@ final class SyncLocalState {
   String? lastPublishedRevision;
   String? lastPublishedPayloadHash;
   DateTime? lastPublishedAt;
+  bool profileMissing;
   bool retryPending;
   String? lastError;
 
@@ -94,6 +96,7 @@ final class SyncLocalState {
       lastPublishedRevision: readOptionalString('lastPublishedRevision'),
       lastPublishedPayloadHash: readOptionalString('lastPublishedPayloadHash'),
       lastPublishedAt: readDate('lastPublishedAt'),
+      profileMissing: json['profileMissing'] == true,
       retryPending: json['retryPending'] == true,
       lastError: readOptionalString('lastError'),
     );
@@ -116,6 +119,7 @@ final class SyncLocalState {
     'lastPublishedRevision': lastPublishedRevision,
     'lastPublishedPayloadHash': lastPublishedPayloadHash,
     'lastPublishedAt': lastPublishedAt?.toUtc().toIso8601String(),
+    'profileMissing': profileMissing,
     'retryPending': retryPending,
     'lastError': lastError,
   };

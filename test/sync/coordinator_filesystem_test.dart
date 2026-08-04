@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/sync/coordinator.dart';
 import 'package:gagaku/sync/filesystem_store.dart';
 import 'package:gagaku/sync/metadata.dart';
+import 'package:gagaku/sync/profile.dart';
 import 'package:gagaku/sync/repository.dart';
 
 void main() {
@@ -16,6 +17,7 @@ void main() {
       final root = await Directory.systemTemp.createTemp(
         'gagaku-sync-coordinator-',
       );
+      await _createProfile(root);
       final deviceA = await _DeviceHarness.start(root, 'device-a', 'initial-a');
       final deviceB = await _DeviceHarness.start(root, 'device-b', 'initial-b');
       addTearDown(() async {
@@ -41,6 +43,52 @@ void main() {
       expect(deviceB.coordinator.status.phase, SyncCoordinatorPhase.clean);
     },
   );
+
+  test(
+    'offline peer suspends safely after another peer deletes the profile',
+    () async {
+      final root = await Directory.systemTemp.createTemp(
+        'gagaku-sync-remote-delete-',
+      );
+      await _createProfile(root);
+      final deviceA = await _DeviceHarness.start(root, 'device-a', 'initial-a');
+      final deviceB = await _DeviceHarness.start(root, 'device-b', 'initial-b');
+      addTearDown(() async {
+        await deviceA.dispose();
+        await deviceB.dispose();
+        if (await root.exists()) await root.delete(recursive: true);
+      });
+      expect(deviceB.data.payload, _payload('initial-a'));
+
+      final reset = await SyncProfileManager(
+        store: FilesystemSyncStore(root.path),
+      ).reset('profile-fixture');
+      expect(reset.failures, isEmpty);
+
+      await deviceB.coordinator.onResume();
+
+      expect(
+        deviceB.coordinator.status.phase,
+        SyncCoordinatorPhase.profileMissing,
+      );
+      expect(deviceB.metadata.state.enabled, isFalse);
+      expect(deviceB.metadata.state.profileMissing, isTrue);
+      expect(deviceB.metadata.state.profileId, 'profile-fixture');
+      expect(deviceB.metadata.state.deviceId, 'device-b');
+      expect(deviceB.data.payload, _payload('initial-a'));
+      expect(await FilesystemSyncStore(root.path).list(''), isEmpty);
+    },
+  );
+}
+
+Future<void> _createProfile(Directory root) async {
+  var idIndex = 0;
+  final profile = await SyncProfileManager(
+    store: FilesystemSyncStore(root.path),
+    idFactory: () => ['probe-fixture', 'profile-fixture'][idIndex++],
+    now: () => DateTime.utc(2026, 1, 2, 3, 4, 5),
+  ).create();
+  expect(profile.profileId, 'profile-fixture');
 }
 
 final class _DeviceHarness {
@@ -64,6 +112,7 @@ final class _DeviceHarness {
     final metadata = MemorySyncMetadataStore(
       SyncLocalState(
         enabled: true,
+        locator: root.path,
         profileId: 'profile-fixture',
         deviceId: deviceId,
       ),
@@ -71,15 +120,19 @@ final class _DeviceHarness {
     final data = _Data(_payload(initialValue));
     final changes = StreamController<Object?>.broadcast(sync: true);
     var revision = 0;
+    final syncStore = FilesystemSyncStore(root.path);
+    final profileManager = SyncProfileManager(store: syncStore);
     final coordinator = SyncCoordinator(
       repository: SyncRepository(
-        store: FilesystemSyncStore(root.path),
+        store: syncStore,
         profileId: 'profile-fixture',
         deviceId: deviceId,
         revisionIdFactory: () => 'revision-$deviceId-${++revision}',
         now: () => DateTime.utc(2026, 1, 2, 3, 4, 5),
       ),
       metadataStore: metadata,
+      validateProfile: () =>
+          profileManager.hasExpectedProfile('profile-fixture'),
       exportData: data.export,
       importData: data.import,
       entityChanges: changes.stream,

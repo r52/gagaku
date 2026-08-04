@@ -22,6 +22,7 @@ void main() {
       lastPublishedRevision: 'revision-published',
       lastPublishedPayloadHash: 'sha256:published',
       lastPublishedAt: DateTime.utc(2026, 1, 2, 3, 5, 6),
+      profileMissing: true,
       retryPending: true,
       lastError: 'synthetic unavailable',
     );

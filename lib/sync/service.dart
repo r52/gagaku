@@ -118,6 +118,7 @@ final class GagakuSyncService extends ChangeNotifier {
     if (!state.hasConfiguration) {
       throw StateError('Sync configuration is incomplete');
     }
+    await _stopCoordinator();
 
     final store = FilesystemSyncStore(state.locator);
     final manager = SyncProfileManager(store: store);
@@ -136,13 +137,18 @@ final class GagakuSyncService extends ChangeNotifier {
       throw StateError('Sync profile has no valid snapshots');
     }
 
-    state.enabled = true;
+    final wasProfileMissing = state.profileMissing;
+    state
+      ..enabled = true
+      ..profileMissing = false;
     await _metadata!.write(state);
     try {
       await _startConfigured(state);
     } catch (_) {
       await _stopCoordinator();
-      state.enabled = false;
+      state
+        ..enabled = false
+        ..profileMissing = wasProfileMissing;
       await _metadata!.write(state);
       rethrow;
     }
@@ -247,6 +253,7 @@ final class GagakuSyncService extends ChangeNotifier {
     final state = await readState();
     state
       ..enabled = false
+      ..profileMissing = false
       ..retryPending = false
       ..lastError = null;
     await _metadata!.write(state);
@@ -277,14 +284,17 @@ final class GagakuSyncService extends ChangeNotifier {
       return;
     }
 
+    final syncStore = FilesystemSyncStore(state.locator);
+    final profileManager = SyncProfileManager(store: syncStore);
     final codec = GagakuDataCodec(store: GagakuData().store);
     final coordinator = SyncCoordinator(
       repository: SyncRepository(
-        store: FilesystemSyncStore(state.locator),
+        store: syncStore,
         profileId: state.profileId,
         deviceId: state.deviceId,
         deviceName: state.deviceName,
       ),
+      validateProfile: () => profileManager.hasExpectedProfile(state.profileId),
       metadataStore: _metadata!,
       exportData: codec.export,
       importData: (payload) => codec.import(

@@ -136,6 +136,18 @@ final class SyncProfileManager {
   Future<SyncProfile> join() async =>
       SyncProfileCodec.decode(await store.read(SyncProfileCodec.key));
 
+  Future<bool> hasExpectedProfile(String expectedProfileId) async {
+    final objects = await store.list('');
+    if (!objects.any((object) => object.key == SyncProfileCodec.key)) {
+      return false;
+    }
+    final profile = await join();
+    if (profile.profileId != expectedProfileId) {
+      throw const SyncValidationException('profile ID mismatch');
+    }
+    return true;
+  }
+
   Future<void> probe() async {
     final key = '.gagaku-sync-probe-${_idFactory()}';
     final bytes = utf8.encode('gagaku-sync-probe');

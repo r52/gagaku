@@ -1403,6 +1403,9 @@ class Translations$sync$en {
 	/// en: 'No valid snapshot found'
 	String get statusNoValidSnapshot => 'No valid snapshot found';
 
+	/// en: 'Remote profile disappeared; sync paused'
+	String get statusProfileMissing => 'Remote profile disappeared; sync paused';
+
 	/// en: 'Conflict requires resolution'
 	String get statusForked => 'Conflict requires resolution';
 
@@ -1498,6 +1501,9 @@ class Translations$sync$en {
 
 	/// en: 'Reconnect using this device's existing identity and profile configuration.'
 	String get resumeSub => 'Reconnect using this device\'s existing identity and profile configuration.';
+
+	/// en: 'Sync was paused because the established remote profile disappeared. Restore it and resume, or forget this configuration if deletion was intentional.'
+	String get profileMissingSub => 'Sync was paused because the established remote profile disappeared. Restore it and resume, or forget this configuration if deletion was intentional.';
 
 	/// en: 'Forget Sync Configuration'
 	String get forget => 'Forget Sync Configuration';
@@ -2647,6 +2653,7 @@ extension on Translations {
 			'sync.statusOffline' => 'Storage unavailable; retry pending',
 			'sync.statusIncompatible' => 'Incompatible or corrupt profile',
 			'sync.statusNoValidSnapshot' => 'No valid snapshot found',
+			'sync.statusProfileMissing' => 'Remote profile disappeared; sync paused',
 			'sync.statusForked' => 'Conflict requires resolution',
 			'sync.statusCleanupWarning' => 'Synchronized with cleanup warning',
 			'sync.statusDisposed' => 'Stopped',
@@ -2666,9 +2673,9 @@ extension on Translations {
 			'sync.branchRevision' => ({required Object revision}) => 'Revision: ${revision}',
 			'sync.branchCreated' => ({required Object time}) => 'Created: ${time}',
 			'sync.branchHash' => ({required Object hash}) => 'Payload: ${hash}',
-			'sync.useBranch' => 'Use This Snapshot',
 			_ => null,
 		} ?? switch (path) {
+			'sync.useBranch' => 'Use This Snapshot',
 			'sync.useBranchConfirm' => 'Use this complete snapshot and publish a resolution that supersedes every branch?',
 			'sync.exportBranch' => 'Export Backup',
 			'sync.exportSuccess' => 'Conflict snapshot exported',
@@ -2681,6 +2688,7 @@ extension on Translations {
 			'sync.disableConfirm' => 'Disable synchronization on this device without deleting remote data?',
 			'sync.resume' => 'Resume Sync',
 			'sync.resumeSub' => 'Reconnect using this device\'s existing identity and profile configuration.',
+			'sync.profileMissingSub' => 'Sync was paused because the established remote profile disappeared. Restore it and resume, or forget this configuration if deletion was intentional.',
 			'sync.forget' => 'Forget Sync Configuration',
 			'sync.forgetSub' => 'Keep remote data but remove this device\'s saved profile and identity.',
 			'sync.forgetConfirm' => 'Forget this device\'s sync configuration? Joining later will create a new device identity; remote data will not be deleted.',

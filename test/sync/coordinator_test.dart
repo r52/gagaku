@@ -68,6 +68,74 @@ void main() {
     expect(head.payload, _payload('changed'));
   });
 
+  test(
+    'missing established profile suspends without losing device identity',
+    () async {
+      final store = MemorySyncStore();
+      final metadata = _metadata(
+        'device-b',
+        lastSeen: const {'device-b': 1},
+        baselineHash: SyncSnapshotCodec.payloadHash(_payload('local')),
+      );
+      final changes = StreamController<Object?>.broadcast(sync: true);
+      final data = _FakeData(_payload('local'));
+      final coordinator = _coordinator(
+        store,
+        metadata,
+        data,
+        changes.stream,
+        deviceId: 'device-b',
+        validateProfile: () async => false,
+      );
+      addTearDown(() async {
+        await coordinator.dispose();
+        await changes.close();
+      });
+
+      await coordinator.start();
+
+      expect(coordinator.status.phase, SyncCoordinatorPhase.profileMissing);
+      expect(metadata.state.enabled, isFalse);
+      expect(metadata.state.profileMissing, isTrue);
+      expect(metadata.state.profileId, 'profile-fixture');
+      expect(metadata.state.deviceId, 'device-b');
+      expect(store.objects, isEmpty);
+    },
+  );
+
+  test(
+    'established profile with no device heads suspends instead of publishing',
+    () async {
+      final store = MemorySyncStore();
+      final metadata = _metadata(
+        'device-b',
+        lastSeen: const {'device-b': 1},
+        baselineHash: SyncSnapshotCodec.payloadHash(_payload('local')),
+      );
+      final changes = StreamController<Object?>.broadcast(sync: true);
+      final data = _FakeData(_payload('local'));
+      final coordinator = _coordinator(
+        store,
+        metadata,
+        data,
+        changes.stream,
+        deviceId: 'device-b',
+        validateProfile: () async => true,
+      );
+      addTearDown(() async {
+        await coordinator.dispose();
+        await changes.close();
+      });
+
+      await coordinator.start();
+
+      expect(coordinator.status.phase, SyncCoordinatorPhase.profileMissing);
+      expect(metadata.state.enabled, isFalse);
+      expect(metadata.state.profileMissing, isTrue);
+      expect(store.objects, isEmpty);
+    },
+  );
+
   test('device name changes publish without a logical data change', () async {
     final store = MemorySyncStore();
     final repository = _repository(store, 'device-a');
@@ -494,6 +562,7 @@ MemorySyncMetadataStore _metadata(
 }) => MemorySyncMetadataStore(
   SyncLocalState(
     enabled: true,
+    locator: '/synthetic/filesystem/profile',
     profileId: 'profile-fixture',
     deviceId: deviceId,
     lastSeen: lastSeen,
@@ -507,12 +576,14 @@ SyncCoordinator _coordinator(
   _FakeData data,
   Stream<Object?> changes, {
   required String deviceId,
+  SyncProfileValidator? validateProfile,
 }) => SyncCoordinator(
   repository: _repository(store, deviceId),
   metadataStore: metadata,
   exportData: data.export,
   importData: data.import,
   entityChanges: changes,
+  validateProfile: validateProfile,
   debounceDuration: const Duration(milliseconds: 15),
   operationTimeout: const Duration(seconds: 2),
 );

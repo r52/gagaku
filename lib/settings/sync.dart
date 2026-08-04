@@ -380,6 +380,7 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
     SyncCoordinatorPhase.incompatible => context.t.sync.statusIncompatible,
     SyncCoordinatorPhase.noValidSnapshot =>
       context.t.sync.statusNoValidSnapshot,
+    SyncCoordinatorPhase.profileMissing => context.t.sync.statusProfileMissing,
     SyncCoordinatorPhase.forked => context.t.sync.statusForked,
     SyncCoordinatorPhase.cleanupWarning => context.t.sync.statusCleanupWarning,
     SyncCoordinatorPhase.disposed => context.t.sync.statusDisposed,
@@ -430,8 +431,14 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
         ] else if (!state.enabled) ...[
           SettingTile(
             title: Text(context.t.sync.resume),
-            subtitle: Text(context.t.sync.resumeSub),
-            trailing: const Icon(Icons.sync),
+            subtitle: Text(
+              state.profileMissing
+                  ? context.t.sync.profileMissingSub
+                  : context.t.sync.resumeSub,
+            ),
+            trailing: Icon(
+              state.profileMissing ? Icons.sync_problem : Icons.sync,
+            ),
             onTap: _busy ? null : () => _run(_service.enable),
           ),
           _profileTile(state),
