@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -10,13 +11,15 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/sync/coordinator.dart';
 import 'package:gagaku/sync/metadata.dart';
 import 'package:gagaku/sync/protocol.dart';
+import 'package:gagaku/sync/saf_store.dart';
 import 'package:gagaku/sync/service.dart';
 import 'package:gagaku/util/ui.dart';
 
 final class SyncSettingsSection extends StatefulWidget {
-  const SyncSettingsSection({super.key, this.service});
+  const SyncSettingsSection({super.key, this.service, this.isAndroid});
 
   final GagakuSyncService? service;
+  final bool? isAndroid;
 
   @override
   State<SyncSettingsSection> createState() => _SyncSettingsSectionState();
@@ -107,7 +110,7 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
     return FilePicker.getDirectoryPath(dialogTitle: dialogTitle);
   }
 
-  Future<void> _configure(SyncProfileMode mode) async {
+  Future<void> _configureFilesystem(SyncProfileMode mode) async {
     final deviceName = await _askDeviceName();
     if (deviceName == null || !mounted) return;
     final directory = await _pickDirectory();
@@ -115,6 +118,20 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
     await _run(() async {
       await _service.configureFilesystem(
         rootPath: directory,
+        mode: mode,
+        deviceName: deviceName,
+      );
+    });
+  }
+
+  Future<void> _configureDocumentTree(SyncProfileMode mode) async {
+    final deviceName = await _askDeviceName();
+    if (deviceName == null || !mounted) return;
+    await _run(() async {
+      final selection = await SafSyncStore.pickTree();
+      if (selection == null) return;
+      await _service.configureSaf(
+        treeUri: selection.uri,
         mode: mode,
         deviceName: deviceName,
       );
@@ -344,12 +361,20 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
   }
 
   SettingTile _profileTile(SyncLocalState state) => SettingTile(
-    title: Text(context.t.sync.filesystem),
+    title: Text(
+      state.transportKind == 'saf'
+          ? context.t.sync.documentTree
+          : context.t.sync.filesystem,
+    ),
     subtitle: Text(
-      '${context.t.sync.location(path: state.locator)}\n'
+      '${state.transportKind == 'saf' ? context.t.sync.documentLocation(uri: state.locator) : context.t.sync.location(path: state.locator)}\n'
       '${context.t.sync.profileId(id: state.profileId)}',
     ),
-    trailing: const Icon(Icons.folder_outlined),
+    trailing: Icon(
+      state.transportKind == 'saf'
+          ? Icons.cloud_outlined
+          : Icons.folder_outlined,
+    ),
   );
 
   SettingTile _deviceTile(SyncLocalState state) => SettingTile(
@@ -417,17 +442,40 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
         ),
         if (!state.enabled && !hasConfiguration) ...[
           SettingTile(
-            title: Text(context.t.sync.create),
-            subtitle: Text(context.t.sync.createSub),
+            title: Text(context.t.sync.createFilesystem),
+            subtitle: Text(context.t.sync.createFilesystemSub),
             trailing: const Icon(Icons.create_new_folder_outlined),
-            onTap: _busy ? null : () => _configure(SyncProfileMode.create),
+            onTap: _busy
+                ? null
+                : () => _configureFilesystem(SyncProfileMode.create),
           ),
           SettingTile(
-            title: Text(context.t.sync.join),
-            subtitle: Text(context.t.sync.joinSub),
+            title: Text(context.t.sync.joinFilesystem),
+            subtitle: Text(context.t.sync.joinFilesystemSub),
             trailing: const Icon(Icons.folder_open),
-            onTap: _busy ? null : () => _configure(SyncProfileMode.join),
+            onTap: _busy
+                ? null
+                : () => _configureFilesystem(SyncProfileMode.join),
           ),
+          if (widget.isAndroid ??
+              defaultTargetPlatform == TargetPlatform.android) ...[
+            SettingTile(
+              title: Text(context.t.sync.createDocumentTree),
+              subtitle: Text(context.t.sync.createDocumentTreeSub),
+              trailing: const Icon(Icons.create_new_folder_outlined),
+              onTap: _busy
+                  ? null
+                  : () => _configureDocumentTree(SyncProfileMode.create),
+            ),
+            SettingTile(
+              title: Text(context.t.sync.joinDocumentTree),
+              subtitle: Text(context.t.sync.joinDocumentTreeSub),
+              trailing: const Icon(Icons.cloud_outlined),
+              onTap: _busy
+                  ? null
+                  : () => _configureDocumentTree(SyncProfileMode.join),
+            ),
+          ],
         ] else if (!state.enabled) ...[
           SettingTile(
             title: Text(context.t.sync.resume),

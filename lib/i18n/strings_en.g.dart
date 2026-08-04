@@ -1352,6 +1352,9 @@ class Translations$sync$en {
 	/// en: 'Filesystem directory'
 	String get filesystem => 'Filesystem directory';
 
+	/// en: 'Android document tree'
+	String get documentTree => 'Android document tree';
+
 	/// en: 'Create New Profile'
 	String get create => 'Create New Profile';
 
@@ -1363,6 +1366,30 @@ class Translations$sync$en {
 
 	/// en: 'Choose a directory containing a Gagaku sync profile.'
 	String get joinSub => 'Choose a directory containing a Gagaku sync profile.';
+
+	/// en: 'Create Filesystem Profile'
+	String get createFilesystem => 'Create Filesystem Profile';
+
+	/// en: 'Choose an empty native filesystem directory and publish this device's data.'
+	String get createFilesystemSub => 'Choose an empty native filesystem directory and publish this device\'s data.';
+
+	/// en: 'Join Filesystem Profile'
+	String get joinFilesystem => 'Join Filesystem Profile';
+
+	/// en: 'Choose a native filesystem directory containing a Gagaku sync profile.'
+	String get joinFilesystemSub => 'Choose a native filesystem directory containing a Gagaku sync profile.';
+
+	/// en: 'Create Document Provider Profile'
+	String get createDocumentTree => 'Create Document Provider Profile';
+
+	/// en: 'Choose an empty Android document tree, including a folder provided by Google Drive, and publish this device's data.'
+	String get createDocumentTreeSub => 'Choose an empty Android document tree, including a folder provided by Google Drive, and publish this device\'s data.';
+
+	/// en: 'Join Document Provider Profile'
+	String get joinDocumentTree => 'Join Document Provider Profile';
+
+	/// en: 'Choose an Android document tree containing a Gagaku sync profile.'
+	String get joinDocumentTreeSub => 'Choose an Android document tree containing a Gagaku sync profile.';
 
 	/// en: 'Device Name'
 	String get deviceName => 'Device Name';
@@ -1423,6 +1450,9 @@ class Translations$sync$en {
 
 	/// en: 'Directory: $path'
 	String location({required Object path}) => 'Directory: ${path}';
+
+	/// en: 'Document tree: $uri'
+	String documentLocation({required Object uri}) => 'Document tree: ${uri}';
 
 	/// en: 'Last pull: $time'
 	String lastPull({required Object time}) => 'Last pull: ${time}';
@@ -2636,10 +2666,19 @@ extension on Translations {
 			'sync.disabled' => 'Disabled',
 			'sync.configured' => 'Configured',
 			'sync.filesystem' => 'Filesystem directory',
+			'sync.documentTree' => 'Android document tree',
 			'sync.create' => 'Create New Profile',
 			'sync.createSub' => 'Choose an empty directory and publish this device\'s data.',
 			'sync.join' => 'Join Existing Profile',
 			'sync.joinSub' => 'Choose a directory containing a Gagaku sync profile.',
+			'sync.createFilesystem' => 'Create Filesystem Profile',
+			'sync.createFilesystemSub' => 'Choose an empty native filesystem directory and publish this device\'s data.',
+			'sync.joinFilesystem' => 'Join Filesystem Profile',
+			'sync.joinFilesystemSub' => 'Choose a native filesystem directory containing a Gagaku sync profile.',
+			'sync.createDocumentTree' => 'Create Document Provider Profile',
+			'sync.createDocumentTreeSub' => 'Choose an empty Android document tree, including a folder provided by Google Drive, and publish this device\'s data.',
+			'sync.joinDocumentTree' => 'Join Document Provider Profile',
+			'sync.joinDocumentTreeSub' => 'Choose an Android document tree containing a Gagaku sync profile.',
 			'sync.deviceName' => 'Device Name',
 			'sync.defaultDeviceName' => 'Gagaku Device',
 			'sync.save' => 'Save',
@@ -2660,9 +2699,12 @@ extension on Translations {
 			'sync.profileId' => ({required Object id}) => 'Profile: ${id}',
 			'sync.deviceId' => ({required Object id}) => 'Device: ${id}',
 			'sync.location' => ({required Object path}) => 'Directory: ${path}',
+			'sync.documentLocation' => ({required Object uri}) => 'Document tree: ${uri}',
 			'sync.lastPull' => ({required Object time}) => 'Last pull: ${time}',
 			'sync.lastPublish' => ({required Object time}) => 'Last publication: ${time}',
 			'sync.never' => 'Never',
+			_ => null,
+		} ?? switch (path) {
 			'sync.pending' => ({required Object count}) => '${count} local change(s) pending',
 			'sync.error' => ({required Object message}) => 'Error: ${message}',
 			'sync.syncNow' => 'Sync Now',
@@ -2673,8 +2715,6 @@ extension on Translations {
 			'sync.branchRevision' => ({required Object revision}) => 'Revision: ${revision}',
 			'sync.branchCreated' => ({required Object time}) => 'Created: ${time}',
 			'sync.branchHash' => ({required Object hash}) => 'Payload: ${hash}',
-			_ => null,
-		} ?? switch (path) {
 			'sync.useBranch' => 'Use This Snapshot',
 			'sync.useBranchConfirm' => 'Use this complete snapshot and publish a resolution that supersedes every branch?',
 			'sync.exportBranch' => 'Export Backup',

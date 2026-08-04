@@ -15,6 +15,8 @@ import 'package:gagaku/sync/metadata.dart';
 import 'package:gagaku/sync/profile.dart';
 import 'package:gagaku/sync/protocol.dart';
 import 'package:gagaku/sync/repository.dart';
+import 'package:gagaku/sync/saf_store.dart';
+import 'package:gagaku/sync/store.dart';
 
 enum SyncProfileMode { create, join }
 
@@ -59,6 +61,39 @@ final class GagakuSyncService extends ChangeNotifier {
     required String rootPath,
     required SyncProfileMode mode,
     required String deviceName,
+  }) {
+    final store = FilesystemSyncStore(rootPath);
+    return _configureStore(
+      store: store,
+      transportKind: 'filesystem',
+      locator: store.rootPath,
+      mode: mode,
+      deviceName: deviceName,
+    );
+  }
+
+  Future<SyncProfile> configureSaf({
+    required String treeUri,
+    required SyncProfileMode mode,
+    required String deviceName,
+  }) async {
+    final store = SafSyncStore(treeUri);
+    await store.checkAccess();
+    return _configureStore(
+      store: store,
+      transportKind: 'saf',
+      locator: store.treeUri,
+      mode: mode,
+      deviceName: deviceName,
+    );
+  }
+
+  Future<SyncProfile> _configureStore({
+    required SyncStore store,
+    required String transportKind,
+    required String locator,
+    required SyncProfileMode mode,
+    required String deviceName,
   }) async {
     final providerContainer = _providerContainer;
     if (providerContainer == null) {
@@ -66,11 +101,9 @@ final class GagakuSyncService extends ChangeNotifier {
     }
     final previous = await readState();
     await _stopCoordinator();
-    late final FilesystemSyncStore store;
     late final SyncProfile profile;
     late final String deviceId;
     try {
-      store = FilesystemSyncStore(rootPath);
       final manager = SyncProfileManager(store: store);
       profile = switch (mode) {
         SyncProfileMode.create => await manager.create(),
@@ -96,8 +129,8 @@ final class GagakuSyncService extends ChangeNotifier {
 
     final state = SyncLocalState(
       enabled: true,
-      transportKind: 'filesystem',
-      locator: store.rootPath,
+      transportKind: transportKind,
+      locator: locator,
       profileId: profile.profileId,
       deviceId: deviceId,
       deviceName: deviceName.trim(),
@@ -120,7 +153,7 @@ final class GagakuSyncService extends ChangeNotifier {
     }
     await _stopCoordinator();
 
-    final store = FilesystemSyncStore(state.locator);
+    final store = _storeForState(state);
     final manager = SyncProfileManager(store: store);
     final profile = await manager.join();
     if (profile.profileId != state.profileId) {
@@ -177,7 +210,7 @@ final class GagakuSyncService extends ChangeNotifier {
     final state = await readState();
     await _stopCoordinator();
     try {
-      final store = FilesystemSyncStore(state.locator);
+      final store = _storeForState(state);
       final profileManager = SyncProfileManager(store: store);
       final profile = await profileManager.join();
       if (profile.profileId != state.profileId) {
@@ -217,7 +250,7 @@ final class GagakuSyncService extends ChangeNotifier {
     await _stopCoordinator();
     try {
       return await SyncProfileManager(
-        store: FilesystemSyncStore(state.locator),
+        store: _storeForState(state),
       ).repair(state.profileId);
     } finally {
       if (state.enabled && _coordinator == null) {
@@ -231,7 +264,7 @@ final class GagakuSyncService extends ChangeNotifier {
     await _stopCoordinator();
     try {
       final result = await SyncProfileManager(
-        store: FilesystemSyncStore(state.locator),
+        store: _storeForState(state),
       ).reset(state.profileId);
       if (result.failures.isEmpty) {
         await _metadata!.write(SyncLocalState());
@@ -272,19 +305,19 @@ final class GagakuSyncService extends ChangeNotifier {
 
   Future<void> _startConfigured(SyncLocalState state) async {
     final providerContainer = _providerContainer!;
-    if (state.transportKind != 'filesystem' ||
+    if (!const {'filesystem', 'saf'}.contains(state.transportKind) ||
         state.locator.isEmpty ||
         state.profileId.isEmpty ||
         state.deviceId.isEmpty) {
       state
         ..retryPending = true
-        ..lastError = 'Incomplete filesystem sync configuration';
+        ..lastError = 'Incomplete sync configuration';
       await _metadata!.write(state);
       notifyListeners();
       return;
     }
 
-    final syncStore = FilesystemSyncStore(state.locator);
+    final syncStore = _storeForState(state);
     final profileManager = SyncProfileManager(store: syncStore);
     final codec = GagakuDataCodec(store: GagakuData().store);
     final coordinator = SyncCoordinator(
@@ -302,6 +335,9 @@ final class GagakuSyncService extends ChangeNotifier {
         refresh: () => refreshImportedGagakuData(providerContainer),
       ),
       entityChanges: GagakuData().store.entityChanges,
+      operationTimeout: state.transportKind == 'saf'
+          ? const Duration(seconds: 30)
+          : const Duration(seconds: 5),
     );
     _coordinator = coordinator;
     _statusSubscription = coordinator.statuses.listen((_) => notifyListeners());
@@ -316,6 +352,13 @@ final class GagakuSyncService extends ChangeNotifier {
     );
     notifyListeners();
   }
+
+  SyncStore _storeForState(SyncLocalState state) =>
+      switch (state.transportKind) {
+        'filesystem' => FilesystemSyncStore(state.locator),
+        'saf' => SafSyncStore(state.locator),
+        final kind => throw StateError('Unsupported sync transport: $kind'),
+      };
 
   Future<void> _stopCoordinator() async {
     final observer = _lifecycleObserver;

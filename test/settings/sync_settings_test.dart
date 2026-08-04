@@ -19,8 +19,10 @@ void main() {
 
     expect(find.text('Database Sync'), findsOneWidget);
     expect(find.text('Disabled'), findsWidgets);
-    expect(find.text('Create New Profile'), findsOneWidget);
-    expect(find.text('Join Existing Profile'), findsOneWidget);
+    expect(find.text('Create Filesystem Profile'), findsOneWidget);
+    expect(find.text('Join Filesystem Profile'), findsOneWidget);
+    expect(find.text('Create Document Provider Profile'), findsOneWidget);
+    expect(find.text('Join Document Provider Profile'), findsOneWidget);
     expect(find.text('Delete Remote Profile'), findsNothing);
   });
 
@@ -73,8 +75,8 @@ void main() {
     expect(metadata.state.deviceId, 'device-fixture');
     expect(find.text('Resume Sync'), findsOneWidget);
     expect(find.text('Forget Sync Configuration'), findsOneWidget);
-    expect(find.text('Create New Profile'), findsNothing);
-    expect(find.text('Join Existing Profile'), findsNothing);
+    expect(find.text('Create Filesystem Profile'), findsNothing);
+    expect(find.text('Join Filesystem Profile'), findsNothing);
   });
 
   testWidgets('missing remote profile presents safe recovery choices', (
@@ -104,7 +106,34 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Forget Sync Configuration'), findsOneWidget);
-    expect(find.text('Create New Profile'), findsNothing);
+    expect(find.text('Create Filesystem Profile'), findsNothing);
+  });
+
+  testWidgets('configured document tree is identified separately', (
+    tester,
+  ) async {
+    final service = GagakuSyncService.withMetadata(
+      MemorySyncMetadataStore(
+        SyncLocalState(
+          enabled: false,
+          transportKind: 'saf',
+          locator: 'content://synthetic.provider/tree/profile-fixture',
+          profileId: 'profile-fixture',
+          deviceId: 'device-fixture',
+          deviceName: 'Fictional Device',
+        ),
+      ),
+    );
+
+    await _pump(tester, service);
+
+    expect(find.text('Android document tree'), findsOneWidget);
+    expect(
+      find.textContaining(
+        'Document tree: content://synthetic.provider/tree/profile-fixture',
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('device name dialog survives cancel and save transitions', (
@@ -155,7 +184,7 @@ Future<void> _pump(WidgetTester tester, GagakuSyncService service) async {
       child: MaterialApp(
         home: Scaffold(
           body: SingleChildScrollView(
-            child: SyncSettingsSection(service: service),
+            child: SyncSettingsSection(service: service, isAndroid: true),
           ),
         ),
       ),
