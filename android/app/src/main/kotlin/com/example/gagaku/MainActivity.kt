@@ -2,18 +2,22 @@ package r52.gagaku
 
 import android.app.Activity
 import android.content.Intent
+import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.provider.DocumentsContract
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import java.io.FileNotFoundException
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class MainActivity : FlutterActivity() {
     private val ioExecutor: ExecutorService = Executors.newSingleThreadExecutor()
@@ -237,11 +241,46 @@ class MainActivity : FlutterActivity() {
             treeUri,
             parent.documentId,
         )
-        return contentResolver.query(childrenUri, PROJECTION, null, null, null)?.use { cursor ->
-            buildList {
-                while (cursor.moveToNext()) add(documentFromCursor(treeUri, cursor))
+        val deadline = SystemClock.elapsedRealtime() + DIRECTORY_LOADING_TIMEOUT_MS
+        while (true) {
+            val changed = CountDownLatch(1)
+            val observer = object : ContentObserver(null) {
+                override fun onChange(selfChange: Boolean) {
+                    changed.countDown()
+                }
             }
-        } ?: throw SafFailure("IO_ERROR", "Unable to list the selected document tree")
+            contentResolver.registerContentObserver(childrenUri, false, observer)
+            try {
+                var loading = false
+                val documents = contentResolver.query(
+                    childrenUri,
+                    PROJECTION,
+                    null,
+                    null,
+                    null,
+                )?.use { cursor ->
+                    loading = cursor.extras.getBoolean(DocumentsContract.EXTRA_LOADING, false)
+                    buildList<SafDocument> {
+                        while (cursor.moveToNext()) add(documentFromCursor(treeUri, cursor))
+                    }
+                } ?: throw SafFailure("IO_ERROR", "Unable to list the selected document tree")
+                if (!loading) return documents
+
+                val remaining = deadline - SystemClock.elapsedRealtime()
+                if (remaining <= 0) {
+                    throw SafFailure(
+                        "PROVIDER_LOADING",
+                        "The document provider is still loading this directory",
+                    )
+                }
+                changed.await(
+                    minOf(remaining, DIRECTORY_LOADING_POLL_MS),
+                    TimeUnit.MILLISECONDS,
+                )
+            } finally {
+                contentResolver.unregisterContentObserver(observer)
+            }
+        }
     }
 
     private fun queryDocument(uri: Uri): SafDocument? =
@@ -426,6 +465,8 @@ class MainActivity : FlutterActivity() {
         private const val TREE_REQUEST_CODE = 7306
         private const val VISIBILITY_ATTEMPTS = 20
         private const val VISIBILITY_DELAY_MS = 250L
+        private const val DIRECTORY_LOADING_TIMEOUT_MS = 5_000L
+        private const val DIRECTORY_LOADING_POLL_MS = 500L
         private val PROJECTION = arrayOf(
             DocumentsContract.Document.COLUMN_DOCUMENT_ID,
             DocumentsContract.Document.COLUMN_DISPLAY_NAME,

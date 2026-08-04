@@ -6,6 +6,8 @@ import 'package:uuid/uuid.dart';
 import 'package:gagaku/sync/protocol.dart';
 import 'package:gagaku/sync/store.dart';
 
+typedef SyncReadRetryPredicate = bool Function(Object error);
+
 final class SyncProfile {
   const SyncProfile({required this.profileId, required this.createdAt});
 
@@ -93,12 +95,21 @@ final class SyncProfileManager {
     required this.store,
     String Function()? idFactory,
     DateTime Function()? now,
+    this.readRetryTimeout = Duration.zero,
+    this.readRetryDelay = const Duration(milliseconds: 500),
+    SyncReadRetryPredicate? retryReadWhen,
   }) : _idFactory = idFactory ?? const Uuid().v4,
-       _now = now ?? DateTime.now;
+       _now = now ?? DateTime.now,
+       _retryReadWhen =
+           retryReadWhen ??
+           ((Object error) => error is SyncObjectNotFoundException);
 
   final SyncStore store;
   final String Function() _idFactory;
   final DateTime Function() _now;
+  final Duration readRetryTimeout;
+  final Duration readRetryDelay;
+  final SyncReadRetryPredicate _retryReadWhen;
 
   static const _permittedSyncthingEntries = {
     '.stfolder',
@@ -134,7 +145,7 @@ final class SyncProfileManager {
       );
 
   Future<SyncProfile> join() async =>
-      SyncProfileCodec.decode(await store.read(SyncProfileCodec.key));
+      SyncProfileCodec.decode(await _read(SyncProfileCodec.key));
 
   Future<bool> hasExpectedProfile(String expectedProfileId) async {
     final objects = await store.list('');
@@ -153,7 +164,7 @@ final class SyncProfileManager {
     final bytes = utf8.encode('gagaku-sync-probe');
     await store.create(key, bytes);
     try {
-      final readback = await store.read(key);
+      final readback = await _read(key);
       if (!_bytesEqual(bytes, readback)) {
         throw const SyncValidationException(
           'sync store probe readback mismatch',
@@ -254,5 +265,20 @@ final class SyncProfileManager {
       if (left[index] != right[index]) return false;
     }
     return true;
+  }
+
+  Future<List<int>> _read(String key) async {
+    if (readRetryTimeout <= Duration.zero) return store.read(key);
+    final elapsed = Stopwatch()..start();
+    while (true) {
+      try {
+        return await store.read(key);
+      } catch (error) {
+        final remaining = readRetryTimeout - elapsed.elapsed;
+        if (!_retryReadWhen(error) || remaining <= Duration.zero) rethrow;
+        final delay = readRetryDelay < remaining ? readRetryDelay : remaining;
+        if (delay > Duration.zero) await Future<void>.delayed(delay);
+      }
+    }
   }
 }

@@ -32,6 +32,27 @@ void main() {
     expect(store.objects.keys, [SyncProfileCodec.key]);
   });
 
+  test('retries transient profile readback within a bounded window', () async {
+    final backing = MemorySyncStore();
+    final store = _DelayedProfileReadStore(backing, failures: 2);
+    final ids = ['probe-create', 'profile-fixture'].iterator;
+    final manager = SyncProfileManager(
+      store: store,
+      idFactory: () {
+        ids.moveNext();
+        return ids.current;
+      },
+      now: () => DateTime.utc(2026, 1, 2, 3, 4, 5),
+      readRetryTimeout: const Duration(seconds: 1),
+      readRetryDelay: Duration.zero,
+    );
+
+    final profile = await manager.create();
+
+    expect(profile.profileId, 'profile-fixture');
+    expect(store.profileReadAttempts, 3);
+  });
+
   test('refuses non-empty and incompatible profile directories', () async {
     final nonEmpty = MemorySyncStore()
       ..seed('unrelated-file.txt', utf8.encode('synthetic'));
@@ -165,6 +186,32 @@ void _seedProfile(MemorySyncStore store) {
       ),
     ),
   );
+}
+
+final class _DelayedProfileReadStore implements SyncStore {
+  _DelayedProfileReadStore(this.backing, {required this.failures});
+
+  final MemorySyncStore backing;
+  final int failures;
+  int profileReadAttempts = 0;
+
+  @override
+  Future<void> create(String key, List<int> bytes) =>
+      backing.create(key, bytes);
+
+  @override
+  Future<void> delete(String key) => backing.delete(key);
+
+  @override
+  Future<List<SyncObject>> list(String prefix) => backing.list(prefix);
+
+  @override
+  Future<List<int>> read(String key) {
+    if (key == SyncProfileCodec.key && profileReadAttempts++ < failures) {
+      throw SyncObjectNotFoundException(key);
+    }
+    return backing.read(key);
+  }
 }
 
 SyncSnapshot _snapshot(String deviceId, int sequence) =>

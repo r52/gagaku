@@ -17,6 +17,8 @@ class SafSyncStoreException implements Exception {
   final String code;
   final String message;
 
+  bool get isTransient => code == 'PROVIDER_LOADING' || code == 'IO_ERROR';
+
   @override
   String toString() => message;
 }

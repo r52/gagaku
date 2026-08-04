@@ -20,6 +20,9 @@ import 'package:gagaku/sync/store.dart';
 
 enum SyncProfileMode { create, join }
 
+const _safBootstrapTimeout = Duration(seconds: 30);
+const _safBootstrapRetryDelay = Duration(milliseconds: 500);
+
 final class GagakuSyncService extends ChangeNotifier {
   GagakuSyncService._();
 
@@ -104,7 +107,13 @@ final class GagakuSyncService extends ChangeNotifier {
     late final SyncProfile profile;
     late final String deviceId;
     try {
-      final manager = SyncProfileManager(store: store);
+      final isSaf = transportKind == 'saf';
+      final manager = SyncProfileManager(
+        store: store,
+        readRetryTimeout: isSaf ? _safBootstrapTimeout : Duration.zero,
+        readRetryDelay: _safBootstrapRetryDelay,
+        retryReadWhen: isSaf ? _isTransientSafBootstrapError : null,
+      );
       profile = switch (mode) {
         SyncProfileMode.create => await manager.create(),
         SyncProfileMode.join => await manager.join(),
@@ -112,12 +121,15 @@ final class GagakuSyncService extends ChangeNotifier {
       deviceId = const Uuid().v4();
       if (mode == SyncProfileMode.join) {
         await manager.probe();
-        final discovery = await SyncRepository(
+        final repository = SyncRepository(
           store: store,
           profileId: profile.profileId,
           deviceId: deviceId,
           deviceName: deviceName,
-        ).discover();
+        );
+        final discovery = isSaf
+            ? await _discoverSafBootstrap(repository)
+            : await repository.discover();
         if (discovery.selection is NoSyncHeads) {
           throw StateError('Sync profile has no valid snapshots');
         }
@@ -359,6 +371,37 @@ final class GagakuSyncService extends ChangeNotifier {
         'saf' => SafSyncStore(state.locator),
         final kind => throw StateError('Unsupported sync transport: $kind'),
       };
+
+  Future<SyncDiscovery> _discoverSafBootstrap(SyncRepository repository) async {
+    final elapsed = Stopwatch()..start();
+    Object? lastTransientError;
+    SyncDiscovery? lastDiscovery;
+    while (true) {
+      try {
+        final discovery = await repository.discover();
+        lastDiscovery = discovery;
+        lastTransientError = null;
+        if (discovery.selection is! NoSyncHeads) return discovery;
+      } catch (error) {
+        if (!_isTransientSafBootstrapError(error)) rethrow;
+        lastTransientError = error;
+      }
+
+      final remaining = _safBootstrapTimeout - elapsed.elapsed;
+      if (remaining <= Duration.zero) {
+        if (lastTransientError != null) throw lastTransientError;
+        return lastDiscovery!;
+      }
+      final delay = _safBootstrapRetryDelay < remaining
+          ? _safBootstrapRetryDelay
+          : remaining;
+      await Future<void>.delayed(delay);
+    }
+  }
+
+  static bool _isTransientSafBootstrapError(Object error) =>
+      error is SyncObjectNotFoundException ||
+      error is SafSyncStoreException && error.isTransient;
 
   Future<void> _stopCoordinator() async {
     final observer = _lifecycleObserver;

@@ -111,4 +111,24 @@ void main() {
       throwsA(isA<SafPermissionException>()),
     );
   });
+
+  test('preserves provider-loading failures as transient errors', () async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          SafSyncStore.channel,
+          (_) => throw PlatformException(
+            code: 'PROVIDER_LOADING',
+            message: 'Synthetic provider is loading',
+          ),
+        );
+
+    await expectLater(
+      SafSyncStore(treeUri).list(''),
+      throwsA(
+        isA<SafSyncStoreException>()
+            .having((error) => error.code, 'code', 'PROVIDER_LOADING')
+            .having((error) => error.isTransient, 'isTransient', isTrue),
+      ),
+    );
+  });
 }
