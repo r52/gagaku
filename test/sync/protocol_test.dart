@@ -94,6 +94,41 @@ void main() {
       });
     });
 
+    test('prepared background encoding preserves protocol bytes', () async {
+      const payload = {
+        'synthetic': {
+          'nested': [3, 2, 1],
+        },
+      };
+      final prepared = await SyncSnapshotCodec.preparePayload(payload);
+      final encoded = await SyncSnapshotCodec.createEncoded(
+        profileId: 'synthetic-profile',
+        deviceId: 'device-a',
+        deviceSequence: 1,
+        revisionId: 'revision-1',
+        createdAt: DateTime.utc(2026, 1, 2, 3, 4, 5),
+        seen: const {'device-a': 1},
+        prepared: prepared,
+      );
+      final synchronous = SyncSnapshotCodec.create(
+        profileId: 'synthetic-profile',
+        deviceId: 'device-a',
+        deviceSequence: 1,
+        revisionId: 'revision-1',
+        createdAt: DateTime.utc(2026, 1, 2, 3, 4, 5),
+        seen: const {'device-a': 1},
+        payload: payload,
+      );
+
+      expect(prepared.payloadHash, synchronous.payloadHash);
+      expect(prepared.payloadLength, synchronous.payloadLength);
+      expect(
+        encoded.bytes,
+        orderedEquals(SyncSnapshotCodec.encode(synchronous)),
+      );
+      expect(encoded.snapshot.payload, payload);
+    });
+
     test(
       'rejects profile, filename, protocol, hash, and truncation errors',
       () {

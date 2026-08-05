@@ -60,6 +60,26 @@ void main() {
         (normalDiscovery.selection as CanonicalSyncHead).head.key,
       );
     });
+
+    test(
+      'reuses explicitly validated immutable objects within a pass',
+      () async {
+        final delegate = MemorySyncStore();
+        final store = _CountingStore(delegate);
+        final repository = _repository(store, 'device-a', ['revision-a1']);
+        await repository.publish(_payload('same'));
+        final first = await repository.discover();
+        store.reset();
+
+        final second = await repository.discover(
+          previouslyValidated: first.validSnapshots,
+        );
+
+        expect(second.deviceHeads['device-a']?.payload, _payload('same'));
+        expect(store.listCount, 1);
+        expect(store.readCount, 0);
+      },
+    );
   });
 
   group('SyncRepository publication', () {
@@ -125,6 +145,22 @@ void main() {
         store.objects.keys.where((key) => key.startsWith('devices/device-a/')),
         hasLength(2),
       );
+    });
+
+    test('reuses discovery results for readback and compaction', () async {
+      final delegate = MemorySyncStore();
+      final store = _CountingStore(delegate);
+      final repository = _repository(store, 'device-a', [
+        'revision-a1',
+        'revision-a2',
+      ]);
+      await repository.publish(_payload('first'));
+      store.reset();
+
+      await repository.publish(_payload('second'));
+
+      expect(store.listCount, 1);
+      expect(store.readCount, 2);
     });
 
     test(
@@ -409,4 +445,36 @@ final class _CorruptingCreateStore implements SyncStore {
 
   @override
   Future<List<int>> read(String key) => delegate.read(key);
+}
+
+final class _CountingStore implements SyncStore {
+  _CountingStore(this.delegate);
+
+  final MemorySyncStore delegate;
+  int listCount = 0;
+  int readCount = 0;
+
+  void reset() {
+    listCount = 0;
+    readCount = 0;
+  }
+
+  @override
+  Future<void> create(String key, List<int> bytes) =>
+      delegate.create(key, bytes);
+
+  @override
+  Future<void> delete(String key) => delegate.delete(key);
+
+  @override
+  Future<List<SyncObject>> list(String prefix) {
+    listCount++;
+    return delegate.list(prefix);
+  }
+
+  @override
+  Future<List<int>> read(String key) {
+    readCount++;
+    return delegate.read(key);
+  }
 }

@@ -61,21 +61,21 @@ void main() {
       final payload = await codec.export();
       exportStopwatch.stop();
 
-      final hashStopwatch = Stopwatch()..start();
-      final hash = SyncSnapshotCodec.payloadHash(payload);
-      final bytes = SyncSnapshotCodec.canonicalJsonBytes(payload).length;
-      hashStopwatch.stop();
+      final prepareStopwatch = Stopwatch()..start();
+      final prepared = await SyncSnapshotCodec.preparePayload(payload);
+      prepareStopwatch.stop();
 
       // Characterization output only; timing is deliberately not asserted.
       // ignore: avoid_print
       print(
-        'PHASE8_EXPORT run=$run bytes=$bytes '
+        'PHASE9_EXPORT run=$run bytes=${prepared.payloadLength} '
         'exportMicroseconds=${exportStopwatch.elapsedMicroseconds} '
-        'canonicalizeAndHashMicroseconds=${hashStopwatch.elapsedMicroseconds}',
+        'backgroundPrepareMicroseconds='
+        '${prepareStopwatch.elapsedMicroseconds}',
       );
       expect(payload, isA<Map<String, dynamic>>());
-      expect(hash, startsWith('sha256:'));
-      expect(bytes, greaterThan(100000));
+      expect(prepared.payloadHash, startsWith('sha256:'));
+      expect(prepared.payloadLength, greaterThan(100000));
     }
   });
 }

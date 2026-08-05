@@ -1,5 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:isolate';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 
@@ -108,6 +110,27 @@ final class SyncSnapshot {
   };
 }
 
+final class SyncPreparedPayload {
+  const SyncPreparedPayload._({
+    required this.payload,
+    required this.canonicalBytes,
+    required this.payloadHash,
+  });
+
+  final Map<String, dynamic> payload;
+  final Uint8List canonicalBytes;
+  final String payloadHash;
+
+  int get payloadLength => canonicalBytes.length;
+}
+
+final class SyncEncodedSnapshot {
+  const SyncEncodedSnapshot({required this.snapshot, required this.bytes});
+
+  final SyncSnapshot snapshot;
+  final Uint8List bytes;
+}
+
 abstract final class SyncSnapshotCodec {
   static const snapshotFormat = 'gagaku-sync-snapshot';
   static const protocolVersion = 1;
@@ -149,8 +172,70 @@ abstract final class SyncSnapshotCodec {
     required Map<String, int> seen,
     required Map<String, dynamic> payload,
     Map<String, dynamic> extra = const {},
+  }) => _createPrepared(
+    profileId: profileId,
+    deviceId: deviceId,
+    deviceSequence: deviceSequence,
+    revisionId: revisionId,
+    createdAt: createdAt,
+    seen: seen,
+    prepared: _preparePayload(payload),
+    extra: extra,
+  );
+
+  static Future<SyncPreparedPayload> preparePayload(
+    Map<String, dynamic> payload,
+  ) async {
+    final material = await Isolate.run(() {
+      final canonicalBytes = Uint8List.fromList(canonicalJsonBytes(payload));
+      return (
+        canonicalBytes: canonicalBytes,
+        payloadHash: _payloadHashBytes(canonicalBytes),
+      );
+    });
+    return SyncPreparedPayload._(
+      payload: UnmodifiableMapView(Map.of(payload)),
+      canonicalBytes: material.canonicalBytes,
+      payloadHash: material.payloadHash,
+    );
+  }
+
+  static Future<SyncEncodedSnapshot> createEncoded({
+    required String profileId,
+    required String deviceId,
+    required int deviceSequence,
+    required String revisionId,
+    required DateTime createdAt,
+    required Map<String, int> seen,
+    required SyncPreparedPayload prepared,
+    Map<String, dynamic> extra = const {},
+  }) => Isolate.run(() {
+    final snapshot = _createPrepared(
+      profileId: profileId,
+      deviceId: deviceId,
+      deviceSequence: deviceSequence,
+      revisionId: revisionId,
+      createdAt: createdAt,
+      seen: seen,
+      prepared: prepared,
+      extra: extra,
+    );
+    return SyncEncodedSnapshot(
+      snapshot: snapshot,
+      bytes: Uint8List.fromList(_encodePrepared(snapshot, prepared)),
+    );
+  });
+
+  static SyncSnapshot _createPrepared({
+    required String profileId,
+    required String deviceId,
+    required int deviceSequence,
+    required String revisionId,
+    required DateTime createdAt,
+    required Map<String, int> seen,
+    required SyncPreparedPayload prepared,
+    required Map<String, dynamic> extra,
   }) {
-    final payloadBytes = canonicalJsonBytes(payload);
     final key = objectKey(
       deviceId: deviceId,
       deviceSequence: deviceSequence,
@@ -164,13 +249,38 @@ abstract final class SyncSnapshotCodec {
       revisionId: revisionId,
       createdAt: createdAt.toUtc(),
       seen: UnmodifiableMapView(SyncClock._sortedClock(Map.of(seen))),
-      payloadHash: payloadHash(payload),
-      payloadLength: payloadBytes.length,
-      payload: UnmodifiableMapView(Map.of(payload)),
+      payloadHash: prepared.payloadHash,
+      payloadLength: prepared.payloadLength,
+      payload: prepared.payload,
       extra: UnmodifiableMapView(Map.of(extra)),
     );
-    _validate(snapshot, expectedProfileId: profileId);
+    _validateEnvelope(snapshot, expectedProfileId: profileId);
     return snapshot;
+  }
+
+  static SyncPreparedPayload _preparePayload(Map<String, dynamic> payload) {
+    final canonicalBytes = Uint8List.fromList(canonicalJsonBytes(payload));
+    return SyncPreparedPayload._(
+      payload: UnmodifiableMapView(Map.of(payload)),
+      canonicalBytes: canonicalBytes,
+      payloadHash: _payloadHashBytes(canonicalBytes),
+    );
+  }
+
+  static List<int> _encodePrepared(
+    SyncSnapshot snapshot,
+    SyncPreparedPayload prepared,
+  ) {
+    _validateEnvelope(snapshot, expectedProfileId: snapshot.profileId);
+    if (snapshot.payloadLength != prepared.payloadLength ||
+        snapshot.payloadHash != prepared.payloadHash) {
+      throw const SyncValidationException('prepared payload mismatch');
+    }
+    return utf8.encode(
+      _canonicalJsonMap(snapshot.toJson(), {
+        'payload': utf8.decode(prepared.canonicalBytes),
+      }),
+    );
   }
 
   static List<int> encode(SyncSnapshot snapshot) {
@@ -257,7 +367,10 @@ abstract final class SyncSnapshotCodec {
       utf8.encode(_canonicalJson(value));
 
   static String payloadHash(Map<String, dynamic> payload) =>
-      '$hashAlgorithm:${sha256.convert(canonicalJsonBytes(payload))}';
+      _payloadHashBytes(canonicalJsonBytes(payload));
+
+  static String _payloadHashBytes(List<int> canonicalBytes) =>
+      '$hashAlgorithm:${sha256.convert(canonicalBytes)}';
 
   static String _canonicalJson(Object? value) {
     return switch (value) {
@@ -274,16 +387,33 @@ abstract final class SyncSnapshotCodec {
     };
   }
 
-  static String _canonicalJsonMap(Map values) {
+  static String _canonicalJsonMap(
+    Map values, [
+    Map<String, String> encodedValues = const {},
+  ]) {
     if (values.keys.any((key) => key is! String)) {
       throw const SyncValidationException('JSON object keys must be strings');
     }
     final keys = values.keys.cast<String>().toList()..sort();
     return '{${keys.map((key) => '${jsonEncode(key)}:'
-        '${_canonicalJson(values[key])}').join(',')}}';
+        '${encodedValues[key] ?? _canonicalJson(values[key])}').join(',')}}';
   }
 
   static void _validate(
+    SyncSnapshot snapshot, {
+    required String expectedProfileId,
+  }) {
+    _validateEnvelope(snapshot, expectedProfileId: expectedProfileId);
+    final payloadBytes = canonicalJsonBytes(snapshot.payload);
+    if (payloadBytes.length != snapshot.payloadLength) {
+      throw const SyncValidationException('payload length mismatch');
+    }
+    if (snapshot.payloadHash != _payloadHashBytes(payloadBytes)) {
+      throw const SyncValidationException('payload hash mismatch');
+    }
+  }
+
+  static void _validateEnvelope(
     SyncSnapshot snapshot, {
     required String expectedProfileId,
   }) {
@@ -315,14 +445,6 @@ abstract final class SyncSnapshotCodec {
     );
     if (snapshot.key != expectedKey) {
       throw const SyncValidationException('filename/envelope mismatch');
-    }
-    final payloadBytes = canonicalJsonBytes(snapshot.payload);
-    if (payloadBytes.length != snapshot.payloadLength) {
-      throw const SyncValidationException('payload length mismatch');
-    }
-    final expectedHash = payloadHash(snapshot.payload);
-    if (snapshot.payloadHash != expectedHash) {
-      throw const SyncValidationException('payload hash mismatch');
     }
   }
 

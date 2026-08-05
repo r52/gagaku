@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:isolate';
 
 import 'package:uuid/uuid.dart';
 
@@ -15,11 +16,13 @@ final class InvalidSyncObject {
 final class SyncDiscovery {
   const SyncDiscovery({
     required this.deviceHeads,
+    required this.validSnapshots,
     required this.invalidObjects,
     required this.selection,
   });
 
   final Map<String, SyncSnapshot> deviceHeads;
+  final List<SyncSnapshot> validSnapshots;
   final List<InvalidSyncObject> invalidObjects;
   final SyncHeadSelection selection;
 }
@@ -45,6 +48,30 @@ final class SyncForkException implements Exception {
 
 typedef SyncRevisionIdFactory = String Function();
 typedef SyncNow = DateTime Function();
+typedef _PendingSnapshot = ({String key, List<int> bytes});
+typedef _DecodedSnapshot = ({SyncSnapshot? snapshot, String? error});
+
+List<_DecodedSnapshot> _decodeSnapshots(
+  List<_PendingSnapshot> pending,
+  String profileId,
+) {
+  final decoded = <_DecodedSnapshot>[];
+  for (final object in pending) {
+    try {
+      decoded.add((
+        snapshot: SyncSnapshotCodec.decode(
+          object.key,
+          object.bytes,
+          expectedProfileId: profileId,
+        ),
+        error: null,
+      ));
+    } on SyncValidationException catch (error) {
+      decoded.add((snapshot: null, error: error.message));
+    }
+  }
+  return decoded;
+}
 
 final class SyncRepository {
   SyncRepository({
@@ -64,23 +91,51 @@ final class SyncRepository {
   final SyncRevisionIdFactory _revisionIdFactory;
   final SyncNow _now;
 
-  Future<SyncDiscovery> discover() async {
+  Future<SyncDiscovery> discover({
+    Iterable<SyncSnapshot> previouslyValidated = const [],
+  }) async {
     final objects = await store.list('devices/');
     final invalid = <InvalidSyncObject>[];
     final valid = <SyncSnapshot>[];
+    final validatedByKey = {
+      for (final snapshot in previouslyValidated) snapshot.key: snapshot,
+    };
+    final pendingObjects = <SyncObject>[];
+    final pendingSnapshots = <_PendingSnapshot>[];
 
     for (final object in objects) {
-      try {
-        final bytes = await store.read(object.key);
-        valid.add(
-          SyncSnapshotCodec.decode(
-            object.key,
-            bytes,
-            expectedProfileId: profileId,
-          ),
-        );
-      } on SyncValidationException catch (error) {
-        invalid.add(InvalidSyncObject(object: object, error: error));
+      final validated = validatedByKey[object.key];
+      if (validated != null) {
+        valid.add(validated);
+        continue;
+      }
+      pendingObjects.add(object);
+      pendingSnapshots.add((
+        key: object.key,
+        bytes: await store.read(object.key),
+      ));
+    }
+
+    if (pendingSnapshots.isNotEmpty) {
+      final decoded = await Isolate.run(
+        () => _decodeSnapshots(pendingSnapshots, profileId),
+      );
+      for (var index = 0; index < decoded.length; index++) {
+        final result = decoded[index];
+        final snapshot = result.snapshot;
+        if (snapshot != null) {
+          valid.add(snapshot);
+        } else {
+          invalid.add(
+            InvalidSyncObject(
+              object: pendingObjects[index],
+              error: SyncValidationException(
+                result.error ?? 'invalid snapshot encoding',
+                key: pendingObjects[index].key,
+              ),
+            ),
+          );
+        }
       }
     }
 
@@ -110,6 +165,7 @@ final class SyncRepository {
     final sortedHeads = SplayTreeMap<String, SyncSnapshot>.from(deviceHeads);
     return SyncDiscovery(
       deviceHeads: UnmodifiableMapView(sortedHeads),
+      validSnapshots: List.unmodifiable(valid),
       invalidObjects: List.unmodifiable(invalid),
       selection: SyncHeadSelector.select(sortedHeads.values),
     );
@@ -117,20 +173,21 @@ final class SyncRepository {
 
   Future<SyncPublication> publish(Map<String, dynamic> payload) async {
     final discovery = await discover();
+    final prepared = await SyncSnapshotCodec.preparePayload(payload);
     final baseClock = switch (discovery.selection) {
       NoSyncHeads() => const <String, int>{},
       CanonicalSyncHead(:final head) => head.seen,
       EquivalentSyncHeads(:final joinedClock) => joinedClock,
       ForkedSyncHeads(:final heads) => throw SyncForkException(heads),
     };
-    return _publish(payload, baseClock, discovery);
+    return _publish(prepared, baseClock, discovery);
   }
 
   Future<SyncPublication> normalizeEquivalentHeads() async {
     final discovery = await discover();
     return switch (discovery.selection) {
       EquivalentSyncHeads(:final heads, :final joinedClock) => _publish(
-        heads.first.payload,
+        await SyncSnapshotCodec.preparePayload(heads.first.payload),
         joinedClock,
         discovery,
       ),
@@ -148,7 +205,11 @@ final class SyncRepository {
       throw ArgumentError.value(selected.key, 'selected', 'not a fork head');
     }
     final joined = SyncClock.join(heads.map((head) => head.seen));
-    return _publish(selected.payload, joined, discovery);
+    return _publish(
+      await SyncSnapshotCodec.preparePayload(selected.payload),
+      joined,
+      discovery,
+    );
   }
 
   /// Publishes a local branch from a previously synchronized clock.
@@ -157,9 +218,10 @@ final class SyncRepository {
   /// is used when local data changed concurrently, so both complete branches
   /// remain visible for explicit resolution.
   Future<SyncPublication> publishFromClock(
-    Map<String, dynamic> payload,
+    SyncPreparedPayload prepared,
     Map<String, int> baseClock,
-  ) async => _publish(payload, baseClock, await discover());
+    SyncDiscovery discovery,
+  ) async => _publish(prepared, baseClock, discovery);
 
   Future<List<String>> retireDevice(String retiredDeviceId) async {
     if (retiredDeviceId.isEmpty || retiredDeviceId.contains('/')) {
@@ -186,7 +248,7 @@ final class SyncRepository {
   }
 
   Future<SyncPublication> _publish(
-    Map<String, dynamic> payload,
+    SyncPreparedPayload prepared,
     Map<String, int> baseClock,
     SyncDiscovery discovery,
   ) async {
@@ -198,49 +260,47 @@ final class SyncRepository {
         ].reduce((left, right) => left > right ? left : right) +
         1;
     final seen = Map<String, int>.of(baseClock)..[deviceId] = nextSequence;
-    final snapshot = SyncSnapshotCodec.create(
+    final encoded = await SyncSnapshotCodec.createEncoded(
       profileId: profileId,
       deviceId: deviceId,
       deviceSequence: nextSequence,
       revisionId: _revisionIdFactory(),
       createdAt: _now().toUtc(),
       seen: seen,
-      payload: payload,
+      prepared: prepared,
       extra: {
         if (deviceName.trim().isNotEmpty) 'deviceName': deviceName.trim(),
       },
     );
+    final snapshot = encoded.snapshot;
 
-    await store.create(snapshot.key, SyncSnapshotCodec.encode(snapshot));
+    await store.create(snapshot.key, encoded.bytes);
     final readback = await store.read(snapshot.key);
-    final validated = SyncSnapshotCodec.decode(
-      snapshot.key,
-      readback,
-      expectedProfileId: profileId,
+    final validated = await Isolate.run(
+      () => SyncSnapshotCodec.decode(
+        snapshot.key,
+        readback,
+        expectedProfileId: profileId,
+      ),
     );
-    final cleanupFailures = await _compactLocalNamespace();
+    final cleanupFailures = await _compactLocalNamespace([
+      ...discovery.validSnapshots,
+      validated,
+    ]);
     return SyncPublication(
       snapshot: validated,
       cleanupFailures: List.unmodifiable(cleanupFailures),
     );
   }
 
-  Future<List<String>> _compactLocalNamespace() async {
-    final objects = await store.list('devices/$deviceId/');
-    final valid = <SyncSnapshot>[];
-    for (final object in objects) {
-      try {
-        valid.add(
-          SyncSnapshotCodec.decode(
-            object.key,
-            await store.read(object.key),
-            expectedProfileId: profileId,
-          ),
-        );
-      } on SyncValidationException {
-        // Invalid objects are retained for explicit repair/recovery.
-      }
-    }
+  Future<List<String>> _compactLocalNamespace(
+    Iterable<SyncSnapshot> validatedSnapshots,
+  ) async {
+    final validByKey = <String, SyncSnapshot>{
+      for (final snapshot in validatedSnapshots)
+        if (snapshot.deviceId == deviceId) snapshot.key: snapshot,
+    };
+    final valid = validByKey.values.toList();
     valid.sort((left, right) {
       final sequence = right.deviceSequence.compareTo(left.deviceSequence);
       return sequence != 0 ? sequence : left.key.compareTo(right.key);

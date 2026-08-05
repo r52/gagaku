@@ -137,6 +137,7 @@ final class _DeviceHarness {
       importData: data.import,
       entityChanges: changes.stream,
       debounceDuration: const Duration(milliseconds: 20),
+      foregroundCooldown: Duration.zero,
       operationTimeout: const Duration(seconds: 2),
     );
     final harness = _DeviceHarness(

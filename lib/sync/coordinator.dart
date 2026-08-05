@@ -48,6 +48,7 @@ final class SyncCoordinator {
     required this.entityChanges,
     this.validateProfile,
     this.debounceDuration = const Duration(milliseconds: 1500),
+    this.foregroundCooldown = const Duration(seconds: 30),
     this.operationTimeout = const Duration(seconds: 5),
     SyncCoordinatorNow? now,
   }) : _now = now ?? DateTime.now;
@@ -59,6 +60,7 @@ final class SyncCoordinator {
   final Stream<Object?> entityChanges;
   final SyncProfileValidator? validateProfile;
   final Duration debounceDuration;
+  final Duration foregroundCooldown;
   final Duration operationTimeout;
   final SyncCoordinatorNow _now;
 
@@ -70,12 +72,15 @@ final class SyncCoordinator {
   SyncLocalState? _state;
   StreamSubscription<Object?>? _changesSubscription;
   Timer? _debounce;
+  Timer? _cooldown;
   Future<void> _generationTail = Future.value();
   bool _passRequested = false;
+  bool _forceRequested = false;
   bool _running = false;
   bool _disposed = false;
   Completer<void>? _idleCompleter;
   SyncSnapshot? _requestedResolution;
+  final Stopwatch _foregroundPublicationClock = Stopwatch();
 
   Stream<SyncCoordinatorStatus> get statuses => _statuses.stream;
   SyncCoordinatorStatus get status => _status;
@@ -99,13 +104,16 @@ final class SyncCoordinator {
     if (_disposed || _state?.enabled != true) return;
     _generationTail = _generationTail.then((_) async {
       final state = _state!;
+      final wasDirty = _isDirty(state);
       state.dirtyGeneration++;
-      await metadataStore.write(state);
+      if (!wasDirty) await metadataStore.write(state);
       _debounce?.cancel();
+      _cooldown?.cancel();
+      _cooldown = null;
       _emit(const SyncCoordinatorStatus(SyncCoordinatorPhase.pending));
       _debounce = Timer(debounceDuration, () {
         _debounce = null;
-        unawaited(requestSync());
+        unawaited(_requestSync(bypassCooldown: false));
       });
     });
   }
@@ -115,6 +123,8 @@ final class SyncCoordinator {
     await _generationTail;
     _debounce?.cancel();
     _debounce = null;
+    _cooldown?.cancel();
+    _cooldown = null;
     if (_isDirty(_state!)) await requestSync();
   }
 
@@ -144,8 +154,17 @@ final class SyncCoordinator {
   }
 
   Future<void> requestSync() {
+    _debounce?.cancel();
+    _debounce = null;
+    _cooldown?.cancel();
+    _cooldown = null;
+    return _requestSync(bypassCooldown: true);
+  }
+
+  Future<void> _requestSync({required bool bypassCooldown}) {
     if (_disposed || _state?.enabled != true) return Future.value();
     _passRequested = true;
+    if (bypassCooldown) _forceRequested = true;
     if (_running) return _idleCompleter!.future;
 
     _running = true;
@@ -158,16 +177,38 @@ final class SyncCoordinator {
   Future<void> _drain(Completer<void> completer) async {
     try {
       while (_passRequested && !_disposed) {
+        final bypassCooldown = _forceRequested;
         _passRequested = false;
+        _forceRequested = false;
+        if (!bypassCooldown && _deferForForegroundCooldown()) continue;
         await _generationTail;
         await _runPass();
+        if (_passRequested && bypassCooldown) _forceRequested = true;
       }
     } finally {
       _running = false;
       _idleCompleter = null;
       if (!completer.isCompleted) completer.complete();
-      if (_passRequested && !_disposed) unawaited(requestSync());
+      if (_passRequested && !_disposed) {
+        unawaited(_requestSync(bypassCooldown: _forceRequested));
+      }
     }
+  }
+
+  bool _deferForForegroundCooldown() {
+    if (foregroundCooldown <= Duration.zero ||
+        !_foregroundPublicationClock.isRunning) {
+      return false;
+    }
+    final remaining = foregroundCooldown - _foregroundPublicationClock.elapsed;
+    if (remaining <= Duration.zero) return false;
+    _cooldown?.cancel();
+    _cooldown = Timer(remaining, () {
+      _cooldown = null;
+      unawaited(_requestSync(bypassCooldown: false));
+    });
+    _emit(const SyncCoordinatorStatus(SyncCoordinatorPhase.pending));
+    return true;
   }
 
   Future<void> _runPass() async {
@@ -204,10 +245,10 @@ final class SyncCoordinator {
       await _suspendForMissingProfile();
       return;
     }
-    await repository.discover();
     final startGeneration = state.dirtyGeneration;
     final payload = await exportData();
-    final payloadHash = SyncSnapshotCodec.payloadHash(payload);
+    final prepared = await SyncSnapshotCodec.preparePayload(payload);
+    final payloadHash = prepared.payloadHash;
     await _generationTail;
     if (state.dirtyGeneration != startGeneration) {
       _passRequested = true;
@@ -234,13 +275,20 @@ final class SyncCoordinator {
           await _suspendForMissingProfile();
           return;
         }
-        await _publish(payload, state.lastSeen, startGeneration, branch: false);
+        await _publish(
+          prepared,
+          state.lastSeen,
+          discovery,
+          startGeneration,
+          branch: false,
+        );
       case CanonicalSyncHead(:final head):
         if (head.payloadHash == payloadHash) {
           if (identityOutdated) {
             await _publish(
-              payload,
+              prepared,
               SyncClock.join([state.lastSeen, head.seen]),
+              discovery,
               startGeneration,
               branch: false,
             );
@@ -261,10 +309,11 @@ final class SyncCoordinator {
         }
         final remoteAdvanced = _remoteAdvanced(state, head.seen);
         await _publish(
-          payload,
+          prepared,
           remoteAdvanced
               ? state.lastSeen
               : SyncClock.join([state.lastSeen, head.seen]),
+          discovery,
           startGeneration,
           branch: remoteAdvanced,
         );
@@ -272,8 +321,9 @@ final class SyncCoordinator {
         final common = heads.first;
         if (localDirty && common.payloadHash != payloadHash) {
           await _publish(
-            payload,
+            prepared,
             state.lastSeen,
+            discovery,
             startGeneration,
             branch: true,
           );
@@ -332,17 +382,27 @@ final class SyncCoordinator {
   }
 
   Future<void> _publish(
-    Map<String, dynamic> payload,
+    SyncPreparedPayload prepared,
     Map<String, int> baseClock,
+    SyncDiscovery discovery,
     int startGeneration, {
     required bool branch,
   }) async {
     _emit(const SyncCoordinatorStatus(SyncCoordinatorPhase.publishing));
-    final publication = await repository.publishFromClock(payload, baseClock);
+    final publication = await repository.publishFromClock(
+      prepared,
+      baseClock,
+      discovery,
+    );
     await _recordPublication(publication, startGeneration);
     if (branch) {
-      final discovery = await repository.discover();
-      final heads = switch (discovery.selection) {
+      final updated = await repository.discover(
+        previouslyValidated: [
+          ...discovery.validSnapshots,
+          publication.snapshot,
+        ],
+      );
+      final heads = switch (updated.selection) {
         ForkedSyncHeads(:final heads) => heads,
         _ => <SyncSnapshot>[],
       };
@@ -444,6 +504,9 @@ final class SyncCoordinator {
       ..lastPublishedPayloadHash = snapshot.payloadHash
       ..lastPublishedAt = _now().toUtc()
       ..lastPublishedGeneration = generation;
+    _foregroundPublicationClock
+      ..reset()
+      ..start();
     if (appliedRevision != null) {
       state
         ..lastAppliedRevision = appliedRevision
@@ -497,6 +560,7 @@ final class SyncCoordinator {
     if (_disposed) return;
     _disposed = true;
     _debounce?.cancel();
+    _cooldown?.cancel();
     await _changesSubscription?.cancel();
     _status = const SyncCoordinatorStatus(SyncCoordinatorPhase.disposed);
     await _statuses.close();

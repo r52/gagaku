@@ -31,6 +31,7 @@ void main() {
         importData: codec.import,
         entityChanges: objectBox.entityChanges,
         debounceDuration: const Duration(milliseconds: 20),
+        foregroundCooldown: Duration.zero,
         operationTimeout: const Duration(seconds: 2),
       );
       addTearDown(() async {
@@ -86,6 +87,7 @@ void main() {
         importData: localCodec.import,
         entityChanges: localObjectBox.entityChanges,
         debounceDuration: const Duration(milliseconds: 20),
+        foregroundCooldown: Duration.zero,
         operationTimeout: const Duration(seconds: 2),
       );
       addTearDown(() async {

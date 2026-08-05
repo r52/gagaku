@@ -189,8 +189,52 @@ void main() {
     },
   );
 
+  test(
+    'foreground cooldown coalesces quiet operations into the latest snapshot',
+    () async {
+      final harness = await _Harness.start(
+        debounce: const Duration(milliseconds: 15),
+        cooldown: const Duration(milliseconds: 120),
+      );
+      addTearDown(harness.dispose);
+
+      harness.data.payload = _payload('operation-one');
+      harness.changes.add(null);
+      await _waitFor(() => harness.metadata.state.dirtyGeneration == 1);
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+
+      harness.data.payload = _payload('operation-two');
+      harness.changes.add(null);
+      await _waitFor(() => harness.metadata.state.dirtyGeneration == 2);
+      await _waitFor(() => harness.metadata.state.lastPublishedGeneration == 2);
+
+      final head = await harness.head();
+      expect(head.deviceSequence, 2);
+      expect(head.payload, _payload('operation-two'));
+    },
+  );
+
+  test('manual sync bypasses the foreground cooldown', () async {
+    final harness = await _Harness.start(
+      debounce: const Duration(hours: 1),
+      cooldown: const Duration(hours: 1),
+    );
+    addTearDown(harness.dispose);
+    harness.data.payload = _payload('manual');
+    harness.changes.add(null);
+    await _waitFor(() => harness.metadata.state.dirtyGeneration == 1);
+
+    await harness.coordinator.requestSync();
+
+    expect((await harness.head()).deviceSequence, 2);
+    expect(harness.metadata.state.lastPublishedGeneration, 1);
+  });
+
   test('pause bypasses the remaining debounce delay', () async {
-    final harness = await _Harness.start(debounce: const Duration(hours: 1));
+    final harness = await _Harness.start(
+      debounce: const Duration(hours: 1),
+      cooldown: const Duration(hours: 1),
+    );
     addTearDown(harness.dispose);
     harness.data.payload = _payload('paused');
     harness.changes.add(null);
@@ -201,6 +245,40 @@ void main() {
     expect((await harness.head()).deviceSequence, 2);
     expect(harness.metadata.state.lastPublishedGeneration, 1);
   });
+
+  test(
+    'dirty bursts persist metadata only on the clean-to-dirty edge',
+    () async {
+      final store = MemorySyncStore();
+      final metadata = _CountingMetadataStore(_metadata('device-b'));
+      final data = _FakeData(_payload('initial'));
+      final changes = StreamController<Object?>.broadcast(sync: true);
+      final coordinator = SyncCoordinator(
+        repository: _repository(store, 'device-b'),
+        metadataStore: metadata,
+        exportData: data.export,
+        importData: data.import,
+        entityChanges: changes.stream,
+        debounceDuration: const Duration(hours: 1),
+        foregroundCooldown: Duration.zero,
+        operationTimeout: const Duration(seconds: 2),
+      );
+      addTearDown(() async {
+        await coordinator.dispose();
+        await changes.close();
+      });
+      await coordinator.start();
+      final writesBeforeBurst = metadata.writeCount;
+
+      for (var index = 0; index < 10; index++) {
+        changes.add(index);
+      }
+      await _waitFor(() => coordinator.localState?.dirtyGeneration == 10);
+
+      expect(metadata.writeCount - writesBeforeBurst, 1);
+      expect(metadata.state.dirtyGeneration, 1);
+    },
+  );
 
   test(
     'resume pulls remote advancement through the serialized coordinator',
@@ -237,7 +315,10 @@ void main() {
   test(
     'a commit during export schedules a follow-up with the latest state',
     () async {
-      final harness = await _Harness.start(debounce: const Duration(hours: 1));
+      final harness = await _Harness.start(
+        debounce: const Duration(hours: 1),
+        cooldown: const Duration(hours: 1),
+      );
       addTearDown(harness.dispose);
       final entered = Completer<void>();
       final release = Completer<void>();
@@ -487,7 +568,10 @@ final class _Harness {
   final SyncRepository repository;
   final SyncCoordinator coordinator;
 
-  static Future<_Harness> start({required Duration debounce}) async {
+  static Future<_Harness> start({
+    required Duration debounce,
+    Duration cooldown = Duration.zero,
+  }) async {
     final store = MemorySyncStore();
     final metadata = _metadata('device-b');
     final data = _FakeData(_payload('initial'));
@@ -500,6 +584,7 @@ final class _Harness {
       importData: data.import,
       entityChanges: changes.stream,
       debounceDuration: debounce,
+      foregroundCooldown: cooldown,
       operationTimeout: const Duration(seconds: 2),
     );
     final harness = _Harness(
@@ -585,6 +670,7 @@ SyncCoordinator _coordinator(
   entityChanges: changes,
   validateProfile: validateProfile,
   debounceDuration: const Duration(milliseconds: 15),
+  foregroundCooldown: Duration.zero,
   operationTimeout: const Duration(seconds: 2),
 );
 
@@ -681,5 +767,23 @@ final class _ToggleStore implements SyncStore {
   Future<List<int>> read(String key) {
     _check();
     return delegate.read(key);
+  }
+}
+
+final class _CountingMetadataStore implements SyncMetadataStore {
+  _CountingMetadataStore(this.delegate);
+
+  final MemorySyncMetadataStore delegate;
+  int writeCount = 0;
+
+  SyncLocalState get state => delegate.state;
+
+  @override
+  Future<SyncLocalState> read() => delegate.read();
+
+  @override
+  Future<void> write(SyncLocalState state) {
+    writeCount++;
+    return delegate.write(state);
   }
 }
