@@ -53,13 +53,13 @@ The separate **Database Directory** setting relocates the live database. It is r
 
 ## Building
 
-Install [Flutter](https://flutter.dev/) and all of its requirements for the platform(s) you wish to build for. Optionally install [Node.js](https://nodejs.org/) to build the extension host.
+Install [Flutter](https://flutter.dev/) and all of its requirements for the platform(s) you wish to build for. Optionally install [Bun](https://bun.com/) to build the extension host.
 
 ```bash
 # Build extension host (optional)
 cd extension/
-npm ci
-npm run deploy
+bun install --frozen-lockfile
+bun run deploy
 cd ..
 
 # Build the app
