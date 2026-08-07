@@ -639,7 +639,7 @@ if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
     }
     final args = rawArgs as List? ?? const [];
     if (kDebugMode) {
-      debugPrint('fjs[$sourceId] bridge: $handlerName(${jsonEncode(args)})');
+      debugPrint('fjs[$sourceId] bridge: $handlerName args=${args.length}');
     }
 
     switch (handlerName) {
@@ -990,7 +990,7 @@ return new Uint8Array(body);
     );
 
     final value = result.value;
-    final rawBytes = kDebugMode ? _logImageRequest(url, value) : value;
+    final rawBytes = kDebugMode ? _logImageRequest(value) : value;
     final bytes = switch (rawBytes) {
       Uint8List bytes => bytes,
       List bytes => Uint8List.fromList(bytes.cast<int>()),
@@ -1003,7 +1003,7 @@ return new Uint8Array(body);
     return bytes;
   }
 
-  dynamic _logImageRequest(String url, dynamic value) {
+  dynamic _logImageRequest(dynamic value) {
     if (value is! List || value.length < 5) {
       throw StateError(
         'Expected fjs image request to return response metadata, got '
@@ -1016,15 +1016,7 @@ return new Uint8Array(body);
       num status => status.toInt(),
       _ => null,
     };
-    final responseUrl = value[1] as String?;
     final mimeType = value[2] as String?;
-    final responseHeaders = switch (value[3]) {
-      Map headers => <String, String>{
-        for (final MapEntry(:key, :value) in headers.entries)
-          key.toString(): value.toString(),
-      },
-      _ => const <String, String>{},
-    };
     final rawBytes = value[4];
     final bytesLength = switch (rawBytes) {
       Uint8List bytes => bytes.lengthInBytes,
@@ -1036,9 +1028,7 @@ return new Uint8Array(body);
       'fjs[$sourceId] image.request${failed ? ' failed' : ''} '
       'status=${statusCode ?? 'unknown'} '
       '${bytesLength ?? 'unknown'} bytes '
-      'mime=${mimeType ?? 'unknown'} '
-      'url=${responseUrl ?? url} '
-      'headers=${jsonEncode(responseHeaders)}',
+      'mime=${mimeType ?? 'unknown'}',
     );
 
     return rawBytes;

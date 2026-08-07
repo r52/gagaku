@@ -13,6 +13,7 @@ import 'package:gagaku/model/maintenance.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/model/types.dart';
 import 'package:gagaku/routes.dart';
+import 'package:gagaku/sync/service.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/update_checker.dart';
 import 'package:gagaku/util/riverpod.dart';
@@ -86,7 +87,33 @@ void main() async {
   await gdat.initGagakuBoxes();
   AppMaintenanceService().start();
 
-  runApp(ProviderScope(child: TranslationProvider(child: App())));
+  final providerContainer = ProviderContainer();
+  await GagakuSyncService().start(providerContainer);
+  runApp(_GagakuRoot(providerContainer: providerContainer));
+}
+
+final class _GagakuRoot extends StatefulWidget {
+  const _GagakuRoot({required this.providerContainer});
+
+  final ProviderContainer providerContainer;
+
+  @override
+  State<_GagakuRoot> createState() => _GagakuRootState();
+}
+
+final class _GagakuRootState extends State<_GagakuRoot> {
+  @override
+  Widget build(BuildContext context) => UncontrolledProviderScope(
+    container: widget.providerContainer,
+    child: TranslationProvider(child: App()),
+  );
+
+  @override
+  void dispose() {
+    unawaited(GagakuSyncService().stop());
+    widget.providerContainer.dispose();
+    super.dispose();
+  }
 }
 
 class App extends HookConsumerWidget {

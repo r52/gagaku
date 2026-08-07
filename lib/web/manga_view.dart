@@ -26,6 +26,27 @@ enum _ChapterDivider { none, divider }
 
 enum _WebMangaTab { chapters, art }
 
+class _UnpagedWebMangaViewBody extends HookWidget {
+  const _UnpagedWebMangaViewBody({
+    required this.controller,
+    required this.chaptersView,
+    required this.coversView,
+  });
+
+  final TabController controller;
+  final Widget chaptersView;
+  final Widget coversView;
+
+  @override
+  Widget build(BuildContext context) {
+    final tab = useListenableSelector(controller, () => controller.index);
+    return switch (_WebMangaTab.values[tab]) {
+      _WebMangaTab.chapters => chaptersView,
+      _WebMangaTab.art => coversView,
+    };
+  }
+}
+
 @Riverpod(retry: noRetry)
 Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
   Ref ref,
@@ -797,33 +818,21 @@ class _WebMangaWideLayout extends HookConsumerWidget {
                   if (!hasArtwork || activeTab == _WebMangaTab.chapters)
                     _WebChapterHeader(manga: manga, series: series),
                   Expanded(
-                    child: hasArtwork
-                        ? TabBarView(
-                            controller: tabController,
-                            children: [
-                              CustomScrollView(
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                controller: chapterScrollController,
-                                scrollBehavior:
-                                    const MouseTouchScrollBehavior(),
-                                slivers: [
-                                  _WebChapterList(manga: manga, series: series),
-                                ],
-                              ),
-                              _WebMangaCoversView(
-                                series: series,
-                                artworkUrls: artworkUrls,
-                              ),
-                            ],
-                          )
-                        : CustomScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            controller: chapterScrollController,
-                            scrollBehavior: const MouseTouchScrollBehavior(),
-                            slivers: [
-                              _WebChapterList(manga: manga, series: series),
-                            ],
-                          ),
+                    child: _UnpagedWebMangaViewBody(
+                      controller: tabController,
+                      chaptersView: CustomScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        controller: chapterScrollController,
+                        scrollBehavior: const MouseTouchScrollBehavior(),
+                        slivers: [
+                          _WebChapterList(manga: manga, series: series),
+                        ],
+                      ),
+                      coversView: _WebMangaCoversView(
+                        series: series,
+                        artworkUrls: artworkUrls,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -1007,28 +1016,18 @@ class _WebMangaNarrowLayout extends HookConsumerWidget {
           body: SafeArea(
             top: false,
             bottom: true,
-            child: hasArtwork
-                ? TabBarView(
-                    controller: tabController,
-                    children: [
-                      CustomScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        scrollBehavior: const MouseTouchScrollBehavior(),
-                        slivers: [
-                          _WebChapterList(manga: manga, series: series),
-                        ],
-                      ),
-                      _WebMangaCoversView(
-                        series: series,
-                        artworkUrls: artworkUrls,
-                      ),
-                    ],
-                  )
-                : CustomScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    scrollBehavior: const MouseTouchScrollBehavior(),
-                    slivers: [_WebChapterList(manga: manga, series: series)],
-                  ),
+            child: _UnpagedWebMangaViewBody(
+              controller: tabController,
+              chaptersView: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                scrollBehavior: const MouseTouchScrollBehavior(),
+                slivers: [_WebChapterList(manga: manga, series: series)],
+              ),
+              coversView: _WebMangaCoversView(
+                series: series,
+                artworkUrls: artworkUrls,
+              ),
+            ),
           ),
         ),
       ),

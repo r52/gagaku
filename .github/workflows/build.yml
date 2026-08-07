@@ -88,8 +88,8 @@ jobs:
 
       # - working-directory: extension/
       #   run: |
-      #     npm ci
-      #     npm run deploy
+      #     bun install --frozen-lockfile
+      #     bun run deploy
 
       - name: Set up signing key
         if: matrix.builder == 'android'
