@@ -10,6 +10,8 @@ import 'package:gagaku/sync/metadata.dart';
 import 'package:gagaku/sync/profile.dart';
 import 'package:gagaku/sync/repository.dart';
 
+import 'test_support.dart';
+
 void main() {
   test(
     'two live coordinators hand off automatically through one directory',

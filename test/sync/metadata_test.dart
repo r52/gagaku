@@ -16,11 +16,7 @@ void main() {
       lastPublishedGeneration: 6,
       lastSeen: {'device-fixture': 3, 'peer-fixture': 2},
       lastBaselinePayloadHash: 'sha256:baseline',
-      lastAppliedRevision: 'revision-applied',
-      lastAppliedPayloadHash: 'sha256:applied',
       lastAppliedAt: DateTime.utc(2026, 1, 2, 3, 4, 5),
-      lastPublishedRevision: 'revision-published',
-      lastPublishedPayloadHash: 'sha256:published',
       lastPublishedAt: DateTime.utc(2026, 1, 2, 3, 5, 6),
       profileMissing: true,
       retryPending: true,
@@ -43,6 +39,20 @@ void main() {
     expect(decoded.dirtyGeneration, 2);
     expect(decoded.lastPublishedGeneration, 2);
     expect(decoded.lastSeen, {'valid-device': 2});
+  });
+
+  test('legacy write-only diagnostics are ignored', () {
+    final state = SyncLocalState.fromJson({
+      'lastAppliedRevision': 'legacy-applied',
+      'lastAppliedPayloadHash': 'sha256:legacy-applied',
+      'lastPublishedRevision': 'legacy-published',
+      'lastPublishedPayloadHash': 'sha256:legacy-published',
+    });
+
+    expect(state.toJson(), isNot(contains('lastAppliedRevision')));
+    expect(state.toJson(), isNot(contains('lastAppliedPayloadHash')));
+    expect(state.toJson(), isNot(contains('lastPublishedRevision')));
+    expect(state.toJson(), isNot(contains('lastPublishedPayloadHash')));
   });
 
   test('sync metadata remains excluded from manual backup settings', () {

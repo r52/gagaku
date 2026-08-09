@@ -107,9 +107,7 @@ final class SyncCoordinator {
       final wasDirty = _isDirty(state);
       state.dirtyGeneration++;
       if (!wasDirty) await metadataStore.write(state);
-      _debounce?.cancel();
-      _cooldown?.cancel();
-      _cooldown = null;
+      _cancelDeferredWork();
       _emit(const SyncCoordinatorStatus(SyncCoordinatorPhase.pending));
       _debounce = Timer(debounceDuration, () {
         _debounce = null;
@@ -121,10 +119,7 @@ final class SyncCoordinator {
   Future<void> onPause() async {
     if (_state?.enabled != true || _disposed) return;
     await _generationTail;
-    _debounce?.cancel();
-    _debounce = null;
-    _cooldown?.cancel();
-    _cooldown = null;
+    _cancelDeferredWork();
     if (_isDirty(_state!)) await requestSync();
   }
 
@@ -154,11 +149,15 @@ final class SyncCoordinator {
   }
 
   Future<void> requestSync() {
+    _cancelDeferredWork();
+    return _requestSync(bypassCooldown: true);
+  }
+
+  void _cancelDeferredWork() {
     _debounce?.cancel();
     _debounce = null;
     _cooldown?.cancel();
     _cooldown = null;
-    return _requestSync(bypassCooldown: true);
   }
 
   Future<void> _requestSync({required bool bypassCooldown}) {
@@ -229,8 +228,6 @@ final class SyncCoordinator {
       await metadataStore.write(state);
     } on SyncValidationException catch (error) {
       await _recordFailure(error, SyncCoordinatorPhase.incompatible);
-    } on TimeoutException catch (error) {
-      await _recordFailure(error, SyncCoordinatorPhase.offline);
     } catch (error) {
       await _recordFailure(error, SyncCoordinatorPhase.offline);
     } finally {
@@ -294,12 +291,7 @@ final class SyncCoordinator {
             );
             return;
           }
-          await _recordCanonical(
-            head,
-            startGeneration,
-            applied: false,
-            published: false,
-          );
+          await _recordCanonical(head, startGeneration, applied: false);
           return;
         }
         if (!localDirty) {
@@ -317,7 +309,7 @@ final class SyncCoordinator {
           startGeneration,
           branch: remoteAdvanced,
         );
-      case EquivalentSyncHeads(:final heads, :final joinedClock):
+      case EquivalentSyncHeads(:final heads):
         final common = heads.first;
         if (localDirty && common.payloadHash != payloadHash) {
           await _publish(
@@ -333,15 +325,10 @@ final class SyncCoordinator {
           await _apply(common, startGeneration, emitClean: false);
         }
         _emit(const SyncCoordinatorStatus(SyncCoordinatorPhase.publishing));
-        final publication = await repository.normalizeEquivalentHeads();
+        final publication = await repository.normalizeEquivalentHeads(
+          discovery,
+        );
         await _recordPublication(publication, startGeneration);
-        state.lastSeen = Map.of(joinedClock)
-          ..update(
-            repository.deviceId,
-            (_) => publication.snapshot.deviceSequence,
-            ifAbsent: () => publication.snapshot.deviceSequence,
-          );
-        await metadataStore.write(state);
       case ForkedSyncHeads(:final heads):
         final requested = _requestedResolution;
         if (requested == null) {
@@ -354,13 +341,12 @@ final class SyncCoordinator {
           return;
         }
         _requestedResolution = null;
-        await _resolveFork(requested, heads, payloadHash, startGeneration);
+        await _resolveFork(requested, discovery, payloadHash, startGeneration);
     }
   }
 
   Future<void> _suspendForMissingProfile() async {
-    _debounce?.cancel();
-    _debounce = null;
+    _cancelDeferredWork();
     await _changesSubscription?.cancel();
     _changesSubscription = null;
     final state = _state!;
@@ -389,7 +375,7 @@ final class SyncCoordinator {
     required bool branch,
   }) async {
     _emit(const SyncCoordinatorStatus(SyncCoordinatorPhase.publishing));
-    final publication = await repository.publishFromClock(
+    final publication = await repository.publishPrepared(
       prepared,
       baseClock,
       discovery,
@@ -422,24 +408,24 @@ final class SyncCoordinator {
     await _generationTail;
     await _recordCanonical(
       head,
-      stateGenerationAtMost(startGeneration),
+      _currentGenerationAtLeast(startGeneration),
       applied: true,
-      published: false,
       emitClean: emitClean,
     );
   }
 
-  int stateGenerationAtMost(int minimum) {
+  int _currentGenerationAtLeast(int minimum) {
     final generation = _state!.dirtyGeneration;
     return generation > minimum ? generation : minimum;
   }
 
   Future<void> _resolveFork(
     SyncSnapshot selected,
-    List<SyncSnapshot> heads,
+    SyncDiscovery discovery,
     String localPayloadHash,
     int startGeneration,
   ) async {
+    final heads = (discovery.selection as ForkedSyncHeads).heads;
     if (!heads.any((head) => head.key == selected.key)) {
       throw ArgumentError.value(selected.key, 'selected', 'not a fork head');
     }
@@ -449,12 +435,11 @@ final class SyncCoordinator {
       await _generationTail;
     }
     _emit(const SyncCoordinatorStatus(SyncCoordinatorPhase.publishing));
-    final publication = await repository.resolveFork(selected);
+    final publication = await repository.resolveFork(discovery, selected);
     await _recordPublication(
       publication,
-      stateGenerationAtMost(startGeneration),
-      appliedRevision: selected.revisionId,
-      appliedHash: selected.payloadHash,
+      _currentGenerationAtLeast(startGeneration),
+      applied: true,
     );
   }
 
@@ -462,7 +447,6 @@ final class SyncCoordinator {
     SyncSnapshot head,
     int generation, {
     required bool applied,
-    required bool published,
     bool emitClean = true,
   }) async {
     final state = _state!;
@@ -471,16 +455,7 @@ final class SyncCoordinator {
       ..lastBaselinePayloadHash = head.payloadHash
       ..lastPublishedGeneration = generation;
     if (applied) {
-      state
-        ..lastAppliedRevision = head.revisionId
-        ..lastAppliedPayloadHash = head.payloadHash
-        ..lastAppliedAt = _now().toUtc();
-    }
-    if (published) {
-      state
-        ..lastPublishedRevision = head.revisionId
-        ..lastPublishedPayloadHash = head.payloadHash
-        ..lastPublishedAt = _now().toUtc();
+      state.lastAppliedAt = _now().toUtc();
     }
     await metadataStore.write(state);
     if (state.dirtyGeneration > generation) _passRequested = true;
@@ -492,27 +467,19 @@ final class SyncCoordinator {
   Future<void> _recordPublication(
     SyncPublication publication,
     int generation, {
-    String? appliedRevision,
-    String? appliedHash,
+    bool applied = false,
   }) async {
     final state = _state!;
     final snapshot = publication.snapshot;
     state
       ..lastSeen = Map.of(snapshot.seen)
       ..lastBaselinePayloadHash = snapshot.payloadHash
-      ..lastPublishedRevision = snapshot.revisionId
-      ..lastPublishedPayloadHash = snapshot.payloadHash
       ..lastPublishedAt = _now().toUtc()
       ..lastPublishedGeneration = generation;
     _foregroundPublicationClock
       ..reset()
       ..start();
-    if (appliedRevision != null) {
-      state
-        ..lastAppliedRevision = appliedRevision
-        ..lastAppliedAt = _now().toUtc();
-    }
-    if (appliedHash != null) state.lastAppliedPayloadHash = appliedHash;
+    if (applied) state.lastAppliedAt = _now().toUtc();
     await metadataStore.write(state);
     if (state.dirtyGeneration > generation) _passRequested = true;
     if (publication.cleanupFailures.isEmpty) {
@@ -559,8 +526,7 @@ final class SyncCoordinator {
   Future<void> dispose() async {
     if (_disposed) return;
     _disposed = true;
-    _debounce?.cancel();
-    _cooldown?.cancel();
+    _cancelDeferredWork();
     await _changesSubscription?.cancel();
     _status = const SyncCoordinatorStatus(SyncCoordinatorPhase.disposed);
     await _statuses.close();

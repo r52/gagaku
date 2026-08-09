@@ -8,6 +8,8 @@ import 'package:gagaku/sync/profile.dart';
 import 'package:gagaku/sync/repository.dart';
 import 'package:gagaku/sync/service.dart';
 
+import 'test_support.dart';
+
 void main() {
   test(
     'disable preserves the configured profile and device identity',

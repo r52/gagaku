@@ -16,11 +16,7 @@ final class SyncLocalState {
     this.lastPublishedGeneration = 0,
     this.lastSeen = const {},
     this.lastBaselinePayloadHash,
-    this.lastAppliedRevision,
-    this.lastAppliedPayloadHash,
     this.lastAppliedAt,
-    this.lastPublishedRevision,
-    this.lastPublishedPayloadHash,
     this.lastPublishedAt,
     this.profileMissing = false,
     this.retryPending = false,
@@ -37,11 +33,7 @@ final class SyncLocalState {
   int lastPublishedGeneration;
   Map<String, int> lastSeen;
   String? lastBaselinePayloadHash;
-  String? lastAppliedRevision;
-  String? lastAppliedPayloadHash;
   DateTime? lastAppliedAt;
-  String? lastPublishedRevision;
-  String? lastPublishedPayloadHash;
   DateTime? lastPublishedAt;
   bool profileMissing;
   bool retryPending;
@@ -90,11 +82,7 @@ final class SyncLocalState {
           : lastPublishedGeneration,
       lastSeen: readClock(json['lastSeen']),
       lastBaselinePayloadHash: readOptionalString('lastBaselinePayloadHash'),
-      lastAppliedRevision: readOptionalString('lastAppliedRevision'),
-      lastAppliedPayloadHash: readOptionalString('lastAppliedPayloadHash'),
       lastAppliedAt: readDate('lastAppliedAt'),
-      lastPublishedRevision: readOptionalString('lastPublishedRevision'),
-      lastPublishedPayloadHash: readOptionalString('lastPublishedPayloadHash'),
       lastPublishedAt: readDate('lastPublishedAt'),
       profileMissing: json['profileMissing'] == true,
       retryPending: json['retryPending'] == true,
@@ -113,11 +101,7 @@ final class SyncLocalState {
     'lastPublishedGeneration': lastPublishedGeneration,
     'lastSeen': lastSeen,
     'lastBaselinePayloadHash': lastBaselinePayloadHash,
-    'lastAppliedRevision': lastAppliedRevision,
-    'lastAppliedPayloadHash': lastAppliedPayloadHash,
     'lastAppliedAt': lastAppliedAt?.toUtc().toIso8601String(),
-    'lastPublishedRevision': lastPublishedRevision,
-    'lastPublishedPayloadHash': lastPublishedPayloadHash,
     'lastPublishedAt': lastPublishedAt?.toUtc().toIso8601String(),
     'profileMissing': profileMissing,
     'retryPending': retryPending,
@@ -155,21 +139,4 @@ final class HiveSyncMetadataStore implements SyncMetadataStore {
   @override
   Future<void> write(SyncLocalState state) =>
       box.put(syncMetadataHiveKey, jsonEncode(state.toJson()));
-}
-
-final class MemorySyncMetadataStore implements SyncMetadataStore {
-  MemorySyncMetadataStore([SyncLocalState? initial])
-    : _state = (initial ?? SyncLocalState()).copy();
-
-  SyncLocalState _state;
-
-  @override
-  Future<SyncLocalState> read() async => _state.copy();
-
-  @override
-  Future<void> write(SyncLocalState state) async {
-    _state = state.copy();
-  }
-
-  SyncLocalState get state => _state.copy();
 }

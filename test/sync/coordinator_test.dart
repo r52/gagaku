@@ -10,6 +10,8 @@ import 'package:gagaku/sync/protocol.dart';
 import 'package:gagaku/sync/repository.dart';
 import 'package:gagaku/sync/store.dart';
 
+import 'test_support.dart';
+
 void main() {
   test(
     'clean startup pulls a dominating remote head without republishing',
@@ -47,7 +49,7 @@ void main() {
         store.objects.keys.where((key) => key.startsWith('devices/device-b/')),
         isEmpty,
       );
-      expect(metadata.state.lastAppliedPayloadHash, isNotNull);
+      expect(metadata.state.lastAppliedAt, isNotNull);
     },
   );
 
