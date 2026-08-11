@@ -119,12 +119,28 @@ final class _GagakuRootState extends State<_GagakuRoot> {
 class App extends HookConsumerWidget {
   App({super.key});
 
-  final _router = GoRouter(
-    routes: $appRoutes,
+  static const _routingErrorLocation = '/routing-error';
+
+  final _exceptionRecovery = _RoutingExceptionRecovery();
+
+  late final _router = GoRouter(
+    routes: [
+      ...$appRoutes,
+      GoRoute(
+        path: _routingErrorLocation,
+        builder: (BuildContext context, GoRouterState state) {
+          return ErrorRoute(
+            error: state.extra! as Exception,
+          ).build(context, state);
+        },
+      ),
+    ],
     initialLocation: '/',
     navigatorKey: rootNavigatorKey,
-    errorBuilder: (BuildContext context, GoRouterState state) {
-      return ErrorRoute(error: state.error!).build(context, state);
+    onException: (BuildContext context, GoRouterState state, GoRouter router) {
+      if (PBLinkDelegate().recoverInitialNavigation(state, router)) return;
+
+      _exceptionRecovery.recover(state, router);
     },
     onEnter:
         (
@@ -139,7 +155,12 @@ class App extends HookConsumerWidget {
             case PBLinkDelegate.scheme:
               return await PBLinkDelegate().process(context, next, router);
             default:
-              return const Allow();
+              return _exceptionRecovery.resumePendingAfter(
+                    next,
+                    router,
+                    _routingErrorLocation,
+                  ) ??
+                  PBLinkDelegate().resumePendingAfter(context, next);
           }
         },
   );
@@ -218,6 +239,34 @@ class App extends HookConsumerWidget {
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
       restorationScopeId: 'app_root_restore',
+    );
+  }
+}
+
+final class _RoutingExceptionRecovery {
+  Exception? _pendingError;
+
+  void recover(GoRouterState state, GoRouter router) {
+    _pendingError = state.error!;
+    router.go('/');
+  }
+
+  OnEnterResult? resumePendingAfter(
+    GoRouterState state,
+    GoRouter router,
+    String errorLocation,
+  ) {
+    if (state.uri.path != '/' || _pendingError == null) return null;
+
+    return Allow(
+      then: () {
+        final error = _pendingError;
+        _pendingError = null;
+
+        if (error != null) {
+          router.go(errorLocation, extra: error);
+        }
+      },
     );
   }
 }

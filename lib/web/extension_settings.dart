@@ -848,7 +848,7 @@ class OAuthButtonRowBuilder extends ConsumerWidget {
 
           PBLinkDelegate().addHandler(redirectParsed.host, (
             context,
-            state,
+            uri,
             router,
           ) async {
             PBLinkDelegate().removeHandler(redirectParsed.host);
@@ -863,7 +863,7 @@ class OAuthButtonRowBuilder extends ConsumerWidget {
                         void process() async {
                           try {
                             final cred = await flow.callback(
-                              state.uri.queryParameters,
+                              uri.queryParameters,
                             );
                             final tokenResp = await cred.getTokenResponse();
 
