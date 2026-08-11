@@ -1161,15 +1161,14 @@ class _WebCoverArtPagedOverlay extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = usePageController(initialPage: index);
+    final activePage = useState(index);
     final headers = ref.watch(sourceHeadersProvider(series.sourceId));
     final imageCache = ref.watch(extensionImageCacheProvider);
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        leading: CloseButton(
-          style: IconButton.styleFrom(backgroundColor: Colors.black),
-        ),
+        leading: const OverlayCloseButton(),
       ),
       backgroundColor: Colors.transparent,
       extendBody: true,
@@ -1180,45 +1179,46 @@ class _WebCoverArtPagedOverlay extends HookConsumerWidget {
           final url = items[id];
           final heroTag = _webArtworkHeroTag(series, id, url);
 
-          return Hero(
-            key: ValueKey(heroTag),
-            tag: heroTag,
-            child: Container(
-              padding: const EdgeInsets.all(10.0),
-              color: Colors.transparent,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
+          final child = Container(
+            padding: const EdgeInsets.all(10.0),
+            color: Colors.transparent,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: CachedNetworkImage(
+                cacheManager: imageCache,
+                httpHeaders: headers,
+                imageUrl: url,
+                imageBuilder: (context, imageProvider) {
+                  return PhotoView(
+                    backgroundDecoration: const BoxDecoration(
+                      color: Colors.transparent,
+                    ),
+                    imageProvider: imageProvider,
+                    minScale: PhotoViewComputedScale.contained * 0.8,
+                    maxScale: PhotoViewComputedScale.covered * 5.0,
+                    initialScale: PhotoViewComputedScale.contained,
+                  );
                 },
-                child: CachedNetworkImage(
-                  cacheManager: imageCache,
-                  httpHeaders: headers,
-                  imageUrl: url,
-                  imageBuilder: (context, imageProvider) {
-                    return PhotoView(
-                      backgroundDecoration: const BoxDecoration(
-                        color: Colors.transparent,
-                      ),
-                      imageProvider: imageProvider,
-                      minScale: PhotoViewComputedScale.contained * 0.8,
-                      maxScale: PhotoViewComputedScale.covered * 5.0,
-                      initialScale: PhotoViewComputedScale.contained,
-                    );
-                  },
-                  fit: BoxFit.contain,
-                  progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      const Center(child: CircularProgressIndicator()),
-                  errorBuilder: (context, error, stacktrace) => Tooltip(
-                    message: error.toString(),
-                    child: const Icon(Icons.error),
-                  ),
+                fit: BoxFit.contain,
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    const Center(child: CircularProgressIndicator()),
+                errorBuilder: (context, error, stacktrace) => Tooltip(
+                  message: error.toString(),
+                  child: const Icon(Icons.error),
                 ),
               ),
             ),
           );
+
+          return activePage.value == id
+              ? Hero(key: ValueKey(heroTag), tag: heroTag, child: child)
+              : KeyedSubtree(key: ValueKey(heroTag), child: child);
         },
         itemCount: items.length,
         controller: controller,
+        onPageChanged: (id) => activePage.value = id,
         scrollDirection: Axis.horizontal,
       ),
     );

@@ -1158,14 +1158,13 @@ class _CoverArtPagedOverlay extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = usePageController(initialPage: index);
+    final activePage = useState(index);
     final imageCache = ref.watch(extensionImageCacheProvider);
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        leading: CloseButton(
-          style: IconButton.styleFrom(backgroundColor: Colors.black),
-        ),
+        leading: const OverlayCloseButton(),
       ),
       backgroundColor: Colors.transparent,
       extendBody: true,
@@ -1181,46 +1180,47 @@ class _CoverArtPagedOverlay extends HookConsumerWidget {
           final item = items[id];
           final url = manga.getUrlFromCover(item);
 
-          return Hero(
-            key: ValueKey(item.id),
-            tag: item.id,
-            child: Container(
-              padding: const EdgeInsets.all(10.0),
-              color: Colors.transparent,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
+          final child = Container(
+            padding: const EdgeInsets.all(10.0),
+            color: Colors.transparent,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: CachedNetworkImage(
+                cacheManager: imageCache,
+                imageUrl: url,
+                imageBuilder: (context, imageProvider) {
+                  return PhotoView(
+                    backgroundDecoration: const BoxDecoration(
+                      color: Colors.transparent,
+                    ),
+                    imageProvider: imageProvider,
+                    minScale: PhotoViewComputedScale.contained * 0.8,
+                    maxScale: PhotoViewComputedScale.covered * 5.0,
+                    initialScale: PhotoViewComputedScale.contained,
+                  );
                 },
-                child: CachedNetworkImage(
-                  cacheManager: imageCache,
-                  imageUrl: url,
-                  imageBuilder: (context, imageProvider) {
-                    return PhotoView(
-                      backgroundDecoration: const BoxDecoration(
-                        color: Colors.transparent,
-                      ),
-                      imageProvider: imageProvider,
-                      minScale: PhotoViewComputedScale.contained * 0.8,
-                      maxScale: PhotoViewComputedScale.covered * 5.0,
-                      initialScale: PhotoViewComputedScale.contained,
-                    );
-                  },
-                  fit: BoxFit.contain,
-                  progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      const Center(child: CircularProgressIndicator()),
-                  errorBuilder: (context, error, stacktrace) {
-                    return Tooltip(
-                      message: error.toString(),
-                      child: const Icon(Icons.error),
-                    );
-                  },
-                ),
+                fit: BoxFit.contain,
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    const Center(child: CircularProgressIndicator()),
+                errorBuilder: (context, error, stacktrace) {
+                  return Tooltip(
+                    message: error.toString(),
+                    child: const Icon(Icons.error),
+                  );
+                },
               ),
             ),
           );
+
+          return activePage.value == id
+              ? Hero(key: ValueKey(item.id), tag: item.id, child: child)
+              : KeyedSubtree(key: ValueKey(item.id), child: child);
         },
         itemCount: items.length,
         controller: controller,
+        onPageChanged: (id) => activePage.value = id,
         scrollDirection: Axis.horizontal,
       ),
     );
