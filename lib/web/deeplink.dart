@@ -10,7 +10,7 @@ import 'model/types.dart';
 typedef DeepLinkHandlerCallback =
     FutureOr<OnEnterResult> Function(
       BuildContext context,
-      GoRouterState state,
+      Uri uri,
       GoRouter router,
     );
 
@@ -26,6 +26,10 @@ class PBLinkDelegate {
   }
 
   static const scheme = 'paperback';
+
+  Uri? _pendingUri;
+  _DeepLinkExecution? _activeExecution;
+  _DeepLinkExecution? _pendingExecution;
 
   late final Map<String, DeepLinkHandlerCallback> _handlers = {
     'addrepo': handleAddRepo,
@@ -58,22 +62,87 @@ class PBLinkDelegate {
     GoRouter router,
   ) async {
     final uri = state.uri;
+    final result = await _dispatch(context, uri, router);
+    final callback = result.then;
+
+    if (callback == null) {
+      _activeExecution = null;
+      return result;
+    }
+
+    // A blocked initial navigation reaches onException before go_router runs
+    // this callback. Keep it addressable so recovery can defer this exact
+    // execution until the root route has committed.
+    final execution = _DeepLinkExecution(uri, callback);
+    _activeExecution = execution;
+
+    return switch (result) {
+      Allow() => Allow(then: execution.run),
+      Block() => Block.then(execution.run),
+    };
+  }
+
+  FutureOr<OnEnterResult> _dispatch(
+    BuildContext context,
+    Uri uri,
+    GoRouter router,
+  ) async {
     final action = uri.host;
 
     if (_handlers.containsKey(action)) {
-      return await _handlers[action]!(context, state, router);
+      return await _handlers[action]!(context, uri, router);
     }
 
     return const Allow();
   }
 
+  bool recoverInitialNavigation(GoRouterState state, GoRouter router) {
+    if (state.uri.scheme != scheme) return false;
+
+    switch (state.error) {
+      case BlockedInitialNavigationException():
+        final uri = state.uri;
+        final execution = _activeExecution;
+
+        if (execution != null && execution.uri == uri) {
+          execution.defer();
+          _pendingExecution = execution;
+        }
+
+        _pendingUri = uri;
+        router.go('/');
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  OnEnterResult resumePendingAfter(BuildContext context, GoRouterState state) {
+    if (state.uri.path != '/' || _pendingUri == null) {
+      return const Allow();
+    }
+
+    return Allow(
+      then: () async {
+        // Allow.then runs after `/` is committed, so dialog routes can safely
+        // push onto an established navigator stack.
+        final execution = _pendingExecution;
+        _pendingUri = null;
+        _pendingExecution = null;
+
+        if (!context.mounted) return;
+        await execution?.runRecovered();
+      },
+    );
+  }
+
   FutureOr<OnEnterResult> handleAddRepo(
     BuildContext context,
-    GoRouterState state,
+    Uri uri,
     GoRouter router,
   ) async {
     final tr = context.t;
-    final data = state.uri.queryParameters;
+    final data = uri.queryParameters;
     final name = data['displayName'];
     final url = data['url'];
 
@@ -122,11 +191,11 @@ class PBLinkDelegate {
 
   FutureOr<OnEnterResult> handleInstallExtensions(
     BuildContext context,
-    GoRouterState state,
+    Uri uri,
     GoRouter router,
   ) async {
     final tr = context.t;
-    final data = state.uri.queryParameters['data'];
+    final data = uri.queryParameters['data'];
 
     if (data == null || data.isEmpty) {
       return const Block.stop();
@@ -154,5 +223,31 @@ class PBLinkDelegate {
           );
       }
     });
+  }
+}
+
+final class _DeepLinkExecution {
+  _DeepLinkExecution(this.uri, this._callback);
+
+  final Uri uri;
+  final OnEnterThenCallback _callback;
+
+  bool _deferred = false;
+  bool _completed = false;
+
+  void defer() => _deferred = true;
+
+  Future<void> run() async {
+    if (_deferred || _completed) return;
+
+    _completed = true;
+    await _callback();
+  }
+
+  Future<void> runRecovered() async {
+    if (_completed) return;
+
+    _completed = true;
+    await _callback();
   }
 }

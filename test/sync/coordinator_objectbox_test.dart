@@ -11,6 +11,8 @@ import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 
+import 'test_support.dart';
+
 void main() {
   test(
     'ObjectBox extension-state burst produces one debounced snapshot',

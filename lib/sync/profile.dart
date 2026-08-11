@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:uuid/uuid.dart';
 
 import 'package:gagaku/sync/protocol.dart';
+import 'package:gagaku/sync/repository.dart';
 import 'package:gagaku/sync/store.dart';
 
 typedef SyncReadRetryPredicate = bool Function(Object error);
@@ -76,15 +77,8 @@ abstract final class SyncProfileCodec {
   }
 }
 
-final class SyncRepairResult {
-  const SyncRepairResult({required this.deleted, required this.failures});
-
-  final List<String> deleted;
-  final List<String> failures;
-}
-
-final class SyncResetResult {
-  const SyncResetResult({required this.deleted, required this.failures});
+final class SyncCleanupResult {
+  const SyncCleanupResult({required this.deleted, required this.failures});
 
   final List<String> deleted;
   final List<String> failures;
@@ -147,15 +141,20 @@ final class SyncProfileManager {
   Future<SyncProfile> join() async =>
       SyncProfileCodec.decode(await _read(SyncProfileCodec.key));
 
+  Future<SyncProfile> joinExpected(String expectedProfileId) async {
+    final profile = await join();
+    if (profile.profileId != expectedProfileId) {
+      throw const SyncValidationException('profile ID mismatch');
+    }
+    return profile;
+  }
+
   Future<bool> hasExpectedProfile(String expectedProfileId) async {
     final objects = await store.list('');
     if (!objects.any((object) => object.key == SyncProfileCodec.key)) {
       return false;
     }
-    final profile = await join();
-    if (profile.profileId != expectedProfileId) {
-      throw const SyncValidationException('profile ID mismatch');
-    }
+    await joinExpected(expectedProfileId);
     return true;
   }
 
@@ -175,14 +174,11 @@ final class SyncProfileManager {
     }
   }
 
-  Future<SyncRepairResult> repair(String expectedProfileId) async {
-    final profile = await join();
-    if (profile.profileId != expectedProfileId) {
-      throw const SyncValidationException('profile ID mismatch');
-    }
+  Future<SyncCleanupResult> repair(String expectedProfileId) async {
+    await joinExpected(expectedProfileId);
     final objects = await store.list('devices/');
     final invalid = <String>[];
-    final validByDevice = <String, List<SyncSnapshot>>{};
+    final valid = <SyncSnapshot>[];
     for (final object in objects) {
       try {
         final snapshot = SyncSnapshotCodec.decode(
@@ -190,53 +186,45 @@ final class SyncProfileManager {
           await store.read(object.key),
           expectedProfileId: expectedProfileId,
         );
-        validByDevice.putIfAbsent(snapshot.deviceId, () => []).add(snapshot);
+        valid.add(snapshot);
       } on SyncValidationException {
         invalid.add(object.key);
       }
     }
 
-    final candidates = <String>[...invalid];
-    for (final snapshots in validByDevice.values) {
-      snapshots.sort((left, right) {
-        final sequence = right.deviceSequence.compareTo(left.deviceSequence);
-        return sequence != 0 ? sequence : left.key.compareTo(right.key);
-      });
-      candidates.addAll(snapshots.skip(2).map((snapshot) => snapshot.key));
-    }
-    candidates.sort();
+    final candidates = <String>[
+      ...invalid,
+      ...syncSnapshotRetentionCandidates(valid),
+    ]..sort();
     return _deleteCandidates(candidates);
   }
 
-  Future<SyncResetResult> reset(String expectedProfileId) async {
-    final profile = await join();
-    if (profile.profileId != expectedProfileId) {
-      throw const SyncValidationException('profile ID mismatch');
-    }
+  Future<SyncCleanupResult> reset(String expectedProfileId) async {
+    await joinExpected(expectedProfileId);
     final deviceResult = await _deleteCandidates([
       for (final object in await store.list('devices/')) object.key,
     ]);
     if (deviceResult.failures.isNotEmpty) {
-      return SyncResetResult(
+      return SyncCleanupResult(
         deleted: deviceResult.deleted,
         failures: deviceResult.failures,
       );
     }
     try {
       await store.delete(SyncProfileCodec.key);
-      return SyncResetResult(
+      return SyncCleanupResult(
         deleted: [...deviceResult.deleted, SyncProfileCodec.key],
         failures: const [],
       );
     } catch (_) {
-      return SyncResetResult(
+      return SyncCleanupResult(
         deleted: deviceResult.deleted,
         failures: const [SyncProfileCodec.key],
       );
     }
   }
 
-  Future<SyncRepairResult> _deleteCandidates(
+  Future<SyncCleanupResult> _deleteCandidates(
     Iterable<String> candidates,
   ) async {
     final deleted = <String>[];
@@ -253,7 +241,7 @@ final class SyncProfileManager {
         failures.add(key);
       }
     }
-    return SyncRepairResult(
+    return SyncCleanupResult(
       deleted: List.unmodifiable(deleted),
       failures: List.unmodifiable(failures),
     );

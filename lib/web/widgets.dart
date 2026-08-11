@@ -704,6 +704,24 @@ class FavoritesButton extends HookWidget {
             child: Text(tr.ui.clear),
           ),
       ],
+      MenuItemButton(
+        leadingIcon: const Icon(Icons.add),
+        onPressed: () async {
+          final name = await showDialog<String>(
+            context: context,
+            builder: (context) => NewCategoryDialog(list: favorites),
+          );
+
+          if (name == null) return;
+
+          final category = WebFavoritesList.name(
+            name: name,
+            sortOrder: favorites.isEmpty ? 0 : favorites.last.sortOrder + 1,
+          );
+          await manager.add(category, link);
+        },
+        child: Text(tr.webSources.settings.newCategory),
+      ),
     ];
 
     return MenuAnchor(

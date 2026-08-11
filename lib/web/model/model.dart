@@ -294,11 +294,25 @@ class WebFavoritesManager extends ChangeNotifier {
         .watch(triggerImmediately: true);
 
     _sub = stream.listen((query) {
-      state = query.find();
-      _rebuildLookupMap();
-      hasData = true;
-      notifyListeners();
+      _setState(query.find());
     });
+  }
+
+  void _setState(List<WebFavoritesList> favorites) {
+    state = favorites;
+    _rebuildLookupMap();
+    hasData = true;
+    notifyListeners();
+  }
+
+  void _refreshState() {
+    final box = GagakuData().store.box<WebFavoritesList>();
+    final query = box
+        .query(WebFavoritesList_.id.notEquals(historyListUUID))
+        .order(WebFavoritesList_.sortOrder)
+        .build();
+    _setState(query.find());
+    query.close();
   }
 
   void _rebuildLookupMap() {
@@ -347,6 +361,7 @@ class WebFavoritesManager extends ChangeNotifier {
       list.list.add(link);
       listBox.put(list);
     }, null);
+    _refreshState();
   }
 
   Future<void> remove(WebFavoritesList list, HistoryLink link) async {
@@ -357,6 +372,7 @@ class WebFavoritesManager extends ChangeNotifier {
       list.list.remove(link);
       listBox.put(list);
     }, null);
+    _refreshState();
   }
 
   Future<void> removeFromAll(HistoryLink link) async {
@@ -376,6 +392,7 @@ class WebFavoritesManager extends ChangeNotifier {
 
       listBox.putMany(lists);
     }, null);
+    _refreshState();
   }
 }
 

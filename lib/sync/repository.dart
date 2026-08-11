@@ -180,13 +180,14 @@ final class SyncRepository {
       EquivalentSyncHeads(:final joinedClock) => joinedClock,
       ForkedSyncHeads(:final heads) => throw SyncForkException(heads),
     };
-    return _publish(prepared, baseClock, discovery);
+    return publishPrepared(prepared, baseClock, discovery);
   }
 
-  Future<SyncPublication> normalizeEquivalentHeads() async {
-    final discovery = await discover();
+  Future<SyncPublication> normalizeEquivalentHeads(
+    SyncDiscovery discovery,
+  ) async {
     return switch (discovery.selection) {
-      EquivalentSyncHeads(:final heads, :final joinedClock) => _publish(
+      EquivalentSyncHeads(:final heads, :final joinedClock) => publishPrepared(
         await SyncSnapshotCodec.preparePayload(heads.first.payload),
         joinedClock,
         discovery,
@@ -195,8 +196,10 @@ final class SyncRepository {
     };
   }
 
-  Future<SyncPublication> resolveFork(SyncSnapshot selected) async {
-    final discovery = await discover();
+  Future<SyncPublication> resolveFork(
+    SyncDiscovery discovery,
+    SyncSnapshot selected,
+  ) async {
     final heads = switch (discovery.selection) {
       ForkedSyncHeads(:final heads) => heads,
       _ => throw StateError('No fork to resolve'),
@@ -205,7 +208,7 @@ final class SyncRepository {
       throw ArgumentError.value(selected.key, 'selected', 'not a fork head');
     }
     final joined = SyncClock.join(heads.map((head) => head.seen));
-    return _publish(
+    return publishPrepared(
       await SyncSnapshotCodec.preparePayload(selected.payload),
       joined,
       discovery,
@@ -217,48 +220,16 @@ final class SyncRepository {
   /// This deliberately does not join newly discovered remote advancement. It
   /// is used when local data changed concurrently, so both complete branches
   /// remain visible for explicit resolution.
-  Future<SyncPublication> publishFromClock(
-    SyncPreparedPayload prepared,
-    Map<String, int> baseClock,
-    SyncDiscovery discovery,
-  ) async => _publish(prepared, baseClock, discovery);
-
-  Future<List<String>> retireDevice(String retiredDeviceId) async {
-    if (retiredDeviceId.isEmpty || retiredDeviceId.contains('/')) {
-      throw ArgumentError.value(
-        retiredDeviceId,
-        'retiredDeviceId',
-        'must be a non-empty path segment',
-      );
-    }
-
-    final prefix = 'devices/$retiredDeviceId/';
-    final failures = <String>[];
-    for (final object in await store.list(prefix)) {
-      if (!object.key.startsWith(prefix)) {
-        continue;
-      }
-      try {
-        await store.delete(object.key);
-      } catch (_) {
-        failures.add(object.key);
-      }
-    }
-    return List.unmodifiable(failures);
-  }
-
-  Future<SyncPublication> _publish(
+  Future<SyncPublication> publishPrepared(
     SyncPreparedPayload prepared,
     Map<String, int> baseClock,
     SyncDiscovery discovery,
   ) async {
     final localHead = discovery.deviceHeads[deviceId];
+    final baseSequence = baseClock[deviceId] ?? 0;
+    final localSequence = localHead?.deviceSequence ?? 0;
     final nextSequence =
-        [
-          baseClock[deviceId] ?? 0,
-          localHead?.deviceSequence ?? 0,
-        ].reduce((left, right) => left > right ? left : right) +
-        1;
+        (baseSequence > localSequence ? baseSequence : localSequence) + 1;
     final seen = Map<String, int>.of(baseClock)..[deviceId] = nextSequence;
     final encoded = await SyncSnapshotCodec.createEncoded(
       profileId: profileId,
@@ -293,27 +264,65 @@ final class SyncRepository {
     );
   }
 
+  Future<List<String>> retireDevice(String retiredDeviceId) async {
+    if (retiredDeviceId.isEmpty || retiredDeviceId.contains('/')) {
+      throw ArgumentError.value(
+        retiredDeviceId,
+        'retiredDeviceId',
+        'must be a non-empty path segment',
+      );
+    }
+
+    final prefix = 'devices/$retiredDeviceId/';
+    final failures = <String>[];
+    for (final object in await store.list(prefix)) {
+      if (!object.key.startsWith(prefix)) {
+        continue;
+      }
+      try {
+        await store.delete(object.key);
+      } catch (_) {
+        failures.add(object.key);
+      }
+    }
+    return List.unmodifiable(failures);
+  }
+
   Future<List<String>> _compactLocalNamespace(
     Iterable<SyncSnapshot> validatedSnapshots,
   ) async {
-    final validByKey = <String, SyncSnapshot>{
-      for (final snapshot in validatedSnapshots)
-        if (snapshot.deviceId == deviceId) snapshot.key: snapshot,
-    };
-    final valid = validByKey.values.toList();
-    valid.sort((left, right) {
-      final sequence = right.deviceSequence.compareTo(left.deviceSequence);
-      return sequence != 0 ? sequence : left.key.compareTo(right.key);
-    });
-
     final failures = <String>[];
-    for (final snapshot in valid.skip(2)) {
+    for (final key in syncSnapshotRetentionCandidates(
+      validatedSnapshots,
+      deviceId: deviceId,
+    )) {
       try {
-        await store.delete(snapshot.key);
+        await store.delete(key);
       } catch (_) {
-        failures.add(snapshot.key);
+        failures.add(key);
       }
     }
     return failures;
   }
+}
+
+List<String> syncSnapshotRetentionCandidates(
+  Iterable<SyncSnapshot> snapshots, {
+  String? deviceId,
+}) {
+  final byDevice = <String, Map<String, SyncSnapshot>>{};
+  for (final snapshot in snapshots) {
+    if (deviceId != null && snapshot.deviceId != deviceId) continue;
+    byDevice.putIfAbsent(snapshot.deviceId, () => {})[snapshot.key] = snapshot;
+  }
+  final candidates = <String>[];
+  for (final snapshots in byDevice.values) {
+    final ordered = snapshots.values.toList()
+      ..sort((left, right) {
+        final sequence = right.deviceSequence.compareTo(left.deviceSequence);
+        return sequence != 0 ? sequence : left.key.compareTo(right.key);
+      });
+    candidates.addAll(ordered.skip(2).map((snapshot) => snapshot.key));
+  }
+  return candidates..sort();
 }

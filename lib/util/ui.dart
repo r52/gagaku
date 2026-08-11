@@ -1153,7 +1153,22 @@ class PageTransitionRouteBuilder<T> extends PageRouteBuilder<T> {
   }
 }
 
-class TransparentOverlay<T> extends ModalRoute<T> {
+class OverlayCloseButton extends StatelessWidget {
+  const OverlayCloseButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return CloseButton(
+      style: IconButton.styleFrom(
+        backgroundColor: colorScheme.inverseSurface,
+        foregroundColor: colorScheme.onInverseSurface,
+      ),
+    );
+  }
+}
+
+class TransparentOverlay<T> extends PageRoute<T> {
   TransparentOverlay({required this.builder}) : super();
 
   final WidgetBuilder builder;
@@ -1175,6 +1190,9 @@ class TransparentOverlay<T> extends ModalRoute<T> {
 
   @override
   bool get maintainState => true;
+
+  @override
+  bool canTransitionFrom(TransitionRoute<dynamic> previousRoute) => false;
 
   @override
   Widget buildPage(

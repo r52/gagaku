@@ -5,6 +5,8 @@ import 'package:gagaku/sync/protocol.dart';
 import 'package:gagaku/sync/repository.dart';
 import 'package:gagaku/sync/store.dart';
 
+import 'test_support.dart';
+
 void main() {
   group('SyncRepository discovery', () {
     test(
@@ -273,7 +275,8 @@ void main() {
 
   group('SyncRepository concurrent heads', () {
     test('normalizes same-payload concurrent heads', () async {
-      final store = MemorySyncStore();
+      final delegate = MemorySyncStore();
+      final store = _CountingStore(delegate);
       final deviceA = _snapshot(
         deviceId: 'device-a',
         sequence: 1,
@@ -288,18 +291,20 @@ void main() {
         seen: {'device-b': 1},
         value: 'shared',
       );
-      store
+      delegate
         ..seed(deviceA.key, SyncSnapshotCodec.encode(deviceA))
         ..seed(deviceB.key, SyncSnapshotCodec.encode(deviceB));
       final repository = _repository(store, 'device-a', ['revision-a2']);
 
-      expect(
-        (await repository.discover()).selection,
-        isA<EquivalentSyncHeads>(),
+      final beforeNormalization = await repository.discover();
+      expect(beforeNormalization.selection, isA<EquivalentSyncHeads>());
+      store.reset();
+      final result = await repository.normalizeEquivalentHeads(
+        beforeNormalization,
       );
-      final result = await repository.normalizeEquivalentHeads();
+      expect(store.listCount, 0);
+      expect(store.readCount, 1);
       final discovery = await repository.discover();
-
       expect(result.snapshot.seen, {'device-a': 2, 'device-b': 1});
       expect(result.snapshot.payload, _payload('shared'));
       expect(
@@ -311,7 +316,8 @@ void main() {
     test(
       'requires fork resolution and publishes the selected whole payload',
       () async {
-        final store = MemorySyncStore();
+        final delegate = MemorySyncStore();
+        final store = _CountingStore(delegate);
         final left = _snapshot(
           deviceId: 'device-a',
           sequence: 2,
@@ -326,7 +332,7 @@ void main() {
           seen: {'device-a': 1, 'device-b': 1},
           value: 'right',
         );
-        store
+        delegate
           ..seed(left.key, SyncSnapshotCodec.encode(left))
           ..seed(right.key, SyncSnapshotCodec.encode(right));
         final repository = _repository(store, 'device-a', ['revision-a3']);
@@ -340,8 +346,11 @@ void main() {
         final selected = fork.heads.singleWhere(
           (head) => head.key == right.key,
         );
-        final resolved = await repository.resolveFork(selected);
+        store.reset();
+        final resolved = await repository.resolveFork(discovery, selected);
 
+        expect(store.listCount, 0);
+        expect(store.readCount, 1);
         expect(resolved.snapshot.seen, {'device-a': 3, 'device-b': 1});
         expect(resolved.snapshot.payload, _payload('right'));
         expect(

@@ -167,10 +167,7 @@ final class GagakuSyncService extends ChangeNotifier {
 
     final store = _storeForState(state);
     final manager = SyncProfileManager(store: store);
-    final profile = await manager.join();
-    if (profile.profileId != state.profileId) {
-      throw const SyncValidationException('profile ID mismatch');
-    }
+    await manager.joinExpected(state.profileId);
     await manager.probe();
     final discovery = await SyncRepository(
       store: store,
@@ -224,10 +221,7 @@ final class GagakuSyncService extends ChangeNotifier {
     try {
       final store = _storeForState(state);
       final profileManager = SyncProfileManager(store: store);
-      final profile = await profileManager.join();
-      if (profile.profileId != state.profileId) {
-        throw const SyncValidationException('profile ID mismatch');
-      }
+      await profileManager.joinExpected(state.profileId);
       final failures = List<String>.of(
         await SyncRepository(
           store: store,
@@ -257,7 +251,7 @@ final class GagakuSyncService extends ChangeNotifier {
     }
   }
 
-  Future<SyncRepairResult> repairRemote() async {
+  Future<SyncCleanupResult> repairRemote() async {
     final state = await readState();
     await _stopCoordinator();
     try {
@@ -271,7 +265,7 @@ final class GagakuSyncService extends ChangeNotifier {
     }
   }
 
-  Future<SyncResetResult> resetRemote() async {
+  Future<SyncCleanupResult> resetRemote() async {
     final state = await readState();
     await _stopCoordinator();
     try {

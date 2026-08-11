@@ -8,6 +8,8 @@ import 'package:gagaku/sync/profile.dart';
 import 'package:gagaku/sync/protocol.dart';
 import 'package:gagaku/sync/store.dart';
 
+import 'test_support.dart';
+
 void main() {
   test('creates, probes, rereads, and joins an immutable profile', () async {
     final store = MemorySyncStore();

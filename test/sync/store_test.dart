@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/sync/store.dart';
 
+import 'test_support.dart';
+
 void main() {
   test('created objects are immutable and byte buffers are isolated', () async {
     final store = MemorySyncStore();

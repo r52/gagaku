@@ -6,6 +6,8 @@ import 'package:gagaku/settings/sync.dart';
 import 'package:gagaku/sync/metadata.dart';
 import 'package:gagaku/sync/service.dart';
 
+import '../sync/test_support.dart';
+
 void main() {
   setUpAll(() async {
     await LocaleSettings.setLocale(AppLocale.en);
