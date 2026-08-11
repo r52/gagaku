@@ -171,6 +171,9 @@ class Translations$ui$en {
 	/// en: 'Edit'
 	String get edit => 'Edit';
 
+	/// en: 'Edited'
+	String get edited => 'Edited';
+
 	/// en: 'Save'
 	String get save => 'Save';
 
@@ -2210,6 +2213,7 @@ extension on Translations {
 			'ui.browse' => 'Browse',
 			'ui.manage' => 'Manage',
 			'ui.edit' => 'Edit',
+			'ui.edited' => 'Edited',
 			'ui.save' => 'Save',
 			'ui.delete' => 'Delete',
 			'ui.rename' => 'Rename',
@@ -2702,9 +2706,9 @@ extension on Translations {
 			'sync.documentLocation' => ({required Object uri}) => 'Document tree: ${uri}',
 			'sync.lastPull' => ({required Object time}) => 'Last pull: ${time}',
 			'sync.lastPublish' => ({required Object time}) => 'Last publication: ${time}',
-			'sync.never' => 'Never',
 			_ => null,
 		} ?? switch (path) {
+			'sync.never' => 'Never',
 			'sync.pending' => ({required Object count}) => '${count} local change(s) pending',
 			'sync.error' => ({required Object message}) => 'Error: ${message}',
 			'sync.syncNow' => 'Sync Now',

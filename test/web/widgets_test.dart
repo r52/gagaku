@@ -32,6 +32,45 @@ void main() {
     store.close();
   });
 
+  testWidgets('renaming a category updates and marks its tile', (tester) async {
+    final category = WebFavoritesList(id: 'reading', name: 'Reading');
+
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MaterialApp(home: CategoryManager(categories: [category])),
+      ),
+    );
+
+    await tester.tap(find.byTooltip(t.ui.rename));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField), 'Favorites');
+    await tester.pump();
+    await tester.tap(find.widgetWithText(ElevatedButton, t.ui.rename));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Reading'), findsNothing);
+    expect(find.text('Favorites'), findsOneWidget);
+    expect(find.text(t.ui.edited), findsOneWidget);
+  });
+
+  testWidgets('allows deleting the final category', (tester) async {
+    final category = WebFavoritesList(id: 'reading', name: 'Reading');
+
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MaterialApp(home: CategoryManager(categories: [category])),
+      ),
+    );
+
+    await tester.tap(find.byTooltip(t.ui.delete));
+    await tester.pumpAndSettle();
+    expect(find.text(t.webSources.settings.categoryDelete), findsOneWidget);
+    await tester.tap(find.text(t.ui.yes));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Reading'), findsNothing);
+  });
+
   testWidgets('creates a first category and favorites the title', (
     tester,
   ) async {

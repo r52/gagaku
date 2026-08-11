@@ -236,6 +236,7 @@ class CategoryManager extends HookConsumerWidget {
     final theme = Theme.of(context);
     final nav = Navigator.of(context);
     final list = useState(categories);
+    final edited = useState(<String>{});
 
     return Scaffold(
       appBar: AppBar(
@@ -293,6 +294,14 @@ class CategoryManager extends HookConsumerWidget {
                     child: ListTile(
                       leading: const Icon(Icons.category),
                       title: Text(item.name),
+                      subtitle: edited.value.contains(item.id)
+                          ? Text(
+                              tr.ui.edited,
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                              ),
+                            )
+                          : null,
                       trailing: OverflowBar(
                         children: [
                           IconButton(
@@ -310,6 +319,8 @@ class CategoryManager extends HookConsumerWidget {
 
                               if (result != null) {
                                 item.name = result;
+                                edited.value = {...edited.value, item.id};
+                                list.value = [...list.value];
                               }
                             },
                             icon: const Icon(Icons.edit),
@@ -317,60 +328,57 @@ class CategoryManager extends HookConsumerWidget {
                           IconButton(
                             tooltip: tr.ui.delete,
                             color: Colors.red,
-                            onPressed: list.value.length != 1
-                                ? () async {
-                                    final warnResult = await showDialog<bool>(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        final nav = Navigator.of(context);
-                                        return AlertDialog(
-                                          title: Text(
-                                            t
-                                                .webSources
-                                                .settings
-                                                .categoryDelete,
-                                          ),
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            spacing: 6.0,
-                                            children: [
-                                              Text(
-                                                t
-                                                    .webSources
-                                                    .settings
-                                                    .categoryDeleteWarn,
-                                              ),
-                                              Text(t.ui.sureContinue),
-                                              const SizedBox.shrink(),
-                                              Text(t.ui.irreversibleWarning),
-                                            ],
-                                          ),
-                                          actions: <Widget>[
-                                            ElevatedButton(
-                                              child: Text(t.ui.no),
-                                              onPressed: () {
-                                                nav.pop(false);
-                                              },
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                nav.pop(true);
-                                              },
-                                              child: Text(t.ui.yes),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
+                            onPressed: () async {
+                              final warnResult = await showDialog<bool>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  final nav = Navigator.of(context);
+                                  return AlertDialog(
+                                    title: Text(
+                                      t.webSources.settings.categoryDelete,
+                                    ),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      spacing: 6.0,
+                                      children: [
+                                        Text(
+                                          t
+                                              .webSources
+                                              .settings
+                                              .categoryDeleteWarn,
+                                        ),
+                                        Text(t.ui.sureContinue),
+                                        const SizedBox.shrink(),
+                                        Text(t.ui.irreversibleWarning),
+                                      ],
+                                    ),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                        child: Text(t.ui.no),
+                                        onPressed: () {
+                                          nav.pop(false);
+                                        },
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          nav.pop(true);
+                                        },
+                                        child: Text(t.ui.yes),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
 
-                                    if (warnResult == true) {
-                                      list.value.remove(item);
-                                      list.value = [...list.value];
-                                    }
-                                  }
-                                : null,
+                              if (warnResult == true) {
+                                list.value.remove(item);
+                                list.value = [...list.value];
+                                edited.value = {...edited.value}
+                                  ..remove(item.id);
+                              }
+                            },
                             icon: const Icon(Icons.delete),
                           ),
                         ],
