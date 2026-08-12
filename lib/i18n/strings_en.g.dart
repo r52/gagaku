@@ -87,6 +87,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	);
 
 	late final Translations$theme$en theme = Translations$theme$en.internal(_root);
+	late final Translations$startup$en startup = Translations$startup$en.internal(_root);
 	late final Translations$reader$en reader = Translations$reader$en.internal(_root);
 	late final Translations$mangadex$en mangadex = Translations$mangadex$en.internal(_root);
 	late final Translations$mangaView$en mangaView = Translations$mangaView$en.internal(_root);
@@ -576,6 +577,30 @@ class Translations$theme$en {
 
 	/// en: 'System Defined'
 	String get system => 'System Defined';
+}
+
+// Path: startup
+class Translations$startup$en {
+	Translations$startup$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Startup Section'
+	String get section => 'Startup Section';
+
+	/// en: 'Choose which section opens when Gagaku starts normally'
+	String get sectionSub => 'Choose which section opens when Gagaku starts normally';
+
+	/// en: 'MangaDex'
+	String get mangadex => 'MangaDex';
+
+	/// en: 'Web Sources'
+	String get webSources => _root.webSources.text;
+
+	/// en: 'Local Library'
+	String get localLibrary => _root.localLibrary.text;
 }
 
 // Path: reader
@@ -2407,6 +2432,11 @@ extension on Translations {
 			'theme.light' => 'Light',
 			'theme.dark' => 'Dark',
 			'theme.system' => 'System Defined',
+			'startup.section' => 'Startup Section',
+			'startup.sectionSub' => 'Choose which section opens when Gagaku starts normally',
+			'startup.mangadex' => 'MangaDex',
+			'startup.webSources' => _root.webSources.text,
+			'startup.localLibrary' => _root.localLibrary.text,
 			'reader.direction.leftToRight' => 'Left to Right',
 			'reader.direction.rightToLeft' => 'Right to Left',
 			'reader.format.single' => 'Single',
@@ -2701,13 +2731,13 @@ extension on Translations {
 			'sync.statusCleanupWarning' => 'Synchronized with cleanup warning',
 			'sync.statusDisposed' => 'Stopped',
 			'sync.profileId' => ({required Object id}) => 'Profile: ${id}',
+			_ => null,
+		} ?? switch (path) {
 			'sync.deviceId' => ({required Object id}) => 'Device: ${id}',
 			'sync.location' => ({required Object path}) => 'Directory: ${path}',
 			'sync.documentLocation' => ({required Object uri}) => 'Document tree: ${uri}',
 			'sync.lastPull' => ({required Object time}) => 'Last pull: ${time}',
 			'sync.lastPublish' => ({required Object time}) => 'Last publication: ${time}',
-			_ => null,
-		} ?? switch (path) {
 			'sync.never' => 'Never',
 			'sync.pending' => ({required Object count}) => '${count} local change(s) pending',
 			'sync.error' => ({required Object message}) => 'Error: ${message}',

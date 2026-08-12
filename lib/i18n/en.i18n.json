@@ -255,6 +255,13 @@
     "dark": "Dark",
     "system": "System Defined"
   },
+  "startup": {
+    "section": "Startup Section",
+    "sectionSub": "Choose which section opens when Gagaku starts normally",
+    "mangadex": "MangaDex",
+    "webSources": "@:webSources.text",
+    "localLibrary": "@:localLibrary.text"
+  },
   "reader": {
     "direction": {
       "leftToRight": "Left to Right",

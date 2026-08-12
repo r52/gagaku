@@ -10,6 +10,7 @@ import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/drawer.dart';
 import 'package:gagaku/model/model.dart';
+import 'package:gagaku/model/startup_section.dart';
 import 'package:gagaku/model/types.dart';
 import 'package:gagaku/settings/convert.dart';
 import 'package:gagaku/settings/refresh.dart';
@@ -26,6 +27,7 @@ const gagakuBackupExcludedLocalKeys = [
   'mangadex_tokens',
   'locallib',
   'data_location',
+  startupSectionHiveKey,
   syncMetadataHiveKey,
 ];
 
@@ -163,6 +165,12 @@ class AppSettingsPage extends HookConsumerWidget {
 
     final gbox = Hive.box(gagakuLocalBox);
     final dataLocation = useState(gbox.get('data_location') as String?);
+    final startupSection = useState(StartupSection.load());
+    final startupSectionLabels = {
+      StartupSection.mangaDex: t.startup.mangadex,
+      StartupSection.webSources: t.startup.webSources,
+      StartupSection.localLibrary: t.startup.localLibrary,
+    };
 
     return Scaffold(
       appBar: AppBar(
@@ -173,6 +181,33 @@ class AppSettingsPage extends HookConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: [
+            BottomSheetSettingTile(
+              title: Text(t.startup.section, style: titleStyle),
+              subtitle: Text(t.startup.sectionSub),
+              trailing: Text(startupSectionLabels[startupSection.value]!),
+              builder: (context) {
+                return RadioGroup<StartupSection>(
+                  groupValue: startupSection.value,
+                  onChanged: (StartupSection? value) async {
+                    if (value == null) return;
+
+                    await value.save();
+                    startupSection.value = value;
+                    if (context.mounted) Navigator.of(context).pop();
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (final section in StartupSection.values)
+                        RadioListTile<StartupSection>(
+                          title: Text(startupSectionLabels[section]!),
+                          value: section,
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
             BottomSheetSettingTile(
               title: Text(t.theme.mode, style: titleStyle),
               trailing: Text(

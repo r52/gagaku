@@ -4,6 +4,43 @@ import 'package:gagaku/web/deeplink.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
+  testWidgets('configured startup section wins a normal launcher start', (
+    tester,
+  ) async {
+    tester.binding.platformDispatcher.defaultRouteNameTestValue = '/';
+    addTearDown(
+      tester.binding.platformDispatcher.clearDefaultRouteNameTestValue,
+    );
+
+    final router = _createPlatformRouter('/extensions');
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pumpAndSettle();
+
+    expect(find.text('web sources'), findsOneWidget);
+    expect(find.text('MangaDex title'), findsNothing);
+  });
+
+  testWidgets('cold MangaDex app link wins the configured startup section', (
+    tester,
+  ) async {
+    tester.binding.platformDispatcher.defaultRouteNameTestValue =
+        'https://mangadex.org/title/fixture-title';
+    addTearDown(
+      tester.binding.platformDispatcher.clearDefaultRouteNameTestValue,
+    );
+
+    final router = _createPlatformRouter('/extensions');
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pumpAndSettle();
+
+    expect(find.text('MangaDex title'), findsOneWidget);
+    expect(find.text('web sources'), findsNothing);
+  });
+
   testWidgets('cold-start Paperback link resumes after root commits', (
     tester,
   ) async {
@@ -136,6 +173,27 @@ void main() {
     expect(find.text('routing error'), findsOneWidget);
     expect(find.text('root'), findsNothing);
   });
+}
+
+GoRouter _createPlatformRouter(String initialLocation) {
+  return GoRouter(
+    initialLocation: initialLocation,
+    routes: [
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const Scaffold(body: Text('root')),
+      ),
+      GoRoute(
+        path: '/extensions',
+        builder: (context, state) => const Scaffold(body: Text('web sources')),
+      ),
+      GoRoute(
+        path: '/title/:mangaId',
+        builder: (context, state) =>
+            const Scaffold(body: Text('MangaDex title')),
+      ),
+    ],
+  );
 }
 
 GoRouter _createRouter(
