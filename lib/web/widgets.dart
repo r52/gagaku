@@ -108,7 +108,7 @@ class WebSourceSliverAppBar extends ConsumerWidget {
                   onPressed: () async {
                     final confirmed = await showDialog<bool>(
                       context: context,
-                      builder: (_) => AlertDialog(
+                      builder: (context) => AlertDialog(
                         title: Text(tr.webSources.resetAllRead),
                         content: Text(tr.webSources.resetAllReadWarning),
                         actions: [
