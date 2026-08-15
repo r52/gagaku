@@ -423,6 +423,63 @@ class Translations$localLibrary$en {
 	/// en: 'Read Archive'
 	String get readArchive => 'Read Archive';
 
+	/// en: 'Read Document'
+	String get readDocument => 'Read Document';
+
+	/// en: 'This document could not be opened.'
+	String get documentOpenFailed => 'This document could not be opened.';
+
+	/// en: 'External document links are disabled.'
+	String get documentExternalLinkBlocked => 'External document links are disabled.';
+
+	/// en: 'Previous page or section'
+	String get documentPrevious => 'Previous page or section';
+
+	/// en: 'Next page or section'
+	String get documentNext => 'Next page or section';
+
+	/// en: 'Previous chapter'
+	String get documentPreviousChapter => 'Previous chapter';
+
+	/// en: 'Next chapter'
+	String get documentNextChapter => 'Next chapter';
+
+	/// en: 'Table of contents'
+	String get documentContents => 'Table of contents';
+
+	/// en: 'Jump to page'
+	String get documentJumpPage => 'Jump to page';
+
+	/// en: 'Page $current of $total'
+	String documentPage({required Object current, required Object total}) => 'Page ${current} of ${total}';
+
+	/// en: 'Page number (1–$total)'
+	String documentPageNumber({required Object total}) => 'Page number (1–${total})';
+
+	/// en: 'Chapter $number'
+	String documentChapter({required Object number}) => 'Chapter ${number}';
+
+	/// en: 'Jump within current section'
+	String get documentJumpSection => 'Jump within current section';
+
+	/// en: 'Position in current section: $percent%'
+	String documentSectionProgress({required Object percent}) => 'Position in current section: ${percent}%';
+
+	/// en: 'Decrease text size'
+	String get documentDecreaseText => 'Decrease text size';
+
+	/// en: 'Increase text size'
+	String get documentIncreaseText => 'Increase text size';
+
+	/// en: 'Reset text size'
+	String get documentResetText => 'Reset text size';
+
+	/// en: 'Use continuous scrolling'
+	String get documentScrollMode => 'Use continuous scrolling';
+
+	/// en: 'Use paginated mode'
+	String get documentPaginatedMode => 'Use paginated mode';
+
 	/// en: 'No library directory set!'
 	String get noPathWarning => 'No library directory set!';
 
@@ -2309,6 +2366,25 @@ extension on Translations {
 			'localLibrary.settings.libraryPath' => 'Manga Library Path',
 			'localLibrary.settings.libraryPathDesc' => 'Choose where to search for your manga library',
 			'localLibrary.readArchive' => 'Read Archive',
+			'localLibrary.readDocument' => 'Read Document',
+			'localLibrary.documentOpenFailed' => 'This document could not be opened.',
+			'localLibrary.documentExternalLinkBlocked' => 'External document links are disabled.',
+			'localLibrary.documentPrevious' => 'Previous page or section',
+			'localLibrary.documentNext' => 'Next page or section',
+			'localLibrary.documentPreviousChapter' => 'Previous chapter',
+			'localLibrary.documentNextChapter' => 'Next chapter',
+			'localLibrary.documentContents' => 'Table of contents',
+			'localLibrary.documentJumpPage' => 'Jump to page',
+			'localLibrary.documentPage' => ({required Object current, required Object total}) => 'Page ${current} of ${total}',
+			'localLibrary.documentPageNumber' => ({required Object total}) => 'Page number (1–${total})',
+			'localLibrary.documentChapter' => ({required Object number}) => 'Chapter ${number}',
+			'localLibrary.documentJumpSection' => 'Jump within current section',
+			'localLibrary.documentSectionProgress' => ({required Object percent}) => 'Position in current section: ${percent}%',
+			'localLibrary.documentDecreaseText' => 'Decrease text size',
+			'localLibrary.documentIncreaseText' => 'Increase text size',
+			'localLibrary.documentResetText' => 'Reset text size',
+			'localLibrary.documentScrollMode' => 'Use continuous scrolling',
+			'localLibrary.documentPaginatedMode' => 'Use paginated mode',
 			'localLibrary.noPathWarning' => 'No library directory set!',
 			'localLibrary.setPath' => 'Set Library Directory',
 			'localLibrary.scanning' => 'Scanning library...',
@@ -2712,6 +2788,8 @@ extension on Translations {
 			'sync.createDocumentTree' => 'Create Document Provider Profile',
 			'sync.createDocumentTreeSub' => 'Choose an empty Android document tree, including a folder provided by Google Drive, and publish this device\'s data.',
 			'sync.joinDocumentTree' => 'Join Document Provider Profile',
+			_ => null,
+		} ?? switch (path) {
 			'sync.joinDocumentTreeSub' => 'Choose an Android document tree containing a Gagaku sync profile.',
 			'sync.deviceName' => 'Device Name',
 			'sync.defaultDeviceName' => 'Gagaku Device',
@@ -2731,8 +2809,6 @@ extension on Translations {
 			'sync.statusCleanupWarning' => 'Synchronized with cleanup warning',
 			'sync.statusDisposed' => 'Stopped',
 			'sync.profileId' => ({required Object id}) => 'Profile: ${id}',
-			_ => null,
-		} ?? switch (path) {
 			'sync.deviceId' => ({required Object id}) => 'Device: ${id}',
 			'sync.location' => ({required Object path}) => 'Directory: ${path}',
 			'sync.documentLocation' => ({required Object uri}) => 'Document tree: ${uri}',

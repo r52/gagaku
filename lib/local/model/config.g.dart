@@ -9,10 +9,16 @@ part of 'config.dart';
 _LocalLibConfig _$LocalLibConfigFromJson(Map<String, dynamic> json) =>
     _LocalLibConfig(
       libraryDirectory: json['libraryDirectory'] as String? ?? '',
+      epubFontSize: (json['epubFontSize'] as num?)?.toDouble() ?? 1.0,
+      epubScroll: json['epubScroll'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$LocalLibConfigToJson(_LocalLibConfig instance) =>
-    <String, dynamic>{'libraryDirectory': instance.libraryDirectory};
+    <String, dynamic>{
+      'libraryDirectory': instance.libraryDirectory,
+      'epubFontSize': instance.epubFontSize,
+      'epubScroll': instance.epubScroll,
+    };
 
 // **************************************************************************
 // RiverpodGenerator
@@ -53,7 +59,7 @@ final class LocalConfigProvider
   }
 }
 
-String _$localConfigHash() => r'7bbb8904996f16d0e588e2293eb4563822c78a7a';
+String _$localConfigHash() => r'9edc3229a7b6e99001651e0253dec438769a9651';
 
 abstract class _$LocalConfig extends $Notifier<LocalLibConfig> {
   LocalLibConfig build();

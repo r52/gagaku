@@ -10,8 +10,11 @@ part 'config.g.dart';
 
 @freezed
 abstract class LocalLibConfig with _$LocalLibConfig {
-  factory LocalLibConfig({@Default('') String libraryDirectory}) =
-      _LocalLibConfig;
+  factory LocalLibConfig({
+    @Default('') String libraryDirectory,
+    @Default(1.0) double epubFontSize,
+    @Default(false) bool epubScroll,
+  }) = _LocalLibConfig;
 
   factory LocalLibConfig.fromJson(Map<String, dynamic> json) =>
       _$LocalLibConfigFromJson(json);
@@ -37,11 +40,16 @@ class LocalConfig extends _$LocalConfig {
     return _fetch();
   }
 
-  LocalLibConfig save(LocalLibConfig update) {
+  Future<LocalLibConfig> save(LocalLibConfig update) async {
     state = update;
     final box = Hive.box(gagakuLocalBox);
-    box.put('locallib', json.encode(update.toJson()));
+    await box.put('locallib', json.encode(update.toJson()));
 
     return update;
   }
+
+  Future<LocalLibConfig> saveEpubPreferences({
+    required double fontSize,
+    required bool scroll,
+  }) => save(state.copyWith(epubFontSize: fontSize, epubScroll: scroll));
 }
