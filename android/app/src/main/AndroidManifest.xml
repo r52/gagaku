@@ -17,9 +17,6 @@
          storage features. Gagaku's document reader is visual-only and opens
          files that the Local library already has permission to access. -->
     <uses-permission
-        android:name="android.permission.ACCESS_NETWORK_STATE"
-        tools:node="remove" />
-    <uses-permission
         android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
         tools:node="remove" />
     <uses-permission
