@@ -57,6 +57,7 @@ dependencies:
   timeago: ^3.7.1
   url_launcher: ^6.1.10
   number_paginator: ^1.0.0
+  open_filex: ^4.7.0
   collection: ^1.19.0
   crypto: ^3.0.7
   device_info_plus: ^13.1.0

@@ -17,6 +17,7 @@ import 'package:gagaku/routes.dart';
 import 'package:gagaku/sync/service.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/update_checker.dart';
+import 'package:gagaku/update_installer.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/deeplink.dart';
@@ -82,6 +83,8 @@ void main() async {
                 ]))
         : null,
   );
+
+  await cleanupCachedUpdateFiles();
 
   final gdat = GagakuData();
   await gdat.initData();

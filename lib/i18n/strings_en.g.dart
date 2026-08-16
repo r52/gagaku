@@ -1776,6 +1776,45 @@ class Translations$updates$en {
 	/// en: 'Download'
 	String get download => 'Download';
 
+	/// en: 'Download and update'
+	String get downloadAndUpdate => 'Download and update';
+
+	/// en: 'Gagaku Update'
+	String get updatingTitle => 'Gagaku Update';
+
+	/// en: 'Preparing update...'
+	String get preparingUpdate => 'Preparing update...';
+
+	/// en: 'Downloading update...'
+	String get downloadingUpdate => 'Downloading update...';
+
+	/// en: '$downloaded of $total ($percent%)'
+	String downloadProgress({required Object downloaded, required Object total, required Object percent}) => '${downloaded} of ${total} (${percent}%)';
+
+	/// en: 'Verifying update...'
+	String get verifyingUpdate => 'Verifying update...';
+
+	/// en: 'Updating...'
+	String get updating => 'Updating...';
+
+	/// en: 'Permission to install updates was not granted.'
+	String get installPermissionDenied => 'Permission to install updates was not granted.';
+
+	/// en: 'The update could not be downloaded. Check your connection and try again.'
+	String get downloadFailed => 'The update could not be downloaded. Check your connection and try again.';
+
+	/// en: 'The downloaded update could not be verified. Please try again.'
+	String get verificationFailed => 'The downloaded update could not be verified. Please try again.';
+
+	/// en: 'Android's package installer could not be opened.'
+	String get installerFailed => 'Android\'s package installer could not be opened.';
+
+	/// en: 'The update was not completed. You can retry or close this dialog.'
+	String get installNotCompleted => 'The update was not completed. You can retry or close this dialog.';
+
+	/// en: 'Close'
+	String get close => 'Close';
+
 	/// en: 'Not Now'
 	String get notNow => 'Not Now';
 
@@ -2882,6 +2921,19 @@ extension on Translations {
 			'updates.updateAvailableBody' => ({required Object currentVersion, required Object newVersion}) => 'A new version is available.\nCurrent: ${currentVersion}\nAvailable: ${newVersion}',
 			'updates.updateAvailableBetaBody' => ({required Object currentVersion, required Object latestVersion}) => 'A new dev-preview is available.\nYour build: ${currentVersion}\nLatest: ${latestVersion}',
 			'updates.download' => 'Download',
+			'updates.downloadAndUpdate' => 'Download and update',
+			'updates.updatingTitle' => 'Gagaku Update',
+			'updates.preparingUpdate' => 'Preparing update...',
+			'updates.downloadingUpdate' => 'Downloading update...',
+			'updates.downloadProgress' => ({required Object downloaded, required Object total, required Object percent}) => '${downloaded} of ${total} (${percent}%)',
+			'updates.verifyingUpdate' => 'Verifying update...',
+			'updates.updating' => 'Updating...',
+			'updates.installPermissionDenied' => 'Permission to install updates was not granted.',
+			'updates.downloadFailed' => 'The update could not be downloaded. Check your connection and try again.',
+			'updates.verificationFailed' => 'The downloaded update could not be verified. Please try again.',
+			'updates.installerFailed' => 'Android\'s package installer could not be opened.',
+			'updates.installNotCompleted' => 'The update was not completed. You can retry or close this dialog.',
+			'updates.close' => 'Close',
 			'updates.notNow' => 'Not Now',
 			'updates.ignoreThisVersion' => 'Ignore This Version',
 			_ => null,

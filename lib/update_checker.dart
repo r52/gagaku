@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/config.dart';
+import 'package:gagaku/update_installer.dart';
 import 'package:gagaku/util/http.dart';
 import 'package:gagaku/version.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -27,12 +28,14 @@ class UpdateInfo {
     this.commitSha,
     required this.releaseUrl,
     required this.publishedAt,
+    this.androidAsset,
   });
 
   final String version;
   final String? commitSha;
   final String releaseUrl;
   final DateTime publishedAt;
+  final AndroidUpdateAsset? androidAsset;
 }
 
 /// Result of an update check.
@@ -188,6 +191,7 @@ class UpdateChecker extends _$UpdateChecker {
       version: tagName,
       releaseUrl: htmlUrl,
       publishedAt: publishedAt,
+      androidAsset: AndroidUpdateAsset.fromReleaseJson(data),
     );
   }
 
@@ -225,6 +229,7 @@ class UpdateChecker extends _$UpdateChecker {
           commitSha: commitSha,
           releaseUrl: data['html_url'] as String,
           publishedAt: DateTime.parse(data['published_at'] as String),
+          androidAsset: AndroidUpdateAsset.fromReleaseJson(data),
         );
         break;
       }
@@ -330,6 +335,10 @@ void showUpdateDialog(
   FutureOr<void> Function()? onDownload,
 }) {
   final t = context.t;
+  final canInstallDirectly =
+      !kIsWeb &&
+      defaultTargetPlatform == TargetPlatform.android &&
+      info.androidAsset != null;
 
   showDialog(
     context: context,
@@ -392,6 +401,22 @@ void showUpdateDialog(
           ),
           FilledButton(
             onPressed: () async {
+              if (canInstallDirectly) {
+                await onDownload?.call();
+                if (dialogContext.mounted) {
+                  Navigator.of(dialogContext).pop();
+                }
+                if (context.mounted) {
+                  unawaited(
+                    showAndroidUpdateInstallerDialog(
+                      context,
+                      info.androidAsset!,
+                    ),
+                  );
+                }
+                return;
+              }
+
               final uri = Uri.parse(info.releaseUrl);
               if (await canLaunchUrl(uri)) {
                 await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -401,7 +426,11 @@ void showUpdateDialog(
                 Navigator.of(dialogContext).pop();
               }
             },
-            child: Text(t.updates.download),
+            child: Text(
+              canInstallDirectly
+                  ? t.updates.downloadAndUpdate
+                  : t.updates.download,
+            ),
           ),
         ],
       );
