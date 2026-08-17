@@ -191,7 +191,7 @@ final class UpdateFeedCategoriesProvider
 }
 
 String _$updateFeedCategoriesHash() =>
-    r'41855e188e6ab8dc2a4c659acab17c2761a77274';
+    r'81539c99c9ab782356cbcb1a8a08b2f26bf699f9';
 
 @ProviderFor(WebUpdateFeedController)
 final webUpdateFeedControllerProvider = WebUpdateFeedControllerProvider._();
@@ -218,7 +218,7 @@ final class WebUpdateFeedControllerProvider
 }
 
 String _$webUpdateFeedControllerHash() =>
-    r'f90372c23799f1dc9d21869eee474c569051469a';
+    r'203b369cd7263f221c20450be87b476ad8c92659';
 
 abstract class _$WebUpdateFeedController
     extends $AsyncNotifier<UpdateFeedState> {

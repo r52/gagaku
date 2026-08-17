@@ -63,6 +63,14 @@ final class PersistentUpdateFeedRepository implements UpdateFeedRepository {
   }
 
   @override
+  Future<void> invalidateSeries(WebSeriesRef series) async {
+    logger.d(
+      'CacheManager: invalidating failed update-feed item ${series.key}',
+    );
+    await _cache.invalidateAll(series.key);
+  }
+
+  @override
   Future<void> publish(List<UpdateFeedItem> items) async {
     logger.d(
       'CacheManager: caching entry $updateFeedCacheKey for '
@@ -125,6 +133,8 @@ class WebUpdateFeedController extends _$WebUpdateFeedController {
         items: null,
         error: error,
         stackTrace: stackTrace,
+        completed: 0,
+        total: 0,
       );
     }
   }
@@ -160,8 +170,11 @@ class WebUpdateFeedController extends _$WebUpdateFeedController {
   }
 
   Future<void> _run(UpdateFeedMessages messages) async {
-    final previousItems = state.asData?.value.items;
+    final previousState = state.asData?.value;
+    final previousItems = previousState?.items;
     final cancellation = UpdateFeedCancellationToken();
+    var completed = 0;
+    var total = 0;
     _cancellation = cancellation;
     state = AsyncData(
       UpdateFeedRunning(
@@ -173,6 +186,18 @@ class WebUpdateFeedController extends _$WebUpdateFeedController {
     );
 
     try {
+      if (previousState case UpdateFeedFailure(
+        error: UpdateFeedItemFailure(
+          stage: UpdateFeedItemFailureStage.fetchingManga,
+          link: final failedLink,
+        ),
+      )) {
+        await ref
+            .read(updateFeedRepositoryProvider)
+            .invalidateSeries(failedLink.requireSeries);
+        cancellation.throwIfCancelled();
+      }
+
       final items = await ref
           .read(updateFeedRunnerProvider)
           .run(
@@ -180,6 +205,8 @@ class WebUpdateFeedController extends _$WebUpdateFeedController {
             messages: messages,
             cancellation: cancellation,
             onProgress: (progress) {
+              completed = progress.completed;
+              total = progress.total;
               if (!identical(_cancellation, cancellation)) {
                 return;
               }
@@ -204,16 +231,14 @@ class WebUpdateFeedController extends _$WebUpdateFeedController {
       }
     } catch (error, stackTrace) {
       if (identical(_cancellation, cancellation)) {
-        logger.e(
-          'Web update feed failed',
-          error: error,
-          stackTrace: stackTrace,
-        );
+        _logFailure(error, stackTrace);
         state = AsyncData(
           UpdateFeedFailure(
             items: previousItems,
             error: error,
             stackTrace: stackTrace,
+            completed: completed,
+            total: total,
           ),
         );
       }
@@ -221,6 +246,36 @@ class WebUpdateFeedController extends _$WebUpdateFeedController {
       if (identical(_cancellation, cancellation)) {
         _cancellation = null;
       }
+    }
+  }
+
+  void _logFailure(Object error, StackTrace stackTrace) {
+    switch (error) {
+      case UpdateFeedItemFailure(
+        :final link,
+        :final stage,
+        :final cause,
+        :final causeStackTrace,
+      ):
+        final series = switch (link.series) {
+          ExtensionSeriesRef(:final sourceId, :final mangaId) =>
+            'sourceId=$sourceId, mangaId=$mangaId',
+          ProxySeriesRef(:final proxyId, :final seriesId) =>
+            'proxyId=$proxyId, seriesId=$seriesId',
+          null => 'series=unresolved',
+        };
+        logger.e(
+          'Web update feed failed during ${stage.name} for '
+          'title="${link.title}", $series',
+          error: cause,
+          stackTrace: causeStackTrace,
+        );
+      default:
+        logger.e(
+          'Web update feed failed',
+          error: error,
+          stackTrace: stackTrace,
+        );
     }
   }
 }

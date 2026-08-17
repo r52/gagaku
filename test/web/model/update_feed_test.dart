@@ -148,13 +148,15 @@ void main() {
     });
 
     test('fetch failure preserves the old cache and releases', () async {
-      final repository = _FakeRepository(candidates: [_link('failure')]);
+      final failedLink = _link('failure');
+      final cause = StateError('failed');
+      final repository = _FakeRepository(candidates: [failedLink]);
       final platform = _FakePlatform();
       final runner = UpdateFeedRunner(
         repository: repository,
         platform: platform,
         resolveLink: (link) async => link,
-        fetchManga: (_) => Future<WebManga?>.error(StateError('failed')),
+        fetchManga: (_) => Future<WebManga?>.error(cause),
         pace: (_, _) async {},
       );
 
@@ -165,7 +167,53 @@ void main() {
           cancellation: UpdateFeedCancellationToken(),
           onProgress: (_) {},
         ),
-        throwsStateError,
+        throwsA(
+          isA<UpdateFeedItemFailure>()
+              .having((failure) => failure.link, 'link', same(failedLink))
+              .having(
+                (failure) => failure.stage,
+                'stage',
+                UpdateFeedItemFailureStage.fetchingManga,
+              )
+              .having((failure) => failure.cause, 'cause', same(cause)),
+        ),
+      );
+
+      expect(repository.published, isEmpty);
+      expect(platform.completedCount, 0);
+      expect(platform.releaseCount, 1);
+    });
+
+    test('link resolution failure retains candidate context', () async {
+      final failedLink = _link('resolution-failure');
+      final cause = StateError('failed to resolve');
+      final repository = _FakeRepository(candidates: [failedLink]);
+      final platform = _FakePlatform();
+      final runner = UpdateFeedRunner(
+        repository: repository,
+        platform: platform,
+        resolveLink: (_) => Future<HistoryLink>.error(cause),
+        fetchManga: (_) async => throw UnimplementedError(),
+        pace: (_, _) async {},
+      );
+
+      await expectLater(
+        runner.run(
+          categoryIds: const ['favorites'],
+          messages: _messages,
+          cancellation: UpdateFeedCancellationToken(),
+          onProgress: (_) {},
+        ),
+        throwsA(
+          isA<UpdateFeedItemFailure>()
+              .having((failure) => failure.link, 'link', same(failedLink))
+              .having(
+                (failure) => failure.stage,
+                'stage',
+                UpdateFeedItemFailureStage.resolvingLink,
+              )
+              .having((failure) => failure.cause, 'cause', same(cause)),
+        ),
       );
 
       expect(repository.published, isEmpty);
@@ -316,6 +364,7 @@ void main() {
           if (attempts == 1) {
             throw StateError('transient');
           }
+          expect(repository.invalidatedSeries, [next.requireSeries.key]);
           return _manga('next', DateTime.utc(2026));
         },
         pace: (_, _) async {},
@@ -332,7 +381,20 @@ void main() {
           .read(webUpdateFeedControllerProvider)
           .requireValue;
       expect(failed, isA<UpdateFeedFailure>());
-      expect(failed.items, [previous]);
+      final failure = failed as UpdateFeedFailure;
+      expect(failure.items, [previous]);
+      expect(failure.completed, 0);
+      expect(failure.total, 1);
+      expect(
+        failure.error,
+        isA<UpdateFeedItemFailure>()
+            .having((failure) => failure.link.title, 'title', 'next')
+            .having(
+              (failure) => failure.stage,
+              'stage',
+              UpdateFeedItemFailureStage.fetchingManga,
+            ),
+      );
 
       await controller.start(_messages);
       final recovered = container
@@ -341,6 +403,7 @@ void main() {
       expect(recovered, isA<UpdateFeedIdle>());
       expect(recovered.items?.single.link.title, 'next');
       expect(attempts, 2);
+      expect(repository.invalidatedSeries, [next.requireSeries.key]);
     });
   });
 }
@@ -398,7 +461,13 @@ final class _FakeRepository implements UpdateFeedRepository {
   final List<HistoryLink> candidates;
   final Future<void> Function()? beforePublish;
   final List<List<UpdateFeedItem>> published = [];
+  final List<String> invalidatedSeries = [];
   List<String>? loadedCategories;
+
+  @override
+  Future<void> invalidateSeries(WebSeriesRef series) async {
+    invalidatedSeries.add(series.key);
+  }
 
   @override
   Future<List<HistoryLink>> loadCandidates(List<String> categoryIds) async {

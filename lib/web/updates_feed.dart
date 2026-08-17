@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
+import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/model/update_feed.dart';
@@ -96,12 +97,33 @@ class WebSourceUpdatesPage extends HookConsumerWidget {
       );
     }
 
-    void addFailure(List<UpdateFeedItem>? items) {
+    void addFailure({
+      required Object error,
+      required List<UpdateFeedItem>? items,
+      required int completed,
+      required int total,
+    }) {
+      final itemFailure = switch (error) {
+        final UpdateFeedItemFailure failure => failure,
+        _ => null,
+      };
+      final reason = itemFailure?.cause ?? error;
       final errorWidget = Column(
         mainAxisSize: MainAxisSize.min,
         spacing: 10.0,
         children: [
-          Text(tr.errors.generic),
+          Text(
+            itemFailure == null
+                ? tr.errors.generic
+                : tr.chapterFeed.updateFailed(item: itemFailure.link.title),
+            textAlign: TextAlign.center,
+          ),
+          if (total > 0) Text('$completed/$total'),
+          Text(switch (reason) {
+            CloudflareBypassException() =>
+              tr.webSources.source.cloudflareManualRequired,
+            _ => tr.chapterFeed.failureReason(reason: reason.toString()),
+          }, textAlign: TextAlign.center),
           ElevatedButton.icon(
             onPressed: () => _startUpdate(context, ref),
             label: Text(tr.ui.retry),
@@ -137,8 +159,8 @@ class WebSourceUpdatesPage extends HookConsumerWidget {
             child: Center(child: CircularProgressIndicator()),
           ),
         );
-      case AsyncError():
-        addFailure(null);
+      case AsyncError(:final error):
+        addFailure(error: error, items: null, completed: 0, total: 0);
       case AsyncData(:final value):
         switch (value) {
           case UpdateFeedRunning(
@@ -175,8 +197,18 @@ class WebSourceUpdatesPage extends HookConsumerWidget {
                 ),
               ),
             );
-          case UpdateFeedFailure(:final items):
-            addFailure(items);
+          case UpdateFeedFailure(
+            :final error,
+            :final items,
+            :final completed,
+            :final total,
+          ):
+            addFailure(
+              error: error,
+              items: items,
+              completed: completed,
+              total: total,
+            );
           case UpdateFeedIdle(:final items):
             if (items == null) {
               addStartPrompt();

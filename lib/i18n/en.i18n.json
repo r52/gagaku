@@ -668,6 +668,8 @@
     "done": "Update complete!",
     "stop": "Stop Update",
     "stopping": "Stopping Update...",
+    "updateFailed": "Failed to update: $item",
+    "failureReason": "Reason: $reason",
     "updateRequired": "Update required! No feed data or data out of date"
   },
   "permissions": {

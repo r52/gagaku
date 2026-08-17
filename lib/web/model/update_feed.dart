@@ -44,10 +44,33 @@ final class UpdateFeedFailure extends UpdateFeedState {
     required super.items,
     required this.error,
     required this.stackTrace,
+    required this.completed,
+    required this.total,
   });
 
   final Object error;
   final StackTrace stackTrace;
+  final int completed;
+  final int total;
+}
+
+enum UpdateFeedItemFailureStage { resolvingLink, fetchingManga }
+
+final class UpdateFeedItemFailure implements Exception {
+  const UpdateFeedItemFailure({
+    required this.link,
+    required this.stage,
+    required this.cause,
+    required this.causeStackTrace,
+  });
+
+  final HistoryLink link;
+  final UpdateFeedItemFailureStage stage;
+  final Object cause;
+  final StackTrace causeStackTrace;
+
+  @override
+  String toString() => cause.toString();
 }
 
 final class UpdateFeedProgress {
@@ -78,6 +101,8 @@ abstract interface class UpdateFeedRepository {
   Future<List<UpdateFeedItem>?> readCached();
 
   Future<List<HistoryLink>> loadCandidates(List<String> categoryIds);
+
+  Future<void> invalidateSeries(WebSeriesRef series);
 
   Future<void> publish(List<UpdateFeedItem> items);
 }
@@ -171,7 +196,22 @@ final class UpdateFeedRunner {
       final links = <HistoryLink>[];
       for (final candidate in candidates) {
         cancellation.throwIfCancelled();
-        final resolved = await resolveLink(candidate);
+        late final HistoryLink resolved;
+        try {
+          resolved = await resolveLink(candidate);
+        } on UpdateFeedCancelled {
+          rethrow;
+        } catch (error, stackTrace) {
+          Error.throwWithStackTrace(
+            UpdateFeedItemFailure(
+              link: candidate,
+              stage: UpdateFeedItemFailureStage.resolvingLink,
+              cause: error,
+              causeStackTrace: stackTrace,
+            ),
+            stackTrace,
+          );
+        }
         cancellation.throwIfCancelled();
         if (resolved.series != null) {
           links.add(resolved);
@@ -191,7 +231,22 @@ final class UpdateFeedRunner {
         await platform.reportProgress(progress, messages);
         cancellation.throwIfCancelled();
 
-        final manga = await fetchManga(link.requireSeries);
+        late final WebManga? manga;
+        try {
+          manga = await fetchManga(link.requireSeries);
+        } on UpdateFeedCancelled {
+          rethrow;
+        } catch (error, stackTrace) {
+          Error.throwWithStackTrace(
+            UpdateFeedItemFailure(
+              link: link,
+              stage: UpdateFeedItemFailureStage.fetchingManga,
+              cause: error,
+              causeStackTrace: stackTrace,
+            ),
+            stackTrace,
+          );
+        }
         cancellation.throwIfCancelled();
         processedCount++;
         if (manga != null) {

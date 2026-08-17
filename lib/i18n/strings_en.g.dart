@@ -1689,6 +1689,12 @@ class Translations$chapterFeed$en {
 	/// en: 'Stopping Update...'
 	String get stopping => 'Stopping Update...';
 
+	/// en: 'Failed to update: $item'
+	String updateFailed({required Object item}) => 'Failed to update: ${item}';
+
+	/// en: 'Reason: $reason'
+	String failureReason({required Object reason}) => 'Reason: ${reason}';
+
 	/// en: 'Update required! No feed data or data out of date'
 	String get updateRequired => 'Update required! No feed data or data out of date';
 }
@@ -2898,6 +2904,8 @@ extension on Translations {
 			'chapterFeed.done' => 'Update complete!',
 			'chapterFeed.stop' => 'Stop Update',
 			'chapterFeed.stopping' => 'Stopping Update...',
+			'chapterFeed.updateFailed' => ({required Object item}) => 'Failed to update: ${item}',
+			'chapterFeed.failureReason' => ({required Object reason}) => 'Reason: ${reason}',
 			'chapterFeed.updateRequired' => 'Update required! No feed data or data out of date',
 			'permissions.needed' => 'Permissions Needed',
 			'permissions.request' => 'Extra permissions are required to update your feed in the background.',
