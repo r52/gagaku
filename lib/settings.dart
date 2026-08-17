@@ -34,7 +34,7 @@ const gagakuBackupExcludedLocalKeys = [
 class AppSettingsPage extends HookConsumerWidget {
   const AppSettingsPage({super.key});
 
-  Future<String?> _backupData(BuildContext context) async {
+  Future<Uri?> _backupData(BuildContext context) async {
     Map<String, dynamic> output = {};
     final gbox = Hive.box(gagakuLocalBox);
 
@@ -102,17 +102,16 @@ class AppSettingsPage extends HookConsumerWidget {
       return null;
     }
 
-    FilePickerResult? result = await FilePicker.pickFiles(
+    PlatformFile? pfile = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['json'],
     );
 
-    if (result == null) {
+    if (pfile == null) {
       // aborted
       return null;
     }
 
-    final pfile = result.files.single;
     late final List<int> data;
     try {
       data = await pfile.readAsByteStream().expand((bytes) => bytes).toList();

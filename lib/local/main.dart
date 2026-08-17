@@ -22,13 +22,13 @@ class LocalLibraryHomeScreen extends StatelessWidget {
   const LocalLibraryHomeScreen({super.key});
 
   Future<PlatformFile?> _pickMangaArchive() async {
-    FilePickerResult? result = await FilePicker.pickFiles(
+    final result = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['cbz', 'zip', 'cbt', 'tar'],
     );
 
     if (result != null) {
-      return result.files.single;
+      return result;
     }
 
     return null;
@@ -45,11 +45,10 @@ class LocalLibraryHomeScreen extends StatelessWidget {
   }
 
   Future<void> _readDocument(NavigatorState navigator) async {
-    final result = await FilePicker.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: const ['pdf', 'epub'],
     );
-    final file = result?.files.single;
     if (file?.path == null) return;
     final format = localDocumentFormatFromPath(file!.path!);
     if (format == null) return;
