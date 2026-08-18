@@ -19,7 +19,8 @@ Gagaku is licensed under the MIT license.
 ## Features
 
 - MangaDex client
-- Local CBZ/CBT file and image directory support, directory cataloging/scanning
+- Local CBZ/CBT/PDF/EPUB file and image directory support, directory cataloging/scanning
+  - PDF and EPUB support is Android only
 - Basic PB extension support
   - v0.9 extensions only
   - manga source providers only (tracking extensions not supported)
@@ -34,7 +35,8 @@ Gagaku is licensed under the MIT license.
 Gagaku does NOT feature:
 
 - Chapter download, offline reading/library management support. There are far better clients for this purpose.
-- File types such as CBR/CB7/PDF/EPUB etc.
+- File types such as CBR/CB7 etc.
+  - PDF/EPUB support is Android only
 
 ### Database synchronization
 
