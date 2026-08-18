@@ -223,7 +223,7 @@ Future<File> downloadAndroidUpdate({
       );
     }
 
-    return partialFile.rename(completedFile.path);
+    return await partialFile.rename(completedFile.path);
   } on UpdateInstallException {
     await _deleteIfPresent(partialFile);
     await _deleteIfPresent(completedFile);

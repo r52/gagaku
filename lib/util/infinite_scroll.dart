@@ -180,10 +180,10 @@ class AppendedFindingSliverChildBuilderDelegate
     required IndexedWidgetBuilder builder,
     required int childCount,
     WidgetBuilder? appendixBuilder,
-    ChildIndexGetter? findChildIndexCallback,
-    bool addAutomaticKeepAlives = true,
-    bool addRepaintBoundaries = true,
-    bool addSemanticIndexes = true,
+    super.findChildIndexCallback,
+    super.addAutomaticKeepAlives,
+    super.addRepaintBoundaries,
+    super.addSemanticIndexes,
     SemanticIndexCallback? semanticIndexCallback,
   }) : super(
          appendixBuilder == null
@@ -194,11 +194,7 @@ class AppendedFindingSliverChildBuilderDelegate
                  }
                  return builder(context, index);
                },
-         findChildIndexCallback: findChildIndexCallback,
          childCount: appendixBuilder == null ? childCount : childCount + 1,
-         addAutomaticKeepAlives: addAutomaticKeepAlives,
-         addRepaintBoundaries: addRepaintBoundaries,
-         addSemanticIndexes: addSemanticIndexes,
          semanticIndexCallback: semanticIndexCallback ?? (_, index) => index,
        );
 

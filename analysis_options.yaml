@@ -10,7 +10,7 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
-  exclude: [build/**, lib/routes.g.dart]
+  exclude: [build/**, lib/routes.g.dart, android/**, ios/**, web/**, windows/**, macos/**, linux/**]
 
 plugins:
   riverpod_lint: ^3.1.0

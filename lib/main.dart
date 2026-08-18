@@ -93,6 +93,7 @@ void main() async {
 
   final providerContainer = ProviderContainer();
   await GagakuSyncService().start(providerContainer);
+  // ignore: riverpod_lint/missing_provider_scope
   runApp(
     _GagakuRoot(
       providerContainer: providerContainer,
