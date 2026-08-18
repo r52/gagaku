@@ -87,6 +87,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	);
 
 	late final Translations$theme$en theme = Translations$theme$en.internal(_root);
+	late final Translations$startup$en startup = Translations$startup$en.internal(_root);
 	late final Translations$reader$en reader = Translations$reader$en.internal(_root);
 	late final Translations$mangadex$en mangadex = Translations$mangadex$en.internal(_root);
 	late final Translations$mangaView$en mangaView = Translations$mangaView$en.internal(_root);
@@ -422,6 +423,63 @@ class Translations$localLibrary$en {
 	/// en: 'Read Archive'
 	String get readArchive => 'Read Archive';
 
+	/// en: 'Read Document'
+	String get readDocument => 'Read Document';
+
+	/// en: 'This document could not be opened.'
+	String get documentOpenFailed => 'This document could not be opened.';
+
+	/// en: 'External document links are disabled.'
+	String get documentExternalLinkBlocked => 'External document links are disabled.';
+
+	/// en: 'Previous page or section'
+	String get documentPrevious => 'Previous page or section';
+
+	/// en: 'Next page or section'
+	String get documentNext => 'Next page or section';
+
+	/// en: 'Previous chapter'
+	String get documentPreviousChapter => 'Previous chapter';
+
+	/// en: 'Next chapter'
+	String get documentNextChapter => 'Next chapter';
+
+	/// en: 'Table of contents'
+	String get documentContents => 'Table of contents';
+
+	/// en: 'Jump to page'
+	String get documentJumpPage => 'Jump to page';
+
+	/// en: 'Page $current of $total'
+	String documentPage({required Object current, required Object total}) => 'Page ${current} of ${total}';
+
+	/// en: 'Page number (1–$total)'
+	String documentPageNumber({required Object total}) => 'Page number (1–${total})';
+
+	/// en: 'Chapter $number'
+	String documentChapter({required Object number}) => 'Chapter ${number}';
+
+	/// en: 'Jump within current section'
+	String get documentJumpSection => 'Jump within current section';
+
+	/// en: 'Position in current section: $percent%'
+	String documentSectionProgress({required Object percent}) => 'Position in current section: ${percent}%';
+
+	/// en: 'Decrease text size'
+	String get documentDecreaseText => 'Decrease text size';
+
+	/// en: 'Increase text size'
+	String get documentIncreaseText => 'Increase text size';
+
+	/// en: 'Reset text size'
+	String get documentResetText => 'Reset text size';
+
+	/// en: 'Use continuous scrolling'
+	String get documentScrollMode => 'Use continuous scrolling';
+
+	/// en: 'Use paginated mode'
+	String get documentPaginatedMode => 'Use paginated mode';
+
 	/// en: 'No library directory set!'
 	String get noPathWarning => 'No library directory set!';
 
@@ -576,6 +634,30 @@ class Translations$theme$en {
 
 	/// en: 'System Defined'
 	String get system => 'System Defined';
+}
+
+// Path: startup
+class Translations$startup$en {
+	Translations$startup$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Startup Section'
+	String get section => 'Startup Section';
+
+	/// en: 'Choose which section opens when Gagaku starts normally'
+	String get sectionSub => 'Choose which section opens when Gagaku starts normally';
+
+	/// en: 'MangaDex'
+	String get mangadex => 'MangaDex';
+
+	/// en: 'Web Sources'
+	String get webSources => _root.webSources.text;
+
+	/// en: 'Local Library'
+	String get localLibrary => _root.localLibrary.text;
 }
 
 // Path: reader
@@ -1607,6 +1689,12 @@ class Translations$chapterFeed$en {
 	/// en: 'Stopping Update...'
 	String get stopping => 'Stopping Update...';
 
+	/// en: 'Failed to update: $item'
+	String updateFailed({required Object item}) => 'Failed to update: ${item}';
+
+	/// en: 'Reason: $reason'
+	String failureReason({required Object reason}) => 'Reason: ${reason}';
+
 	/// en: 'Update required! No feed data or data out of date'
 	String get updateRequired => 'Update required! No feed data or data out of date';
 }
@@ -1693,6 +1781,45 @@ class Translations$updates$en {
 
 	/// en: 'Download'
 	String get download => 'Download';
+
+	/// en: 'Download and update'
+	String get downloadAndUpdate => 'Download and update';
+
+	/// en: 'Gagaku Update'
+	String get updatingTitle => 'Gagaku Update';
+
+	/// en: 'Preparing update...'
+	String get preparingUpdate => 'Preparing update...';
+
+	/// en: 'Downloading update...'
+	String get downloadingUpdate => 'Downloading update...';
+
+	/// en: '$downloaded of $total ($percent%)'
+	String downloadProgress({required Object downloaded, required Object total, required Object percent}) => '${downloaded} of ${total} (${percent}%)';
+
+	/// en: 'Verifying update...'
+	String get verifyingUpdate => 'Verifying update...';
+
+	/// en: 'Updating...'
+	String get updating => 'Updating...';
+
+	/// en: 'Permission to install updates was not granted.'
+	String get installPermissionDenied => 'Permission to install updates was not granted.';
+
+	/// en: 'The update could not be downloaded. Check your connection and try again.'
+	String get downloadFailed => 'The update could not be downloaded. Check your connection and try again.';
+
+	/// en: 'The downloaded update could not be verified. Please try again.'
+	String get verificationFailed => 'The downloaded update could not be verified. Please try again.';
+
+	/// en: 'Android's package installer could not be opened.'
+	String get installerFailed => 'Android\'s package installer could not be opened.';
+
+	/// en: 'The update was not completed. You can retry or close this dialog.'
+	String get installNotCompleted => 'The update was not completed. You can retry or close this dialog.';
+
+	/// en: 'Close'
+	String get close => 'Close';
 
 	/// en: 'Not Now'
 	String get notNow => 'Not Now';
@@ -2284,6 +2411,25 @@ extension on Translations {
 			'localLibrary.settings.libraryPath' => 'Manga Library Path',
 			'localLibrary.settings.libraryPathDesc' => 'Choose where to search for your manga library',
 			'localLibrary.readArchive' => 'Read Archive',
+			'localLibrary.readDocument' => 'Read Document',
+			'localLibrary.documentOpenFailed' => 'This document could not be opened.',
+			'localLibrary.documentExternalLinkBlocked' => 'External document links are disabled.',
+			'localLibrary.documentPrevious' => 'Previous page or section',
+			'localLibrary.documentNext' => 'Next page or section',
+			'localLibrary.documentPreviousChapter' => 'Previous chapter',
+			'localLibrary.documentNextChapter' => 'Next chapter',
+			'localLibrary.documentContents' => 'Table of contents',
+			'localLibrary.documentJumpPage' => 'Jump to page',
+			'localLibrary.documentPage' => ({required Object current, required Object total}) => 'Page ${current} of ${total}',
+			'localLibrary.documentPageNumber' => ({required Object total}) => 'Page number (1–${total})',
+			'localLibrary.documentChapter' => ({required Object number}) => 'Chapter ${number}',
+			'localLibrary.documentJumpSection' => 'Jump within current section',
+			'localLibrary.documentSectionProgress' => ({required Object percent}) => 'Position in current section: ${percent}%',
+			'localLibrary.documentDecreaseText' => 'Decrease text size',
+			'localLibrary.documentIncreaseText' => 'Increase text size',
+			'localLibrary.documentResetText' => 'Reset text size',
+			'localLibrary.documentScrollMode' => 'Use continuous scrolling',
+			'localLibrary.documentPaginatedMode' => 'Use paginated mode',
 			'localLibrary.noPathWarning' => 'No library directory set!',
 			'localLibrary.setPath' => 'Set Library Directory',
 			'localLibrary.scanning' => 'Scanning library...',
@@ -2407,6 +2553,11 @@ extension on Translations {
 			'theme.light' => 'Light',
 			'theme.dark' => 'Dark',
 			'theme.system' => 'System Defined',
+			'startup.section' => 'Startup Section',
+			'startup.sectionSub' => 'Choose which section opens when Gagaku starts normally',
+			'startup.mangadex' => 'MangaDex',
+			'startup.webSources' => _root.webSources.text,
+			'startup.localLibrary' => _root.localLibrary.text,
 			'reader.direction.leftToRight' => 'Left to Right',
 			'reader.direction.rightToLeft' => 'Right to Left',
 			'reader.format.single' => 'Single',
@@ -2682,6 +2833,8 @@ extension on Translations {
 			'sync.createDocumentTree' => 'Create Document Provider Profile',
 			'sync.createDocumentTreeSub' => 'Choose an empty Android document tree, including a folder provided by Google Drive, and publish this device\'s data.',
 			'sync.joinDocumentTree' => 'Join Document Provider Profile',
+			_ => null,
+		} ?? switch (path) {
 			'sync.joinDocumentTreeSub' => 'Choose an Android document tree containing a Gagaku sync profile.',
 			'sync.deviceName' => 'Device Name',
 			'sync.defaultDeviceName' => 'Gagaku Device',
@@ -2706,8 +2859,6 @@ extension on Translations {
 			'sync.documentLocation' => ({required Object uri}) => 'Document tree: ${uri}',
 			'sync.lastPull' => ({required Object time}) => 'Last pull: ${time}',
 			'sync.lastPublish' => ({required Object time}) => 'Last publication: ${time}',
-			_ => null,
-		} ?? switch (path) {
 			'sync.never' => 'Never',
 			'sync.pending' => ({required Object count}) => '${count} local change(s) pending',
 			'sync.error' => ({required Object message}) => 'Error: ${message}',
@@ -2753,6 +2904,8 @@ extension on Translations {
 			'chapterFeed.done' => 'Update complete!',
 			'chapterFeed.stop' => 'Stop Update',
 			'chapterFeed.stopping' => 'Stopping Update...',
+			'chapterFeed.updateFailed' => ({required Object item}) => 'Failed to update: ${item}',
+			'chapterFeed.failureReason' => ({required Object reason}) => 'Reason: ${reason}',
 			'chapterFeed.updateRequired' => 'Update required! No feed data or data out of date',
 			'permissions.needed' => 'Permissions Needed',
 			'permissions.request' => 'Extra permissions are required to update your feed in the background.',
@@ -2776,6 +2929,19 @@ extension on Translations {
 			'updates.updateAvailableBody' => ({required Object currentVersion, required Object newVersion}) => 'A new version is available.\nCurrent: ${currentVersion}\nAvailable: ${newVersion}',
 			'updates.updateAvailableBetaBody' => ({required Object currentVersion, required Object latestVersion}) => 'A new dev-preview is available.\nYour build: ${currentVersion}\nLatest: ${latestVersion}',
 			'updates.download' => 'Download',
+			'updates.downloadAndUpdate' => 'Download and update',
+			'updates.updatingTitle' => 'Gagaku Update',
+			'updates.preparingUpdate' => 'Preparing update...',
+			'updates.downloadingUpdate' => 'Downloading update...',
+			'updates.downloadProgress' => ({required Object downloaded, required Object total, required Object percent}) => '${downloaded} of ${total} (${percent}%)',
+			'updates.verifyingUpdate' => 'Verifying update...',
+			'updates.updating' => 'Updating...',
+			'updates.installPermissionDenied' => 'Permission to install updates was not granted.',
+			'updates.downloadFailed' => 'The update could not be downloaded. Check your connection and try again.',
+			'updates.verificationFailed' => 'The downloaded update could not be verified. Please try again.',
+			'updates.installerFailed' => 'Android\'s package installer could not be opened.',
+			'updates.installNotCompleted' => 'The update was not completed. You can retry or close this dialog.',
+			'updates.close' => 'Close',
 			'updates.notNow' => 'Not Now',
 			'updates.ignoreThisVersion' => 'Ignore This Version',
 			_ => null,

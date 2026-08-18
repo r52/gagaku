@@ -102,6 +102,25 @@
       "libraryPathDesc": "Choose where to search for your manga library"
     },
     "readArchive": "Read Archive",
+    "readDocument": "Read Document",
+    "documentOpenFailed": "This document could not be opened.",
+    "documentExternalLinkBlocked": "External document links are disabled.",
+    "documentPrevious": "Previous page or section",
+    "documentNext": "Next page or section",
+    "documentPreviousChapter": "Previous chapter",
+    "documentNextChapter": "Next chapter",
+    "documentContents": "Table of contents",
+    "documentJumpPage": "Jump to page",
+    "documentPage": "Page $current of $total",
+    "documentPageNumber": "Page number (1–$total)",
+    "documentChapter": "Chapter $number",
+    "documentJumpSection": "Jump within current section",
+    "documentSectionProgress": "Position in current section: $percent%",
+    "documentDecreaseText": "Decrease text size",
+    "documentIncreaseText": "Increase text size",
+    "documentResetText": "Reset text size",
+    "documentScrollMode": "Use continuous scrolling",
+    "documentPaginatedMode": "Use paginated mode",
     "noPathWarning": "No library directory set!",
     "setPath": "Set Library Directory",
     "scanning": "Scanning library...",
@@ -254,6 +273,13 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System Defined"
+  },
+  "startup": {
+    "section": "Startup Section",
+    "sectionSub": "Choose which section opens when Gagaku starts normally",
+    "mangadex": "MangaDex",
+    "webSources": "@:webSources.text",
+    "localLibrary": "@:localLibrary.text"
   },
   "reader": {
     "direction": {
@@ -642,6 +668,8 @@
     "done": "Update complete!",
     "stop": "Stop Update",
     "stopping": "Stopping Update...",
+    "updateFailed": "Failed to update: $item",
+    "failureReason": "Reason: $reason",
     "updateRequired": "Update required! No feed data or data out of date"
   },
   "permissions": {
@@ -669,6 +697,19 @@
     "updateAvailableBody": "A new version is available.\nCurrent: $currentVersion\nAvailable: $newVersion",
     "updateAvailableBetaBody": "A new dev-preview is available.\nYour build: $currentVersion\nLatest: $latestVersion",
     "download": "Download",
+    "downloadAndUpdate": "Download and update",
+    "updatingTitle": "Gagaku Update",
+    "preparingUpdate": "Preparing update...",
+    "downloadingUpdate": "Downloading update...",
+    "downloadProgress": "$downloaded of $total ($percent%)",
+    "verifyingUpdate": "Verifying update...",
+    "updating": "Updating...",
+    "installPermissionDenied": "Permission to install updates was not granted.",
+    "downloadFailed": "The update could not be downloaded. Check your connection and try again.",
+    "verificationFailed": "The downloaded update could not be verified. Please try again.",
+    "installerFailed": "Android's package installer could not be opened.",
+    "installNotCompleted": "The update was not completed. You can retry or close this dialog.",
+    "close": "Close",
     "notNow": "Not Now",
     "ignoreThisVersion": "Ignore This Version"
   }

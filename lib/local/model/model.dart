@@ -8,13 +8,41 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/local/model/archive_thumbnail_provider.dart';
 import 'package:gagaku/local/model/config.dart';
+import 'package:gagaku/local/model/document_session.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'model.g.dart';
 
-enum LibraryItemType { directory, archive }
+enum LibraryItemType { directory, archive, pdf, epub }
+
+extension LibraryItemTypeDocumentFormat on LibraryItemType {
+  LocalDocumentFormat? get documentFormat => switch (this) {
+    LibraryItemType.pdf => LocalDocumentFormat.pdf,
+    LibraryItemType.epub => LocalDocumentFormat.epub,
+    LibraryItemType.directory || LibraryItemType.archive => null,
+  };
+}
+
+LibraryItemType? localLibraryFileTypeFromPath(
+  String path, {
+  required bool documentsEnabled,
+}) {
+  final lowerPath = path.toLowerCase();
+  if (lowerPath.endsWith('.cbz') ||
+      lowerPath.endsWith('.zip') ||
+      lowerPath.endsWith('.cbt') ||
+      lowerPath.endsWith('.tar')) {
+    return LibraryItemType.archive;
+  }
+  if (!documentsEnabled) return null;
+  return switch (localDocumentFormatFromPath(path)) {
+    LocalDocumentFormat.pdf => LibraryItemType.pdf,
+    LocalDocumentFormat.epub => LibraryItemType.epub,
+    null => null,
+  };
+}
 
 typedef LibraryItemCompare = int Function(LocalLibraryItem, LocalLibraryItem);
 
@@ -139,6 +167,16 @@ class LocalLibraryItem {
   List<LocalLibraryItem> children = [];
   int get id => Object.hash(path, type);
 
+  LocalDocumentDescriptor? get documentDescriptor {
+    final format = type.documentFormat;
+    if (format == null) return null;
+    return LocalDocumentDescriptor(
+      path: path,
+      title: name ?? path,
+      format: format,
+    );
+  }
+
   void setSortType(LibrarySort type) {
     sort = type;
     children.sort(_libraryCompare[sort]);
@@ -153,11 +191,13 @@ class _ScanArgs {
   const _ScanArgs({
     required this.libDir,
     required this.formats,
+    required this.documentsEnabled,
     required this.currentSort,
     required this.sendPort,
   });
   final String libDir;
   final FormatInfo formats;
+  final bool documentsEnabled;
   final LibrarySort currentSort;
   final SendPort sendPort;
 }
@@ -165,12 +205,13 @@ class _ScanArgs {
 Future<LocalLibraryItem?> _processFileIsolate(
   File file,
   LocalLibraryItem? parent,
+  bool documentsEnabled,
 ) async {
-  final lpath = file.path.toLowerCase();
-  if (lpath.endsWith('.cbz') ||
-      lpath.endsWith('.zip') ||
-      lpath.endsWith('.cbt') ||
-      lpath.endsWith('.tar')) {
+  final type = localLibraryFileTypeFromPath(
+    file.path,
+    documentsEnabled: documentsEnabled,
+  );
+  if (type != null) {
     DateTime modified;
     try {
       modified = await file.lastModified();
@@ -180,11 +221,11 @@ Future<LocalLibraryItem?> _processFileIsolate(
 
     return LocalLibraryItem(
       path: file.path,
-      type: LibraryItemType.archive,
+      type: type,
       modified: modified,
       name: file.uri.pathSegments.last,
       isReadable: true,
-      thumbnail: file.path,
+      thumbnail: type == LibraryItemType.archive ? file.path : null,
       parent: parent,
     );
   }
@@ -203,6 +244,7 @@ Future<LocalLibraryItem?> _processDirectoryIsolate(
   Directory dir,
   LocalLibraryItem? parent,
   FormatInfo formats,
+  bool documentsEnabled,
   LibrarySort currentSort,
 ) async {
   final entities = await _listDirectory(dir);
@@ -240,7 +282,7 @@ Future<LocalLibraryItem?> _processDirectoryIsolate(
   }
 
   for (final e in files) {
-    final p = await _processFileIsolate(e, res);
+    final p = await _processFileIsolate(e, res, documentsEnabled);
     if (p != null) {
       res.children.add(p);
     }
@@ -248,7 +290,13 @@ Future<LocalLibraryItem?> _processDirectoryIsolate(
 
   final dirs = entities.whereType<Directory>();
   for (final e in dirs) {
-    final p = await _processDirectoryIsolate(e, res, formats, currentSort);
+    final p = await _processDirectoryIsolate(
+      e,
+      res,
+      formats,
+      documentsEnabled,
+      currentSort,
+    );
     if (p != null) {
       res.children.add(p);
     }
@@ -288,7 +336,7 @@ Future<void> _isolateWorker(_ScanArgs args) async {
 
   for (final e in entities) {
     if (e is File) {
-      final p = await _processFileIsolate(e, top);
+      final p = await _processFileIsolate(e, top, args.documentsEnabled);
       if (p != null) {
         top.children.add(p);
       }
@@ -297,6 +345,7 @@ Future<void> _isolateWorker(_ScanArgs args) async {
         e,
         top,
         args.formats,
+        args.documentsEnabled,
         args.currentSort,
       );
       if (p != null) {
@@ -365,6 +414,7 @@ class LocalLibrary extends _$LocalLibrary {
           _ScanArgs(
             libDir: libDir,
             formats: formats,
+            documentsEnabled: Platform.isAndroid,
             currentSort: currentSort,
             sendPort: receivePort.sendPort,
           ),

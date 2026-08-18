@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/update_checker.dart';
+import 'package:gagaku/update_installer.dart';
 import 'package:gagaku/version.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -87,14 +89,40 @@ void main() {
     );
 
     test('stable channel surfaces a newer release', () async {
-      final client = _RecordingClient((_) => _stableRelease(version: 'v1.0.1'));
+      final client = _RecordingClient(
+        (_) => _stableRelease(version: 'v1.0.1', withAndroidAsset: true),
+      );
       final container = _container(client: client);
       addTearDown(container.dispose);
 
       final result = await container.read(updateCheckerProvider.future);
 
       expect(result, isA<UpdateResultAvailable>());
-      expect((result as UpdateResultAvailable).info.version, '1.0.1');
+      final info = (result as UpdateResultAvailable).info;
+      expect(info.version, '1.0.1');
+      expect(info.androidAsset?.downloadUrl.path, endsWith('/app-release.apk'));
+      expect(info.androidAsset?.size, 12345);
+      expect(info.androidAsset?.sha256Digest, 'a' * 64);
+    });
+
+    test('stable channel ignores malformed Android release assets', () async {
+      final client = _RecordingClient(
+        (_) => _jsonResponse(
+          _release(
+            tagName: 'v1.0.1',
+            name: 'v1.0.1',
+            body: '',
+            assets: [_androidAsset(digest: 'not-a-digest')],
+          ),
+        ),
+      );
+      final container = _container(client: client);
+      addTearDown(container.dispose);
+
+      final result = await container.read(updateCheckerProvider.future);
+
+      expect(result, isA<UpdateResultAvailable>());
+      expect((result as UpdateResultAvailable).info.androidAsset, isNull);
     });
 
     test('stable channel recognizes an ignored newer release', () async {
@@ -175,6 +203,7 @@ void main() {
       final info = (result as UpdateResultAvailable).info;
       expect(info.commitSha, remoteSha);
       expect(info.version, 'Dev Preview Build');
+      expect(info.androidAsset, isNotNull);
     });
 
     test('beta channel recognizes an ignored dev-preview commit', () async {
@@ -270,6 +299,54 @@ void main() {
   });
 
   group('update dialog UX', () {
+    testWidgets('Android APK releases offer Download and update', (
+      tester,
+    ) async {
+      await LocaleSettings.setLocale(AppLocale.en);
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: TranslationProvider(
+            child: MaterialApp(
+              home: Builder(
+                builder: (context) => TextButton(
+                  onPressed: () {
+                    showUpdateDialog(
+                      context,
+                      UpdateInfo(
+                        version: '1.0.1',
+                        releaseUrl: 'https://example.com/release',
+                        publishedAt: DateTime(2026, 7, 5),
+                        androidAsset: AndroidUpdateAsset(
+                          downloadUrl: Uri.parse(
+                            'https://github.com/r52/gagaku/releases/download/v1.0.1/app-release.apk',
+                          ),
+                          size: 12345,
+                          sha256Digest: 'a' * 64,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Open update dialog'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      try {
+        await tester.tap(find.text('Open update dialog'));
+        await tester.pumpAndSettle();
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
+
+      expect(find.text('Download and update'), findsOneWidget);
+      expect(find.text('Download'), findsNothing);
+    });
+
     testWidgets('snackbar View opens the update dialog', (tester) async {
       await LocaleSettings.setLocale(AppLocale.en);
       var dismissed = 0;
@@ -434,8 +511,18 @@ ProviderContainer _container({
   );
 }
 
-http.Response _stableRelease({required String version}) {
-  return _jsonResponse(_release(tagName: version, name: version, body: ''));
+http.Response _stableRelease({
+  required String version,
+  bool withAndroidAsset = false,
+}) {
+  return _jsonResponse(
+    _release(
+      tagName: version,
+      name: version,
+      body: '',
+      assets: withAndroidAsset ? [_androidAsset()] : null,
+    ),
+  );
 }
 
 http.Response _betaReleases({required String commitSha}) {
@@ -445,6 +532,7 @@ http.Response _betaReleases({required String commitSha}) {
       tagName: 'dev-preview',
       name: 'Dev Preview Build',
       body: 'Built from commit $commitSha',
+      assets: [_androidAsset()],
     ),
   ]);
 }
@@ -453,6 +541,7 @@ Map<String, Object?> _release({
   required String tagName,
   String? name,
   String? body,
+  List<Map<String, Object?>>? assets,
 }) {
   return {
     'tag_name': tagName,
@@ -460,6 +549,19 @@ Map<String, Object?> _release({
     'body': body,
     'html_url': 'https://github.com/r52/gagaku/releases/tag/$tagName',
     'published_at': '2026-07-05T12:00:00Z',
+    'assets': ?assets,
+  };
+}
+
+Map<String, Object?> _androidAsset({String? digest}) {
+  return {
+    'name': 'app-release.apk',
+    'state': 'uploaded',
+    'content_type': 'application/vnd.android.package-archive',
+    'browser_download_url':
+        'https://github.com/r52/gagaku/releases/download/v1.0.1/app-release.apk',
+    'size': 12345,
+    'digest': digest ?? 'sha256:${'a' * 64}',
   };
 }
 

@@ -1,5 +1,7 @@
 // ignore_for_file: unused_local_variable
 
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -8,6 +10,8 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/local/archive_reader.dart';
 import 'package:gagaku/local/model/config.dart';
 import 'package:gagaku/local/directory_reader.dart';
+import 'package:gagaku/local/document_reader.dart';
+import 'package:gagaku/local/model/document_session.dart';
 import 'package:gagaku/local/model/model.dart';
 import 'package:gagaku/local/settings.dart';
 import 'package:gagaku/local/widgets.dart';
@@ -18,13 +22,13 @@ class LocalLibraryHomeScreen extends StatelessWidget {
   const LocalLibraryHomeScreen({super.key});
 
   Future<PlatformFile?> _pickMangaArchive() async {
-    FilePickerResult? result = await FilePicker.pickFiles(
+    final result = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['cbz', 'zip', 'cbt', 'tar'],
     );
 
     if (result != null) {
-      return result.files.single;
+      return result;
     }
 
     return null;
@@ -38,6 +42,26 @@ class LocalLibraryHomeScreen extends StatelessWidget {
         ArchiveReaderRouteBuilder(path: result.path!, title: result.name),
       );
     }
+  }
+
+  Future<void> _readDocument(NavigatorState navigator) async {
+    final file = await FilePicker.pickFile(
+      type: FileType.custom,
+      allowedExtensions: const ['pdf', 'epub'],
+    );
+    if (file?.path == null) return;
+    final format = localDocumentFormatFromPath(file!.path!);
+    if (format == null) return;
+
+    navigator.push(
+      LocalDocumentReaderRouteBuilder(
+        descriptor: LocalDocumentDescriptor(
+          path: file.path!,
+          title: file.name,
+          format: format,
+        ),
+      ),
+    );
   }
 
   @override
@@ -66,6 +90,14 @@ class LocalLibraryHomeScreen extends StatelessWidget {
                   icon: const Icon(Icons.more_vert),
                 ),
                 menuChildren: [
+                  if (Platform.isAndroid)
+                    MenuItemButton(
+                      onPressed: () async {
+                        await _readDocument(nav);
+                      },
+                      leadingIcon: const Icon(Icons.menu_book),
+                      child: Text(tr.localLibrary.readDocument),
+                    ),
                   MenuItemButton(
                     onPressed: () async {
                       await _readArchive(nav);
@@ -188,6 +220,15 @@ class LocalLibraryHomeScreen extends StatelessWidget {
                             ArchiveReaderRouteBuilder(
                               path: item.path,
                               title: item.name ?? item.path,
+                            ),
+                          );
+                          break;
+                        case LibraryItemType.pdf:
+                        case LibraryItemType.epub:
+                          final descriptor = item.documentDescriptor!;
+                          nav.push(
+                            LocalDocumentReaderRouteBuilder(
+                              descriptor: descriptor,
                             ),
                           );
                           break;

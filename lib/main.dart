@@ -11,11 +11,13 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/model/maintenance.dart';
 import 'package:gagaku/model/model.dart';
+import 'package:gagaku/model/startup_section.dart';
 import 'package:gagaku/model/types.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/sync/service.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/update_checker.dart';
+import 'package:gagaku/update_installer.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/deeplink.dart';
@@ -82,6 +84,8 @@ void main() async {
         : null,
   );
 
+  await cleanupCachedUpdateFiles();
+
   final gdat = GagakuData();
   await gdat.initData();
   await gdat.initGagakuBoxes();
@@ -89,13 +93,23 @@ void main() async {
 
   final providerContainer = ProviderContainer();
   await GagakuSyncService().start(providerContainer);
-  runApp(_GagakuRoot(providerContainer: providerContainer));
+  // ignore: riverpod_lint/missing_provider_scope
+  runApp(
+    _GagakuRoot(
+      providerContainer: providerContainer,
+      initialLocation: StartupSection.load().location,
+    ),
+  );
 }
 
 final class _GagakuRoot extends StatefulWidget {
-  const _GagakuRoot({required this.providerContainer});
+  const _GagakuRoot({
+    required this.providerContainer,
+    required this.initialLocation,
+  });
 
   final ProviderContainer providerContainer;
+  final String initialLocation;
 
   @override
   State<_GagakuRoot> createState() => _GagakuRootState();
@@ -105,7 +119,9 @@ final class _GagakuRootState extends State<_GagakuRoot> {
   @override
   Widget build(BuildContext context) => UncontrolledProviderScope(
     container: widget.providerContainer,
-    child: TranslationProvider(child: App()),
+    child: TranslationProvider(
+      child: App(initialLocation: widget.initialLocation),
+    ),
   );
 
   @override
@@ -117,7 +133,9 @@ final class _GagakuRootState extends State<_GagakuRoot> {
 }
 
 class App extends HookConsumerWidget {
-  App({super.key});
+  App({required this.initialLocation, super.key});
+
+  final String initialLocation;
 
   static const _routingErrorLocation = '/routing-error';
 
@@ -135,7 +153,7 @@ class App extends HookConsumerWidget {
         },
       ),
     ],
-    initialLocation: '/',
+    initialLocation: initialLocation,
     navigatorKey: rootNavigatorKey,
     onException: (BuildContext context, GoRouterState state, GoRouter router) {
       if (PBLinkDelegate().recoverInitialNavigation(state, router)) return;

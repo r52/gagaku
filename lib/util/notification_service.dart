@@ -13,11 +13,12 @@ class NotificationService {
 
   factory NotificationService() => _instance;
 
-  late FlutterLocalNotificationsPlugin plugin;
+  late final FlutterLocalNotificationsPlugin plugin;
+  late final Future<void> _initialization;
 
   NotificationService._internal() {
     plugin = FlutterLocalNotificationsPlugin();
-    _initializeSettings();
+    _initialization = _initializeSettings();
   }
 
   Future<void> _initializeSettings() async {
@@ -52,8 +53,6 @@ class NotificationService {
           },
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
-
-    await _requestPermissions();
   }
 
   Future<void> _requestPermissions() async {
@@ -73,7 +72,8 @@ class NotificationService {
   }
 
   Future<void> initialize() async {
-    _instance._requestPermissions();
+    await _initialization;
+    await _requestPermissions();
   }
 
   Future<void> updateProgressNotification({

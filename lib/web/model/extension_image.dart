@@ -69,7 +69,7 @@ class ExtensionImage extends ImageProvider<ExtensionImage> {
         ),
       );
 
-      return decode(await ui.ImmutableBuffer.fromUint8List(bytes));
+      return await decode(await ui.ImmutableBuffer.fromUint8List(bytes));
     } catch (e) {
       scheduleMicrotask(() {
         PaintingBinding.instance.imageCache.evict(key);

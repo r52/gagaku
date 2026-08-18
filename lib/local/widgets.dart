@@ -122,10 +122,11 @@ class _LocalLibraryItemThumbnail extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (item.thumbnail == null) {
-      return Icon(
-        item.isReadable ? Icons.menu_book : Icons.folder,
-        size: 128.0,
-      );
+      return Icon(switch (item.type) {
+        LibraryItemType.pdf => Icons.picture_as_pdf,
+        LibraryItemType.epub => Icons.menu_book,
+        _ => item.isReadable ? Icons.menu_book : Icons.folder,
+      }, size: 128.0);
     }
 
     if (item.type != LibraryItemType.archive) {
