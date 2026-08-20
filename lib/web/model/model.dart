@@ -15,6 +15,7 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/util.dart';
+import 'package:gagaku/web/model/cloudflare.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/fjs_extension_runtime.dart';
@@ -726,10 +727,18 @@ Stream<List<WebSourceInfo>> installedSources(Ref ref) async* {
 class ExtensionSource extends _$ExtensionSource {
   ExtensionRuntime? _runtime;
 
+  int? get runtimeGeneration => switch (_runtime) {
+    FjsExtensionRuntime(:final runtimeGeneration) => runtimeGeneration,
+    _ => null,
+  };
+
   @override
   Future<WebSourceInfo> build(String sourceId) async {
     final repo = ExtensionRepository();
     final (source, body) = await repo.fetchSourceAndBody(sourceId);
+    final initialBrowserState = ref
+        .read(cloudflareBrowserStatesProvider.notifier)
+        .take(sourceId);
 
     void onResetAllState(String id) {
       ref.read(extensionStateProvider.notifier).resetAllState(id);
@@ -763,6 +772,7 @@ class ExtensionSource extends _$ExtensionSource {
       onSetExtensionSecureState: onSetExtensionSecureState,
       getExtensionState: getExtensionState,
       getExtensionSecureState: getExtensionSecureState,
+      initialBrowserState: initialBrowserState,
     );
     _runtime = runtime;
 
@@ -805,9 +815,32 @@ class ExtensionSource extends _$ExtensionSource {
     await _runtime!.uninitializeForms(source);
   }
 
+  Future<T> _retryRead<T>(
+    String operation,
+    Future<T> Function(ExtensionRuntime runtime) action,
+  ) {
+    final runtime = _runtime!;
+    return retryCloudflareRead(
+      () => action(runtime),
+      onRetry: (delay) {
+        final generation = runtime is FjsExtensionRuntime
+            ? runtime.runtimeGeneration
+            : null;
+        logger.i(
+          'ExtensionSource($sourceId) Cloudflare read retry '
+          'operation=$operation attempt=2 delayMs=${delay.inMilliseconds} '
+          'runtimeGeneration=$generation',
+        );
+      },
+    );
+  }
+
   Future<List<DiscoverSection>> getDiscoverSections() async {
     final source = await future;
-    return await _runtime!.getDiscoverSections(source);
+    return await _retryRead(
+      'getDiscoverSections',
+      (runtime) => runtime.getDiscoverSections(source),
+    );
   }
 
   Future<PagedResults<DiscoverSectionItem>> getDiscoverSectionItems(
@@ -815,7 +848,10 @@ class ExtensionSource extends _$ExtensionSource {
     dynamic metadata,
   ) async {
     final source = await future;
-    return await _runtime!.getDiscoverSectionItems(source, section, metadata);
+    return await _retryRead(
+      'getDiscoverSectionItems',
+      (runtime) => runtime.getDiscoverSectionItems(source, section, metadata),
+    );
   }
 
   Future<PagedResults<SearchResultItem>> searchManga(
@@ -824,27 +860,39 @@ class ExtensionSource extends _$ExtensionSource {
     SortingOption? sortOp,
   }) async {
     await future;
-    return await _runtime!.searchManga(query, metadata, sortOp: sortOp);
+    return await _retryRead(
+      'searchManga',
+      (runtime) => runtime.searchManga(query, metadata, sortOp: sortOp),
+    );
   }
 
   Future<WebManga?> getManga(String mangaId) async {
     await future;
-    return await _runtime!.getManga(mangaId);
+    return await _retryRead('getManga', (runtime) => runtime.getManga(mangaId));
   }
 
   Future<ChapterDetails> getChapterDetails(Chapter chapter) async {
     await future;
-    return await _runtime!.getChapterDetails(chapter);
+    return await _retryRead(
+      'getChapterDetails',
+      (runtime) => runtime.getChapterDetails(chapter),
+    );
   }
 
   Future<String?> getMangaURL(String mangaId) async {
     await future;
-    return await _runtime!.getMangaURL(mangaId);
+    return await _retryRead(
+      'getMangaURL',
+      (runtime) => runtime.getMangaURL(mangaId),
+    );
   }
 
   Future<List<SortingOption>?> getSortingOptions(SearchQuery query) async {
     await future;
-    return _runtime!.getSortingOptions(query);
+    return await _retryRead(
+      'getSortingOptions',
+      (runtime) async => runtime.getSortingOptions(query),
+    );
   }
 
   Future<ExtensionForm?> getAdvancedSearchForm(SearchQuery query) async {

@@ -2,11 +2,11 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/web/cloudflare_resolution.dart';
 import 'package:gagaku/web/extension_browser.dart';
 import 'package:gagaku/web/extension_settings.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -15,6 +15,12 @@ import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 const _firstSearch = 0xDEADBEEF;
+var _nextExtensionHomepageInstanceId = 1;
+
+typedef _ExtensionHomepageData = ({
+  List<DiscoverSection> sections,
+  List<PagedResults<DiscoverSectionItem>> sectionItems,
+});
 
 class _ExtensionHomeCard extends ConsumerWidget {
   final WebSourceInfo extensionInfo;
@@ -69,6 +75,7 @@ class _ExtensionHomeCard extends ConsumerWidget {
           ],
         );
       case AsyncError(:final error):
+        final requiresCloudflare = error is CloudflareBypassException;
         subtitle = Text(
           switch (error) {
             CloudflareBypassException() =>
@@ -82,11 +89,15 @@ class _ExtensionHomeCard extends ConsumerWidget {
         trailing = Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _ExtensionHomeRetryButton(source: source),
+            if (requiresCloudflare)
+              CloudflareResolutionButton(source: source, compact: true)
+            else
+              _ExtensionHomeRetryButton(source: source),
             _ExtensionHomeActionMenu(
               source: source,
               canReload: true,
               includeReload: false,
+              includeWebsite: !requiresCloudflare,
             ),
           ],
         );
@@ -149,11 +160,13 @@ class _ExtensionHomeActionMenu extends ConsumerWidget {
   final WebSourceInfo source;
   final bool canReload;
   final bool includeReload;
+  final bool includeWebsite;
 
   const _ExtensionHomeActionMenu({
     required this.source,
     required this.canReload,
     this.includeReload = true,
+    this.includeWebsite = true,
   });
 
   @override
@@ -173,7 +186,7 @@ class _ExtensionHomeActionMenu extends ConsumerWidget {
               : null,
           child: Text(tr.webSources.source.reload),
         ),
-      if (hasWebsite)
+      if (hasWebsite && includeWebsite)
         MenuItemButton(
           leadingIcon: const Icon(Icons.public),
           onPressed: () => Navigator.of(context).push(
@@ -321,6 +334,62 @@ class ExtensionHomePage extends StatelessWidget {
   }
 }
 
+class _ExtensionOperationError extends StatelessWidget {
+  const _ExtensionOperationError({
+    required this.source,
+    required this.error,
+    required this.stackTrace,
+    required this.onRetry,
+    required this.onResolved,
+  });
+
+  final WebSourceInfo source;
+  final Object error;
+  final StackTrace stackTrace;
+  final VoidCallback onRetry;
+  final VoidCallback onResolved;
+
+  @override
+  Widget build(BuildContext context) {
+    if (error is! CloudflareBypassException) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [Text('$error'), Text(stackTrace.toString())],
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            context.t.webSources.source.cloudflareManualRequired,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              OutlinedButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh),
+                label: Text(context.t.ui.retry),
+              ),
+              CloudflareResolutionButton(
+                source: source,
+                onResolved: onResolved,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class ExtensionHomeWidget extends HookConsumerWidget {
   final WebSourceInfo source;
 
@@ -335,32 +404,132 @@ class ExtensionHomeWidget extends HookConsumerWidget {
     const style = CommonTextStyles.twentyfour;
     final controller = useScrollController();
     final refresh = useState(0);
-    final sectionsFuture = useMemoized(
-      () => ref
-          .read(extensionSourceProvider(source.id).notifier)
-          .getDiscoverSections(),
-      [source, refresh.value],
+    final instanceId = useMemoized(() => _nextExtensionHomepageInstanceId++);
+    final activeLoadId = useRef(0);
+    final disposed = useRef(false);
+    useEffect(() {
+      return () {
+        disposed.value = true;
+        activeLoadId.value++;
+        debugPrint(
+          'ExtensionHomepage(${source.id}) disposed instance=$instanceId',
+        );
+      };
+    }, [source.id, instanceId]);
+    final homepageFuture = useMemoized<Future<_ExtensionHomepageData?>>(
+      () async {
+        final loadId = ++activeLoadId.value;
+        final notifier = ref.read(extensionSourceProvider(source.id).notifier);
+        final runtimeGeneration = notifier.runtimeGeneration;
+        var stage = 'sections';
+
+        bool isCurrentLoad() {
+          if (disposed.value || activeLoadId.value != loadId) {
+            return false;
+          }
+          return identical(
+            ref.read(extensionSourceProvider(source.id).notifier),
+            notifier,
+          );
+        }
+
+        bool abandonIfStale() {
+          if (isCurrentLoad()) {
+            return false;
+          }
+          debugPrint(
+            'ExtensionHomepage(${source.id}) abandoned instance=$instanceId '
+            'load=$loadId runtimeGeneration=$runtimeGeneration stage=$stage',
+          );
+          return true;
+        }
+
+        debugPrint(
+          'ExtensionHomepage(${source.id}) start instance=$instanceId '
+          'load=$loadId runtimeGeneration=$runtimeGeneration',
+        );
+        try {
+          final sections = await notifier.getDiscoverSections();
+          if (abandonIfStale()) {
+            return null;
+          }
+          debugPrint(
+            'ExtensionHomepage(${source.id}) sections instance=$instanceId '
+            'load=$loadId runtimeGeneration=$runtimeGeneration '
+            'count=${sections.length}',
+          );
+
+          final sectionItems = <PagedResults<DiscoverSectionItem>>[];
+          for (final (index, section) in sections.indexed) {
+            stage = 'section[$index:${section.id}]';
+            debugPrint(
+              'ExtensionHomepage(${source.id}) section start '
+              'instance=$instanceId load=$loadId '
+              'runtimeGeneration=$runtimeGeneration index=$index '
+              'section=${section.id}',
+            );
+            final results = await notifier.getDiscoverSectionItems(
+              section,
+              null,
+            );
+            if (abandonIfStale()) {
+              return null;
+            }
+            sectionItems.add(results);
+            debugPrint(
+              'ExtensionHomepage(${source.id}) section success '
+              'instance=$instanceId load=$loadId '
+              'runtimeGeneration=$runtimeGeneration index=$index '
+              'section=${section.id} items=${results.items.length} '
+              'hasMetadata=${results.metadata != null}',
+            );
+          }
+
+          stage = 'complete';
+          debugPrint(
+            'ExtensionHomepage(${source.id}) success instance=$instanceId '
+            'load=$loadId runtimeGeneration=$runtimeGeneration '
+            'sections=${sections.length}',
+          );
+          return (sections: sections, sectionItems: sectionItems);
+        } catch (error, stackTrace) {
+          if (abandonIfStale()) {
+            return null;
+          }
+          debugPrint(
+            'ExtensionHomepage(${source.id}) failed instance=$instanceId '
+            'load=$loadId runtimeGeneration=$runtimeGeneration stage=$stage '
+            'errorType=${error.runtimeType} error=$error',
+          );
+          Error.throwWithStackTrace(error, stackTrace);
+        }
+      },
+      [source.id, refresh.value],
     );
-    final sectionsSnapshot = useFuture(sectionsFuture);
+    final homepageSnapshot = useFuture(homepageFuture, preserveState: false);
     final slivers = <Widget>[];
 
-    if (sectionsSnapshot.hasError) {
-      final error = sectionsSnapshot.error!;
-      final stackTrace = sectionsSnapshot.stackTrace!;
-      final msg = "ExtensionSource(${source.id}).getDiscoverSections() failed";
+    if (homepageSnapshot.hasError) {
+      final error = homepageSnapshot.error!;
+      final stackTrace = homepageSnapshot.stackTrace!;
 
       Styles.showSnackBar(messenger, content: '$error');
-      logger.e(msg, error: error, stackTrace: stackTrace);
 
       slivers.add(
-        SliverList.list(
-          children: [Text('$error'), Text(stackTrace.toString())],
+        SliverToBoxAdapter(
+          child: _ExtensionOperationError(
+            source: source,
+            error: error,
+            stackTrace: stackTrace,
+            onRetry: () => refresh.value++,
+            onResolved: () => refresh.value++,
+          ),
         ),
       );
     }
 
-    if (sectionsSnapshot.connectionState == ConnectionState.waiting ||
-        !sectionsSnapshot.hasData) {
+    if (homepageSnapshot.connectionState == ConnectionState.waiting ||
+        !homepageSnapshot.hasData) {
       slivers.add(
         const SliverToBoxAdapter(
           child: Center(child: CircularProgressIndicator()),
@@ -368,122 +537,83 @@ class ExtensionHomeWidget extends HookConsumerWidget {
       );
     }
 
-    if (sectionsSnapshot.data != null) {
-      final sections = sectionsSnapshot.data!;
+    if (homepageSnapshot.data case (
+      sections: final sections,
+      sectionItems: final sectionItems,
+    )) {
       final homepageWidgets = <Widget>[];
-      final sectionItems = useMemoized(() async {
-        final notifier = ref.read(extensionSourceProvider(source.id).notifier);
-        return [
-          for (final section in sections)
-            await notifier.getDiscoverSectionItems(section, null),
-        ];
-      }, [source, refresh.value, sections]);
-      final itemFuture = useFuture(sectionItems);
+      for (final (idx, section) in sections.indexed) {
+        final sectionResults = sectionItems.elementAt(idx);
+        if (sectionResults.metadata != null) {
+          homepageWidgets.add(
+            TextButton.icon(
+              onPressed: () {
+                nav.push(
+                  SlideTransitionRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        _DiscoverSectionPage(source: source, section: section),
+                  ),
+                );
+              },
+              label: Text(section.title, style: style),
+              icon: const Icon(Icons.arrow_forward),
+              iconAlignment: IconAlignment.end,
+            ),
+          );
+        } else {
+          homepageWidgets.add(Center(child: Text(section.title, style: style)));
+        }
 
-      if (itemFuture.hasError) {
-        final error = itemFuture.error!;
-        final stackTrace = itemFuture.stackTrace!;
-        final msg =
-            "ExtensionSource(${source.id}).getDiscoverSectionItems() failed";
+        if (section.type != DiscoverSectionType.genres) {
+          final mangas = sectionResults.items
+              .map((e) => HistoryLink.fromDiscoverySectionItem(source, e))
+              .toList();
+          homepageWidgets.add(MangaCarousel(items: mangas));
+        } else {
+          homepageWidgets.add(
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 256),
+                child: CarouselView(
+                  itemExtent: 180,
+                  shrinkExtent: 180,
+                  enableSplash: true,
+                  onTap: (idx) {
+                    final element =
+                        sectionResults.items.elementAt(idx)
+                            as GenresCarouselItem;
 
-        Styles.showSnackBar(messenger, content: '$error');
-        logger.e(msg, error: error, stackTrace: stackTrace);
-
-        slivers.add(
-          SliverList.list(
-            children: [Text('$error'), Text(stackTrace.toString())],
-          ),
-        );
-      }
-
-      if (itemFuture.connectionState == ConnectionState.waiting ||
-          !itemFuture.hasData) {
-        slivers.add(
-          const SliverToBoxAdapter(
-            child: Center(child: CircularProgressIndicator()),
-          ),
-        );
-      }
-
-      if (itemFuture.hasData) {
-        for (final (idx, section) in sections.indexed) {
-          final sectionResults = itemFuture.data!.elementAt(idx);
-          if (sectionResults.metadata != null) {
-            homepageWidgets.add(
-              TextButton.icon(
-                onPressed: () {
-                  nav.push(
-                    SlideTransitionRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          _DiscoverSectionPage(
-                            source: source,
-                            section: section,
-                          ),
-                    ),
-                  );
-                },
-                label: Text(section.title, style: style),
-                icon: const Icon(Icons.arrow_forward),
-                iconAlignment: IconAlignment.end,
-              ),
-            );
-          } else {
-            homepageWidgets.add(
-              Center(child: Text(section.title, style: style)),
-            );
-          }
-
-          if (section.type != DiscoverSectionType.genres) {
-            final mangas = sectionResults.items
-                .map((e) => HistoryLink.fromDiscoverySectionItem(source, e))
-                .toList();
-            homepageWidgets.add(MangaCarousel(items: mangas));
-          } else {
-            homepageWidgets.add(
-              Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 256),
-                  child: CarouselView(
-                    itemExtent: 180,
-                    shrinkExtent: 180,
-                    enableSplash: true,
-                    onTap: (idx) {
-                      final element =
-                          sectionResults.items.elementAt(idx)
-                              as GenresCarouselItem;
-
-                      ExtensionSearchRoute(
-                        initialSource: source,
-                        query: element.searchQuery,
-                      ).push(context);
-                    },
-                    children: [
-                      for (final item in sectionResults.items)
-                        ColoredBox(
-                          color: theme.colorScheme.primaryContainer,
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.theater_comedy, size: 32.0),
-                                Text(
-                                  (item as GenresCarouselItem).name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  overflow: TextOverflow.clip,
-                                  softWrap: false,
+                    ExtensionSearchRoute(
+                      initialSource: source,
+                      query: element.searchQuery,
+                    ).push(context);
+                  },
+                  children: [
+                    for (final item in sectionResults.items)
+                      ColoredBox(
+                        color: theme.colorScheme.primaryContainer,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.theater_comedy, size: 32.0),
+                              Text(
+                                (item as GenresCarouselItem).name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              ],
-                            ),
+                                overflow: TextOverflow.clip,
+                                softWrap: false,
+                              ),
+                            ],
                           ),
                         ),
-                    ],
-                  ),
+                      ),
+                  ],
                 ),
               ),
-            );
-          }
+            ),
+          );
         }
       }
 
@@ -504,7 +634,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
       body: RefreshIndicator(
         onRefresh: () {
           refresh.value++;
-          return sectionsFuture;
+          return Future<void>.value();
         },
         child: ScrollConfiguration(
           behavior: const MouseTouchScrollBehavior(),

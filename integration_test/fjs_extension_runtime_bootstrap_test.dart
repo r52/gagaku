@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -7,8 +8,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart'
     show CookieManager, WebUri;
+import 'package:flutter_inappwebview/flutter_inappwebview.dart'
+    as inapp
+    show Cookie;
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/exception.dart';
+import 'package:gagaku/web/model/cloudflare.dart';
 import 'package:gagaku/web/model/fjs_extension_runtime.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:image/image.dart' as img;
@@ -1278,6 +1283,71 @@ await new Promise((resolve) => setTimeout(() => resolve("cancelled"), 1000));
   });
 
   test(
+    'fjs runtime consumes manually captured browser state directly',
+    () async {
+      Map<String, dynamic>? storedState;
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'manualStateSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, state) {
+          storedState = Map<String, dynamic>.from(state as Map);
+        },
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+        initialBrowserState: CloudflareBrowserState(
+          cookies: [
+            inapp.Cookie(
+              name: 'cf_clearance',
+              value: 'manual-clearance',
+              domain: 'manual.invalid',
+              path: '/',
+              isSecure: true,
+            ),
+          ],
+          localStorage: const {'manual-token': 'ready'},
+          userAgentHeaders: const {'user-agent': 'Manual Browser/1'},
+        ),
+      );
+      addTearDown(runtime.dispose);
+
+      final source = WebSourceInfo(
+        id: 'manualStateSource',
+        name: 'Manual State Source',
+        repo: 'phase6',
+        baseUrl: 'https://manual.invalid/',
+        icon: '',
+        capabilities: const [SourceIntents.cloudflareBypassRequired],
+      );
+      await runtime.init(source, r'''
+globalThis.source ??= {};
+globalThis.source.manualStateSource = {
+  cloudflareBypassCompleted: async (request, cookies, localStorage) => {
+    Application.setState(
+      cookies.find((cookie) => cookie.name === "cf_clearance")?.value,
+      "clearance"
+    );
+    Application.setState(localStorage["manual-token"], "localStorage");
+  },
+  initialise: async () => {}
+};
+''');
+
+      expect(storedState, {
+        'clearance': 'manual-clearance',
+        'localStorage': 'ready',
+      });
+      expect(
+        runtime.startupBrowserOutcome,
+        StartupBrowserOutcome.manualBrowserState,
+      );
+    },
+  );
+
+  test(
     'fjs runtime preserves an existing valid Cloudflare clearance',
     () async {
       final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
@@ -1348,6 +1418,10 @@ globalThis.source.knownGoodSource = {
 
       expect(storedState, {'clearance': 'known-good-clearance'});
       expect(basePageRequests, 1);
+      expect(
+        runtime.startupBrowserOutcome,
+        StartupBrowserOutcome.readyWithExistingClearance,
+      );
     },
   );
 
@@ -1424,6 +1498,10 @@ globalThis.source.unchallengedCloudflareSource = {
 
       expect(storedState, {'status': 'initialized'});
       expect(basePageRequests, 1);
+      expect(
+        runtime.startupBrowserOutcome,
+        StartupBrowserOutcome.readyWithoutChallenge,
+      );
       expect(
         runtime.getCookies(),
         isNot(
@@ -1530,6 +1608,10 @@ globalThis.source.staleClearanceSource = {
       );
       expect(challengePageRequests, greaterThan(0));
       expect(storedState, isNull);
+      expect(
+        runtime.startupBrowserOutcome,
+        StartupBrowserOutcome.manualResolutionRequired,
+      );
     },
   );
 
@@ -1601,6 +1683,113 @@ globalThis.source.manualCloudflareSource = {
 };
 '''),
         throwsA(isA<CloudflareBypassException>()),
+      );
+      expect(
+        runtime.startupBrowserOutcome,
+        StartupBrowserOutcome.manualResolutionRequired,
+      );
+    },
+  );
+
+  test('fjs runtime reports a failed startup browser HTTP load', () async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    addTearDown(() => server.close(force: true));
+    server.listen((request) async {
+      request.response
+        ..statusCode = HttpStatus.serviceUnavailable
+        ..reasonPhrase = 'Test unavailable'
+        ..write('unavailable');
+      await request.response.close();
+    });
+
+    final runtime = FjsExtensionRuntime(
+      sourceId: 'failedStartupSource',
+      extensionHost: await rootBundle.loadString(
+        'assets/extensionhost/bundle.js',
+      ),
+      onResetAllState: (_) {},
+      onSetExtensionState: (_, _) {},
+      onSetExtensionSecureState: (_, _) {},
+      getExtensionState: (_) => {},
+      getExtensionSecureState: (_) => {},
+      startupBrowserTimeout: const Duration(milliseconds: 500),
+    );
+    addTearDown(runtime.dispose);
+
+    final source = WebSourceInfo(
+      id: 'failedStartupSource',
+      name: 'Failed Startup Source',
+      repo: 'phase6',
+      baseUrl: 'http://127.0.0.1:${server.port}/',
+      icon: '',
+    );
+
+    await expectLater(
+      runtime.init(source, ''),
+      throwsA(
+        isA<StartupBrowserException>().having(
+          (error) => error.outcome,
+          'outcome',
+          StartupBrowserOutcome.browserLoadFailed,
+        ),
+      ),
+    );
+    expect(
+      runtime.startupBrowserOutcome,
+      StartupBrowserOutcome.browserLoadFailed,
+    );
+  });
+
+  test(
+    'fjs runtime reports an indeterminate startup browser timeout',
+    () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final requestPending = Completer<void>();
+      addTearDown(() {
+        if (!requestPending.isCompleted) {
+          requestPending.complete();
+        }
+        return server.close(force: true);
+      });
+      server.listen((request) async {
+        await requestPending.future;
+      });
+
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'timedOutStartupSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, _) {},
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+        startupBrowserTimeout: const Duration(milliseconds: 250),
+      );
+      addTearDown(runtime.dispose);
+
+      final source = WebSourceInfo(
+        id: 'timedOutStartupSource',
+        name: 'Timed Out Startup Source',
+        repo: 'phase6',
+        baseUrl: 'http://127.0.0.1:${server.port}/',
+        icon: '',
+      );
+
+      await expectLater(
+        runtime.init(source, ''),
+        throwsA(
+          isA<StartupBrowserException>().having(
+            (error) => error.outcome,
+            'outcome',
+            StartupBrowserOutcome.indeterminateTimeout,
+          ),
+        ),
+      );
+      expect(
+        runtime.startupBrowserOutcome,
+        StartupBrowserOutcome.indeterminateTimeout,
       );
     },
   );

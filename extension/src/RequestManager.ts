@@ -33,6 +33,7 @@ export class MockRequestManager implements RequestManager {
 
   private userAgent: string;
   private defaultUserAgentHeaders: Record<string, string>;
+  private nextRequestId = 1;
 
   constructor(selectorRegistry: SelectorRegistry) {
     this.selectorRegistry = selectorRegistry;
@@ -73,6 +74,47 @@ export class MockRequestManager implements RequestManager {
 
   async getDefaultUserAgent(): Promise<string> {
     return this.defaultUserAgentHeaders["user-agent"] ?? this.userAgent;
+  }
+
+  private diagnosticFingerprint(value: string): string {
+    let hash = 0x811c9dc5;
+    for (let i = 0; i < value.length; i++) {
+      hash ^= value.charCodeAt(i) & 0xff;
+      hash = Math.imul(hash, 0x01000193) >>> 0;
+    }
+    return `fnv32:${hash.toString(16).padStart(8, "0")}`;
+  }
+
+  private diagnosticTarget(url: string): string {
+    try {
+      const parsed = new URL(url);
+      const target = `${parsed.protocol}//${parsed.host}${parsed.pathname}`;
+      return target.length <= 240 ? target : `${target.slice(0, 237)}...`;
+    } catch {
+      return "<invalid-url>";
+    }
+  }
+
+  private requestCookieNames(headers: Record<string, string>): string[] {
+    const cookieHeader = this.headerValue(headers, "cookie");
+    if (!cookieHeader) {
+      return [];
+    }
+    return Array.from(
+      new Set(
+        cookieHeader
+          .split(";")
+          .map((entry) => entry.split("=", 1)[0]?.trim())
+          .filter((name): name is string => Boolean(name)),
+      ),
+    ).sort();
+  }
+
+  private errorSummary(error: unknown): string {
+    if (error instanceof Error) {
+      return `${error.name}:${error.message}`;
+    }
+    return String(error);
   }
 
   private createDefaultUserAgentHeaders(): Record<string, string> {
@@ -317,43 +359,85 @@ export class MockRequestManager implements RequestManager {
   }
 
   async scheduleRequest(request: Request): Promise<[Response, ArrayBuffer]> {
-    const { finalRequest, requestBody, requestHeaders } =
-      await this.prepareRequest(request);
-    const nativeRequestBody =
-      requestBody instanceof FormData
-        ? await this.encodeFormDataBody(requestBody, requestHeaders)
-        : requestBody;
+    const requestId = this.nextRequestId++;
+    let stage = "prepare";
+    try {
+      const { finalRequest, requestBody, requestHeaders } =
+        await this.prepareRequest(request);
+      const userAgent = this.headerValue(requestHeaders, "user-agent");
+      const cookieNames = this.requestCookieNames(requestHeaders);
+      console.log(
+        `request[${requestId}] start method=${finalRequest.method} ` +
+          `target=${this.diagnosticTarget(finalRequest.url)} ` +
+          `cookieNames=${JSON.stringify(cookieNames)} ` +
+          `clearancePresent=${cookieNames.includes("cf_clearance")} ` +
+          `userAgentFingerprint=${
+            userAgent ? this.diagnosticFingerprint(userAgent) : null
+          }`,
+      );
 
-    const fetchResponse = await this.fetchNativeFollowingRedirects(
-      finalRequest.url,
-      finalRequest.method,
-      nativeRequestBody,
-      requestHeaders,
-    );
+      stage = "encodeBody";
+      const nativeRequestBody =
+        requestBody instanceof FormData
+          ? await this.encodeFormDataBody(requestBody, requestHeaders)
+          : requestBody;
 
-    const responseHeaders: Record<string, string> = {};
-    for (const [name, value] of fetchResponse.headers.entries()) {
-      responseHeaders[name] = value;
-    }
+      stage = "nativeFetch";
+      const fetchResponse = await this.fetchNativeFollowingRedirects(
+        finalRequest.url,
+        finalRequest.method,
+        nativeRequestBody,
+        requestHeaders,
+      );
 
-    const finalResponse: Response = {
-      url: fetchResponse.url,
-      headers: responseHeaders,
-      status: fetchResponse.status,
-      cookies: this.responseCookies(fetchResponse),
-      mimeType: fetchResponse.headers.get("content-type")?.split(";", 1)[0]?.trim(),
-    };
+      const responseHeaders: Record<string, string> = {};
+      for (const [name, value] of fetchResponse.headers.entries()) {
+        responseHeaders[name] = value;
+      }
+      const responseCookies = this.responseCookies(fetchResponse);
+      const finalResponse: Response = {
+        url: fetchResponse.url,
+        headers: responseHeaders,
+        status: fetchResponse.status,
+        cookies: responseCookies,
+        mimeType: fetchResponse.headers
+          .get("content-type")
+          ?.split(";", 1)[0]
+          ?.trim(),
+      };
 
-    const responseBody = await fetchResponse.arrayBuffer();
+      stage = "responseBody";
+      const responseBody = await fetchResponse.arrayBuffer();
+      console.log(
+        `request[${requestId}] response status=${fetchResponse.status} ` +
+          `target=${this.diagnosticTarget(fetchResponse.url)} ` +
+          `redirected=${fetchResponse.url !== finalRequest.url} ` +
+          `setCookieNames=${JSON.stringify(
+            Array.from(new Set(responseCookies.map((cookie) => cookie.name))).sort(),
+          )} cfMitigated=${fetchResponse.headers.get("cf-mitigated")} ` +
+          `server=${fetchResponse.headers.get("server")} ` +
+          `cfRay=${fetchResponse.headers.get("cf-ray")} ` +
+          `contentType=${finalResponse.mimeType ?? null} ` +
+          `bodyBytes=${responseBody.byteLength}`,
+      );
 
-    return [
-      finalResponse,
-      await this.applyResponseInterceptors(
+      stage = "responseInterceptors";
+      const finalBody = await this.applyResponseInterceptors(
         finalRequest,
         finalResponse,
         responseBody,
-      ),
-    ];
+      );
+      console.log(
+        `request[${requestId}] success finalBodyBytes=${finalBody.byteLength}`,
+      );
+      return [finalResponse, finalBody];
+    } catch (error) {
+      console.error(
+        `request[${requestId}] failed stage=${stage} ` +
+          `error=${this.errorSummary(error)}`,
+      );
+      throw error;
+    }
   }
 
   private async fetchNativeFollowingRedirects(
