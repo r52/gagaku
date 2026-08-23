@@ -783,11 +783,20 @@ class ExtensionSource extends _$ExtensionSource {
       }
     });
 
-    await _extensionSourceInitPool.withResource(() async {
-      if (identical(_runtime, runtime)) {
-        await runtime.init(source, body);
+    try {
+      await _extensionSourceInitPool.withResource(() async {
+        if (identical(_runtime, runtime)) {
+          await runtime.init(source, body);
+        }
+      });
+    } catch (error, stackTrace) {
+      if (initialBrowserState != null && isCloudflareBypassError(error)) {
+        ref
+            .read(cloudflareBrowserStatesProvider.notifier)
+            .restoreIfAbsent(sourceId, initialBrowserState);
       }
-    });
+      Error.throwWithStackTrace(error, stackTrace);
+    }
 
     return source;
   }
@@ -822,13 +831,15 @@ class ExtensionSource extends _$ExtensionSource {
     final runtime = _runtime!;
     return retryCloudflareRead(
       () => action(runtime),
-      onRetry: (delay) {
+      onRetry: (attempt, delay) {
         final generation = runtime is FjsExtensionRuntime
             ? runtime.runtimeGeneration
             : null;
         logger.i(
-          'ExtensionSource($sourceId) Cloudflare read retry '
-          'operation=$operation attempt=2 delayMs=${delay.inMilliseconds} '
+          'ExtensionSource($sourceId) time='
+          '${DateTime.now().toUtc().toIso8601String()} '
+          'Cloudflare read retry operation=$operation attempt=$attempt '
+          'delayMs=${delay.inMilliseconds} '
           'runtimeGeneration=$generation',
         );
       },
@@ -897,7 +908,10 @@ class ExtensionSource extends _$ExtensionSource {
 
   Future<ExtensionForm?> getAdvancedSearchForm(SearchQuery query) async {
     await future;
-    return await _runtime!.getAdvancedSearchForm(query);
+    return await _retryRead(
+      'getAdvancedSearchForm',
+      (runtime) => runtime.getAdvancedSearchForm(query),
+    );
   }
 
   Future<bool> hasAdvancedSearchForm() async {

@@ -1518,6 +1518,97 @@ globalThis.source.unchallengedCloudflareSource = {
   );
 
   test(
+    'fjs runtime reconciles a clearance written before a delayed page load',
+    () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final baseUrl = 'http://127.0.0.1:${server.port}/';
+      final baseWebUri = WebUri(baseUrl);
+      final resourcePending = Completer<void>();
+      Map<String, dynamic>? storedState;
+
+      addTearDown(() async {
+        if (!resourcePending.isCompleted) {
+          resourcePending.complete();
+        }
+        await CookieManager.instance().deleteCookie(
+          url: baseWebUri,
+          name: 'cf_clearance',
+        );
+        await server.close(force: true);
+      });
+      await CookieManager.instance().deleteCookie(
+        url: baseWebUri,
+        name: 'cf_clearance',
+      );
+      server.listen((request) async {
+        if (request.uri.path == '/pending.png') {
+          await resourcePending.future;
+          try {
+            request.response.statusCode = HttpStatus.noContent;
+            await request.response.close();
+          } catch (_) {}
+          return;
+        }
+
+        request.response
+          ..statusCode = HttpStatus.ok
+          ..headers.contentType = ContentType.html
+          ..write(
+            '<html><title>Just a moment...</title><body>'
+            '<script>document.cookie = '
+            '"cf_clearance=late-clearance; path=/";</script>'
+            '<img src="/pending.png">'
+            '</body></html>',
+          );
+        await request.response.close();
+      });
+
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'lateClearanceSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, state) {
+          storedState = Map<String, dynamic>.from(state as Map);
+        },
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+        startupBrowserTimeout: const Duration(milliseconds: 750),
+      );
+      addTearDown(runtime.dispose);
+
+      final source = WebSourceInfo(
+        id: 'lateClearanceSource',
+        name: 'Late Clearance Source',
+        repo: 'phase6',
+        baseUrl: baseUrl,
+        icon: '',
+        capabilities: const [SourceIntents.cloudflareBypassRequired],
+      );
+      await runtime.init(source, r'''
+globalThis.source ??= {};
+globalThis.source.lateClearanceSource = {
+  cloudflareBypassCompleted: async (request, cookies) => {
+    Application.setState(
+      cookies.find((cookie) => cookie.name === "cf_clearance")?.value,
+      "clearance"
+    );
+  },
+  initialise: async () => {}
+};
+''');
+
+      expect(storedState, {'clearance': 'late-clearance'});
+      expect(
+        runtime.startupBrowserOutcome,
+        StartupBrowserOutcome.readyWithNewClearance,
+      );
+    },
+  );
+
+  test(
     'fjs runtime rejects stale Cloudflare clearance after a challenge starts',
     () async {
       final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
@@ -1691,7 +1782,7 @@ globalThis.source.manualCloudflareSource = {
     },
   );
 
-  test('fjs runtime reports a failed startup browser HTTP load', () async {
+  test('fjs runtime records a failed startup browser HTTP load', () async {
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     addTearDown(() => server.close(force: true));
     server.listen((request) async {
@@ -1724,16 +1815,12 @@ globalThis.source.manualCloudflareSource = {
       icon: '',
     );
 
-    await expectLater(
-      runtime.init(source, ''),
-      throwsA(
-        isA<StartupBrowserException>().having(
-          (error) => error.outcome,
-          'outcome',
-          StartupBrowserOutcome.browserLoadFailed,
-        ),
-      ),
-    );
+    await runtime.init(source, r'''
+globalThis.source ??= {};
+globalThis.source.failedStartupSource = {
+  initialise: async () => {}
+};
+''');
     expect(
       runtime.startupBrowserOutcome,
       StartupBrowserOutcome.browserLoadFailed,
@@ -1741,7 +1828,7 @@ globalThis.source.manualCloudflareSource = {
   });
 
   test(
-    'fjs runtime reports an indeterminate startup browser timeout',
+    'fjs runtime records an indeterminate startup browser timeout',
     () async {
       final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
       final requestPending = Completer<void>();
@@ -1777,16 +1864,12 @@ globalThis.source.manualCloudflareSource = {
         icon: '',
       );
 
-      await expectLater(
-        runtime.init(source, ''),
-        throwsA(
-          isA<StartupBrowserException>().having(
-            (error) => error.outcome,
-            'outcome',
-            StartupBrowserOutcome.indeterminateTimeout,
-          ),
-        ),
-      );
+      await runtime.init(source, r'''
+globalThis.source ??= {};
+globalThis.source.timedOutStartupSource = {
+  initialise: async () => {}
+};
+''');
       expect(
         runtime.startupBrowserOutcome,
         StartupBrowserOutcome.indeterminateTimeout,

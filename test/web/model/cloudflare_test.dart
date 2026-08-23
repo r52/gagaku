@@ -111,4 +111,29 @@ void main() {
     expect(notifier.take('source'), same(browserState));
     expect(notifier.take('source'), isNull);
   });
+
+  test(
+    'a failed initialization restores state without replacing a newer solve',
+    () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      const firstState = CloudflareBrowserState(
+        cookies: [],
+        localStorage: {'token': 'first'},
+        userAgentHeaders: {'user-agent': 'test-agent'},
+      );
+      const newerState = CloudflareBrowserState(
+        cookies: [],
+        localStorage: {'token': 'newer'},
+        userAgentHeaders: {'user-agent': 'test-agent'},
+      );
+      final notifier = container.read(cloudflareBrowserStatesProvider.notifier);
+
+      notifier.restoreIfAbsent('source', firstState);
+      notifier.stage('source', newerState);
+      notifier.restoreIfAbsent('source', firstState);
+
+      expect(notifier.take('source'), same(newerState));
+    },
+  );
 }

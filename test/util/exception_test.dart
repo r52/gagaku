@@ -12,6 +12,7 @@ void main() {
     var attempts = 0;
 
     Duration? observedDelay;
+    int? observedAttempt;
     final result = await retryCloudflareRead(
       () async {
         attempts++;
@@ -20,27 +21,39 @@ void main() {
         }
         return 'ready';
       },
-      retryDelay: Duration.zero,
-      onRetry: (delay) => observedDelay = delay,
+      retryDelays: const [Duration.zero],
+      onRetry: (attempt, delay) {
+        observedAttempt = attempt;
+        observedDelay = delay;
+      },
     );
 
     expect(result, 'ready');
     expect(attempts, 2);
+    expect(observedAttempt, 2);
     expect(observedDelay, Duration.zero);
   });
 
-  test('retryCloudflareRead converts a persistent rejection', () async {
+  test('retryCloudflareRead follows the bounded retry schedule', () async {
     var attempts = 0;
+    final retries = <(int, Duration)>[];
 
     await expectLater(
-      retryCloudflareRead<void>(() async {
-        attempts++;
-        throw _RuntimeCloudflareError();
-      }, retryDelay: Duration.zero),
+      retryCloudflareRead<void>(
+        () async {
+          attempts++;
+          throw _RuntimeCloudflareError();
+        },
+        retryDelays: const [Duration.zero, Duration.zero],
+        onRetry: (attempt, delay) {
+          retries.add((attempt, delay));
+        },
+      ),
       throwsA(isA<CloudflareBypassException>()),
     );
 
-    expect(attempts, 2);
+    expect(attempts, 3);
+    expect(retries, [(2, Duration.zero), (3, Duration.zero)]);
   });
 
   test('retryCloudflareRead does not retry unrelated errors', () async {

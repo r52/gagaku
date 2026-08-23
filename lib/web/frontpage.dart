@@ -17,6 +17,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 const _firstSearch = 0xDEADBEEF;
 var _nextExtensionHomepageInstanceId = 1;
 
+String _extensionHomepageTimestamp() =>
+    DateTime.now().toUtc().toIso8601String();
+
 typedef _ExtensionHomepageData = ({
   List<DiscoverSection> sections,
   List<PagedResults<DiscoverSectionItem>> sectionItems,
@@ -412,100 +415,103 @@ class ExtensionHomeWidget extends HookConsumerWidget {
         disposed.value = true;
         activeLoadId.value++;
         debugPrint(
-          'ExtensionHomepage(${source.id}) disposed instance=$instanceId',
+          'ExtensionHomepage(${source.id}) time='
+          '${_extensionHomepageTimestamp()} disposed instance=$instanceId',
         );
       };
     }, [source.id, instanceId]);
-    final homepageFuture = useMemoized<Future<_ExtensionHomepageData?>>(
-      () async {
-        final loadId = ++activeLoadId.value;
-        final notifier = ref.read(extensionSourceProvider(source.id).notifier);
-        final runtimeGeneration = notifier.runtimeGeneration;
-        var stage = 'sections';
+    final homepageFuture = useMemoized<Future<_ExtensionHomepageData?>>(() async {
+      final loadId = ++activeLoadId.value;
+      final notifier = ref.read(extensionSourceProvider(source.id).notifier);
+      final runtimeGeneration = notifier.runtimeGeneration;
+      var stage = 'sections';
 
-        bool isCurrentLoad() {
-          if (disposed.value || activeLoadId.value != loadId) {
-            return false;
-          }
-          return identical(
-            ref.read(extensionSourceProvider(source.id).notifier),
-            notifier,
-          );
+      bool isCurrentLoad() {
+        if (disposed.value || activeLoadId.value != loadId) {
+          return false;
         }
-
-        bool abandonIfStale() {
-          if (isCurrentLoad()) {
-            return false;
-          }
-          debugPrint(
-            'ExtensionHomepage(${source.id}) abandoned instance=$instanceId '
-            'load=$loadId runtimeGeneration=$runtimeGeneration stage=$stage',
-          );
-          return true;
-        }
-
-        debugPrint(
-          'ExtensionHomepage(${source.id}) start instance=$instanceId '
-          'load=$loadId runtimeGeneration=$runtimeGeneration',
+        return identical(
+          ref.read(extensionSourceProvider(source.id).notifier),
+          notifier,
         );
-        try {
-          final sections = await notifier.getDiscoverSections();
-          if (abandonIfStale()) {
-            return null;
-          }
-          debugPrint(
-            'ExtensionHomepage(${source.id}) sections instance=$instanceId '
-            'load=$loadId runtimeGeneration=$runtimeGeneration '
-            'count=${sections.length}',
-          );
+      }
 
-          final sectionItems = <PagedResults<DiscoverSectionItem>>[];
-          for (final (index, section) in sections.indexed) {
-            stage = 'section[$index:${section.id}]';
-            debugPrint(
-              'ExtensionHomepage(${source.id}) section start '
-              'instance=$instanceId load=$loadId '
-              'runtimeGeneration=$runtimeGeneration index=$index '
-              'section=${section.id}',
-            );
-            final results = await notifier.getDiscoverSectionItems(
-              section,
-              null,
-            );
-            if (abandonIfStale()) {
-              return null;
-            }
-            sectionItems.add(results);
-            debugPrint(
-              'ExtensionHomepage(${source.id}) section success '
-              'instance=$instanceId load=$loadId '
-              'runtimeGeneration=$runtimeGeneration index=$index '
-              'section=${section.id} items=${results.items.length} '
-              'hasMetadata=${results.metadata != null}',
-            );
-          }
-
-          stage = 'complete';
-          debugPrint(
-            'ExtensionHomepage(${source.id}) success instance=$instanceId '
-            'load=$loadId runtimeGeneration=$runtimeGeneration '
-            'sections=${sections.length}',
-          );
-          return (sections: sections, sectionItems: sectionItems);
-        } catch (error, stackTrace) {
-          if (abandonIfStale()) {
-            return null;
-          }
-          debugPrint(
-            'ExtensionHomepage(${source.id}) failed instance=$instanceId '
-            'load=$loadId runtimeGeneration=$runtimeGeneration stage=$stage '
-            'errorType=${error.runtimeType} error=$error',
-          );
-          Error.throwWithStackTrace(error, stackTrace);
+      bool abandonIfStale() {
+        if (isCurrentLoad()) {
+          return false;
         }
-      },
-      [source.id, refresh.value],
-    );
+        debugPrint(
+          'ExtensionHomepage(${source.id}) time='
+          '${_extensionHomepageTimestamp()} '
+          'abandoned instance=$instanceId '
+          'load=$loadId runtimeGeneration=$runtimeGeneration stage=$stage',
+        );
+        return true;
+      }
+
+      debugPrint(
+        'ExtensionHomepage(${source.id}) time=${_extensionHomepageTimestamp()} '
+        'start instance=$instanceId '
+        'load=$loadId runtimeGeneration=$runtimeGeneration',
+      );
+      try {
+        final sections = await notifier.getDiscoverSections();
+        if (abandonIfStale()) {
+          return null;
+        }
+        debugPrint(
+          'ExtensionHomepage(${source.id}) time='
+          '${_extensionHomepageTimestamp()} sections instance=$instanceId '
+          'load=$loadId runtimeGeneration=$runtimeGeneration '
+          'count=${sections.length}',
+        );
+
+        final sectionItems = <PagedResults<DiscoverSectionItem>>[];
+        for (final (index, section) in sections.indexed) {
+          stage = 'section[$index:${section.id}]';
+          debugPrint(
+            'ExtensionHomepage(${source.id}) time='
+            '${_extensionHomepageTimestamp()} section start '
+            'instance=$instanceId load=$loadId '
+            'runtimeGeneration=$runtimeGeneration index=$index '
+            'section=${section.id}',
+          );
+          final results = await notifier.getDiscoverSectionItems(section, null);
+          if (abandonIfStale()) {
+            return null;
+          }
+          sectionItems.add(results);
+          debugPrint(
+            'ExtensionHomepage(${source.id}) time='
+            '${_extensionHomepageTimestamp()} section success '
+            'instance=$instanceId load=$loadId '
+            'runtimeGeneration=$runtimeGeneration index=$index '
+            'section=${section.id} items=${results.items.length} '
+            'hasMetadata=${results.metadata != null}',
+          );
+        }
+
+        stage = 'complete';
+        debugPrint(
+          'ExtensionHomepage(${source.id}) time='
+          '${_extensionHomepageTimestamp()} success instance=$instanceId '
+          'load=$loadId runtimeGeneration=$runtimeGeneration '
+          'sections=${sections.length}',
+        );
+        return (sections: sections, sectionItems: sectionItems);
+      } catch (error, stackTrace) {
+        if (abandonIfStale()) {
+          return null;
+        }
+        debugPrint(
+          'ExtensionHomepage(${source.id}) time='
+          '${_extensionHomepageTimestamp()} failed instance=$instanceId '
+          'load=$loadId runtimeGeneration=$runtimeGeneration stage=$stage '
+          'errorType=${error.runtimeType} error=$error',
+        );
+        Error.throwWithStackTrace(error, stackTrace);
+      }
+    }, [source.id, refresh.value]);
     final homepageSnapshot = useFuture(homepageFuture, preserveState: false);
     final slivers = <Widget>[];
 

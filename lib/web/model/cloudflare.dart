@@ -46,6 +46,9 @@ String diagnosticUserAgentFingerprint(String value) {
   return 'fnv32:${hash.toRadixString(16).padLeft(8, '0')}';
 }
 
+String cloudflareDiagnosticTimestamp() =>
+    DateTime.now().toUtc().toIso8601String();
+
 String? cloudflareClearanceFingerprint(Iterable<Cookie> cookies) {
   for (final cookie in cookies) {
     if (cookie.name == 'cf_clearance') {
@@ -208,6 +211,13 @@ class CloudflareBrowserStates extends _$CloudflareBrowserStates {
   Map<String, CloudflareBrowserState> build() => {};
 
   void stage(String sourceId, CloudflareBrowserState browserState) {
+    state = {...state, sourceId: browserState};
+  }
+
+  void restoreIfAbsent(String sourceId, CloudflareBrowserState browserState) {
+    if (state.containsKey(sourceId)) {
+      return;
+    }
     state = {...state, sourceId: browserState};
   }
 

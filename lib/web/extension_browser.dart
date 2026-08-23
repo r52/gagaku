@@ -171,7 +171,8 @@ JSON.stringify((() => {
         Uri.parse(widget.source.baseUrl!),
       );
       debugPrint(
-        'cloudflare[${widget.source.id}] manual cookie selection '
+        'cloudflare[${widget.source.id}] '
+        'time=${cloudflareDiagnosticTimestamp()} manual cookie selection '
         'input=${cookieSelection.inputCount} '
         'selected=${cookieSelection.cookies.length} '
         'discarded=${cookieSelection.discardedCount} '
@@ -181,7 +182,8 @@ JSON.stringify((() => {
       final userAgentHeaders = await _readUserAgentHeaders(controller);
       final userAgent = userAgentHeaders['user-agent'];
       debugPrint(
-        'cloudflare[${widget.source.id}] manual browser state '
+        'cloudflare[${widget.source.id}] '
+        'time=${cloudflareDiagnosticTimestamp()} manual browser state '
         'clearanceFingerprint='
         '${cloudflareClearanceFingerprint(cookieSelection.cookies)} '
         'userAgentFingerprint='

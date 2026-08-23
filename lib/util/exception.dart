@@ -56,29 +56,34 @@ bool isCloudflareBypassError(Object error) {
 
 Future<T> retryCloudflareRead<T>(
   Future<T> Function() operation, {
-  Duration retryDelay = const Duration(seconds: 1),
-  void Function(Duration delay)? onRetry,
+  List<Duration> retryDelays = const [
+    Duration(seconds: 2),
+    Duration(seconds: 6),
+    Duration(seconds: 15),
+  ],
+  void Function(int nextAttempt, Duration delay)? onRetry,
 }) async {
-  try {
-    return await operation();
-  } catch (error, stackTrace) {
-    if (!isCloudflareBypassError(error)) {
-      Error.throwWithStackTrace(error, stackTrace);
-    }
-  }
+  for (var attempt = 1; ; attempt++) {
+    try {
+      return await operation();
+    } catch (error, stackTrace) {
+      if (!isCloudflareBypassError(error)) {
+        Error.throwWithStackTrace(error, stackTrace);
+      }
 
-  onRetry?.call(retryDelay);
-  if (retryDelay > Duration.zero) {
-    await Future<void>.delayed(retryDelay);
-  }
+      if (attempt > retryDelays.length) {
+        Error.throwWithStackTrace(
+          const CloudflareBypassException(),
+          stackTrace,
+        );
+      }
 
-  try {
-    return await operation();
-  } catch (error, stackTrace) {
-    if (isCloudflareBypassError(error)) {
-      Error.throwWithStackTrace(const CloudflareBypassException(), stackTrace);
+      final delay = retryDelays[attempt - 1];
+      onRetry?.call(attempt + 1, delay);
+      if (delay > Duration.zero) {
+        await Future<void>.delayed(delay);
+      }
     }
-    Error.throwWithStackTrace(error, stackTrace);
   }
 }
 

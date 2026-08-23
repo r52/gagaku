@@ -450,6 +450,14 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
 
     void complete(StartupBrowserOutcome outcome) {
       if (!completer.isCompleted) {
+        _startupBrowserOutcome = outcome;
+        _logStartupBrowserOutcome(
+          outcome,
+          latestCookies,
+          latestLocalStorage,
+          requiresCloudflare: requiresCloudflare,
+          challengeObserved: challengeObserved,
+        );
         completer.complete(
           StartupBrowserState(
             outcome: outcome,
@@ -466,58 +474,121 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
       }
     }
 
-    timeout = Timer(startupBrowserTimeout, () {
+    void completeDiagnosticOutcome(
+      StartupBrowserOutcome outcome,
+      Object error,
+    ) {
+      if (completer.isCompleted) {
+        return;
+      }
+      _startupBrowserOutcome = outcome;
+      _logStartupBrowserOutcome(
+        outcome,
+        latestCookies,
+        latestLocalStorage,
+        requiresCloudflare: requiresCloudflare,
+        challengeObserved: challengeObserved,
+        error: error,
+      );
+      completer.complete(
+        StartupBrowserState(
+          outcome: outcome,
+          cookies: latestCookies,
+          localStorage: latestLocalStorage,
+        ),
+      );
+    }
+
+    void completeManualResolution({Object? error}) {
+      if (completer.isCompleted) {
+        return;
+      }
+      _startupBrowserOutcome = StartupBrowserOutcome.manualResolutionRequired;
+      _logStartupBrowserOutcome(
+        StartupBrowserOutcome.manualResolutionRequired,
+        latestCookies,
+        latestLocalStorage,
+        requiresCloudflare: requiresCloudflare,
+        challengeObserved: challengeObserved,
+        error: error,
+      );
+      completeError(const CloudflareBypassException(), StackTrace.current);
+    }
+
+    Future<void> reconcileTimeout() async {
+      try {
+        final cookieSelection = selectBrowserCookiesForUrl(
+          await cookieManager.getCookies(
+            url: baseWebUri,
+            webViewController: startupView?.webViewController,
+          ),
+          Uri.parse(baseUrl),
+        );
+        if (completer.isCompleted) {
+          return;
+        }
+        _logCookieSelection('headless-timeout', cookieSelection);
+        latestCookies = cookieSelection.cookies;
+
+        final controller = startupView?.webViewController;
+        if (requiresCloudflare && controller != null) {
+          try {
+            latestLocalStorage = await _readLocalStorage(controller);
+          } catch (error) {
+            debugPrint(
+              '$_logName time=${cloudflareDiagnosticTimestamp()} startup browser '
+              'timeout localStorageErrorType=${error.runtimeType}',
+            );
+          }
+        }
+      } catch (error) {
+        if (!completer.isCompleted) {
+          debugPrint(
+            '$_logName time=${cloudflareDiagnosticTimestamp()} startup browser '
+            'timeout cookieReadErrorType=${error.runtimeType}',
+          );
+        }
+      }
+
+      if (completer.isCompleted) {
+        return;
+      }
+
+      final hasNewClearance =
+          requiresCloudflare &&
+          _hasNewCloudflareClearance(latestCookies, initialCloudflareClearance);
+      if (hasNewClearance) {
+        complete(StartupBrowserOutcome.readyWithNewClearance);
+        return;
+      }
+
       final httpError = pendingHttpError;
-      if (httpError != null && !challengeObserved) {
-        _logStartupBrowserOutcome(
-          httpError.outcome,
-          latestCookies,
-          latestLocalStorage,
-          requiresCloudflare: requiresCloudflare,
-          challengeObserved: challengeObserved,
-          error: httpError,
-        );
-        _startupBrowserOutcome = httpError.outcome;
-        completeError(httpError, StackTrace.current);
-      } else if (requiresCloudflare &&
-          challengeObserved &&
-          !_hasNewCloudflareClearance(
-            latestCookies,
-            initialCloudflareClearance,
-          )) {
-        _logStartupBrowserOutcome(
-          StartupBrowserOutcome.manualResolutionRequired,
-          latestCookies,
-          latestLocalStorage,
-          requiresCloudflare: requiresCloudflare,
-          challengeObserved: challengeObserved,
-        );
-        _startupBrowserOutcome = StartupBrowserOutcome.manualResolutionRequired;
-        completeError(const CloudflareBypassException(), StackTrace.current);
+      if (httpError != null) {
+        completeDiagnosticOutcome(httpError.outcome, httpError);
+      } else if (requiresCloudflare && challengeObserved) {
+        completeManualResolution();
       } else {
         final error = StartupBrowserException(
           outcome: StartupBrowserOutcome.indeterminateTimeout,
           message:
               'Timed out before the startup page produced a readiness result',
         );
-        _logStartupBrowserOutcome(
-          error.outcome,
-          latestCookies,
-          latestLocalStorage,
-          requiresCloudflare: requiresCloudflare,
-          challengeObserved: challengeObserved,
-          error: error,
-        );
-        _startupBrowserOutcome = error.outcome;
-        completeError(error, StackTrace.current);
+        completeDiagnosticOutcome(error.outcome, error);
       }
+    }
+
+    timeout = Timer(startupBrowserTimeout, () {
+      unawaited(reconcileTimeout());
     });
 
     try {
       void markChallengeObserved() {
         if (!challengeObserved) {
           challengeObserved = true;
-          debugPrint('$_logName Cloudflare challenge observed');
+          debugPrint(
+            '$_logName time=${cloudflareDiagnosticTimestamp()} '
+            'Cloudflare challenge observed',
+          );
         }
       }
 
@@ -568,7 +639,8 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
               outcome: StartupBrowserOutcome.browserLoadFailed,
               message:
                   'The startup page returned HTTP '
-                  '${errorResponse.statusCode ?? 'an unknown status'}',
+                  '${errorResponse.statusCode ?? 'an unknown status'} at '
+                  '${_diagnosticBrowserTarget(request.url)}',
               cause: errorResponse.reasonPhrase,
             );
           }
@@ -579,38 +651,18 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
             return;
           }
           observeUrl(request.url);
-          if (challengeObserved) {
-            _logStartupBrowserOutcome(
-              StartupBrowserOutcome.manualResolutionRequired,
-              latestCookies,
-              latestLocalStorage,
-              requiresCloudflare: requiresCloudflare,
-              challengeObserved: challengeObserved,
-              error: error.description,
-            );
-            _startupBrowserOutcome =
-                StartupBrowserOutcome.manualResolutionRequired;
-            completeError(
-              const CloudflareBypassException(),
-              StackTrace.current,
-            );
-            return;
-          }
           final exception = StartupBrowserException(
             outcome: StartupBrowserOutcome.browserLoadFailed,
-            message: 'The startup page failed to load',
+            message:
+                'The startup page failed to load at '
+                '${_diagnosticBrowserTarget(request.url)}',
             cause: error.description,
           );
-          _logStartupBrowserOutcome(
-            exception.outcome,
-            latestCookies,
-            latestLocalStorage,
-            requiresCloudflare: requiresCloudflare,
-            challengeObserved: challengeObserved,
-            error: exception,
-          );
-          _startupBrowserOutcome = exception.outcome;
-          completeError(exception, StackTrace.current);
+          if (challengeObserved) {
+            pendingHttpError = exception;
+            return;
+          }
+          completeDiagnosticOutcome(exception.outcome, exception);
         },
         onLoadStop: (controller, url) async {
           if (url == null) {
@@ -621,16 +673,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
           try {
             final httpError = pendingHttpError;
             if (httpError != null && !challengeObserved) {
-              _logStartupBrowserOutcome(
-                httpError.outcome,
-                latestCookies,
-                latestLocalStorage,
-                requiresCloudflare: requiresCloudflare,
-                challengeObserved: challengeObserved,
-                error: httpError,
-              );
-              _startupBrowserOutcome = httpError.outcome;
-              completeError(httpError, StackTrace.current);
+              completeDiagnosticOutcome(httpError.outcome, httpError);
               return;
             }
 
@@ -652,6 +695,10 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
             final newClearance =
                 hasClearance &&
                 _hasNewCloudflareClearance(cookies, initialCloudflareClearance);
+            if (httpError != null && !newClearance) {
+              completeDiagnosticOutcome(httpError.outcome, httpError);
+              return;
+            }
             if (!requiresCloudflare || !challengeObserved || newClearance) {
               final outcome = !requiresCloudflare
                   ? StartupBrowserOutcome.readyPageLoaded
@@ -672,13 +719,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
       await startupView.run();
       final result = await completer.future;
       _cookies = result.cookies;
-      return _completeStartupBrowserState(
-        outcome: result.outcome,
-        cookies: result.cookies,
-        localStorage: result.localStorage,
-        requiresCloudflare: requiresCloudflare,
-        challengeObserved: challengeObserved,
-      );
+      return result;
     } on CloudflareBypassException {
       _cookies = const [];
       rethrow;
@@ -739,7 +780,8 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     Object? error,
   }) {
     debugPrint(
-      '$_logName startup browser outcome=${outcome.name} '
+      '$_logName time=${cloudflareDiagnosticTimestamp()} '
+      'startup browser outcome=${outcome.name} '
       'requiresCloudflare=$requiresCloudflare '
       'challengeObserved=$challengeObserved '
       '${_browserStateSummary(cookies, localStorage)}'
@@ -749,11 +791,20 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
 
   void _logCookieSelection(String stage, BrowserCookieSelection selection) {
     debugPrint(
-      '$_logName cookie selection stage=$stage '
+      '$_logName time=${cloudflareDiagnosticTimestamp()} '
+      'cookie selection stage=$stage '
       'input=${selection.inputCount} selected=${selection.cookies.length} '
       'discarded=${selection.discardedCount} '
       'duplicateNames=${selection.duplicateNames}',
     );
+  }
+
+  String _diagnosticBrowserTarget(WebUri? url) {
+    final parsed = Uri.tryParse(url?.toString() ?? '');
+    if (parsed == null || !parsed.hasScheme || parsed.host.isEmpty) {
+      return '<unknown>';
+    }
+    return parsed.replace(query: null, fragment: null).toString();
   }
 
   Cookie? _cloudflareClearance(List<Cookie> cookies) {
@@ -918,7 +969,7 @@ if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
     final unchanged = current.length - added.length - changed.length;
 
     debugPrint(
-      '$_logName cookie store '
+      '$_logName time=${cloudflareDiagnosticTimestamp()} cookie store '
       'decodedType=${decodedCookieStore.runtimeType} '
       'count=${current.length} added=$added removed=$removed changed=$changed '
       'unchanged=$unchanged cookies=${cookies.map((cookie) => cookie.summary).toList()}',

@@ -367,7 +367,8 @@ export class MockRequestManager implements RequestManager {
       const userAgent = this.headerValue(requestHeaders, "user-agent");
       const cookieNames = this.requestCookieNames(requestHeaders);
       console.log(
-        `request[${requestId}] start method=${finalRequest.method} ` +
+        `request[${requestId}] time=${new Date().toISOString()} ` +
+          `start method=${finalRequest.method} ` +
           `target=${this.diagnosticTarget(finalRequest.url)} ` +
           `cookieNames=${JSON.stringify(cookieNames)} ` +
           `clearancePresent=${cookieNames.includes("cf_clearance")} ` +
@@ -409,7 +410,8 @@ export class MockRequestManager implements RequestManager {
       stage = "responseBody";
       const responseBody = await fetchResponse.arrayBuffer();
       console.log(
-        `request[${requestId}] response status=${fetchResponse.status} ` +
+        `request[${requestId}] time=${new Date().toISOString()} ` +
+          `response status=${fetchResponse.status} ` +
           `target=${this.diagnosticTarget(fetchResponse.url)} ` +
           `redirected=${fetchResponse.url !== finalRequest.url} ` +
           `setCookieNames=${JSON.stringify(
@@ -428,12 +430,14 @@ export class MockRequestManager implements RequestManager {
         responseBody,
       );
       console.log(
-        `request[${requestId}] success finalBodyBytes=${finalBody.byteLength}`,
+        `request[${requestId}] time=${new Date().toISOString()} ` +
+          `success finalBodyBytes=${finalBody.byteLength}`,
       );
       return [finalResponse, finalBody];
     } catch (error) {
       console.error(
-        `request[${requestId}] failed stage=${stage} ` +
+        `request[${requestId}] time=${new Date().toISOString()} ` +
+          `failed stage=${stage} ` +
           `error=${this.errorSummary(error)}`,
       );
       throw error;
