@@ -105,6 +105,7 @@ export function ApplicationPolyfill(): typeof Application {
         globalThis.gagaku?.callHandler(
           "setExtensionSecureState",
           secureStateStorage,
+          key,
         );
       } else {
         secureStateStorage[key] = value;
@@ -120,7 +121,11 @@ export function ApplicationPolyfill(): typeof Application {
         }
 
         stateStorage[key] = value;
-        globalThis.gagaku?.callHandler("setExtensionState", stateStorage);
+        globalThis.gagaku?.callHandler(
+          "setExtensionState",
+          stateStorage,
+          key,
+        );
       } else {
         stateStorage[key] = value;
       }

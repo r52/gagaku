@@ -44,6 +44,49 @@ class CloudflareBypassException implements Exception {
   String toString() => 'Cloudflare challenge requires manual resolution';
 }
 
+bool isCloudflareBypassError(Object error) {
+  if (error is CloudflareBypassException) {
+    return true;
+  }
+
+  return error.toString().toLowerCase().contains(
+    'cloudflare bypass is required',
+  );
+}
+
+Future<T> retryCloudflareRead<T>(
+  Future<T> Function() operation, {
+  List<Duration> retryDelays = const [
+    Duration(seconds: 2),
+    Duration(seconds: 6),
+    Duration(seconds: 15),
+  ],
+  void Function(int nextAttempt, Duration delay)? onRetry,
+}) async {
+  for (var attempt = 1; ; attempt++) {
+    try {
+      return await operation();
+    } catch (error, stackTrace) {
+      if (!isCloudflareBypassError(error)) {
+        Error.throwWithStackTrace(error, stackTrace);
+      }
+
+      if (attempt > retryDelays.length) {
+        Error.throwWithStackTrace(
+          const CloudflareBypassException(),
+          stackTrace,
+        );
+      }
+
+      final delay = retryDelays[attempt - 1];
+      onRetry?.call(attempt + 1, delay);
+      if (delay > Duration.zero) {
+        await Future<void>.delayed(delay);
+      }
+    }
+  }
+}
+
 class UnknownSourceException implements Exception {
   final String? sourceId;
   final String message;

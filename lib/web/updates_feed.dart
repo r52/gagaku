@@ -4,6 +4,8 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:gagaku/web/cloudflare_resolution.dart';
+import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/model/update_feed.dart';
 import 'package:gagaku/web/model/update_feed_controller.dart';
@@ -108,6 +110,21 @@ class WebSourceUpdatesPage extends HookConsumerWidget {
         _ => null,
       };
       final reason = itemFailure?.cause ?? error;
+      WebSourceInfo? cloudflareSource;
+      if (reason is CloudflareBypassException && itemFailure != null) {
+        final series = itemFailure.link.series;
+        if (series case ExtensionSeriesRef(:final sourceId)) {
+          final installed = ref.watch(installedSourcesProvider).value;
+          if (installed != null) {
+            for (final source in installed) {
+              if (source.id == sourceId) {
+                cloudflareSource = source;
+                break;
+              }
+            }
+          }
+        }
+      }
       final errorWidget = Column(
         mainAxisSize: MainAxisSize.min,
         spacing: 10.0,
@@ -124,11 +141,17 @@ class WebSourceUpdatesPage extends HookConsumerWidget {
               tr.webSources.source.cloudflareManualRequired,
             _ => tr.chapterFeed.failureReason(reason: reason.toString()),
           }, textAlign: TextAlign.center),
-          ElevatedButton.icon(
-            onPressed: () => _startUpdate(context, ref),
-            label: Text(tr.ui.retry),
-            icon: const Icon(Icons.refresh),
-          ),
+          if (cloudflareSource != null)
+            CloudflareResolutionButton(
+              source: cloudflareSource,
+              onResolved: () => _startUpdate(context, ref),
+            )
+          else
+            ElevatedButton.icon(
+              onPressed: () => _startUpdate(context, ref),
+              label: Text(tr.ui.retry),
+              icon: const Icon(Icons.refresh),
+            ),
         ],
       );
       if (items == null) {

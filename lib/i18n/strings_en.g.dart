@@ -2073,8 +2073,20 @@ class Translations$webSources$source$en {
 	/// en: 'Reload extension website'
 	String get reloadWebsite => 'Reload extension website';
 
-	/// en: 'Open the extension website, complete the Cloudflare challenge, then reload the extension.'
-	String get cloudflareManualRequired => 'Open the extension website, complete the Cloudflare challenge, then reload the extension.';
+	/// en: 'Manual Cloudflare verification is required.'
+	String get cloudflareManualRequired => 'Manual Cloudflare verification is required.';
+
+	/// en: 'Resolve Cloudflare'
+	String get cloudflareResolve => 'Resolve Cloudflare';
+
+	/// en: 'Complete any verification shown by the website, then tap Done.'
+	String get cloudflareInstructions => 'Complete any verification shown by the website, then tap Done.';
+
+	/// en: 'Done'
+	String get cloudflareComplete => 'Done';
+
+	/// en: 'Could not save the browser session. Try again after the website finishes loading.'
+	String get cloudflareCaptureFailed => 'Could not save the browser session. Try again after the website finishes loading.';
 
 	/// en: 'Extension Manager'
 	String get manager => 'Extension Manager';
@@ -2497,7 +2509,11 @@ extension on Translations {
 			'webSources.source.openWebsite' => 'Open extension website',
 			'webSources.source.reload' => 'Reload extension',
 			'webSources.source.reloadWebsite' => 'Reload extension website',
-			'webSources.source.cloudflareManualRequired' => 'Open the extension website, complete the Cloudflare challenge, then reload the extension.',
+			'webSources.source.cloudflareManualRequired' => 'Manual Cloudflare verification is required.',
+			'webSources.source.cloudflareResolve' => 'Resolve Cloudflare',
+			'webSources.source.cloudflareInstructions' => 'Complete any verification shown by the website, then tap Done.',
+			'webSources.source.cloudflareComplete' => 'Done',
+			'webSources.source.cloudflareCaptureFailed' => 'Could not save the browser session. Try again after the website finishes loading.',
 			'webSources.source.manager' => 'Extension Manager',
 			'webSources.source.noDataWarning' => 'No repos nor extensions installed!',
 			'webSources.source.refresh' => 'Refresh repos',
@@ -2829,12 +2845,12 @@ extension on Translations {
 			'sync.createFilesystem' => 'Create Filesystem Profile',
 			'sync.createFilesystemSub' => 'Choose an empty native filesystem directory and publish this device\'s data.',
 			'sync.joinFilesystem' => 'Join Filesystem Profile',
+			_ => null,
+		} ?? switch (path) {
 			'sync.joinFilesystemSub' => 'Choose a native filesystem directory containing a Gagaku sync profile.',
 			'sync.createDocumentTree' => 'Create Document Provider Profile',
 			'sync.createDocumentTreeSub' => 'Choose an empty Android document tree, including a folder provided by Google Drive, and publish this device\'s data.',
 			'sync.joinDocumentTree' => 'Join Document Provider Profile',
-			_ => null,
-		} ?? switch (path) {
 			'sync.joinDocumentTreeSub' => 'Choose an Android document tree containing a Gagaku sync profile.',
 			'sync.deviceName' => 'Device Name',
 			'sync.defaultDeviceName' => 'Gagaku Device',

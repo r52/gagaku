@@ -63,3 +63,6 @@ memories/
 .pi-lens/
 .plans/
 .pi/
+
+# test artifacts
+gagaku*.json

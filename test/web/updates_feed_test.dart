@@ -35,13 +35,23 @@ void main() {
       completed: 2,
       total: 5,
     );
+    final source = WebSourceInfo(
+      id: 'blocked-source',
+      name: 'Blocked source',
+      repo: 'test',
+      baseUrl: 'https://example.com',
+      icon: '',
+      capabilities: const [SourceIntents.cloudflareBypassRequired],
+    );
 
-    await _pumpFailure(tester, failure);
+    await _pumpFailure(tester, failure, installedSources: [source]);
 
     expect(
       find.text(t.chapterFeed.updateFailed(item: 'Blocked title')),
       findsOneWidget,
     );
+    expect(find.text(t.webSources.source.cloudflareResolve), findsOneWidget);
+    expect(find.text(t.ui.retry), findsNothing);
     expect(find.text('2/5'), findsOneWidget);
     expect(
       find.text(t.webSources.source.cloudflareManualRequired),
@@ -84,8 +94,9 @@ void main() {
 
 Future<void> _pumpFailure(
   WidgetTester tester,
-  UpdateFeedFailure failure,
-) async {
+  UpdateFeedFailure failure, {
+  List<WebSourceInfo> installedSources = const [],
+}) async {
   final resolver = WebLinkResolver(
     extensionExists: (_) async => false,
     redirectTransport: const _NoopRedirectTransport(),
@@ -93,6 +104,9 @@ Future<void> _pumpFailure(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        installedSourcesProvider.overrideWith(
+          (ref) => Stream.value(installedSources),
+        ),
         webLinkResolverProvider.overrideWithValue(resolver),
         webUpdateFeedControllerProvider.overrideWith(
           () => _FailureController(failure),
@@ -103,6 +117,7 @@ Future<void> _pumpFailure(
       ),
     ),
   );
+  await tester.pump();
   await tester.pump();
 }
 
