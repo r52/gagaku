@@ -12,6 +12,7 @@ import 'package:gagaku/drawer.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/model/startup_section.dart';
 import 'package:gagaku/model/types.dart';
+import 'package:gagaku/model/update_metadata.dart';
 import 'package:gagaku/settings/convert.dart';
 import 'package:gagaku/settings/refresh.dart';
 import 'package:gagaku/settings/sync.dart';
@@ -29,6 +30,8 @@ const gagakuBackupExcludedLocalKeys = [
   'data_location',
   startupSectionHiveKey,
   syncMetadataHiveKey,
+  updateLastCheckHiveKey,
+  updateIgnoredVersionsHiveKey,
 ];
 
 class AppSettingsPage extends HookConsumerWidget {

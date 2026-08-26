@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/config.dart';
+import 'package:gagaku/model/update_metadata.dart';
 import 'package:gagaku/update_installer.dart';
 import 'package:gagaku/util/http.dart';
 import 'package:gagaku/version.dart';
@@ -103,7 +104,8 @@ class UpdateChecker extends _$UpdateChecker {
 
     // Check cooldown.
     final now = ref.read(updateCheckerNowProvider)();
-    final lastCheck = settings.lastUpdateCheck;
+    final metadata = ref.read(updateMetadataStoreProvider);
+    final lastCheck = metadata.lastUpdateCheck;
     if (lastCheck != null) {
       final elapsed = now.difference(lastCheck);
       final cooldown = Duration(hours: settings.updateCheckCooldownHours);
@@ -142,7 +144,7 @@ class UpdateChecker extends _$UpdateChecker {
     }
 
     // Check if ignored.
-    final isIgnored = settings.ignoredUpdates.contains(
+    final isIgnored = metadata.ignoredUpdates.contains(
       settings.updateChannel == 'beta' ? info.commitSha : info.version,
     );
 
@@ -383,16 +385,15 @@ void showUpdateDialog(
             builder: (context, ref, child) {
               return TextButton(
                 onPressed: () async {
-                  final cfg = ref.read(gagakuSettingsProvider);
-                  final updated = cfg.copyWith(
-                    ignoredUpdates: [
-                      ...cfg.ignoredUpdates,
-                      info.commitSha ?? info.version,
-                    ],
-                    lastUpdateCheck: ref.read(updateCheckerNowProvider)(),
-                  );
-                  ref.read(gagakuSettingsProvider.notifier).save(updated);
-                  Navigator.of(dialogContext).pop();
+                  await ref
+                      .read(updateMetadataStoreProvider)
+                      .ignoreUpdate(
+                        info.commitSha ?? info.version,
+                        ref.read(updateCheckerNowProvider)(),
+                      );
+                  if (dialogContext.mounted) {
+                    Navigator.of(dialogContext).pop();
+                  }
                 },
                 child: child!,
               );

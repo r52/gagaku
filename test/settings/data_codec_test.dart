@@ -46,6 +46,10 @@ void main() {
 
       final exported = await codec.export();
       expect(exported, isNot(contains('version')));
+      expect(
+        exported['gagaku'],
+        isNot(anyOf(contains('lastUpdateCheck'), contains('ignoredUpdates'))),
+      );
 
       _clearAllEntities(store);
       await codec.import(exported);

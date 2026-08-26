@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:gagaku/settings.dart';
+import 'package:gagaku/model/update_metadata.dart';
 import 'package:gagaku/sync/metadata.dart';
 
 void main() {
@@ -57,5 +58,12 @@ void main() {
 
   test('sync metadata remains excluded from manual backup settings', () {
     expect(gagakuBackupExcludedLocalKeys, contains(syncMetadataHiveKey));
+  });
+
+  test('update metadata remains excluded from manual backup settings', () {
+    expect(
+      gagakuBackupExcludedLocalKeys,
+      containsAll([updateLastCheckHiveKey, updateIgnoredVersionsHiveKey]),
+    );
   });
 }

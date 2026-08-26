@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
-import 'package:gagaku/model/config.dart';
 import 'package:gagaku/model/model.dart';
+import 'package:gagaku/model/update_metadata.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/update_checker.dart';
 import 'package:gagaku/util/cached_network_image.dart';
@@ -66,11 +66,9 @@ class _MainDrawerState extends ConsumerState<MainDrawer> {
   }
 
   Future<void> _recordUpdateCheck() async {
-    final config = ref.read(gagakuSettingsProvider);
-    final updatedConfig = config.copyWith(
-      lastUpdateCheck: ref.read(updateCheckerNowProvider)(),
-    );
-    ref.read(gagakuSettingsProvider.notifier).save(updatedConfig);
+    await ref
+        .read(updateMetadataStoreProvider)
+        .recordUpdateCheck(ref.read(updateCheckerNowProvider)());
   }
 
   void _showAvailableUpdateDialog(UpdateInfo info) {

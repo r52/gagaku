@@ -33,7 +33,7 @@ final class UpdateCheckerProvider
   UpdateChecker create() => UpdateChecker();
 }
 
-String _$updateCheckerHash() => r'33746f86aa1300705053ca1a6cfc6d47804815f3';
+String _$updateCheckerHash() => r'663ffb715596a4ca9dfea100cfa5479cacf22201';
 
 abstract class _$UpdateChecker extends $AsyncNotifier<UpdateResult> {
   FutureOr<UpdateResult> build();

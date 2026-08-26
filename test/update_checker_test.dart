@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/config.dart';
+import 'package:gagaku/model/update_metadata.dart';
 import 'package:gagaku/update_checker.dart';
 import 'package:gagaku/update_installer.dart';
 import 'package:gagaku/version.dart';
@@ -52,9 +53,9 @@ void main() {
       final client = _RecordingClient();
       final container = _container(
         now: now,
-        settings: GagakuConfig(
+        settings: GagakuConfig(updateCheckCooldownHours: 24),
+        metadata: _MemoryUpdateMetadataStore(
           lastUpdateCheck: now.subtract(const Duration(hours: 23)),
-          updateCheckCooldownHours: 24,
         ),
         client: client,
       );
@@ -128,7 +129,7 @@ void main() {
     test('stable channel recognizes an ignored newer release', () async {
       final client = _RecordingClient((_) => _stableRelease(version: 'v1.0.1'));
       final container = _container(
-        settings: GagakuConfig(ignoredUpdates: ['1.0.1']),
+        metadata: _MemoryUpdateMetadataStore(ignoredUpdates: {'1.0.1'}),
         client: client,
       );
       addTearDown(container.dispose);
@@ -212,10 +213,8 @@ void main() {
         (_) => _betaReleases(commitSha: remoteSha),
       );
       final container = _container(
-        settings: GagakuConfig(
-          updateChannel: 'beta',
-          ignoredUpdates: [remoteSha],
-        ),
+        settings: GagakuConfig(updateChannel: 'beta'),
+        metadata: _MemoryUpdateMetadataStore(ignoredUpdates: {remoteSha}),
         client: client,
       );
       addTearDown(container.dispose);
@@ -489,11 +488,55 @@ void main() {
       expect(snoozed, 1);
       expect(find.text('Update Available'), findsNothing);
     });
+
+    testWidgets('Ignore stores the release in device-local metadata', (
+      tester,
+    ) async {
+      await LocaleSettings.setLocale(AppLocale.en);
+      final metadata = _MemoryUpdateMetadataStore();
+      final now = DateTime(2026, 7, 5, 12);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            updateMetadataStoreProvider.overrideWithValue(metadata),
+            updateCheckerNowProvider.overrideWithValue(() => now),
+          ],
+          child: TranslationProvider(
+            child: MaterialApp(
+              home: Builder(
+                builder: (context) => TextButton(
+                  onPressed: () => showUpdateDialog(
+                    context,
+                    UpdateInfo(
+                      version: '1.0.1',
+                      releaseUrl: 'https://example.com/release',
+                      publishedAt: now,
+                    ),
+                  ),
+                  child: const Text('Open update dialog'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open update dialog'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Ignore This Version'));
+      await tester.pumpAndSettle();
+
+      expect(metadata.ignoredUpdates, {'1.0.1'});
+      expect(metadata.lastUpdateCheck, now);
+      expect(find.text('Update Available'), findsNothing);
+    });
   });
 }
 
 ProviderContainer _container({
   GagakuConfig? settings,
+  UpdateMetadataStore? metadata,
   _RecordingClient? client,
   DateTime? now,
   bool isReleaseBuild = true,
@@ -502,6 +545,9 @@ ProviderContainer _container({
   return ProviderContainer(
     overrides: [
       gagakuSettingsProvider.overrideWithValue(settings ?? GagakuConfig()),
+      updateMetadataStoreProvider.overrideWithValue(
+        metadata ?? _MemoryUpdateMetadataStore(),
+      ),
       updateCheckerHttpClientFactoryProvider.overrideWithValue(
         () => updateClient,
       ),
@@ -509,6 +555,32 @@ ProviderContainer _container({
       updateCheckerIsReleaseBuildProvider.overrideWithValue(isReleaseBuild),
     ],
   );
+}
+
+final class _MemoryUpdateMetadataStore implements UpdateMetadataStore {
+  _MemoryUpdateMetadataStore({
+    this.lastUpdateCheck,
+    Set<String>? ignoredUpdates,
+  }) : _ignoredUpdates = ignoredUpdates ?? {};
+
+  @override
+  DateTime? lastUpdateCheck;
+
+  final Set<String> _ignoredUpdates;
+
+  @override
+  Set<String> get ignoredUpdates => Set.unmodifiable(_ignoredUpdates);
+
+  @override
+  Future<void> recordUpdateCheck(DateTime checkedAt) async {
+    lastUpdateCheck = checkedAt;
+  }
+
+  @override
+  Future<void> ignoreUpdate(String update, DateTime checkedAt) async {
+    _ignoredUpdates.add(update);
+    lastUpdateCheck = checkedAt;
+  }
 }
 
 http.Response _stableRelease({
