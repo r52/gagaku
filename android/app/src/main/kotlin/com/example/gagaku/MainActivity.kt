@@ -1,6 +1,5 @@
 package r52.gagaku
 
-import android.app.Activity
 import android.content.Intent
 import android.database.ContentObserver
 import android.database.Cursor
@@ -22,7 +21,6 @@ import java.util.concurrent.TimeUnit
 class MainActivity : FlutterFragmentActivity() {
     private val ioExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
-    private var pendingTreeResult: MethodChannel.Result? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -34,7 +32,14 @@ class MainActivity : FlutterFragmentActivity() {
 
     private fun handleMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
-            "pickTree" -> pickTree(result)
+            "persistAccess" -> runIo(result) {
+                val treeUri = tree(call)
+                val flags =
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                contentResolver.takePersistableUriPermission(treeUri, flags)
+                requirePersistedAccess(treeUri)
+                null
+            }
             "checkAccess" -> runIo(result) {
                 tree(call).also(::requirePersistedAccess)
                 null
@@ -86,61 +91,7 @@ class MainActivity : FlutterFragmentActivity() {
         }
     }
 
-    private fun pickTree(result: MethodChannel.Result) {
-        if (pendingTreeResult != null) {
-            result.error("BUSY", "A document-tree picker is already open", null)
-            return
-        }
-        pendingTreeResult = result
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).addFlags(
-            Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
-                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION or
-                Intent.FLAG_GRANT_PREFIX_URI_PERMISSION,
-        )
-        startActivityForResult(intent, TREE_REQUEST_CODE)
-    }
-
-    @Deprecated("The system document-tree picker still reports through this API")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode != TREE_REQUEST_CODE) {
-            super.onActivityResult(requestCode, resultCode, data)
-            return
-        }
-        val result = pendingTreeResult ?: return
-        pendingTreeResult = null
-        val treeUri = data?.data
-        if (resultCode != Activity.RESULT_OK || treeUri == null) {
-            result.success(null)
-            return
-        }
-        try {
-            val flags = data.flags and
-                (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-            if (flags and Intent.FLAG_GRANT_READ_URI_PERMISSION == 0 ||
-                flags and Intent.FLAG_GRANT_WRITE_URI_PERMISSION == 0
-            ) {
-                throw SafFailure(
-                    "PERMISSION_DENIED",
-                    "The selected provider did not grant read and write access",
-                )
-            }
-            contentResolver.takePersistableUriPermission(treeUri, flags)
-            requirePersistedAccess(treeUri)
-            result.success(
-                mapOf(
-                    "uri" to treeUri.toString(),
-                    "displayName" to rootDocument(treeUri).name,
-                ),
-            )
-        } catch (error: Throwable) {
-            reportError(result, error)
-        }
-    }
-
     override fun onDestroy() {
-        pendingTreeResult?.error("CANCELLED", "Document-tree picker was closed", null)
-        pendingTreeResult = null
         ioExecutor.shutdownNow()
         super.onDestroy()
     }
@@ -462,7 +413,6 @@ class MainActivity : FlutterFragmentActivity() {
 
     companion object {
         private const val CHANNEL_NAME = "r52.gagaku/saf_sync"
-        private const val TREE_REQUEST_CODE = 7306
         private const val VISIBILITY_ATTEMPTS = 20
         private const val VISIBILITY_DELAY_MS = 250L
         private const val DIRECTORY_LOADING_TIMEOUT_MS = 5_000L

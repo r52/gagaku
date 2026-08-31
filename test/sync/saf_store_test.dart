@@ -17,8 +17,6 @@ void main() {
         .setMockMethodCallHandler(SafSyncStore.channel, (call) async {
           final arguments = Map<String, dynamic>.from(call.arguments as Map);
           switch (call.method) {
-            case 'pickTree':
-              return {'uri': treeUri, 'displayName': 'Synthetic Sync Folder'};
             case 'checkAccess':
               return null;
             case 'list':

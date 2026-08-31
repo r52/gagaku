@@ -128,10 +128,10 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
     final deviceName = await _askDeviceName();
     if (deviceName == null || !mounted) return;
     await _run(() async {
-      final selection = await SafSyncStore.pickTree();
-      if (selection == null) return;
+      final treeUri = await SafSyncStore.pickTree();
+      if (treeUri == null) return;
       await _service.configureSaf(
-        treeUri: selection.uri,
+        treeUri: treeUri,
         mode: mode,
         deviceName: deviceName,
       );
