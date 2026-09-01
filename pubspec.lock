@@ -429,10 +429,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: b7acb5d123cb398f6b4a8a38e43777545254f8fc1fabef3ee11cbbb56aece9c8
+      sha256: "3c5191df3efd7445ab7c6bc4653fe10a2bc907e2f826244eea7f5622724161f5"
       url: "https://pub.dev"
     source: hosted
-    version: "12.1.2"
+    version: "12.1.3"
   file_picker_darwin:
     dependency: transitive
     description:
@@ -669,18 +669,18 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_readium
-      sha256: "6ce107a6756311a12ff2dc6a8ec035b79de31c92cb9e242638ecd243b67d48ac"
+      sha256: f89598f7b4e9f93657ee9dd6ab13a14d410114b38516ebbc79022fb2e5bdbf7e
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.2"
+    version: "0.4.3"
   flutter_readium_platform_interface:
     dependency: transitive
     description:
       name: flutter_readium_platform_interface
-      sha256: b36348dc4ce098ad6b2f7b8b87908a806309d38de4d77f97f210ab354b2d9db1
+      sha256: "18dc1968982776f3824833c4c4f67aad69f2fce209500f6bfd43076b5929202b"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.2"
+    version: "0.4.3"
   flutter_riverpod:
     dependency: transitive
     description:
@@ -1743,18 +1743,18 @@ packages:
     dependency: transitive
     description:
       name: wakelock_plus
-      sha256: "7253bca0fcf40d8413ddfcf4d2a1fa0a82475e79be25a4f2c564b695c9351486"
+      sha256: "22b3e7e937721de70e63c85e7139f4ac781dc22863b9262431a53ac030eb074b"
       url: "https://pub.dev"
     source: hosted
-    version: "1.7.0"
+    version: "1.8.0"
   wakelock_plus_platform_interface:
     dependency: transitive
     description:
       name: wakelock_plus_platform_interface
-      sha256: "0618d1799f0b28bcf98255b4ee8313e6fc4d38589dc4ee5fe5840d57d1aff6da"
+      sha256: "764c25504562abc8ac3406f5d175f126b276e6ba916c7c2675690b73368ca384"
       url: "https://pub.dev"
     source: hosted
-    version: "1.6.0"
+    version: "1.7.0"
   watcher:
     dependency: transitive
     description:
