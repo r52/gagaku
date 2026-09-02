@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit
 class MainActivity : FlutterFragmentActivity() {
     private val ioExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
+    private var updateFeedExecutionChannel: MethodChannel? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -28,6 +29,58 @@ class MainActivity : FlutterFragmentActivity() {
             flutterEngine.dartExecutor.binaryMessenger,
             CHANNEL_NAME,
         ).setMethodCallHandler(::handleMethodCall)
+        updateFeedExecutionChannel = MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            UPDATE_FEED_EXECUTION_CHANNEL_NAME,
+        ).also { channel ->
+            channel.setMethodCallHandler(::handleUpdateFeedExecutionCall)
+        }
+    }
+
+    private fun handleUpdateFeedExecutionCall(
+        call: MethodCall,
+        result: MethodChannel.Result,
+    ) {
+        try {
+            when (call.method) {
+                "start" -> {
+                    val notificationText = call.argument<String>("notificationText")
+                    if (notificationText.isNullOrBlank()) {
+                        result.error(
+                            "INVALID_ARGUMENT",
+                            "Missing update-feed notification text",
+                            null,
+                        )
+                        return
+                    }
+                    UpdateFeedForegroundService.start(this, notificationText)
+                    result.success(null)
+                }
+                "stop" -> {
+                    UpdateFeedForegroundService.stop(this)
+                    result.success(null)
+                }
+                else -> result.notImplemented()
+            }
+        } catch (error: SecurityException) {
+            result.error(
+                "PERMISSION_DENIED",
+                error.message ?: "Unable to start the update-feed foreground service",
+                null,
+            )
+        } catch (error: IllegalStateException) {
+            result.error(
+                "START_NOT_ALLOWED",
+                error.message ?: "Android did not allow the update-feed foreground service to start",
+                null,
+            )
+        } catch (error: Throwable) {
+            result.error(
+                "SERVICE_ERROR",
+                error.message ?: "Update-feed foreground-service operation failed",
+                null,
+            )
+        }
     }
 
     private fun handleMethodCall(call: MethodCall, result: MethodChannel.Result) {
@@ -92,6 +145,9 @@ class MainActivity : FlutterFragmentActivity() {
     }
 
     override fun onDestroy() {
+        UpdateFeedForegroundService.stop(this)
+        updateFeedExecutionChannel?.setMethodCallHandler(null)
+        updateFeedExecutionChannel = null
         ioExecutor.shutdownNow()
         super.onDestroy()
     }
@@ -413,6 +469,8 @@ class MainActivity : FlutterFragmentActivity() {
 
     companion object {
         private const val CHANNEL_NAME = "r52.gagaku/saf_sync"
+        private const val UPDATE_FEED_EXECUTION_CHANNEL_NAME =
+            "r52.gagaku/update_feed_execution"
         private const val VISIBILITY_ATTEMPTS = 20
         private const val VISIBILITY_DELAY_MS = 250L
         private const val DIRECTORY_LOADING_TIMEOUT_MS = 5_000L

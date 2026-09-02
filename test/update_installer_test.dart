@@ -100,7 +100,9 @@ void main() {
     ) async {
       await LocaleSettings.setLocale(AppLocale.en);
       final bytes = utf8.encode('fictional signed apk bytes');
-      final cacheRoot = await Directory.systemTemp.createTemp('gagaku-update-');
+      final cacheRoot = (await tester.runAsync(
+        () => Directory.systemTemp.createTemp('gagaku-update-'),
+      ))!;
       addTearDown(() => cacheRoot.delete(recursive: true));
 
       await _pumpInstallerApp(
@@ -140,7 +142,9 @@ void main() {
     ) async {
       await LocaleSettings.setLocale(AppLocale.en);
       final bytes = utf8.encode('fictional signed apk bytes');
-      final cacheRoot = await Directory.systemTemp.createTemp('gagaku-update-');
+      final cacheRoot = (await tester.runAsync(
+        () => Directory.systemTemp.createTemp('gagaku-update-'),
+      ))!;
       addTearDown(() => cacheRoot.delete(recursive: true));
 
       await _pumpInstallerApp(

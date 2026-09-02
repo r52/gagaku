@@ -4,6 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/sync/saf_store.dart';
 import 'package:integration_test/integration_test.dart';
 
+// Run with --dart-define=GAGAKU_RUN_INTERACTIVE_SAF_TEST=true.
+const _runInteractiveSafTest = bool.fromEnvironment(
+  'GAGAKU_RUN_INTERACTIVE_SAF_TEST',
+);
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -37,5 +42,5 @@ void main() {
 
     await store.delete(key);
     expect(await store.list(prefix), isEmpty);
-  });
+  }, skip: !_runInteractiveSafTest);
 }

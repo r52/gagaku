@@ -19,30 +19,6 @@ class WebSourceUpdatesPage extends HookConsumerWidget {
   final ScrollController? controller;
 
   Future<void> _startUpdate(BuildContext context, WidgetRef ref) async {
-    final platform = ref.read(updateFeedPlatformProvider);
-    if (!await platform.hasBackgroundPermissions()) {
-      if (!context.mounted) {
-        return;
-      }
-      final tr = context.t;
-      await showDialog<void>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(tr.permissions.needed),
-          content: Text(tr.permissions.request),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(tr.ui.ok),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (!context.mounted) {
-      return;
-    }
     final tr = context.t;
     await ref
         .read(webUpdateFeedControllerProvider.notifier)

@@ -103,7 +103,7 @@ final class UpdateFeedPlatformProvider
 }
 
 String _$updateFeedPlatformHash() =>
-    r'50805807eef0ad737af7ffbf66624bdc0ecbbc1b';
+    r'fdc64dc354c0e3e666ca6c54b36f9c883cf16253';
 
 @ProviderFor(updateFeedRunner)
 final updateFeedRunnerProvider = UpdateFeedRunnerProvider._();
