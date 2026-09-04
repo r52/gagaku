@@ -101,11 +101,52 @@ const _knownHosts =
     'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/known_hosts.json';
 
 const defaultBrowserUserAgent =
-    'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.121 Mobile Safari/537.36';
+    'Mozilla/5.0 (Linux; Android 17; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/149.0.7827.5 Mobile Safari/537.36';
 const defaultSecChUa =
-    '"Google Chrome";v="146", "Chromium";v="146", "Not_A Brand";v="24"';
+    '"Chromium";v="149", "Android WebView";v="149", "Not_A Brand";v="99"';
 const defaultSecChUaMobile = '?1';
 const defaultSecChUaPlatform = '"Android"';
+
+/// Derives Chromium low-entropy Client Hints from a validated user agent.
+Map<String, String>? deriveBrowserUserAgentHeaders(
+  String userAgent,
+  TargetPlatform platform,
+) {
+  if (!userAgent.startsWith('Mozilla/5.0 ') ||
+      !userAgent.contains('AppleWebKit/')) {
+    return null;
+  }
+
+  final chromiumVersion = RegExp(
+    r'(?:Chrome|Chromium)/(\d+)(?:\.\d+){0,3}',
+  ).firstMatch(userAgent);
+  if (chromiumVersion == null) {
+    return null;
+  }
+
+  final majorVersion = chromiumVersion.group(1)!;
+  final platformName = switch (platform) {
+    TargetPlatform.android => 'Android',
+    TargetPlatform.fuchsia => 'Fuchsia',
+    TargetPlatform.iOS => 'iOS',
+    TargetPlatform.linux => 'Linux',
+    TargetPlatform.macOS => 'macOS',
+    TargetPlatform.windows => 'Windows',
+  };
+  final browserBrand = userAgent.contains('; wv)')
+      ? 'Android WebView'
+      : 'Google Chrome';
+
+  return {
+    'user-agent': userAgent,
+    'sec-ch-ua':
+        '"Chromium";v="$majorVersion", '
+        '"$browserBrand";v="$majorVersion", '
+        '"Not_A Brand";v="99"',
+    'sec-ch-ua-mobile': userAgent.contains(' Mobile ') ? '?1' : '?0',
+    'sec-ch-ua-platform': '"$platformName"',
+  };
+}
 
 class GagakuData {
   GagakuData._internal();
@@ -161,145 +202,19 @@ class GagakuData {
     dynamicUserAgentHeaders = headers;
   }
 
-  Map<String, String> _extractUserAgentHeaders(Map<String, String> headers) {
-    return {
-      for (final MapEntry(:key, :value) in headers.entries)
-        if (key == 'user-agent' || key.startsWith('sec-ch-ua')) key: value,
-    };
-  }
-
   Future<void> _fetchDynamicUserAgent() async {
-    HeadlessInAppWebView? headlessWebView;
-    bool fetched = false;
-    final completer = Completer<void>();
-
-    void completeFetch() {
-      if (!completer.isCompleted) {
-        completer.complete();
-      }
-    }
-
-    void completeFetchError(Object error, StackTrace stackTrace) {
-      if (!completer.isCompleted) {
-        completer.completeError(error, stackTrace);
-      }
-    }
-
-    headlessWebView = HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: WebUri("https://localhost/")),
-      initialSettings: InAppWebViewSettings(useShouldInterceptRequest: true),
-      shouldInterceptRequest: (controller, request) async {
-        if (request.url.toString() == "https://localhost/") {
-          final headers =
-              request.headers?.map(
-                (key, value) => MapEntry(key.toLowerCase(), value),
-              ) ??
-              {};
-          final ua = headers['user-agent'];
-
-          if (ua != null && ua.isNotEmpty) {
-            _setDynamicUserAgentHeaders(_extractUserAgentHeaders(headers));
-            fetched = true;
-
-            logger.d("Fast fetched dynamic user agent: $dynamicUserAgent");
-            if (dynamicSecChUa != null) {
-              logger.d(
-                "Fast Client Hints - UA: $dynamicSecChUa, Mobile: $dynamicSecChUaMobile, Platform: $dynamicSecChUaPlatform",
-              );
-            }
-            completeFetch();
-          }
-
-          return WebResourceResponse(
-            contentType: "text/html",
-            data: Uint8List.fromList([]),
-            statusCode: 200,
-            reasonPhrase: "OK",
-            headers: {"Content-Type": "text/html; charset=utf-8"},
-          );
-        }
-        return null;
-      },
-      onLoadStop: (controller, url) async {
-        if (fetched) {
-          headlessWebView?.dispose();
-          completeFetch();
-          return;
-        }
-        try {
-          final jsSource = '''
-            (function() {
-              var result = {
-                userAgent: navigator.userAgent
-              };
-              
-              if (navigator.userAgentData) {
-                result.secChUa = navigator.userAgentData.brands
-                  .map(function(b) { return '"' + b.brand + '";v="' + b.version + '"'; })
-                  .join(', ');
-                result.secChUaMobile = navigator.userAgentData.mobile ? "?1" : "?0";
-                result.secChUaPlatform = '"' + navigator.userAgentData.platform + '"';
-              }
-              
-              return result;
-            })();
-          ''';
-
-          final uaResult = await controller.evaluateJavascript(
-            source: jsSource,
-          );
-
-          if (uaResult is Map) {
-            _setDynamicUserAgentHeaders({
-              if (uaResult['userAgent'] != null)
-                'user-agent': uaResult['userAgent'].toString(),
-              if (uaResult['secChUa'] != null)
-                'sec-ch-ua': uaResult['secChUa'].toString(),
-              if (uaResult['secChUaMobile'] != null)
-                'sec-ch-ua-mobile': uaResult['secChUaMobile'].toString(),
-              if (uaResult['secChUaPlatform'] != null)
-                'sec-ch-ua-platform': uaResult['secChUaPlatform'].toString(),
-            });
-
-            logger.d("Fetched dynamic user agent: $dynamicUserAgent");
-            if (dynamicSecChUa != null) {
-              logger.d(
-                "Client Hints - UA: $dynamicSecChUa, Mobile: $dynamicSecChUaMobile, Platform: $dynamicSecChUaPlatform",
-              );
-            }
-          }
-        } catch (e) {
-          logger.e("Failed to evaluate user agent script", error: e);
-        } finally {
-          headlessWebView?.dispose();
-          completeFetch();
-        }
-      },
-      onReceivedError: (controller, request, error) {
-        logger.e(
-          'Failed to get dynamic user agent: ${error.description}',
-          error: error,
-        );
-        headlessWebView?.dispose();
-        completeFetch();
-      },
-      onReceivedHttpError: (controller, request, errorResponse) {
-        logger.e(
-          'Failed to get dynamic user agent with status: ${errorResponse.statusCode}',
-        );
-        headlessWebView?.dispose();
-        completeFetch();
-      },
+    final userAgent = await InAppWebViewController.getDefaultUserAgent();
+    final headers = deriveBrowserUserAgentHeaders(
+      userAgent,
+      defaultTargetPlatform,
     );
-
-    try {
-      await headlessWebView.run();
-    } catch (error, stackTrace) {
-      headlessWebView.dispose();
-      completeFetchError(error, stackTrace);
+    if (headers == null) {
+      logger.w("Could not derive browser headers from user agent: $userAgent");
+      return;
     }
 
-    await completer.future;
+    _setDynamicUserAgentHeaders(headers);
+    logger.d("Fetched dynamic browser headers: $dynamicUserAgentHeaders");
   }
 
   Future<void> initData() async {
