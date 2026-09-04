@@ -143,6 +143,18 @@ class App extends HookConsumerWidget {
 
   late final _router = GoRouter(
     routes: [
+      GoRoute(
+        path: GagakuRoute.shareWebManga,
+        redirect: (BuildContext context, GoRouterState state) {
+          final share = GagakuRoute.parseWebMangaShareUri(state.uri);
+          if (share == null) return '/';
+
+          return WebMangaViewRoute(
+            sourceId: share.sourceId,
+            mangaId: share.mangaId,
+          ).location;
+        },
+      ),
       ...$appRoutes,
       GoRoute(
         path: _routingErrorLocation,

@@ -54,6 +54,41 @@ abstract class GagakuRoute {
   static const extensionInstall = '/extensions/install';
 
   static const config = '/config';
+
+  static const shareHost = 'r52.github.io';
+  static const shareWebManga = '/gagaku/open.html';
+  static const shareVersion = '1';
+  static const shareMangaType = 'manga';
+
+  static Uri webMangaShareUri({
+    required String sourceId,
+    required String mangaId,
+  }) {
+    return Uri.https(shareHost, shareWebManga, {
+      'v': shareVersion,
+      'type': shareMangaType,
+      'source': sourceId,
+      'manga': mangaId,
+    });
+  }
+
+  static ({String sourceId, String mangaId})? parseWebMangaShareUri(Uri uri) {
+    final query = uri.queryParameters;
+    final sourceId = query['source'];
+    final mangaId = query['manga'];
+
+    if (uri.path != shareWebManga ||
+        query['v'] != shareVersion ||
+        query['type'] != shareMangaType ||
+        sourceId == null ||
+        sourceId.isEmpty ||
+        mangaId == null ||
+        mangaId.isEmpty) {
+      return null;
+    }
+
+    return (sourceId: sourceId, mangaId: mangaId);
+  }
 }
 
 const gagakuLocalBox =
