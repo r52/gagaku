@@ -16,9 +16,7 @@ export class FormManager {
     });
     this._forms[id] = form;
 
-    if ("gagaku" in globalThis) {
-      await globalThis.gagaku?.callHandler("initializeForm", id, instanceId);
-    }
+    await globalThis.gagaku.callHandler("initializeForm", id, instanceId);
 
     return id;
   }
@@ -31,17 +29,13 @@ export class FormManager {
 
     delete this._forms[id];
 
-    if ("gagaku" in globalThis) {
-      globalThis.gagaku?.callHandler("uninitializeForm", id, instanceId);
-    }
+    globalThis.gagaku.callHandler("uninitializeForm", id, instanceId);
   }
 
   uninitializeForms(): void {
     Object.keys(this._forms).forEach((key) => delete this._forms[key]);
 
-    if ("gagaku" in globalThis) {
-      globalThis.gagaku?.callHandler("uninitializeForms");
-    }
+    globalThis.gagaku.callHandler("uninitializeForms");
   }
 
   getForm(id: string, instanceId?: string): Form | undefined {

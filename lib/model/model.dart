@@ -213,11 +213,6 @@ class GagakuData {
   }
 
   String? get dynamicUserAgent => dynamicUserAgentHeaders['user-agent'];
-  String? get dynamicSecChUa => dynamicUserAgentHeaders['sec-ch-ua'];
-  String? get dynamicSecChUaMobile =>
-      dynamicUserAgentHeaders['sec-ch-ua-mobile'];
-  String? get dynamicSecChUaPlatform =>
-      dynamicUserAgentHeaders['sec-ch-ua-platform'];
 
   Map<String, String> get browserUserAgentHeaders {
     return {

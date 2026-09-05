@@ -136,6 +136,7 @@ globalThis.console = Object.fromEntries(
   bool _hasAdvancedSearchForm = false;
   bool _hasSortOps = false;
   List<Cookie>? _cookies;
+  Map<String, String> _browserUserAgentHeaders = const {};
   StartupBrowserOutcome? _startupBrowserOutcome;
   Map<String, _CookieStateDiagnostic>? _lastCookieStoreCookies;
   final Map<String, FjsExtensionForm> _forms = {};
@@ -149,6 +150,9 @@ globalThis.console = Object.fromEntries(
 
   @override
   bool get hasSortOps => _hasSortOps;
+
+  @override
+  Map<String, String> get browserUserAgentHeaders => _browserUserAgentHeaders;
 
   @visibleForTesting
   StartupBrowserOutcome? get startupBrowserOutcome => _startupBrowserOutcome;
@@ -268,33 +272,24 @@ return JSON.stringify(value);
           ),
         ),
       );
-      final suppliedUserAgentHeaders = initialBrowserState?.userAgentHeaders;
-      final Map<String, String> defaultUserAgentHeaders;
-      if (suppliedUserAgentHeaders == null) {
-        defaultUserAgentHeaders = await _runInitStep(
-          'resolve default user agent headers',
-          () => GagakuData().resolveBrowserUserAgentHeaders(),
-        );
-      } else {
-        defaultUserAgentHeaders = suppliedUserAgentHeaders;
-      }
-      final userAgent = defaultUserAgentHeaders['user-agent'];
+      final startupBrowserState = await _runInitStep(
+        'load startup browser state',
+        () => _loadStartupBrowserState(source),
+      );
+      _browserUserAgentHeaders = Map.unmodifiable(
+        startupBrowserState.userAgentHeaders,
+      );
       debugPrint(
-        '$_logName user agent source='
-        '${suppliedUserAgentHeaders == null ? 'default' : 'manual'} '
+        '$_logName user agent startupOutcome=${startupBrowserState.outcome.name} '
         'fingerprint='
-        '${userAgent == null ? null : diagnosticUserAgentFingerprint(userAgent)}',
+        '${diagnosticUserAgentFingerprint(_browserUserAgentHeaders['user-agent']!)}',
       );
       await _runInitStep(
         'install host bridge',
         () => _evalGlobal(
-          _bootstrapScript(defaultUserAgentHeaders),
+          _bootstrapScript(_browserUserAgentHeaders),
           label: 'install host bridge',
         ),
-      );
-      final startupBrowserState = await _runInitStep(
-        'load startup browser state',
-        () => _loadStartupBrowserState(source),
       );
       await _runInitStep(
         'evaluate extension host',
@@ -403,6 +398,10 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
         outcome: StartupBrowserOutcome.manualBrowserState,
         cookies: cookieSelection.cookies,
         localStorage: suppliedState.localStorage,
+        userAgentHeaders: {
+          ...await GagakuData().resolveBrowserUserAgentHeaders(),
+          ...suppliedState.userAgentHeaders,
+        },
         requiresCloudflare: source.hasCapability(
           SourceIntents.cloudflareBypassRequired,
         ),
@@ -417,6 +416,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
         outcome: StartupBrowserOutcome.skippedNoBaseUrl,
         cookies: const <Cookie>[],
         localStorage: const <String, String>{},
+        userAgentHeaders: await GagakuData().resolveBrowserUserAgentHeaders(),
         requiresCloudflare: false,
         challengeObserved: false,
       );
@@ -442,6 +442,8 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     final cookieManager = CookieManager.instance();
     var latestCookies = <Cookie>[];
     var latestLocalStorage = <String, String>{};
+    var latestUserAgentHeaders = await GagakuData()
+        .resolveBrowserUserAgentHeaders();
     var challengeObserved = false;
     StartupBrowserException? pendingHttpError;
     String? initialCloudflareClearance;
@@ -463,6 +465,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
             outcome: outcome,
             cookies: latestCookies,
             localStorage: latestLocalStorage,
+            userAgentHeaders: latestUserAgentHeaders,
           ),
         );
       }
@@ -495,6 +498,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
           outcome: outcome,
           cookies: latestCookies,
           localStorage: latestLocalStorage,
+          userAgentHeaders: latestUserAgentHeaders,
         ),
       );
     }
@@ -531,6 +535,13 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
         latestCookies = cookieSelection.cookies;
 
         final controller = startupView?.webViewController;
+        if (controller != null) {
+          final headers = await readBrowserUserAgentHeaders(controller);
+          if (completer.isCompleted) {
+            return;
+          }
+          latestUserAgentHeaders = headers;
+        }
         if (requiresCloudflare && controller != null) {
           try {
             latestLocalStorage = await _readLocalStorage(controller);
@@ -665,12 +676,17 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
           completeDiagnosticOutcome(exception.outcome, exception);
         },
         onLoadStop: (controller, url) async {
-          if (url == null) {
+          if (url == null || completer.isCompleted) {
             return;
           }
 
           observeUrl(url);
           try {
+            final headers = await readBrowserUserAgentHeaders(controller);
+            if (completer.isCompleted) {
+              return;
+            }
+            latestUserAgentHeaders = headers;
             final httpError = pendingHttpError;
             if (httpError != null && !challengeObserved) {
               completeDiagnosticOutcome(httpError.outcome, httpError);
@@ -684,11 +700,17 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
               ),
               Uri.parse(url.toString()),
             );
+            if (completer.isCompleted) {
+              return;
+            }
             _logCookieSelection('headless-loaded', cookieSelection);
             final cookies = cookieSelection.cookies;
             latestCookies = cookies;
             if (requiresCloudflare) {
               latestLocalStorage = await _readLocalStorage(controller);
+            }
+            if (completer.isCompleted) {
+              return;
             }
 
             final hasClearance = _cloudflareClearance(cookies) != null;
@@ -753,6 +775,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     required StartupBrowserOutcome outcome,
     required List<Cookie> cookies,
     required Map<String, String> localStorage,
+    required Map<String, String> userAgentHeaders,
     required bool requiresCloudflare,
     required bool challengeObserved,
   }) {
@@ -768,6 +791,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
       outcome: outcome,
       cookies: cookies,
       localStorage: localStorage,
+      userAgentHeaders: userAgentHeaders,
     );
   }
 
@@ -1541,6 +1565,7 @@ return await globalThis.$sourceId.getSearchResults(
     _hasAdvancedSearchForm = false;
     _hasSortOps = false;
     _cookies = null;
+    _browserUserAgentHeaders = const {};
     _forms.clear();
 
     if (engine == null) {

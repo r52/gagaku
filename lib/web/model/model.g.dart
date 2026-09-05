@@ -119,7 +119,7 @@ final class SourceHeadersProvider
   }
 }
 
-String _$sourceHeadersHash() => r'eb2f2794f3f6affcba6a03390abdef24f1698aa8';
+String _$sourceHeadersHash() => r'4036165872f3dd1d3eb4a2986e82eba3a4c9f6a6';
 
 final class SourceHeadersFamily extends $Family
     with $FunctionalFamilyOverride<Map<String, String>, String> {
@@ -397,7 +397,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'53cc95b75cf54cf2298f57aefe92f2bec11e4d36';
+String _$extensionSourceHash() => r'f97ce629679a3173d004f9da1e00040894569cc7';
 
 final class ExtensionSourceFamily extends $Family
     with

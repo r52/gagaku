@@ -1,10 +1,64 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'cloudflare.g.dart';
+
+/// Reads identity from an existing browser, retaining compatible fallback hints
+/// when the page does not expose UA metadata. Never creates a WebView.
+Future<Map<String, String>> readBrowserUserAgentHeaders(
+  InAppWebViewController controller,
+) async {
+  final fallback = await GagakuData().resolveBrowserUserAgentHeaders();
+  try {
+    final encoded = await controller
+        .evaluateJavascript(
+          source: r'''
+JSON.stringify((() => {
+  const result = { "user-agent": navigator.userAgent };
+  const metadata = navigator.userAgentData;
+  if (metadata) {
+    result["sec-ch-ua"] = metadata.brands
+      .map((brand) => `${JSON.stringify(brand.brand)};v=${JSON.stringify(brand.version)}`)
+      .join(", ");
+    result["sec-ch-ua-mobile"] = metadata.mobile ? "?1" : "?0";
+    result["sec-ch-ua-platform"] = JSON.stringify(metadata.platform);
+  }
+  return result;
+})())
+''',
+        )
+        .timeout(const Duration(seconds: 2));
+    if (encoded is! String) {
+      return fallback;
+    }
+    final values = jsonDecode(encoded);
+    if (values is! Map) {
+      return fallback;
+    }
+    final captured = <String, String>{
+      for (final MapEntry(:key, :value) in values.entries)
+        if (key is String && value is String && value.isNotEmpty) key: value,
+    };
+    final userAgent = captured['user-agent'];
+    return {
+      ...fallback,
+      // A browser-reported UA may differ from the startup default (notably on
+      // Windows). Missing hints must describe that UA rather than the old one.
+      ...?userAgent == null
+          ? null
+          : deriveBrowserUserAgentHeaders(userAgent, defaultTargetPlatform),
+      ...captured,
+    };
+  } catch (error) {
+    debugPrint('Browser identity capture failed: ${error.runtimeType}');
+    return fallback;
+  }
+}
 
 class CloudflareBrowserState {
   const CloudflareBrowserState({
@@ -198,11 +252,13 @@ class StartupBrowserState {
     required this.outcome,
     required this.cookies,
     required this.localStorage,
+    required this.userAgentHeaders,
   });
 
   final StartupBrowserOutcome outcome;
   final List<Cookie> cookies;
   final Map<String, String> localStorage;
+  final Map<String, String> userAgentHeaders;
 }
 
 @Riverpod(keepAlive: true)

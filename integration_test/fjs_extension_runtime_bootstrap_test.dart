@@ -12,11 +12,30 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart'
     as inapp
     show Cookie;
 import 'package:gagaku/model/model.dart';
+import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/web/model/cloudflare.dart';
 import 'package:gagaku/web/model/fjs_extension_runtime.dart';
+import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
+
+// Keep repository/persistence setup out of this transport integration while
+// exercising the actual initialized fjs runtime and source-family boundary.
+class _InitializedExtensionSource extends ExtensionSource {
+  _InitializedExtensionSource(this.source, this.runtime);
+
+  final WebSourceInfo source;
+  final FjsExtensionRuntime runtime;
+
+  @override
+  Future<WebSourceInfo> build(String sourceId) async => source;
+
+  @override
+  Future<FjsExtensionRuntime> getRuntime() async => runtime;
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -25,17 +44,19 @@ void main() {
     dynamic storedState;
     dynamic storedSecureState;
     final gdat = GagakuData();
+    final previousHeaders = gdat.dynamicUserAgentHeaders;
     gdat.dynamicUserAgentHeaders = {
       'user-agent': 'Phase Test Browser/123',
       'sec-ch-ua': '"Phase Test Browser";v="123"',
       'sec-ch-ua-mobile': '?0',
-      'sec-ch-ua-platform': '"Linux"',
-      'sec-ch-ua-full-version-list': '"Phase Test Browser";v="123.4.5.6"',
+      'sec-ch-ua-platform': '"Windows"',
     };
     addTearDown(() {
-      gdat.dynamicUserAgentHeaders = {};
+      gdat.dynamicUserAgentHeaders = previousHeaders;
     });
     final receivedRequests = <Map<String, String?>>[];
+    final browserIdentity = Completer<Map<String, dynamic>>();
+    final firstExtensionIdentity = Completer<Map<String, String?>>();
     String? receivedFormDataContentType;
     String? receivedFormDataBody;
     String? receivedCrossOriginCookie;
@@ -72,6 +93,76 @@ void main() {
       ),
     );
     server.listen((request) async {
+      if (request.uri.path == '/browser-identity') {
+        final identity = jsonDecode(await utf8.decoder.bind(request).join());
+        if (!browserIdentity.isCompleted) {
+          browserIdentity.complete(Map<String, dynamic>.from(identity as Map));
+        }
+        request.response.statusCode = HttpStatus.noContent;
+        await request.response.close();
+        return;
+      }
+      if (request.uri.path == '/bootstrap-identity') {
+        firstExtensionIdentity.complete({
+          for (final name in const [
+            'user-agent',
+            'sec-ch-ua',
+            'sec-ch-ua-mobile',
+            'sec-ch-ua-platform',
+          ])
+            name: request.headers.value(name),
+        });
+        request.response.write('ready');
+        await request.response.close();
+        return;
+      }
+      if (request.uri.path == '/image-identity' ||
+          request.uri.path == '/image-cf-identity') {
+        final body = latin1.decode(
+          await request.fold<List<int>>(
+            [],
+            (bytes, chunk) => bytes..addAll(chunk),
+          ),
+        );
+        final cookies = request.headers.value(HttpHeaders.cookieHeader) ?? '';
+        if (request.uri.path == '/image-cf-identity') {
+          if (request.headers.value('sec-fetch-dest') == 'document') {
+            request.response
+              ..headers.contentType = ContentType.html
+              ..cookies.add(
+                Cookie('cf_clearance', 'image-clearance')..path = '/',
+              )
+              ..write('<html><title>Image clearance</title>ready</html>');
+            await request.response.close();
+            return;
+          }
+          if (!cookies.contains('cf_clearance=image-clearance')) {
+            request.response.statusCode = HttpStatus.serviceUnavailable;
+            await request.response.close();
+            return;
+          }
+        }
+        request.response
+          ..headers.contentType = ContentType('image', 'png')
+          ..write(
+            jsonEncode({
+              'identity': {
+                for (final name in const [
+                  'user-agent',
+                  'sec-ch-ua',
+                  'sec-ch-ua-mobile',
+                  'sec-ch-ua-platform',
+                ])
+                  name: request.headers.value(name),
+              },
+              'sourceId': request.headers.value('x-source-id'),
+              'cookie': cookies,
+              'body': body,
+            }),
+          );
+        await request.response.close();
+        return;
+      }
       if (request.uri.path == '/phase5') {
         request.response
           ..statusCode = 200
@@ -169,9 +260,6 @@ void main() {
           'sec-ch-ua': request.headers.value('sec-ch-ua'),
           'sec-ch-ua-mobile': request.headers.value('sec-ch-ua-mobile'),
           'sec-ch-ua-platform': request.headers.value('sec-ch-ua-platform'),
-          'sec-ch-ua-full-version-list': request.headers.value(
-            'sec-ch-ua-full-version-list',
-          ),
           'origin': request.headers.value('origin'),
           'referer': request.headers.value('referer'),
           'cookie': request.headers.value(HttpHeaders.cookieHeader),
@@ -231,11 +319,16 @@ void main() {
       request.response
         ..statusCode = 200
         ..headers.contentType = ContentType.html
-        ..write(
-          '<html><title>Startup</title><script>'
-          'localStorage.setItem("phase6", "startup-storage");'
-          '</script>startup</html>',
-        );
+        ..write(r'''<html><title>Startup</title><script>
+localStorage.setItem("phase6", "startup-storage");
+fetch("/browser-identity", {
+  method: "POST",
+  body: JSON.stringify({
+    userAgent: navigator.userAgent,
+    metadata: navigator.userAgentData.toJSON()
+  })
+});
+</script>startup</html>''');
       await request.response.close();
     });
 
@@ -282,7 +375,15 @@ void main() {
       ],
     );
 
-    await runtime.init(source, r'''
+    await runtime.init(
+      source,
+      '''
+await Application.scheduleRequest({
+  url: ${jsonEncode('${baseUrl}bootstrap-identity')},
+  method: "GET"
+});
+'''
+      r'''
 globalThis.source ??= {};
 let savedCloudflareCookies = [];
 let cloudflareRequest;
@@ -692,7 +793,75 @@ globalThis.source.phase2source = {
     };
   }
 };
-''');
+''',
+    );
+
+    final browser = await browserIdentity.future.timeout(
+      const Duration(seconds: 5),
+    );
+    final metadata = browser['metadata'] as Map<String, dynamic>;
+    final expectedIdentity = <String, String>{
+      'user-agent': browser['userAgent'] as String,
+      'sec-ch-ua': (metadata['brands'] as List)
+          .map((brand) => '"${brand['brand']}";v="${brand['version']}"')
+          .join(', '),
+      'sec-ch-ua-mobile': metadata['mobile'] == true ? '?1' : '?0',
+      'sec-ch-ua-platform': '"${metadata['platform']}"',
+    };
+    // This request runs at extension-body evaluation, before source initialise.
+    // Comparing to the page's own report catches a synthetic/late bootstrap.
+    expect(await firstExtensionIdentity.future, expectedIdentity);
+    expect(runtime.browserUserAgentHeaders, expectedIdentity);
+
+    final container = ProviderContainer(
+      overrides: [
+        extensionSourceProvider(
+          source.id,
+        ).overrideWith(() => _InitializedExtensionSource(source, runtime)),
+      ],
+    );
+    addTearDown(container.dispose);
+    final imageClientProvider = Provider<ExtensionHttpClient>((ref) {
+      final client = ExtensionHttpClient(http.Client(), ref);
+      ref.onDispose(client.close);
+      return client;
+    });
+    final imageClient = container.read(imageClientProvider);
+    final imageResponse = await imageClient.post(
+      Uri.parse('${baseUrl}image-identity'),
+      headers: {'x-source-id': source.id, 'cookie': 'session=image-session'},
+      body: 'café',
+      encoding: latin1,
+    );
+    final imageRequest = jsonDecode(imageResponse.body) as Map;
+    expect(imageRequest['identity'], expectedIdentity);
+    expect(imageRequest['sourceId'], isNull);
+    expect(imageRequest['body'], 'café');
+    expect(imageRequest['cookie'], contains('session=image-session'));
+    expect(imageRequest['cookie'], contains('cf_clearance=startup-clearance'));
+
+    final overriddenIdentity = {
+      'user-agent': 'Explicit Image Browser/1',
+      'sec-ch-ua': '"Explicit Image Browser";v="1"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"Windows"',
+    };
+    final explicitResponse = await imageClient.get(
+      Uri.parse('${baseUrl}image-identity'),
+      headers: {'x-source-id': source.id, ...overriddenIdentity},
+    );
+    expect(
+      (jsonDecode(explicitResponse.body) as Map)['identity'],
+      overriddenIdentity,
+    );
+    final solvedResponse = await imageClient.get(
+      Uri.parse('${baseUrl}image-cf-identity'),
+      headers: {'x-source-id': source.id, ...overriddenIdentity},
+    );
+    final solvedRequest = jsonDecode(solvedResponse.body) as Map;
+    expect(solvedRequest['identity'], expectedIdentity);
+    expect(solvedRequest['cookie'], contains('cf_clearance=image-clearance'));
+    expect(solvedRequest['cookie'], isNot(contains('startup-clearance')));
 
     expect(startupChallengeRequests, greaterThan(0));
     expect(runtime.hasAdvancedSearchForm, true);
@@ -899,14 +1068,9 @@ globalThis.source.phase2source = {
     expect(explicitOriginRequest['referer'], 'https://reader.example/explicit');
     expect(requestWithReferer['method'], 'POST');
     expect(requestWithReferer['x-phase'], 'intercepted');
-    expect(requestWithReferer['user-agent'], 'Phase Test Browser/123');
-    expect(requestWithReferer['sec-ch-ua'], '"Phase Test Browser";v="123"');
-    expect(requestWithReferer['sec-ch-ua-mobile'], '?0');
-    expect(requestWithReferer['sec-ch-ua-platform'], '"Linux"');
-    expect(
-      requestWithReferer['sec-ch-ua-full-version-list'],
-      '"Phase Test Browser";v="123.4.5.6"',
-    );
+    for (final MapEntry(:key, :value) in expectedIdentity.entries) {
+      expect(requestWithReferer[key], value, reason: key);
+    }
     expect(requestWithReferer['origin'], 'https://reader.example');
     expect(
       requestWithReferer['referer'],
@@ -914,7 +1078,7 @@ globalThis.source.phase2source = {
     );
     expect(requestWithReferer['cookie'], contains('session=abc'));
     expect(requestWithReferer['body'], 'hello from fjs');
-    expect(requestResult['defaultUserAgent'], 'Phase Test Browser/123');
+    expect(requestResult['defaultUserAgent'], expectedIdentity['user-agent']);
     expect(requestResult['status'], 201);
     expect(
       requestResult['headers'],

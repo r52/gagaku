@@ -96,56 +96,39 @@ export function ApplicationPolyfill(): typeof Application {
     getSecureState: (key) => secureStateStorage[key],
 
     setSecureState: (value, key) => {
-      if ("gagaku" in globalThis) {
-        if (value === undefined) {
-          value = null;
-        }
-
-        secureStateStorage[key] = value;
-        globalThis.gagaku?.callHandler(
-          "setExtensionSecureState",
-          secureStateStorage,
-          key,
-        );
-      } else {
-        secureStateStorage[key] = value;
+      if (value === undefined) {
+        value = null;
       }
+      secureStateStorage[key] = value;
+      globalThis.gagaku.callHandler(
+        "setExtensionSecureState",
+        secureStateStorage,
+        key,
+      );
     },
 
     getState: (key) => stateStorage[key],
 
     setState: (value, key) => {
-      if ("gagaku" in globalThis) {
-        if (value === undefined) {
-          value = null;
-        }
-
-        stateStorage[key] = value;
-        globalThis.gagaku?.callHandler(
-          "setExtensionState",
-          stateStorage,
-          key,
-        );
-      } else {
-        stateStorage[key] = value;
+      if (value === undefined) {
+        value = null;
       }
+      stateStorage[key] = value;
+      globalThis.gagaku.callHandler(
+        "setExtensionState",
+        stateStorage,
+        key,
+      );
     },
 
     resetAllState: () => {
       stateStorage = {};
 
-      if ("gagaku" in globalThis) {
-        globalThis.gagaku?.callHandler("resetAllState");
-      }
+      globalThis.gagaku.callHandler("resetAllState");
     },
 
-    executeInWebView: (context) => {
-      if ("gagaku" in globalThis) {
-        return globalThis.gagaku?.callHandler("executeInWebView", context);
-      }
-
-      throw new Error("`executeInWebView` is not available in this context.");
-    },
+    executeInWebView: (context) =>
+      globalThis.gagaku.callHandler("executeInWebView", context),
 
     // gagaku
     createExtensionState: (state: Record<string, any> | undefined) => {
@@ -181,9 +164,7 @@ export function ApplicationPolyfill(): typeof Application {
 
     // @ts-expect-error
     formDidChange: (formId: string) => {
-      if ("gagaku" in globalThis) {
-        globalThis.gagaku?.callHandler("formDidChange", formId);
-      }
+      globalThis.gagaku.callHandler("formDidChange", formId);
     },
 
     initializeForm: formManager.initializeForm.bind(formManager),
