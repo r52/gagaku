@@ -1682,7 +1682,7 @@ globalThis.source.unchallengedCloudflareSource = {
   );
 
   test(
-    'fjs runtime reconciles a clearance written before a delayed page load',
+    'fjs runtime rejects a rotated cookie while a challenge load is pending',
     () async {
       final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
       final baseUrl = 'http://127.0.0.1:${server.port}/';
@@ -1751,7 +1751,8 @@ globalThis.source.unchallengedCloudflareSource = {
         icon: '',
         capabilities: const [SourceIntents.cloudflareBypassRequired],
       );
-      await runtime.init(source, r'''
+      await expectLater(
+        runtime.init(source, r'''
 globalThis.source ??= {};
 globalThis.source.lateClearanceSource = {
   cloudflareBypassCompleted: async (request, cookies) => {
@@ -1762,12 +1763,14 @@ globalThis.source.lateClearanceSource = {
   },
   initialise: async () => {}
 };
-''');
+'''),
+        throwsA(isA<CloudflareBypassException>()),
+      );
 
-      expect(storedState, {'clearance': 'late-clearance'});
+      expect(storedState, isNull);
       expect(
         runtime.startupBrowserOutcome,
-        StartupBrowserOutcome.readyWithNewClearance,
+        StartupBrowserOutcome.manualResolutionRequired,
       );
     },
   );
@@ -2037,6 +2040,136 @@ globalThis.source.timedOutStartupSource = {
       expect(
         runtime.startupBrowserOutcome,
         StartupBrowserOutcome.indeterminateTimeout,
+      );
+    },
+  );
+
+  test('new clearance cannot override a completed challenge response', () async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    final baseUrl = 'http://127.0.0.1:${server.port}/';
+    final baseWebUri = WebUri(baseUrl);
+    await CookieManager.instance().deleteCookie(
+      url: baseWebUri,
+      name: 'cf_clearance',
+    );
+    addTearDown(() async {
+      await CookieManager.instance().deleteCookie(
+        url: baseWebUri,
+        name: 'cf_clearance',
+      );
+      await server.close(force: true);
+    });
+    server.listen((request) async {
+      request.response
+        ..statusCode = HttpStatus.forbidden
+        ..headers.set('cf-mitigated', 'challenge')
+        ..headers.contentType = ContentType.html
+        ..cookies.add(Cookie('cf_clearance', 'rotated-but-blocked')..path = '/')
+        // The response marker must win even if the document title looks benign.
+        ..write('<html><title>Ready</title>still challenged</html>');
+      await request.response.close();
+    });
+    var initialized = false;
+    final runtime = FjsExtensionRuntime(
+      sourceId: 'rotatedBlockedSource',
+      extensionHost: await rootBundle.loadString(
+        'assets/extensionhost/bundle.js',
+      ),
+      onResetAllState: (_) {},
+      onSetExtensionState: (_, _) => initialized = true,
+      onSetExtensionSecureState: (_, _) {},
+      getExtensionState: (_) => {},
+      getExtensionSecureState: (_) => {},
+      startupBrowserTimeout: const Duration(seconds: 2),
+    );
+    addTearDown(runtime.dispose);
+    final source = WebSourceInfo(
+      id: 'rotatedBlockedSource',
+      name: 'Rotated Blocked Source',
+      repo: 'test',
+      baseUrl: baseUrl,
+      icon: '',
+      capabilities: const [SourceIntents.cloudflareBypassRequired],
+    );
+    await expectLater(
+      runtime.init(source, r'''
+globalThis.source.rotatedBlockedSource = {
+  initialise: async () => Application.setState(true, "initialized")
+};
+'''),
+      throwsA(isA<CloudflareBypassException>()),
+    );
+    expect(initialized, false);
+    expect(
+      runtime.startupBrowserOutcome,
+      StartupBrowserOutcome.manualResolutionRequired,
+    );
+  });
+
+  test(
+    'navigation during metadata capture invalidates a ready candidate',
+    () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final baseUrl = 'http://127.0.0.1:${server.port}/';
+      var failedNavigation = false;
+      addTearDown(() => server.close(force: true));
+      server.listen((request) async {
+        if (request.uri.path == '/failed') {
+          failedNavigation = true;
+          request.response
+            ..statusCode = HttpStatus.serviceUnavailable
+            ..headers.contentType = ContentType.html
+            ..write('<html><title>Unavailable</title>failed navigation</html>');
+        } else {
+          request.response
+            ..headers.contentType = ContentType.html
+            ..write(r'''<html><title>Ready candidate</title><script>
+const metadata = navigator.userAgentData;
+Object.defineProperty(navigator, "userAgentData", {
+  get() {
+    location.replace("/failed");
+    return metadata;
+  }
+});
+</script></html>''');
+        }
+        await request.response.close();
+      });
+      var initialized = false;
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'metadataNavigationSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, _) => initialized = true,
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+        startupBrowserTimeout: const Duration(seconds: 3),
+      );
+      addTearDown(runtime.dispose);
+      final source = WebSourceInfo(
+        id: 'metadataNavigationSource',
+        name: 'Metadata Navigation Source',
+        repo: 'test',
+        baseUrl: baseUrl,
+        icon: '',
+        capabilities: const [SourceIntents.cloudflareBypassRequired],
+      );
+      await expectLater(
+        runtime.init(source, r'''
+globalThis.source.metadataNavigationSource = {
+  initialise: async () => Application.setState(true, "initialized")
+};
+'''),
+        throwsA(isA<StartupBrowserException>()),
+      );
+      expect(failedNavigation, true);
+      expect(initialized, false);
+      expect(
+        runtime.startupBrowserOutcome,
+        StartupBrowserOutcome.browserLoadFailed,
       );
     },
   );
