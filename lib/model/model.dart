@@ -103,11 +103,12 @@ const _knownHosts =
 const defaultBrowserUserAgent =
     'Mozilla/5.0 (Linux; Android 17; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/149.0.7827.5 Mobile Safari/537.36';
 const defaultSecChUa =
-    '"Chromium";v="149", "Android WebView";v="149", "Not_A Brand";v="99"';
+    '"Android WebView";v="149", "Chromium";v="149", "Not)A;Brand";v="24"';
 const defaultSecChUaMobile = '?1';
 const defaultSecChUaPlatform = '"Android"';
 
-/// Derives Chromium low-entropy Client Hints from a validated user agent.
+/// Synthesizes low-entropy hints for Android WebView and Windows WebView2.
+/// This follows Chromium's current GREASE algorithm, not authoritative metadata.
 Map<String, String>? deriveBrowserUserAgentHeaders(
   String userAgent,
   TargetPlatform platform,
@@ -124,28 +125,69 @@ Map<String, String>? deriveBrowserUserAgentHeaders(
     return null;
   }
 
-  final majorVersion = chromiumVersion.group(1)!;
-  final platformName = switch (platform) {
-    TargetPlatform.android => 'Android',
-    TargetPlatform.fuchsia => 'Fuchsia',
-    TargetPlatform.iOS => 'iOS',
-    TargetPlatform.linux => 'Linux',
-    TargetPlatform.macOS => 'macOS',
-    TargetPlatform.windows => 'Windows',
-  };
-  final browserBrand = userAgent.contains('; wv)')
-      ? 'Android WebView'
-      : 'Google Chrome';
+  final majorVersion = int.tryParse(chromiumVersion.group(1)!);
+  if (majorVersion == null) {
+    return null;
+  }
+
+  final (String, String, String) identity;
+  switch (platform) {
+    case TargetPlatform.android when userAgent.contains('; wv)'):
+      identity = ('Android WebView', '$majorVersion', 'Android');
+    case TargetPlatform.windows:
+      final edgeVersion = RegExp(
+        r'Edg/(\d+)(?:\.\d+){0,3}',
+      ).firstMatch(userAgent);
+      if (edgeVersion == null) {
+        return null;
+      }
+      identity = ('Microsoft Edge', edgeVersion.group(1)!, 'Windows');
+    default:
+      return null;
+  }
+  final (browserBrand, browserVersion, platformName) = identity;
 
   return {
     'user-agent': userAgent,
-    'sec-ch-ua':
-        '"Chromium";v="$majorVersion", '
-        '"$browserBrand";v="$majorVersion", '
-        '"Not_A Brand";v="99"',
+    'sec-ch-ua': _buildSecChUa(majorVersion, browserBrand, browserVersion),
     'sec-ch-ua-mobile': userAgent.contains(' Mobile ') ? '?1' : '?0',
     'sec-ch-ua-platform': '"$platformName"',
   };
+}
+
+String _buildSecChUa(
+  int chromiumMajor,
+  String browserBrand,
+  String browserVersion,
+) {
+  // Chromium 149: GetGreasedUserAgentBrandVersion and ShuffleBrandList.
+  // Update if Chromium changes its algorithm; the major alone handles releases.
+  // https://github.com/chromium/chromium/blob/149.0.7827.5/components/embedder_support/user_agent_utils.cc
+  const greaseChars = [' ', '(', ':', '-', '.', '/', ')', ';', '=', '?', '_'];
+  const greaseVersions = ['8', '99', '24'];
+  const orders = [
+    [0, 1, 2],
+    [0, 2, 1],
+    [1, 0, 2],
+    [1, 2, 0],
+    [2, 0, 1],
+    [2, 1, 0],
+  ];
+  final greaseBrand =
+      'Not${greaseChars[chromiumMajor % greaseChars.length]}'
+      'A${greaseChars[(chromiumMajor + 1) % greaseChars.length]}Brand';
+  final greaseVersion = greaseVersions[chromiumMajor % greaseVersions.length];
+  final brands = [
+    '"$greaseBrand";v="$greaseVersion"',
+    '"Chromium";v="$chromiumMajor"',
+    '"$browserBrand";v="$browserVersion"',
+  ];
+  final order = orders[chromiumMajor % orders.length];
+  final shuffled = List<String>.filled(3, '');
+  for (var i = 0; i < brands.length; i++) {
+    shuffled[order[i]] = brands[i];
+  }
+  return shuffled.join(', ');
 }
 
 class GagakuData {
