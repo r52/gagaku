@@ -8,16 +8,28 @@ Direct calls to native `fetch` do not receive these defaults automatically.
 
 Identity is captured from the existing source-startup browser, or reused from
 manual Cloudflare resolution, before extension code executes. Missing browser
-metadata uses the Android WebView/Windows WebView2 synthesis baseline. Non-CF
-sources retain best-effort startup and fallback metadata on browser failure;
-CF-capable sources fail initialization on browser failure or timeout. Captures
+metadata uses the Android WebView/Windows WebView2 synthesis baseline. Captures
 containing fallback values are not guaranteed-authoritative metadata.
+
+Startup failure policy is shared by all source types:
+
+| Failure | Non-CF source | CF-capable source |
+| --- | --- | --- |
+| HTTP/navigation failure or document-load timeout | Continue with diagnostic state and fallback metadata | Fail; request manual resolution if a challenge was observed |
+| Preparation, native setup, or document-inspection failure/deadline | Fail with `infrastructureFailed` | Fail with `infrastructureFailed`, even after a challenge |
+| Cleanup failure | Fail with `infrastructureFailed` if no primary failure exists | Same |
+
+Unavailable ancillary UA metadata/local storage still uses its fallback; it is
+not itself an infrastructure failure. A stalled inspection is an infrastructure
+failure. HTTP failure evidence is retained even when the response is a challenge
+and the source has not declared Cloudflare capability. Setup deadlines cannot
+publish late readiness; native creation that finishes late retains cleanup
+ownership. Cleanup errors are logged without replacing an existing failure.
 
 CF-capable sources require a loaded, non-challenge document for startup readiness.
 A rotated clearance cookie alone cannot resolve an active challenge or unfinished
 navigation. Once a challenge has been observed, readiness also requires a new
-clearance cookie;
-an unresolved challenge requires manual resolution. Metadata capture cannot
+clearance cookie; an unresolved challenge requires manual resolution. Metadata capture cannot
 override failure evidence, and navigation changes invalidate pending captures.
 
 The same runtime identity supplies extension cover/image HTTP defaults. A

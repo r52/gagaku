@@ -2173,4 +2173,289 @@ globalThis.source.metadataNavigationSource = {
       );
     },
   );
+
+  for (final scenario in [
+    (
+      name: 'non-CF challenge responses retain HTTP failure diagnostics',
+      cloudflare: false,
+      timeout: const Duration(seconds: 3),
+      status: HttpStatus.forbidden,
+      challenge: true,
+      holdResponse: false,
+      script: '',
+      outcome: StartupBrowserOutcome.browserLoadFailed,
+      fatal: false,
+    ),
+    (
+      name: 'CF timeout without challenge is not manual resolution',
+      cloudflare: true,
+      timeout: const Duration(seconds: 1),
+      status: HttpStatus.ok,
+      challenge: false,
+      holdResponse: true,
+      script: '',
+      outcome: StartupBrowserOutcome.indeterminateTimeout,
+      fatal: true,
+    ),
+    for (final cloudflare in [false, true])
+      (
+        name: 'setup deadline is an infrastructure failure (CF=$cloudflare)',
+        cloudflare: cloudflare,
+        timeout: Duration.zero,
+        status: HttpStatus.ok,
+        challenge: false,
+        holdResponse: false,
+        script: '',
+        outcome: StartupBrowserOutcome.infrastructureFailed,
+        fatal: true,
+      ),
+    (
+      name: 'unavailable ancillary metadata does not fail a ready CF page',
+      cloudflare: true,
+      timeout: const Duration(seconds: 3),
+      status: HttpStatus.ok,
+      challenge: false,
+      holdResponse: false,
+      script: r'''
+Object.defineProperty(navigator, "userAgentData", {
+  get() { throw new Error("metadata unavailable"); }
+});
+Object.defineProperty(window, "localStorage", {
+  get() { throw new Error("storage unavailable"); }
+});
+''',
+      outcome: StartupBrowserOutcome.readyWithoutChallenge,
+      fatal: false,
+    ),
+    (
+      name: 'inspection deadline is an infrastructure failure',
+      cloudflare: true,
+      timeout: const Duration(seconds: 1),
+      status: HttpStatus.ok,
+      challenge: false,
+      holdResponse: false,
+      script: r'''
+const metadata = navigator.userAgentData;
+Object.defineProperty(navigator, "userAgentData", {
+  get() {
+    // A bounded slow platform evaluation, not a stalled HTTP document.
+    const deadline = performance.now() + 2500;
+    while (performance.now() < deadline) {}
+    return metadata;
+  }
+});
+''',
+      outcome: StartupBrowserOutcome.infrastructureFailed,
+      fatal: true,
+    ),
+  ]) {
+    test(scenario.name, () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final url = WebUri('http://127.0.0.1:${server.port}/');
+      await CookieManager.instance().deleteCookie(
+        url: url,
+        name: 'cf_clearance',
+      );
+      final release = Completer<void>();
+      addTearDown(() async {
+        if (!release.isCompleted) release.complete();
+        await server.close(force: true);
+        await CookieManager.instance().deleteCookie(
+          url: url,
+          name: 'cf_clearance',
+        );
+      });
+      server.listen((request) async {
+        if (scenario.holdResponse) {
+          await release.future;
+          return;
+        }
+        request.response
+          ..statusCode = scenario.status
+          ..headers.contentType = ContentType.html;
+        if (scenario.challenge) {
+          request.response.headers.set('cf-mitigated', 'challenge');
+        }
+        request.response.write(
+          '<html><title>Ready</title><script>${scenario.script}</script>ready</html>',
+        );
+        await request.response.close();
+      });
+      var initialized = false;
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'outcomeSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, _) => initialized = true,
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+        startupBrowserTimeout: scenario.timeout,
+      );
+      addTearDown(runtime.dispose);
+      final source = WebSourceInfo(
+        id: 'outcomeSource',
+        name: 'Outcome Source',
+        repo: 'test',
+        baseUrl: url.toString(),
+        icon: '',
+        capabilities: [
+          if (scenario.cloudflare) SourceIntents.cloudflareBypassRequired,
+        ],
+      );
+      final initialization = runtime.init(source, r'''
+globalThis.source.outcomeSource = {
+  initialise: async () => Application.setState(true, "initialized")
+};
+''');
+      if (scenario.fatal) {
+        await expectLater(
+          initialization,
+          throwsA(
+            isA<StartupBrowserException>().having(
+              (error) => error.outcome,
+              'outcome',
+              scenario.outcome,
+            ),
+          ),
+        );
+      } else {
+        await initialization;
+      }
+      expect(initialized, !scenario.fatal);
+      expect(runtime.startupBrowserOutcome, scenario.outcome);
+    });
+  }
+
+  test('an observed challenge can recover through a same-URL reload', () async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    final url = WebUri('http://127.0.0.1:${server.port}/');
+    await CookieManager.instance().deleteCookie(url: url, name: 'cf_clearance');
+    addTearDown(() async {
+      await server.close(force: true);
+      await CookieManager.instance().deleteCookie(
+        url: url,
+        name: 'cf_clearance',
+      );
+    });
+    var released = false;
+    var readyRequested = false;
+    server.listen((request) async {
+      if (request.uri.path == '/release') {
+        released = true;
+        request.response.cookies.add(
+          Cookie('cf_clearance', 'recovered-clearance')..path = '/',
+        );
+      } else if (!released) {
+        request.response
+          ..statusCode = HttpStatus.forbidden
+          ..headers.set('cf-mitigated', 'challenge')
+          ..headers.contentType = ContentType.html
+          ..write(r'''<html><title>Just a moment...</title><script>
+window.addEventListener("load", () => {
+  setTimeout(async () => {
+    await fetch("/release");
+    location.reload();
+  }, 300);
+});
+</script>challenge</html>''');
+      } else {
+        readyRequested = true;
+        request.response
+          ..headers.contentType = ContentType.html
+          ..write('<html><title>Recovered</title>ready</html>');
+      }
+      await request.response.close();
+    });
+    dynamic initializedClearance;
+    final runtime = FjsExtensionRuntime(
+      sourceId: 'recoveredSource',
+      extensionHost: await rootBundle.loadString(
+        'assets/extensionhost/bundle.js',
+      ),
+      onResetAllState: (_) {},
+      onSetExtensionState: (_, value) =>
+          initializedClearance = (value as Map)['initialized'],
+      onSetExtensionSecureState: (_, _) {},
+      getExtensionState: (_) => {},
+      getExtensionSecureState: (_) => {},
+      startupBrowserTimeout: const Duration(seconds: 5),
+    );
+    addTearDown(runtime.dispose);
+    await runtime.init(
+      WebSourceInfo(
+        id: 'recoveredSource',
+        name: 'Recovered Source',
+        repo: 'test',
+        baseUrl: url.toString(),
+        icon: '',
+        capabilities: const [SourceIntents.cloudflareBypassRequired],
+      ),
+      r'''
+let clearance;
+globalThis.source.recoveredSource = {
+  cloudflareBypassCompleted: async (request, cookies) => {
+    clearance = cookies.find(cookie => cookie.name === "cf_clearance").value;
+  },
+  initialise: async () => Application.setState(clearance, "initialized")
+};
+''',
+    );
+    expect(readyRequested, true);
+    expect(initializedClearance, 'recovered-clearance');
+    expect(
+      runtime.startupBrowserOutcome,
+      StartupBrowserOutcome.readyWithNewClearance,
+    );
+  });
+
+  test(
+    'invalid supplied-state target retains its preparation failure cause',
+    () async {
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'invalidTargetSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        initialBrowserState: const CloudflareBrowserState(
+          cookies: [],
+          localStorage: {},
+          userAgentHeaders: {},
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, _) {},
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+      );
+      addTearDown(runtime.dispose);
+      await expectLater(
+        runtime.init(
+          WebSourceInfo(
+            id: 'invalidTargetSource',
+            name: 'Invalid Target Source',
+            repo: 'test',
+            baseUrl: 'http://[',
+            icon: '',
+          ),
+          'throw new Error("extension body must not execute");',
+        ),
+        throwsA(
+          isA<StartupBrowserException>()
+              .having(
+                (error) => error.outcome,
+                'outcome',
+                StartupBrowserOutcome.infrastructureFailed,
+              )
+              .having((error) => error.cause, 'cause', isA<FormatException>()),
+        ),
+      );
+      expect(
+        runtime.startupBrowserOutcome,
+        StartupBrowserOutcome.infrastructureFailed,
+      );
+    },
+  );
 }

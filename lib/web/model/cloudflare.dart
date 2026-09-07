@@ -118,19 +118,15 @@ BrowserCookieSelection selectBrowserCookiesForUrl(
   DateTime? now,
 }) {
   final currentTime = now ?? DateTime.now();
-  final candidates = <({Cookie cookie, int index})>[];
+  final selected = <String, ({Cookie cookie, int index})>{};
   final counts = <String, int>{};
 
   for (final (index, cookie) in cookies.indexed) {
     if (!_browserCookieApplies(cookie, url, currentTime)) {
       continue;
     }
-    candidates.add((cookie: cookie, index: index));
+    final candidate = (cookie: cookie, index: index);
     counts.update(cookie.name, (count) => count + 1, ifAbsent: () => 1);
-  }
-
-  final selected = <String, ({Cookie cookie, int index})>{};
-  for (final candidate in candidates) {
     final existing = selected[candidate.cookie.name];
     if (existing == null ||
         _compareBrowserCookies(candidate, existing, url) > 0) {
@@ -226,6 +222,7 @@ enum StartupBrowserOutcome {
   manualResolutionRequired,
   indeterminateTimeout,
   browserLoadFailed,
+  infrastructureFailed,
 }
 
 class StartupBrowserException implements Exception {
