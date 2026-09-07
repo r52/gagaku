@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:fjs/fjs.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart'
@@ -325,7 +326,7 @@ fetch("/browser-identity", {
   method: "POST",
   body: JSON.stringify({
     userAgent: navigator.userAgent,
-    metadata: navigator.userAgentData.toJSON()
+    metadata: navigator.userAgentData?.toJSON?.() ?? null
   })
 });
 </script>startup</html>''');
@@ -799,14 +800,19 @@ globalThis.source.phase2source = {
     final browser = await browserIdentity.future.timeout(
       const Duration(seconds: 5),
     );
-    final metadata = browser['metadata'] as Map<String, dynamic>;
+    final metadata = browser['metadata'] as Map<String, dynamic>?;
+    final userAgent = browser['userAgent'] as String;
     final expectedIdentity = <String, String>{
-      'user-agent': browser['userAgent'] as String,
-      'sec-ch-ua': (metadata['brands'] as List)
-          .map((brand) => '"${brand['brand']}";v="${brand['version']}"')
-          .join(', '),
-      'sec-ch-ua-mobile': metadata['mobile'] == true ? '?1' : '?0',
-      'sec-ch-ua-platform': '"${metadata['platform']}"',
+      ...gdat.browserUserAgentHeaders,
+      ...?deriveBrowserUserAgentHeaders(userAgent, defaultTargetPlatform),
+      'user-agent': userAgent,
+      if (metadata != null) ...{
+        'sec-ch-ua': (metadata['brands'] as List)
+            .map((brand) => '"${brand['brand']}";v="${brand['version']}"')
+            .join(', '),
+        'sec-ch-ua-mobile': metadata['mobile'] == true ? '?1' : '?0',
+        'sec-ch-ua-platform': '"${metadata['platform']}"',
+      },
     };
     // This request runs at extension-body evaluation, before source initialise.
     // Comparing to the page's own report catches a synthetic/late bootstrap.
@@ -2458,4 +2464,127 @@ globalThis.source.recoveredSource = {
       );
     },
   );
+
+  for (final clientHints in [true, false]) {
+    test(
+      'browser capture seeds unresolved global HTTP identity once (hints=$clientHints)',
+      () async {
+        final gdat = GagakuData();
+        final previousHeaders = gdat.dynamicUserAgentHeaders;
+        gdat.dynamicUserAgentHeaders = {};
+        addTearDown(() => gdat.dynamicUserAgentHeaders = previousHeaders);
+        final fallback = gdat.browserUserAgentHeaders;
+        final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+        addTearDown(() => server.close(force: true));
+        final baseUrl = 'http://127.0.0.1:${server.port}';
+        const headerNames = [
+          'user-agent',
+          'sec-ch-ua',
+          'sec-ch-ua-mobile',
+          'sec-ch-ua-platform',
+        ];
+        final nativeRequests = <Map<String, String?>>[];
+        var reportedUserAgent = '';
+        Map<String, Object>? reportedMetadata;
+        server.listen((request) async {
+          if (request.uri.path != '/startup') {
+            final identity = {
+              for (final name in headerNames) name: request.headers.value(name),
+            };
+            if (request.uri.path == '/native') nativeRequests.add(identity);
+            request.response
+              ..headers.contentType = ContentType.json
+              ..write(jsonEncode(identity));
+          } else {
+            request.response
+              ..headers.contentType = ContentType.html
+              ..write('''<html><title>Identity</title><script>
+Object.defineProperty(navigator, "userAgent", {value: ${jsonEncode(reportedUserAgent)}});
+Object.defineProperty(navigator, "userAgentData", {value: ${jsonEncode(reportedMetadata)}});
+</script>ready</html>''');
+          }
+          await request.response.close();
+        });
+        final container = ProviderContainer();
+        addTearDown(container.dispose);
+        final imageClientProvider = Provider<ExtensionHttpClient>((ref) {
+          final client = ExtensionHttpClient(http.Client(), ref);
+          ref.onDispose(client.close);
+          return client;
+        });
+        final globalClient = container.read(imageClientProvider);
+        final host = await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        );
+        Map<String, String>? firstCapturedIdentity;
+        // Empty capture must not freeze the fallback into global identity. Later
+        // captures may seed it once, but must not replace an established identity.
+        for (final major in [null, 135, 136]) {
+          final windows =
+              clientHints || defaultTargetPlatform == TargetPlatform.windows;
+          reportedUserAgent = major == null
+              ? ''
+              : windows
+              ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$major.0.0.0 Safari/537.36 Edg/$major.0.0.0'
+              : 'Mozilla/5.0 (Linux; Android 10; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/$major.0.0.0 Mobile Safari/537.36';
+          reportedMetadata = clientHints && major != null
+              ? {
+                  'brands': [
+                    {'brand': 'Chromium', 'version': '$major'},
+                    {'brand': 'Microsoft Edge', 'version': '$major'},
+                  ],
+                  'mobile': false,
+                  'platform': 'Windows',
+                }
+              : null;
+          final expected = major == null
+              ? fallback
+              : clientHints
+              ? {
+                  'user-agent': reportedUserAgent,
+                  'sec-ch-ua':
+                      '"Chromium";v="$major", "Microsoft Edge";v="$major"',
+                  'sec-ch-ua-mobile': '?0',
+                  'sec-ch-ua-platform': '"Windows"',
+                }
+              : deriveBrowserUserAgentHeaders(
+                  reportedUserAgent,
+                  defaultTargetPlatform,
+                )!;
+          final runtime = FjsExtensionRuntime(
+            sourceId: 'identitySource',
+            extensionHost: host,
+            onResetAllState: (_) {},
+            onSetExtensionState: (_, _) {},
+            onSetExtensionSecureState: (_, _) {},
+            getExtensionState: (_) => {},
+            getExtensionSecureState: (_) => {},
+          );
+          addTearDown(runtime.dispose);
+          await runtime.init(
+            WebSourceInfo(
+              id: 'identitySource',
+              name: 'Identity Source',
+              repo: 'test',
+              baseUrl: '$baseUrl/startup',
+              icon: '',
+            ),
+            '''
+await Application.scheduleRequest({url: ${jsonEncode('$baseUrl/native')}, method: "GET"});
+globalThis.source.identitySource = {initialise: async () => {}};
+''',
+          );
+          expect(nativeRequests.last, expected);
+          if (major != null) firstCapturedIdentity ??= expected;
+          // Solver identity is cached by host, not port. Use localhost for these
+          // defaults, separate from the bootstrap test's 127.0.0.1 image solve.
+          final response = await globalClient.get(
+            Uri.parse('http://localhost:${server.port}/global'),
+          );
+          expect(jsonDecode(response.body), firstCapturedIdentity ?? fallback);
+          await runtime.dispose();
+        }
+      },
+    );
+  }
 }

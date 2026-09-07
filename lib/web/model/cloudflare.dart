@@ -13,7 +13,8 @@ part 'cloudflare.g.dart';
 Future<Map<String, String>> readBrowserUserAgentHeaders(
   InAppWebViewController controller,
 ) async {
-  final fallback = await GagakuData().resolveBrowserUserAgentHeaders();
+  final gdat = GagakuData();
+  final fallback = await gdat.resolveBrowserUserAgentHeaders();
   try {
     final encoded = await controller
         .evaluateJavascript(
@@ -45,7 +46,7 @@ JSON.stringify((() => {
         if (key is String && value is String && value.isNotEmpty) key: value,
     };
     final userAgent = captured['user-agent'];
-    return {
+    final headers = <String, String>{
       ...fallback,
       // A browser-reported UA may differ from the startup default (notably on
       // Windows). Missing hints must describe that UA rather than the old one.
@@ -54,6 +55,13 @@ JSON.stringify((() => {
           : deriveBrowserUserAgentHeaders(userAgent, defaultTargetPlatform),
       ...captured,
     };
+    // Windows has no native default-UA getter. Seed global HTTP defaults from
+    // the first actual browser capture, without replacing an established identity
+    // or treating a fallback-only result as a successful capture.
+    if (userAgent != null && gdat.dynamicUserAgent == null) {
+      gdat.dynamicUserAgentHeaders = Map.unmodifiable(headers);
+    }
+    return headers;
   } catch (error) {
     debugPrint('Browser identity capture failed: ${error.runtimeType}');
     return fallback;

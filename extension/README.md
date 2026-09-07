@@ -11,6 +11,12 @@ manual Cloudflare resolution, before extension code executes. Missing browser
 metadata uses the Android WebView/Windows WebView2 synthesis baseline. Captures
 containing fallback values are not guaranteed-authoritative metadata.
 
+When native default-UA lookup is unavailable (notably Windows), the first
+successful browser UA capture also seeds the global HTTP identity. Empty or
+failed captures leave it unresolved; an established identity is never replaced
+by subsequent captures. The static fallback remains in use until that first
+capture. Browsers without UA client hints use synthesis from the captured UA.
+
 Startup failure policy is shared by all source types:
 
 | Failure | Non-CF source | CF-capable source |
