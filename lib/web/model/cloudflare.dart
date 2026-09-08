@@ -46,19 +46,25 @@ JSON.stringify((() => {
         if (key is String && value is String && value.isNotEmpty) key: value,
     };
     final userAgent = captured['user-agent'];
+    final derived = userAgent == null
+        ? null
+        : deriveBrowserUserAgentHeaders(userAgent, defaultTargetPlatform);
     final headers = <String, String>{
       ...fallback,
       // A browser-reported UA may differ from the startup default (notably on
       // Windows). Missing hints must describe that UA rather than the old one.
-      ...?userAgent == null
-          ? null
-          : deriveBrowserUserAgentHeaders(userAgent, defaultTargetPlatform),
+      ...?derived,
       ...captured,
     };
     // Windows has no native default-UA getter. Seed global HTTP defaults from
-    // the first actual browser capture, without replacing an established identity
-    // or treating a fallback-only result as a successful capture.
-    if (userAgent != null && gdat.dynamicUserAgent == null) {
+    // the first complete captured or synthesized identity, without replacing an
+    // established identity or freezing unrelated fallback hints beside a new UA.
+    if (userAgent != null &&
+        gdat.dynamicUserAgent == null &&
+        (derived != null ||
+            (captured.containsKey('sec-ch-ua') &&
+                captured.containsKey('sec-ch-ua-mobile') &&
+                captured.containsKey('sec-ch-ua-platform')))) {
       gdat.dynamicUserAgentHeaders = Map.unmodifiable(headers);
     }
     return headers;

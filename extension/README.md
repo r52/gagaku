@@ -12,10 +12,12 @@ metadata uses the Android WebView/Windows WebView2 synthesis baseline. Captures
 containing fallback values are not guaranteed-authoritative metadata.
 
 When native default-UA lookup is unavailable (notably Windows), the first
-successful browser UA capture also seeds the global HTTP identity. Empty or
-failed captures leave it unresolved; an established identity is never replaced
-by subsequent captures. The static fallback remains in use until that first
-capture. Browsers without UA client hints use synthesis from the captured UA.
+complete browser identity also seeds the global HTTP identity. Promotion requires
+a nonempty captured UA plus either supported UA synthesis or all three captured
+client hints. Empty, failed, or unsupported partial captures leave it unresolved;
+subsequent captures do not replace an established identity. The static fallback
+remains in use until an eligible capture arrives. Per-runtime captures still use
+best-effort fallback for missing metadata.
 
 Startup failure policy is shared by all source types:
 
@@ -31,6 +33,9 @@ failure. HTTP failure evidence is retained even when the response is a challenge
 and the source has not declared Cloudflare capability. Setup deadlines cannot
 publish late readiness; native creation that finishes late retains cleanup
 ownership. Cleanup errors are logged without replacing an existing failure.
+Each document start retains its matching early HTTP response and discards
+preempted response evidence, so an abandoned navigation cannot block the newer
+document's completion. History-only URL changes do not discard failure evidence.
 
 CF-capable sources require a loaded, non-challenge document for startup readiness.
 A rotated clearance cookie alone cannot resolve an active challenge or unfinished

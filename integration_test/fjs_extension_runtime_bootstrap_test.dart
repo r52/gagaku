@@ -2517,17 +2517,19 @@ Object.defineProperty(navigator, "userAgentData", {value: ${jsonEncode(reportedM
           'assets/extensionhost/bundle.js',
         );
         Map<String, String>? firstCapturedIdentity;
-        // Empty capture must not freeze the fallback into global identity. Later
-        // captures may seed it once, but must not replace an established identity.
-        for (final major in [null, 135, 136]) {
+        // Empty and unsupported partial captures must leave global identity
+        // unresolved so a later complete capture can seed it exactly once.
+        for (final major in [null, 134, 135, 136]) {
           final windows =
               clientHints || defaultTargetPlatform == TargetPlatform.windows;
           reportedUserAgent = major == null
               ? ''
+              : major == 134
+              ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36'
               : windows
               ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$major.0.0.0 Safari/537.36 Edg/$major.0.0.0'
               : 'Mozilla/5.0 (Linux; Android 10; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/$major.0.0.0 Mobile Safari/537.36';
-          reportedMetadata = clientHints && major != null
+          reportedMetadata = clientHints && major != null && major != 134
               ? {
                   'brands': [
                     {'brand': 'Chromium', 'version': '$major'},
@@ -2539,6 +2541,8 @@ Object.defineProperty(navigator, "userAgentData", {value: ${jsonEncode(reportedM
               : null;
           final expected = major == null
               ? fallback
+              : major == 134
+              ? {...fallback, 'user-agent': reportedUserAgent}
               : clientHints
               ? {
                   'user-agent': reportedUserAgent,
@@ -2575,7 +2579,7 @@ globalThis.source.identitySource = {initialise: async () => {}};
 ''',
           );
           expect(nativeRequests.last, expected);
-          if (major != null) firstCapturedIdentity ??= expected;
+          if (major != null && major != 134) firstCapturedIdentity ??= expected;
           // Solver identity is cached by host, not port. Use localhost for these
           // defaults, separate from the bootstrap test's 127.0.0.1 image solve.
           final response = await globalClient.get(

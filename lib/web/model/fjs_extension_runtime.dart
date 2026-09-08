@@ -712,9 +712,10 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
               navigationUrl = url ?? navigationUrl;
               pageLoaded = false;
               response = navigationResponses.remove(navigationUrl.toString());
-              if (incomingResponseUrl?.toString() == navigationUrl.toString()) {
-                incomingResponseUrl = null;
-              }
+              // Only this document's early response survives a new start.
+              // Other pending errors were preempted and must not block its stop.
+              navigationResponses.clear();
+              incomingResponseUrl = null;
               observeUrl(url);
             },
             onUpdateVisitedHistory: (controller, url, isReload) {
