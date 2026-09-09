@@ -160,54 +160,10 @@ class _LocalDocumentReaderScreenState extends State<LocalDocumentReaderScreen> {
     _pointerDownPosition = null;
   }
 
-  Widget _buildReader(BuildContext context, Publication publication) {
-    final customBuilder = widget.readerBuilder;
-    if (customBuilder != null) return customBuilder(context, publication);
-
-    return ReadiumReaderWidget(
-      publication: publication,
-      allowedDefaultActions: const {},
-      onExternalLinkActivated: _blockExternalLink,
-      onTextSelected: (event) {
-        logger.d(
-          'Local document reader selected text '
-          '(${event.selectedText?.length ?? 0} characters)',
-        );
-      },
-    );
-  }
-
-  Widget _buildBody(BuildContext context) {
-    final state = _controller.state;
-    return switch (state.phase) {
-      LocalDocumentSessionPhase.loading => const Center(
-        child: CircularProgressIndicator(),
-      ),
-      LocalDocumentSessionPhase.failure => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(
-            context.t.localLibrary.documentOpenFailed,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-      LocalDocumentSessionPhase.closed => const SizedBox.shrink(),
-      LocalDocumentSessionPhase.ready => LayoutBuilder(
-        builder: (context, constraints) => Listener(
-          behavior: HitTestBehavior.translucent,
-          onPointerDown: _onPointerDown,
-          onPointerMove: _onPointerMove,
-          onPointerUp: (event) => _onPointerUp(event, constraints.maxWidth),
-          onPointerCancel: _onPointerCancel,
-          child: _buildReader(context, state.publication!),
-        ),
-      ),
-    };
-  }
-
   @override
   Widget build(BuildContext context) {
+    final state = _controller.state;
+    final readerBuilder = widget.readerBuilder;
     return PopScope(
       canPop: _allowPop,
       onPopInvokedWithResult: (didPop, result) {
@@ -219,7 +175,44 @@ class _LocalDocumentReaderScreenState extends State<LocalDocumentReaderScreen> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              _buildBody(context),
+              switch (state.phase) {
+                LocalDocumentSessionPhase.loading => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                LocalDocumentSessionPhase.failure => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      context.t.localLibrary.documentOpenFailed,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                LocalDocumentSessionPhase.closed => const SizedBox.shrink(),
+                LocalDocumentSessionPhase.ready => LayoutBuilder(
+                  builder: (context, constraints) => Listener(
+                    behavior: HitTestBehavior.translucent,
+                    onPointerDown: _onPointerDown,
+                    onPointerMove: _onPointerMove,
+                    onPointerUp: (event) =>
+                        _onPointerUp(event, constraints.maxWidth),
+                    onPointerCancel: _onPointerCancel,
+                    child: readerBuilder != null
+                        ? readerBuilder(context, state.publication!)
+                        : ReadiumReaderWidget(
+                            publication: state.publication!,
+                            allowedDefaultActions: const {},
+                            onExternalLinkActivated: _blockExternalLink,
+                            onTextSelected: (event) {
+                              logger.d(
+                                'Local document reader selected text '
+                                '(${event.selectedText?.length ?? 0} characters)',
+                              );
+                            },
+                          ),
+                  ),
+                ),
+              },
               _DocumentChrome(
                 visible: _chromeVisible,
                 descriptor: widget.descriptor,
