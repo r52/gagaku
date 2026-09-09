@@ -85,6 +85,12 @@ class LocalLibraryHomeScreen extends StatelessWidget {
             OverflowBar(
               spacing: 8.0,
               children: [
+                IconButton(
+                  color: theme.colorScheme.onPrimaryContainer,
+                  icon: const Icon(Icons.settings),
+                  tooltip: tr.arg_settings(arg: tr.localLibrary.text),
+                  onPressed: () => nav.push(LocalLibrarySettingsRouteBuilder()),
+                ),
                 MenuAnchor(
                   builder: (context, controller, child) => IconButton(
                     color: theme.colorScheme.onPrimaryContainer,
@@ -112,13 +118,6 @@ class LocalLibraryHomeScreen extends StatelessWidget {
                       },
                       leadingIcon: const Icon(Icons.folder_open),
                       child: Text(tr.localLibrary.readArchive),
-                    ),
-                    MenuItemButton(
-                      onPressed: () {
-                        nav.push(LocalLibrarySettingsRouteBuilder());
-                      },
-                      leadingIcon: const Icon(Icons.settings),
-                      child: Text(tr.settings),
                     ),
                   ],
                 ),

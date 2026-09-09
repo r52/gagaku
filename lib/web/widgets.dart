@@ -101,6 +101,11 @@ class WebSourceSliverAppBar extends ConsumerWidget {
                 ),
               ),
             ),
+            IconButton(
+              icon: const Icon(Icons.settings),
+              tooltip: tr.arg_settings(arg: tr.webSources.text),
+              onPressed: () => nav.push(WebSourceSettingsRouteBuilder()),
+            ),
             MenuAnchor(
               builder: (context, controller, _) => IconButton(
                 icon: const Icon(Icons.more_vert),
@@ -141,11 +146,6 @@ class WebSourceSliverAppBar extends ConsumerWidget {
                   leadingIcon: const Icon(Icons.open_in_browser),
                   onPressed: () => openLinkDialog(context, resolver),
                   child: Text(tr.webSources.openLink),
-                ),
-                MenuItemButton(
-                  leadingIcon: const Icon(Icons.settings),
-                  onPressed: () => nav.push(WebSourceSettingsRouteBuilder()),
-                  child: Text(tr.arg_settings(arg: tr.webSources.text)),
                 ),
               ],
             ),
