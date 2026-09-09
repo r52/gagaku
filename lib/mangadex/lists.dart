@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util/riverpod.dart';
-import 'package:gagaku/drawer.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/login_password.dart';
 import 'package:gagaku/mangadex/model/model.dart';
@@ -134,7 +133,6 @@ class MangaDexListsWidget extends HookConsumerWidget {
     );
 
     return Scaffold(
-      drawer: const MainDrawer(),
       floatingActionButton: FloatingActionButton.extended(
         tooltip: t.mangadex.newList,
         icon: const Icon(Icons.playlist_add),

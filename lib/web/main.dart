@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/drawer.dart';
+import 'package:gagaku/app_navigation.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
-import 'package:gagaku/util/util.dart';
+import 'package:gagaku/model/startup_section.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -49,9 +49,6 @@ class WebSourceHomePage extends HookConsumerWidget {
         }
       };
     }, []);
-
-    final useRail = DeviceContext.useNavigationRail(context);
-    final extendRail = DeviceContext.extendNavigationRail(context);
 
     void onDestination(int idx) {
       if (idx == selectedIndex) {
@@ -101,62 +98,15 @@ class WebSourceHomePage extends HookConsumerWidget {
       ),
     ];
 
-    if (useRail) {
-      return Scaffold(
-        restorationId: 'extension_home_restore',
-        drawer: const MainDrawer(),
-        body: Row(
-          children: [
-            NavigationRail(
-              selectedIndex: selectedIndex,
-              onDestinationSelected: onDestination,
-              extended: extendRail,
-              labelType: extendRail
-                  ? NavigationRailLabelType.none
-                  : NavigationRailLabelType.selected,
-              destinations: destinations,
-            ),
-            const VerticalDivider(thickness: 1, width: 1),
-            Expanded(
-              child: DefaultScrollController(
-                controller: activeController,
-                child: child,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Scaffold(
+    return AppNavigationScaffold(
+      section: StartupSection.webSources,
       restorationId: 'extension_home_restore',
-      drawer: const MainDrawer(),
-      body: DefaultScrollController(controller: activeController, child: child),
-      bottomNavigationBar: NavigationBar(
-        height: 60,
-        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        destinations: [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: tr.webSources.home,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.menu_book),
-            label: tr.chapterFeed.latestUpdates,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.favorite_border),
-            selectedIcon: Icon(Icons.favorite),
-            label: tr.webSources.favorites,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.history),
-            label: tr.history.text,
-          ),
-        ],
-        selectedIndex: selectedIndex,
-        onDestinationSelected: onDestination,
+      destinations: destinations,
+      selectedIndex: selectedIndex,
+      onDestinationSelected: onDestination,
+      child: DefaultScrollController(
+        controller: activeController,
+        child: child,
       ),
     );
   }

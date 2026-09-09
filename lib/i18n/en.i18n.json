@@ -1,4 +1,20 @@
 {
+  "navigation": {
+    "read": "Read",
+    "expand": "Expand navigation",
+    "collapse": "Collapse navigation",
+    "openMenu": "Open navigation",
+    "menuUpdateAvailable": "Open navigation: update available",
+    "globalSettings": "Settings",
+    "mangaDex": "MangaDex"
+  },
+  "about": {
+    "flutter": "Flutter: $version",
+    "dart": "Dart: $version",
+    "builtOn": "Built on: $timestamp",
+    "license": "License: MIT",
+    "sourceCode": "Source code on GitHub"
+  },
   "ui": {
     "add": "Add",
     "addNew": "Add New",

@@ -8,7 +8,6 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/model/config.dart';
-import 'package:gagaku/drawer.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/model/startup_section.dart';
 import 'package:gagaku/model/types.dart';
@@ -18,6 +17,7 @@ import 'package:gagaku/settings/refresh.dart';
 import 'package:gagaku/settings/sync.dart';
 import 'package:gagaku/sync/metadata.dart';
 import 'package:gagaku/util/ui.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -174,394 +174,413 @@ class AppSettingsPage extends HookConsumerWidget {
       StartupSection.localLibrary: t.startup.localLibrary,
     };
 
-    return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: TitleFlexBar(title: t.arg_settings(arg: 'Gagaku')),
-      ),
-      drawer: const MainDrawer(),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          children: [
-            BottomSheetSettingTile(
-              title: Text(t.startup.section, style: titleStyle),
-              subtitle: Text(t.startup.sectionSub),
-              trailing: Text(startupSectionLabels[startupSection.value]!),
-              builder: (context) {
-                return RadioGroup<StartupSection>(
-                  groupValue: startupSection.value,
-                  onChanged: (StartupSection? value) async {
-                    if (value == null) return;
+    final canPop = GoRouter.of(context).canPop();
+    void goBack() {
+      if (canPop) {
+        context.pop();
+      } else {
+        context.go(StartupSection.load().location);
+      }
+    }
 
-                    await value.save();
-                    startupSection.value = value;
-                    if (context.mounted) Navigator.of(context).pop();
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (final section in StartupSection.values)
-                        RadioListTile<StartupSection>(
-                          title: Text(startupSectionLabels[section]!),
-                          value: section,
-                        ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            BottomSheetSettingTile(
-              title: Text(t.theme.mode, style: titleStyle),
-              trailing: Text(
-                cfg.themeMode == ThemeMode.light
-                    ? t.theme.light
-                    : cfg.themeMode == ThemeMode.dark
-                    ? t.theme.dark
-                    : t.theme.system,
+    return PopScope(
+      canPop: canPop,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) goBack();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: BackButton(onPressed: goBack),
+          flexibleSpace: TitleFlexBar(title: t.arg_settings(arg: 'Gagaku')),
+        ),
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            children: [
+              BottomSheetSettingTile(
+                title: Text(t.startup.section, style: titleStyle),
+                subtitle: Text(t.startup.sectionSub),
+                trailing: Text(startupSectionLabels[startupSection.value]!),
+                builder: (context) {
+                  return RadioGroup<StartupSection>(
+                    groupValue: startupSection.value,
+                    onChanged: (StartupSection? value) async {
+                      if (value == null) return;
+
+                      await value.save();
+                      startupSection.value = value;
+                      if (context.mounted) Navigator.of(context).pop();
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (final section in StartupSection.values)
+                          RadioListTile<StartupSection>(
+                            title: Text(startupSectionLabels[section]!),
+                            value: section,
+                          ),
+                      ],
+                    ),
+                  );
+                },
               ),
-              builder: (context) {
-                return RadioGroup<ThemeMode>(
-                  groupValue: cfg.themeMode,
-                  onChanged: (ThemeMode? value) {
-                    if (value != null) {
-                      final c = cfg.copyWith(themeMode: value);
-                      ref.run(
-                        (tsx) async =>
-                            tsx.get(gagakuSettingsProvider.notifier).save(c),
-                      );
-                      Navigator.of(context).pop();
-                    }
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      RadioListTile<ThemeMode>(
-                        title: Text(t.theme.light),
-                        value: ThemeMode.light,
-                      ),
-                      RadioListTile<ThemeMode>(
-                        title: Text(t.theme.dark),
-                        value: ThemeMode.dark,
-                      ),
-                      RadioListTile<ThemeMode>(
-                        title: Text(t.theme.system),
-                        value: ThemeMode.system,
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            BottomSheetSettingTile(
-              title: Text(t.theme.color, style: titleStyle),
-              trailing: Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: cfg.theme.color,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: theme.colorScheme.onSurface),
+              BottomSheetSettingTile(
+                title: Text(t.theme.mode, style: titleStyle),
+                trailing: Text(
+                  cfg.themeMode == ThemeMode.light
+                      ? t.theme.light
+                      : cfg.themeMode == ThemeMode.dark
+                      ? t.theme.dark
+                      : t.theme.system,
                 ),
-              ),
-              builder: (context) {
-                return Wrap(
-                  spacing: 12.0,
-                  runSpacing: 12.0,
-                  children: [
-                    for (final c in GagakuTheme.values)
-                      InkWell(
-                        onTap: () {
-                          final newCfg = cfg.copyWith(theme: c);
-                          ref.run(
-                            (tsx) async => tsx
-                                .get(gagakuSettingsProvider.notifier)
-                                .save(newCfg),
-                          );
-                          Navigator.of(context).pop();
-                        },
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: c.color,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: cfg.theme == c
-                                      ? theme.colorScheme.primary
-                                      : theme.colorScheme.onSurface,
-                                  width: cfg.theme == c ? 3 : 1,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(t[c.label]),
-                          ],
+                builder: (context) {
+                  return RadioGroup<ThemeMode>(
+                    groupValue: cfg.themeMode,
+                    onChanged: (ThemeMode? value) {
+                      if (value != null) {
+                        final c = cfg.copyWith(themeMode: value);
+                        ref.run(
+                          (tsx) async =>
+                              tsx.get(gagakuSettingsProvider.notifier).save(c),
+                        );
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RadioListTile<ThemeMode>(
+                          title: Text(t.theme.light),
+                          value: ThemeMode.light,
                         ),
-                      ),
-                  ],
-                );
-              },
-            ),
-
-            // --- Update settings ---
-            SwitchListTile(
-              title: Text(t.updates.checkForUpdates, style: titleStyle),
-              subtitle: Text(t.updates.checkForUpdatesSub),
-              value: cfg.checkForUpdates,
-              onChanged: (bool value) {
-                final c = cfg.copyWith(checkForUpdates: value);
-                ref.run(
-                  (tsx) async =>
-                      tsx.get(gagakuSettingsProvider.notifier).save(c),
-                );
-              },
-            ),
-            BottomSheetSettingTile(
-              title: Text(t.updates.updateChannel, style: titleStyle),
-              subtitle: Text(t.updates.updateChannelSub),
-              trailing: Text(cfg.updateChannel),
-              builder: (context) {
-                return RadioGroup<String>(
-                  groupValue: cfg.updateChannel,
-                  onChanged: (String? value) {
-                    if (value != null) {
-                      final c = cfg.copyWith(updateChannel: value);
-                      ref.run(
-                        (tsx) async =>
-                            tsx.get(gagakuSettingsProvider.notifier).save(c),
-                      );
-                      Navigator.of(context).pop();
-                    }
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      RadioListTile<String>(
-                        title: Text(t.updates.channelStable),
-                        value: 'stable',
-                      ),
-                      RadioListTile<String>(
-                        title: Text(t.updates.channelBeta),
-                        value: 'beta',
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            BottomSheetSettingTile(
-              title: Text(t.updates.checkFrequency, style: titleStyle),
-              subtitle: Text(t.updates.checkFrequencySub),
-              trailing: Text('${cfg.updateCheckCooldownHours}h'),
-              builder: (context) {
-                return RadioGroup<int>(
-                  groupValue: cfg.updateCheckCooldownHours,
-                  onChanged: (int? value) {
-                    if (value != null) {
-                      final c = cfg.copyWith(updateCheckCooldownHours: value);
-                      ref.run(
-                        (tsx) async =>
-                            tsx.get(gagakuSettingsProvider.notifier).save(c),
-                      );
-                      Navigator.of(context).pop();
-                    }
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      RadioListTile<int>(
-                        title: Text(t.updates.freqHourly),
-                        value: 1,
-                      ),
-                      RadioListTile<int>(
-                        title: Text(t.updates.freqDaily),
-                        value: 24,
-                      ),
-                      RadioListTile<int>(
-                        title: Text(t.updates.freqWeekly),
-                        value: 168,
-                      ),
-                      RadioListTile<int>(
-                        title: Text(t.updates.freqMonthly),
-                        value: 720,
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            SettingTile(
-              title: Text(t.cache.clear, style: titleStyle),
-              subtitle: Text(t.cache.clearSub),
-              trailing: const Icon(Icons.delete_sweep),
-              onTap: () async {
-                final result = await showDialog<bool>(
-                  context: context,
-                  builder: (BuildContext context) {
-                    final nav = Navigator.of(context);
-                    return AlertDialog(
-                      title: Text(t.cache.clear),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(t.cache.clearWarning),
-                          Text(t.ui.irreversibleWarning),
-                        ],
-                      ),
-                      actions: <Widget>[
-                        ElevatedButton(
-                          child: Text(t.ui.no),
-                          onPressed: () {
-                            nav.pop(null);
-                          },
+                        RadioListTile<ThemeMode>(
+                          title: Text(t.theme.dark),
+                          value: ThemeMode.dark,
                         ),
-                        TextButton(
-                          onPressed: () {
-                            nav.pop(true);
-                          },
-                          child: Text(t.ui.yes),
+                        RadioListTile<ThemeMode>(
+                          title: Text(t.theme.system),
+                          value: ThemeMode.system,
                         ),
                       ],
-                    );
-                  },
-                );
-
-                if (result == true) {
-                  await cache.clearAll();
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context)
-                    ..removeCurrentSnackBar()
-                    ..showSnackBar(
-                      SnackBar(
-                        content: Text(t.cache.clearSuccess),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                }
-              },
-            ),
-            const SyncSettingsSection(),
-            HookBuilder(
-              builder: (context) {
-                final isLoading = useState(false);
-
-                return SettingTile(
-                  title: Text(t.backup.data, style: titleStyle),
-                  subtitle: Text(t.backup.dataSub),
-                  trailing: isLoading.value
-                      ? SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.save),
-                  onTap: isLoading.value
-                      ? null
-                      : () async {
-                          isLoading.value = true;
-                          final result = await _backupData(context);
-                          isLoading.value = false;
-
-                          if (result != null) {
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context)
-                              ..removeCurrentSnackBar()
-                              ..showSnackBar(
-                                SnackBar(
-                                  content: Text(t.backup.success),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                          } else {
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context)
-                              ..removeCurrentSnackBar()
-                              ..showSnackBar(
-                                SnackBar(
-                                  content: Text(t.backup.cancelled),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                          }
-                        },
-                );
-              },
-            ),
-            HookBuilder(
-              builder: (context) {
-                final isLoading = useState(false);
-                return SettingTile(
-                  title: Text(t.backup.restore, style: titleStyle),
-                  subtitle: Text(t.backup.fromFile),
-                  trailing: isLoading.value
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.settings_backup_restore),
-                  onTap: isLoading.value
-                      ? null
-                      : () async {
-                          isLoading.value = true;
-                          final result = await _restoreBackup(context);
-                          isLoading.value = false;
-
-                          String msg = t.backup.restoreSuccess;
-                          Color bg = Colors.green;
-
-                          if (!context.mounted) return;
-                          switch (result) {
-                            case true:
-                              msg = t.backup.restoreSuccess;
-                              bg = Colors.green;
-                              break;
-                            case false:
-                              msg = t.backup.restoreFail;
-                              bg = Colors.red;
-                              break;
-                            case null:
-                              msg = t.backup.restoreCancelled;
-                              bg = Colors.red;
-                              break;
-                          }
-
-                          if (!context.mounted) return;
-                          ScaffoldMessenger.of(context)
-                            ..removeCurrentSnackBar()
-                            ..showSnackBar(
-                              SnackBar(content: Text(msg), backgroundColor: bg),
-                            );
-                        },
-                );
-              },
-            ),
-            SettingTile(
-              title: Text(t.backup.dataLocation, style: titleStyle),
-              subtitle: Text(
-                '${dataLocation.value ?? t.backup.dataLocDefault}\n'
-                '${t.backup.dataLocSub}',
+                    ),
+                  );
+                },
               ),
-              trailing: const Icon(Icons.folder_open),
-              onTap: () async {
-                final perms = await Permission.manageExternalStorage.request();
+              BottomSheetSettingTile(
+                title: Text(t.theme.color, style: titleStyle),
+                trailing: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: cfg.theme.color,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: theme.colorScheme.onSurface),
+                  ),
+                ),
+                builder: (context) {
+                  return Wrap(
+                    spacing: 12.0,
+                    runSpacing: 12.0,
+                    children: [
+                      for (final c in GagakuTheme.values)
+                        InkWell(
+                          onTap: () {
+                            final newCfg = cfg.copyWith(theme: c);
+                            ref.run(
+                              (tsx) async => tsx
+                                  .get(gagakuSettingsProvider.notifier)
+                                  .save(newCfg),
+                            );
+                            Navigator.of(context).pop();
+                          },
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: c.color,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: cfg.theme == c
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.onSurface,
+                                    width: cfg.theme == c ? 3 : 1,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(t[c.label]),
+                            ],
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
 
-                if (perms.isGranted) {
-                  String? selectedDirectory =
-                      await FilePicker.getDirectoryPath();
+              // --- Update settings ---
+              SwitchListTile(
+                title: Text(t.updates.checkForUpdates, style: titleStyle),
+                subtitle: Text(t.updates.checkForUpdatesSub),
+                value: cfg.checkForUpdates,
+                onChanged: (bool value) {
+                  final c = cfg.copyWith(checkForUpdates: value);
+                  ref.run(
+                    (tsx) async =>
+                        tsx.get(gagakuSettingsProvider.notifier).save(c),
+                  );
+                },
+              ),
+              BottomSheetSettingTile(
+                title: Text(t.updates.updateChannel, style: titleStyle),
+                subtitle: Text(t.updates.updateChannelSub),
+                trailing: Text(cfg.updateChannel),
+                builder: (context) {
+                  return RadioGroup<String>(
+                    groupValue: cfg.updateChannel,
+                    onChanged: (String? value) {
+                      if (value != null) {
+                        final c = cfg.copyWith(updateChannel: value);
+                        ref.run(
+                          (tsx) async =>
+                              tsx.get(gagakuSettingsProvider.notifier).save(c),
+                        );
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RadioListTile<String>(
+                          title: Text(t.updates.channelStable),
+                          value: 'stable',
+                        ),
+                        RadioListTile<String>(
+                          title: Text(t.updates.channelBeta),
+                          value: 'beta',
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              BottomSheetSettingTile(
+                title: Text(t.updates.checkFrequency, style: titleStyle),
+                subtitle: Text(t.updates.checkFrequencySub),
+                trailing: Text('${cfg.updateCheckCooldownHours}h'),
+                builder: (context) {
+                  return RadioGroup<int>(
+                    groupValue: cfg.updateCheckCooldownHours,
+                    onChanged: (int? value) {
+                      if (value != null) {
+                        final c = cfg.copyWith(updateCheckCooldownHours: value);
+                        ref.run(
+                          (tsx) async =>
+                              tsx.get(gagakuSettingsProvider.notifier).save(c),
+                        );
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RadioListTile<int>(
+                          title: Text(t.updates.freqHourly),
+                          value: 1,
+                        ),
+                        RadioListTile<int>(
+                          title: Text(t.updates.freqDaily),
+                          value: 24,
+                        ),
+                        RadioListTile<int>(
+                          title: Text(t.updates.freqWeekly),
+                          value: 168,
+                        ),
+                        RadioListTile<int>(
+                          title: Text(t.updates.freqMonthly),
+                          value: 720,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              SettingTile(
+                title: Text(t.cache.clear, style: titleStyle),
+                subtitle: Text(t.cache.clearSub),
+                trailing: const Icon(Icons.delete_sweep),
+                onTap: () async {
+                  final result = await showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext context) {
+                      final nav = Navigator.of(context);
+                      return AlertDialog(
+                        title: Text(t.cache.clear),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(t.cache.clearWarning),
+                            Text(t.ui.irreversibleWarning),
+                          ],
+                        ),
+                        actions: <Widget>[
+                          ElevatedButton(
+                            child: Text(t.ui.no),
+                            onPressed: () {
+                              nav.pop(null);
+                            },
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              nav.pop(true);
+                            },
+                            child: Text(t.ui.yes),
+                          ),
+                        ],
+                      );
+                    },
+                  );
 
-                  if (selectedDirectory != null) {
-                    await gbox.put('data_location', selectedDirectory);
-                    dataLocation.value = selectedDirectory;
+                  if (result == true) {
+                    await cache.clearAll();
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context)
+                      ..removeCurrentSnackBar()
+                      ..showSnackBar(
+                        SnackBar(
+                          content: Text(t.cache.clearSuccess),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
                   }
-                }
-              },
-            ),
-          ],
+                },
+              ),
+              const SyncSettingsSection(),
+              HookBuilder(
+                builder: (context) {
+                  final isLoading = useState(false);
+
+                  return SettingTile(
+                    title: Text(t.backup.data, style: titleStyle),
+                    subtitle: Text(t.backup.dataSub),
+                    trailing: isLoading.value
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.save),
+                    onTap: isLoading.value
+                        ? null
+                        : () async {
+                            isLoading.value = true;
+                            final result = await _backupData(context);
+                            isLoading.value = false;
+
+                            if (result != null) {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context)
+                                ..removeCurrentSnackBar()
+                                ..showSnackBar(
+                                  SnackBar(
+                                    content: Text(t.backup.success),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                            } else {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context)
+                                ..removeCurrentSnackBar()
+                                ..showSnackBar(
+                                  SnackBar(
+                                    content: Text(t.backup.cancelled),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                            }
+                          },
+                  );
+                },
+              ),
+              HookBuilder(
+                builder: (context) {
+                  final isLoading = useState(false);
+                  return SettingTile(
+                    title: Text(t.backup.restore, style: titleStyle),
+                    subtitle: Text(t.backup.fromFile),
+                    trailing: isLoading.value
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.settings_backup_restore),
+                    onTap: isLoading.value
+                        ? null
+                        : () async {
+                            isLoading.value = true;
+                            final result = await _restoreBackup(context);
+                            isLoading.value = false;
+
+                            String msg = t.backup.restoreSuccess;
+                            Color bg = Colors.green;
+
+                            if (!context.mounted) return;
+                            switch (result) {
+                              case true:
+                                msg = t.backup.restoreSuccess;
+                                bg = Colors.green;
+                                break;
+                              case false:
+                                msg = t.backup.restoreFail;
+                                bg = Colors.red;
+                                break;
+                              case null:
+                                msg = t.backup.restoreCancelled;
+                                bg = Colors.red;
+                                break;
+                            }
+
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context)
+                              ..removeCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(msg),
+                                  backgroundColor: bg,
+                                ),
+                              );
+                          },
+                  );
+                },
+              ),
+              SettingTile(
+                title: Text(t.backup.dataLocation, style: titleStyle),
+                subtitle: Text(
+                  '${dataLocation.value ?? t.backup.dataLocDefault}\n'
+                  '${t.backup.dataLocSub}',
+                ),
+                trailing: const Icon(Icons.folder_open),
+                onTap: () async {
+                  final perms = await Permission.manageExternalStorage
+                      .request();
+
+                  if (perms.isGranted) {
+                    String? selectedDirectory =
+                        await FilePicker.getDirectoryPath();
+
+                    if (selectedDirectory != null) {
+                      await gbox.put('data_location', selectedDirectory);
+                      dataLocation.value = selectedDirectory;
+                    }
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

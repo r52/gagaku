@@ -165,10 +165,10 @@ packages:
     dependency: "direct main"
     description:
       name: cached_network_image_ce
-      sha256: "20d35070c8a9a767086d350608cda24a292bad7fbcc1c69e486e2c6125928084"
+      sha256: "8fdd544f275dcbbdad3012fc497a15dd0a6984fc431130b16ac4929e19e542a8"
       url: "https://pub.dev"
     source: hosted
-    version: "4.10.1"
+    version: "4.11.1"
   cached_network_image_platform_interface_ce:
     dependency: transitive
     description:
@@ -661,18 +661,18 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_readium
-      sha256: f89598f7b4e9f93657ee9dd6ab13a14d410114b38516ebbc79022fb2e5bdbf7e
+      sha256: f90d9f1b17fbfed6be1579e0e9dd443e352aa811ea78e3757c5d1c46a6cb8cf1
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.3"
+    version: "0.4.4"
   flutter_readium_platform_interface:
     dependency: transitive
     description:
       name: flutter_readium_platform_interface
-      sha256: "18dc1968982776f3824833c4c4f67aad69f2fce209500f6bfd43076b5929202b"
+      sha256: "6f752d138f3c0903875d2f8c96a120a4a1d61d8f55d1c36aea10f9866cf695d5"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.3"
+    version: "0.4.4"
   flutter_riverpod:
     dependency: transitive
     description:
@@ -985,10 +985,10 @@ packages:
     dependency: "direct main"
     description:
       name: logger
-      sha256: "25aee487596a6257655a1e091ec2ae66bc30e7af663592cc3a27e6591e05035c"
+      sha256: "2a0dc097e7b01d942475bdd552356db2d0f768b05540bd4b2b53f1840f2239a7"
       url: "https://pub.dev"
     source: hosted
-    version: "2.7.0"
+    version: "2.8.0"
   logging:
     dependency: transitive
     description:
@@ -1282,10 +1282,10 @@ packages:
     dependency: transitive
     description:
       name: platform
-      sha256: "5d6b1b0036a5f331ebc77c850ebc8506cbc1e9416c27e59b439f917a902a4984"
+      sha256: a36d119c13416516a7b5913fbe8af8531e11633d784c550b2125f76c758524ec
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.6"
+    version: "3.2.0"
   plugin_platform_interface:
     dependency: transitive
     description:

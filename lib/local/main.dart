@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/drawer.dart';
+import 'package:gagaku/app_navigation.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/local/archive_reader.dart';
 import 'package:gagaku/local/model/config.dart';
@@ -15,6 +15,8 @@ import 'package:gagaku/local/model/document_session.dart';
 import 'package:gagaku/local/model/model.dart';
 import 'package:gagaku/local/settings.dart';
 import 'package:gagaku/local/widgets.dart';
+import 'package:gagaku/model/startup_section.dart';
+import 'package:gagaku/util/util.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -70,123 +72,106 @@ class LocalLibraryHomeScreen extends StatelessWidget {
     final nav = Navigator.of(context);
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: TitleFlexBar(title: tr.localLibrary.text),
-        actions: [
-          OverflowBar(
-            spacing: 8.0,
-            children: [
-              MenuAnchor(
-                builder: (context, controller, child) => IconButton(
-                  color: theme.colorScheme.onPrimaryContainer,
-                  onPressed: () {
-                    if (controller.isOpen) {
-                      controller.close();
-                    } else {
-                      controller.open();
-                    }
-                  },
-                  icon: const Icon(Icons.more_vert),
-                ),
-                menuChildren: [
-                  if (Platform.isAndroid)
+    return AppNavigationScaffold(
+      section: StartupSection.localLibrary,
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          leading: DeviceContext.useNavigationRail(context)
+              ? null
+              : const AppNavigationButton(),
+          flexibleSpace: TitleFlexBar(title: tr.localLibrary.text),
+          actions: [
+            OverflowBar(
+              spacing: 8.0,
+              children: [
+                MenuAnchor(
+                  builder: (context, controller, child) => IconButton(
+                    color: theme.colorScheme.onPrimaryContainer,
+                    onPressed: () {
+                      if (controller.isOpen) {
+                        controller.close();
+                      } else {
+                        controller.open();
+                      }
+                    },
+                    icon: const Icon(Icons.more_vert),
+                  ),
+                  menuChildren: [
+                    if (Platform.isAndroid)
+                      MenuItemButton(
+                        onPressed: () async {
+                          await _readDocument(nav);
+                        },
+                        leadingIcon: const Icon(Icons.menu_book),
+                        child: Text(tr.localLibrary.readDocument),
+                      ),
                     MenuItemButton(
                       onPressed: () async {
-                        await _readDocument(nav);
+                        await _readArchive(nav);
                       },
-                      leadingIcon: const Icon(Icons.menu_book),
-                      child: Text(tr.localLibrary.readDocument),
+                      leadingIcon: const Icon(Icons.folder_open),
+                      child: Text(tr.localLibrary.readArchive),
                     ),
-                  MenuItemButton(
-                    onPressed: () async {
-                      await _readArchive(nav);
-                    },
-                    leadingIcon: const Icon(Icons.folder_open),
-                    child: Text(tr.localLibrary.readArchive),
-                  ),
-                  MenuItemButton(
-                    onPressed: () {
-                      nav.push(LocalLibrarySettingsRouteBuilder());
-                    },
-                    leadingIcon: const Icon(Icons.settings),
-                    child: Text(tr.settings),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-      drawer: const MainDrawer(),
-      body: HookConsumer(
-        builder: (BuildContext context, WidgetRef ref, Widget? child) {
-          final libDir = ref.watch(
-            localConfigProvider.select((c) => c.libraryDirectory),
-          );
-          final libraryProvider = ref.watch(localLibraryProvider);
-          final sort = ref.watch(librarySortTypeProvider);
-          final currentItem = useState<LocalLibraryItem?>(
-            libraryProvider.value,
-          );
-
-          useEffect(() {
-            final newVal = libraryProvider.value;
-            if (currentItem.value != null && newVal != null) {
-              final result = findLibraryItem(currentItem.value!, newVal, sort);
-
-              if (result != null) {
-                currentItem.value = result;
-              } else {
-                currentItem.value = newVal;
-              }
-            }
-
-            currentItem.value ??= newVal;
-            return null;
-          }, [libraryProvider]);
-
-          if (libDir.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: 10.0,
-                children: [
-                  Text(tr.localLibrary.noPathWarning),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      nav.push(LocalLibrarySettingsRouteBuilder());
-                    },
-                    icon: const Icon(Icons.library_add),
-                    label: Text(tr.localLibrary.setPath),
-                  ),
-                  const Divider(),
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      await _readArchive(nav);
-                    },
-                    icon: const Icon(Icons.folder_open),
-                    label: Text(tr.localLibrary.readArchive),
-                  ),
-                ],
-              ),
+                    MenuItemButton(
+                      onPressed: () {
+                        nav.push(LocalLibrarySettingsRouteBuilder());
+                      },
+                      leadingIcon: const Icon(Icons.settings),
+                      child: Text(tr.settings),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+        body: HookConsumer(
+          builder: (BuildContext context, WidgetRef ref, Widget? child) {
+            final libDir = ref.watch(
+              localConfigProvider.select((c) => c.libraryDirectory),
             );
-          }
+            final libraryProvider = ref.watch(localLibraryProvider);
+            final sort = ref.watch(librarySortTypeProvider);
+            final currentItem = useState<LocalLibraryItem?>(
+              libraryProvider.value,
+            );
 
-          return RefreshIndicator(
-            onRefresh: () async => ref.refresh(localLibraryProvider.future),
-            child: switch (libraryProvider) {
-              AsyncValue(:final error?, :final stackTrace?) => ErrorList(
-                error: error,
-                stackTrace: stackTrace,
-                message: "localLibraryProvider failed",
-              ),
-              AsyncValue(value: final top?) when top.error != null => Center(
+            useEffect(() {
+              final newVal = libraryProvider.value;
+              if (currentItem.value != null && newVal != null) {
+                final result = findLibraryItem(
+                  currentItem.value!,
+                  newVal,
+                  sort,
+                );
+
+                if (result != null) {
+                  currentItem.value = result;
+                } else {
+                  currentItem.value = newVal;
+                }
+              }
+
+              currentItem.value ??= newVal;
+              return null;
+            }, [libraryProvider]);
+
+            if (libDir.isEmpty) {
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   spacing: 10.0,
                   children: [
-                    Text(top.error!),
+                    Text(tr.localLibrary.noPathWarning),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        nav.push(LocalLibrarySettingsRouteBuilder());
+                      },
+                      icon: const Icon(Icons.library_add),
+                      label: Text(tr.localLibrary.setPath),
+                    ),
+                    const Divider(),
                     ElevatedButton.icon(
                       onPressed: () async {
                         await _readArchive(nav);
@@ -196,67 +181,81 @@ class LocalLibraryHomeScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-              AsyncValue(value: final top?) when currentItem.value != null =>
-                LibraryListWidget(
-                  title: Text(
-                    currentItem.value!.path,
-                    style: CommonTextStyles.twentyfour,
-                  ),
-                  item: currentItem.value!,
-                  onTap: (item) {
-                    if (item.isReadable) {
-                      switch (item.type) {
-                        case LibraryItemType.directory:
-                          nav.push(
-                            DirectoryReaderRouteBuilder(
-                              path: item.path,
-                              title: item.name ?? item.path,
-                            ),
-                          );
-                          break;
-                        case LibraryItemType.archive:
-                          nav.push(
-                            ArchiveReaderRouteBuilder(
-                              path: item.path,
-                              title: item.name ?? item.path,
-                            ),
-                          );
-                          break;
-                        case LibraryItemType.pdf:
-                        case LibraryItemType.epub:
-                          final descriptor = item.documentDescriptor!;
-                          nav.push(
-                            LocalDocumentReaderRouteBuilder(
-                              descriptor: descriptor,
-                            ),
-                          );
-                          break;
-                      }
-                    } else {
-                      currentItem.value = item;
-                    }
-                  },
+              );
+            }
+
+            return RefreshIndicator(
+              onRefresh: () async => ref.refresh(localLibraryProvider.future),
+              child: switch (libraryProvider) {
+                AsyncValue(:final error?, :final stackTrace?) => ErrorList(
+                  error: error,
+                  stackTrace: stackTrace,
+                  message: "localLibraryProvider failed",
                 ),
-              AsyncValue(value: final top?) => const ListSpinner(),
-              AsyncValue(:final progress) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      tr.localLibrary.scanning,
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurface,
-                        fontWeight: FontWeight.normal,
-                        fontSize: 18,
-                        decoration: TextDecoration.none,
+                AsyncValue(value: final top?) when top.error != null => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10.0,
+                    children: [
+                      Text(top.error!),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          await _readArchive(nav);
+                        },
+                        icon: const Icon(Icons.folder_open),
+                        label: Text(tr.localLibrary.readArchive),
                       ),
+                    ],
+                  ),
+                ),
+                AsyncValue(value: final top?) when currentItem.value != null =>
+                  LibraryListWidget(
+                    title: Text(
+                      currentItem.value!.path,
+                      style: CommonTextStyles.twentyfour,
                     ),
-                    const SizedBox(height: 20),
-                    CircularProgressIndicator(value: progress?.toDouble()),
-                    if (progress != null)
+                    item: currentItem.value!,
+                    onTap: (item) {
+                      if (item.isReadable) {
+                        switch (item.type) {
+                          case LibraryItemType.directory:
+                            nav.push(
+                              DirectoryReaderRouteBuilder(
+                                path: item.path,
+                                title: item.name ?? item.path,
+                              ),
+                            );
+                            break;
+                          case LibraryItemType.archive:
+                            nav.push(
+                              ArchiveReaderRouteBuilder(
+                                path: item.path,
+                                title: item.name ?? item.path,
+                              ),
+                            );
+                            break;
+                          case LibraryItemType.pdf:
+                          case LibraryItemType.epub:
+                            final descriptor = item.documentDescriptor!;
+                            nav.push(
+                              LocalDocumentReaderRouteBuilder(
+                                descriptor: descriptor,
+                              ),
+                            );
+                            break;
+                        }
+                      } else {
+                        currentItem.value = item;
+                      }
+                    },
+                  ),
+                AsyncValue(value: final top?) => const ListSpinner(),
+                AsyncValue(:final progress) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       Text(
-                        '${(progress * 100).floor()}%',
+                        tr.localLibrary.scanning,
                         style: TextStyle(
                           color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.normal,
@@ -264,12 +263,25 @@ class LocalLibraryHomeScreen extends StatelessWidget {
                           decoration: TextDecoration.none,
                         ),
                       ),
-                  ],
+                      const SizedBox(height: 20),
+                      CircularProgressIndicator(value: progress?.toDouble()),
+                      if (progress != null)
+                        Text(
+                          '${(progress * 100).floor()}%',
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            },
-          );
-        },
+              },
+            );
+          },
+        ),
       ),
     );
   }
