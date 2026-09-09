@@ -18,9 +18,6 @@ type RequestManager = Pick<
   | "getDefaultUserAgent"
 >;
 
-const fallbackUserAgent =
-  "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.121 Mobile Safari/537.36";
-
 export class MockRequestManager implements RequestManager {
   private static readonly nativeFetchTimeoutMs = 30_000;
 
@@ -31,18 +28,13 @@ export class MockRequestManager implements RequestManager {
     interceptResponseSelectorId: SelectorID<ResponseInterceptor>;
   }[];
 
-  private userAgent: string;
-  private defaultUserAgentHeaders: Record<string, string>;
+  private readonly defaultUserAgentHeaders: typeof gagaku.defaultUserAgentHeaders;
   private nextRequestId = 1;
 
   constructor(selectorRegistry: SelectorRegistry) {
     this.selectorRegistry = selectorRegistry;
     this.registeredInterceptors = [];
-    this.userAgent =
-      typeof navigator !== "undefined"
-        ? navigator.userAgent
-        : fallbackUserAgent;
-    this.defaultUserAgentHeaders = this.createDefaultUserAgentHeaders();
+    this.defaultUserAgentHeaders = globalThis.gagaku.defaultUserAgentHeaders;
   }
 
   registerInterceptor(
@@ -73,7 +65,7 @@ export class MockRequestManager implements RequestManager {
   setRedirectHandler(): void {}
 
   async getDefaultUserAgent(): Promise<string> {
-    return this.defaultUserAgentHeaders["user-agent"] ?? this.userAgent;
+    return this.defaultUserAgentHeaders["user-agent"];
   }
 
   private diagnosticFingerprint(value: string): string {
@@ -117,24 +109,6 @@ export class MockRequestManager implements RequestManager {
     return String(error);
   }
 
-  private createDefaultUserAgentHeaders(): Record<string, string> {
-    const headers: Record<string, string> = {
-      "user-agent": this.userAgent,
-    };
-
-    const nativeHeaders = globalThis.gagaku?.defaultUserAgentHeaders;
-    if (!nativeHeaders || typeof nativeHeaders !== "object") {
-      return headers;
-    }
-
-    for (const [name, value] of Object.entries(nativeHeaders)) {
-      if (typeof value === "string" && value.length > 0) {
-        headers[name.toLowerCase()] = value;
-      }
-    }
-
-    return headers;
-  }
 
   private hasHeader(headers: Record<string, string>, name: string): boolean {
     const normalizedName = name.toLowerCase();

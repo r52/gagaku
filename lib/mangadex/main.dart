@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/drawer.dart';
+import 'package:gagaku/app_navigation.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
-import 'package:gagaku/util/util.dart';
+import 'package:gagaku/model/startup_section.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -50,9 +50,6 @@ class MangaDexHomePage extends HookConsumerWidget {
         }
       };
     }, []);
-
-    final useRail = DeviceContext.useNavigationRail(context);
-    final extendRail = DeviceContext.extendNavigationRail(context);
 
     void onDestination(int idx) {
       if (idx == selectedIndex) {
@@ -108,61 +105,15 @@ class MangaDexHomePage extends HookConsumerWidget {
       ),
     ];
 
-    if (useRail) {
-      return Scaffold(
-        restorationId: 'md_home_restore',
-        drawer: const MainDrawer(),
-        body: Row(
-          children: [
-            NavigationRail(
-              selectedIndex: selectedIndex,
-              onDestinationSelected: onDestination,
-              extended: extendRail,
-              labelType: extendRail
-                  ? NavigationRailLabelType.none
-                  : NavigationRailLabelType.selected,
-              destinations: destinations,
-            ),
-            const VerticalDivider(thickness: 1, width: 1),
-            Expanded(
-              child: DefaultScrollController(
-                controller: activeController,
-                child: child,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Scaffold(
+    return AppNavigationScaffold(
+      section: StartupSection.mangaDex,
       restorationId: 'md_home_restore',
-      drawer: const MainDrawer(),
-      body: DefaultScrollController(controller: activeController, child: child),
-      bottomNavigationBar: NavigationBar(
-        height: 60,
-        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        destinations: [
-          NavigationDestination(icon: Icon(Icons.home), label: t.mangadex.home),
-          NavigationDestination(
-            icon: Icon(Icons.menu_book),
-            label: t.mangadex.myFeed,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.collections),
-            label: t.library,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.list),
-            label: t.mangadex.myLists,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.history),
-            label: t.history.text,
-          ),
-        ],
-        selectedIndex: selectedIndex,
-        onDestinationSelected: onDestination,
+      destinations: destinations,
+      selectedIndex: selectedIndex,
+      onDestinationSelected: onDestination,
+      child: DefaultScrollController(
+        controller: activeController,
+        child: child,
       ),
     );
   }

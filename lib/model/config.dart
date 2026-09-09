@@ -80,15 +80,6 @@ class GagakuConfig with _$GagakuConfig {
   @override
   String updateChannel;
 
-  /// List of update versions the user has explicitly ignored
-  @override
-  List<String> ignoredUpdates;
-
-  /// Timestamp of the last update check (used for cooldown)
-  @Property(type: PropertyType.date)
-  @override
-  DateTime? lastUpdateCheck;
-
   GagakuConfig({
     this.dbid = 0,
     this.themeMode = ThemeMode.system,
@@ -97,8 +88,6 @@ class GagakuConfig with _$GagakuConfig {
     this.checkForUpdates = true,
     this.updateCheckCooldownHours = 24,
     this.updateChannel = 'stable',
-    this.ignoredUpdates = const [],
-    this.lastUpdateCheck,
   });
 
   factory GagakuConfig.fromJson(Map<String, dynamic> json) =>

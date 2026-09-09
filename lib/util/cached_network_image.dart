@@ -8,6 +8,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/http.dart';
 import 'package:gagaku/util/riverpod.dart';
+import 'package:gagaku/web/model/cloudflare.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -32,9 +33,10 @@ class ExtensionHttpClient extends http.BaseClient {
   final Ref _ref;
 
   http.Request _buildRequest(
-    http.BaseRequest request, [
-    Map<String, String> extraHeaders = const {},
-  ]) {
+    http.BaseRequest request,
+    Map<String, String> sourceHeaders,
+    Map<String, String> clearanceHeaders,
+  ) {
     final newRequest = http.Request(request.method, request.url);
 
     newRequest
@@ -49,24 +51,23 @@ class ExtensionHttpClient extends http.BaseClient {
     }
 
     final requestCookies = newRequest.headers['cookie'];
-    final extraCookies = extraHeaders['cookie'];
-    newRequest.headers.addAll(extraHeaders);
+    for (final MapEntry(:key, :value) in sourceHeaders.entries) {
+      if (key != 'cookie') {
+        newRequest.headers.putIfAbsent(key, () => value);
+      }
+    }
+    newRequest.headers.addAll(clearanceHeaders);
 
-    final mergedCookies = _mergeCookieHeaders(requestCookies, extraCookies);
+    final mergedCookies = _mergeCookieHeaders(
+      _mergeCookieHeaders(requestCookies, sourceHeaders['cookie']),
+      clearanceHeaders['cookie'],
+    );
     if (mergedCookies != null) {
       newRequest.headers['cookie'] = mergedCookies;
     }
 
-    final browserHeaders = GagakuData().browserUserAgentHeaders;
     for (final MapEntry(:key, :value) in _defaultImageHeaders.entries) {
       newRequest.headers.putIfAbsent(key, () => value);
-    }
-    for (final key in const [
-      'sec-ch-ua',
-      'sec-ch-ua-mobile',
-      'sec-ch-ua-platform',
-    ]) {
-      newRequest.headers.putIfAbsent(key, () => browserHeaders[key]!);
     }
 
     if (request is http.Request) {
@@ -77,37 +78,23 @@ class ExtensionHttpClient extends http.BaseClient {
     return newRequest;
   }
 
-  Future<Map<String, String>> _extraHeadersFor(
+  Future<Map<String, String>> _sourceHeadersFor(
     Uri url,
     String? sourceId,
   ) async {
-    final clearanceHeaders = _cloudflareBypass.headersFor(url);
-    final extensionCookies = await _extensionCookieHeader(url, sourceId);
-    final cookies = _mergeCookieHeaders(
-      extensionCookies,
-      clearanceHeaders['cookie'],
-    );
-
-    return {
-      for (final MapEntry(:key, :value) in clearanceHeaders.entries)
-        if (key != 'cookie') key: value,
-      'cookie': ?cookies,
-    };
-  }
-
-  Future<String?> _extensionCookieHeader(Uri url, String? sourceId) async {
     if (sourceId == null || sourceId.isEmpty || sourceId == 'gist') {
-      return null;
+      return GagakuData().resolveBrowserUserAgentHeaders();
     }
 
     final provider = extensionSourceProvider(sourceId);
     await _ref.readAsync(provider.future);
-    final cookies = await _ref.read(provider.notifier).getCookies();
-
+    final runtime = await _ref.read(provider.notifier).getRuntime();
+    final cookies = runtime.getCookies();
     final applicableCookies = cookies?.where(
       (cookie) => _cookieAppliesTo(cookie, url),
     );
-    return _serializeCookies(applicableCookies ?? const []);
+    final cookieHeader = _serializeCookies(applicableCookies ?? const []);
+    return {...runtime.browserUserAgentHeaders, 'cookie': ?cookieHeader};
   }
 
   static bool _shouldAttemptBypass(http.StreamedResponse response) {
@@ -121,11 +108,13 @@ class ExtensionHttpClient extends http.BaseClient {
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
     final url = request.url;
     final sourceId = request.headers[_sourceIdHeader];
+    var sourceHeaders = await _sourceHeadersFor(url, sourceId);
 
     await _cloudflareBypass.waitForActiveSolver(url);
 
-    var extraHeaders = await _extraHeadersFor(url, sourceId);
-    final response = await _inner.send(_buildRequest(request, extraHeaders));
+    final response = await _inner.send(
+      _buildRequest(request, sourceHeaders, _cloudflareBypass.headersFor(url)),
+    );
     if (!_shouldAttemptBypass(response)) {
       return response;
     }
@@ -135,8 +124,10 @@ class ExtensionHttpClient extends http.BaseClient {
 
     await _cloudflareBypass.refresh(url);
 
-    extraHeaders = await _extraHeadersFor(url, sourceId);
-    return _inner.send(_buildRequest(request, extraHeaders));
+    sourceHeaders = await _sourceHeadersFor(url, sourceId);
+    return _inner.send(
+      _buildRequest(request, sourceHeaders, _cloudflareBypass.headersFor(url)),
+    );
   }
 
   @override
@@ -228,13 +219,16 @@ class _CloudflareBypass {
               return;
             }
 
-            final userAgent = await controller.evaluateJavascript(
-              source: 'navigator.userAgent',
+            final browserHeaders = await readBrowserUserAgentHeaders(
+              controller,
             );
+            if (completer.isCompleted) {
+              return;
+            }
             final cookieHeader = _serializeCookies(cookies);
             _clearanceHeaders[_domain(url)] = {
               'cookie': ?cookieHeader,
-              if (userAgent is String) 'user-agent': userAgent,
+              ...browserHeaders,
             };
             complete();
           } catch (_) {

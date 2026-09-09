@@ -15,7 +15,6 @@ import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -72,6 +71,15 @@ Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
 }
 
 class WebMangaViewPage extends ConsumerWidget {
+  static void _handleBack(BuildContext context) {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+    } else {
+      const WebSourceFrontRoute().go(context);
+    }
+  }
+
   const WebMangaViewPage({
     super.key,
     required this.sourceId,
@@ -96,13 +104,21 @@ class WebMangaViewPage extends ConsumerWidget {
     return DataProviderWhenWidget(
       provider: _fetchWebMangaInfoProvider(resolvedSeries),
       loadingBuilder: (context, progress) => Scaffold(
-        appBar: AppBar(leading: const BackButton()),
+        appBar: AppBar(
+          leading: BackButton(
+            onPressed: () => WebMangaViewPage._handleBack(context),
+          ),
+        ),
         body: Center(
           child: CircularProgressIndicator(value: progress?.toDouble()),
         ),
       ),
       errorBuilder: (context, child, _, _) => Scaffold(
-        appBar: AppBar(leading: const BackButton()),
+        appBar: AppBar(
+          leading: BackButton(
+            onPressed: () => WebMangaViewPage._handleBack(context),
+          ),
+        ),
         body: Consumer(
           child: child,
           builder: (context, ref, child) {
@@ -291,8 +307,10 @@ class _WebActionBar extends ConsumerWidget {
               onPressed: () =>
                   Clipboard.setData(
                     ClipboardData(
-                      text:
-                          'gagaku://open${GoRouterState.of(context).uri.path}',
+                      text: GagakuRoute.webMangaShareUri(
+                        sourceId: series.sourceId,
+                        mangaId: series.location,
+                      ).toString(),
                     ),
                   ).then((_) {
                     if (!context.mounted) return;
@@ -728,7 +746,9 @@ class _WebMangaWideLayout extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: const BackButton(),
+        leading: BackButton(
+          onPressed: () => WebMangaViewPage._handleBack(context),
+        ),
         title: Text(manga.title),
         actions: [
           _WebActionBar(
@@ -911,7 +931,9 @@ class _WebMangaNarrowLayout extends HookConsumerWidget {
               floating: false,
               expandedHeight: bannerExpandedHeight,
               forceElevated: innerBoxIsScrolled,
-              leading: const BackButton(),
+              leading: BackButton(
+                onPressed: () => WebMangaViewPage._handleBack(context),
+              ),
               flexibleSpace: FlexibleSpaceBar(
                 expandedTitleScale: bannerTitleScale,
                 title: Text(

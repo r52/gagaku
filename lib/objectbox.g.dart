@@ -128,18 +128,6 @@ final _entities = <obx_int.ModelEntity>[
         type: 9,
         flags: 0,
       ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(8, 3742548953557989391),
-        name: 'ignoredUpdates',
-        type: 30,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(9, 256716685694045656),
-        name: 'lastUpdateCheck',
-        type: 10,
-        flags: 0,
-      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
@@ -513,7 +501,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
     retiredIndexUids: const [],
-    retiredPropertyUids: const [5985338773610867635],
+    retiredPropertyUids: const [
+      5985338773610867635,
+      3742548953557989391,
+      256716685694045656,
+    ],
     retiredRelationUids: const [],
     modelVersion: 5,
     modelVersionParserMinimum: 5,
@@ -625,9 +617,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.dbGridAlbumExtent,
         );
         final updateChannelOffset = fbb.writeString(object.updateChannel);
-        final ignoredUpdatesOffset = fbb.writeList(
-          object.ignoredUpdates.map(fbb.writeString).toList(growable: false),
-        );
         fbb.startTable(10);
         fbb.addInt64(0, object.dbid);
         fbb.addOffset(1, dbThemeModeOffset);
@@ -636,19 +625,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addBool(4, object.checkForUpdates);
         fbb.addInt64(5, object.updateCheckCooldownHours);
         fbb.addOffset(6, updateChannelOffset);
-        fbb.addOffset(7, ignoredUpdatesOffset);
-        fbb.addInt64(8, object.lastUpdateCheck?.millisecondsSinceEpoch);
         fbb.finish(fbb.endTable());
         return object.dbid;
       },
       objectFromFB: (obx.Store store, ByteData fbData) {
         final buffer = fb.BufferContext(fbData);
         final rootOffset = buffer.derefObject(0);
-        final lastUpdateCheckValue = const fb.Int64Reader().vTableGetNullable(
-          buffer,
-          rootOffset,
-          20,
-        );
         final dbidParam = const fb.Int64Reader().vTableGet(
           buffer,
           rootOffset,
@@ -670,21 +652,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final updateChannelParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 16, '');
-        final ignoredUpdatesParam = const fb.ListReader<String>(
-          fb.StringReader(asciiOptimization: true),
-          lazy: false,
-        ).vTableGet(buffer, rootOffset, 18, []);
-        final lastUpdateCheckParam = lastUpdateCheckValue == null
-            ? null
-            : DateTime.fromMillisecondsSinceEpoch(lastUpdateCheckValue);
         final object =
             GagakuConfig(
                 dbid: dbidParam,
                 checkForUpdates: checkForUpdatesParam,
                 updateCheckCooldownHours: updateCheckCooldownHoursParam,
                 updateChannel: updateChannelParam,
-                ignoredUpdates: ignoredUpdatesParam,
-                lastUpdateCheck: lastUpdateCheckParam,
               )
               ..dbThemeMode = const fb.StringReader(
                 asciiOptimization: true,
@@ -1229,16 +1202,6 @@ class GagakuConfig_ {
   /// See [GagakuConfig.updateChannel].
   static final updateChannel = obx.QueryStringProperty<GagakuConfig>(
     _entities[2].properties[6],
-  );
-
-  /// See [GagakuConfig.ignoredUpdates].
-  static final ignoredUpdates = obx.QueryStringVectorProperty<GagakuConfig>(
-    _entities[2].properties[7],
-  );
-
-  /// See [GagakuConfig.lastUpdateCheck].
-  static final lastUpdateCheck = obx.QueryDateProperty<GagakuConfig>(
-    _entities[2].properties[8],
   );
 }
 

@@ -20,26 +20,29 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	Translations({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<AppLocale, Translations>? meta})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
-		  $meta = meta ?? TranslationMetadata(
+		  _meta = meta ?? TranslationMetadata(
 		    locale: AppLocale.en,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
 		  ) {
-		$meta.setFlatMapFunction(_flatMapFunction);
+		_meta.setFlatMapFunction(_flatMapFunction);
 	}
 
 	/// Metadata for the translations of <en>.
-	@override final TranslationMetadata<AppLocale, Translations> $meta;
+	final TranslationMetadata<AppLocale, Translations> _meta;
+	@override TranslationMetadata<AppLocale, Translations> get $meta => _meta;
 
 	/// Access flat map
-	dynamic operator[](String key) => $meta.getTranslation(key);
+	dynamic operator[](String key) => _meta.getTranslation(key);
 
 	late final Translations _root = this; // ignore: unused_field
 
 	Translations $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => Translations(meta: meta ?? this.$meta);
 
 	// Translations
+	late final Translations$navigation$en navigation = Translations$navigation$en.internal(_root);
+	late final Translations$about$en about = Translations$about$en.internal(_root);
 	late final Translations$ui$en ui = Translations$ui$en.internal(_root);
 	late final Translations$errors$en errors = Translations$errors$en.internal(_root);
 	late final Translations$auth$en auth = Translations$auth$en.internal(_root);
@@ -105,6 +108,60 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$chapterFeed$en chapterFeed = Translations$chapterFeed$en.internal(_root);
 	late final Translations$permissions$en permissions = Translations$permissions$en.internal(_root);
 	late final Translations$updates$en updates = Translations$updates$en.internal(_root);
+}
+
+// Path: navigation
+class Translations$navigation$en {
+	Translations$navigation$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Read'
+	String get read => 'Read';
+
+	/// en: 'Expand navigation'
+	String get expand => 'Expand navigation';
+
+	/// en: 'Collapse navigation'
+	String get collapse => 'Collapse navigation';
+
+	/// en: 'Open navigation'
+	String get openMenu => 'Open navigation';
+
+	/// en: 'Open navigation: update available'
+	String get menuUpdateAvailable => 'Open navigation: update available';
+
+	/// en: 'Settings'
+	String get globalSettings => 'Settings';
+
+	/// en: 'MangaDex'
+	String get mangaDex => 'MangaDex';
+}
+
+// Path: about
+class Translations$about$en {
+	Translations$about$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Flutter: $version'
+	String flutter({required Object version}) => 'Flutter: ${version}';
+
+	/// en: 'Dart: $version'
+	String dart({required Object version}) => 'Dart: ${version}';
+
+	/// en: 'Built on: $timestamp'
+	String builtOn({required Object timestamp}) => 'Built on: ${timestamp}';
+
+	/// en: 'License: MIT'
+	String get license => 'License: MIT';
+
+	/// en: 'Source code on GitHub'
+	String get sourceCode => 'Source code on GitHub';
 }
 
 // Path: ui
@@ -2333,6 +2390,18 @@ class Translations$webSources$source$install$en {
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'navigation.read' => 'Read',
+			'navigation.expand' => 'Expand navigation',
+			'navigation.collapse' => 'Collapse navigation',
+			'navigation.openMenu' => 'Open navigation',
+			'navigation.menuUpdateAvailable' => 'Open navigation: update available',
+			'navigation.globalSettings' => 'Settings',
+			'navigation.mangaDex' => 'MangaDex',
+			'about.flutter' => ({required Object version}) => 'Flutter: ${version}',
+			'about.dart' => ({required Object version}) => 'Dart: ${version}',
+			'about.builtOn' => ({required Object timestamp}) => 'Built on: ${timestamp}',
+			'about.license' => 'License: MIT',
+			'about.sourceCode' => 'Source code on GitHub',
 			'ui.add' => 'Add',
 			'ui.addNew' => 'Add New',
 			'ui.go' => 'Go',
@@ -2833,6 +2902,8 @@ extension on Translations {
 			'backup.dataLocSub' => 'Moves the live ObjectBox database after restart. This is not safe for concurrent multi-device synchronization; use Database Sync instead.',
 			'backup.dataLocDefault' => 'Default',
 			'sync.title' => 'Database Sync',
+			_ => null,
+		} ?? switch (path) {
 			'sync.description' => 'Automatically synchronizes all ObjectBox data through storage you control. Hive settings, credentials, local-library paths, and caches remain device-local.',
 			'sync.disabled' => 'Disabled',
 			'sync.configured' => 'Configured',
@@ -2845,8 +2916,6 @@ extension on Translations {
 			'sync.createFilesystem' => 'Create Filesystem Profile',
 			'sync.createFilesystemSub' => 'Choose an empty native filesystem directory and publish this device\'s data.',
 			'sync.joinFilesystem' => 'Join Filesystem Profile',
-			_ => null,
-		} ?? switch (path) {
 			'sync.joinFilesystemSub' => 'Choose a native filesystem directory containing a Gagaku sync profile.',
 			'sync.createDocumentTree' => 'Create Document Provider Profile',
 			'sync.createDocumentTreeSub' => 'Choose an empty Android document tree, including a folder provided by Google Drive, and publish this device\'s data.',

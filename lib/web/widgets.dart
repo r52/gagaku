@@ -5,6 +5,7 @@ import 'package:gagaku/util/riverpod.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gagaku/app_navigation.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/routes.dart';
@@ -70,6 +71,10 @@ class WebSourceSliverAppBar extends ConsumerWidget {
 
     return SliverAppBar.medium(
       pinned: true,
+      automaticallyImplyLeading: false,
+      leading: DeviceContext.useNavigationRail(context)
+          ? null
+          : const AppNavigationButton(),
       title: GestureDetector(
         onTap: () => controller?.animateTo(
           0.0,
@@ -95,6 +100,11 @@ class WebSourceSliverAppBar extends ConsumerWidget {
                   pageBuilder: (_, _, _) => const SourceManager(),
                 ),
               ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.settings),
+              tooltip: tr.arg_settings(arg: tr.webSources.text),
+              onPressed: () => nav.push(WebSourceSettingsRouteBuilder()),
             ),
             MenuAnchor(
               builder: (context, controller, _) => IconButton(
@@ -136,11 +146,6 @@ class WebSourceSliverAppBar extends ConsumerWidget {
                   leadingIcon: const Icon(Icons.open_in_browser),
                   onPressed: () => openLinkDialog(context, resolver),
                   child: Text(tr.webSources.openLink),
-                ),
-                MenuItemButton(
-                  leadingIcon: const Icon(Icons.settings),
-                  onPressed: () => nav.push(WebSourceSettingsRouteBuilder()),
-                  child: Text(tr.arg_settings(arg: tr.webSources.text)),
                 ),
               ],
             ),

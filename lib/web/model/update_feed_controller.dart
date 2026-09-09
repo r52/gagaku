@@ -10,7 +10,7 @@ import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/model/update_feed.dart';
-import 'package:gagaku/web/model/update_feed_background.dart';
+import 'package:gagaku/web/model/update_feed_foreground.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'update_feed_controller.g.dart';
@@ -92,7 +92,7 @@ UpdateFeedRepository updateFeedRepository(Ref ref) {
 
 @Riverpod(keepAlive: true)
 UpdateFeedPlatform updateFeedPlatform(Ref ref) {
-  return FlutterBackgroundUpdateFeedPlatform(NotificationService());
+  return NativeUpdateFeedPlatform(NotificationService());
 }
 
 @Riverpod(keepAlive: true)

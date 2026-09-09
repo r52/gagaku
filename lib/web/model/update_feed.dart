@@ -112,8 +112,6 @@ abstract interface class UpdateFeedExecutionLease {
 }
 
 abstract interface class UpdateFeedPlatform {
-  Future<bool> hasBackgroundPermissions();
-
   Future<UpdateFeedExecutionLease> acquire(UpdateFeedMessages messages);
 
   Future<void> reportProgress(

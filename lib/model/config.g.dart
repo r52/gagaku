@@ -24,14 +24,6 @@ GagakuConfig _$GagakuConfigFromJson(Map<String, dynamic> json) => GagakuConfig(
   updateCheckCooldownHours:
       (json['updateCheckCooldownHours'] as num?)?.toInt() ?? 24,
   updateChannel: json['updateChannel'] as String? ?? 'stable',
-  ignoredUpdates:
-      (json['ignoredUpdates'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList() ??
-      const [],
-  lastUpdateCheck: json['lastUpdateCheck'] == null
-      ? null
-      : DateTime.parse(json['lastUpdateCheck'] as String),
 );
 
 Map<String, dynamic> _$GagakuConfigToJson(GagakuConfig instance) =>
@@ -42,8 +34,6 @@ Map<String, dynamic> _$GagakuConfigToJson(GagakuConfig instance) =>
       'checkForUpdates': instance.checkForUpdates,
       'updateCheckCooldownHours': instance.updateCheckCooldownHours,
       'updateChannel': instance.updateChannel,
-      'ignoredUpdates': instance.ignoredUpdates,
-      'lastUpdateCheck': instance.lastUpdateCheck?.toIso8601String(),
     };
 
 const _$ThemeModeEnumMap = {

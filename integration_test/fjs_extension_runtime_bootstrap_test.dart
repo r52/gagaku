@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:fjs/fjs.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart'
@@ -12,11 +13,30 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart'
     as inapp
     show Cookie;
 import 'package:gagaku/model/model.dart';
+import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/web/model/cloudflare.dart';
 import 'package:gagaku/web/model/fjs_extension_runtime.dart';
+import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
+
+// Keep repository/persistence setup out of this transport integration while
+// exercising the actual initialized fjs runtime and source-family boundary.
+class _InitializedExtensionSource extends ExtensionSource {
+  _InitializedExtensionSource(this.source, this.runtime);
+
+  final WebSourceInfo source;
+  final FjsExtensionRuntime runtime;
+
+  @override
+  Future<WebSourceInfo> build(String sourceId) async => source;
+
+  @override
+  Future<FjsExtensionRuntime> getRuntime() async => runtime;
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -25,17 +45,19 @@ void main() {
     dynamic storedState;
     dynamic storedSecureState;
     final gdat = GagakuData();
+    final previousHeaders = gdat.dynamicUserAgentHeaders;
     gdat.dynamicUserAgentHeaders = {
       'user-agent': 'Phase Test Browser/123',
       'sec-ch-ua': '"Phase Test Browser";v="123"',
       'sec-ch-ua-mobile': '?0',
-      'sec-ch-ua-platform': '"Linux"',
-      'sec-ch-ua-full-version-list': '"Phase Test Browser";v="123.4.5.6"',
+      'sec-ch-ua-platform': '"Windows"',
     };
     addTearDown(() {
-      gdat.dynamicUserAgentHeaders = {};
+      gdat.dynamicUserAgentHeaders = previousHeaders;
     });
     final receivedRequests = <Map<String, String?>>[];
+    final browserIdentity = Completer<Map<String, dynamic>>();
+    final firstExtensionIdentity = Completer<Map<String, String?>>();
     String? receivedFormDataContentType;
     String? receivedFormDataBody;
     String? receivedCrossOriginCookie;
@@ -72,6 +94,76 @@ void main() {
       ),
     );
     server.listen((request) async {
+      if (request.uri.path == '/browser-identity') {
+        final identity = jsonDecode(await utf8.decoder.bind(request).join());
+        if (!browserIdentity.isCompleted) {
+          browserIdentity.complete(Map<String, dynamic>.from(identity as Map));
+        }
+        request.response.statusCode = HttpStatus.noContent;
+        await request.response.close();
+        return;
+      }
+      if (request.uri.path == '/bootstrap-identity') {
+        firstExtensionIdentity.complete({
+          for (final name in const [
+            'user-agent',
+            'sec-ch-ua',
+            'sec-ch-ua-mobile',
+            'sec-ch-ua-platform',
+          ])
+            name: request.headers.value(name),
+        });
+        request.response.write('ready');
+        await request.response.close();
+        return;
+      }
+      if (request.uri.path == '/image-identity' ||
+          request.uri.path == '/image-cf-identity') {
+        final body = latin1.decode(
+          await request.fold<List<int>>(
+            [],
+            (bytes, chunk) => bytes..addAll(chunk),
+          ),
+        );
+        final cookies = request.headers.value(HttpHeaders.cookieHeader) ?? '';
+        if (request.uri.path == '/image-cf-identity') {
+          if (request.headers.value('sec-fetch-dest') == 'document') {
+            request.response
+              ..headers.contentType = ContentType.html
+              ..cookies.add(
+                Cookie('cf_clearance', 'image-clearance')..path = '/',
+              )
+              ..write('<html><title>Image clearance</title>ready</html>');
+            await request.response.close();
+            return;
+          }
+          if (!cookies.contains('cf_clearance=image-clearance')) {
+            request.response.statusCode = HttpStatus.serviceUnavailable;
+            await request.response.close();
+            return;
+          }
+        }
+        request.response
+          ..headers.contentType = ContentType('image', 'png')
+          ..write(
+            jsonEncode({
+              'identity': {
+                for (final name in const [
+                  'user-agent',
+                  'sec-ch-ua',
+                  'sec-ch-ua-mobile',
+                  'sec-ch-ua-platform',
+                ])
+                  name: request.headers.value(name),
+              },
+              'sourceId': request.headers.value('x-source-id'),
+              'cookie': cookies,
+              'body': body,
+            }),
+          );
+        await request.response.close();
+        return;
+      }
       if (request.uri.path == '/phase5') {
         request.response
           ..statusCode = 200
@@ -169,9 +261,6 @@ void main() {
           'sec-ch-ua': request.headers.value('sec-ch-ua'),
           'sec-ch-ua-mobile': request.headers.value('sec-ch-ua-mobile'),
           'sec-ch-ua-platform': request.headers.value('sec-ch-ua-platform'),
-          'sec-ch-ua-full-version-list': request.headers.value(
-            'sec-ch-ua-full-version-list',
-          ),
           'origin': request.headers.value('origin'),
           'referer': request.headers.value('referer'),
           'cookie': request.headers.value(HttpHeaders.cookieHeader),
@@ -231,11 +320,16 @@ void main() {
       request.response
         ..statusCode = 200
         ..headers.contentType = ContentType.html
-        ..write(
-          '<html><title>Startup</title><script>'
-          'localStorage.setItem("phase6", "startup-storage");'
-          '</script>startup</html>',
-        );
+        ..write(r'''<html><title>Startup</title><script>
+localStorage.setItem("phase6", "startup-storage");
+fetch("/browser-identity", {
+  method: "POST",
+  body: JSON.stringify({
+    userAgent: navigator.userAgent,
+    metadata: navigator.userAgentData?.toJSON?.() ?? null
+  })
+});
+</script>startup</html>''');
       await request.response.close();
     });
 
@@ -282,7 +376,15 @@ void main() {
       ],
     );
 
-    await runtime.init(source, r'''
+    await runtime.init(
+      source,
+      '''
+await Application.scheduleRequest({
+  url: ${jsonEncode('${baseUrl}bootstrap-identity')},
+  method: "GET"
+});
+'''
+      r'''
 globalThis.source ??= {};
 let savedCloudflareCookies = [];
 let cloudflareRequest;
@@ -692,7 +794,80 @@ globalThis.source.phase2source = {
     };
   }
 };
-''');
+''',
+    );
+
+    final browser = await browserIdentity.future.timeout(
+      const Duration(seconds: 5),
+    );
+    final metadata = browser['metadata'] as Map<String, dynamic>?;
+    final userAgent = browser['userAgent'] as String;
+    final expectedIdentity = <String, String>{
+      ...gdat.browserUserAgentHeaders,
+      ...?deriveBrowserUserAgentHeaders(userAgent, defaultTargetPlatform),
+      'user-agent': userAgent,
+      if (metadata != null) ...{
+        'sec-ch-ua': (metadata['brands'] as List)
+            .map((brand) => '"${brand['brand']}";v="${brand['version']}"')
+            .join(', '),
+        'sec-ch-ua-mobile': metadata['mobile'] == true ? '?1' : '?0',
+        'sec-ch-ua-platform': '"${metadata['platform']}"',
+      },
+    };
+    // This request runs at extension-body evaluation, before source initialise.
+    // Comparing to the page's own report catches a synthetic/late bootstrap.
+    expect(await firstExtensionIdentity.future, expectedIdentity);
+    expect(runtime.browserUserAgentHeaders, expectedIdentity);
+
+    final container = ProviderContainer(
+      overrides: [
+        extensionSourceProvider(
+          source.id,
+        ).overrideWith(() => _InitializedExtensionSource(source, runtime)),
+      ],
+    );
+    addTearDown(container.dispose);
+    final imageClientProvider = Provider<ExtensionHttpClient>((ref) {
+      final client = ExtensionHttpClient(http.Client(), ref);
+      ref.onDispose(client.close);
+      return client;
+    });
+    final imageClient = container.read(imageClientProvider);
+    final imageResponse = await imageClient.post(
+      Uri.parse('${baseUrl}image-identity'),
+      headers: {'x-source-id': source.id, 'cookie': 'session=image-session'},
+      body: 'café',
+      encoding: latin1,
+    );
+    final imageRequest = jsonDecode(imageResponse.body) as Map;
+    expect(imageRequest['identity'], expectedIdentity);
+    expect(imageRequest['sourceId'], isNull);
+    expect(imageRequest['body'], 'café');
+    expect(imageRequest['cookie'], contains('session=image-session'));
+    expect(imageRequest['cookie'], contains('cf_clearance=startup-clearance'));
+
+    final overriddenIdentity = {
+      'user-agent': 'Explicit Image Browser/1',
+      'sec-ch-ua': '"Explicit Image Browser";v="1"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"Windows"',
+    };
+    final explicitResponse = await imageClient.get(
+      Uri.parse('${baseUrl}image-identity'),
+      headers: {'x-source-id': source.id, ...overriddenIdentity},
+    );
+    expect(
+      (jsonDecode(explicitResponse.body) as Map)['identity'],
+      overriddenIdentity,
+    );
+    final solvedResponse = await imageClient.get(
+      Uri.parse('${baseUrl}image-cf-identity'),
+      headers: {'x-source-id': source.id, ...overriddenIdentity},
+    );
+    final solvedRequest = jsonDecode(solvedResponse.body) as Map;
+    expect(solvedRequest['identity'], expectedIdentity);
+    expect(solvedRequest['cookie'], contains('cf_clearance=image-clearance'));
+    expect(solvedRequest['cookie'], isNot(contains('startup-clearance')));
 
     expect(startupChallengeRequests, greaterThan(0));
     expect(runtime.hasAdvancedSearchForm, true);
@@ -899,14 +1074,9 @@ globalThis.source.phase2source = {
     expect(explicitOriginRequest['referer'], 'https://reader.example/explicit');
     expect(requestWithReferer['method'], 'POST');
     expect(requestWithReferer['x-phase'], 'intercepted');
-    expect(requestWithReferer['user-agent'], 'Phase Test Browser/123');
-    expect(requestWithReferer['sec-ch-ua'], '"Phase Test Browser";v="123"');
-    expect(requestWithReferer['sec-ch-ua-mobile'], '?0');
-    expect(requestWithReferer['sec-ch-ua-platform'], '"Linux"');
-    expect(
-      requestWithReferer['sec-ch-ua-full-version-list'],
-      '"Phase Test Browser";v="123.4.5.6"',
-    );
+    for (final MapEntry(:key, :value) in expectedIdentity.entries) {
+      expect(requestWithReferer[key], value, reason: key);
+    }
     expect(requestWithReferer['origin'], 'https://reader.example');
     expect(
       requestWithReferer['referer'],
@@ -914,7 +1084,7 @@ globalThis.source.phase2source = {
     );
     expect(requestWithReferer['cookie'], contains('session=abc'));
     expect(requestWithReferer['body'], 'hello from fjs');
-    expect(requestResult['defaultUserAgent'], 'Phase Test Browser/123');
+    expect(requestResult['defaultUserAgent'], expectedIdentity['user-agent']);
     expect(requestResult['status'], 201);
     expect(
       requestResult['headers'],
@@ -1518,7 +1688,7 @@ globalThis.source.unchallengedCloudflareSource = {
   );
 
   test(
-    'fjs runtime reconciles a clearance written before a delayed page load',
+    'fjs runtime rejects a rotated cookie while a challenge load is pending',
     () async {
       final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
       final baseUrl = 'http://127.0.0.1:${server.port}/';
@@ -1587,7 +1757,8 @@ globalThis.source.unchallengedCloudflareSource = {
         icon: '',
         capabilities: const [SourceIntents.cloudflareBypassRequired],
       );
-      await runtime.init(source, r'''
+      await expectLater(
+        runtime.init(source, r'''
 globalThis.source ??= {};
 globalThis.source.lateClearanceSource = {
   cloudflareBypassCompleted: async (request, cookies) => {
@@ -1598,12 +1769,14 @@ globalThis.source.lateClearanceSource = {
   },
   initialise: async () => {}
 };
-''');
+'''),
+        throwsA(isA<CloudflareBypassException>()),
+      );
 
-      expect(storedState, {'clearance': 'late-clearance'});
+      expect(storedState, isNull);
       expect(
         runtime.startupBrowserOutcome,
-        StartupBrowserOutcome.readyWithNewClearance,
+        StartupBrowserOutcome.manualResolutionRequired,
       );
     },
   );
@@ -1876,4 +2049,546 @@ globalThis.source.timedOutStartupSource = {
       );
     },
   );
+
+  test('new clearance cannot override a completed challenge response', () async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    final baseUrl = 'http://127.0.0.1:${server.port}/';
+    final baseWebUri = WebUri(baseUrl);
+    await CookieManager.instance().deleteCookie(
+      url: baseWebUri,
+      name: 'cf_clearance',
+    );
+    addTearDown(() async {
+      await CookieManager.instance().deleteCookie(
+        url: baseWebUri,
+        name: 'cf_clearance',
+      );
+      await server.close(force: true);
+    });
+    server.listen((request) async {
+      request.response
+        ..statusCode = HttpStatus.forbidden
+        ..headers.set('cf-mitigated', 'challenge')
+        ..headers.contentType = ContentType.html
+        ..cookies.add(Cookie('cf_clearance', 'rotated-but-blocked')..path = '/')
+        // The response marker must win even if the document title looks benign.
+        ..write('<html><title>Ready</title>still challenged</html>');
+      await request.response.close();
+    });
+    var initialized = false;
+    final runtime = FjsExtensionRuntime(
+      sourceId: 'rotatedBlockedSource',
+      extensionHost: await rootBundle.loadString(
+        'assets/extensionhost/bundle.js',
+      ),
+      onResetAllState: (_) {},
+      onSetExtensionState: (_, _) => initialized = true,
+      onSetExtensionSecureState: (_, _) {},
+      getExtensionState: (_) => {},
+      getExtensionSecureState: (_) => {},
+      startupBrowserTimeout: const Duration(seconds: 2),
+    );
+    addTearDown(runtime.dispose);
+    final source = WebSourceInfo(
+      id: 'rotatedBlockedSource',
+      name: 'Rotated Blocked Source',
+      repo: 'test',
+      baseUrl: baseUrl,
+      icon: '',
+      capabilities: const [SourceIntents.cloudflareBypassRequired],
+    );
+    await expectLater(
+      runtime.init(source, r'''
+globalThis.source.rotatedBlockedSource = {
+  initialise: async () => Application.setState(true, "initialized")
+};
+'''),
+      throwsA(isA<CloudflareBypassException>()),
+    );
+    expect(initialized, false);
+    expect(
+      runtime.startupBrowserOutcome,
+      StartupBrowserOutcome.manualResolutionRequired,
+    );
+  });
+
+  test(
+    'navigation during metadata capture invalidates a ready candidate',
+    () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final baseUrl = 'http://127.0.0.1:${server.port}/';
+      var failedNavigation = false;
+      addTearDown(() => server.close(force: true));
+      server.listen((request) async {
+        if (request.uri.path == '/failed') {
+          failedNavigation = true;
+          request.response
+            ..statusCode = HttpStatus.serviceUnavailable
+            ..headers.contentType = ContentType.html
+            ..write('<html><title>Unavailable</title>failed navigation</html>');
+        } else {
+          request.response
+            ..headers.contentType = ContentType.html
+            ..write(r'''<html><title>Ready candidate</title><script>
+const metadata = navigator.userAgentData;
+Object.defineProperty(navigator, "userAgentData", {
+  get() {
+    location.replace("/failed");
+    return metadata;
+  }
+});
+</script></html>''');
+        }
+        await request.response.close();
+      });
+      var initialized = false;
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'metadataNavigationSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, _) => initialized = true,
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+        startupBrowserTimeout: const Duration(seconds: 3),
+      );
+      addTearDown(runtime.dispose);
+      final source = WebSourceInfo(
+        id: 'metadataNavigationSource',
+        name: 'Metadata Navigation Source',
+        repo: 'test',
+        baseUrl: baseUrl,
+        icon: '',
+        capabilities: const [SourceIntents.cloudflareBypassRequired],
+      );
+      await expectLater(
+        runtime.init(source, r'''
+globalThis.source.metadataNavigationSource = {
+  initialise: async () => Application.setState(true, "initialized")
+};
+'''),
+        throwsA(isA<StartupBrowserException>()),
+      );
+      expect(failedNavigation, true);
+      expect(initialized, false);
+      expect(
+        runtime.startupBrowserOutcome,
+        StartupBrowserOutcome.browserLoadFailed,
+      );
+    },
+  );
+
+  for (final scenario in [
+    (
+      name: 'non-CF challenge responses retain HTTP failure diagnostics',
+      cloudflare: false,
+      timeout: const Duration(seconds: 3),
+      status: HttpStatus.forbidden,
+      challenge: true,
+      holdResponse: false,
+      script: '',
+      outcome: StartupBrowserOutcome.browserLoadFailed,
+      fatal: false,
+    ),
+    (
+      name: 'CF timeout without challenge is not manual resolution',
+      cloudflare: true,
+      timeout: const Duration(seconds: 1),
+      status: HttpStatus.ok,
+      challenge: false,
+      holdResponse: true,
+      script: '',
+      outcome: StartupBrowserOutcome.indeterminateTimeout,
+      fatal: true,
+    ),
+    for (final cloudflare in [false, true])
+      (
+        name: 'setup deadline is an infrastructure failure (CF=$cloudflare)',
+        cloudflare: cloudflare,
+        timeout: Duration.zero,
+        status: HttpStatus.ok,
+        challenge: false,
+        holdResponse: false,
+        script: '',
+        outcome: StartupBrowserOutcome.infrastructureFailed,
+        fatal: true,
+      ),
+    (
+      name: 'unavailable ancillary metadata does not fail a ready CF page',
+      cloudflare: true,
+      timeout: const Duration(seconds: 3),
+      status: HttpStatus.ok,
+      challenge: false,
+      holdResponse: false,
+      script: r'''
+Object.defineProperty(navigator, "userAgentData", {
+  get() { throw new Error("metadata unavailable"); }
+});
+Object.defineProperty(window, "localStorage", {
+  get() { throw new Error("storage unavailable"); }
+});
+''',
+      outcome: StartupBrowserOutcome.readyWithoutChallenge,
+      fatal: false,
+    ),
+    (
+      name: 'inspection deadline is an infrastructure failure',
+      cloudflare: true,
+      timeout: const Duration(seconds: 1),
+      status: HttpStatus.ok,
+      challenge: false,
+      holdResponse: false,
+      script: r'''
+const metadata = navigator.userAgentData;
+Object.defineProperty(navigator, "userAgentData", {
+  get() {
+    // A bounded slow platform evaluation, not a stalled HTTP document.
+    const deadline = performance.now() + 2500;
+    while (performance.now() < deadline) {}
+    return metadata;
+  }
+});
+''',
+      outcome: StartupBrowserOutcome.infrastructureFailed,
+      fatal: true,
+    ),
+  ]) {
+    test(scenario.name, () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final url = WebUri('http://127.0.0.1:${server.port}/');
+      await CookieManager.instance().deleteCookie(
+        url: url,
+        name: 'cf_clearance',
+      );
+      final release = Completer<void>();
+      addTearDown(() async {
+        if (!release.isCompleted) release.complete();
+        await server.close(force: true);
+        await CookieManager.instance().deleteCookie(
+          url: url,
+          name: 'cf_clearance',
+        );
+      });
+      server.listen((request) async {
+        if (scenario.holdResponse) {
+          await release.future;
+          return;
+        }
+        request.response
+          ..statusCode = scenario.status
+          ..headers.contentType = ContentType.html;
+        if (scenario.challenge) {
+          request.response.headers.set('cf-mitigated', 'challenge');
+        }
+        request.response.write(
+          '<html><title>Ready</title><script>${scenario.script}</script>ready</html>',
+        );
+        await request.response.close();
+      });
+      var initialized = false;
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'outcomeSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, _) => initialized = true,
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+        startupBrowserTimeout: scenario.timeout,
+      );
+      addTearDown(runtime.dispose);
+      final source = WebSourceInfo(
+        id: 'outcomeSource',
+        name: 'Outcome Source',
+        repo: 'test',
+        baseUrl: url.toString(),
+        icon: '',
+        capabilities: [
+          if (scenario.cloudflare) SourceIntents.cloudflareBypassRequired,
+        ],
+      );
+      final initialization = runtime.init(source, r'''
+globalThis.source.outcomeSource = {
+  initialise: async () => Application.setState(true, "initialized")
+};
+''');
+      if (scenario.fatal) {
+        await expectLater(
+          initialization,
+          throwsA(
+            isA<StartupBrowserException>().having(
+              (error) => error.outcome,
+              'outcome',
+              scenario.outcome,
+            ),
+          ),
+        );
+      } else {
+        await initialization;
+      }
+      expect(initialized, !scenario.fatal);
+      expect(runtime.startupBrowserOutcome, scenario.outcome);
+    });
+  }
+
+  test('an observed challenge can recover through a same-URL reload', () async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    final url = WebUri('http://127.0.0.1:${server.port}/');
+    await CookieManager.instance().deleteCookie(url: url, name: 'cf_clearance');
+    addTearDown(() async {
+      await server.close(force: true);
+      await CookieManager.instance().deleteCookie(
+        url: url,
+        name: 'cf_clearance',
+      );
+    });
+    var released = false;
+    var readyRequested = false;
+    server.listen((request) async {
+      if (request.uri.path == '/release') {
+        released = true;
+        request.response.cookies.add(
+          Cookie('cf_clearance', 'recovered-clearance')..path = '/',
+        );
+      } else if (!released) {
+        request.response
+          ..statusCode = HttpStatus.forbidden
+          ..headers.set('cf-mitigated', 'challenge')
+          ..headers.contentType = ContentType.html
+          ..write(r'''<html><title>Just a moment...</title><script>
+window.addEventListener("load", () => {
+  setTimeout(async () => {
+    await fetch("/release");
+    location.reload();
+  }, 300);
+});
+</script>challenge</html>''');
+      } else {
+        readyRequested = true;
+        request.response
+          ..headers.contentType = ContentType.html
+          ..write('<html><title>Recovered</title>ready</html>');
+      }
+      await request.response.close();
+    });
+    dynamic initializedClearance;
+    final runtime = FjsExtensionRuntime(
+      sourceId: 'recoveredSource',
+      extensionHost: await rootBundle.loadString(
+        'assets/extensionhost/bundle.js',
+      ),
+      onResetAllState: (_) {},
+      onSetExtensionState: (_, value) =>
+          initializedClearance = (value as Map)['initialized'],
+      onSetExtensionSecureState: (_, _) {},
+      getExtensionState: (_) => {},
+      getExtensionSecureState: (_) => {},
+      startupBrowserTimeout: const Duration(seconds: 5),
+    );
+    addTearDown(runtime.dispose);
+    await runtime.init(
+      WebSourceInfo(
+        id: 'recoveredSource',
+        name: 'Recovered Source',
+        repo: 'test',
+        baseUrl: url.toString(),
+        icon: '',
+        capabilities: const [SourceIntents.cloudflareBypassRequired],
+      ),
+      r'''
+let clearance;
+globalThis.source.recoveredSource = {
+  cloudflareBypassCompleted: async (request, cookies) => {
+    clearance = cookies.find(cookie => cookie.name === "cf_clearance").value;
+  },
+  initialise: async () => Application.setState(clearance, "initialized")
+};
+''',
+    );
+    expect(readyRequested, true);
+    expect(initializedClearance, 'recovered-clearance');
+    expect(
+      runtime.startupBrowserOutcome,
+      StartupBrowserOutcome.readyWithNewClearance,
+    );
+  });
+
+  test(
+    'invalid supplied-state target retains its preparation failure cause',
+    () async {
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'invalidTargetSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        initialBrowserState: const CloudflareBrowserState(
+          cookies: [],
+          localStorage: {},
+          userAgentHeaders: {},
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, _) {},
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => {},
+        getExtensionSecureState: (_) => {},
+      );
+      addTearDown(runtime.dispose);
+      await expectLater(
+        runtime.init(
+          WebSourceInfo(
+            id: 'invalidTargetSource',
+            name: 'Invalid Target Source',
+            repo: 'test',
+            baseUrl: 'http://[',
+            icon: '',
+          ),
+          'throw new Error("extension body must not execute");',
+        ),
+        throwsA(
+          isA<StartupBrowserException>()
+              .having(
+                (error) => error.outcome,
+                'outcome',
+                StartupBrowserOutcome.infrastructureFailed,
+              )
+              .having((error) => error.cause, 'cause', isA<FormatException>()),
+        ),
+      );
+      expect(
+        runtime.startupBrowserOutcome,
+        StartupBrowserOutcome.infrastructureFailed,
+      );
+    },
+  );
+
+  for (final clientHints in [true, false]) {
+    test(
+      'browser capture seeds unresolved global HTTP identity once (hints=$clientHints)',
+      () async {
+        final gdat = GagakuData();
+        final previousHeaders = gdat.dynamicUserAgentHeaders;
+        gdat.dynamicUserAgentHeaders = {};
+        addTearDown(() => gdat.dynamicUserAgentHeaders = previousHeaders);
+        final fallback = gdat.browserUserAgentHeaders;
+        final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+        addTearDown(() => server.close(force: true));
+        final baseUrl = 'http://127.0.0.1:${server.port}';
+        const headerNames = [
+          'user-agent',
+          'sec-ch-ua',
+          'sec-ch-ua-mobile',
+          'sec-ch-ua-platform',
+        ];
+        final nativeRequests = <Map<String, String?>>[];
+        var reportedUserAgent = '';
+        Map<String, Object>? reportedMetadata;
+        server.listen((request) async {
+          if (request.uri.path != '/startup') {
+            final identity = {
+              for (final name in headerNames) name: request.headers.value(name),
+            };
+            if (request.uri.path == '/native') nativeRequests.add(identity);
+            request.response
+              ..headers.contentType = ContentType.json
+              ..write(jsonEncode(identity));
+          } else {
+            request.response
+              ..headers.contentType = ContentType.html
+              ..write('''<html><title>Identity</title><script>
+Object.defineProperty(navigator, "userAgent", {value: ${jsonEncode(reportedUserAgent)}});
+Object.defineProperty(navigator, "userAgentData", {value: ${jsonEncode(reportedMetadata)}});
+</script>ready</html>''');
+          }
+          await request.response.close();
+        });
+        final container = ProviderContainer();
+        addTearDown(container.dispose);
+        final imageClientProvider = Provider<ExtensionHttpClient>((ref) {
+          final client = ExtensionHttpClient(http.Client(), ref);
+          ref.onDispose(client.close);
+          return client;
+        });
+        final globalClient = container.read(imageClientProvider);
+        final host = await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        );
+        Map<String, String>? firstCapturedIdentity;
+        // Empty and unsupported partial captures must leave global identity
+        // unresolved so a later complete capture can seed it exactly once.
+        for (final major in [null, 134, 135, 136]) {
+          final windows =
+              clientHints || defaultTargetPlatform == TargetPlatform.windows;
+          reportedUserAgent = major == null
+              ? ''
+              : major == 134
+              ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36'
+              : windows
+              ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$major.0.0.0 Safari/537.36 Edg/$major.0.0.0'
+              : 'Mozilla/5.0 (Linux; Android 10; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/$major.0.0.0 Mobile Safari/537.36';
+          reportedMetadata = clientHints && major != null && major != 134
+              ? {
+                  'brands': [
+                    {'brand': 'Chromium', 'version': '$major'},
+                    {'brand': 'Microsoft Edge', 'version': '$major'},
+                  ],
+                  'mobile': false,
+                  'platform': 'Windows',
+                }
+              : null;
+          final expected = major == null
+              ? fallback
+              : major == 134
+              ? {...fallback, 'user-agent': reportedUserAgent}
+              : clientHints
+              ? {
+                  'user-agent': reportedUserAgent,
+                  'sec-ch-ua':
+                      '"Chromium";v="$major", "Microsoft Edge";v="$major"',
+                  'sec-ch-ua-mobile': '?0',
+                  'sec-ch-ua-platform': '"Windows"',
+                }
+              : deriveBrowserUserAgentHeaders(
+                  reportedUserAgent,
+                  defaultTargetPlatform,
+                )!;
+          final runtime = FjsExtensionRuntime(
+            sourceId: 'identitySource',
+            extensionHost: host,
+            onResetAllState: (_) {},
+            onSetExtensionState: (_, _) {},
+            onSetExtensionSecureState: (_, _) {},
+            getExtensionState: (_) => {},
+            getExtensionSecureState: (_) => {},
+          );
+          addTearDown(runtime.dispose);
+          await runtime.init(
+            WebSourceInfo(
+              id: 'identitySource',
+              name: 'Identity Source',
+              repo: 'test',
+              baseUrl: '$baseUrl/startup',
+              icon: '',
+            ),
+            '''
+await Application.scheduleRequest({url: ${jsonEncode('$baseUrl/native')}, method: "GET"});
+globalThis.source.identitySource = {initialise: async () => {}};
+''',
+          );
+          expect(nativeRequests.last, expected);
+          if (major != null && major != 134) firstCapturedIdentity ??= expected;
+          // Solver identity is cached by host, not port. Use localhost for these
+          // defaults, separate from the bootstrap test's 127.0.0.1 image solve.
+          final response = await globalClient.get(
+            Uri.parse('http://localhost:${server.port}/global'),
+          );
+          expect(jsonDecode(response.body), firstCapturedIdentity ?? fallback);
+          await runtime.dispose();
+        }
+      },
+    );
+  }
 }

@@ -54,6 +54,41 @@ abstract class GagakuRoute {
   static const extensionInstall = '/extensions/install';
 
   static const config = '/config';
+
+  static const shareHost = 'r52.github.io';
+  static const shareWebManga = '/gagaku/open.html';
+  static const shareVersion = '1';
+  static const shareMangaType = 'manga';
+
+  static Uri webMangaShareUri({
+    required String sourceId,
+    required String mangaId,
+  }) {
+    return Uri.https(shareHost, shareWebManga, {
+      'v': shareVersion,
+      'type': shareMangaType,
+      'source': sourceId,
+      'manga': mangaId,
+    });
+  }
+
+  static ({String sourceId, String mangaId})? parseWebMangaShareUri(Uri uri) {
+    final query = uri.queryParameters;
+    final sourceId = query['source'];
+    final mangaId = query['manga'];
+
+    if (uri.path != shareWebManga ||
+        query['v'] != shareVersion ||
+        query['type'] != shareMangaType ||
+        sourceId == null ||
+        sourceId.isEmpty ||
+        mangaId == null ||
+        mangaId.isEmpty) {
+      return null;
+    }
+
+    return (sourceId: sourceId, mangaId: mangaId);
+  }
 }
 
 const gagakuLocalBox =
@@ -66,11 +101,94 @@ const _knownHosts =
     'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/known_hosts.json';
 
 const defaultBrowserUserAgent =
-    'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.121 Mobile Safari/537.36';
+    'Mozilla/5.0 (Linux; Android 17; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/149.0.7827.5 Mobile Safari/537.36';
 const defaultSecChUa =
-    '"Google Chrome";v="146", "Chromium";v="146", "Not_A Brand";v="24"';
+    '"Android WebView";v="149", "Chromium";v="149", "Not)A;Brand";v="24"';
 const defaultSecChUaMobile = '?1';
 const defaultSecChUaPlatform = '"Android"';
+
+/// Synthesizes low-entropy hints for Android WebView and Windows WebView2.
+/// This follows Chromium's current GREASE algorithm, not authoritative metadata.
+Map<String, String>? deriveBrowserUserAgentHeaders(
+  String userAgent,
+  TargetPlatform platform,
+) {
+  if (!userAgent.startsWith('Mozilla/5.0 ') ||
+      !userAgent.contains('AppleWebKit/')) {
+    return null;
+  }
+
+  final chromiumVersion = RegExp(
+    r'(?:Chrome|Chromium)/(\d+)(?:\.\d+){0,3}',
+  ).firstMatch(userAgent);
+  if (chromiumVersion == null) {
+    return null;
+  }
+
+  final majorVersion = int.tryParse(chromiumVersion.group(1)!);
+  if (majorVersion == null) {
+    return null;
+  }
+
+  final (String, String, String) identity;
+  switch (platform) {
+    case TargetPlatform.android when userAgent.contains('; wv)'):
+      identity = ('Android WebView', '$majorVersion', 'Android');
+    case TargetPlatform.windows:
+      final edgeVersion = RegExp(
+        r'Edg/(\d+)(?:\.\d+){0,3}',
+      ).firstMatch(userAgent);
+      if (edgeVersion == null) {
+        return null;
+      }
+      identity = ('Microsoft Edge', edgeVersion.group(1)!, 'Windows');
+    default:
+      return null;
+  }
+  final (browserBrand, browserVersion, platformName) = identity;
+
+  return {
+    'user-agent': userAgent,
+    'sec-ch-ua': _buildSecChUa(majorVersion, browserBrand, browserVersion),
+    'sec-ch-ua-mobile': userAgent.contains(' Mobile ') ? '?1' : '?0',
+    'sec-ch-ua-platform': '"$platformName"',
+  };
+}
+
+String _buildSecChUa(
+  int chromiumMajor,
+  String browserBrand,
+  String browserVersion,
+) {
+  // Chromium 149: GetGreasedUserAgentBrandVersion and ShuffleBrandList.
+  // Update if Chromium changes its algorithm; the major alone handles releases.
+  // https://github.com/chromium/chromium/blob/149.0.7827.5/components/embedder_support/user_agent_utils.cc
+  const greaseChars = [' ', '(', ':', '-', '.', '/', ')', ';', '=', '?', '_'];
+  const greaseVersions = ['8', '99', '24'];
+  const orders = [
+    [0, 1, 2],
+    [0, 2, 1],
+    [1, 0, 2],
+    [1, 2, 0],
+    [2, 0, 1],
+    [2, 1, 0],
+  ];
+  final greaseBrand =
+      'Not${greaseChars[chromiumMajor % greaseChars.length]}'
+      'A${greaseChars[(chromiumMajor + 1) % greaseChars.length]}Brand';
+  final greaseVersion = greaseVersions[chromiumMajor % greaseVersions.length];
+  final brands = [
+    '"$greaseBrand";v="$greaseVersion"',
+    '"Chromium";v="$chromiumMajor"',
+    '"$browserBrand";v="$browserVersion"',
+  ];
+  final order = orders[chromiumMajor % orders.length];
+  final shuffled = List<String>.filled(3, '');
+  for (var i = 0; i < brands.length; i++) {
+    shuffled[order[i]] = brands[i];
+  }
+  return shuffled.join(', ');
+}
 
 class GagakuData {
   GagakuData._internal();
@@ -95,11 +213,6 @@ class GagakuData {
   }
 
   String? get dynamicUserAgent => dynamicUserAgentHeaders['user-agent'];
-  String? get dynamicSecChUa => dynamicUserAgentHeaders['sec-ch-ua'];
-  String? get dynamicSecChUaMobile =>
-      dynamicUserAgentHeaders['sec-ch-ua-mobile'];
-  String? get dynamicSecChUaPlatform =>
-      dynamicUserAgentHeaders['sec-ch-ua-platform'];
 
   Map<String, String> get browserUserAgentHeaders {
     return {
@@ -126,145 +239,19 @@ class GagakuData {
     dynamicUserAgentHeaders = headers;
   }
 
-  Map<String, String> _extractUserAgentHeaders(Map<String, String> headers) {
-    return {
-      for (final MapEntry(:key, :value) in headers.entries)
-        if (key == 'user-agent' || key.startsWith('sec-ch-ua')) key: value,
-    };
-  }
-
   Future<void> _fetchDynamicUserAgent() async {
-    HeadlessInAppWebView? headlessWebView;
-    bool fetched = false;
-    final completer = Completer<void>();
-
-    void completeFetch() {
-      if (!completer.isCompleted) {
-        completer.complete();
-      }
-    }
-
-    void completeFetchError(Object error, StackTrace stackTrace) {
-      if (!completer.isCompleted) {
-        completer.completeError(error, stackTrace);
-      }
-    }
-
-    headlessWebView = HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: WebUri("https://localhost/")),
-      initialSettings: InAppWebViewSettings(useShouldInterceptRequest: true),
-      shouldInterceptRequest: (controller, request) async {
-        if (request.url.toString() == "https://localhost/") {
-          final headers =
-              request.headers?.map(
-                (key, value) => MapEntry(key.toLowerCase(), value),
-              ) ??
-              {};
-          final ua = headers['user-agent'];
-
-          if (ua != null && ua.isNotEmpty) {
-            _setDynamicUserAgentHeaders(_extractUserAgentHeaders(headers));
-            fetched = true;
-
-            logger.d("Fast fetched dynamic user agent: $dynamicUserAgent");
-            if (dynamicSecChUa != null) {
-              logger.d(
-                "Fast Client Hints - UA: $dynamicSecChUa, Mobile: $dynamicSecChUaMobile, Platform: $dynamicSecChUaPlatform",
-              );
-            }
-            completeFetch();
-          }
-
-          return WebResourceResponse(
-            contentType: "text/html",
-            data: Uint8List.fromList([]),
-            statusCode: 200,
-            reasonPhrase: "OK",
-            headers: {"Content-Type": "text/html; charset=utf-8"},
-          );
-        }
-        return null;
-      },
-      onLoadStop: (controller, url) async {
-        if (fetched) {
-          headlessWebView?.dispose();
-          completeFetch();
-          return;
-        }
-        try {
-          final jsSource = '''
-            (function() {
-              var result = {
-                userAgent: navigator.userAgent
-              };
-              
-              if (navigator.userAgentData) {
-                result.secChUa = navigator.userAgentData.brands
-                  .map(function(b) { return '"' + b.brand + '";v="' + b.version + '"'; })
-                  .join(', ');
-                result.secChUaMobile = navigator.userAgentData.mobile ? "?1" : "?0";
-                result.secChUaPlatform = '"' + navigator.userAgentData.platform + '"';
-              }
-              
-              return result;
-            })();
-          ''';
-
-          final uaResult = await controller.evaluateJavascript(
-            source: jsSource,
-          );
-
-          if (uaResult is Map) {
-            _setDynamicUserAgentHeaders({
-              if (uaResult['userAgent'] != null)
-                'user-agent': uaResult['userAgent'].toString(),
-              if (uaResult['secChUa'] != null)
-                'sec-ch-ua': uaResult['secChUa'].toString(),
-              if (uaResult['secChUaMobile'] != null)
-                'sec-ch-ua-mobile': uaResult['secChUaMobile'].toString(),
-              if (uaResult['secChUaPlatform'] != null)
-                'sec-ch-ua-platform': uaResult['secChUaPlatform'].toString(),
-            });
-
-            logger.d("Fetched dynamic user agent: $dynamicUserAgent");
-            if (dynamicSecChUa != null) {
-              logger.d(
-                "Client Hints - UA: $dynamicSecChUa, Mobile: $dynamicSecChUaMobile, Platform: $dynamicSecChUaPlatform",
-              );
-            }
-          }
-        } catch (e) {
-          logger.e("Failed to evaluate user agent script", error: e);
-        } finally {
-          headlessWebView?.dispose();
-          completeFetch();
-        }
-      },
-      onReceivedError: (controller, request, error) {
-        logger.e(
-          'Failed to get dynamic user agent: ${error.description}',
-          error: error,
-        );
-        headlessWebView?.dispose();
-        completeFetch();
-      },
-      onReceivedHttpError: (controller, request, errorResponse) {
-        logger.e(
-          'Failed to get dynamic user agent with status: ${errorResponse.statusCode}',
-        );
-        headlessWebView?.dispose();
-        completeFetch();
-      },
+    final userAgent = await InAppWebViewController.getDefaultUserAgent();
+    final headers = deriveBrowserUserAgentHeaders(
+      userAgent,
+      defaultTargetPlatform,
     );
-
-    try {
-      await headlessWebView.run();
-    } catch (error, stackTrace) {
-      headlessWebView.dispose();
-      completeFetchError(error, stackTrace);
+    if (headers == null) {
+      logger.w("Could not derive browser headers from user agent: $userAgent");
+      return;
     }
 
-    await completer.future;
+    _setDynamicUserAgentHeaders(headers);
+    logger.d("Fetched dynamic browser headers: $dynamicUserAgentHeaders");
   }
 
   Future<void> initData() async {

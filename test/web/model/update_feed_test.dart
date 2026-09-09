@@ -501,9 +501,6 @@ final class _FakePlatform implements UpdateFeedPlatform {
   }
 
   @override
-  Future<bool> hasBackgroundPermissions() async => true;
-
-  @override
   Future<void> reportCompleted(UpdateFeedMessages messages) async {
     completedCount++;
   }

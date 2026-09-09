@@ -4,8 +4,6 @@
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
@@ -92,6 +90,16 @@
                 <data android:scheme="https" android:host="cubari.moe"/>
             </intent-filter>
 
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="https"
+                    android:host="r52.github.io"
+                    android:path="/gagaku/open.html"/>
+            </intent-filter>
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -108,7 +116,7 @@
         </activity>
 
         <service
-            android:name="de.julianassmann.flutter_background.IsolateHolderService"
+            android:name=".UpdateFeedForegroundService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 

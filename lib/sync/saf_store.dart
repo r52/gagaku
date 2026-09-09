@@ -1,15 +1,10 @@
 import 'dart:io';
 
+import 'package:android_file_picker/android_file_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 
 import 'package:gagaku/sync/store.dart';
-
-final class SafTreeSelection {
-  const SafTreeSelection({required this.uri, required this.displayName});
-
-  final String uri;
-  final String displayName;
-}
 
 class SafSyncStoreException implements Exception {
   const SafSyncStoreException(this.code, this.message);
@@ -38,24 +33,23 @@ final class SafSyncStore implements SyncStore {
 
   final String treeUri;
 
-  static Future<SafTreeSelection?> pickTree() async {
+  static Future<String?> pickTree() async {
     if (!Platform.isAndroid) {
       throw UnsupportedError('Document-tree sync is only available on Android');
     }
-    final value = await channel.invokeMapMethod<String, dynamic>('pickTree');
-    if (value == null) return null;
-    final uri = value['uri'];
-    final displayName = value['displayName'];
-    if (uri is! String || displayName is! String) {
-      throw const SafSyncStoreException(
-        'invalidResponse',
-        'The document provider returned an invalid folder selection',
-      );
-    }
-    return SafTreeSelection(
-      uri: _validateTreeUri(uri),
-      displayName: displayName,
+    final treeUri = await FilePicker.getDirectoryPath(
+      androidOptions: const FilePickerAndroidOptions(
+        safOptions: AndroidSAFOptions(
+          grant: AndroidSAFGrant.lifetime,
+          accessMode: AndroidSAFAccessMode.readWrite,
+          persistGrant: true,
+        ),
+      ),
     );
+    if (treeUri == null) return null;
+    final validatedTreeUri = _validateTreeUri(treeUri);
+    await SafSyncStore(validatedTreeUri)._invoke<void>('persistAccess');
+    return validatedTreeUri;
   }
 
   Future<void> checkAccess() => _invoke<void>('checkAccess');

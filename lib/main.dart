@@ -13,12 +13,12 @@ import 'package:gagaku/model/maintenance.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/model/startup_section.dart';
 import 'package:gagaku/model/types.dart';
+import 'package:gagaku/model/update_metadata.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/sync/service.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/update_checker.dart';
 import 'package:gagaku/update_installer.dart';
-import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/deeplink.dart';
 import 'package:go_router/go_router.dart';
@@ -143,6 +143,18 @@ class App extends HookConsumerWidget {
 
   late final _router = GoRouter(
     routes: [
+      GoRoute(
+        path: GagakuRoute.shareWebManga,
+        redirect: (BuildContext context, GoRouterState state) {
+          final share = GagakuRoute.parseWebMangaShareUri(state.uri);
+          if (share == null) return '/';
+
+          return WebMangaViewRoute(
+            sourceId: share.sourceId,
+            mangaId: share.mangaId,
+          ).location;
+        },
+      ),
       ...$appRoutes,
       GoRoute(
         path: _routingErrorLocation,
@@ -189,13 +201,9 @@ class App extends HookConsumerWidget {
     final updateResult = ref.watch(updateCheckerProvider);
 
     Future<void> recordUpdateCheck() async {
-      final config = ref.read(gagakuSettingsProvider);
-      final updatedConfig = config.copyWith(
-        lastUpdateCheck: ref.read(updateCheckerNowProvider)(),
-      );
-      await ref.run((tsx) async {
-        return tsx.get(gagakuSettingsProvider.notifier).save(updatedConfig);
-      });
+      await ref
+          .read(updateMetadataStoreProvider)
+          .recordUpdateCheck(ref.read(updateCheckerNowProvider)());
     }
 
     // Surface updates without blocking startup.

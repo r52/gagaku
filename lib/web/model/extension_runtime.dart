@@ -8,6 +8,9 @@ abstract interface class ExtensionRuntime {
   bool get hasAdvancedSearchForm;
   bool get hasSortOps;
 
+  /// The immutable browser identity selected before extension initialization.
+  Map<String, String> get browserUserAgentHeaders;
+
   Future<void> init(WebSourceInfo source, String extensionBody);
 
   FutureOr<void> dispose();

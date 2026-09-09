@@ -5,7 +5,6 @@ import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/routes.dart';
@@ -99,7 +98,10 @@ Map<String, String> sourceHeaders(Ref ref, String sourceId) {
   final referrers = ref.watch(extensionReferrerProvider);
   final baseReferrer = referrers[sourceId] ?? '';
 
-  final headers = <String, String>{'user-agent': getUserAgent()};
+  // Real sources obtain their initialized runtime's identity in the HTTP client.
+  final headers = <String, String>{
+    if (sourceId == 'gist') 'user-agent': getUserAgent(),
+  };
 
   if (sourceId != 'gist') {
     headers['x-source-id'] = sourceId;
@@ -917,11 +919,6 @@ class ExtensionSource extends _$ExtensionSource {
   Future<bool> hasAdvancedSearchForm() async {
     await future;
     return _runtime!.hasAdvancedSearchForm;
-  }
-
-  Future<List<Cookie>?> getCookies() async {
-    await future;
-    return _runtime!.getCookies();
   }
 
   Future<bool> hasSortOps() async {

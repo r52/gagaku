@@ -1,12 +1,14 @@
 import type { Form, SelectorID } from "@paperback/types";
 
 export interface GagakuInterface {
-  defaultUserAgentHeaders?: Record<string, string>;
+  readonly defaultUserAgentHeaders: Readonly<
+    Record<string, string> & { "user-agent": string }
+  >;
   callHandler(handlerName: string, ...args: any[]): any;
 }
 
 declare global {
-  var gagaku: GagakuInterface | undefined;
+  var gagaku: GagakuInterface;
 
   namespace Application {
     // binding

@@ -123,40 +123,6 @@ class _ExtensionBrowserPageState extends State<ExtensionBrowserPage> {
     };
   }
 
-  Future<Map<String, String>> _readUserAgentHeaders(
-    InAppWebViewController controller,
-  ) async {
-    final encoded = await controller.evaluateJavascript(
-      source: r'''
-JSON.stringify((() => {
-  const result = { "user-agent": navigator.userAgent };
-  if (navigator.userAgentData) {
-    result["sec-ch-ua"] = navigator.userAgentData.brands
-      .map((brand) => `"${brand.brand}";v="${brand.version}"`)
-      .join(", ");
-    result["sec-ch-ua-mobile"] = navigator.userAgentData.mobile ? "?1" : "?0";
-    result["sec-ch-ua-platform"] = `"${navigator.userAgentData.platform}"`;
-  }
-  return result;
-})())
-''',
-    );
-    if (encoded is! String) {
-      return GagakuData().browserUserAgentHeaders;
-    }
-
-    final values = jsonDecode(encoded);
-    if (values is! Map) {
-      return GagakuData().browserUserAgentHeaders;
-    }
-
-    return {
-      ...GagakuData().browserUserAgentHeaders,
-      for (final MapEntry(:key, :value) in values.entries)
-        if (value is String && value.isNotEmpty) key.toString(): value,
-    };
-  }
-
   Future<void> _completeCloudflareResolution() async {
     final controller = _controller;
     if (controller == null || _completing) {
@@ -179,7 +145,7 @@ JSON.stringify((() => {
         'duplicateNames=${cookieSelection.duplicateNames}',
       );
       final localStorage = await _readLocalStorage(controller);
-      final userAgentHeaders = await _readUserAgentHeaders(controller);
+      final userAgentHeaders = await readBrowserUserAgentHeaders(controller);
       final userAgent = userAgentHeaders['user-agent'];
       debugPrint(
         'cloudflare[${widget.source.id}] '

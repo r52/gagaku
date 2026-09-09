@@ -128,10 +128,10 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
     final deviceName = await _askDeviceName();
     if (deviceName == null || !mounted) return;
     await _run(() async {
-      final selection = await SafSyncStore.pickTree();
-      if (selection == null) return;
+      final treeUri = await SafSyncStore.pickTree();
+      if (treeUri == null) return;
       await _service.configureSaf(
-        treeUri: selection.uri,
+        treeUri: treeUri,
         mode: mode,
         deviceName: deviceName,
       );
@@ -360,39 +360,12 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
         : snapshot.deviceId;
   }
 
-  SettingTile _profileTile(SyncLocalState state) => SettingTile(
-    title: Text(
-      state.transportKind == 'saf'
-          ? context.t.sync.documentTree
-          : context.t.sync.filesystem,
-    ),
-    subtitle: Text(
-      '${state.transportKind == 'saf' ? context.t.sync.documentLocation(uri: state.locator) : context.t.sync.location(path: state.locator)}\n'
-      '${context.t.sync.profileId(id: state.profileId)}',
-    ),
-    trailing: Icon(
-      state.transportKind == 'saf'
-          ? Icons.cloud_outlined
-          : Icons.folder_outlined,
-    ),
-  );
-
-  SettingTile _deviceTile(SyncLocalState state) => SettingTile(
-    title: Text(context.t.sync.deviceName),
-    subtitle: Text(
-      '${state.deviceName.isEmpty ? context.t.sync.defaultDeviceName : state.deviceName}\n'
-      '${context.t.sync.deviceId(id: state.deviceId)}',
-    ),
-    trailing: const Icon(Icons.edit_outlined),
-    onTap: _busy
-        ? null
-        : () async {
-            final name = await _askDeviceName();
-            if (name != null) {
-              await _run(() => _service.renameDevice(name));
-            }
-          },
-  );
+  Future<void> _renameDevice() async {
+    final name = await _askDeviceName();
+    if (name != null) {
+      await _run(() => _service.renameDevice(name));
+    }
+  }
 
   String _statusText(SyncCoordinatorPhase phase) => switch (phase) {
     SyncCoordinatorPhase.disabled => context.t.sync.statusDisabled,
@@ -489,8 +462,8 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
             ),
             onTap: _busy ? null : () => _run(_service.enable),
           ),
-          _profileTile(state),
-          _deviceTile(state),
+          _SyncProfileTile(state: state),
+          _SyncDeviceTile(state: state, onTap: _busy ? null : _renameDevice),
           SettingTile(
             title: Text(context.t.sync.forget),
             subtitle: Text(context.t.sync.forgetSub),
@@ -532,8 +505,8 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
                 ? _showConflict
                 : null,
           ),
-          _profileTile(state),
-          _deviceTile(state),
+          _SyncProfileTile(state: state),
+          _SyncDeviceTile(state: state, onTap: _busy ? null : _renameDevice),
           if (status.phase == SyncCoordinatorPhase.forked)
             SettingTile(
               title: Text(context.t.sync.conflict),
@@ -591,4 +564,46 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
       ],
     );
   }
+}
+
+class _SyncProfileTile extends StatelessWidget {
+  const _SyncProfileTile({required this.state});
+
+  final SyncLocalState state;
+
+  @override
+  Widget build(BuildContext context) => SettingTile(
+    title: Text(
+      state.transportKind == 'saf'
+          ? context.t.sync.documentTree
+          : context.t.sync.filesystem,
+    ),
+    subtitle: Text(
+      '${state.transportKind == 'saf' ? context.t.sync.documentLocation(uri: state.locator) : context.t.sync.location(path: state.locator)}\n'
+      '${context.t.sync.profileId(id: state.profileId)}',
+    ),
+    trailing: Icon(
+      state.transportKind == 'saf'
+          ? Icons.cloud_outlined
+          : Icons.folder_outlined,
+    ),
+  );
+}
+
+class _SyncDeviceTile extends StatelessWidget {
+  const _SyncDeviceTile({required this.state, required this.onTap});
+
+  final SyncLocalState state;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => SettingTile(
+    title: Text(context.t.sync.deviceName),
+    subtitle: Text(
+      '${state.deviceName.isEmpty ? context.t.sync.defaultDeviceName : state.deviceName}\n'
+      '${context.t.sync.deviceId(id: state.deviceId)}',
+    ),
+    trailing: const Icon(Icons.edit_outlined),
+    onTap: onTap,
+  );
 }

@@ -91,16 +91,6 @@
           "id": "7:792936636075357605",
           "name": "updateChannel",
           "type": 9
-        },
-        {
-          "id": "8:3742548953557989391",
-          "name": "ignoredUpdates",
-          "type": 30
-        },
-        {
-          "id": "9:256716685694045656",
-          "name": "lastUpdateCheck",
-          "type": 10
         }
       ],
       "relations": []
@@ -391,7 +381,9 @@
   "retiredEntityUids": [],
   "retiredIndexUids": [],
   "retiredPropertyUids": [
-    5985338773610867635
+    5985338773610867635,
+    3742548953557989391,
+    256716685694045656
   ],
   "retiredRelationUids": [],
   "version": 1

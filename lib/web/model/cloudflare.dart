@@ -1,10 +1,78 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:gagaku/model/model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'cloudflare.g.dart';
+
+/// Reads identity from an existing browser, retaining compatible fallback hints
+/// when the page does not expose UA metadata. Never creates a WebView.
+Future<Map<String, String>> readBrowserUserAgentHeaders(
+  InAppWebViewController controller,
+) async {
+  final gdat = GagakuData();
+  final fallback = await gdat.resolveBrowserUserAgentHeaders();
+  try {
+    final encoded = await controller
+        .evaluateJavascript(
+          source: r'''
+JSON.stringify((() => {
+  const result = { "user-agent": navigator.userAgent };
+  const metadata = navigator.userAgentData;
+  if (metadata) {
+    result["sec-ch-ua"] = metadata.brands
+      .map((brand) => `${JSON.stringify(brand.brand)};v=${JSON.stringify(brand.version)}`)
+      .join(", ");
+    result["sec-ch-ua-mobile"] = metadata.mobile ? "?1" : "?0";
+    result["sec-ch-ua-platform"] = JSON.stringify(metadata.platform);
+  }
+  return result;
+})())
+''',
+        )
+        .timeout(const Duration(seconds: 2));
+    if (encoded is! String) {
+      return fallback;
+    }
+    final values = jsonDecode(encoded);
+    if (values is! Map) {
+      return fallback;
+    }
+    final captured = <String, String>{
+      for (final MapEntry(:key, :value) in values.entries)
+        if (key is String && value is String && value.isNotEmpty) key: value,
+    };
+    final userAgent = captured['user-agent'];
+    final derived = userAgent == null
+        ? null
+        : deriveBrowserUserAgentHeaders(userAgent, defaultTargetPlatform);
+    final headers = <String, String>{
+      ...fallback,
+      // A browser-reported UA may differ from the startup default (notably on
+      // Windows). Missing hints must describe that UA rather than the old one.
+      ...?derived,
+      ...captured,
+    };
+    // Windows has no native default-UA getter. Seed global HTTP defaults from
+    // the first complete captured or synthesized identity, without replacing an
+    // established identity or freezing unrelated fallback hints beside a new UA.
+    if (userAgent != null &&
+        gdat.dynamicUserAgent == null &&
+        (derived != null ||
+            (captured.containsKey('sec-ch-ua') &&
+                captured.containsKey('sec-ch-ua-mobile') &&
+                captured.containsKey('sec-ch-ua-platform')))) {
+      gdat.dynamicUserAgentHeaders = Map.unmodifiable(headers);
+    }
+    return headers;
+  } catch (error) {
+    debugPrint('Browser identity capture failed: ${error.runtimeType}');
+    return fallback;
+  }
+}
 
 class CloudflareBrowserState {
   const CloudflareBrowserState({
@@ -64,19 +132,15 @@ BrowserCookieSelection selectBrowserCookiesForUrl(
   DateTime? now,
 }) {
   final currentTime = now ?? DateTime.now();
-  final candidates = <({Cookie cookie, int index})>[];
+  final selected = <String, ({Cookie cookie, int index})>{};
   final counts = <String, int>{};
 
   for (final (index, cookie) in cookies.indexed) {
     if (!_browserCookieApplies(cookie, url, currentTime)) {
       continue;
     }
-    candidates.add((cookie: cookie, index: index));
+    final candidate = (cookie: cookie, index: index);
     counts.update(cookie.name, (count) => count + 1, ifAbsent: () => 1);
-  }
-
-  final selected = <String, ({Cookie cookie, int index})>{};
-  for (final candidate in candidates) {
     final existing = selected[candidate.cookie.name];
     if (existing == null ||
         _compareBrowserCookies(candidate, existing, url) > 0) {
@@ -172,6 +236,7 @@ enum StartupBrowserOutcome {
   manualResolutionRequired,
   indeterminateTimeout,
   browserLoadFailed,
+  infrastructureFailed,
 }
 
 class StartupBrowserException implements Exception {
@@ -198,11 +263,13 @@ class StartupBrowserState {
     required this.outcome,
     required this.cookies,
     required this.localStorage,
+    required this.userAgentHeaders,
   });
 
   final StartupBrowserOutcome outcome;
   final List<Cookie> cookies;
   final Map<String, String> localStorage;
+  final Map<String, String> userAgentHeaders;
 }
 
 @Riverpod(keepAlive: true)

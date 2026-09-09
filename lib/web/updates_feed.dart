@@ -19,30 +19,6 @@ class WebSourceUpdatesPage extends HookConsumerWidget {
   final ScrollController? controller;
 
   Future<void> _startUpdate(BuildContext context, WidgetRef ref) async {
-    final platform = ref.read(updateFeedPlatformProvider);
-    if (!await platform.hasBackgroundPermissions()) {
-      if (!context.mounted) {
-        return;
-      }
-      final tr = context.t;
-      await showDialog<void>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(tr.permissions.needed),
-          content: Text(tr.permissions.request),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(tr.ui.ok),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (!context.mounted) {
-      return;
-    }
     final tr = context.t;
     await ref
         .read(webUpdateFeedControllerProvider.notifier)
@@ -70,110 +46,6 @@ class WebSourceUpdatesPage extends HookConsumerWidget {
       ),
     ];
 
-    void addItems(List<UpdateFeedItem> items) {
-      slivers.add(
-        SuperSliverList.builder(
-          itemCount: items.length,
-          itemBuilder: (context, index) => ChapterFeedItem(state: items[index]),
-        ),
-      );
-    }
-
-    void addStartPrompt() {
-      slivers.add(
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 10.0,
-            children: [
-              Text(tr.chapterFeed.updateRequired),
-              ElevatedButton.icon(
-                onPressed: () => _startUpdate(context, ref),
-                label: Text(tr.chapterFeed.updatingFeed),
-                icon: const Icon(Icons.refresh),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    void addFailure({
-      required Object error,
-      required List<UpdateFeedItem>? items,
-      required int completed,
-      required int total,
-    }) {
-      final itemFailure = switch (error) {
-        final UpdateFeedItemFailure failure => failure,
-        _ => null,
-      };
-      final reason = itemFailure?.cause ?? error;
-      WebSourceInfo? cloudflareSource;
-      if (reason is CloudflareBypassException && itemFailure != null) {
-        final series = itemFailure.link.series;
-        if (series case ExtensionSeriesRef(:final sourceId)) {
-          final installed = ref.watch(installedSourcesProvider).value;
-          if (installed != null) {
-            for (final source in installed) {
-              if (source.id == sourceId) {
-                cloudflareSource = source;
-                break;
-              }
-            }
-          }
-        }
-      }
-      final errorWidget = Column(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 10.0,
-        children: [
-          Text(
-            itemFailure == null
-                ? tr.errors.generic
-                : tr.chapterFeed.updateFailed(item: itemFailure.link.title),
-            textAlign: TextAlign.center,
-          ),
-          if (total > 0) Text('$completed/$total'),
-          Text(switch (reason) {
-            CloudflareBypassException() =>
-              tr.webSources.source.cloudflareManualRequired,
-            _ => tr.chapterFeed.failureReason(reason: reason.toString()),
-          }, textAlign: TextAlign.center),
-          if (cloudflareSource != null)
-            CloudflareResolutionButton(
-              source: cloudflareSource,
-              onResolved: () => _startUpdate(context, ref),
-            )
-          else
-            ElevatedButton.icon(
-              onPressed: () => _startUpdate(context, ref),
-              label: Text(tr.ui.retry),
-              icon: const Icon(Icons.refresh),
-            ),
-        ],
-      );
-      if (items == null) {
-        slivers.add(
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Center(child: errorWidget),
-          ),
-        );
-      } else {
-        slivers.add(
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: errorWidget,
-            ),
-          ),
-        );
-        addItems(items);
-      }
-    }
-
     switch (feed) {
       case AsyncLoading():
         slivers.add(
@@ -183,7 +55,15 @@ class WebSourceUpdatesPage extends HookConsumerWidget {
           ),
         );
       case AsyncError(:final error):
-        addFailure(error: error, items: null, completed: 0, total: 0);
+        slivers.add(
+          _UpdateFeedFailureSliver(
+            error: error,
+            hasItems: false,
+            completed: 0,
+            total: 0,
+            onRetry: () => _startUpdate(context, ref),
+          ),
+        );
       case AsyncData(:final value):
         switch (value) {
           case UpdateFeedRunning(
@@ -226,17 +106,39 @@ class WebSourceUpdatesPage extends HookConsumerWidget {
             :final completed,
             :final total,
           ):
-            addFailure(
-              error: error,
-              items: items,
-              completed: completed,
-              total: total,
+            slivers.add(
+              _UpdateFeedFailureSliver(
+                error: error,
+                hasItems: items != null,
+                completed: completed,
+                total: total,
+                onRetry: () => _startUpdate(context, ref),
+              ),
             );
+            if (items != null) {
+              slivers.add(_UpdateFeedItemsSliver(items: items));
+            }
           case UpdateFeedIdle(:final items):
             if (items == null) {
-              addStartPrompt();
+              slivers.add(
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10.0,
+                    children: [
+                      Text(tr.chapterFeed.updateRequired),
+                      ElevatedButton.icon(
+                        onPressed: () => _startUpdate(context, ref),
+                        label: Text(tr.chapterFeed.updatingFeed),
+                        icon: const Icon(Icons.refresh),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             } else {
-              addItems(items);
+              slivers.add(_UpdateFeedItemsSliver(items: items));
             }
         }
     }
@@ -253,5 +155,98 @@ class WebSourceUpdatesPage extends HookConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+class _UpdateFeedItemsSliver extends StatelessWidget {
+  const _UpdateFeedItemsSliver({required this.items});
+
+  final List<UpdateFeedItem> items;
+
+  @override
+  Widget build(BuildContext context) => SuperSliverList.builder(
+    itemCount: items.length,
+    itemBuilder: (context, index) => ChapterFeedItem(state: items[index]),
+  );
+}
+
+class _UpdateFeedFailureSliver extends ConsumerWidget {
+  const _UpdateFeedFailureSliver({
+    required this.error,
+    required this.hasItems,
+    required this.completed,
+    required this.total,
+    required this.onRetry,
+  });
+
+  final Object error;
+  final bool hasItems;
+  final int completed;
+  final int total;
+  final Future<void> Function() onRetry;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
+    final itemFailure = switch (error) {
+      final UpdateFeedItemFailure failure => failure,
+      _ => null,
+    };
+    final reason = itemFailure?.cause ?? error;
+    WebSourceInfo? cloudflareSource;
+    if (reason is CloudflareBypassException && itemFailure != null) {
+      final series = itemFailure.link.series;
+      if (series case ExtensionSeriesRef(:final sourceId)) {
+        final installed = ref.watch(installedSourcesProvider).value;
+        if (installed != null) {
+          for (final source in installed) {
+            if (source.id == sourceId) {
+              cloudflareSource = source;
+              break;
+            }
+          }
+        }
+      }
+    }
+    final errorWidget = Column(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 10.0,
+      children: [
+        Text(
+          itemFailure == null
+              ? tr.errors.generic
+              : tr.chapterFeed.updateFailed(item: itemFailure.link.title),
+          textAlign: TextAlign.center,
+        ),
+        if (total > 0) Text('$completed/$total'),
+        Text(switch (reason) {
+          CloudflareBypassException() =>
+            tr.webSources.source.cloudflareManualRequired,
+          _ => tr.chapterFeed.failureReason(reason: reason.toString()),
+        }, textAlign: TextAlign.center),
+        if (cloudflareSource != null)
+          CloudflareResolutionButton(
+            source: cloudflareSource,
+            onResolved: onRetry,
+          )
+        else
+          ElevatedButton.icon(
+            onPressed: onRetry,
+            label: Text(tr.ui.retry),
+            icon: const Icon(Icons.refresh),
+          ),
+      ],
+    );
+    return hasItems
+        ? SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: errorWidget,
+            ),
+          )
+        : SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(child: errorWidget),
+          );
   }
 }

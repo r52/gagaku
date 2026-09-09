@@ -48,7 +48,7 @@ final class CloudflareBrowserStatesProvider
 }
 
 String _$cloudflareBrowserStatesHash() =>
-    r'ffe52eb09ecccf7aa9a8036bdc48eeb460e46739';
+    r'684ae8e8828c5ab88d3c1273ce9129fe7a770984';
 
 abstract class _$CloudflareBrowserStates
     extends $Notifier<Map<String, CloudflareBrowserState>> {

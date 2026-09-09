@@ -4,16 +4,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/sync/saf_store.dart';
 import 'package:integration_test/integration_test.dart';
 
+// Run with --dart-define=GAGAKU_RUN_INTERACTIVE_SAF_TEST=true.
+const _runInteractiveSafTest = bool.fromEnvironment(
+  'GAGAKU_RUN_INTERACTIVE_SAF_TEST',
+);
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('selects and exercises an Android document tree', (tester) async {
     expect(Platform.isAndroid, isTrue);
 
-    final selection = await tester.runAsync(SafSyncStore.pickTree);
-    expect(selection, isNotNull);
+    final treeUri = await tester.runAsync(SafSyncStore.pickTree);
+    expect(treeUri, isNotNull);
 
-    final store = SafSyncStore(selection!.uri);
+    final store = SafSyncStore(treeUri!);
     final prefix =
         'gagaku-phase5-${DateTime.now().microsecondsSinceEpoch}/nested/';
     final key = '${prefix}probe.bin';
@@ -37,5 +42,5 @@ void main() {
 
     await store.delete(key);
     expect(await store.list(prefix), isEmpty);
-  });
+  }, skip: !_runInteractiveSafTest);
 }

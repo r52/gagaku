@@ -84,18 +84,6 @@ void main() {
     expect(selection.cookies.single.value, 'reader');
   });
 
-  test('startup browser failures retain their explicit outcome', () {
-    const exception = StartupBrowserException(
-      outcome: StartupBrowserOutcome.indeterminateTimeout,
-      message: 'Timed out',
-      cause: 'test cause',
-    );
-
-    expect(exception.outcome, StartupBrowserOutcome.indeterminateTimeout);
-    expect(exception.toString(), contains('indeterminateTimeout'));
-    expect(exception.toString(), contains('test cause'));
-  });
-
   test('manual browser state is handed to one runtime initialization', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);
