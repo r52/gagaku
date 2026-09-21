@@ -26,24 +26,20 @@ enum GridAlbumExtent {
 @Entity()
 @JsonSerializable()
 class GagakuConfig with _$GagakuConfig {
-  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @Id()
   int dbid;
 
   /// Theme mode
-  @override
   @Transient()
   ThemeMode themeMode;
 
   /// Theme color
-  @override
   @JsonKey(unknownEnumValue: GagakuTheme.lime)
   @Transient()
   GagakuTheme theme;
 
   /// Grid view size
-  @override
   @Transient()
   GridAlbumExtent gridAlbumExtent;
 
@@ -69,15 +65,12 @@ class GagakuConfig with _$GagakuConfig {
   }
 
   /// Whether to check for updates on startup (default: true)
-  @override
   bool checkForUpdates;
 
   /// Update check cooldown in hours: 1 (hourly), 24 (daily), 168 (weekly), 720 (monthly)
-  @override
   int updateCheckCooldownHours;
 
   /// Update channel: 'stable' or 'beta' (default: 'stable')
-  @override
   String updateChannel;
 
   GagakuConfig({

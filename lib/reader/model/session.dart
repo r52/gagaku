@@ -51,8 +51,9 @@ final class ReaderPrefetchPolicy {
   int get hashCode => Object.hash(forwardCount, backwardCount, cacheWidth);
 }
 
-typedef ReaderPrecacheImage =
-    Future<void> Function(ImageProvider<Object> provider);
+typedef ReaderPrecacheImage = Future<void> Function(
+  ImageProvider<Object> provider,
+);
 typedef ReaderPostFrameScheduler = void Function(VoidCallback callback);
 
 void _scheduleAfterFrame(VoidCallback callback) {
@@ -63,12 +64,10 @@ class ReaderSession {
   ReaderSession({
     required List<ReaderPage> pages,
     required String? subtitle,
-    required ReaderPrecacheImage precacheImage,
-    ReaderPostFrameScheduler schedulePostFrame = _scheduleAfterFrame,
+    required this._precacheImage,
+    this._schedulePostFrame = _scheduleAfterFrame,
   }) : _pages = pages,
        _subtitle = subtitle,
-       _precacheImage = precacheImage,
-       _schedulePostFrame = schedulePostFrame,
        currentPage = ValueNotifier<int>(0),
        subtext = ValueNotifier<String?>(
          subtitle ?? (pages.isNotEmpty ? pages.first.sortKey : ''),

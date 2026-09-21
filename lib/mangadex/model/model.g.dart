@@ -39,7 +39,7 @@ abstract class _$LoggedUser extends $AsyncNotifier<User?> {
   FutureOr<User?> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<User?>, User?>;
     final element =
         ref.element
@@ -49,7 +49,7 @@ abstract class _$LoggedUser extends $AsyncNotifier<User?> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
 
@@ -83,7 +83,7 @@ abstract class _$AuthControl extends $StreamNotifier<AuthenticationStatus> {
   Stream<AuthenticationStatus> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref =
         this.ref
             as $Ref<AsyncValue<AuthenticationStatus>, AuthenticationStatus>;
@@ -98,7 +98,7 @@ abstract class _$AuthControl extends $StreamNotifier<AuthenticationStatus> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
 
@@ -141,7 +141,7 @@ abstract class _$MangaChaptersListSort extends $Notifier<ListSort> {
   ListSort build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<ListSort, ListSort>;
     final element =
         ref.element
@@ -151,7 +151,7 @@ abstract class _$MangaChaptersListSort extends $Notifier<ListSort> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
 
@@ -230,7 +230,7 @@ abstract class _$ReadChapters extends $AsyncNotifier<ReadChaptersMap> {
   FutureOr<ReadChaptersMap> build(String? userId);
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<ReadChaptersMap>, ReadChaptersMap>;
     final element =
         ref.element
@@ -240,7 +240,7 @@ abstract class _$ReadChapters extends $AsyncNotifier<ReadChaptersMap> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, () => build(_$args));
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
 
@@ -478,7 +478,7 @@ abstract class _$UserLists extends $AsyncNotifier<List<CustomList>> {
   FutureOr<List<CustomList>> build(String? userId);
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref =
         this.ref as $Ref<AsyncValue<List<CustomList>>, List<CustomList>>;
     final element =
@@ -489,7 +489,7 @@ abstract class _$UserLists extends $AsyncNotifier<List<CustomList>> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, () => build(_$args));
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
 
@@ -568,7 +568,7 @@ abstract class _$FollowedLists extends $AsyncNotifier<List<CustomList>> {
   FutureOr<List<CustomList>> build(String? userId);
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref =
         this.ref as $Ref<AsyncValue<List<CustomList>>, List<CustomList>>;
     final element =
@@ -579,7 +579,7 @@ abstract class _$FollowedLists extends $AsyncNotifier<List<CustomList>> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, () => build(_$args));
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
 
@@ -658,7 +658,7 @@ abstract class _$ListSource extends $AsyncNotifier<CustomList?> {
   FutureOr<CustomList?> build(String listId);
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<CustomList?>, CustomList?>;
     final element =
         ref.element
@@ -668,7 +668,7 @@ abstract class _$ListSource extends $AsyncNotifier<CustomList?> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, () => build(_$args));
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
 
@@ -702,7 +702,7 @@ abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
   FutureOr<Queue<Chapter>> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<Queue<Chapter>>, Queue<Chapter>>;
     final element =
         ref.element
@@ -712,7 +712,7 @@ abstract class _$MangaDexHistory extends $AsyncNotifier<Queue<Chapter>> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
 
@@ -793,7 +793,7 @@ abstract class _$UserLibrary
   FutureOr<Map<String, MangaReadingStatus>> build(String? userId);
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref =
         this.ref
             as $Ref<
@@ -811,7 +811,7 @@ abstract class _$UserLibrary
               Object?,
               Object?
             >;
-    element.handleCreate(ref, () => build(_$args));
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
 
@@ -890,7 +890,7 @@ abstract class _$ReadingStatus extends $AsyncNotifier<MangaReadingStatus?> {
   FutureOr<MangaReadingStatus?> build(Manga manga);
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref =
         this.ref as $Ref<AsyncValue<MangaReadingStatus?>, MangaReadingStatus?>;
     final element =
@@ -901,7 +901,7 @@ abstract class _$ReadingStatus extends $AsyncNotifier<MangaReadingStatus?> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, () => build(_$args));
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
 
@@ -980,7 +980,7 @@ abstract class _$FollowingStatus extends $AsyncNotifier<bool> {
   FutureOr<bool> build(Manga manga);
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<bool>, bool>;
     final element =
         ref.element
@@ -990,7 +990,7 @@ abstract class _$FollowingStatus extends $AsyncNotifier<bool> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, () => build(_$args));
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
 
@@ -1024,7 +1024,7 @@ abstract class _$TagList extends $AsyncNotifier<Iterable<Tag>> {
   FutureOr<Iterable<Tag>> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<Iterable<Tag>>, Iterable<Tag>>;
     final element =
         ref.element
@@ -1034,7 +1034,7 @@ abstract class _$TagList extends $AsyncNotifier<Iterable<Tag>> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
 
@@ -1069,7 +1069,7 @@ abstract class _$Statistics
   FutureOr<Map<String, MangaStatistics>> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref =
         this.ref
             as $Ref<
@@ -1087,7 +1087,7 @@ abstract class _$Statistics
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
 
@@ -1198,7 +1198,7 @@ abstract class _$ChapterStats
   FutureOr<Map<String, ChapterStatistics>> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref =
         this.ref
             as $Ref<
@@ -1216,7 +1216,7 @@ abstract class _$ChapterStats
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
 
@@ -1295,7 +1295,7 @@ abstract class _$Ratings extends $AsyncNotifier<SelfRating?> {
   FutureOr<SelfRating?> build(Manga manga);
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<SelfRating?>, SelfRating?>;
     final element =
         ref.element
@@ -1305,7 +1305,7 @@ abstract class _$Ratings extends $AsyncNotifier<SelfRating?> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, () => build(_$args));
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
 

@@ -67,7 +67,7 @@ abstract class _$WebConfig extends $Notifier<ExtensionConfig> {
   ExtensionConfig build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<ExtensionConfig, ExtensionConfig>;
     final element =
         ref.element
@@ -77,7 +77,7 @@ abstract class _$WebConfig extends $Notifier<ExtensionConfig> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
 
@@ -119,7 +119,7 @@ abstract class _$ExtensionState extends $Notifier<ExtensionStateDB> {
   ExtensionStateDB build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<ExtensionStateDB, ExtensionStateDB>;
     final element =
         ref.element
@@ -129,7 +129,7 @@ abstract class _$ExtensionState extends $Notifier<ExtensionStateDB> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
 
@@ -172,7 +172,7 @@ abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateDB> {
   ExtensionStateDB build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<ExtensionStateDB, ExtensionStateDB>;
     final element =
         ref.element
@@ -182,6 +182,6 @@ abstract class _$ExtensionSecureState extends $Notifier<ExtensionStateDB> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }

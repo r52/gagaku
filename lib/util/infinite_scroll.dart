@@ -36,7 +36,7 @@ class PagedSuperSliverList<PageKeyType, ItemType> extends StatelessWidget {
     required this.state,
     required this.fetchNextPage,
     required this.builderDelegate,
-    required IndexedWidgetBuilder separatorBuilder,
+    required IndexedWidgetBuilder this._separatorBuilder,
     this.findChildIndexCallback,
     this.addAutomaticKeepAlives = true,
     this.addRepaintBoundaries = true,
@@ -45,8 +45,7 @@ class PagedSuperSliverList<PageKeyType, ItemType> extends StatelessWidget {
     this.semanticIndexCallback,
     this.shrinkWrapFirstPageIndicators = false,
     super.key,
-  }) : prototypeItem = null,
-       _separatorBuilder = separatorBuilder;
+  }) : prototypeItem = null;
 
   /// Matches [PagedLayoutBuilder.state].
   final PagingState<PageKeyType, ItemType> state;
@@ -102,16 +101,18 @@ class PagedSuperSliverList<PageKeyType, ItemType> extends StatelessWidget {
                   itemCount,
                   noMoreItemsIndicatorBuilder,
                 ),
-        loadingListingBuilder:
-            (context, itemBuilder, itemCount, progressIndicatorBuilder) =>
-                _buildSliverList(
-                  itemBuilder,
-                  itemCount,
-                  progressIndicatorBuilder,
-                ),
-        errorListingBuilder:
-            (context, itemBuilder, itemCount, errorIndicatorBuilder) =>
-                _buildSliverList(itemBuilder, itemCount, errorIndicatorBuilder),
+        loadingListingBuilder: (
+          context,
+          itemBuilder,
+          itemCount,
+          progressIndicatorBuilder,
+        ) => _buildSliverList(itemBuilder, itemCount, progressIndicatorBuilder),
+        errorListingBuilder: (
+          context,
+          itemBuilder,
+          itemCount,
+          errorIndicatorBuilder,
+        ) => _buildSliverList(itemBuilder, itemCount, errorIndicatorBuilder),
         shrinkWrapFirstPageIndicators: shrinkWrapFirstPageIndicators,
       );
 

@@ -24,9 +24,8 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          extensionSourceProvider(
-            source.id,
-          ).overrideWith(() => notifier = _RetryingExtensionSource(source)),
+          extensionSourceProvider(source.id)
+              .overrideWith(() => notifier = _RetryingExtensionSource(source)),
         ],
         child: TranslationProvider(
           child: MaterialApp(
@@ -38,7 +37,7 @@ void main() {
     await tester.pump();
     await _flushAsync(tester);
 
-    expect(notifier.calls, 1);
+    expect(notifier._calls, 1);
     expect(find.text(t.ui.retry), findsOneWidget);
     expect(find.text(t.webSources.source.cloudflareResolve), findsOneWidget);
 
@@ -46,7 +45,7 @@ void main() {
     await tester.pump();
     await _flushAsync(tester);
 
-    expect(notifier.calls, 2);
+    expect(notifier._calls, 2);
     expect(find.text(t.ui.retry), findsNothing);
     expect(find.text(t.webSources.source.cloudflareResolve), findsNothing);
 
@@ -65,15 +64,15 @@ class _RetryingExtensionSource extends ExtensionSource {
   _RetryingExtensionSource(this.source);
 
   final WebSourceInfo source;
-  int calls = 0;
+  int _calls = 0;
 
   @override
   Future<WebSourceInfo> build(String sourceId) async => source;
 
   @override
   Future<List<DiscoverSection>> getDiscoverSections() async {
-    calls++;
-    if (calls == 1) {
+    _calls++;
+    if (_calls == 1) {
       throw const CloudflareBypassException();
     }
     return const [];

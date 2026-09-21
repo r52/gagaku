@@ -7,10 +7,12 @@ import 'package:riverpod/misc.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:gagaku/log.dart';
 
-/// XXX: this may break because its depending on an internal riverpod class
-mixin ListBasedInfiniteScrollMix<T> on $AsyncNotifier<List<T>> {
+mixin ListBasedInfiniteScrollMix<T>
+    on AnyNotifier<AsyncValue<List<T>>, List<T>> {
   int offset = 0;
   bool hasNextPage = true;
+
+  Future<List<T>> get future;
 
   @protected
   @mustBeOverridden

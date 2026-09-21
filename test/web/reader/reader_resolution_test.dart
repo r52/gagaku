@@ -7,7 +7,6 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/model.dart';
-import 'package:gagaku/web/model/source_adapter.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/reader.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -38,29 +37,42 @@ void main() {
   });
 
   test('direct Imgur ingress resolves typed pages and releases them', () async {
-    final transport = _StaticTransport([
-      {'description': 'Page 1', 'src': 'https://example.com/1.jpg'},
-      {'description': 'Page 2', 'src': 'https://example.com/2.jpg'},
-    ]);
-    final broker = WebSourceBroker(
-      cache: _MemoryCacheManager(),
-      proxyAdapter: ProxyWebSourceAdapter(transport: transport),
-      extensionAdapter: ExtensionWebSourceAdapter(
-        fetchManga: (_, _) => throw UnimplementedError(),
-        fetchChapterContent: (_, _) => throw UnimplementedError(),
+    Uri? requested;
+    final dio = Dio();
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          requested = options.uri;
+          handler.resolve(
+            Response<dynamic>(
+              requestOptions: options,
+              statusCode: 200,
+              data: [
+                {'description': 'Page 1', 'src': 'https://example.com/1.jpg'},
+                {'description': 'Page 2', 'src': 'https://example.com/2.jpg'},
+              ],
+            ),
+          );
+        },
       ),
     );
+    addTearDown(dio.close);
     final container = ProviderContainer(
-      overrides: [webSourceBrokerProvider.overrideWithValue(broker)],
+      overrides: [
+        cacheProvider.overrideWithValue(_MemoryCacheManager()),
+        webSourceDioProvider.overrideWithValue(dio),
+      ],
     );
     final chapter = const WebChapterRef(
       series: WebSeriesRef.proxy(proxyId: 'imgur', seriesId: 'album-1'),
       chapterId: '1',
     );
 
-    final resolved = await container.read(
+    final subscription = container.listen(
       resolveWebChapterProvider(chapter).future,
+      (_, _) {},
     );
+    final resolved = await subscription.read();
 
     expect(resolved.chapter, chapter);
     expect(resolved.title, 'album-1');
@@ -74,7 +86,7 @@ void main() {
       'https://example.com/2.jpg',
     ]);
     expect(
-      transport.requested,
+      requested,
       Uri.parse('https://cubari.moe/read/api/imgur/chapter/album-1'),
     );
 
@@ -103,36 +115,38 @@ void main() {
     );
     const html = '<main><p>Chapter text</p><img src="/image.jpg"></main>';
     const sourceBaseUrl = 'https://example.com/novel/';
-    final broker = WebSourceBroker(
-      cache: _MemoryCacheManager(),
-      proxyAdapter: ProxyWebSourceAdapter(transport: _StaticTransport([])),
-      extensionAdapter: ExtensionWebSourceAdapter(
-        fetchManga: (_, _) async => const WebManga.extension(
-          data: sourceManga,
-          chaptersList: [chapter],
-        ),
-        fetchChapterContent: (_, _) async => ExtensionChapterContent(
-          runtime: _FakeExtensionRuntime(),
-          details: const ChapterDetails.html(
-            id: 'chapter-1',
-            mangaId: 'novel-1',
-            html: html,
-          ),
-          sourceBaseUrl: sourceBaseUrl,
-        ),
-      ),
-    );
+    final dio = Dio();
+    addTearDown(dio.close);
     final container = ProviderContainer(
-      overrides: [webSourceBrokerProvider.overrideWithValue(broker)],
+      overrides: [
+        cacheProvider.overrideWithValue(_MemoryCacheManager()),
+        webSourceDioProvider.overrideWithValue(dio),
+        extensionSourceProvider('source-1').overrideWith(
+          () => _HtmlExtensionSource(
+            manga: const WebManga.extension(
+              data: sourceManga,
+              chaptersList: [chapter],
+            ),
+            details: const ChapterDetails.html(
+              id: 'chapter-1',
+              mangaId: 'novel-1',
+              html: html,
+            ),
+            baseUrl: sourceBaseUrl,
+          ),
+        ),
+      ],
     );
     const chapterRef = WebChapterRef(
       series: WebSeriesRef.extension(sourceId: 'source-1', mangaId: 'novel-1'),
       chapterId: 'chapter-1',
     );
 
-    final resolved = await container.read(
+    final subscription = container.listen(
       resolveWebChapterProvider(chapterRef).future,
+      (_, _) {},
     );
+    final resolved = await subscription.read();
 
     expect(resolved.chapter, chapterRef);
     expect(resolved.title, 'Chapter One');
@@ -148,24 +162,35 @@ void main() {
   });
 }
 
-class _StaticTransport implements WebSourceTransport {
-  _StaticTransport(this.data);
+class _HtmlExtensionSource extends ExtensionSource {
+  _HtmlExtensionSource({
+    required this.manga,
+    required this.details,
+    required this.baseUrl,
+  });
 
-  final Object data;
-  Uri? requested;
+  final WebManga manga;
+  final ChapterDetails details;
+  final String baseUrl;
+  final ExtensionRuntime _runtime = _FakeExtensionRuntime();
 
   @override
-  Future<Response<dynamic>> getUri(
-    Uri uri, {
-    bool followRedirects = true,
-  }) async {
-    requested = uri;
-    return Response<dynamic>(
-      requestOptions: RequestOptions(path: uri.toString()),
-      statusCode: 200,
-      data: data,
-    );
-  }
+  Future<WebSourceInfo> build(String sourceId) async => WebSourceInfo(
+    id: sourceId,
+    name: 'Test source',
+    repo: 'test',
+    icon: '',
+    baseUrl: baseUrl,
+  );
+
+  @override
+  Future<WebManga?> getManga(String mangaId) async => manga;
+
+  @override
+  Future<ChapterDetails> getChapterDetails(Chapter chapter) async => details;
+
+  @override
+  Future<ExtensionRuntime> getRuntime() async => _runtime;
 }
 
 class _MemoryCacheManager implements CacheManager {

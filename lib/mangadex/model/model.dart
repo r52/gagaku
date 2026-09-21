@@ -294,10 +294,9 @@ class MangaDexModel {
     MangaDexTransport? transport,
     MangaDexTransport? externalTransport,
     CacheManager? cache,
-    Future<bool> Function()? authenticationCheck,
+    this._authenticationCheck,
     TokenStorage<OIDAuthToken>? tokenStorage,
-  }) : _cache = cache ?? ref.read(cacheProvider),
-       _authenticationCheck = authenticationCheck {
+  }) : _cache = cache ?? ref.read(cacheProvider) {
     if (transport != null) {
       _transport = transport;
     } else {

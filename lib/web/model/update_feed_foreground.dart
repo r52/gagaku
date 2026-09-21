@@ -5,13 +5,12 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/util/notification_service.dart';
 import 'package:gagaku/web/model/update_feed.dart';
 
-typedef UpdateFeedNotificationReporter =
-    Future<void> Function({
-      int? maxProgress,
-      int? currentProgress,
-      String? title,
-      String? body,
-    });
+typedef UpdateFeedNotificationReporter = Future<void> Function({
+  int? maxProgress,
+  int? currentProgress,
+  String? title,
+  String? body,
+});
 
 abstract interface class UpdateFeedExecutionClient {
   Future<void> start(String notificationText);
@@ -60,14 +59,11 @@ final class NativeUpdateFeedPlatform implements UpdateFeedPlatform {
        );
 
   NativeUpdateFeedPlatform._({
-    required UpdateFeedExecutionClient executionClient,
-    required bool isAndroid,
-    required Future<void> Function() initializeNotifications,
-    required UpdateFeedNotificationReporter reportNotification,
-  }) : _executionClient = executionClient,
-       _isAndroid = isAndroid,
-       _initializeNotifications = initializeNotifications,
-       _reportNotification = reportNotification;
+    required this._executionClient,
+    required this._isAndroid,
+    required this._initializeNotifications,
+    required this._reportNotification,
+  });
 
   final UpdateFeedExecutionClient _executionClient;
   final bool _isAndroid;

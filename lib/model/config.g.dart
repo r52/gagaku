@@ -108,7 +108,7 @@ abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
   GagakuConfig build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<GagakuConfig, GagakuConfig>;
     final element =
         ref.element
@@ -118,6 +118,6 @@ abstract class _$GagakuSettings extends $Notifier<GagakuConfig> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
