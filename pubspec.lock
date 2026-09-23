@@ -421,10 +421,10 @@ packages:
     dependency: transitive
     description:
       name: file_picker_darwin
-      sha256: deb3ff69d58656b885c85bc1627f09ecb79860f272a5e7577149582ede4dce5d
+      sha256: "51aef9f4c80449c736e7cc02198675fda73689f0bd45a84da642cfeab0250d46"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0"
+    version: "2.1.2"
   file_picker_linux:
     dependency: transitive
     description:
@@ -645,18 +645,18 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_readium
-      sha256: d795e392823ea236f8fbc9bc75e0ae1efc5d94f3646fb15ef626d081761134a1
+      sha256: "6fafb70ccd8bcecfaf37308fb155bb3e8d298453f972ecaa6e7b419e02a3a628"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.6.0"
   flutter_readium_platform_interface:
     dependency: transitive
     description:
       name: flutter_readium_platform_interface
-      sha256: c94c1016507bfa0d931c12f77b52d5b195dbe9aa06d398148d3aeb76e1abc457
+      sha256: e343a5005c02fe9c6a07816c412c3966f106ef90de319871b2cf222533ebe310
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.6.0"
   flutter_riverpod:
     dependency: transitive
     description:
@@ -1115,10 +1115,10 @@ packages:
     dependency: transitive
     description:
       name: package_config
-      sha256: f096c55ebb7deb7e384101542bfba8c52696c1b56fca2eb62827989ef2353bbc
+      sha256: ffcf4cf3d6c0b74ac43708d9f56625506e8a68aa935abe9d267a7330f320eb5d
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.0"
+    version: "3.0.0"
   package_info_plus:
     dependency: transitive
     description:
@@ -1440,10 +1440,10 @@ packages:
     dependency: transitive
     description:
       name: source_gen
-      sha256: a603f1fb984a7391ae5978d1b92bfaaa08b350dca5c825256f925818f7943bf5
+      sha256: "11b6047da8e4eb6c643ccac3d0fda3f9c9e11651695f7da24a85ade8aff15a44"
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.4"
+    version: "4.3.0"
   source_helper:
     dependency: transitive
     description:
