@@ -609,7 +609,11 @@ class ChapterFeedWidget extends HookWidget {
                       return val >= 0 ? val : null;
                     },
                     builderDelegate:
-                        PagedChildBuilderDelegate<ChapterFeedItemData>(
+                        ErrorReportingPagedChildBuilderDelegate<
+                          ChapterFeedItemData
+                        >(
+                          error: newState.error,
+                          fetchNextPage: fetchNextPage,
                           animateTransitions: true,
                           itemBuilder: (context, item, index) =>
                               ChapterFeedItem(
@@ -1408,7 +1412,9 @@ class MangaListViewSliver extends ConsumerWidget {
             return PagedSliverList(
               state: state,
               fetchNextPage: fetchNextPage,
-              builderDelegate: PagedChildBuilderDelegate<Manga>(
+              builderDelegate: ErrorReportingPagedChildBuilderDelegate<Manga>(
+                error: state.error,
+                fetchNextPage: fetchNextPage,
                 animateTransitions: true,
                 itemBuilder: (context, item, index) => _ListMangaItem(
                   key: ValueKey(item.id),
@@ -1431,7 +1437,10 @@ class MangaListViewSliver extends ConsumerWidget {
               gridDelegate: delegate,
               state: state,
               fetchNextPage: fetchNextPage,
-              builderDelegate: PagedChildBuilderDelegate<Manga>(
+              showNewPageErrorIndicatorAsGridChild: false,
+              builderDelegate: ErrorReportingPagedChildBuilderDelegate<Manga>(
+                error: state.error,
+                fetchNextPage: fetchNextPage,
                 animateTransitions: true,
                 itemBuilder: (context, item, index) => GridMangaDetailedItem(
                   key: ValueKey(item.id),
@@ -1452,7 +1461,10 @@ class MangaListViewSliver extends ConsumerWidget {
               gridDelegate: delegate,
               state: state,
               fetchNextPage: fetchNextPage,
-              builderDelegate: PagedChildBuilderDelegate<Manga>(
+              showNewPageErrorIndicatorAsGridChild: false,
+              builderDelegate: ErrorReportingPagedChildBuilderDelegate<Manga>(
+                error: state.error,
+                fetchNextPage: fetchNextPage,
                 animateTransitions: true,
                 itemBuilder: (context, item, index) => GridMangaItem(
                   key: ValueKey(item.id),
@@ -1591,9 +1603,11 @@ class GridMangaDetailedItem extends ConsumerWidget {
                         quality: CoverArtQuality.small,
                       ),
                       width: screenSizeSmall ? 80.0 : 128.0,
-                      progressIndicatorBuilder:
-                          (context, url, downloadProgress) =>
-                              const Center(child: CircularProgressIndicator()),
+                      progressIndicatorBuilder: (
+                        context,
+                        url,
+                        downloadProgress,
+                      ) => const Center(child: CircularProgressIndicator()),
                       errorBuilder: (context, error, stacktrace) {
                         return Tooltip(
                           message: error.toString(),

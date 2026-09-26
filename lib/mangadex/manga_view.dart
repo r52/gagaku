@@ -924,7 +924,10 @@ class _MangaCoversView extends HookWidget {
           ),
           state: filteredState,
           fetchNextPage: controller.fetchNextPage,
-          builderDelegate: PagedChildBuilderDelegate<CoverArt>(
+          showNewPageErrorIndicatorAsGridChild: false,
+          builderDelegate: ErrorReportingPagedChildBuilderDelegate<CoverArt>(
+            error: filteredState.error,
+            fetchNextPage: controller.fetchNextPage,
             animateTransitions: true,
             itemBuilder: (context, item, index) => _CoverArtItem(
               key: ValueKey(item.id),
@@ -991,7 +994,9 @@ class _ChapterListSliver extends HookWidget {
       state: state,
       fetchNextPage: fetchNextPage,
       separatorBuilder: (_, index) => const SizedBox(height: 4.0),
-      builderDelegate: PagedChildBuilderDelegate<Chapter>(
+      builderDelegate: ErrorReportingPagedChildBuilderDelegate<Chapter>(
+        error: state.error,
+        fetchNextPage: fetchNextPage,
         itemBuilder: (context, _, index) {
           final chapter = orderedChapters![index];
           final previousChapter = index > 0 ? orderedChapters[index - 1] : null;
@@ -2064,10 +2069,11 @@ class _MangaDexNarrowLayout extends HookConsumerWidget {
                         colorBlendMode: BlendMode.modulate,
                         color: Colors.grey,
                         fit: BoxFit.cover,
-                        progressIndicatorBuilder:
-                            (context, url, downloadProgress) => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
+                        progressIndicatorBuilder: (
+                          context,
+                          url,
+                          downloadProgress,
+                        ) => const Center(child: CircularProgressIndicator()),
                         errorBuilder: (context, error, stacktrace) {
                           return Tooltip(
                             message: error.toString(),

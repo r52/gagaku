@@ -1,5 +1,7 @@
 import 'dart:collection';
+
 import 'package:flutter/rendering.dart';
+import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/riverpod.dart';
 
 import 'package:cached_network_image_ce/cached_network_image.dart';
@@ -441,76 +443,88 @@ class WebMangaListViewSliver extends ConsumerWidget {
               state: state,
               fetchNextPage: fetchNextPage,
               separatorBuilder: (_, _) => const SizedBox(height: 4.0),
-              builderDelegate: PagedChildBuilderDelegate<HistoryLink>(
-                animateTransitions: true,
-                itemBuilder: (context, item, index) {
-                  final tr = context.t;
-                  return ListTile(
-                    key: ValueKey(item.url),
-                    tileColor: index.isOdd
-                        ? theme.colorScheme.surfaceContainer
-                        : theme.colorScheme.surfaceContainerHighest,
-                    leading: FavoritesButton(link: item),
-                    trailing: showRemoveButton
-                        ? IconButton(
-                            tooltip: tr.mangaActions.removeHistory,
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () async {
-                              WebHistoryManager().remove(item);
-                            },
-                          )
-                        : null,
-                    title: Text(item.title),
-                    textColor: theme.colorScheme.onSurface,
-                    onTap: () async {
+              builderDelegate:
+                  ErrorReportingPagedChildBuilderDelegate<HistoryLink>(
+                    error: state.error,
+                    fetchNextPage: fetchNextPage,
+                    animateTransitions: true,
+                    itemBuilder: (context, item, index) {
                       final tr = context.t;
-                      final resolver = ref.read(webLinkResolverProvider);
-                      final messenger = ScaffoldMessenger.of(context);
-                      final result = await resolver.resolveHistoryLink(item);
-
-                      if (!context.mounted) return;
-                      if (result.series == null) {
-                        messenger
-                          ..removeCurrentSnackBar()
-                          ..showSnackBar(
-                            SnackBar(
-                              content: Text(tr.errors.unsupportedUrl),
-                              backgroundColor: Colors.red,
-                            ),
+                      return ListTile(
+                        key: ValueKey(item.url),
+                        tileColor: index.isOdd
+                            ? theme.colorScheme.surfaceContainer
+                            : theme.colorScheme.surfaceContainerHighest,
+                        leading: FavoritesButton(link: item),
+                        trailing: showRemoveButton
+                            ? IconButton(
+                                tooltip: tr.mangaActions.removeHistory,
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () async {
+                                  WebHistoryManager().remove(item);
+                                },
+                              )
+                            : null,
+                        title: Text(item.title),
+                        textColor: theme.colorScheme.onSurface,
+                        onTap: () async {
+                          final tr = context.t;
+                          final resolver = ref.read(webLinkResolverProvider);
+                          final messenger = ScaffoldMessenger.of(context);
+                          final result = await resolver.resolveHistoryLink(
+                            item,
                           );
-                      } else {
-                        openWebSource(
-                          context,
-                          ResolvedWebLink(series: result.series!),
-                        );
-                      }
+
+                          if (!context.mounted) return;
+                          if (result.series == null) {
+                            messenger
+                              ..removeCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(tr.errors.unsupportedUrl),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                          } else {
+                            openWebSource(
+                              context,
+                              ResolvedWebLink(series: result.series!),
+                            );
+                          }
+                        },
+                      );
                     },
-                  );
-                },
-              ),
+                  ),
             );
           case WebMangaListView.grid:
             return PagedSliverGrid(
               state: state,
               fetchNextPage: fetchNextPage,
+              showNewPageErrorIndicatorAsGridChild: false,
               gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: gridExtent.grid,
                 mainAxisSpacing: 8,
                 crossAxisSpacing: 8,
                 childAspectRatio: 0.7,
               ),
-              builderDelegate: PagedChildBuilderDelegate<HistoryLink>(
-                animateTransitions: true,
-                itemBuilder: (context, item, index) {
-                  return GridMangaItem(
-                    key: ValueKey(item.url),
-                    link: item,
-                    showFavoriteButton: showFavoriteButton,
-                    showRemoveButton: showRemoveButton,
-                    showSearchButton: showSearchButton,
-                  );
-                },
-              ),
+              builderDelegate:
+                  ErrorReportingPagedChildBuilderDelegate<HistoryLink>(
+                    error: state.error,
+                    fetchNextPage: fetchNextPage,
+                    animateTransitions: true,
+                    itemBuilder: (context, item, index) {
+                      return GridMangaItem(
+                        key: ValueKey(item.url),
+                        link: item,
+                        showFavoriteButton: showFavoriteButton,
+                        showRemoveButton: showRemoveButton,
+                        showSearchButton: showSearchButton,
+                      );
+                    },
+                  ),
             );
         }
       },

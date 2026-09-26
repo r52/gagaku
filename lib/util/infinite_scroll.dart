@@ -1,8 +1,56 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:gagaku/i18n/strings.g.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
+
+/// Displays the paging error verbatim for both initial and subsequent failures.
+///
+/// Retry uses the same callback as the paged view so already loaded pages remain
+/// intact. Grids should set `showNewPageErrorIndicatorAsGridChild: false` to give
+/// long errors the full width of the view rather than a fixed-size grid tile.
+class ErrorReportingPagedChildBuilderDelegate<ItemType>
+    extends PagedChildBuilderDelegate<ItemType> {
+  ErrorReportingPagedChildBuilderDelegate({
+    required Object? error,
+    required NextPageCallback fetchNextPage,
+    required super.itemBuilder,
+    super.animateTransitions,
+  }) : super(
+         firstPageErrorIndicatorBuilder: (_) =>
+             _PagingErrorIndicator(error: error!, onRetry: fetchNextPage),
+         newPageErrorIndicatorBuilder: (_) =>
+             _PagingErrorIndicator(error: error!, onRetry: fetchNextPage),
+       );
+}
+
+class _PagingErrorIndicator extends StatelessWidget {
+  const _PagingErrorIndicator({required this.error, required this.onRetry});
+
+  final Object error;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SelectionArea(child: Text('$error')),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh),
+            label: Text(context.t.ui.retry),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 /// A [SliverList] with pagination capabilities.
 ///
