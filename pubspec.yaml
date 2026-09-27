@@ -35,8 +35,6 @@ dependencies:
   android_file_picker: ^2.0.0
   flutter:
     sdk: flutter
-  flutter_localizations:
-    sdk: flutter
   flutter_hooks: ^0.21.2
   freezed_annotation: ^3.0.0
   hive_ce: ^2.11.1
@@ -92,6 +90,9 @@ dependencies:
       url: https://github.com/r52/fjs.git
       ref: gagaku
 
+  material_ui: ^1.0.0
+  cupertino_ui: ^1.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -109,7 +110,6 @@ dev_dependencies:
   json_serializable: ^6.6.1
   flutter_native_splash: ^2.2.19
   flutter_launcher_icons: "^0.14.1"
-  yaml: ^3.1.3
   slang_build_runner: ^4.6.0
   # Includes upstream analyzer 11–14 support without changing the DB runtime.
   # Return to a hosted release once it includes this generator compatibility fix.

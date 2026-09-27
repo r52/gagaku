@@ -1,6 +1,6 @@
 import 'package:archive/archive_io.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/local/model/model.dart';
 import 'package:gagaku/local/model/types.dart';

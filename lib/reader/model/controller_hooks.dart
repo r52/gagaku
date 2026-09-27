@@ -1,6 +1,6 @@
 // ignore_for_file: use_super_parameters
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';

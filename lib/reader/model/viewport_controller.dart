@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/reader/model/session.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';

@@ -1,8 +1,10 @@
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+
 import 'dart:async';
+
 import 'package:gagaku/util/riverpod.dart';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
@@ -10,6 +12,7 @@ import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
+import 'package:gagaku/util/material_hooks.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/model/search_history.dart';
 import 'package:gagaku/util/util.dart';
@@ -89,7 +92,7 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
     final theme = Theme.of(context);
     final nav = Navigator.of(context);
     final filter = _searchParameters;
-    final controller = useSearchController();
+    final controller = useMaterialSearchController();
 
     final selected = useReducer(
       MangaSetAction.modify,
@@ -132,11 +135,11 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
                         onPressed: () async {
                           final result = await nav.push<MangaFilters>(
                             SlideTransitionRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      _MangaDexFilterWidget(
-                                        filter: filter.filter,
-                                      ),
+                              pageBuilder: (
+                                context,
+                                animation,
+                                secondaryAnimation,
+                              ) => _MangaDexFilterWidget(filter: filter.filter),
                             ),
                           );
 

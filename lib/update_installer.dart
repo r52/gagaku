@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -51,9 +51,8 @@ class AndroidUpdateAsset {
       }
 
       final uri = Uri.tryParse(rawUrl);
-      final digestMatch = RegExp(
-        r'^sha256:([0-9a-fA-F]{64})$',
-      ).firstMatch(digest);
+      final digestMatch = RegExp(r'^sha256:([0-9a-fA-F]{64})$')
+          .firstMatch(digest);
       if (uri == null ||
           uri.scheme != 'https' ||
           uri.host != 'github.com' ||

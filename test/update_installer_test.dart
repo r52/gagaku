@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
@@ -84,9 +84,8 @@ void main() {
       });
       final updateDirectory = Directory('${cacheRoot.path}/gagaku-updates');
       await updateDirectory.create();
-      await File(
-        '${updateDirectory.path}/gagaku-update.apk',
-      ).writeAsBytes([1, 2, 3]);
+      await File('${updateDirectory.path}/gagaku-update.apk')
+          .writeAsBytes([1, 2, 3]);
 
       await cleanupCachedUpdateFiles(temporaryDirectory: () async => cacheRoot);
 

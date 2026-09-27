@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/local/model/model.dart';
 import 'package:gagaku/reader/main.dart';

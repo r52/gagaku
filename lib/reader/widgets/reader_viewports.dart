@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/reader/model/config.dart';
 import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/reader/model/viewport_controller.dart';

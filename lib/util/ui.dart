@@ -1,7 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/common.dart';
@@ -249,9 +249,8 @@ class ButtonChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textStyle = TextStyle(
-      color: theme.colorScheme.onTertiaryContainer,
-    ).merge(style);
+    final textStyle = TextStyle(color: theme.colorScheme.onTertiaryContainer)
+        .merge(style);
 
     final bstyle = Styles.buttonStyle(
       backgroundColor: color ?? theme.colorScheme.tertiaryContainer,
@@ -296,9 +295,8 @@ class IconTextChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final textStyle = TextStyle(
-      color: colorScheme.onTertiaryContainer,
-    ).merge(style);
+    final textStyle = TextStyle(color: colorScheme.onTertiaryContainer)
+        .merge(style);
 
     Widget child = Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
@@ -877,15 +875,17 @@ class ListSpinner extends StatelessWidget {
 
 typedef DataBuilder<T> = Widget Function(BuildContext context, T data);
 typedef LoadingBuilder = Widget Function(BuildContext context, num? progress);
-typedef ErrorWrapperBuilder =
-    Widget Function(
-      BuildContext context,
-      Widget defaultChild,
-      Object error,
-      StackTrace stacktrace,
-    );
-typedef ErrorBuilder =
-    Widget Function(BuildContext context, Object error, StackTrace stacktrace);
+typedef ErrorWrapperBuilder = Widget Function(
+  BuildContext context,
+  Widget defaultChild,
+  Object error,
+  StackTrace stacktrace,
+);
+typedef ErrorBuilder = Widget Function(
+  BuildContext context,
+  Object error,
+  StackTrace stacktrace,
+);
 
 class DataProviderWhenWidget<T> extends ConsumerWidget {
   const DataProviderWhenWidget({

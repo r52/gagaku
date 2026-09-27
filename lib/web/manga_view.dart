@@ -1,6 +1,6 @@
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:gagaku/util/riverpod.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
@@ -9,6 +9,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/cached_network_image.dart';
+import 'package:gagaku/util/material_hooks.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
@@ -183,7 +184,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
     final chapterScrollController = useScrollController();
     final artworkUrls = manga.artworkUrls;
     final hasArtwork = artworkUrls.isNotEmpty;
-    final tabController = useTabController(
+    final tabController = useMaterialTabController(
       initialLength: hasArtwork ? _WebMangaTab.values.length : 1,
       keys: [hasArtwork],
     );
@@ -373,18 +374,17 @@ class _WebMetadataList extends StatelessWidget {
                     tileColor: theme.colorScheme.surfaceContainerHighest,
                     title: Text(alttitle),
                     onTap: () =>
-                        Clipboard.setData(ClipboardData(text: alttitle)).then((
-                          _,
-                        ) {
-                          if (!context.mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              showCloseIcon: true,
-                              duration: const Duration(milliseconds: 1000),
-                              content: Text(tr.ui.copyClipboard),
-                            ),
-                          );
-                        }),
+                        Clipboard.setData(ClipboardData(text: alttitle))
+                            .then((_) {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  showCloseIcon: true,
+                                  duration: const Duration(milliseconds: 1000),
+                                  content: Text(tr.ui.copyClipboard),
+                                ),
+                              );
+                            }),
                     trailing: IconButton(
                       tooltip: tr.webSources.searchWithExt,
                       style: Styles.squareIconButtonStyle(
@@ -962,9 +962,11 @@ class _WebMangaNarrowLayout extends HookConsumerWidget {
                       colorBlendMode: BlendMode.modulate,
                       color: Colors.grey,
                       fit: BoxFit.cover,
-                      progressIndicatorBuilder:
-                          (context, url, downloadProgress) =>
-                              const Center(child: CircularProgressIndicator()),
+                      progressIndicatorBuilder: (
+                        context,
+                        url,
+                        downloadProgress,
+                      ) => const Center(child: CircularProgressIndicator()),
                       errorBuilder: (context, error, stacktrace) => Tooltip(
                         message: error.toString(),
                         child: const Icon(Icons.error),

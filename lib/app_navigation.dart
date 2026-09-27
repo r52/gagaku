@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:gagaku/about.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -299,9 +299,8 @@ class _NavigationPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.t;
-    final aboutLabel = MaterialLocalizations.of(
-      context,
-    ).aboutListTileTitle('Gagaku');
+    final aboutLabel = MaterialLocalizations.of(context)
+        .aboutListTileTitle('Gagaku');
 
     return SafeArea(
       child: CustomScrollView(

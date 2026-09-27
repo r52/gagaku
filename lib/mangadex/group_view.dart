@@ -1,6 +1,6 @@
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:animations/animations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/i18n/strings.g.dart';

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/extension_browser.dart';

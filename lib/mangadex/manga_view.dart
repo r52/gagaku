@@ -4,7 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
@@ -16,6 +16,7 @@ import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
+import 'package:gagaku/util/material_hooks.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/types.dart' show SearchQuery;
@@ -223,7 +224,7 @@ class _MangaDexMangaViewWidgetState
     final me = ref.watch(loggedUserProvider).value;
 
     final hasRelated = widget.manga.relatedMangas.isNotEmpty;
-    final tabController = useTabController(
+    final tabController = useMaterialTabController(
       initialLength: hasRelated
           ? _ViewType.values.length
           : _ViewType.values.length - 1,

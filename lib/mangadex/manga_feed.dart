@@ -1,5 +1,5 @@
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';

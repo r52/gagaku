@@ -2,9 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/log.dart';
@@ -159,9 +158,8 @@ class App extends HookConsumerWidget {
       GoRoute(
         path: _routingErrorLocation,
         builder: (BuildContext context, GoRouterState state) {
-          return ErrorRoute(
-            error: state.extra! as Exception,
-          ).build(context, state);
+          return ErrorRoute(error: state.extra! as Exception)
+              .build(context, state);
         },
       ),
     ],
@@ -233,6 +231,8 @@ class App extends HookConsumerWidget {
 
     return MaterialApp.router(
       title: 'Gagaku',
+      // Bridge theme/localizations for dependencies still using SDK Material.
+      builder: (context, child) => MaterialUiCompatibilityBridge(child: child!),
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: AppLocaleUtils.supportedLocales,
       locale: TranslationProvider.of(context).flutterLocale,
