@@ -470,7 +470,7 @@ packages:
     description:
       path: "."
       ref: gagaku
-      resolved-ref: c1280d8a660ed2cc558b5e3f0800e5dbb68c3d70
+      resolved-ref: d40bb634a19e62aca641e24a1ba0a4bcd7272990
       url: "https://github.com/r52/fjs.git"
     source: git
     version: "3.3.0"
@@ -772,18 +772,18 @@ packages:
     dependency: "direct main"
     description:
       name: hive_ce
-      sha256: "650b64282b7ea664ea58a08492d2b163ac6dc6d0ef552d0d77aac6678e1518e9"
+      sha256: "2b1bf607ddf852cad8deaf2331cac0e54289d3a3c64079463b26f196008909ce"
       url: "https://pub.dev"
     source: hosted
-    version: "2.20.0"
+    version: "2.20.1"
   hive_ce_flutter:
     dependency: "direct main"
     description:
       name: hive_ce_flutter
-      sha256: "2677e95a333ff15af43ccd06af7eb7abbf1a4f154ea071997f3de4346cae913a"
+      sha256: "231c5f025a44f4a555b4e7417d1468027cc32d9471b00543bd5bce72464a1009"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.4"
+    version: "2.4.0"
   hooks:
     dependency: transitive
     description:
@@ -1123,10 +1123,10 @@ packages:
     description:
       path: "."
       ref: password
-      resolved-ref: e713328037274edc2557476f93fd462f81572bfe
+      resolved-ref: b16eea15ece97b2f14481c4d0b4b490c393d607d
       url: "https://github.com/r52/openid_client.git"
     source: git
-    version: "0.4.10+1"
+    version: "0.4.10+2"
   package_config:
     dependency: transitive
     description:
@@ -1259,10 +1259,10 @@ packages:
     dependency: transitive
     description:
       name: petitparser
-      sha256: "91bd59303e9f769f108f8df05e371341b15d59e995e6806aefab827b58336675"
+      sha256: "2f1564aadb14215e478563b5406cb80729d022158c01dc50c96013c2f7eb4790"
       url: "https://pub.dev"
     source: hosted
-    version: "7.0.2"
+    version: "7.1.0"
   photo_view:
     dependency: "direct main"
     description:
@@ -1776,10 +1776,10 @@ packages:
     dependency: transitive
     description:
       name: xml
-      sha256: "67f0aff7be013d107995e9b75bf4e7f2c3ef2dfdb2c8e68024bba0a7fd5756a4"
+      sha256: "0fe8cc98946def31cbcbc8734aa4067031e6f65ea3a78a508060bfed2200bfeb"
       url: "https://pub.dev"
     source: hosted
-    version: "7.0.1"
+    version: "7.1.0"
   yaml:
     dependency: transitive
     description:

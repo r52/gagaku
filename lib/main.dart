@@ -56,7 +56,13 @@ void main() async {
     timeago.setLocaleMessages(locale, lookupMessages);
   });
 
-  await Hive.initFlutter();
+  await Hive.initFlutter(
+    null,
+    HiveStorageBackendPreference.native,
+    null,
+    null,
+    true,
+  );
   Hive.registerAdapter(CacheEntryAdapter());
   await Hive.openLazyBox<CacheEntry>(gagakuCache);
 
