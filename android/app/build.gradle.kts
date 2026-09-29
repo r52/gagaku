@@ -59,6 +59,10 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    // Play Services 18.1.1 pulls Cronet 141 with duplicate namespaces.
+    // Remove this override once Play Services adopts the namespace fix.
+    // https://issues.chromium.org/issues/406926302
+    implementation("org.chromium.net:cronet-api:143.7445.0")
 }
 
 kotlin {
