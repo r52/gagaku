@@ -90,7 +90,7 @@ dependencies:
       url: https://github.com/r52/fjs.git
       ref: gagaku
 
-  material_ui: ^1.0.0
+  material_ui: ^1.5.0
   cupertino_ui: ^1.0.0
 
 dev_dependencies:
