@@ -253,10 +253,10 @@ packages:
     dependency: "direct main"
     description:
       name: cronet_http
-      sha256: "9da9860b409d71e4b8259e3dee631176d499dee23e7cd45a3024ebd5181997d8"
+      sha256: d8aa6c72b4a3b6c9b299a53f0c4e10cfc87961b2c7496e6c9a7216157f9c529c
       url: "https://pub.dev"
     source: hosted
-    version: "1.9.0"
+    version: "1.10.0"
   cross_file:
     dependency: transitive
     description:
@@ -470,10 +470,10 @@ packages:
     description:
       path: "."
       ref: gagaku
-      resolved-ref: d40bb634a19e62aca641e24a1ba0a4bcd7272990
+      resolved-ref: cd9f9b656952d1be841e71d2f00392b592d6cb2d
       url: "https://github.com/r52/fjs.git"
     source: git
-    version: "3.3.0"
+    version: "3.3.1"
   flat_buffers:
     dependency: transitive
     description:
@@ -674,7 +674,7 @@ packages:
     source: hosted
     version: "3.4.3"
   flutter_rust_bridge:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: flutter_rust_bridge
       sha256: e87d6b9ee934dcd24a128ccb2bd91905d2d5fe5c06245d6a8f5477d4907a437a
