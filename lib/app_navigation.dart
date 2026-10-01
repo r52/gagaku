@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:gagaku/about.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -25,6 +26,24 @@ UpdateInfo? _availableUpdate(WidgetRef ref) {
 }
 
 /// The three contexts share a panel, without sharing their navigation stacks.
+///
+/// The available parent width selects compact (<=600dp), collapsed rail
+/// (>600dp), or standard expanded rail (>=1240dp) presentation. Explicit wide
+/// expansion choices survive breakpoint changes without remounting [child].
+///
+/// Collapsed section rails reveal app contexts only when expanded; contexts
+/// remain primary navigation when [destinations] is empty. Settings, About,
+/// and update feedback stay pinned while destinations scroll.
+///
+/// Rails preserve destination widget labels, disabled state, padding, and
+/// indicator overrides. A null [selectedIndex] leaves rail destinations
+/// unselected.
+///
+/// Compact mode uses the native [NavigationBar] with best-effort adaptation:
+/// icons and disabled state are forwarded, while [Text] and [RichText] labels
+/// become plain text. Other label widgets have no compact label. Per-destination
+/// padding and indicator overrides apply only to rails. The native bar requires
+/// at least two destinations and selects the first when [selectedIndex] is null.
 class AppNavigationScaffold extends ConsumerStatefulWidget {
   const AppNavigationScaffold({
     super.key,
@@ -49,16 +68,16 @@ class AppNavigationScaffold extends ConsumerStatefulWidget {
 }
 
 class _AppNavigationScaffoldState extends ConsumerState<AppNavigationScaffold> {
-  static const _collapsedWidth = 80.0;
+  static const _collapsedWidth = 96.0;
   static const _expandedWidth = 320.0;
+  static const _resizeDuration = Duration(milliseconds: 250);
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   _NavigationLayout? _layout;
-  bool _expanded = true;
+  bool? _expandedPreference;
+  bool _drawerOpen = false;
   VoidCallback? _afterDismiss;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void _updateLayout(BuildContext context) {
     final layout = !DeviceContext.useNavigationRail(context)
         ? _NavigationLayout.compact
         : DeviceContext.extendNavigationRail(context)
@@ -66,12 +85,10 @@ class _AppNavigationScaffoldState extends ConsumerState<AppNavigationScaffold> {
         : _NavigationLayout.medium;
     if (_layout != layout) {
       _layout = layout;
-      _expanded = layout == _NavigationLayout.wide;
       _afterDismiss = null;
-      // The old drawer must release its LocalHistoryEntry and focus before the
-      // new layout takes over. Keep the content subtree mounted throughout.
+      // Release the old drawer's history entry without remounting the content.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _scaffoldKey.currentState?.closeDrawer();
+        if (mounted) _dismiss();
       });
     }
   }
@@ -90,8 +107,9 @@ class _AppNavigationScaffoldState extends ConsumerState<AppNavigationScaffold> {
 
   void _toggle() {
     if (_layout == _NavigationLayout.wide) {
-      setState(() => _expanded = !_expanded);
+      setState(() => _expandedPreference = !(_expandedPreference ?? true));
     } else {
+      setState(() => _drawerOpen = true);
       _scaffoldKey.currentState?.openDrawer();
     }
   }
@@ -99,7 +117,7 @@ class _AppNavigationScaffoldState extends ConsumerState<AppNavigationScaffold> {
   void _dismiss() => _scaffoldKey.currentState?.closeDrawer();
 
   void _perform(VoidCallback action) {
-    if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
+    if (_drawerOpen) {
       _afterDismiss = action;
       _dismiss();
     } else {
@@ -108,6 +126,7 @@ class _AppNavigationScaffoldState extends ConsumerState<AppNavigationScaffold> {
   }
 
   void _onDrawerChanged(bool open) {
+    if (_drawerOpen != open) setState(() => _drawerOpen = open);
     if (open) return;
     final action = _afterDismiss;
     _afterDismiss = null;
@@ -116,6 +135,12 @@ class _AppNavigationScaffoldState extends ConsumerState<AppNavigationScaffold> {
         if (mounted) action();
       });
     }
+  }
+
+  Future<bool> _onBackButtonPressed() {
+    if (!_drawerOpen) return SynchronousFuture(false);
+    _dismiss();
+    return SynchronousFuture(true);
   }
 
   void _selectContext(StartupSection section) {
@@ -134,118 +159,180 @@ class _AppNavigationScaffoldState extends ConsumerState<AppNavigationScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    final compact = _layout == _NavigationLayout.compact;
-    final inlineExpanded = _layout == _NavigationLayout.wide && _expanded;
     final info = _availableUpdate(ref);
+    final mediaQuery = MediaQuery.of(context);
 
-    return Scaffold(
-      key: _scaffoldKey,
-      restorationId: widget.restorationId,
-      drawerEnableOpenDragGesture: compact,
-      onDrawerChanged: _onDrawerChanged,
-      // Keep the controller mounted across breakpoints so closing releases
-      // both Scaffold's open state and the route's LocalHistoryEntry.
-      drawer: Drawer(
-        width: math.min(_expandedWidth, MediaQuery.sizeOf(context).width - 56),
-        child: Actions(
-          actions: {
-            DismissIntent: CallbackAction<DismissIntent>(
-              onInvoke: (_) {
-                _dismiss();
-                return null;
-              },
-            ),
-          },
-          child: Shortcuts(
-            shortcuts: const {
-              SingleActivator(LogicalKeyboardKey.escape): DismissIntent(),
-            },
-            child: _NavigationPanel(
-              expanded: true,
-              section: widget.section,
-              destinations: widget.destinations,
-              selectedIndex: widget.selectedIndex,
-              updateAvailable: info != null,
-              onToggle: _dismiss,
-              onDestination: (index) =>
-                  _perform(() => widget.onDestinationSelected?.call(index)),
-              onContext: _selectContext,
-              onSettings: () => _perform(() {
-                const AppSettingsRoute().push<void>(context);
-              }),
-              onAbout: () => _perform(() {
-                showGagakuAboutDialog(context, ref, info);
-              }),
-            ),
-          ),
-        ),
-      ),
-      body: Row(
-        children: [
-          SizedBox(
-            width: compact
-                ? 0
-                : inlineExpanded
-                ? _expandedWidth
-                : _collapsedWidth,
-            child: compact
-                ? null
-                : Material(
-                    color: Theme.of(context).colorScheme.surface,
-                    child: _NavigationPanel(
-                      expanded: inlineExpanded,
-                      section: widget.section,
-                      destinations: widget.destinations,
-                      selectedIndex: widget.selectedIndex,
-                      updateAvailable: info != null,
-                      onToggle: _toggle,
-                      onDestination: (index) => _perform(
-                        () => widget.onDestinationSelected?.call(index),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = constraints.biggest;
+        return MediaQuery(
+          // App bars and the rail must use the same actual window constraints.
+          data: size == mediaQuery.size
+              ? mediaQuery
+              : mediaQuery.copyWith(size: size),
+          child: Builder(
+            builder: (context) {
+              _updateLayout(context);
+              final compact = _layout == _NavigationLayout.compact;
+              final inlineExpanded =
+                  _layout == _NavigationLayout.wide &&
+                  (_expandedPreference ?? true);
+
+              Widget scaffold = PopScope<Object?>(
+                // Advertise modal Back ownership to Android predictive Back.
+                canPop: !_drawerOpen,
+                onPopInvokedWithResult: (didPop, result) {
+                  if (!didPop && _drawerOpen) _dismiss();
+                },
+                child: Scaffold(
+                  key: _scaffoldKey,
+                  restorationId: widget.restorationId,
+                  drawerEnableOpenDragGesture: compact,
+                  onDrawerChanged: _onDrawerChanged,
+                  // Keep history/focus ownership mounted across breakpoints.
+                  drawer: Drawer(
+                    width: math.min(_expandedWidth, size.width - 56),
+                    child: Actions(
+                      actions: {
+                        DismissIntent: CallbackAction<DismissIntent>(
+                          onInvoke: (_) {
+                            _dismiss();
+                            return null;
+                          },
+                        ),
+                      },
+                      child: Shortcuts(
+                        shortcuts: const {
+                          SingleActivator(LogicalKeyboardKey.escape):
+                              DismissIntent(),
+                        },
+                        child: SafeArea(
+                          top: false,
+                          bottom: false,
+                          child: _NavigationPanel(
+                            expanded: true,
+                            section: widget.section,
+                            destinations: widget.destinations,
+                            selectedIndex: widget.selectedIndex,
+                            updateAvailable: info != null,
+                            onToggle: _dismiss,
+                            onDestination: (index) => _perform(
+                              () => widget.onDestinationSelected?.call(index),
+                            ),
+                            onContext: _selectContext,
+                            onSettings: () => _perform(() {
+                              const AppSettingsRoute().push<void>(context);
+                            }),
+                            onAbout: () => _perform(() {
+                              showGagakuAboutDialog(context, ref, info);
+                            }),
+                          ),
+                        ),
                       ),
-                      onContext: _selectContext,
-                      onSettings: () => _perform(() {
-                        const AppSettingsRoute().push<void>(context);
-                      }),
-                      onAbout: () => _perform(() {
-                        showGagakuAboutDialog(context, ref, info);
-                      }),
                     ),
                   ),
-          ),
-          SizedBox(
-            width: compact ? 0 : 1,
-            child: compact
-                ? null
-                : const VerticalDivider(thickness: 1, width: 1),
-          ),
-          Expanded(
-            // A shell Navigator's route blocks earlier semantics in its own
-            // container. Isolate it so the persistent rail remains accessible.
-            child: Semantics(
-              container: true,
-              explicitChildNodes: true,
-              child: widget.child,
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: compact && widget.destinations.isNotEmpty
-          ? NavigationBar(
-              height: 60,
-              labelBehavior:
-                  NavigationDestinationLabelBehavior.onlyShowSelected,
-              selectedIndex: widget.selectedIndex!,
-              onDestinationSelected: widget.onDestinationSelected,
-              destinations: [
-                for (final destination in widget.destinations)
-                  NavigationDestination(
-                    icon: destination.icon,
-                    selectedIcon: destination.selectedIcon,
-                    label: (destination.label as Text).data!,
+                  body: SafeArea(
+                    // Horizontal system insets belong outside the rail width,
+                    // not inside its icon hit targets (notched phone landscape).
+                    top: false,
+                    bottom: false,
+                    child: Row(
+                      children: [
+                        AnimatedSize(
+                          duration: _resizeDuration,
+                          curve: Curves.easeOutCubic,
+                          alignment: AlignmentDirectional.centerStart,
+                          child: SizedBox(
+                            width: compact
+                                ? 0
+                                : inlineExpanded
+                                ? _expandedWidth
+                                : _collapsedWidth,
+                            child: compact
+                                ? null
+                                : Material(
+                                    color:
+                                        NavigationRailTheme.of(context)
+                                            .backgroundColor ??
+                                        Theme.of(context).colorScheme.surface,
+                                    child: _NavigationPanel(
+                                      expanded: inlineExpanded,
+                                      section: widget.section,
+                                      destinations: widget.destinations,
+                                      selectedIndex: widget.selectedIndex,
+                                      updateAvailable: info != null,
+                                      onToggle: _toggle,
+                                      onDestination: (index) => _perform(
+                                        () => widget.onDestinationSelected
+                                            ?.call(index),
+                                      ),
+                                      onContext: _selectContext,
+                                      onSettings: () => _perform(() {
+                                        const AppSettingsRoute().push<void>(
+                                          context,
+                                        );
+                                      }),
+                                      onAbout: () => _perform(() {
+                                        showGagakuAboutDialog(
+                                          context,
+                                          ref,
+                                          info,
+                                        );
+                                      }),
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: compact ? 0 : 1,
+                          child: compact
+                              ? null
+                              : const VerticalDivider(thickness: 1, width: 1),
+                        ),
+                        Expanded(
+                          // Isolate the shell route's blocking semantics so
+                          // persistent navigation remains accessible.
+                          child: Semantics(
+                            container: true,
+                            explicitChildNodes: true,
+                            child: widget.child,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-              ],
-            )
-          : null,
+                  bottomNavigationBar: compact && widget.destinations.isNotEmpty
+                      ? NavigationBar(
+                          height: 60,
+                          labelBehavior: NavigationDestinationLabelBehavior
+                              .onlyShowSelected,
+                          selectedIndex: widget.selectedIndex ?? 0,
+                          onDestinationSelected: widget.onDestinationSelected,
+                          destinations: [
+                            for (final destination in widget.destinations)
+                              NavigationDestination(
+                                icon: destination.icon,
+                                selectedIcon: destination.selectedIcon,
+                                label: _labelText(destination.label) ?? '',
+                                enabled: !destination.disabled,
+                              ),
+                          ],
+                        )
+                      : null,
+                ),
+              );
+              if (Router.maybeOf(context)?.backButtonDispatcher != null) {
+                // A shell Navigator must not consume Back before the modal rail.
+                scaffold = BackButtonListener(
+                  onBackButtonPressed: _onBackButtonPressed,
+                  child: scaffold,
+                );
+              }
+              return scaffold;
+            },
+          ),
+        );
+      },
     );
   }
 }
@@ -303,190 +390,268 @@ class _NavigationPanel extends StatelessWidget {
         .aboutListTileTitle('Gagaku');
 
     return SafeArea(
-      child: CustomScrollView(
-        primary: false,
-        slivers: [
-          SliverToBoxAdapter(
-            child: Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: IconButton(
-                  tooltip: expanded
-                      ? t.navigation.collapse
-                      : t.navigation.expand,
-                  onPressed: onToggle,
-                  icon: Icon(expanded ? Icons.menu_open : Icons.menu),
+      left: false,
+      right: false,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: expanded ? 16 : 24,
+                vertical: 16,
+              ),
+              child: IconButton(
+                style: const ButtonStyle(
+                  minimumSize: WidgetStatePropertyAll(Size.square(48)),
                 ),
+                tooltip: expanded ? t.navigation.collapse : t.navigation.expand,
+                onPressed: onToggle,
+                icon: Icon(expanded ? Icons.menu_open : Icons.menu),
               ),
             ),
           ),
-          SliverList.list(
-            children: [
-              for (var index = 0; index < destinations.length; index++)
-                _PanelItem(
-                  expanded: expanded,
-                  icon: selectedIndex == index
-                      ? destinations[index].selectedIcon
-                      : destinations[index].icon,
-                  label: destinations[index].label,
-                  tooltip: (destinations[index].label as Text).data!,
-                  selected: selectedIndex == index,
-                  onTap: () => onDestination(index),
+          Expanded(
+            child: CustomScrollView(
+              primary: false,
+              slivers: [
+                SliverList.list(
+                  children: [
+                    for (var index = 0; index < destinations.length; index++)
+                      _PanelItem(
+                        expanded: expanded,
+                        icon: selectedIndex == index
+                            ? destinations[index].selectedIcon
+                            : destinations[index].icon,
+                        label: destinations[index].label,
+                        selected: selectedIndex == index,
+                        padding: destinations[index].padding,
+                        indicatorColor: destinations[index].indicatorColor,
+                        indicatorShape: destinations[index].indicatorShape,
+                        onTap: destinations[index].disabled
+                            ? null
+                            : () => onDestination(index),
+                      ),
+                    if (expanded || destinations.isEmpty) ...[
+                      if (destinations.isNotEmpty)
+                        const Divider(indent: 12, endIndent: 12),
+                      if (expanded)
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                            24,
+                            12,
+                            24,
+                            8,
+                          ),
+                          child: Semantics(
+                            header: true,
+                            child: Text(
+                              t.navigation.read,
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                          ),
+                        ),
+                      _PanelItem(
+                        expanded: expanded,
+                        icon: Icon(
+                          section == StartupSection.mangaDex
+                              ? Icons.menu_book
+                              : Icons.menu_book_outlined,
+                        ),
+                        label: Text(t.navigation.mangaDex),
+                        tooltip: t.navigation.mangaDex,
+                        selected: section == StartupSection.mangaDex,
+                        onTap: () => onContext(StartupSection.mangaDex),
+                      ),
+                      _PanelItem(
+                        expanded: expanded,
+                        icon: Icon(
+                          section == StartupSection.localLibrary
+                              ? Icons.photo_album
+                              : Icons.photo_album_outlined,
+                        ),
+                        label: Text(t.localLibrary.text),
+                        tooltip: t.localLibrary.text,
+                        selected: section == StartupSection.localLibrary,
+                        onTap: () => onContext(StartupSection.localLibrary),
+                      ),
+                      _PanelItem(
+                        expanded: expanded,
+                        icon: const Icon(Icons.language),
+                        label: Text(t.webSources.text),
+                        tooltip: t.webSources.text,
+                        selected: section == StartupSection.webSources,
+                        onTap: () => onContext(StartupSection.webSources),
+                      ),
+                    ],
+                  ],
                 ),
-              if (destinations.isNotEmpty)
-                const Divider(indent: 12, endIndent: 12),
-              if (expanded)
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(24, 12, 24, 8),
-                  child: Semantics(
-                    header: true,
-                    child: Text(
-                      t.navigation.read,
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                  ),
-                ),
-              _PanelItem(
-                expanded: expanded,
-                icon: Icon(
-                  section == StartupSection.mangaDex
-                      ? Icons.menu_book
-                      : Icons.menu_book_outlined,
-                ),
-                label: Text(t.navigation.mangaDex),
-                tooltip: t.navigation.mangaDex,
-                selected: section == StartupSection.mangaDex,
-                onTap: () => onContext(StartupSection.mangaDex),
-              ),
-              _PanelItem(
-                expanded: expanded,
-                icon: Icon(
-                  section == StartupSection.localLibrary
-                      ? Icons.photo_album
-                      : Icons.photo_album_outlined,
-                ),
-                label: Text(t.localLibrary.text),
-                tooltip: t.localLibrary.text,
-                selected: section == StartupSection.localLibrary,
-                onTap: () => onContext(StartupSection.localLibrary),
-              ),
-              _PanelItem(
-                expanded: expanded,
-                icon: const Icon(Icons.language),
-                label: Text(t.webSources.text),
-                tooltip: t.webSources.text,
-                selected: section == StartupSection.webSources,
-                onTap: () => onContext(StartupSection.webSources),
-              ),
-            ],
-          ),
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                const Divider(indent: 12, endIndent: 12),
-                _PanelItem(
-                  expanded: expanded,
-                  icon: const Icon(Icons.settings_outlined),
-                  label: Text(t.navigation.globalSettings),
-                  tooltip: t.navigation.globalSettings,
-                  onTap: onSettings,
-                ),
-                _PanelItem(
-                  expanded: expanded,
-                  icon: const Icon(Icons.info_outline),
-                  label: Text(aboutLabel),
-                  tooltip: updateAvailable
-                      ? '$aboutLabel: ${t.updates.updateAvailableTitle}'
-                      : aboutLabel,
-                  badge: updateAvailable,
-                  onTap: onAbout,
-                ),
-                const SizedBox(height: 8),
               ],
             ),
           ),
+          // Utilities and update feedback stay visible even in short landscape
+          // windows; only the destinations scroll.
+          const Divider(indent: 12, endIndent: 12),
+          _PanelItem(
+            expanded: expanded,
+            icon: const Icon(Icons.settings_outlined),
+            label: Text(t.navigation.globalSettings),
+            tooltip: t.navigation.globalSettings,
+            onTap: onSettings,
+          ),
+          _PanelItem(
+            expanded: expanded,
+            icon: const Icon(Icons.info_outline),
+            label: Text(aboutLabel),
+            tooltip: updateAvailable
+                ? '$aboutLabel: ${t.updates.updateAvailableTitle}'
+                : aboutLabel,
+            badge: updateAvailable,
+            onTap: onAbout,
+          ),
+          const SizedBox(height: 8),
         ],
       ),
     );
   }
 }
 
+String? _labelText(Widget label) => switch (label) {
+  Text(:final data, :final textSpan) => data ?? textSpan?.toPlainText(),
+  RichText(:final text) => text.toPlainText(),
+  _ => null,
+};
+
 class _PanelItem extends StatelessWidget {
   const _PanelItem({
     required this.expanded,
     required this.icon,
     required this.label,
-    required this.tooltip,
     required this.onTap,
+    this.tooltip,
     this.selected = false,
     this.badge = false,
+    this.padding,
+    this.indicatorColor,
+    this.indicatorShape,
   });
 
   final bool expanded;
   final Widget icon;
   final Widget label;
-  final String tooltip;
-  final VoidCallback onTap;
+  final String? tooltip;
+  final VoidCallback? onTap;
   final bool selected;
   final bool badge;
+  final EdgeInsetsGeometry? padding;
+  final Color? indicatorColor;
+  final ShapeBorder? indicatorShape;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final foreground = selected
+    final railTheme = NavigationRailTheme.of(context);
+    final foreground = onTap == null
+        ? theme.disabledColor
+        : selected
         ? theme.colorScheme.onSecondaryContainer
         : theme.colorScheme.onSurfaceVariant;
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: expanded ? 12 : 8, vertical: 4),
+    final iconTheme = selected
+        ? railTheme.selectedIconTheme
+        : railTheme.unselectedIconTheme;
+    final labelStyle = selected
+        ? railTheme.selectedLabelTextStyle
+        : railTheme.unselectedLabelTextStyle;
+    final shape =
+        indicatorShape ?? railTheme.indicatorShape ?? const StadiumBorder();
+
+    return MergeSemantics(
       child: Semantics(
         selected: selected,
         button: true,
+        enabled: onTap != null,
         label: tooltip,
         onTap: onTap,
-        excludeSemantics: true,
         child: Tooltip(
-          message: tooltip,
+          message: tooltip ?? _labelText(label) ?? '',
           excludeFromSemantics: true,
           child: Material(
-            color: selected
-                ? theme.colorScheme.secondaryContainer
-                : Colors.transparent,
-            shape: const StadiumBorder(),
-            clipBehavior: Clip.antiAlias,
+            color: Colors.transparent,
             child: InkWell(
               onTap: onTap,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 48),
-                child: IconTheme.merge(
-                  data: IconThemeData(color: foreground),
-                  child: DefaultTextStyle(
-                    style: theme.textTheme.labelLarge!.copyWith(
-                      color: foreground,
+              excludeFromSemantics: true,
+              customBorder: shape,
+              // Keep the whole row tappable, including indicator gutters.
+              child: Padding(
+                padding:
+                    padding ??
+                    EdgeInsets.symmetric(
+                      horizontal: expanded ? 12 : 8,
+                      vertical: 4,
                     ),
-                    child: expanded
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
+                child: Ink(
+                  decoration: ShapeDecoration(
+                    color: selected
+                        ? indicatorColor ??
+                              railTheme.indicatorColor ??
+                              theme.colorScheme.secondaryContainer
+                        : Colors.transparent,
+                    shape: shape,
+                  ),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: expanded ? 56 : 48),
+                    child: IconTheme.merge(
+                      data: IconThemeData(
+                        color: foreground,
+                        size: 24,
+                      ).merge(iconTheme),
+                      child: DefaultTextStyle(
+                        style:
+                            labelStyle ??
+                            theme.textTheme.labelLarge!.copyWith(
+                              color: foreground,
                             ),
-                            child: Row(
-                              children: [
-                                icon,
-                                const SizedBox(width: 12),
-                                Expanded(child: label),
-                                if (badge) ...[
-                                  const SizedBox(width: 12),
-                                  const Badge(),
+                        child: expanded
+                            ? Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                child: Row(
+                                  children: [
+                                    icon,
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: ExcludeSemantics(
+                                        excluding: tooltip != null,
+                                        child: label,
+                                      ),
+                                    ),
+                                    if (badge) ...[
+                                      const SizedBox(width: 12),
+                                      const Badge(),
+                                    ],
+                                  ],
+                                ),
+                              )
+                            : Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Badge(isLabelVisible: badge, child: icon),
+                                  SizedBox.shrink(
+                                    child: ExcludeSemantics(
+                                      excluding: tooltip != null,
+                                      child: Visibility.maintain(
+                                        visible: false,
+                                        child: label,
+                                      ),
+                                    ),
+                                  ),
                                 ],
-                              ],
-                            ),
-                          )
-                        : Center(
-                            child: Badge(isLabelVisible: badge, child: icon),
-                          ),
+                              ),
+                      ),
+                    ),
                   ),
                 ),
               ),
