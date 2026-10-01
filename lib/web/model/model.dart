@@ -151,16 +151,17 @@ WebLinkResolver webLinkResolver(Ref ref) {
   );
 }
 
+/// Caches manga and dispatches source-specific work to privately owned adapters.
+///
+/// The adapters do not own the shared HTTP client or extension runtimes.
 class WebSourceBroker {
-  WebSourceBroker({
-    required this._ref,
-    required this._cache,
-    required this._dio,
-  });
+  WebSourceBroker({required Ref ref, required this._cache, required Dio dio})
+    : _proxy = _ProxyWebSourceAdapter(dio: dio),
+      _extension = _ExtensionWebSourceAdapter(ref: ref);
 
-  final Ref _ref;
   final CacheManager _cache;
-  final Dio _dio;
+  final _ProxyWebSourceAdapter _proxy;
+  final _ExtensionWebSourceAdapter _extension;
 
   Future<void> invalidateCacheItem(String item) async {
     if (await _cache.exists(item)) {
@@ -184,15 +185,10 @@ class WebSourceBroker {
       }
     }
 
-    final WebManga? manga;
-    switch (series) {
-      case ProxySeriesRef():
-        manga = await _fetchProxyManga(series);
-      case ExtensionSeriesRef(:final sourceId, :final mangaId):
-        final provider = extensionSourceProvider(sourceId);
-        await _ref.readAsync(provider.future);
-        manga = await _ref.read(provider.notifier).getManga(mangaId);
-    }
+    final manga = await switch (series) {
+      ProxySeriesRef() => _proxy.fetchManga(series),
+      ExtensionSeriesRef() => _extension.fetchManga(series),
+    };
 
     if (manga != null) {
       const expiry = Duration(days: 1);
@@ -203,7 +199,21 @@ class WebSourceBroker {
     return manga;
   }
 
-  Future<WebManga?> _fetchProxyManga(ProxySeriesRef series) async {
+  Future<ExtensionChapterContent> getExtensionChapterContent(
+    ExtensionSeriesRef series,
+    Chapter chapter,
+  ) => _extension.fetchChapterContent(series, chapter);
+
+  Future<dynamic> getProxyAPI(String path) => _proxy.fetchApiPath(path);
+}
+
+class _ProxyWebSourceAdapter {
+  _ProxyWebSourceAdapter({required this._dio});
+
+  /// Shared client; [webSourceDioProvider] owns its disposal.
+  final Dio _dio;
+
+  Future<WebManga?> fetchManga(ProxySeriesRef series) async {
     final response = await _dio.getUri(
       Uri.parse(
         'https://cubari.moe/read/api/${series.proxyId}/series/${series.seriesId}/',
@@ -224,21 +234,7 @@ class WebSourceBroker {
     return null;
   }
 
-  Future<ExtensionChapterContent> getExtensionChapterContent(
-    ExtensionSeriesRef series,
-    Chapter chapter,
-  ) async {
-    final provider = extensionSourceProvider(series.sourceId);
-    final source = await _ref.readAsync(provider.future);
-    final notifier = _ref.read(provider.notifier);
-    return ExtensionChapterContent(
-      runtime: await notifier.getRuntime(),
-      details: await notifier.getChapterDetails(chapter),
-      sourceBaseUrl: source.baseUrl,
-    );
-  }
-
-  Future<dynamic> getProxyAPI(String path) async {
+  Future<dynamic> fetchApiPath(String path) async {
     final response = await _dio.getUri(Uri.parse('https://cubari.moe$path'));
 
     if (response.statusCode == 200) {
@@ -249,6 +245,33 @@ class WebSourceBroker {
       message: 'Failed to download API data',
       statusCode: response.statusCode,
       statusMessage: response.statusMessage,
+    );
+  }
+}
+
+/// Resolves provider-owned sources per operation rather than retaining notifiers.
+class _ExtensionWebSourceAdapter {
+  _ExtensionWebSourceAdapter({required this._ref});
+
+  final Ref _ref;
+
+  Future<WebManga?> fetchManga(ExtensionSeriesRef series) async {
+    final provider = extensionSourceProvider(series.sourceId);
+    await _ref.readAsync(provider.future);
+    return _ref.read(provider.notifier).getManga(series.mangaId);
+  }
+
+  Future<ExtensionChapterContent> fetchChapterContent(
+    ExtensionSeriesRef series,
+    Chapter chapter,
+  ) async {
+    final provider = extensionSourceProvider(series.sourceId);
+    final source = await _ref.readAsync(provider.future);
+    final notifier = _ref.read(provider.notifier);
+    return ExtensionChapterContent(
+      runtime: await notifier.getRuntime(),
+      details: await notifier.getChapterDetails(chapter),
+      sourceBaseUrl: source.baseUrl,
     );
   }
 }
