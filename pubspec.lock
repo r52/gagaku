@@ -470,10 +470,10 @@ packages:
     description:
       path: "."
       ref: gagaku
-      resolved-ref: cd9f9b656952d1be841e71d2f00392b592d6cb2d
+      resolved-ref: "8b3a4c4b1929b37382979ade6783ecf62e3424be"
       url: "https://github.com/r52/fjs.git"
     source: git
-    version: "3.3.1"
+    version: "3.3.2"
   flat_buffers:
     dependency: transitive
     description:
@@ -677,10 +677,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_rust_bridge
-      sha256: e87d6b9ee934dcd24a128ccb2bd91905d2d5fe5c06245d6a8f5477d4907a437a
+      sha256: ec69331e2335ab4d456c0a9fc700892c2c85b72b9c0cb39df3ecfe8833d5d5c8
       url: "https://pub.dev"
     source: hosted
-    version: "2.12.0"
+    version: "2.13.0"
   flutter_staggered_grid_view:
     dependency: transitive
     description:
@@ -1073,27 +1073,26 @@ packages:
     dependency: "direct main"
     description:
       name: objectbox
-      sha256: "1179fd1b0f0fea07f89f823a5256c7ab52f811824d2b53c6453ed04a443ffccf"
+      sha256: b42378542a99fac0e6d59ef045a415472227a0ca79a4d21ed80c2b96432c4a57
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.0-preview.2"
+    version: "6.0.0-preview.3"
   objectbox_flutter_libs:
     dependency: "direct main"
     description:
       name: objectbox_flutter_libs
-      sha256: "077e250876f2375a136583b790b023a5152b19c02230f06f687f381726e22122"
+      sha256: "84550565448f7f1939d9edbb50b54b53b32833a1bf334f74b493298e175f80aa"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.0-preview.2"
+    version: "6.0.0-preview.3"
   objectbox_generator:
     dependency: "direct dev"
     description:
-      path: generator
-      ref: "2686aa59e248ba19686ce463171d481735fc1b76"
-      resolved-ref: "2686aa59e248ba19686ce463171d481735fc1b76"
-      url: "https://github.com/objectbox/objectbox-dart.git"
-    source: git
-    version: "6.0.0-preview.2"
+      name: objectbox_generator
+      sha256: "5ab41942147b938083c1ee146a8b811bb8196d234d34ab56ea0f8381b2c8157d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.0-preview.3"
   objective_c:
     dependency: transitive
     description:
@@ -1106,10 +1105,10 @@ packages:
     dependency: transitive
     description:
       name: octo_image
-      sha256: "66e8f59a538a9f9f53141bc22ec0a12f8e85f2ca3bfcacab6dd30315b2fc256d"
+      sha256: "49c4f93afc10f1ad4fdef9db88fed9c65a8eb5d9ad0a4fa9b128d7fedeb41418"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.1"
+    version: "2.1.2"
   open_filex:
     dependency: "direct main"
     description:
