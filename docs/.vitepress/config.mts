@@ -30,6 +30,13 @@ export default defineConfig({
           { text: 'Troubleshooting', link: '/troubleshooting' },
         ],
       },
+      {
+        text: 'Configure Gagaku',
+        items: [
+          { text: 'App settings', link: '/app-settings' },
+          { text: 'Web Sources settings', link: '/web-source-settings' },
+        ],
+      },
     ],
     search: { provider: 'local' },
     outline: [2, 3],

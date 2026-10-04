@@ -89,3 +89,5 @@ Verification can expire, and some websites or browser-only extensions may still 
 ## Keep a title for later
 
 Use the **heart / Add to Favorites** control on a title to choose a category, or create one with **Add New Category**. Your saved titles are in the Web Sources **Favorites** tab. See [Reading & favorites](./reading.md#web-sources-favorites) for the distinction between favorites and downloads.
+
+To rename or reorder categories, or choose which ones are checked in **Latest Updates**, see [Web Sources settings](./web-source-settings.md). Category-management edits need **Save** in the editor and **Save Settings** on the parent screen.

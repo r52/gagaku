@@ -38,6 +38,11 @@ See [Reading & favorites](./reading.md) for the few controls you will need most 
 
 Open the navigation panel, choose **Settings**, and change **Startup Section** to **MangaDex**, **Web Sources**, or **Local Library**. This changes the normal startup destination; it does not combine the three libraries.
 
+## Configure and protect your data
+
+- [App settings](./app-settings.md): appearance, app updates, database sync, backup/restore, and database storage.
+- [Web Sources settings](./web-source-settings.md): organize favorites categories and choose which lists appear in Latest Updates.
+
 ## What Gagaku does not do
 
 Gagaku does not download chapters or maintain an offline manga library. Favorites, reading history, and cached images are not chapter downloads. To read your own files offline, use [Local Library](./local-library.md).

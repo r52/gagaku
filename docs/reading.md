@@ -29,7 +29,7 @@ Reader preferences are saved as you change them. Start with the default page pre
 
 On a Web Sources title, tap the **heart / Add to Favorites** control. Check the categories where you want the title to appear. If you have no categories yet, use **Add New Category**, enter a name, and confirm; the title is added to that new category.
 
-Open the Web Sources **Favorites** tab to find it again. Categories are local to Gagaku; you do not need a MangaDex account for them.
+Open the Web Sources **Favorites** tab to find it again. Categories are managed by Gagaku, not your MangaDex account; they can be included in backups and database sync. See [Web Sources settings](./web-source-settings.md) to rename/reorder categories and choose **Categories to Update** for the Latest Updates feed.
 
 **History** can help you find previously browsed titles. The **Save History?** switch is on the Web Sources **History** screen. If you turn it off, new browsing entries will not be saved.
 
