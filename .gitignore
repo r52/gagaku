@@ -56,6 +56,10 @@ extension/dist/
 # node
 node_modules/
 
+# VitePress artifacts
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+
 # ai
 .aiexclude
 .memories/
