@@ -16,8 +16,6 @@ import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-typedef CtxCallback = void Function(BuildContext);
-
 class ReaderWidget extends StatelessWidget {
   const ReaderWidget({
     super.key,
@@ -242,7 +240,7 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
                       ChoiceChip(
                         avatar: Icon(f.icon, color: theme.iconTheme.color),
                         label: Text(tr[f.label]),
-                        selected: settings.format == f,
+                        selected: format == f,
                         onSelected: (reader.longstrip)
                             ? null
                             : (value) {
@@ -328,16 +326,20 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
                           _saveSetting(settings.copyWith(precacheCount: value));
                         }
                       },
-                      dropdownMenuEntries:
-                          List<DropdownMenuEntry<int>>.generate(
-                            10,
-                            (int index) => DropdownMenuEntry<int>(
-                              value: index + 1,
-                              label: (index + 1 > 9)
-                                  ? 'Max (not recommended)'
-                                  : (index + 1).toString(),
-                            ),
+                      dropdownMenuEntries: [
+                        for (
+                          var count = 1;
+                          count <= ReaderPrefetchPolicy.maxPreloadCount + 1;
+                          count++
+                        )
+                          DropdownMenuEntry<int>(
+                            value: count,
+                            label:
+                                ReaderPrefetchPolicy.isUnboundedPreload(count)
+                                ? tr.reader.precacheMax
+                                : count.toString(),
                           ),
+                      ],
                     ),
                   ],
                 ),
@@ -388,7 +390,7 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
               mainAxisAlignment: MainAxisAlignment.center,
               spacing: 10.0,
               children: [
-                const Text('Read on external site:'),
+                Text(tr.reader.readExternal),
                 ElevatedButton(
                   onPressed: () async {
                     await Styles.tryLaunchUrl(context, reader.externalUrl!);
@@ -409,25 +411,18 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
             controller: horizontalViewport,
             pages: pages,
             settings: settings,
-            onTap: (localPosition) {
+            onTapZone: (zone) {
               focusNode.requestFocus();
 
-              final taploc = localPosition.dx;
-              final viewport = MediaQuery.sizeOf(context).width;
-              final tapmargin = viewport / 2.5;
-
-              // Tap in the middle 20% (from 40% to 60%).
-              if (taploc > tapmargin && taploc < viewport - tapmargin) {
-                session.toggleChrome();
-                return;
-              }
-
-              if (settings.clickToTurn) {
-                if (taploc <= tapmargin) {
+              switch (zone) {
+                case ReaderTapZone.center:
+                  session.toggleChrome();
+                case ReaderTapZone.left when settings.clickToTurn:
                   _handleTurn(session.turnLeft(settings.direction));
-                } else if (taploc >= viewport - tapmargin) {
+                case ReaderTapZone.right when settings.clickToTurn:
                   _handleTurn(session.turnRight(settings.direction));
-                }
+                case ReaderTapZone.left || ReaderTapZone.right:
+                  break;
               }
             },
             onPageChanged: (page) {

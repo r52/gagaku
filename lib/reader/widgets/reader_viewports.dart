@@ -18,7 +18,7 @@ class HorizontalReaderView extends StatelessWidget {
     required this.controller,
     required this.pages,
     required this.settings,
-    required this.onTap,
+    required this.onTapZone,
     required this.onPageChanged,
     required this.onInteraction,
   });
@@ -26,50 +26,52 @@ class HorizontalReaderView extends StatelessWidget {
   final HorizontalReaderViewportController controller;
   final List<ReaderPage> pages;
   final ReaderConfig settings;
-  final ValueChanged<Offset> onTap;
+  final ValueChanged<ReaderTapZone> onTapZone;
   final ValueChanged<int> onPageChanged;
   final VoidCallback onInteraction;
 
   @override
   Widget build(BuildContext context) {
-    return PassiveTapListener(
-      onTap: onTap,
-      child: PhotoViewGallery.builder(
-        allowImplicitScrolling: true,
-        reverse: settings.direction == ReaderDirection.rightToLeft,
-        scrollPhysics: !settings.swipeGestures
-            ? const NeverScrollableScrollPhysics()
-            : null,
-        backgroundDecoration: const BoxDecoration(color: Colors.black),
-        pageController: controller.pageController,
-        onPageChanged: (index) {
-          onPageChanged(index);
-          onInteraction();
-        },
-        loadingBuilder: (context, event) => Center(
-          child: SizedBox(
-            width: 150,
-            child: LinearProgressIndicator(
-              value: event != null && event.expectedTotalBytes != null
-                  ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
-                  : null,
+    return LayoutBuilder(
+      builder: (context, constraints) => PassiveTapListener(
+        onTap: (position) =>
+            onTapZone(ReaderTapZone.of(position.dx, constraints.maxWidth)),
+        child: PhotoViewGallery.builder(
+          allowImplicitScrolling: true,
+          reverse: settings.direction == ReaderDirection.rightToLeft,
+          scrollPhysics: !settings.swipeGestures
+              ? const NeverScrollableScrollPhysics()
+              : null,
+          backgroundDecoration: const BoxDecoration(color: Colors.black),
+          pageController: controller.pageController,
+          onPageChanged: (index) {
+            onPageChanged(index);
+            onInteraction();
+          },
+          loadingBuilder: (context, event) => Center(
+            child: SizedBox(
+              width: 150,
+              child: LinearProgressIndicator(
+                value: event != null && event.expectedTotalBytes != null
+                    ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
+                    : null,
+              ),
             ),
           ),
+          itemCount: pages.length,
+          builder: (context, index) {
+            final page = pages[index];
+            return PhotoViewGalleryPageOptions(
+              imageProvider: readerImageProvider(page),
+              controller: controller.viewController(index),
+              scaleStateController: controller.scaleController(index),
+              minScale: PhotoViewComputedScale.contained,
+              maxScale: PhotoViewComputedScale.covered * 5,
+              initialScale: PhotoViewComputedScale.contained,
+              basePosition: Alignment.center,
+            );
+          },
         ),
-        itemCount: pages.length,
-        builder: (context, index) {
-          final page = pages[index];
-          return PhotoViewGalleryPageOptions(
-            heroAttributes: PhotoViewHeroAttributes(tag: page.id),
-            imageProvider: page.provider,
-            controller: controller.viewController(index),
-            scaleStateController: controller.scaleController(index),
-            minScale: PhotoViewComputedScale.contained,
-            maxScale: PhotoViewComputedScale.covered * 5,
-            initialScale: PhotoViewComputedScale.contained,
-            basePosition: Alignment.center,
-          );
-        },
       ),
     );
   }
@@ -138,65 +140,68 @@ class _LongStripReaderViewState extends State<LongStripReaderView> {
       :onCenterTap,
     ) = widget;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onTapUp: (details) {
-        final taploc = details.localPosition.dx;
-        final tapmargin = mediaSize.width / 2.5;
-
-        if (taploc > tapmargin && taploc < mediaSize.width - tapmargin) {
-          onCenterTap();
-        }
-      },
-      child: NotificationListener<UserScrollNotification>(
-        onNotification: (notification) {
-          if (notification.direction != ScrollDirection.idle) {
-            controller.releasePin();
+    return LayoutBuilder(
+      builder: (context, constraints) => GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTapUp: (details) {
+          final zone = ReaderTapZone.of(
+            details.localPosition.dx,
+            constraints.maxWidth,
+          );
+          if (zone == ReaderTapZone.center) {
+            onCenterTap();
           }
-          return false;
         },
-        child: SuperListView.builder(
-          padding: _padding,
-          listController: controller.listController,
-          controller: controller.scrollController,
-          cacheExtent: mediaSize.height * 3,
-          addAutomaticKeepAlives: false,
-          extentEstimation: (index, _) {
-            if (index == null) return 0;
-            final aspectRatio = pages[index].aspectRatio;
-            return aspectRatio == null
-                ? mediaSize.height
-                : displayWidth / aspectRatio;
+        child: NotificationListener<UserScrollNotification>(
+          onNotification: (notification) {
+            if (notification.direction != ScrollDirection.idle) {
+              controller.releasePin();
+            }
+            return false;
           },
-          itemCount: pages.length,
-          itemBuilder: (context, index) {
-            final page = pages[index];
-            return Center(
-              key: ValueKey(page.id),
-              child: _LongStripZoomGesture(
-                onZoomRequested: () {
-                  Navigator.of(context).push<void>(
-                    TransparentOverlay(
-                      builder: (context) => LongStripPageOverlay(page: page),
-                    ),
-                  );
-                },
-                child: Hero(
-                  tag: page.id,
-                  child: RepaintBoundary(
-                    child: LongStripPageImage(
-                      page: page,
-                      displayWidth: displayWidth,
-                      cacheWidth: cacheWidth,
-                      placeholderExtent: mediaSize.height,
-                      onAspectRatioChanged: () =>
-                          controller.invalidateExtent(index),
+          child: SuperListView.builder(
+            padding: _padding,
+            listController: controller.listController,
+            controller: controller.scrollController,
+            cacheExtent: mediaSize.height * 3,
+            addAutomaticKeepAlives: false,
+            extentEstimation: (index, _) {
+              if (index == null) return 0;
+              final aspectRatio = pages[index].aspectRatio;
+              return aspectRatio == null
+                  ? mediaSize.height
+                  : displayWidth / aspectRatio;
+            },
+            itemCount: pages.length,
+            itemBuilder: (context, index) {
+              final page = pages[index];
+              return Center(
+                key: ValueKey(page.id),
+                child: _LongStripZoomGesture(
+                  onZoomRequested: () {
+                    Navigator.of(context).push<void>(
+                      TransparentOverlay(
+                        builder: (context) => LongStripPageOverlay(page: page),
+                      ),
+                    );
+                  },
+                  child: Hero(
+                    tag: page.id,
+                    child: RepaintBoundary(
+                      child: LongStripPageImage(
+                        page: page,
+                        displayWidth: displayWidth,
+                        cacheWidth: cacheWidth,
+                        placeholderExtent: mediaSize.height,
+                        onAspectRatioChanged: () =>
+                            controller.invalidateExtent(index),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -221,7 +226,7 @@ class LongStripPageOverlay extends StatelessWidget {
       body: Hero(
         tag: page.id,
         child: PhotoView(
-          imageProvider: page.provider,
+          imageProvider: readerImageProvider(page),
           backgroundDecoration: const BoxDecoration(color: Colors.transparent),
           minScale: PhotoViewComputedScale.contained,
           maxScale: PhotoViewComputedScale.covered * 5,

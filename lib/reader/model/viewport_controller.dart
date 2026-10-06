@@ -57,17 +57,6 @@ class HorizontalReaderViewportController implements ReaderViewportController {
     controller.scaleState = defaultScaleStateCycle(controller.scaleState);
   }
 
-  @Deprecated('Remove with the legacy animated reader command.')
-  void animateToPage(
-    int page, {
-    required Duration duration,
-    required Curve curve,
-  }) {
-    if (_pageController.hasClients) {
-      _pageController.animateToPage(page, duration: duration, curve: curve);
-    }
-  }
-
   void dispose() {
     _pageController.dispose();
 
@@ -112,6 +101,9 @@ class LongStripReaderViewportController implements ReaderViewportController {
   _LongStripAnchor? _pinnedAnchor;
   bool _repinScheduled = false;
 
+  /// Destination of the scroll started by [scrollBy], while it runs.
+  double? _scrollTarget;
+
   void applyDefaultScale({required bool portrait}) {
     if (_scaleSelected) return;
     scale.value = portrait ? LongStripScale.full : LongStripScale.small;
@@ -147,11 +139,24 @@ class LongStripReaderViewportController implements ReaderViewportController {
     if (!scrollController.hasClients) return ReaderPageTurnResult.handled;
 
     releasePin();
-    scrollController.animateTo(
-      scrollController.offset + delta,
-      duration: const Duration(milliseconds: 50),
-      curve: Curves.easeInOut,
+
+    // Key repeats extend the running scroll instead of restarting an eased
+    // animation from wherever the previous one had reached.
+    final position = scrollController.position;
+    final target = ((_scrollTarget ?? position.pixels) + delta).clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
     );
+    _scrollTarget = target;
+    scrollController
+        .animateTo(
+          target,
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOut,
+        )
+        .whenComplete(() {
+          if (_scrollTarget == target) _scrollTarget = null;
+        });
     return ReaderPageTurnResult.handled;
   }
 
@@ -278,23 +283,6 @@ class LongStripReaderViewportController implements ReaderViewportController {
       if (pinned != null && pinned.index != page) return;
       onVisiblePageChanged(page);
     });
-  }
-
-  @Deprecated('Remove with the legacy animated reader command.')
-  void animateToPage(
-    int page, {
-    required Duration duration,
-    required Curve curve,
-  }) {
-    if (!listController.isAttached) return;
-
-    listController.animateToItem(
-      index: page,
-      scrollController: scrollController,
-      alignment: 0,
-      duration: (_) => duration,
-      curve: (_) => curve,
-    );
   }
 
   void dispose() {

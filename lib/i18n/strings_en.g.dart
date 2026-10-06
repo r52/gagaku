@@ -689,6 +689,12 @@ class Translations$reader$en {
 	/// en: 'Page Preload'
 	String get precacheCount => 'Page Preload';
 
+	/// en: 'Max (not recommended)'
+	String get precacheMax => 'Max (not recommended)';
+
+	/// en: 'Read on external site:'
+	String get readExternal => 'Read on external site:';
+
 	/// en: 'Go to page'
 	String get gotoPage => 'Go to page';
 
@@ -2484,6 +2490,8 @@ extension on Translations {
 			'reader.swipeGestures' => 'Swipe Gestures',
 			'reader.clickToTurn' => 'Click/Tap to Turn Page',
 			'reader.precacheCount' => 'Page Preload',
+			'reader.precacheMax' => 'Max (not recommended)',
+			'reader.readExternal' => 'Read on external site:',
 			'reader.gotoPage' => 'Go to page',
 			'reader.pageCount' => ({required Object current, required Object total}) => 'Page ${current} of ${total}',
 			'mangadex.home' => 'Home',
@@ -2754,10 +2762,10 @@ extension on Translations {
 			'sync.statusForked' => 'Conflict requires resolution',
 			'sync.statusCleanupWarning' => 'Synchronized with cleanup warning',
 			'sync.statusDisposed' => 'Stopped',
-			'sync.profileId' => ({required Object id}) => 'Profile: ${id}',
-			'sync.deviceId' => ({required Object id}) => 'Device: ${id}',
 			_ => null,
 		} ?? switch (path) {
+			'sync.profileId' => ({required Object id}) => 'Profile: ${id}',
+			'sync.deviceId' => ({required Object id}) => 'Device: ${id}',
 			'sync.location' => ({required Object path}) => 'Directory: ${path}',
 			'sync.documentLocation' => ({required Object uri}) => 'Document tree: ${uri}',
 			'sync.lastPull' => ({required Object time}) => 'Last pull: ${time}',

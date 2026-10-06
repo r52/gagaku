@@ -107,17 +107,17 @@ void main() {
     session.updatePrefetchPolicy(const ReaderPrefetchPolicy(forwardCount: 2));
     session.reportVisiblePage(3);
     scheduler.flush();
-    expect(requested, [pages[4].provider]);
+    expect(requested, [readerImageProvider(pages[4])]);
 
     await Future<void>.delayed(Duration.zero);
     scheduler.flush();
 
     expect(requested.skip(1), [
-      pages[4].provider,
-      pages[5].provider,
-      pages[0].provider,
-      pages[1].provider,
-      pages[2].provider,
+      readerImageProvider(pages[4]),
+      readerImageProvider(pages[5]),
+      readerImageProvider(pages[0]),
+      readerImageProvider(pages[1]),
+      readerImageProvider(pages[2]),
     ]);
   });
 
@@ -137,10 +137,10 @@ void main() {
     scheduler.flush();
 
     expect(requested, [
-      pages[6].provider,
-      pages[2].provider,
-      pages[3].provider,
-      pages[4].provider,
+      readerImageProvider(pages[6]),
+      readerImageProvider(pages[2]),
+      readerImageProvider(pages[3]),
+      readerImageProvider(pages[4]),
     ]);
   });
 
@@ -162,7 +162,9 @@ void main() {
       await _settle(scheduler);
 
       expect(
-        requested.where((provider) => provider == pages[1].provider).length,
+        requested
+            .where((provider) => provider == readerImageProvider(pages[1]))
+            .length,
         greaterThan(1),
       );
     },
@@ -193,7 +195,10 @@ void main() {
     session.reportVisiblePage(6);
     scheduler.flush();
 
-    expect(requested, [pages[7].provider, pages[8].provider]);
+    expect(requested, [
+      readerImageProvider(pages[7]),
+      readerImageProvider(pages[8]),
+    ]);
   });
 
   test('measures again after the decode width changes', () async {
@@ -212,8 +217,7 @@ void main() {
     );
     scheduler.flush();
 
-    expect(requested, hasLength(1));
-    expect(requested.single, isA<ResizeImage>());
+    expect(requested, [readerImageProvider(pages[1], cacheWidth: 256)]);
   });
 
   test('builds mode-specific prefetch policies', () {
@@ -234,6 +238,20 @@ void main() {
       ),
       const ReaderPrefetchPolicy(forwardCount: 9, cacheWidth: 800),
     );
+  });
+
+  test('preloads every page only above the largest selectable count', () {
+    const max = ReaderPrefetchPolicy.maxPreloadCount;
+    expect(ReaderPrefetchPolicy.isUnboundedPreload(max), isFalse);
+    expect(ReaderPrefetchPolicy.isUnboundedPreload(max + 1), isTrue);
+  });
+
+  test('splits taps into page-turn sides and a center chrome zone', () {
+    expect(ReaderTapZone.of(0, 1000), ReaderTapZone.left);
+    expect(ReaderTapZone.of(400, 1000), ReaderTapZone.left);
+    expect(ReaderTapZone.of(401, 1000), ReaderTapZone.center);
+    expect(ReaderTapZone.of(599, 1000), ReaderTapZone.center);
+    expect(ReaderTapZone.of(600, 1000), ReaderTapZone.right);
   });
 
   test('owns reader chrome visibility', () {

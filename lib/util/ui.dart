@@ -12,6 +12,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart';
 import 'package:url_launcher/url_launcher.dart' show launchUrl;
 
+typedef CtxCallback = void Function(BuildContext);
+
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
   const MouseTouchScrollBehavior();
 

@@ -33,6 +33,13 @@ final class ReaderPrefetchPolicy {
     this.cacheWidth,
   });
 
+  /// Largest selectable preload count; the option above it preloads as many
+  /// pages as fit in the image cache.
+  static const maxPreloadCount = 9;
+
+  static bool isUnboundedPreload(int configuredCount) =>
+      configuredCount > maxPreloadCount;
+
   factory ReaderPrefetchPolicy.forReader({
     required ReaderFormat format,
     required int configuredCount,
@@ -41,11 +48,13 @@ final class ReaderPrefetchPolicy {
   }) {
     return switch (format) {
       ReaderFormat.longstrip => ReaderPrefetchPolicy(
-        forwardCount: configuredCount.clamp(1, 9),
+        forwardCount: configuredCount.clamp(1, maxPreloadCount),
         cacheWidth: longStripCacheWidth,
       ),
       ReaderFormat.single => ReaderPrefetchPolicy(
-        forwardCount: configuredCount > 9 ? pageCount : configuredCount,
+        forwardCount: isUnboundedPreload(configuredCount)
+            ? pageCount
+            : configuredCount,
       ),
     };
   }
@@ -274,11 +283,10 @@ class ReaderSession {
       forwardCount: forwardCount,
       backwardCount: backwardCount,
     )) {
-      final page = _pages[index];
-      final provider = switch (policy.cacheWidth) {
-        final width? => ResizeImage.resizeIfNeeded(width, null, page.provider),
-        null => page.provider,
-      };
+      final provider = readerImageProvider(
+        _pages[index],
+        cacheWidth: policy.cacheWidth,
+      );
 
       // Pages that already completed are requested again: a cache hit is a
       // cheap synchronous resolve that also refreshes their LRU position,

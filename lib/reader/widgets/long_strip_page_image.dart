@@ -10,13 +10,6 @@ int longStripCacheWidth(double physicalWidth) {
   return (steps < 1 ? 1 : steps) * longStripCacheWidthStep;
 }
 
-ImageProvider<Object> readerImageProvider(
-  ReaderPage page, {
-  required int cacheWidth,
-}) {
-  return ResizeImage.resizeIfNeeded(cacheWidth, null, page.provider);
-}
-
 class LongStripPageImage extends StatefulWidget {
   const LongStripPageImage({
     super.key,

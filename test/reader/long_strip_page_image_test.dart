@@ -93,7 +93,19 @@ void main() {
 
     expect(provider, isA<ResizeImage>());
     expect((provider as ResizeImage).width, 320);
+    expect(provider.height, readerMaxDecodeDimension);
+    expect(provider.policy, ResizeImagePolicy.fit);
     expect(provider.allowUpscaling, isFalse);
+  });
+
+  test('bounds unresized decodes to keep tall pages proportional', () {
+    final page = ReaderPage(provider: _TestImageProvider(null));
+
+    final provider = readerImageProvider(page) as ResizeImage;
+
+    expect(provider.width, readerMaxDecodeDimension);
+    expect(provider.height, readerMaxDecodeDimension);
+    expect(provider.policy, ResizeImagePolicy.fit);
   });
 
   testWidgets('double tap hoists the page into a Hero zoom overlay', (
@@ -271,6 +283,19 @@ void main() {
 
     expect(subject.controller.scrollController.offset, closeTo(450, 0.5));
     expect(subject.reports, everyElement(1));
+  });
+
+  testWidgets('repeated key scrolls extend the running scroll', (tester) async {
+    final subject = await _pumpLongStrip(tester, pageCount: 6);
+    addTearDown(subject.dispose);
+    await subject.pump();
+
+    subject.controller.scrollBy(250, currentPage: 0);
+    await tester.pump(const Duration(milliseconds: 16));
+    subject.controller.scrollBy(250, currentPage: 0);
+    await tester.pumpAndSettle();
+
+    expect(subject.controller.scrollController.offset, closeTo(500, 0.5));
   });
 
   testWidgets('anchors relative to the leading list padding', (tester) async {
