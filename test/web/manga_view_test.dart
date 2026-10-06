@@ -40,7 +40,7 @@ void main() {
   });
 
   for (final testCase in [
-    (name: 'narrow', size: const Size(600, 800)),
+    (name: 'narrow', size: const Size(400, 800)),
     (name: 'wide', size: const Size(1200, 800)),
   ]) {
     testWidgets('artwork-enabled ${testCase.name} layout can pull to refresh', (

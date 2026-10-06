@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/rendering.dart';
 import 'package:gagaku/util/riverpod.dart';
-import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:collection/collection.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
@@ -14,8 +13,8 @@ import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/routes.dart';
-import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
+import 'package:gagaku/util/manga_detail.dart';
 import 'package:gagaku/util/material_hooks.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -23,7 +22,6 @@ import 'package:gagaku/web/model/types.dart' show SearchQuery;
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -108,8 +106,8 @@ class _MangaDexMangaViewWidgetState
   late final _chapterController = PagingController<int, Chapter>(
     getNextPageKey: _chapterManager.getNextPageKey,
     fetchPage: (pageKey) async {
-      final api = ref.watch(mangadexProvider);
-      final sort = ref.watch(mangaChaptersListSortProvider);
+      final api = ref.read(mangadexProvider);
+      final sort = ref.read(mangaChaptersListSortProvider);
       final chapterlist = await api.fetchChapterFeed(
         path: chapterInfo.path!.replaceFirst('{id}', widget.manga.id),
         feedKey: chapterInfo.key,
@@ -145,7 +143,7 @@ class _MangaDexMangaViewWidgetState
   late final _coverController = PagingController<int, CoverArt>(
     getNextPageKey: _coverManager.getNextPageKey,
     fetchPage: (pageKey) async {
-      final api = ref.watch(mangadexProvider);
+      final api = ref.read(mangadexProvider);
       final covers = await api.getCoverList(widget.manga, offset: pageKey);
 
       _coverManager.totalItems = covers.total;
@@ -229,11 +227,6 @@ class _MangaDexMangaViewWidgetState
           ? _ViewType.values.length
           : _ViewType.values.length - 1,
     );
-    final tabview = useListenableSelector(
-      tabController,
-      () => tabController.index,
-    );
-
     ref.listen(userListNewMutation(me?.id), (_, next) {
       if (next is MutationError) {
         Styles.showSnackBar(
@@ -269,7 +262,7 @@ class _MangaDexMangaViewWidgetState
         });
       }
 
-      switch (_ViewType.values[tabview]) {
+      switch (_ViewType.values[tabController.index]) {
         case _ViewType.chapters:
           _chapterManager.reset();
           await ref
@@ -287,78 +280,51 @@ class _MangaDexMangaViewWidgetState
       }
     }
 
-    final chapterScrollController = useScrollController();
-    final useWideLayout = DeviceContext.useNavigationRail(context);
+    final scrollController = useScrollController();
 
-    if (useWideLayout) {
-      return _MangaDexWideLayout(
-        manga: widget.manga,
-        tabController: tabController,
-        doRefresh: doRefresh,
-        chapterController: _chapterController,
-        coverController: _coverController,
-        relatedController: _relatedController,
-        chapterScrollController: chapterScrollController,
-      );
-    } else {
-      return _MangaDexNarrowLayout(
-        manga: widget.manga,
-        tabController: tabController,
-        doRefresh: doRefresh,
-        chapterController: _chapterController,
-        coverController: _coverController,
-        relatedController: _relatedController,
-        chapterScrollController: chapterScrollController,
-      );
-    }
+    return MangaDetailScaffold(
+      title: widget.manga.attributes!.title.get(tr.$meta.locale.languageCode),
+      coverUrl: widget.manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
+      badge: CountryFlag(
+        flag: widget.manga.attributes!.originalLanguage.flag,
+        size: 24,
+      ),
+      actions: _MangaDexActionBar(manga: widget.manga),
+      metadata: _MangaMetadataColumn(manga: widget.manga),
+      collapsedBannerHeight: 100.0,
+      tabController: tabController,
+      tabs: [
+        MangaDetailTab(
+          label: tr.mangaView.chapters,
+          scrollToTop: true,
+          body: _MangaChaptersView(
+            manga: widget.manga,
+            controller: _chapterController,
+          ),
+        ),
+        MangaDetailTab(
+          label: tr.mangaView.art,
+          body: _MangaCoversView(
+            manga: widget.manga,
+            controller: _coverController,
+          ),
+        ),
+        if (hasRelated)
+          MangaDetailTab(
+            label: tr.mangaView.related,
+            body: _MangaRelatedView(
+              manga: widget.manga,
+              controller: _relatedController,
+            ),
+          ),
+      ],
+      onRefresh: doRefresh,
+      scrollController: scrollController,
+    );
   }
 }
 
-class _PinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
-  const _PinnedHeaderDelegate({required this.child, required this.height});
-  final Widget child;
-  final double height;
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) => child;
-  @override
-  double get maxExtent => height;
-  @override
-  double get minExtent => height;
-  @override
-  bool shouldRebuild(_PinnedHeaderDelegate old) =>
-      child != old.child || height != old.height;
-}
-
-class _UnpagedMangaViewBody extends HookWidget {
-  const _UnpagedMangaViewBody({
-    required this.controller,
-    required this.chaptersView,
-    required this.coversView,
-    required this.relatedView,
-  });
-
-  final TabController controller;
-  final Widget chaptersView;
-  final Widget coversView;
-  final Widget relatedView;
-
-  @override
-  Widget build(BuildContext context) {
-    final tabview = useListenableSelector(controller, () => controller.index);
-    return switch (_ViewType.values[tabview]) {
-      _ViewType.chapters => chaptersView,
-      _ViewType.art => coversView,
-      _ViewType.related => relatedView,
-    };
-  }
-}
-
-// Metadata section shown in the left panel (wide) or as a SliverList child (narrow).
+// Metadata section shown in the side pane (two-pane) or below the banner.
 class _MangaMetadataColumn extends HookWidget {
   const _MangaMetadataColumn({required this.manga});
 
@@ -763,23 +729,27 @@ class _ChapterControlsBar extends ConsumerWidget {
 }
 
 class _MangaChaptersView extends StatelessWidget {
-  const _MangaChaptersView({
-    required this.manga,
-    required this.controller,
-    this.scrollController,
-  });
+  const _MangaChaptersView({required this.manga, required this.controller});
 
   final Manga manga;
   final PagingController<int, Chapter> controller;
-  final ScrollController? scrollController;
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       scrollCacheExtent: const ScrollCacheExtent.viewport(1.0),
       physics: const AlwaysScrollableScrollPhysics(),
-      controller: scrollController,
       slivers: [
+        PinnedHeaderSliver(
+          child: Material(
+            elevation: 1,
+            child: _ChapterControlsBar(
+              manga: manga,
+              chapterController: controller,
+              onSortChanged: controller.refresh,
+            ),
+          ),
+        ),
         PagingListener(
           controller: controller,
           builder: (context, state, fetchNextPage) {
@@ -930,23 +900,29 @@ class _MangaCoversView extends HookWidget {
             error: filteredState.error,
             fetchNextPage: controller.fetchNextPage,
             animateTransitions: true,
-            itemBuilder: (context, item, index) => _CoverArtItem(
+            itemBuilder: (context, item, index) => CoverArtGridItem(
               key: ValueKey(item.id),
-              cover: item,
-              manga: manga,
-              page: index,
-              onTap: () async {
-                Navigator.push(
-                  context,
-                  TransparentOverlay(
-                    builder: (context) => _CoverArtPagedOverlay(
-                      index: index,
-                      manga: manga,
-                      items: filteredState.items!,
-                    ),
+              url: manga
+                  .getUrlFromCover(item)
+                  .quality(quality: CoverArtQuality.medium),
+              heroTag: item.id,
+              footer: item.attributes?.volume != null
+                  ? GridAlbumTextBar(
+                      text: tr.mangaView.volume(n: item.attributes!.volume!),
+                    )
+                  : null,
+              onTap: () => Navigator.push(
+                context,
+                TransparentOverlay(
+                  builder: (context) => CoverArtPagedOverlay(
+                    index: index,
+                    items: [
+                      for (final cover in filteredState.items!)
+                        (url: manga.getUrlFromCover(cover), heroTag: cover.id),
+                    ],
                   ),
-                );
-              },
+                ),
+              ),
             ),
           ),
         ),
@@ -1077,157 +1053,6 @@ class _ChapterListHeader extends HookWidget {
       child: Text(
         text,
         style: TextStyle(fontWeight: bold ? FontWeight.bold : null),
-      ),
-    );
-  }
-}
-
-class _CoverArtItem extends HookConsumerWidget {
-  const _CoverArtItem({
-    super.key,
-    required this.cover,
-    required this.manga,
-    required this.page,
-    this.onTap,
-  });
-
-  final CoverArt cover;
-  final Manga manga;
-  final int page;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final tr = context.t;
-    final aniController = useAnimationController(
-      duration: const Duration(milliseconds: 100),
-    );
-    final url = manga.getUrlFromCover(cover);
-    final imageCache = ref.watch(extensionImageCacheProvider);
-
-    final image = GridAlbumImage(
-      animation: aniController.drive(Styles.coverArtGradientTween),
-      child: CachedNetworkImage(
-        imageUrl: url.quality(quality: CoverArtQuality.medium),
-        cacheManager: imageCache,
-        width: 256.0,
-        progressIndicatorBuilder: (context, url, downloadProgress) =>
-            const Center(child: CircularProgressIndicator()),
-        errorBuilder: (context, error, stacktrace) {
-          return Tooltip(
-            message: error.toString(),
-            child: const Icon(Icons.error),
-          );
-        },
-        fit: BoxFit.cover,
-      ),
-    );
-
-    return Hero(
-      tag: cover.id,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          onHover: (hovering) {
-            if (hovering) {
-              aniController.forward();
-            } else {
-              aniController.reverse();
-            }
-          },
-          child: GridTile(
-            footer: cover.attributes?.volume != null
-                ? GridAlbumTextBar(
-                    text: tr.mangaView.volume(n: cover.attributes!.volume!),
-                  )
-                : null,
-            child: image,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CoverArtPagedOverlay extends HookConsumerWidget {
-  const _CoverArtPagedOverlay({
-    required this.index,
-    required this.items,
-    required this.manga,
-  });
-
-  final int index;
-  final List<CoverArt> items;
-  final Manga manga;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final controller = usePageController(initialPage: index);
-    final activePage = useState(index);
-    final imageCache = ref.watch(extensionImageCacheProvider);
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: const OverlayCloseButton(),
-      ),
-      backgroundColor: Colors.transparent,
-      extendBody: true,
-      extendBodyBehindAppBar: true,
-      body: PageView.builder(
-        scrollBehavior: const MouseTouchScrollBehavior(),
-        findChildIndexCallback: (key) {
-          final valueKey = key as ValueKey<String>;
-          final val = items.indexWhere((i) => i.id == valueKey.value);
-          return val >= 0 ? val : null;
-        },
-        itemBuilder: (BuildContext context, int id) {
-          final item = items[id];
-          final url = manga.getUrlFromCover(item);
-
-          final child = Container(
-            padding: const EdgeInsets.all(10.0),
-            color: Colors.transparent,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: CachedNetworkImage(
-                cacheManager: imageCache,
-                imageUrl: url,
-                imageBuilder: (context, imageProvider) {
-                  return PhotoView(
-                    backgroundDecoration: const BoxDecoration(
-                      color: Colors.transparent,
-                    ),
-                    imageProvider: imageProvider,
-                    minScale: PhotoViewComputedScale.contained * 0.8,
-                    maxScale: PhotoViewComputedScale.covered * 5.0,
-                    initialScale: PhotoViewComputedScale.contained,
-                  );
-                },
-                fit: BoxFit.contain,
-                progressIndicatorBuilder: (context, url, downloadProgress) =>
-                    const Center(child: CircularProgressIndicator()),
-                errorBuilder: (context, error, stacktrace) {
-                  return Tooltip(
-                    message: error.toString(),
-                    child: const Icon(Icons.error),
-                  );
-                },
-              ),
-            ),
-          );
-
-          return activePage.value == id
-              ? Hero(key: ValueKey(item.id), tag: item.id, child: child)
-              : KeyedSubtree(key: ValueKey(item.id), child: child);
-        },
-        itemCount: items.length,
-        controller: controller,
-        onPageChanged: (id) => activePage.value = id,
-        scrollDirection: Axis.horizontal,
       ),
     );
   }
@@ -1783,74 +1608,16 @@ class _MangaDexMoreMenu extends StatelessWidget {
   }
 }
 
-class _MangaDexWideLayout extends HookConsumerWidget {
-  const _MangaDexWideLayout({
-    required this.manga,
-    required this.tabController,
-    required this.doRefresh,
-    required this.chapterController,
-    required this.coverController,
-    required this.relatedController,
-    required this.chapterScrollController,
-  });
+class _MangaRelatedView extends StatelessWidget {
+  const _MangaRelatedView({required this.manga, required this.controller});
 
   final Manga manga;
-  final TabController tabController;
-  final Future<void> Function() doRefresh;
-  final PagingController<int, Chapter> chapterController;
-  final PagingController<int, CoverArt> coverController;
-  final PagingController<int, Manga> relatedController;
-  final ScrollController chapterScrollController;
+  final PagingController<int, Manga> controller;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final tr = context.t;
-    final hasRelated = manga.relatedMangas.isNotEmpty;
-    final tabview = useListenableSelector(
-      tabController,
-      () => tabController.index,
-    );
-
-    final leftWidth = (MediaQuery.sizeOf(context).width * 0.35).clamp(
-      240.0,
-      360.0,
-    );
-
-    final coverWidget = Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: AspectRatio(
-          aspectRatio: 2 / 3,
-          child: CachedNetworkImage(
-            cacheManager: ref.watch(extensionImageCacheProvider),
-            imageUrl: manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
-            fit: BoxFit.cover,
-            progressIndicatorBuilder: (context, url, downloadProgress) =>
-                const Center(child: CircularProgressIndicator()),
-            errorBuilder: (context, error, stacktrace) => Tooltip(
-              message: error.toString(),
-              child: const Icon(Icons.error),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    final metadataColumn = _MangaMetadataColumn(manga: manga);
-
-    final chaptersViewWide = _MangaChaptersView(
-      manga: manga,
-      controller: chapterController,
-      scrollController: chapterScrollController,
-    );
-
-    final coversView = _MangaCoversView(
-      manga: manga,
-      controller: coverController,
-    );
-
-    final relatedView = MangaListWidget(
+    return MangaListWidget(
       physics: const AlwaysScrollableScrollPhysics(),
       title: Text(
         tr.mangaView.relatedTitles,
@@ -1859,283 +1626,13 @@ class _MangaDexWideLayout extends HookConsumerWidget {
       noController: true,
       children: [
         MangaListViewSliver(
-          controller: relatedController,
-          headers: manga.relatedMangas.fold({}, (previousValue, element) {
-            previousValue?[element.id] = tr[element.related!.label];
-            return previousValue;
-          }),
-        ),
-      ],
-    );
-
-    final chapterControlsBar = _ChapterControlsBar(
-      manga: manga,
-      chapterController: chapterController,
-      onSortChanged: () => chapterController.refresh(),
-    );
-
-    return Scaffold(
-      appBar: AppBar(
-        leading: const BackButton(),
-        title: Text(manga.attributes!.title.get(tr.$meta.locale.languageCode)),
-        actions: [_MangaDexActionBar(manga: manga)],
-      ),
-      body: RefreshIndicator(
-        onRefresh: doRefresh,
-        notificationPredicate: (notification) {
-          return notification.depth == 0;
-        },
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: leftWidth,
-              child: NotificationListener<ScrollNotification>(
-                onNotification: (_) => true,
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      coverWidget,
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                        child: CountryFlag(
-                          flag: manga.attributes!.originalLanguage.flag,
-                          size: 24,
-                        ),
-                      ),
-                      metadataColumn,
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const VerticalDivider(thickness: 1, width: 1),
-            Expanded(
-              child: Column(
-                children: [
-                  Material(
-                    elevation: 2,
-                    child: TabBar(
-                      controller: tabController,
-                      tabs: [
-                        Tab(text: tr.mangaView.chapters),
-                        Tab(text: tr.mangaView.art),
-                        if (hasRelated) Tab(text: tr.mangaView.related),
-                      ],
-                    ),
-                  ),
-                  if (_ViewType.values[tabview] == _ViewType.chapters)
-                    Material(elevation: 1, child: chapterControlsBar),
-                  Expanded(
-                    child: _UnpagedMangaViewBody(
-                      controller: tabController,
-                      chaptersView: chaptersViewWide,
-                      coversView: coversView,
-                      relatedView: relatedView,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: ScrollToTopFab(
-        controller: chapterScrollController,
-        visibleCondition: () => _ViewType.values[tabview] == _ViewType.chapters,
-      ),
-    );
-  }
-}
-
-class _MangaDexNarrowLayout extends HookConsumerWidget {
-  const _MangaDexNarrowLayout({
-    required this.manga,
-    required this.tabController,
-    required this.doRefresh,
-    required this.chapterController,
-    required this.coverController,
-    required this.relatedController,
-    required this.chapterScrollController,
-  });
-
-  final Manga manga;
-  final TabController tabController;
-  final Future<void> Function() doRefresh;
-  final PagingController<int, Chapter> chapterController;
-  final PagingController<int, CoverArt> coverController;
-  final PagingController<int, Manga> relatedController;
-  final ScrollController chapterScrollController;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final tr = context.t;
-    final hasRelated = manga.relatedMangas.isNotEmpty;
-    final tabview = useListenableSelector(
-      tabController,
-      () => tabController.index,
-    );
-
-    final isPhoneLandscape =
-        !DeviceContext.isPortraitMode(context) &&
-        DeviceContext.screenWidthSmall(context);
-    final bannerExpandedHeight = isPhoneLandscape ? 120.0 : 250.0;
-    final bannerTitleScale = isPhoneLandscape ? 1.5 : 2.0;
-
-    final chaptersView = _MangaChaptersView(
-      manga: manga,
-      controller: chapterController,
-    );
-
-    final coversView = _MangaCoversView(
-      manga: manga,
-      controller: coverController,
-    );
-
-    final relatedView = MangaListWidget(
-      physics: const AlwaysScrollableScrollPhysics(),
-      title: Text(
-        tr.mangaView.relatedTitles,
-        style: CommonTextStyles.twentyfour,
-      ),
-      noController: true,
-      children: [
-        MangaListViewSliver(
-          controller: relatedController,
-          headers: manga.relatedMangas.fold({}, (previousValue, element) {
-            previousValue?[element.id] = tr[element.related!.label];
-            return previousValue;
-          }),
-        ),
-      ],
-    );
-
-    final chapterControlsBar = _ChapterControlsBar(
-      manga: manga,
-      chapterController: chapterController,
-      onSortChanged: () => chapterController.refresh(),
-    );
-
-    return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: doRefresh,
-        notificationPredicate: (notification) {
-          // Depth 1 is the top of the NestedScrollView
-          if (notification is OverscrollNotification &&
-              notification.velocity == 0.0 &&
-              notification.overscroll < 0.0) {
-            return notification.depth == 1;
-          }
-
-          return notification.depth == 0;
-        },
-        child: NestedScrollView(
-          controller: chapterScrollController,
-          scrollBehavior: const MouseTouchScrollBehavior(),
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[
-              SliverAppBar(
-                pinned: true,
-                snap: false,
-                floating: false,
-                forceElevated: innerBoxIsScrolled,
-                expandedHeight: bannerExpandedHeight,
-                collapsedHeight: 100.0,
-                leading: const BackButton(),
-                flexibleSpace: FlexibleSpaceBar(
-                  expandedTitleScale: bannerTitleScale,
-                  title: Text(
-                    manga.attributes!.title.get(tr.$meta.locale.languageCode),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      shadows: <Shadow>[
-                        Shadow(
-                          offset: Offset(1.0, 1.0),
-                          color: Color.fromARGB(255, 0, 0, 0),
-                        ),
-                      ],
-                    ),
-                  ),
-                  background: Stack(
-                    fit: StackFit.passthrough,
-                    children: [
-                      CachedNetworkImage(
-                        cacheManager: ref.watch(extensionImageCacheProvider),
-                        imageUrl: manga.getFirstCoverUrl(
-                          quality: CoverArtQuality.medium,
-                        ),
-                        colorBlendMode: BlendMode.modulate,
-                        color: Colors.grey,
-                        fit: BoxFit.cover,
-                        progressIndicatorBuilder: (
-                          context,
-                          url,
-                          downloadProgress,
-                        ) => const Center(child: CircularProgressIndicator()),
-                        errorBuilder: (context, error, stacktrace) {
-                          return Tooltip(
-                            message: error.toString(),
-                            child: const Icon(Icons.error),
-                          );
-                        },
-                      ),
-                      Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 20.0, bottom: 10.0),
-                          child: CountryFlag(
-                            flag: manga.attributes!.originalLanguage.flag,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                actions: [_MangaDexActionBar(manga: manga)],
-              ),
-              SliverList.list(
-                children: [
-                  _MangaMetadataColumn(manga: manga),
-                  TabBar(
-                    controller: tabController,
-                    tabs: [
-                      Tab(text: tr.mangaView.chapters),
-                      Tab(text: tr.mangaView.art),
-                      if (hasRelated) Tab(text: tr.mangaView.related),
-                    ],
-                  ),
-                ],
-              ),
-              if (_ViewType.values[tabview] == _ViewType.chapters)
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: _PinnedHeaderDelegate(
-                    child: Material(elevation: 1, child: chapterControlsBar),
-                    height: 64.0,
-                  ),
-                ),
-            ];
+          controller: controller,
+          headers: {
+            for (final related in manga.relatedMangas)
+              related.id: tr[related.related!.label],
           },
-          body: SafeArea(
-            top: false,
-            bottom: true,
-            child: _UnpagedMangaViewBody(
-              controller: tabController,
-              chaptersView: chaptersView,
-              coversView: coversView,
-              relatedView: relatedView,
-            ),
-          ),
         ),
-      ),
-      floatingActionButton: ScrollToTopFab(
-        controller: chapterScrollController,
-        visibleCondition: () => _ViewType.values[tabview] == _ViewType.chapters,
-      ),
+      ],
     );
   }
 }
