@@ -74,9 +74,9 @@ class WebSourceSliverAppBar extends ConsumerWidget {
     return SliverAppBar.medium(
       pinned: true,
       automaticallyImplyLeading: false,
-      leading: DeviceContext.useNavigationRail(context)
-          ? null
-          : const AppNavigationButton(),
+      leading: AppNavigationScaffold.usesMenuButton(context)
+          ? const AppNavigationButton()
+          : null,
       title: GestureDetector(
         onTap: () => controller?.animateTo(
           0.0,

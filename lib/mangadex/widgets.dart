@@ -393,9 +393,9 @@ class MangaDexSliverAppBar extends StatelessWidget {
     return SliverAppBar.medium(
       pinned: true,
       automaticallyImplyLeading: false,
-      leading: DeviceContext.useNavigationRail(context)
-          ? null
-          : const AppNavigationButton(),
+      leading: AppNavigationScaffold.usesMenuButton(context)
+          ? const AppNavigationButton()
+          : null,
       title: GestureDetector(
         onTap: () {
           controller?.animateTo(

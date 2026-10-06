@@ -1,4 +1,5 @@
 import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/app_navigation.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -555,5 +556,243 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byTooltip(t.navigation.collapse), findsNothing);
     expect(find.text('Constrained content'), findsOneWidget);
+  });
+
+  testWidgets('collapsed labels are visible and icons keep their position', (
+    tester,
+  ) async {
+    await _setWindow(tester, const Size(1300, 800));
+    await _pumpApp(
+      tester,
+      const MaterialApp(
+        home: AppNavigationScaffold(
+          section: StartupSection.webSources,
+          destinations: _destinations,
+          selectedIndex: 0,
+          child: Scaffold(body: Text('Wide content')),
+        ),
+      ),
+    );
+    final browseIcon = find.byIcon(Icons.home);
+    final expandedCenter = tester.getCenter(browseIcon).dx;
+    final expandedLabel = tester.getCenter(find.text('Browse')).dx;
+    expect(expandedLabel, greaterThan(expandedCenter));
+
+    await tester.tap(find.byTooltip(t.navigation.collapse));
+    await tester.pumpAndSettle();
+    expect(tester.getCenter(browseIcon).dx, expandedCenter);
+    final label = tester.getRect(find.text('Browse'));
+    expect(label.top, greaterThan(tester.getRect(browseIcon).bottom));
+    expect(label.center.dx, closeTo(expandedCenter, 0.5));
+    expect(find.text('Browse').hitTestable(), findsOneWidget);
+  });
+
+  testWidgets('medium modal rail overlays content and closes on Escape', (
+    tester,
+  ) async {
+    await _setWindow(tester, const Size(800, 800));
+    await _pumpApp(
+      tester,
+      const MaterialApp(
+        home: AppNavigationScaffold(
+          section: StartupSection.webSources,
+          destinations: _destinations,
+          selectedIndex: 0,
+          child: _PersistentContent(),
+        ),
+      ),
+    );
+    final content = find.byKey(const ValueKey('content'));
+    final panel = find.byType(ListView);
+    expect(tester.getRect(content).left, 96);
+    expect(tester.getSize(panel).width, 96);
+
+    await tester.tap(find.byTooltip(t.navigation.expand));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 125));
+    expect(tester.getSize(panel).width, inExclusiveRange(96, 320));
+    expect(tester.getRect(content).left, 96);
+    await tester.pumpAndSettle();
+    expect(tester.getSize(panel).width, 320);
+    expect(tester.getRect(content).left, 96);
+    expect(find.text(t.navigation.read), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.byTooltip(t.navigation.expand), findsOneWidget);
+    expect(tester.getSize(panel).width, 96);
+    expect(find.text('Content count: 0'), findsOneWidget);
+  });
+
+  testWidgets('disabled destinations ignore themed icon and label colors', (
+    tester,
+  ) async {
+    await _setWindow(tester, const Size(800, 800));
+    final theme = ThemeData(
+      navigationRailTheme: const NavigationRailThemeData(
+        unselectedIconTheme: IconThemeData(color: Colors.red),
+        unselectedLabelTextStyle: TextStyle(color: Colors.red),
+      ),
+    );
+    await _pumpApp(
+      tester,
+      MaterialApp(
+        theme: theme,
+        home: const AppNavigationScaffold(
+          section: StartupSection.webSources,
+          selectedIndex: 0,
+          destinations: [
+            NavigationRailDestination(
+              icon: Icon(Icons.home),
+              label: Text('Browse'),
+            ),
+            NavigationRailDestination(
+              icon: Icon(Icons.block, key: ValueKey('blocked-icon')),
+              label: Text('Unavailable'),
+              disabled: true,
+            ),
+            NavigationRailDestination(
+              icon: Icon(Icons.favorite, key: ValueKey('saved-icon')),
+              label: Text('Saved'),
+            ),
+          ],
+          child: Scaffold(body: Text('Themed content')),
+        ),
+      ),
+    );
+    final disabled = theme.colorScheme.onSurface.withValues(alpha: 0.38);
+    Color? iconColor(String key) =>
+        IconTheme.of(tester.element(find.byKey(ValueKey(key)))).color;
+    Color? labelColor(String text) =>
+        DefaultTextStyle.of(tester.element(find.text(text))).style.color;
+
+    expect(iconColor('blocked-icon'), disabled);
+    expect(labelColor('Unavailable'), disabled);
+    expect(iconColor('saved-icon'), Colors.red);
+    expect(labelColor('Saved'), Colors.red);
+  });
+
+  testWidgets('wide expansion choice is shared across app contexts', (
+    tester,
+  ) async {
+    await _setWindow(tester, const Size(1300, 800));
+    final section = ValueNotifier(StartupSection.webSources);
+    addTearDown(section.dispose);
+    await _pumpApp(
+      tester,
+      MaterialApp(
+        home: ValueListenableBuilder(
+          valueListenable: section,
+          builder: (context, value, _) => AppNavigationScaffold(
+            // Separate contexts mount separate scaffolds.
+            key: ValueKey(value),
+            section: value,
+            child: const Scaffold(body: Text('Context content')),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.byTooltip(t.navigation.collapse));
+    await tester.pumpAndSettle();
+    section.value = StartupSection.mangaDex;
+    await tester.pumpAndSettle();
+    expect(find.byTooltip(t.navigation.expand), findsOneWidget);
+    expect(find.byTooltip(t.navigation.collapse), findsNothing);
+  });
+
+  for (final (width, expected) in [(411.0, true), (800.0, false)]) {
+    testWidgets('usesMenuButton is $expected at ${width}dp', (tester) async {
+      await _setWindow(tester, Size(width, 800));
+      bool? usesMenuButton;
+      await _pumpApp(
+        tester,
+        MaterialApp(
+          home: AppNavigationScaffold(
+            section: StartupSection.localLibrary,
+            child: Builder(
+              builder: (context) {
+                usesMenuButton = AppNavigationScaffold.usesMenuButton(context);
+                return const Scaffold(body: Text('Menu content'));
+              },
+            ),
+          ),
+        ),
+      );
+      expect(usesMenuButton, expected);
+    });
+  }
+
+  testWidgets('compact modal rail follows edge and panel drags', (
+    tester,
+  ) async {
+    await _setWindow(tester, const Size(411, 800));
+    await _pumpApp(
+      tester,
+      const MaterialApp(
+        home: AppNavigationScaffold(
+          section: StartupSection.webSources,
+          destinations: _destinations,
+          selectedIndex: 0,
+          child: _PersistentContent(),
+        ),
+      ),
+    );
+    expect(find.byTooltip(t.navigation.collapse), findsNothing);
+    await tester.dragFrom(const Offset(5, 400), const Offset(300, 0));
+    await tester.pumpAndSettle();
+    expect(find.byTooltip(t.navigation.collapse), findsOneWidget);
+    expect(tester.getRect(find.byType(ListView)).left, 0);
+
+    await tester.dragFrom(const Offset(200, 400), const Offset(-300, 0));
+    await tester.pumpAndSettle();
+    expect(find.byTooltip(t.navigation.collapse), findsNothing);
+    await tester.tap(find.text('Content count: 0'));
+    await tester.pump();
+    expect(find.text('Content count: 1'), findsOneWidget);
+  });
+
+  testWidgets('compact modal rail covers and blocks the NavigationBar', (
+    tester,
+  ) async {
+    await _setWindow(tester, const Size(411, 800));
+    var selectedIndex = 0;
+    await _pumpApp(
+      tester,
+      MaterialApp(
+        home: StatefulBuilder(
+          builder: (context, setState) => AppNavigationScaffold(
+            section: StartupSection.webSources,
+            destinations: _destinations,
+            selectedIndex: selectedIndex,
+            onDestinationSelected: (index) =>
+                setState(() => selectedIndex = index),
+            child: Scaffold(
+              appBar: AppBar(leading: const AppNavigationButton()),
+              body: const Text('Bar content'),
+            ),
+          ),
+        ),
+      ),
+    );
+    final saved = find.descendant(
+      of: find.byType(NavigationBar),
+      matching: find.byIcon(Icons.favorite),
+    );
+    // A point in the Saved slot that the 320dp panel does not cover.
+    final savedSlot = Offset(405, tester.getCenter(saved).dy);
+    await tester.tap(find.byTooltip(t.navigation.openMenu));
+    await tester.pumpAndSettle();
+    final panel = tester.getRect(find.byType(ListView));
+    expect(savedSlot.dx, greaterThan(panel.right));
+
+    // The scrim, not the bar, receives the tap.
+    await tester.tapAt(savedSlot);
+    await tester.pumpAndSettle();
+    expect(selectedIndex, 0);
+    expect(find.byTooltip(t.navigation.collapse), findsNothing);
+
+    await tester.tapAt(savedSlot);
+    await tester.pumpAndSettle();
+    expect(selectedIndex, 1);
   });
 }
