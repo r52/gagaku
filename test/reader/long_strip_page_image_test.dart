@@ -237,6 +237,95 @@ void main() {
 
     expect(subject.controller.scrollController.offset, initialOffset);
   });
+
+  testWidgets('a jump discards the visible page observed before it', (
+    tester,
+  ) async {
+    final subject = await _pumpLongStrip(tester, pageCount: 6);
+    addTearDown(subject.dispose);
+
+    // Mirrors ReaderSession.bindViewport: the restore jump is scheduled
+    // before the list's first layout reports the range at offset zero.
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      subject.controller.jumpToPage(3);
+    });
+    await subject.pump();
+
+    expect(subject.reports, [3]);
+  });
+
+  testWidgets('keeps the top item in place when the display width changes', (
+    tester,
+  ) async {
+    final subject = await _pumpLongStrip(tester, pageCount: 6);
+    addTearDown(subject.dispose);
+    await subject.pump();
+
+    // 2:4 pages at 300 wide are 600 tall: offset 900 is halfway into page 1.
+    subject.controller.scrollController.jumpTo(900);
+    await tester.pumpAndSettle();
+    expect(subject.reports.last, 1);
+    subject.reports.clear();
+
+    await subject.pump(displayWidth: 150);
+
+    expect(subject.controller.scrollController.offset, closeTo(450, 0.5));
+    expect(subject.reports, everyElement(1));
+  });
+
+  testWidgets('anchors relative to the leading list padding', (tester) async {
+    final subject = await _pumpLongStrip(tester, pageCount: 6);
+    addTearDown(subject.dispose);
+    await subject.pump(topPadding: 100);
+
+    // Page 1 spans 700..1300 after the 100px padding: 1000 is its middle.
+    subject.controller.scrollController.jumpTo(1000);
+    await tester.pumpAndSettle();
+
+    await subject.pump(displayWidth: 150, topPadding: 100);
+    expect(subject.controller.scrollController.offset, closeTo(550, 0.5));
+
+    await subject.pump(displayWidth: 150, topPadding: 40);
+    expect(subject.controller.scrollController.offset, closeTo(490, 0.5));
+  });
+
+  testWidgets('holds a jump target while pages above learn their size', (
+    tester,
+  ) async {
+    final image = await _createImage(2, 2);
+    final provider = _DeferredImageProvider();
+    // Square pages lay out at 300px once resolved, half the 600px estimate
+    // reserved for them while loading.
+    final subject = await _pumpLongStrip(
+      tester,
+      pageCount: 8,
+      provider: provider,
+      knownAspectRatio: false,
+    );
+    addTearDown(() {
+      subject.dispose();
+      image.dispose();
+    });
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      subject.controller.jumpToPage(5);
+    });
+    await subject.pump();
+
+    provider.complete(image);
+    await tester.pumpAndSettle();
+
+    final target = find.byKey(ValueKey(subject.pages[5].id));
+    expect(subject.pages[4].aspectRatio, 1);
+    expect(tester.getTopLeft(target).dy, closeTo(0, 0.5));
+    expect(subject.reports, isNotEmpty);
+    expect(subject.reports, everyElement(5));
+
+    // A user scroll releases the pin and reports again.
+    await tester.drag(find.byType(LongStripReaderView), const Offset(0, -400));
+    await tester.pumpAndSettle();
+    expect(subject.reports.last, 6);
+  });
 }
 
 Future<void> _tapOverlayToDismiss(WidgetTester tester) async {
@@ -249,45 +338,68 @@ Future<_LongStripSubject> _pumpLongStrip(
   WidgetTester tester, {
   int pageCount = 1,
   ImageProvider<Object>? provider,
+  Size imageSize = const Size(2, 4),
+  bool knownAspectRatio = true,
 }) async {
-  final image = provider == null ? await _createImage(2, 4) : null;
+  final image = provider == null
+      ? await _createImage(imageSize.width.toInt(), imageSize.height.toInt())
+      : null;
   final pageProvider = provider ?? _TestImageProvider(image);
-  final pages = List.generate(
-    pageCount,
-    (_) =>
-        ReaderPage(provider: pageProvider)..recordImageSize(const Size(2, 4)),
-  );
+  final pages = List.generate(pageCount, (_) {
+    final page = ReaderPage(provider: pageProvider);
+    if (knownAspectRatio) page.recordImageSize(imageSize);
+    return page;
+  });
+  final reports = <int>[];
   final controller = LongStripReaderViewportController(
-    onVisiblePageChanged: (_) {},
+    onVisiblePageChanged: reports.add,
   );
-  return _LongStripSubject(tester, image, pages, controller);
+  return _LongStripSubject(tester, image, pages, controller, reports);
 }
 
 class _LongStripSubject {
-  const _LongStripSubject(this.tester, this.image, this.pages, this.controller);
+  const _LongStripSubject(
+    this.tester,
+    this.image,
+    this.pages,
+    this.controller,
+    this.reports,
+  );
 
   final WidgetTester tester;
   final ui.Image? image;
   final List<ReaderPage> pages;
   final LongStripReaderViewportController controller;
+  final List<int> reports;
 
   ReaderPage get page => pages.first;
 
-  Future<void> pump({VoidCallback? onCenterTap}) async {
+  Future<void> pump({
+    VoidCallback? onCenterTap,
+    double displayWidth = 300,
+    double topPadding = 0,
+    bool settle = true,
+  }) async {
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(
-          body: LongStripReaderView(
-            controller: controller,
-            pages: pages,
-            displayWidth: 300,
-            cacheWidth: 300,
-            onCenterTap: onCenterTap ?? () {},
+        home: Builder(
+          builder: (context) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(padding: EdgeInsets.only(top: topPadding)),
+            child: Scaffold(
+              body: LongStripReaderView(
+                controller: controller,
+                pages: pages,
+                displayWidth: displayWidth,
+                cacheWidth: 300,
+                onCenterTap: onCenterTap ?? () {},
+              ),
+            ),
           ),
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    if (settle) await tester.pumpAndSettle();
   }
 
   void dispose() {
@@ -313,7 +425,10 @@ class _TestImageProvider extends ImageProvider<int> {
 
   @override
   Future<int> obtainKey(ImageConfiguration configuration) {
-    return SynchronousFuture(image?.width ?? 0);
+    final image = this.image;
+    return SynchronousFuture(
+      image == null ? 0 : image.width * 100000 + image.height,
+    );
   }
 
   @override
@@ -342,5 +457,26 @@ class _PendingImageProvider extends ImageProvider<int> {
   @override
   ImageStreamCompleter loadImage(int key, ImageDecoderCallback decode) {
     return OneFrameImageStreamCompleter(Completer<ImageInfo>().future);
+  }
+}
+
+class _DeferredImageProvider extends ImageProvider<_DeferredImageProvider> {
+  final Completer<ImageInfo> _completer = Completer();
+
+  void complete(ui.Image image) {
+    _completer.complete(ImageInfo(image: image.clone()));
+  }
+
+  @override
+  Future<_DeferredImageProvider> obtainKey(ImageConfiguration configuration) {
+    return SynchronousFuture(this);
+  }
+
+  @override
+  ImageStreamCompleter loadImage(
+    _DeferredImageProvider key,
+    ImageDecoderCallback decode,
+  ) {
+    return OneFrameImageStreamCompleter(_completer.future);
   }
 }

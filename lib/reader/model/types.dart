@@ -25,6 +25,21 @@ enum ReaderFormat {
   String get label => '$_key$name';
 }
 
+enum LongStripScale {
+  small(0.4),
+  large(0.8),
+  full(1.0);
+
+  const LongStripScale(this.scale);
+  final double scale;
+
+  LongStripScale get next => switch (this) {
+    LongStripScale.small => LongStripScale.large,
+    LongStripScale.large => LongStripScale.full,
+    LongStripScale.full => LongStripScale.small,
+  };
+}
+
 Iterable<int> readerPrecacheIndices({
   required int currentIndex,
   required int pageCount,

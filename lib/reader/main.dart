@@ -8,6 +8,7 @@ import 'package:gagaku/reader/model/config.dart';
 import 'package:gagaku/reader/model/session.dart';
 import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/reader/model/viewport_controller.dart';
+import 'package:gagaku/reader/widgets/long_strip_page_image.dart';
 import 'package:gagaku/reader/widgets/reader_progress_indicator.dart';
 import 'package:gagaku/reader/widgets/reader_viewports.dart';
 import 'package:gagaku/util/ui.dart';
@@ -15,18 +16,9 @@ import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-enum LongStripScale {
-  small(0.4),
-  large(0.8),
-  full(1.0);
-
-  const LongStripScale(this.scale);
-  final double scale;
-}
-
 typedef CtxCallback = void Function(BuildContext);
 
-class ReaderWidget extends StatefulHookConsumerWidget {
+class ReaderWidget extends StatelessWidget {
   const ReaderWidget({
     super.key,
     required this.pages,
@@ -47,22 +39,37 @@ class ReaderWidget extends StatefulHookConsumerWidget {
   final String? externalUrl;
 
   @override
-  ConsumerState<ReaderWidget> createState() => _ReaderWidgetState();
+  Widget build(BuildContext context) {
+    // A new page list is a new chapter: start a fresh session and viewport
+    // state instead of carrying positions and zoom across content.
+    return _ReaderView(key: ObjectKey(pages), reader: this);
+  }
 }
 
-class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
+class _ReaderView extends StatefulHookConsumerWidget {
+  const _ReaderView({super.key, required this.reader});
+
+  final ReaderWidget reader;
+
+  @override
+  ConsumerState<_ReaderView> createState() => _ReaderViewState();
+}
+
+class _ReaderViewState extends ConsumerState<_ReaderView> {
   late final ReaderSession session;
   late final HorizontalReaderViewportController horizontalViewport;
   late final LongStripReaderViewportController longStripViewport;
+
+  ReaderWidget get reader => widget.reader;
 
   @override
   void initState() {
     super.initState();
     horizontalViewport = HorizontalReaderViewportController();
     session = ReaderSession(
-      pages: widget.pages,
-      subtitle: widget.subtitle,
-      precacheImage: (provider) => precacheImage(provider, context),
+      pages: reader.pages,
+      precacheImage: (provider) =>
+          precacheReaderImage(provider, createLocalImageConfiguration(context)),
     );
     longStripViewport = LongStripReaderViewportController(
       onVisiblePageChanged: (page) {
@@ -72,12 +79,11 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
   }
 
   @override
-  void didUpdateWidget(ReaderWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.pages != oldWidget.pages ||
-        widget.subtitle != oldWidget.subtitle) {
-      session.updateContent(pages: widget.pages, subtitle: widget.subtitle);
-    }
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    longStripViewport.applyDefaultScale(
+      portrait: DeviceContext.isPortraitMode(context),
+    );
   }
 
   @override
@@ -94,61 +100,10 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     });
   }
 
-  LongStripScale toggleLongStripScale(LongStripScale current) {
-    return switch (current) {
-      LongStripScale.small => LongStripScale.large,
-      LongStripScale.large => LongStripScale.full,
-      LongStripScale.full => LongStripScale.small,
-    };
-  }
-
-  KeyEventResult onTapLeft({
-    required ReaderConfig settings,
-    required ReaderFormat format,
-  }) {
-    if (format == ReaderFormat.longstrip) return KeyEventResult.handled;
-
-    if (session.turnLeft(settings.direction) ==
-        ReaderPageTurnResult.closeReader) {
+  KeyEventResult _handleTurn(ReaderPageTurnResult result) {
+    if (result == ReaderPageTurnResult.closeReader) {
       context.pop();
     }
-    return KeyEventResult.handled;
-  }
-
-  KeyEventResult onTapRight({
-    required ReaderConfig settings,
-    required ReaderFormat format,
-  }) {
-    if (format == ReaderFormat.longstrip) return KeyEventResult.handled;
-
-    if (session.turnRight(settings.direction) ==
-        ReaderPageTurnResult.closeReader) {
-      context.pop();
-    }
-    return KeyEventResult.handled;
-  }
-
-  KeyEventResult onTapTop(double offset, {required ReaderFormat format}) {
-    if (format == ReaderFormat.longstrip) {
-      longStripViewport.scrollBy(-offset);
-      return KeyEventResult.handled;
-    }
-
-    horizontalViewport.panVertically(session.currentPage.value, offset);
-    return KeyEventResult.handled;
-  }
-
-  KeyEventResult onTapBottom(double offset, {required ReaderFormat format}) {
-    if (format == ReaderFormat.longstrip) {
-      if (longStripViewport.isAtChapterEnd(widget.pages.length)) {
-        context.pop();
-      } else {
-        longStripViewport.scrollBy(offset);
-      }
-      return KeyEventResult.handled;
-    }
-
-    horizontalViewport.panVertically(session.currentPage.value, -offset);
     return KeyEventResult.handled;
   }
 
@@ -172,21 +127,19 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
     }, [showUI]);
 
     final tr = context.t;
-    final pageCount = widget.pages.length;
+    final pages = reader.pages;
+    final pageCount = pages.length;
     final focusNode = useFocusNode();
 
     final settings = ref.watch(readerSettingsProvider);
     final theme = Theme.of(context);
-    final format = widget.longstrip ? ReaderFormat.longstrip : settings.format;
-    final isPortrait = DeviceContext.isPortraitMode(context);
-    final longStripScale = useValueNotifier(
-      isPortrait ? LongStripScale.full : LongStripScale.small,
-    );
-    final longStripScaleValue = useValueListenable(longStripScale);
+    final format = reader.longstrip ? ReaderFormat.longstrip : settings.format;
+    final longStripScale = useValueListenable(longStripViewport.scale);
     final longStripDisplayWidth =
-        MediaQuery.sizeOf(context).width * longStripScaleValue.scale;
-    final longStripCacheWidth =
-        (longStripDisplayWidth * MediaQuery.devicePixelRatioOf(context)).ceil();
+        MediaQuery.sizeOf(context).width * longStripScale.scale;
+    final cacheWidth = longStripCacheWidth(
+      longStripDisplayWidth * MediaQuery.devicePixelRatioOf(context),
+    );
     final viewport = switch (format) {
       ReaderFormat.single => horizontalViewport,
       ReaderFormat.longstrip => longStripViewport,
@@ -195,10 +148,15 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
       format: format,
       configuredCount: settings.precacheCount,
       pageCount: pageCount,
-      longStripCacheWidth: longStripCacheWidth,
+      longStripCacheWidth: cacheWidth,
     );
 
-    session.bindViewport(viewport);
+    // Runs during this build, before the viewport's widget builds, so the
+    // viewport can prepare its initial page.
+    useEffect(() {
+      session.bindViewport(viewport);
+      return null;
+    }, [viewport]);
     useEffect(() {
       session.updatePrefetchPolicy(prefetchPolicy);
       return null;
@@ -212,12 +170,15 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
           leading: const BackButton(),
           title: ListTile(
             title: Text(
-              widget.title,
+              reader.title,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             subtitle: HookBuilder(
               builder: (_) {
-                final value = useValueListenable(session.subtext);
+                final page = useValueListenable(session.currentPage);
+                final value =
+                    reader.subtitle ??
+                    (page < pages.length ? pages[page].sortKey : null);
                 if (value == null) {
                   return const SizedBox.shrink();
                 }
@@ -245,8 +206,8 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
               mainAxisAlignment: MainAxisAlignment.center,
               spacing: 10.0,
               children: <Widget>[
-                if (widget.onHeaderPressed != null &&
-                    widget.drawerHeader != null)
+                if (reader.onHeaderPressed != null &&
+                    reader.drawerHeader != null)
                   TextButton(
                     onPressed: () {
                       // First one pops the drawer
@@ -255,19 +216,19 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                       // Second one pops the reader
                       context.pop();
 
-                      widget.onHeaderPressed!(context);
+                      reader.onHeaderPressed!(context);
                     },
                     child: Text(
-                      widget.drawerHeader!,
+                      reader.drawerHeader!,
                       style: CommonTextStyles.eighteen,
                     ),
                   ),
-                if (widget.drawerHeader != null &&
-                    widget.onHeaderPressed == null)
+                if (reader.drawerHeader != null &&
+                    reader.onHeaderPressed == null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Text(
-                      widget.drawerHeader!,
+                      reader.drawerHeader!,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontSize: 18,
                       ),
@@ -282,7 +243,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                         avatar: Icon(f.icon, color: theme.iconTheme.color),
                         label: Text(tr[f.label]),
                         selected: settings.format == f,
-                        onSelected: (widget.longstrip)
+                        onSelected: (reader.longstrip)
                             ? null
                             : (value) {
                                 if (value) {
@@ -295,18 +256,7 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                 ListTile(
                   leading: const Icon(Icons.fit_screen),
                   title: Text(tr.reader.togglePageSize),
-                  onTap: (format == ReaderFormat.longstrip)
-                      ? () {
-                          final currentScale = longStripScale.value;
-                          final nextScale = toggleLongStripScale(currentScale);
-                          longStripScale.value = nextScale;
-                          longStripViewport.resize(
-                            nextScale.scale / currentScale.scale,
-                          );
-                        }
-                      : () => horizontalViewport.togglePageSize(
-                          session.currentPage.value,
-                        ),
+                  onTap: session.togglePageSize,
                 ),
                 Wrap(
                   alignment: WrapAlignment.center,
@@ -412,28 +362,28 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
           if (event is KeyDownEvent) {
             switch (key) {
               case PhysicalKeyboardKey.arrowLeft:
-                return onTapLeft(settings: settings, format: format);
+                return _handleTurn(session.turnLeft(settings.direction));
               case PhysicalKeyboardKey.arrowRight:
-                return onTapRight(settings: settings, format: format);
+                return _handleTurn(session.turnRight(settings.direction));
             }
           }
 
           // Handle vertical navigation on key press and repeat.
           switch (key) {
             case PhysicalKeyboardKey.arrowUp:
-              return onTapTop(250, format: format);
+              return _handleTurn(session.scrollBy(-250));
             case PhysicalKeyboardKey.arrowDown:
-              return onTapBottom(250, format: format);
+              return _handleTurn(session.scrollBy(250));
             case PhysicalKeyboardKey.pageUp:
-              return onTapTop(1000, format: format);
+              return _handleTurn(session.scrollBy(-1000));
             case PhysicalKeyboardKey.pageDown:
-              return onTapBottom(1000, format: format);
+              return _handleTurn(session.scrollBy(1000));
             default:
               return KeyEventResult.ignored;
           }
         },
-        child: switch (widget.pages.isEmpty) {
-          true when widget.externalUrl != null => Center(
+        child: switch (pages.isEmpty) {
+          true when reader.externalUrl != null => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               spacing: 10.0,
@@ -441,23 +391,23 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
                 const Text('Read on external site:'),
                 ElevatedButton(
                   onPressed: () async {
-                    await Styles.tryLaunchUrl(context, widget.externalUrl!);
+                    await Styles.tryLaunchUrl(context, reader.externalUrl!);
                   },
-                  child: Text(widget.externalUrl!),
+                  child: Text(reader.externalUrl!),
                 ),
               ],
             ),
           ),
           _ when format == ReaderFormat.longstrip => LongStripReaderView(
             controller: longStripViewport,
-            pages: widget.pages,
+            pages: pages,
             displayWidth: longStripDisplayWidth,
-            cacheWidth: longStripCacheWidth,
+            cacheWidth: cacheWidth,
             onCenterTap: session.toggleChrome,
           ),
           _ => HorizontalReaderView(
             controller: horizontalViewport,
-            pages: widget.pages,
+            pages: pages,
             settings: settings,
             onTap: (localPosition) {
               focusNode.requestFocus();
@@ -474,9 +424,9 @@ class _ReaderWidgetState extends ConsumerState<ReaderWidget> {
 
               if (settings.clickToTurn) {
                 if (taploc <= tapmargin) {
-                  onTapLeft(settings: settings, format: format);
+                  _handleTurn(session.turnLeft(settings.direction));
                 } else if (taploc >= viewport - tapmargin) {
-                  onTapRight(settings: settings, format: format);
+                  _handleTurn(session.turnRight(settings.direction));
                 }
               }
             },

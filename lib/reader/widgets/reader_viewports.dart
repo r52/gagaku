@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/rendering.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/reader/model/config.dart';
 import 'package:gagaku/reader/model/types.dart';
@@ -74,7 +75,7 @@ class HorizontalReaderView extends StatelessWidget {
   }
 }
 
-class LongStripReaderView extends StatelessWidget {
+class LongStripReaderView extends StatefulWidget {
   const LongStripReaderView({
     super.key,
     required this.controller,
@@ -91,8 +92,51 @@ class LongStripReaderView extends StatelessWidget {
   final VoidCallback onCenterTap;
 
   @override
+  State<LongStripReaderView> createState() => _LongStripReaderViewState();
+}
+
+class _LongStripReaderViewState extends State<LongStripReaderView> {
+  /// Vertical insets applied as list padding; tracked so anchors can be
+  /// captured relative to the first item.
+  EdgeInsets? _padding;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final padding = MediaQuery.paddingOf(context).copyWith(left: 0, right: 0);
+    final previous = _padding;
+    _padding = padding;
+
+    // System bars toggling with the reader chrome change the top inset,
+    // which would otherwise shift every page.
+    if (previous != null && previous.top != padding.top) {
+      widget.controller.preserveAnchorForRelayout(
+        leadingPadding: previous.top,
+        extentsChanged: false,
+      );
+    }
+  }
+
+  @override
+  void didUpdateWidget(LongStripReaderView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.displayWidth != oldWidget.displayWidth) {
+      widget.controller.preserveAnchorForRelayout(
+        leadingPadding: _padding?.top ?? 0,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final mediaSize = MediaQuery.sizeOf(context);
+    final LongStripReaderView(
+      :controller,
+      :pages,
+      :displayWidth,
+      :cacheWidth,
+      :onCenterTap,
+    ) = widget;
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
@@ -104,46 +148,56 @@ class LongStripReaderView extends StatelessWidget {
           onCenterTap();
         }
       },
-      child: SuperListView.builder(
-        listController: controller.listController,
-        controller: controller.scrollController,
-        cacheExtent: mediaSize.height * 3,
-        addAutomaticKeepAlives: false,
-        extentEstimation: (index, _) {
-          if (index == null) return 0;
-          final aspectRatio = pages[index].aspectRatio;
-          return aspectRatio == null
-              ? mediaSize.height
-              : displayWidth / aspectRatio;
+      child: NotificationListener<UserScrollNotification>(
+        onNotification: (notification) {
+          if (notification.direction != ScrollDirection.idle) {
+            controller.releasePin();
+          }
+          return false;
         },
-        itemCount: pages.length,
-        itemBuilder: (context, index) {
-          final page = pages[index];
-          return Center(
-            key: ValueKey(page.id),
-            child: _LongStripZoomGesture(
-              onZoomRequested: () {
-                Navigator.of(context).push<void>(
-                  TransparentOverlay(
-                    builder: (context) => LongStripPageOverlay(page: page),
-                  ),
-                );
-              },
-              child: Hero(
-                tag: page.id,
-                child: RepaintBoundary(
-                  child: LongStripPageImage(
-                    page: page,
-                    displayWidth: displayWidth,
-                    cacheWidth: cacheWidth,
-                    onAspectRatioChanged: () =>
-                        controller.invalidateExtent(index),
+        child: SuperListView.builder(
+          padding: _padding,
+          listController: controller.listController,
+          controller: controller.scrollController,
+          cacheExtent: mediaSize.height * 3,
+          addAutomaticKeepAlives: false,
+          extentEstimation: (index, _) {
+            if (index == null) return 0;
+            final aspectRatio = pages[index].aspectRatio;
+            return aspectRatio == null
+                ? mediaSize.height
+                : displayWidth / aspectRatio;
+          },
+          itemCount: pages.length,
+          itemBuilder: (context, index) {
+            final page = pages[index];
+            return Center(
+              key: ValueKey(page.id),
+              child: _LongStripZoomGesture(
+                onZoomRequested: () {
+                  Navigator.of(context).push<void>(
+                    TransparentOverlay(
+                      builder: (context) => LongStripPageOverlay(page: page),
+                    ),
+                  );
+                },
+                child: Hero(
+                  tag: page.id,
+                  child: RepaintBoundary(
+                    child: LongStripPageImage(
+                      page: page,
+                      displayWidth: displayWidth,
+                      cacheWidth: cacheWidth,
+                      placeholderExtent: mediaSize.height,
+                      onAspectRatioChanged: () =>
+                          controller.invalidateExtent(index),
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
