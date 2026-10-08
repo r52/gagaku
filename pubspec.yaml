@@ -76,7 +76,7 @@ dependencies:
   dio: ^5.8.0+1
   fresh_dio: ^0.6.0
   native_dio_adapter: ^1.4.0
-  flutter_local_notifications: ^22.0.0-dev.3
+  flutter_local_notifications: ^23.0.0-dev.3
   objectbox: ^6.0.0-preview.3
   objectbox_flutter_libs: any
   go_router: ^18.0.1
