@@ -1,10 +1,6 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/i18n/strings.g.dart';
-import 'package:gagaku/model/model.dart';
 import 'package:gagaku/web/model/cloudflare.dart';
 import 'package:gagaku/web/model/types.dart';
 
@@ -33,27 +29,7 @@ class _ExtensionBrowserPageState extends State<ExtensionBrowserPage> {
   void initState() {
     super.initState();
     _currentUrl = widget.source.baseUrl!;
-    _webViewSettings = _createSettings();
-  }
-
-  InAppWebViewSettings _createSettings() {
-    final contentBlockers = <ContentBlocker>[];
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      for (final filter in GagakuData().blockers) {
-        contentBlockers.add(
-          ContentBlocker(
-            trigger: ContentBlockerTrigger(urlFilter: filter),
-            action: ContentBlockerAction(type: ContentBlockerActionType.BLOCK),
-          ),
-        );
-      }
-    }
-
-    return InAppWebViewSettings(
-      contentBlockers: contentBlockers.isEmpty ? null : contentBlockers,
-      browserAcceleratorKeysEnabled: false,
-      isInspectable: false,
-    );
+    _webViewSettings = createExtensionBrowserSettings();
   }
 
   void _updateUrl(WebUri? url) {
@@ -101,28 +77,6 @@ class _ExtensionBrowserPageState extends State<ExtensionBrowserPage> {
     return cookies;
   }
 
-  Future<Map<String, String>> _readLocalStorage(
-    InAppWebViewController controller,
-  ) async {
-    final encoded = await controller.evaluateJavascript(
-      source:
-          'JSON.stringify(Object.fromEntries(Object.entries(localStorage)))',
-    );
-    if (encoded is! String) {
-      return const {};
-    }
-
-    final values = jsonDecode(encoded);
-    if (values is! Map) {
-      return const {};
-    }
-
-    return {
-      for (final MapEntry(:key, :value) in values.entries)
-        key.toString(): value.toString(),
-    };
-  }
-
   Future<void> _completeCloudflareResolution() async {
     final controller = _controller;
     if (controller == null || _completing) {
@@ -139,12 +93,9 @@ class _ExtensionBrowserPageState extends State<ExtensionBrowserPage> {
       debugPrint(
         'cloudflare[${widget.source.id}] '
         'time=${cloudflareDiagnosticTimestamp()} manual cookie selection '
-        'input=${cookieSelection.inputCount} '
-        'selected=${cookieSelection.cookies.length} '
-        'discarded=${cookieSelection.discardedCount} '
-        'duplicateNames=${cookieSelection.duplicateNames}',
+        '${cookieSelection.diagnosticSummary}',
       );
-      final localStorage = await _readLocalStorage(controller);
+      final localStorage = await readBrowserLocalStorage(controller);
       final userAgentHeaders = await readBrowserUserAgentHeaders(controller);
       final userAgent = userAgentHeaders['user-agent'];
       debugPrint(

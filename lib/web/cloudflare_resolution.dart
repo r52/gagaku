@@ -1,11 +1,19 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/i18n/strings.g.dart';
+import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/extension_browser.dart';
 import 'package:gagaku/web/model/cloudflare.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+/// The manual-resolution message for errors that [CloudflareResolutionButton]
+/// can resolve, or null for any other error.
+String? cloudflareErrorMessage(Translations tr, Object error) =>
+    isCloudflareBypassError(error)
+    ? tr.webSources.source.cloudflareManualRequired
+    : null;
 
 Future<bool> resolveExtensionCloudflare(
   BuildContext context,

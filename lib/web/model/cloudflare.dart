@@ -74,6 +74,104 @@ JSON.stringify((() => {
   }
 }
 
+/// Reads the page's `localStorage` as string pairs. Errors propagate so callers
+/// decide whether a missing capture is fatal.
+Future<Map<String, String>> readBrowserLocalStorage(
+  InAppWebViewController controller,
+) async {
+  final encoded = await controller.evaluateJavascript(
+    source: 'JSON.stringify(Object.fromEntries(Object.entries(localStorage)))',
+  );
+  if (encoded is! String) {
+    return const {};
+  }
+
+  final values = jsonDecode(encoded);
+  if (values is! Map) {
+    return const {};
+  }
+
+  return {
+    for (final MapEntry(:key, :value) in values.entries)
+      key.toString(): value.toString(),
+  };
+}
+
+/// Settings shared by the visible source browser and the headless startup
+/// browser, including the Android content blockers.
+InAppWebViewSettings createExtensionBrowserSettings() {
+  final contentBlockers = <ContentBlocker>[];
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    for (final filter in GagakuData().blockers) {
+      contentBlockers.add(
+        ContentBlocker(
+          trigger: ContentBlockerTrigger(urlFilter: filter),
+          action: ContentBlockerAction(type: ContentBlockerActionType.BLOCK),
+        ),
+      );
+    }
+  }
+
+  return InAppWebViewSettings(
+    contentBlockers: contentBlockers.isEmpty ? null : contentBlockers,
+    browserAcceleratorKeysEnabled: false,
+    isInspectable: false,
+  );
+}
+
+const cloudflareClearanceCookieName = 'cf_clearance';
+
+Cookie? findCloudflareClearance(Iterable<Cookie> cookies) {
+  for (final cookie in cookies) {
+    if (cookie.name == cloudflareClearanceCookieName) {
+      return cookie;
+    }
+  }
+  return null;
+}
+
+/// Cookie rotation alone cannot prove a challenge was resolved; a solve must
+/// yield a clearance that differs from the one present before it started.
+bool hasNewCloudflareClearance(
+  Iterable<Cookie> cookies,
+  String? initialClearance,
+) {
+  final clearance = findCloudflareClearance(cookies);
+  return clearance != null && clearance.value != initialClearance;
+}
+
+/// Browser-only signal: challenge pages navigate to `__cf_chl_*` URLs.
+bool isCloudflareChallengeUrl(Uri? url) {
+  return url?.queryParameters.keys.any(
+        (name) => name.startsWith('__cf_chl_'),
+      ) ==
+      true;
+}
+
+/// Browser-only signal: the rendered challenge document title.
+bool isCloudflareChallengeTitle(String? title) {
+  return title?.toLowerCase().contains('just a moment') == true;
+}
+
+/// The one challenge signal available to plain HTTP clients as well as
+/// browsers. Header names are compared case-insensitively.
+bool isCloudflareChallengeHeaders(Map<String, String>? headers) {
+  return headers?.entries.any(
+        (header) =>
+            header.key.toLowerCase() == 'cf-mitigated' &&
+            header.value.toLowerCase() == 'challenge',
+      ) ==
+      true;
+}
+
+String? serializeBrowserCookies(Iterable<Cookie> cookies) {
+  final values = [
+    for (final cookie in cookies)
+      if (cookie.value != null) '${cookie.name}=${cookie.value}',
+  ];
+  return values.isEmpty ? null : values.join('; ');
+}
+
 class CloudflareBrowserState {
   const CloudflareBrowserState({
     required this.cookies,
@@ -98,6 +196,10 @@ class BrowserCookieSelection {
   final List<String> duplicateNames;
 
   int get discardedCount => inputCount - cookies.length;
+
+  String get diagnosticSummary =>
+      'input=$inputCount selected=${cookies.length} '
+      'discarded=$discardedCount duplicateNames=$duplicateNames';
 }
 
 String diagnosticValueFingerprint(String value) {
@@ -105,6 +207,9 @@ String diagnosticValueFingerprint(String value) {
   return 'sha256:${digest.substring(0, 12)}';
 }
 
+/// Mirrors `RequestManager.diagnosticFingerprint` in
+/// `extension/src/RequestManager.ts` so Dart and JS logs correlate; keep the
+/// two implementations identical.
 String diagnosticUserAgentFingerprint(String value) {
   var hash = 0x811c9dc5;
   for (final codeUnit in value.codeUnits) {
@@ -118,12 +223,8 @@ String cloudflareDiagnosticTimestamp() =>
     DateTime.now().toUtc().toIso8601String();
 
 String? cloudflareClearanceFingerprint(Iterable<Cookie> cookies) {
-  for (final cookie in cookies) {
-    if (cookie.name == 'cf_clearance') {
-      return diagnosticValueFingerprint(cookie.value);
-    }
-  }
-  return null;
+  final clearance = findCloudflareClearance(cookies);
+  return clearance == null ? null : diagnosticValueFingerprint(clearance.value);
 }
 
 BrowserCookieSelection selectBrowserCookiesForUrl(
@@ -258,18 +359,15 @@ class StartupBrowserException implements Exception {
   }
 }
 
-class StartupBrowserState {
+class StartupBrowserState extends CloudflareBrowserState {
   const StartupBrowserState({
     required this.outcome,
-    required this.cookies,
-    required this.localStorage,
-    required this.userAgentHeaders,
+    required super.cookies,
+    required super.localStorage,
+    required super.userAgentHeaders,
   });
 
   final StartupBrowserOutcome outcome;
-  final List<Cookie> cookies;
-  final Map<String, String> localStorage;
-  final Map<String, String> userAgentHeaders;
 }
 
 @Riverpod(keepAlive: true)

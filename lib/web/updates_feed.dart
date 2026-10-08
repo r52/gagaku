@@ -2,7 +2,6 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
-import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/cloudflare_resolution.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -193,8 +192,9 @@ class _UpdateFeedFailureSliver extends ConsumerWidget {
       _ => null,
     };
     final reason = itemFailure?.cause ?? error;
+    final cloudflareMessage = cloudflareErrorMessage(tr, reason);
     WebSourceInfo? cloudflareSource;
-    if (reason is CloudflareBypassException && itemFailure != null) {
+    if (cloudflareMessage != null && itemFailure != null) {
       final series = itemFailure.link.series;
       if (series case ExtensionSeriesRef(:final sourceId)) {
         final installed = ref.watch(installedSourcesProvider).value;
@@ -219,11 +219,11 @@ class _UpdateFeedFailureSliver extends ConsumerWidget {
           textAlign: TextAlign.center,
         ),
         if (total > 0) Text('$completed/$total'),
-        Text(switch (reason) {
-          CloudflareBypassException() =>
-            tr.webSources.source.cloudflareManualRequired,
-          _ => tr.chapterFeed.failureReason(reason: reason.toString()),
-        }, textAlign: TextAlign.center),
+        Text(
+          cloudflareMessage ??
+              tr.chapterFeed.failureReason(reason: reason.toString()),
+          textAlign: TextAlign.center,
+        ),
         if (cloudflareSource != null)
           CloudflareResolutionButton(
             source: cloudflareSource,

@@ -841,8 +841,8 @@ class ExtensionSource extends _$ExtensionSource {
             ? runtime.runtimeGeneration
             : null;
         logger.i(
-          'ExtensionSource($sourceId) time='
-          '${DateTime.now().toUtc().toIso8601String()} '
+          'ExtensionSource($sourceId) '
+          'time=${cloudflareDiagnosticTimestamp()} '
           'Cloudflare read retry operation=$operation attempt=$attempt '
           'delayMs=${delay.inMilliseconds} '
           'runtimeGeneration=$generation',

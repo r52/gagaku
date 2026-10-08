@@ -4,7 +4,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
-import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/cloudflare_resolution.dart';
 import 'package:gagaku/web/extension_browser.dart';
@@ -78,13 +77,10 @@ class _ExtensionHomeCard extends ConsumerWidget {
           ],
         );
       case AsyncError(:final error):
-        final requiresCloudflare = error is CloudflareBypassException;
+        final cloudflareMessage = cloudflareErrorMessage(tr, error);
+        final requiresCloudflare = cloudflareMessage != null;
         subtitle = Text(
-          switch (error) {
-            CloudflareBypassException() =>
-              tr.webSources.source.cloudflareManualRequired,
-            _ => error.toString(),
-          },
+          cloudflareMessage ?? error.toString(),
           style: TextStyle(color: theme.colorScheme.error),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
@@ -354,7 +350,8 @@ class _ExtensionOperationError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (error is! CloudflareBypassException) {
+    final cloudflareMessage = cloudflareErrorMessage(context.t, error);
+    if (cloudflareMessage == null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [Text('$error'), Text(stackTrace.toString())],
@@ -366,10 +363,7 @@ class _ExtensionOperationError extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            context.t.webSources.source.cloudflareManualRequired,
-            textAlign: TextAlign.center,
-          ),
+          Text(cloudflareMessage, textAlign: TextAlign.center),
           const SizedBox(height: 12),
           Wrap(
             alignment: WrapAlignment.center,
