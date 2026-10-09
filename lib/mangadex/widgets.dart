@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:animations/animations.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/app_navigation.dart';
@@ -14,7 +14,6 @@ import 'package:gagaku/model/search_history.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/mangadex/settings.dart';
-import 'package:gagaku/reader/main.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
@@ -393,9 +392,9 @@ class MangaDexSliverAppBar extends StatelessWidget {
     return SliverAppBar.medium(
       pinned: true,
       automaticallyImplyLeading: false,
-      leading: DeviceContext.useNavigationRail(context)
-          ? null
-          : const AppNavigationButton(),
+      leading: AppNavigationScaffold.usesMenuButton(context)
+          ? const AppNavigationButton()
+          : null,
       title: GestureDetector(
         onTap: () {
           controller?.animateTo(
@@ -609,7 +608,11 @@ class ChapterFeedWidget extends HookWidget {
                       return val >= 0 ? val : null;
                     },
                     builderDelegate:
-                        PagedChildBuilderDelegate<ChapterFeedItemData>(
+                        ErrorReportingPagedChildBuilderDelegate<
+                          ChapterFeedItemData
+                        >(
+                          error: newState.error,
+                          fetchNextPage: fetchNextPage,
                           animateTransitions: true,
                           itemBuilder: (context, item, index) =>
                               ChapterFeedItem(
@@ -1408,7 +1411,9 @@ class MangaListViewSliver extends ConsumerWidget {
             return PagedSliverList(
               state: state,
               fetchNextPage: fetchNextPage,
-              builderDelegate: PagedChildBuilderDelegate<Manga>(
+              builderDelegate: ErrorReportingPagedChildBuilderDelegate<Manga>(
+                error: state.error,
+                fetchNextPage: fetchNextPage,
                 animateTransitions: true,
                 itemBuilder: (context, item, index) => _ListMangaItem(
                   key: ValueKey(item.id),
@@ -1431,7 +1436,10 @@ class MangaListViewSliver extends ConsumerWidget {
               gridDelegate: delegate,
               state: state,
               fetchNextPage: fetchNextPage,
-              builderDelegate: PagedChildBuilderDelegate<Manga>(
+              showNewPageErrorIndicatorAsGridChild: false,
+              builderDelegate: ErrorReportingPagedChildBuilderDelegate<Manga>(
+                error: state.error,
+                fetchNextPage: fetchNextPage,
                 animateTransitions: true,
                 itemBuilder: (context, item, index) => GridMangaDetailedItem(
                   key: ValueKey(item.id),
@@ -1452,7 +1460,10 @@ class MangaListViewSliver extends ConsumerWidget {
               gridDelegate: delegate,
               state: state,
               fetchNextPage: fetchNextPage,
-              builderDelegate: PagedChildBuilderDelegate<Manga>(
+              showNewPageErrorIndicatorAsGridChild: false,
+              builderDelegate: ErrorReportingPagedChildBuilderDelegate<Manga>(
+                error: state.error,
+                fetchNextPage: fetchNextPage,
                 animateTransitions: true,
                 itemBuilder: (context, item, index) => GridMangaItem(
                   key: ValueKey(item.id),
@@ -1591,9 +1602,11 @@ class GridMangaDetailedItem extends ConsumerWidget {
                         quality: CoverArtQuality.small,
                       ),
                       width: screenSizeSmall ? 80.0 : 128.0,
-                      progressIndicatorBuilder:
-                          (context, url, downloadProgress) =>
-                              const Center(child: CircularProgressIndicator()),
+                      progressIndicatorBuilder: (
+                        context,
+                        url,
+                        downloadProgress,
+                      ) => const Center(child: CircularProgressIndicator()),
                       errorBuilder: (context, error, stacktrace) {
                         return Tooltip(
                           message: error.toString(),

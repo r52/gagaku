@@ -24,16 +24,12 @@
     "submit": "Submit",
     "yes": "Yes",
     "no": "No",
-    "on": "On",
-    "off": "Off",
     "none": "None",
     "block": "Block",
     "unblock": "Unblock",
     "follow": "Follow",
     "unfollow": "Unfollow",
     "create": "Create",
-    "browse": "Browse",
-    "manage": "Manage",
     "edit": "Edit",
     "edited": "Edited",
     "save": "Save",
@@ -48,11 +44,9 @@
     "copyClipboard": "Copied to clipboard!",
     "pasteClipboard": "Paste from Clipboard",
     "dragHint": "Hint: Drag to reorder",
-    "makeDefault": "Make Default",
     "retry": "Retry",
     "irreversibleWarning": "NOTE: THIS ACTION IS IRREVERSIBLE",
     "filterItems": "Filter Items",
-    "filterLocales": "Filter Locales",
     "allLocales": "All Locales",
     "selected": "$count Selected",
     "unknown": "Unknown",
@@ -63,17 +57,13 @@
   },
   "errors": {
     "generic": "Error",
-    "noresults": "No results",
     "notitles": "No titles",
-    "nomanga": "No manga",
     "nolists": "No lists",
     "norepos": "No repos",
     "noitems": "No items",
     "unsupportedUrl": "Unsupported URL",
     "loginFail": "Failed to login: $reason",
-    "notLoggedIn": "Operation failed. User not logged in",
     "unsupportedSource": "Unsupported extension type",
-    "unknownSourceID": "Unknown source ID $id",
     "fetchFail": "Something went wrong while fetching a new page",
     "pageNotFound": "Page Not Found",
     "pageNotFoundArg": "Can't find a page for: $url",
@@ -97,10 +87,6 @@
     "loginFailed": "Login Failed: $error",
     "loggingIn": "Logging in..."
   },
-  "sort": {
-    "desc": "Descending",
-    "asc": "Ascending"
-  },
   "library": "Library",
   "history": {
     "text": "History",
@@ -114,8 +100,7 @@
     "archiveUnreadableWarning": "This archive contains no readable images!",
     "dirUnreadableWarning": "This directory contains no readable images!",
     "settings": {
-      "libraryPath": "Manga Library Path",
-      "libraryPathDesc": "Choose where to search for your manga library"
+      "libraryPath": "Manga Library Path"
     },
     "readArchive": "Read Archive",
     "readDocument": "Read Document",
@@ -128,7 +113,6 @@
     "documentContents": "Table of contents",
     "documentJumpPage": "Jump to page",
     "documentPage": "Page $current of $total",
-    "documentPageNumber": "Page number (1–$total)",
     "documentChapter": "Chapter $number",
     "documentJumpSection": "Jump within current section",
     "documentSectionProgress": "Position in current section: $percent%",
@@ -178,7 +162,6 @@
       "clearAll": "Clear All Extension Settings",
       "clearAllDesc": "Clears all extension settings. Recommended when replacing or upgrading extensions.",
       "clearAllWarning": "Are you sure you want to delete all extension settings?",
-      "clearSettings": "Clear Settings",
       "clearSuccess": "Settings Cleared",
       "migrateExtension": "Migrate Extension Data",
       "migrateExtensionDesc": "Migrate all data from one extension to another.",
@@ -209,8 +192,7 @@
       "nameEmptyWarning": "Name cannot be empty",
       "urlInvalidWarning": "Must be a valid URL",
       "repoAddOK": "Repo added",
-      "repoExists": "Repo already exists",
-      "missingRepo": "Missing Repo"
+      "repoExists": "Repo already exists"
     },
     "source": {
       "settings": "Extension Settings",
@@ -226,13 +208,8 @@
       "noDataWarning": "No repos nor extensions installed!",
       "refresh": "Refresh repos",
       "delete": "@:ui.delete $arg",
-      "add": "@:ui.add $arg",
-      "update": "Update/Replace $arg",
       "sourceDeleteOK": "Extension disabled",
-      "sourceUpdateOK": "Extension updated",
       "sourceAddOK": "Extension enabled",
-      "installedVersion": " (installed: v${version})",
-      "noTagsWarning": "This extension provides no filter options",
       "install": {
         "title": "Install Extensions",
         "warning": "Only install extensions from sources you trust. Are you sure you want to install these extensions?",
@@ -240,7 +217,6 @@
         "success": "${count} extension(s) installed."
       }
     },
-    "sourceUnavailable": "Source ${id} Unavailable",
     "noSourcesWarning": "No extensions installed!",
     "noSearchableSourcesWarning": "No searchable extensions installed!",
     "sourceSearch": "Extension Search",
@@ -261,7 +237,6 @@
     "filters": "Search Filters",
     "resetFilters": "Reset Filters",
     "applyFilters": "Apply Filters",
-    "selectedTagFilters": "Selected Tag Filters",
     "filterTags": "Filter tags",
     "otherOptions": "Other Options",
     "inclusion": "Inclusion Mode",
@@ -316,6 +291,8 @@
     "swipeGestures": "Swipe Gestures",
     "clickToTurn": "Click/Tap to Turn Page",
     "precacheCount": "Page Preload",
+    "precacheMax": "Max (not recommended)",
+    "readExternal": "Read on external site:",
     "gotoPage": "Go to page",
     "pageCount": "Page ${current} of ${total}"
   },
@@ -331,8 +308,6 @@
     "byChapter": "By Chapter",
     "byManga": "By Manga",
     "localHistory": "Reading History (local)",
-    "noFollowsMsg": "Find some manga to follow!",
-    "noHistoryMsg": "No reading history",
     "createNewList": "Create New List",
     "createNewListBtn": "+ @:mangadex.createNewList",
     "listName": "List Name",
@@ -351,9 +326,7 @@
     "newListOk": "New list created",
     "newListError": "Failed to create list: $error",
     "officialPub": "Official Publisher",
-    "noGroup": "No Group",
     "groupDesc": "Group Description",
-    "groupFeed": "Group Feed",
     "groupTitles": "Group Titles",
     "login": "Login to MangaDex",
     "contentRating": "Content Rating",
@@ -380,9 +353,7 @@
       "originalLanguageDesc": "Only show titles originally published in these languages. If no languages are selected, no filter will be applied",
       "contentRating": "Content Filter",
       "dataSaver": "Data Saver",
-      "groupBlacklist": "Blocked Groups",
-      "selectLanguages": "Select Languages",
-      "selectContentFilters": "Select Content Filters"
+      "groupBlacklist": "Blocked Groups"
     },
     "sort": {
       "relevance_asc": "Worst Match",
@@ -450,7 +421,6 @@
     "read": "read",
     "unread": "unread",
     "markAllWarning": "Are you sure you want to mark all visible chapters as ${arg}?",
-    "noChaptersMsg": "No Chapters",
     "markAs": "Mark as $arg",
     "copyLink": "Copy gagaku link"
   },
@@ -474,7 +444,6 @@
     "follow": "Follow Manga",
     "unfollow": "Unfollow Manga",
     "favorite": "Add to Favorites",
-    "unfavorite": "Remove from Favorites",
     "removeHistory": "Remove from History"
   },
   "mangaRelations": {
@@ -588,7 +557,6 @@
     "dataSub": "Backup all gagaku data and settings (excludes MangaDex login and local library files)",
     "restore": "Restore Backup",
     "restoreWarning": "Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?",
-    "toFile": "Backup Data to File",
     "fromFile": "Restore Data from File",
     "success": "Backup saved",
     "restoreSuccess": "Backup restored",
@@ -606,10 +574,6 @@
     "configured": "Configured",
     "filesystem": "Filesystem directory",
     "documentTree": "Android document tree",
-    "create": "Create New Profile",
-    "createSub": "Choose an empty directory and publish this device's data.",
-    "join": "Join Existing Profile",
-    "joinSub": "Choose a directory containing a Gagaku sync profile.",
     "createFilesystem": "Create Filesystem Profile",
     "createFilesystemSub": "Choose an empty native filesystem directory and publish this device's data.",
     "joinFilesystem": "Join Filesystem Profile",
@@ -673,12 +637,10 @@
     "repairConfirm": "Delete invalid snapshots and snapshots beyond the newest two for every device in this validated profile?",
     "reset": "Delete Remote Profile",
     "resetConfirm": "Permanently delete every Gagaku snapshot and profile metadata in this validated sync directory?",
-    "operationSuccess": "Sync operation completed",
     "deletedCount": "Deleted $count remote object(s)",
     "failureCount": "$count object(s) could not be deleted",
     "operationFailed": "Sync operation failed: $error",
-    "directoryRequired": "Choose a filesystem directory",
-    "busy": "Working…"
+    "directoryRequired": "Choose a filesystem directory"
   },
   "chapterFeed": {
     "latestUpdates": "Latest Updates",
@@ -692,19 +654,13 @@
     "failureReason": "Reason: $reason",
     "updateRequired": "Update required! No feed data or data out of date"
   },
-  "permissions": {
-    "needed": "Permissions Needed",
-    "request": "Extra permissions are required to update your feed in the background."
-  },
   "updates": {
     "checkForUpdates": "Check for Updates",
     "checkForUpdatesSub": "Check for new versions on startup",
     "updateChannel": "Update Channel",
     "updateChannelSub": "Choose which releases to check for",
     "channelStable": "Stable",
-    "channelStableDesc": "Stable releases",
     "channelBeta": "Beta",
-    "channelBetaDesc": "Dev-preview, bleeding edge",
     "checkFrequency": "Check Frequency",
     "checkFrequencySub": "How often to check for updates",
     "freqHourly": "Every hour",

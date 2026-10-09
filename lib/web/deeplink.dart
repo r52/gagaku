@@ -1,18 +1,17 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:go_router/go_router.dart';
 
 import 'model/types.dart';
 
-typedef DeepLinkHandlerCallback =
-    FutureOr<OnEnterResult> Function(
-      BuildContext context,
-      Uri uri,
-      GoRouter router,
-    );
+typedef DeepLinkHandlerCallback = FutureOr<OnEnterResult> Function(
+  BuildContext context,
+  Uri uri,
+  GoRouter router,
+);
 
 final _defaultHandlers = {'addrepo', 'installextensions'};
 

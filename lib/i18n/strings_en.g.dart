@@ -46,7 +46,6 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$ui$en ui = Translations$ui$en.internal(_root);
 	late final Translations$errors$en errors = Translations$errors$en.internal(_root);
 	late final Translations$auth$en auth = Translations$auth$en.internal(_root);
-	late final Translations$sort$en sort = Translations$sort$en.internal(_root);
 
 	/// en: 'Library'
 	String get library => 'Library';
@@ -106,7 +105,6 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$backup$en backup = Translations$backup$en.internal(_root);
 	late final Translations$sync$en sync = Translations$sync$en.internal(_root);
 	late final Translations$chapterFeed$en chapterFeed = Translations$chapterFeed$en.internal(_root);
-	late final Translations$permissions$en permissions = Translations$permissions$en.internal(_root);
 	late final Translations$updates$en updates = Translations$updates$en.internal(_root);
 }
 
@@ -196,12 +194,6 @@ class Translations$ui$en {
 	/// en: 'No'
 	String get no => 'No';
 
-	/// en: 'On'
-	String get on => 'On';
-
-	/// en: 'Off'
-	String get off => 'Off';
-
 	/// en: 'None'
 	String get none => 'None';
 
@@ -219,12 +211,6 @@ class Translations$ui$en {
 
 	/// en: 'Create'
 	String get create => 'Create';
-
-	/// en: 'Browse'
-	String get browse => 'Browse';
-
-	/// en: 'Manage'
-	String get manage => 'Manage';
 
 	/// en: 'Edit'
 	String get edit => 'Edit';
@@ -268,9 +254,6 @@ class Translations$ui$en {
 	/// en: 'Hint: Drag to reorder'
 	String get dragHint => 'Hint: Drag to reorder';
 
-	/// en: 'Make Default'
-	String get makeDefault => 'Make Default';
-
 	/// en: 'Retry'
 	String get retry => 'Retry';
 
@@ -279,9 +262,6 @@ class Translations$ui$en {
 
 	/// en: 'Filter Items'
 	String get filterItems => 'Filter Items';
-
-	/// en: 'Filter Locales'
-	String get filterLocales => 'Filter Locales';
 
 	/// en: 'All Locales'
 	String get allLocales => 'All Locales';
@@ -316,14 +296,8 @@ class Translations$errors$en {
 	/// en: 'Error'
 	String get generic => 'Error';
 
-	/// en: 'No results'
-	String get noresults => 'No results';
-
 	/// en: 'No titles'
 	String get notitles => 'No titles';
-
-	/// en: 'No manga'
-	String get nomanga => 'No manga';
 
 	/// en: 'No lists'
 	String get nolists => 'No lists';
@@ -340,14 +314,8 @@ class Translations$errors$en {
 	/// en: 'Failed to login: $reason'
 	String loginFail({required Object reason}) => 'Failed to login: ${reason}';
 
-	/// en: 'Operation failed. User not logged in'
-	String get notLoggedIn => 'Operation failed. User not logged in';
-
 	/// en: 'Unsupported extension type'
 	String get unsupportedSource => 'Unsupported extension type';
-
-	/// en: 'Unknown source ID $id'
-	String unknownSourceID({required Object id}) => 'Unknown source ID ${id}';
 
 	/// en: 'Something went wrong while fetching a new page'
 	String get fetchFail => 'Something went wrong while fetching a new page';
@@ -417,21 +385,6 @@ class Translations$auth$en {
 
 	/// en: 'Logging in...'
 	String get loggingIn => 'Logging in...';
-}
-
-// Path: sort
-class Translations$sort$en {
-	Translations$sort$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Descending'
-	String get desc => 'Descending';
-
-	/// en: 'Ascending'
-	String get asc => 'Ascending';
 }
 
 // Path: history
@@ -510,9 +463,6 @@ class Translations$localLibrary$en {
 	/// en: 'Page $current of $total'
 	String documentPage({required Object current, required Object total}) => 'Page ${current} of ${total}';
 
-	/// en: 'Page number (1–$total)'
-	String documentPageNumber({required Object total}) => 'Page number (1–${total})';
-
 	/// en: 'Chapter $number'
 	String documentChapter({required Object number}) => 'Chapter ${number}';
 
@@ -578,9 +528,6 @@ class Translations$webSources$en {
 	late final Translations$webSources$repo$en repo = Translations$webSources$repo$en.internal(_root);
 	late final Translations$webSources$source$en source = Translations$webSources$source$en.internal(_root);
 
-	/// en: 'Source ${id} Unavailable'
-	String sourceUnavailable({required Object id}) => 'Source ${id} Unavailable';
-
 	/// en: 'No extensions installed!'
 	String get noSourcesWarning => 'No extensions installed!';
 
@@ -643,9 +590,6 @@ class Translations$search$en {
 
 	/// en: 'Apply Filters'
 	String get applyFilters => 'Apply Filters';
-
-	/// en: 'Selected Tag Filters'
-	String get selectedTagFilters => 'Selected Tag Filters';
 
 	/// en: 'Filter tags'
 	String get filterTags => 'Filter tags';
@@ -745,6 +689,12 @@ class Translations$reader$en {
 	/// en: 'Page Preload'
 	String get precacheCount => 'Page Preload';
 
+	/// en: 'Max (not recommended)'
+	String get precacheMax => 'Max (not recommended)';
+
+	/// en: 'Read on external site:'
+	String get readExternal => 'Read on external site:';
+
 	/// en: 'Go to page'
 	String get gotoPage => 'Go to page';
 
@@ -792,12 +742,6 @@ class Translations$mangadex$en {
 
 	/// en: 'Reading History (local)'
 	String get localHistory => 'Reading History (local)';
-
-	/// en: 'Find some manga to follow!'
-	String get noFollowsMsg => 'Find some manga to follow!';
-
-	/// en: 'No reading history'
-	String get noHistoryMsg => 'No reading history';
 
 	/// en: 'Create New List'
 	String get createNewList => 'Create New List';
@@ -853,14 +797,8 @@ class Translations$mangadex$en {
 	/// en: 'Official Publisher'
 	String get officialPub => 'Official Publisher';
 
-	/// en: 'No Group'
-	String get noGroup => 'No Group';
-
 	/// en: 'Group Description'
 	String get groupDesc => 'Group Description';
-
-	/// en: 'Group Feed'
-	String get groupFeed => 'Group Feed';
 
 	/// en: 'Group Titles'
 	String get groupTitles => 'Group Titles';
@@ -996,9 +934,6 @@ class Translations$mangaView$en {
 	/// en: 'Are you sure you want to mark all visible chapters as ${arg}?'
 	String markAllWarning({required Object arg}) => 'Are you sure you want to mark all visible chapters as ${arg}?';
 
-	/// en: 'No Chapters'
-	String get noChaptersMsg => 'No Chapters';
-
 	/// en: 'Mark as $arg'
 	String markAs({required Object arg}) => 'Mark as ${arg}';
 
@@ -1076,9 +1011,6 @@ class Translations$mangaActions$en {
 
 	/// en: 'Add to Favorites'
 	String get favorite => 'Add to Favorites';
-
-	/// en: 'Remove from Favorites'
-	String get unfavorite => 'Remove from Favorites';
 
 	/// en: 'Remove from History'
 	String get removeHistory => 'Remove from History';
@@ -1440,9 +1372,6 @@ class Translations$backup$en {
 	/// en: 'Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?'
 	String get restoreWarning => 'Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?';
 
-	/// en: 'Backup Data to File'
-	String get toFile => 'Backup Data to File';
-
 	/// en: 'Restore Data from File'
 	String get fromFile => 'Restore Data from File';
 
@@ -1496,18 +1425,6 @@ class Translations$sync$en {
 
 	/// en: 'Android document tree'
 	String get documentTree => 'Android document tree';
-
-	/// en: 'Create New Profile'
-	String get create => 'Create New Profile';
-
-	/// en: 'Choose an empty directory and publish this device's data.'
-	String get createSub => 'Choose an empty directory and publish this device\'s data.';
-
-	/// en: 'Join Existing Profile'
-	String get join => 'Join Existing Profile';
-
-	/// en: 'Choose a directory containing a Gagaku sync profile.'
-	String get joinSub => 'Choose a directory containing a Gagaku sync profile.';
 
 	/// en: 'Create Filesystem Profile'
 	String get createFilesystem => 'Create Filesystem Profile';
@@ -1698,9 +1615,6 @@ class Translations$sync$en {
 	/// en: 'Permanently delete every Gagaku snapshot and profile metadata in this validated sync directory?'
 	String get resetConfirm => 'Permanently delete every Gagaku snapshot and profile metadata in this validated sync directory?';
 
-	/// en: 'Sync operation completed'
-	String get operationSuccess => 'Sync operation completed';
-
 	/// en: 'Deleted $count remote object(s)'
 	String deletedCount({required Object count}) => 'Deleted ${count} remote object(s)';
 
@@ -1712,9 +1626,6 @@ class Translations$sync$en {
 
 	/// en: 'Choose a filesystem directory'
 	String get directoryRequired => 'Choose a filesystem directory';
-
-	/// en: 'Working…'
-	String get busy => 'Working…';
 }
 
 // Path: chapterFeed
@@ -1756,21 +1667,6 @@ class Translations$chapterFeed$en {
 	String get updateRequired => 'Update required! No feed data or data out of date';
 }
 
-// Path: permissions
-class Translations$permissions$en {
-	Translations$permissions$en.internal(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Permissions Needed'
-	String get needed => 'Permissions Needed';
-
-	/// en: 'Extra permissions are required to update your feed in the background.'
-	String get request => 'Extra permissions are required to update your feed in the background.';
-}
-
 // Path: updates
 class Translations$updates$en {
 	Translations$updates$en.internal(this._root);
@@ -1794,14 +1690,8 @@ class Translations$updates$en {
 	/// en: 'Stable'
 	String get channelStable => 'Stable';
 
-	/// en: 'Stable releases'
-	String get channelStableDesc => 'Stable releases';
-
 	/// en: 'Beta'
 	String get channelBeta => 'Beta';
-
-	/// en: 'Dev-preview, bleeding edge'
-	String get channelBetaDesc => 'Dev-preview, bleeding edge';
 
 	/// en: 'Check Frequency'
 	String get checkFrequency => 'Check Frequency';
@@ -1895,9 +1785,6 @@ class Translations$localLibrary$settings$en {
 
 	/// en: 'Manga Library Path'
 	String get libraryPath => 'Manga Library Path';
-
-	/// en: 'Choose where to search for your manga library'
-	String get libraryPathDesc => 'Choose where to search for your manga library';
 }
 
 // Path: localLibrary.errors
@@ -2007,9 +1894,6 @@ class Translations$webSources$settings$en {
 	/// en: 'Are you sure you want to delete all extension settings?'
 	String get clearAllWarning => 'Are you sure you want to delete all extension settings?';
 
-	/// en: 'Clear Settings'
-	String get clearSettings => 'Clear Settings';
-
 	/// en: 'Settings Cleared'
 	String get clearSuccess => 'Settings Cleared';
 
@@ -2105,9 +1989,6 @@ class Translations$webSources$repo$en {
 
 	/// en: 'Repo already exists'
 	String get repoExists => 'Repo already exists';
-
-	/// en: 'Missing Repo'
-	String get missingRepo => 'Missing Repo';
 }
 
 // Path: webSources.source
@@ -2157,26 +2038,11 @@ class Translations$webSources$source$en {
 	/// en: 'Delete $arg'
 	String delete({required Object arg}) => '${_root.ui.delete} ${arg}';
 
-	/// en: 'Add $arg'
-	String add({required Object arg}) => '${_root.ui.add} ${arg}';
-
-	/// en: 'Update/Replace $arg'
-	String update({required Object arg}) => 'Update/Replace ${arg}';
-
 	/// en: 'Extension disabled'
 	String get sourceDeleteOK => 'Extension disabled';
 
-	/// en: 'Extension updated'
-	String get sourceUpdateOK => 'Extension updated';
-
 	/// en: 'Extension enabled'
 	String get sourceAddOK => 'Extension enabled';
-
-	/// en: ' (installed: v${version})'
-	String installedVersion({required Object version}) => ' (installed: v${version})';
-
-	/// en: 'This extension provides no filter options'
-	String get noTagsWarning => 'This extension provides no filter options';
 
 	late final Translations$webSources$source$install$en install = Translations$webSources$source$install$en.internal(_root);
 }
@@ -2272,12 +2138,6 @@ class Translations$mangadex$settings$en {
 
 	/// en: 'Blocked Groups'
 	String get groupBlacklist => 'Blocked Groups';
-
-	/// en: 'Select Languages'
-	String get selectLanguages => 'Select Languages';
-
-	/// en: 'Select Content Filters'
-	String get selectContentFilters => 'Select Content Filters';
 }
 
 // Path: mangadex.sort
@@ -2410,16 +2270,12 @@ extension on Translations {
 			'ui.submit' => 'Submit',
 			'ui.yes' => 'Yes',
 			'ui.no' => 'No',
-			'ui.on' => 'On',
-			'ui.off' => 'Off',
 			'ui.none' => 'None',
 			'ui.block' => 'Block',
 			'ui.unblock' => 'Unblock',
 			'ui.follow' => 'Follow',
 			'ui.unfollow' => 'Unfollow',
 			'ui.create' => 'Create',
-			'ui.browse' => 'Browse',
-			'ui.manage' => 'Manage',
 			'ui.edit' => 'Edit',
 			'ui.edited' => 'Edited',
 			'ui.save' => 'Save',
@@ -2434,11 +2290,9 @@ extension on Translations {
 			'ui.copyClipboard' => 'Copied to clipboard!',
 			'ui.pasteClipboard' => 'Paste from Clipboard',
 			'ui.dragHint' => 'Hint: Drag to reorder',
-			'ui.makeDefault' => 'Make Default',
 			'ui.retry' => 'Retry',
 			'ui.irreversibleWarning' => 'NOTE: THIS ACTION IS IRREVERSIBLE',
 			'ui.filterItems' => 'Filter Items',
-			'ui.filterLocales' => 'Filter Locales',
 			'ui.allLocales' => 'All Locales',
 			'ui.selected' => ({required Object count}) => '${count} Selected',
 			'ui.unknown' => 'Unknown',
@@ -2447,17 +2301,13 @@ extension on Translations {
 			'ui.decrease' => 'Decrease',
 			'ui.increase' => 'Increase',
 			'errors.generic' => 'Error',
-			'errors.noresults' => 'No results',
 			'errors.notitles' => 'No titles',
-			'errors.nomanga' => 'No manga',
 			'errors.nolists' => 'No lists',
 			'errors.norepos' => 'No repos',
 			'errors.noitems' => 'No items',
 			'errors.unsupportedUrl' => 'Unsupported URL',
 			'errors.loginFail' => ({required Object reason}) => 'Failed to login: ${reason}',
-			'errors.notLoggedIn' => 'Operation failed. User not logged in',
 			'errors.unsupportedSource' => 'Unsupported extension type',
-			'errors.unknownSourceID' => ({required Object id}) => 'Unknown source ID ${id}',
 			'errors.fetchFail' => 'Something went wrong while fetching a new page',
 			'errors.pageNotFound' => 'Page Not Found',
 			'errors.pageNotFoundArg' => ({required Object url}) => 'Can\'t find a page for: ${url}',
@@ -2478,8 +2328,6 @@ extension on Translations {
 			'auth.loginSuccess' => 'Login Successful',
 			'auth.loginFailed' => ({required Object error}) => 'Login Failed: ${error}',
 			'auth.loggingIn' => 'Logging in...',
-			'sort.desc' => 'Descending',
-			'sort.asc' => 'Ascending',
 			'library' => 'Library',
 			'history.text' => 'History',
 			'history.clear' => 'Clear History',
@@ -2490,7 +2338,6 @@ extension on Translations {
 			'localLibrary.archiveUnreadableWarning' => 'This archive contains no readable images!',
 			'localLibrary.dirUnreadableWarning' => 'This directory contains no readable images!',
 			'localLibrary.settings.libraryPath' => 'Manga Library Path',
-			'localLibrary.settings.libraryPathDesc' => 'Choose where to search for your manga library',
 			'localLibrary.readArchive' => 'Read Archive',
 			'localLibrary.readDocument' => 'Read Document',
 			'localLibrary.documentOpenFailed' => 'This document could not be opened.',
@@ -2502,7 +2349,6 @@ extension on Translations {
 			'localLibrary.documentContents' => 'Table of contents',
 			'localLibrary.documentJumpPage' => 'Jump to page',
 			'localLibrary.documentPage' => ({required Object current, required Object total}) => 'Page ${current} of ${total}',
-			'localLibrary.documentPageNumber' => ({required Object total}) => 'Page number (1–${total})',
 			'localLibrary.documentChapter' => ({required Object number}) => 'Chapter ${number}',
 			'localLibrary.documentJumpSection' => 'Jump within current section',
 			'localLibrary.documentSectionProgress' => ({required Object percent}) => 'Position in current section: ${percent}%',
@@ -2543,7 +2389,6 @@ extension on Translations {
 			'webSources.settings.clearAll' => 'Clear All Extension Settings',
 			'webSources.settings.clearAllDesc' => 'Clears all extension settings. Recommended when replacing or upgrading extensions.',
 			'webSources.settings.clearAllWarning' => 'Are you sure you want to delete all extension settings?',
-			'webSources.settings.clearSettings' => 'Clear Settings',
 			'webSources.settings.clearSuccess' => 'Settings Cleared',
 			'webSources.settings.migrateExtension' => 'Migrate Extension Data',
 			'webSources.settings.migrateExtensionDesc' => 'Migrate all data from one extension to another.',
@@ -2573,7 +2418,6 @@ extension on Translations {
 			'webSources.repo.urlInvalidWarning' => 'Must be a valid URL',
 			'webSources.repo.repoAddOK' => 'Repo added',
 			'webSources.repo.repoExists' => 'Repo already exists',
-			'webSources.repo.missingRepo' => 'Missing Repo',
 			'webSources.source.settings' => 'Extension Settings',
 			'webSources.source.openWebsite' => 'Open extension website',
 			'webSources.source.reload' => 'Reload extension',
@@ -2587,18 +2431,12 @@ extension on Translations {
 			'webSources.source.noDataWarning' => 'No repos nor extensions installed!',
 			'webSources.source.refresh' => 'Refresh repos',
 			'webSources.source.delete' => ({required Object arg}) => '${_root.ui.delete} ${arg}',
-			'webSources.source.add' => ({required Object arg}) => '${_root.ui.add} ${arg}',
-			'webSources.source.update' => ({required Object arg}) => 'Update/Replace ${arg}',
 			'webSources.source.sourceDeleteOK' => 'Extension disabled',
-			'webSources.source.sourceUpdateOK' => 'Extension updated',
 			'webSources.source.sourceAddOK' => 'Extension enabled',
-			'webSources.source.installedVersion' => ({required Object version}) => ' (installed: v${version})',
-			'webSources.source.noTagsWarning' => 'This extension provides no filter options',
 			'webSources.source.install.title' => 'Install Extensions',
 			'webSources.source.install.warning' => 'Only install extensions from sources you trust. Are you sure you want to install these extensions?',
 			'webSources.source.install.alreadyInstalled' => 'Already installed',
 			'webSources.source.install.success' => ({required Object count}) => '${count} extension(s) installed.',
-			'webSources.sourceUnavailable' => ({required Object id}) => 'Source ${id} Unavailable',
 			'webSources.noSourcesWarning' => 'No extensions installed!',
 			'webSources.noSearchableSourcesWarning' => 'No searchable extensions installed!',
 			'webSources.sourceSearch' => 'Extension Search',
@@ -2617,7 +2455,6 @@ extension on Translations {
 			'search.filters' => 'Search Filters',
 			'search.resetFilters' => 'Reset Filters',
 			'search.applyFilters' => 'Apply Filters',
-			'search.selectedTagFilters' => 'Selected Tag Filters',
 			'search.filterTags' => 'Filter tags',
 			'search.otherOptions' => 'Other Options',
 			'search.inclusion' => 'Inclusion Mode',
@@ -2653,6 +2490,8 @@ extension on Translations {
 			'reader.swipeGestures' => 'Swipe Gestures',
 			'reader.clickToTurn' => 'Click/Tap to Turn Page',
 			'reader.precacheCount' => 'Page Preload',
+			'reader.precacheMax' => 'Max (not recommended)',
+			'reader.readExternal' => 'Read on external site:',
 			'reader.gotoPage' => 'Go to page',
 			'reader.pageCount' => ({required Object current, required Object total}) => 'Page ${current} of ${total}',
 			'mangadex.home' => 'Home',
@@ -2666,8 +2505,6 @@ extension on Translations {
 			'mangadex.byChapter' => 'By Chapter',
 			'mangadex.byManga' => 'By Manga',
 			'mangadex.localHistory' => 'Reading History (local)',
-			'mangadex.noFollowsMsg' => 'Find some manga to follow!',
-			'mangadex.noHistoryMsg' => 'No reading history',
 			'mangadex.createNewList' => 'Create New List',
 			'mangadex.createNewListBtn' => '+ ${_root.mangadex.createNewList}',
 			'mangadex.listName' => 'List Name',
@@ -2686,9 +2523,7 @@ extension on Translations {
 			'mangadex.newListOk' => 'New list created',
 			'mangadex.newListError' => ({required Object error}) => 'Failed to create list: ${error}',
 			'mangadex.officialPub' => 'Official Publisher',
-			'mangadex.noGroup' => 'No Group',
 			'mangadex.groupDesc' => 'Group Description',
-			'mangadex.groupFeed' => 'Group Feed',
 			'mangadex.groupTitles' => 'Group Titles',
 			'mangadex.login' => 'Login to MangaDex',
 			'mangadex.contentRating' => 'Content Rating',
@@ -2711,8 +2546,6 @@ extension on Translations {
 			'mangadex.settings.contentRating' => 'Content Filter',
 			'mangadex.settings.dataSaver' => 'Data Saver',
 			'mangadex.settings.groupBlacklist' => 'Blocked Groups',
-			'mangadex.settings.selectLanguages' => 'Select Languages',
-			'mangadex.settings.selectContentFilters' => 'Select Content Filters',
 			'mangadex.sort.relevance_asc' => 'Worst Match',
 			'mangadex.sort.relevance_desc' => 'Best Match',
 			'mangadex.sort.followedCount_asc' => 'Fewest Follows',
@@ -2773,7 +2606,6 @@ extension on Translations {
 			'mangaView.read' => 'read',
 			'mangaView.unread' => 'unread',
 			'mangaView.markAllWarning' => ({required Object arg}) => 'Are you sure you want to mark all visible chapters as ${arg}?',
-			'mangaView.noChaptersMsg' => 'No Chapters',
 			'mangaView.markAs' => ({required Object arg}) => 'Mark as ${arg}',
 			'mangaView.copyLink' => 'Copy gagaku link',
 			'readingStatus.remove' => 'Remove',
@@ -2791,7 +2623,6 @@ extension on Translations {
 			'mangaActions.follow' => 'Follow Manga',
 			'mangaActions.unfollow' => 'Unfollow Manga',
 			'mangaActions.favorite' => 'Add to Favorites',
-			'mangaActions.unfavorite' => 'Remove from Favorites',
 			'mangaActions.removeHistory' => 'Remove from History',
 			'mangaRelations.monochrome' => 'Monochrome',
 			'mangaRelations.main_story' => 'Main Story',
@@ -2891,7 +2722,6 @@ extension on Translations {
 			'backup.dataSub' => 'Backup all gagaku data and settings (excludes MangaDex login and local library files)',
 			'backup.restore' => 'Restore Backup',
 			'backup.restoreWarning' => 'Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?',
-			'backup.toFile' => 'Backup Data to File',
 			'backup.fromFile' => 'Restore Data from File',
 			'backup.success' => 'Backup saved',
 			'backup.restoreSuccess' => 'Backup restored',
@@ -2902,17 +2732,11 @@ extension on Translations {
 			'backup.dataLocSub' => 'Moves the live ObjectBox database after restart. This is not safe for concurrent multi-device synchronization; use Database Sync instead.',
 			'backup.dataLocDefault' => 'Default',
 			'sync.title' => 'Database Sync',
-			_ => null,
-		} ?? switch (path) {
 			'sync.description' => 'Automatically synchronizes all ObjectBox data through storage you control. Hive settings, credentials, local-library paths, and caches remain device-local.',
 			'sync.disabled' => 'Disabled',
 			'sync.configured' => 'Configured',
 			'sync.filesystem' => 'Filesystem directory',
 			'sync.documentTree' => 'Android document tree',
-			'sync.create' => 'Create New Profile',
-			'sync.createSub' => 'Choose an empty directory and publish this device\'s data.',
-			'sync.join' => 'Join Existing Profile',
-			'sync.joinSub' => 'Choose a directory containing a Gagaku sync profile.',
 			'sync.createFilesystem' => 'Create Filesystem Profile',
 			'sync.createFilesystemSub' => 'Choose an empty native filesystem directory and publish this device\'s data.',
 			'sync.joinFilesystem' => 'Join Filesystem Profile',
@@ -2938,6 +2762,8 @@ extension on Translations {
 			'sync.statusForked' => 'Conflict requires resolution',
 			'sync.statusCleanupWarning' => 'Synchronized with cleanup warning',
 			'sync.statusDisposed' => 'Stopped',
+			_ => null,
+		} ?? switch (path) {
 			'sync.profileId' => ({required Object id}) => 'Profile: ${id}',
 			'sync.deviceId' => ({required Object id}) => 'Device: ${id}',
 			'sync.location' => ({required Object path}) => 'Directory: ${path}',
@@ -2976,12 +2802,10 @@ extension on Translations {
 			'sync.repairConfirm' => 'Delete invalid snapshots and snapshots beyond the newest two for every device in this validated profile?',
 			'sync.reset' => 'Delete Remote Profile',
 			'sync.resetConfirm' => 'Permanently delete every Gagaku snapshot and profile metadata in this validated sync directory?',
-			'sync.operationSuccess' => 'Sync operation completed',
 			'sync.deletedCount' => ({required Object count}) => 'Deleted ${count} remote object(s)',
 			'sync.failureCount' => ({required Object count}) => '${count} object(s) could not be deleted',
 			'sync.operationFailed' => ({required Object error}) => 'Sync operation failed: ${error}',
 			'sync.directoryRequired' => 'Choose a filesystem directory',
-			'sync.busy' => 'Working…',
 			'chapterFeed.latestUpdates' => 'Latest Updates',
 			'chapterFeed.updates' => 'Updates',
 			'chapterFeed.updatingFeed' => 'Updating Feed',
@@ -2992,16 +2816,12 @@ extension on Translations {
 			'chapterFeed.updateFailed' => ({required Object item}) => 'Failed to update: ${item}',
 			'chapterFeed.failureReason' => ({required Object reason}) => 'Reason: ${reason}',
 			'chapterFeed.updateRequired' => 'Update required! No feed data or data out of date',
-			'permissions.needed' => 'Permissions Needed',
-			'permissions.request' => 'Extra permissions are required to update your feed in the background.',
 			'updates.checkForUpdates' => 'Check for Updates',
 			'updates.checkForUpdatesSub' => 'Check for new versions on startup',
 			'updates.updateChannel' => 'Update Channel',
 			'updates.updateChannelSub' => 'Choose which releases to check for',
 			'updates.channelStable' => 'Stable',
-			'updates.channelStableDesc' => 'Stable releases',
 			'updates.channelBeta' => 'Beta',
-			'updates.channelBetaDesc' => 'Dev-preview, bleeding edge',
 			'updates.checkFrequency' => 'Check Frequency',
 			'updates.checkFrequencySub' => 'How often to check for updates',
 			'updates.freqHourly' => 'Every hour',

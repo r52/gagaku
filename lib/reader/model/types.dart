@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:uuid/uuid.dart';
 
 enum ReaderDirection {
@@ -25,6 +25,38 @@ enum ReaderFormat {
   String get label => '$_key$name';
 }
 
+/// Horizontal tap regions of the reader: the outer 40% on each side turn
+/// pages, the middle 20% toggles the reader chrome.
+enum ReaderTapZone {
+  left,
+  center,
+  right;
+
+  static const _sideFraction = 0.4;
+
+  static ReaderTapZone of(double dx, double width) {
+    final margin = width * _sideFraction;
+    if (dx <= margin) return ReaderTapZone.left;
+    if (dx >= width - margin) return ReaderTapZone.right;
+    return ReaderTapZone.center;
+  }
+}
+
+enum LongStripScale {
+  small(0.4),
+  large(0.8),
+  full(1.0);
+
+  const LongStripScale(this.scale);
+  final double scale;
+
+  LongStripScale get next => switch (this) {
+    LongStripScale.small => LongStripScale.large,
+    LongStripScale.large => LongStripScale.full,
+    LongStripScale.full => LongStripScale.small,
+  };
+}
+
 Iterable<int> readerPrecacheIndices({
   required int currentIndex,
   required int pageCount,
@@ -42,6 +74,26 @@ Iterable<int> readerPrecacheIndices({
   for (var index = backwardStart; index < currentIndex; index++) {
     yield index;
   }
+}
+
+/// Largest decoded page dimension. The engine clamps images beyond the GPU
+/// texture limit per axis, distorting very tall webtoon slices; decoding
+/// within this bound keeps their proportions on GPUs with 16384px textures,
+/// at the cost of horizontal resolution for such slices.
+const readerMaxDecodeDimension = 16384;
+
+/// The provider every reader surface decodes [page] through, so displayed
+/// and prefetched images share cache entries. Never upscales.
+ImageProvider<Object> readerImageProvider(ReaderPage page, {int? cacheWidth}) {
+  return ResizeImage(
+    page.provider,
+    width: min(
+      cacheWidth ?? readerMaxDecodeDimension,
+      readerMaxDecodeDimension,
+    ),
+    height: readerMaxDecodeDimension,
+    policy: ResizeImagePolicy.fit,
+  );
 }
 
 class ReaderPage {

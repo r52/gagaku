@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:cached_network_image_ce/src/cache/default_cache_manager.dart';
 import 'package:cached_network_image_platform_interface_ce/cached_network_image_platform_interface_ce.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/http.dart';
@@ -90,13 +91,15 @@ class ExtensionHttpClient extends http.BaseClient {
     await _ref.readAsync(provider.future);
     final runtime = await _ref.read(provider.notifier).getRuntime();
     final cookies = runtime.getCookies();
-    final applicableCookies = cookies?.where(
-      (cookie) => _cookieAppliesTo(cookie, url),
+    final cookieHeader = serializeBrowserCookies(
+      selectBrowserCookiesForUrl(cookies ?? const [], url).cookies,
     );
-    final cookieHeader = _serializeCookies(applicableCookies ?? const []);
     return {...runtime.browserUserAgentHeaders, 'cookie': ?cookieHeader};
   }
 
+  /// Plain HTTP responses only expose the `cf-mitigated` header as a definite
+  /// challenge signal. The broader status/content-type fallback also covers
+  /// interstitials that do not send it; failed solves are rate-limited per host.
   static bool _shouldAttemptBypass(http.StreamedResponse response) {
     final contentType = response.headers['content-type']?.toLowerCase();
     return response.statusCode == 403 ||
@@ -115,14 +118,21 @@ class ExtensionHttpClient extends http.BaseClient {
     final response = await _inner.send(
       _buildRequest(request, sourceHeaders, _cloudflareBypass.headersFor(url)),
     );
-    if (!_shouldAttemptBypass(response)) {
+    if (!_shouldAttemptBypass(response) ||
+        _cloudflareBypass.isCoolingDown(url)) {
       return response;
     }
 
     // Listening and cancelling releases the blocked response connection.
     unawaited(response.stream.listen((_) {}).cancel().catchError((_) {}));
 
-    await _cloudflareBypass.refresh(url);
+    await _cloudflareBypass.refresh(
+      url,
+      trigger: isCloudflareChallengeHeaders(response.headers)
+          ? 'cf-mitigated'
+          : 'fallback',
+      statusCode: response.statusCode,
+    );
 
     sourceHeaders = await _sourceHeadersFor(url, sourceId);
     return _inner.send(
@@ -139,6 +149,7 @@ class ExtensionHttpClient extends http.BaseClient {
 
 class _CloudflareBypass {
   static const _timeout = Duration(seconds: 15);
+  static const _failureCooldown = Duration(minutes: 2);
   static const _imageContentTypeScript = '''
     (function() {
       return document.contentType &&
@@ -148,6 +159,7 @@ class _CloudflareBypass {
 
   final Map<String, Future<void>> _activeSolvers = {};
   final Map<String, Map<String, String>> _clearanceHeaders = {};
+  final Map<String, DateTime> _failedSolves = {};
 
   String _domain(Uri url) => url.host.toLowerCase();
 
@@ -161,7 +173,19 @@ class _CloudflareBypass {
     }
   }
 
-  Future<void> refresh(Uri url) async {
+  /// Whether a recent solve for this host failed. Solving again immediately
+  /// would only repeat the full headless timeout for every image request.
+  bool isCoolingDown(Uri url) {
+    final failedAt = _failedSolves[_domain(url)];
+    return failedAt != null &&
+        DateTime.now().difference(failedAt) < _failureCooldown;
+  }
+
+  Future<void> refresh(
+    Uri url, {
+    required String trigger,
+    required int statusCode,
+  }) async {
     final domain = _domain(url);
     final activeSolver = _activeSolvers[domain];
     if (activeSolver != null) {
@@ -174,7 +198,16 @@ class _CloudflareBypass {
     final solver = _runSolver(url);
     _activeSolvers[domain] = solver;
     try {
-      await solver;
+      final solved = await solver;
+      if (solved) {
+        _failedSolves.remove(domain);
+      } else {
+        _failedSolves[domain] = DateTime.now();
+      }
+      debugPrint(
+        'cloudflare[image] time=${cloudflareDiagnosticTimestamp()} '
+        'host=$domain trigger=$trigger status=$statusCode solved=$solved',
+      );
     } finally {
       if (identical(_activeSolvers[domain], solver)) {
         _activeSolvers.remove(domain);
@@ -182,20 +215,26 @@ class _CloudflareBypass {
     }
   }
 
-  Future<void> _runSolver(Uri url) async {
-    final completer = Completer<void>();
+  Future<bool> _runSolver(Uri url) async {
+    final completer = Completer<bool>();
     final targetUrl = WebUri.uri(url);
+    final cookieManager = CookieManager.instance();
     Timer? timeout;
     HeadlessInAppWebView? webView;
 
-    void complete() {
+    void complete(bool solved) {
       if (!completer.isCompleted) {
-        completer.complete();
+        completer.complete(solved);
       }
     }
 
     try {
-      timeout = Timer(_timeout, complete);
+      timeout = Timer(_timeout, () => complete(false));
+      // A stale clearance may be what caused the failed request, so only a
+      // clearance that differs from this one proves the challenge was solved.
+      final initialClearance = findCloudflareClearance(
+        await cookieManager.getCookies(url: targetUrl),
+      )?.value;
       webView = HeadlessInAppWebView(
         initialUrlRequest: URLRequest(url: targetUrl),
         onLoadStop: (controller, loadedUrl) async {
@@ -204,18 +243,25 @@ class _CloudflareBypass {
           }
 
           try {
-            final result = await controller.evaluateJavascript(
-              source: _imageContentTypeScript,
-            );
-            final cookies = await CookieManager.instance().getCookies(
-              url: targetUrl,
-              webViewController: controller,
-            );
-            final hasClearance = cookies.any(
-              (cookie) => cookie.name == 'cf_clearance',
-            );
-
-            if (result != true && !hasClearance) {
+            final isImage =
+                await controller.evaluateJavascript(
+                  source: _imageContentTypeScript,
+                ) ==
+                true;
+            if (!isImage &&
+                (isCloudflareChallengeUrl(loadedUrl) ||
+                    isCloudflareChallengeTitle(await controller.getTitle()))) {
+              return;
+            }
+            final cookies = selectBrowserCookiesForUrl(
+              await cookieManager.getCookies(
+                url: targetUrl,
+                webViewController: controller,
+              ),
+              url,
+            ).cookies;
+            if (!isImage &&
+                !hasNewCloudflareClearance(cookies, initialClearance)) {
               return;
             }
 
@@ -225,12 +271,12 @@ class _CloudflareBypass {
             if (completer.isCompleted) {
               return;
             }
-            final cookieHeader = _serializeCookies(cookies);
+            final cookieHeader = serializeBrowserCookies(cookies);
             _clearanceHeaders[_domain(url)] = {
               'cookie': ?cookieHeader,
               ...browserHeaders,
             };
-            complete();
+            complete(true);
           } catch (_) {
             // A later load event may still finish the challenge successfully.
           }
@@ -238,65 +284,12 @@ class _CloudflareBypass {
       );
 
       await webView.run();
-      await completer.future;
+      return await completer.future;
     } finally {
       timeout?.cancel();
       await webView?.dispose();
     }
   }
-}
-
-bool _cookieAppliesTo(Cookie cookie, Uri url) {
-  final value = cookie.value;
-  if (value == null) {
-    return false;
-  }
-
-  final expiresDate = cookie.expiresDate;
-  if (expiresDate != null &&
-      expiresDate <= DateTime.now().millisecondsSinceEpoch) {
-    return false;
-  }
-
-  if (cookie.isSecure == true && url.scheme.toLowerCase() != 'https') {
-    return false;
-  }
-
-  var domain = cookie.domain?.toLowerCase() ?? '';
-  if (domain.startsWith('.')) {
-    domain = domain.substring(1);
-  }
-  if (domain.isEmpty) {
-    return false;
-  }
-
-  final host = url.host.toLowerCase();
-  if (host != domain && !host.endsWith('.$domain')) {
-    return false;
-  }
-
-  final cookiePath = cookie.path;
-  if (cookiePath == null || cookiePath.isEmpty || cookiePath == '/') {
-    return true;
-  }
-
-  final requestPath = url.path.isEmpty ? '/' : url.path;
-  if (requestPath == cookiePath) {
-    return true;
-  }
-  if (!requestPath.startsWith(cookiePath)) {
-    return false;
-  }
-  return cookiePath.endsWith('/') ||
-      requestPath.substring(cookiePath.length).startsWith('/');
-}
-
-String? _serializeCookies(Iterable<Cookie> cookies) {
-  final values = [
-    for (final cookie in cookies)
-      if (cookie.value != null) '${cookie.name}=${cookie.value}',
-  ];
-  return values.isEmpty ? null : values.join('; ');
 }
 
 String? _mergeCookieHeaders(String? base, String? overlay) {

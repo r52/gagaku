@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/model/config.dart';
@@ -221,9 +221,8 @@ class UpdateChecker extends _$UpdateChecker {
       final data = release as Map<String, dynamic>;
       if (data['tag_name'] == 'dev-preview') {
         final body = data['body'] as String? ?? '';
-        final shaMatch = RegExp(
-          r'Built from commit ([0-9a-f]{40})',
-        ).firstMatch(body);
+        final shaMatch = RegExp(r'Built from commit ([0-9a-f]{40})')
+            .firstMatch(body);
         final commitSha = shaMatch?.group(1);
 
         devPreview = UpdateInfo(

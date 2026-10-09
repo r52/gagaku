@@ -1,10 +1,9 @@
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
-import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/cloudflare_resolution.dart';
 import 'package:gagaku/web/extension_browser.dart';
@@ -78,13 +77,10 @@ class _ExtensionHomeCard extends ConsumerWidget {
           ],
         );
       case AsyncError(:final error):
-        final requiresCloudflare = error is CloudflareBypassException;
+        final cloudflareMessage = cloudflareErrorMessage(tr, error);
+        final requiresCloudflare = cloudflareMessage != null;
         subtitle = Text(
-          switch (error) {
-            CloudflareBypassException() =>
-              tr.webSources.source.cloudflareManualRequired,
-            _ => error.toString(),
-          },
+          cloudflareMessage ?? error.toString(),
           style: TextStyle(color: theme.colorScheme.error),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
@@ -354,7 +350,8 @@ class _ExtensionOperationError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (error is! CloudflareBypassException) {
+    final cloudflareMessage = cloudflareErrorMessage(context.t, error);
+    if (cloudflareMessage == null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [Text('$error'), Text(stackTrace.toString())],
@@ -366,10 +363,7 @@ class _ExtensionOperationError extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            context.t.webSources.source.cloudflareManualRequired,
-            textAlign: TextAlign.center,
-          ),
+          Text(cloudflareMessage, textAlign: TextAlign.center),
           const SizedBox(height: 12),
           Wrap(
             alignment: WrapAlignment.center,
@@ -423,7 +417,6 @@ class ExtensionHomeWidget extends HookConsumerWidget {
     final homepageFuture = useMemoized<Future<_ExtensionHomepageData?>>(() async {
       final loadId = ++activeLoadId.value;
       final notifier = ref.read(extensionSourceProvider(source.id).notifier);
-      final runtimeGeneration = notifier.runtimeGeneration;
       var stage = 'sections';
 
       bool isCurrentLoad() {
@@ -444,7 +437,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
           'ExtensionHomepage(${source.id}) time='
           '${_extensionHomepageTimestamp()} '
           'abandoned instance=$instanceId '
-          'load=$loadId runtimeGeneration=$runtimeGeneration stage=$stage',
+          'load=$loadId stage=$stage',
         );
         return true;
       }
@@ -452,7 +445,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
       debugPrint(
         'ExtensionHomepage(${source.id}) time=${_extensionHomepageTimestamp()} '
         'start instance=$instanceId '
-        'load=$loadId runtimeGeneration=$runtimeGeneration',
+        'load=$loadId',
       );
       try {
         final sections = await notifier.getDiscoverSections();
@@ -462,7 +455,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
         debugPrint(
           'ExtensionHomepage(${source.id}) time='
           '${_extensionHomepageTimestamp()} sections instance=$instanceId '
-          'load=$loadId runtimeGeneration=$runtimeGeneration '
+          'load=$loadId '
           'count=${sections.length}',
         );
 
@@ -473,7 +466,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
             'ExtensionHomepage(${source.id}) time='
             '${_extensionHomepageTimestamp()} section start '
             'instance=$instanceId load=$loadId '
-            'runtimeGeneration=$runtimeGeneration index=$index '
+            'index=$index '
             'section=${section.id}',
           );
           final results = await notifier.getDiscoverSectionItems(section, null);
@@ -485,7 +478,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
             'ExtensionHomepage(${source.id}) time='
             '${_extensionHomepageTimestamp()} section success '
             'instance=$instanceId load=$loadId '
-            'runtimeGeneration=$runtimeGeneration index=$index '
+            'index=$index '
             'section=${section.id} items=${results.items.length} '
             'hasMetadata=${results.metadata != null}',
           );
@@ -495,7 +488,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
         debugPrint(
           'ExtensionHomepage(${source.id}) time='
           '${_extensionHomepageTimestamp()} success instance=$instanceId '
-          'load=$loadId runtimeGeneration=$runtimeGeneration '
+          'load=$loadId '
           'sections=${sections.length}',
         );
         return (sections: sections, sectionItems: sectionItems);
@@ -506,7 +499,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
         debugPrint(
           'ExtensionHomepage(${source.id}) time='
           '${_extensionHomepageTimestamp()} failed instance=$instanceId '
-          'load=$loadId runtimeGeneration=$runtimeGeneration stage=$stage '
+          'load=$loadId stage=$stage '
           'errorType=${error.runtimeType} error=$error',
         );
         Error.throwWithStackTrace(error, stackTrace);
@@ -585,9 +578,9 @@ class ExtensionHomeWidget extends HookConsumerWidget {
                   shrinkExtent: 180,
                   enableSplash: true,
                   onTap: (idx) {
-                    final element =
-                        sectionResults.items.elementAt(idx)
-                            as GenresCarouselItem;
+                    final element = sectionResults.items.elementAt(
+                      idx,
+                    ) as GenresCarouselItem;
 
                     ExtensionSearchRoute(
                       initialSource: source,
@@ -667,9 +660,9 @@ class ExtensionHomeWidget extends HookConsumerWidget {
                       if (source.hasCapability(SourceIntents.mangaSearch))
                         IconButton(
                           icon: const Icon(Icons.search),
-                          onPressed: () => ExtensionSearchRoute(
-                            initialSource: source,
-                          ).push(context),
+                          onPressed: () =>
+                              ExtensionSearchRoute(initialSource: source)
+                                  .push(context),
                           tooltip: tr.search.arg(arg: source.name),
                         ),
                       if (source.hasCapability(SourceIntents.settingsUI))
@@ -677,9 +670,11 @@ class ExtensionHomeWidget extends HookConsumerWidget {
                           icon: const Icon(Icons.settings),
                           onPressed: () => nav.push(
                             SlideTransitionRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      ExtensionSettingsPage(source: source),
+                              pageBuilder: (
+                                context,
+                                animation,
+                                secondaryAnimation,
+                              ) => ExtensionSettingsPage(source: source),
                             ),
                           ),
                           tooltip: tr.webSources.source.settings,

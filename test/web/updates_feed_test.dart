@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/exception.dart';
@@ -97,9 +98,11 @@ Future<void> _pumpFailure(
   UpdateFeedFailure failure, {
   List<WebSourceInfo> installedSources = const [],
 }) async {
+  final dio = Dio();
+  addTearDown(dio.close);
   final resolver = WebLinkResolver(
     extensionExists: (_) async => false,
-    redirectTransport: const _NoopRedirectTransport(),
+    dio: dio,
   );
   await tester.pumpWidget(
     ProviderScope(
@@ -128,11 +131,4 @@ final class _FailureController extends WebUpdateFeedController {
 
   @override
   Future<UpdateFeedState> build() async => failure;
-}
-
-final class _NoopRedirectTransport implements WebLinkRedirectTransport {
-  const _NoopRedirectTransport();
-
-  @override
-  Future<Uri?> resolveRedirect(Uri uri) async => null;
 }

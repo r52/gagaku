@@ -1,6 +1,5 @@
-import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:gagaku/util/riverpod.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
@@ -8,7 +7,8 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/exception.dart';
-import 'package:gagaku/util/cached_network_image.dart';
+import 'package:gagaku/util/manga_detail.dart';
+import 'package:gagaku/util/material_hooks.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
@@ -16,7 +16,6 @@ import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'manga_view.g.dart';
@@ -24,27 +23,6 @@ part 'manga_view.g.dart';
 enum _ChapterDivider { none, divider }
 
 enum _WebMangaTab { chapters, art }
-
-class _UnpagedWebMangaViewBody extends HookWidget {
-  const _UnpagedWebMangaViewBody({
-    required this.controller,
-    required this.chaptersView,
-    required this.coversView,
-  });
-
-  final TabController controller;
-  final Widget chaptersView;
-  final Widget coversView;
-
-  @override
-  Widget build(BuildContext context) {
-    final tab = useListenableSelector(controller, () => controller.index);
-    return switch (_WebMangaTab.values[tab]) {
-      _WebMangaTab.chapters => chaptersView,
-      _WebMangaTab.art => coversView,
-    };
-  }
-}
 
 @Riverpod(retry: noRetry)
 Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
@@ -119,20 +97,9 @@ class WebMangaViewPage extends ConsumerWidget {
             onPressed: () => WebMangaViewPage._handleBack(context),
           ),
         ),
-        body: Consumer(
+        body: RefreshIndicator(
+          onRefresh: () => _refreshWebManga(ref, resolvedSeries),
           child: child,
-          builder: (context, ref, child) {
-            final api = ref.watch(webSourceBrokerProvider);
-            return RefreshIndicator(
-              onRefresh: () async {
-                await api.invalidateAll(resolvedSeries.key);
-                return ref.refresh(
-                  _fetchWebMangaInfoProvider(resolvedSeries).future,
-                );
-              },
-              child: child!,
-            );
-          },
         ),
       ),
       builder: (context, data) => WebMangaViewWidget(
@@ -158,6 +125,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tr = context.t;
     final source = switch (series) {
       ExtensionSeriesRef(:final sourceId) => ref.watch(
         getExtensionFromIdProvider(sourceId).select(
@@ -179,38 +147,87 @@ class WebMangaViewWidget extends HookConsumerWidget {
       return null;
     }, [link]);
 
-    // Declared unconditionally (hooks rule).
+    final headers = ref.watch(sourceHeadersProvider(series.sourceId));
     final chapterScrollController = useScrollController();
     final artworkUrls = manga.artworkUrls;
     final hasArtwork = artworkUrls.isNotEmpty;
-    final tabController = useTabController(
+    final tabController = useMaterialTabController(
       initialLength: hasArtwork ? _WebMangaTab.values.length : 1,
       keys: [hasArtwork],
     );
 
-    final useWideLayout = DeviceContext.useNavigationRail(context);
+    return MangaDetailScaffold(
+      title: manga.title,
+      coverUrl: manga.cover,
+      coverHeaders: headers,
+      badge: _WebSourceBadge(sourceId: series.sourceId, source: source),
+      actions: _WebActionBar(
+        manga: manga,
+        series: series,
+        link: link,
+        source: source,
+      ),
+      metadata: _WebMetadataList(manga: manga, series: series, source: source),
+      tabController: tabController,
+      tabs: [
+        MangaDetailTab(
+          label: tr.mangaView.chapters,
+          scrollToTop: true,
+          body: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            scrollBehavior: const MouseTouchScrollBehavior(),
+            slivers: [
+              PinnedHeaderSliver(
+                child: _WebChapterHeader(manga: manga, series: series),
+              ),
+              _WebChapterList(manga: manga, series: series),
+            ],
+          ),
+        ),
+        if (hasArtwork)
+          MangaDetailTab(
+            label: tr.mangaView.art,
+            body: _WebMangaCoversView(
+              series: series,
+              artworkUrls: artworkUrls,
+              headers: headers,
+            ),
+          ),
+      ],
+      onRefresh: () => _refreshWebManga(ref, series),
+      scrollController: chapterScrollController,
+      onBack: () => WebMangaViewPage._handleBack(context),
+    );
+  }
+}
 
-    if (useWideLayout) {
-      return _WebMangaWideLayout(
-        manga: manga,
-        series: series,
-        link: link,
-        source: source,
-        chapterScrollController: chapterScrollController,
-        artworkUrls: artworkUrls,
-        tabController: tabController,
-      );
-    } else {
-      return _WebMangaNarrowLayout(
-        manga: manga,
-        series: series,
-        link: link,
-        source: source,
-        chapterScrollController: chapterScrollController,
-        artworkUrls: artworkUrls,
-        tabController: tabController,
-      );
-    }
+Future<(WebManga, HistoryLink)> _refreshWebManga(
+  WidgetRef ref,
+  WebSeriesRef series,
+) async {
+  await ref.read(webSourceBrokerProvider).invalidateAll(series.key);
+  return ref.refresh(_fetchWebMangaInfoProvider(series).future);
+}
+
+class _WebSourceBadge extends StatelessWidget {
+  const _WebSourceBadge({required this.sourceId, required this.source});
+
+  final String sourceId;
+  final WebSourceInfo? source;
+
+  @override
+  Widget build(BuildContext context) {
+    final icon = source?.icon;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(sourceId, style: CommonTextStyles.twelveBold),
+        if (icon != null && icon.isNotEmpty) ...[
+          const SizedBox(width: 6),
+          Image.network(icon, width: 24, height: 24),
+        ],
+      ],
+    );
   }
 }
 
@@ -373,18 +390,17 @@ class _WebMetadataList extends StatelessWidget {
                     tileColor: theme.colorScheme.surfaceContainerHighest,
                     title: Text(alttitle),
                     onTap: () =>
-                        Clipboard.setData(ClipboardData(text: alttitle)).then((
-                          _,
-                        ) {
-                          if (!context.mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              showCloseIcon: true,
-                              duration: const Duration(milliseconds: 1000),
-                              content: Text(tr.ui.copyClipboard),
-                            ),
-                          );
-                        }),
+                        Clipboard.setData(ClipboardData(text: alttitle))
+                            .then((_) {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  showCloseIcon: true,
+                                  duration: const Duration(milliseconds: 1000),
+                                  content: Text(tr.ui.copyClipboard),
+                                ),
+                              );
+                            }),
                     trailing: IconButton(
                       tooltip: tr.webSources.searchWithExt,
                       style: Styles.squareIconButtonStyle(
@@ -540,8 +556,13 @@ class _WebChapterHeader extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
         child: Row(
           children: [
-            Text(tr.mangaView.chapters, style: CommonTextStyles.twentyfour),
-            const Spacer(),
+            Expanded(
+              child: Text(
+                tr.mangaView.chapters,
+                style: CommonTextStyles.twentyfour,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             Consumer(
               builder: (context, ref, child) {
                 final mangakey = series.key;
@@ -657,9 +678,9 @@ class _WebChapterList extends HookWidget {
 
     return SliverList.separated(
       findItemIndexCallback: (key) {
-        final valueKey = key as ValueKey<int>;
+        final valueKey = key as ValueKey<String>;
         final val = manga.chapters.indexWhere(
-          (i) => i.hashCode == valueKey.value,
+          (i) => i.readMarkerKey == valueKey.value,
         );
         return val >= 0 ? val : null;
       },
@@ -672,7 +693,7 @@ class _WebChapterList extends HookWidget {
       itemBuilder: (BuildContext context, int index) {
         final current = manga.chapters[index];
         return ChapterButtonWidget(
-          key: ValueKey(current.hashCode),
+          key: ValueKey(current.readMarkerKey),
           data: current,
           manga: manga,
           series: series,
@@ -683,390 +704,16 @@ class _WebChapterList extends HookWidget {
   }
 }
 
-class _WebMangaWideLayout extends HookConsumerWidget {
-  const _WebMangaWideLayout({
-    required this.manga,
-    required this.series,
-    required this.link,
-    required this.source,
-    required this.chapterScrollController,
-    required this.artworkUrls,
-    required this.tabController,
-  });
-
-  final WebManga manga;
-  final WebSeriesRef series;
-  final HistoryLink link;
-  final WebSourceInfo? source;
-  final ScrollController chapterScrollController;
-  final List<String> artworkUrls;
-  final TabController tabController;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final tr = context.t;
-    final api = ref.watch(webSourceBrokerProvider);
-    final headers = ref.watch(sourceHeadersProvider(series.sourceId));
-    final imageCache = ref.watch(extensionImageCacheProvider);
-    final hasArtwork = artworkUrls.isNotEmpty;
-    final activeTab = useListenableSelector(
-      tabController,
-      () => _WebMangaTab.values[tabController.index],
-    );
-    final leftWidth = (MediaQuery.sizeOf(context).width * 0.35).clamp(
-      240.0,
-      360.0,
-    );
-
-    final coverWidget = Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: AspectRatio(
-          aspectRatio: 2 / 3,
-          child: CachedNetworkImage(
-            imageUrl: manga.cover,
-            httpHeaders: headers,
-            cacheManager: imageCache,
-            memCacheWidth: 256,
-            maxWidthDiskCache: 256,
-            colorBlendMode: BlendMode.modulate,
-            color: Colors.grey,
-            fit: BoxFit.cover,
-            progressIndicatorBuilder: (context, url, downloadProgress) =>
-                const Center(child: CircularProgressIndicator()),
-            errorBuilder: (context, error, stacktrace) => Tooltip(
-              message: error.toString(),
-              child: const Icon(Icons.error),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-          onPressed: () => WebMangaViewPage._handleBack(context),
-        ),
-        title: Text(manga.title),
-        actions: [
-          _WebActionBar(
-            manga: manga,
-            series: series,
-            link: link,
-            source: source,
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await api.invalidateAll(series.key);
-          return ref.refresh(_fetchWebMangaInfoProvider(series).future);
-        },
-        notificationPredicate: (notification) => notification.depth == 0,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: leftWidth,
-              child: NotificationListener<ScrollNotification>(
-                onNotification: (_) => true,
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      coverWidget,
-                      if (source != null && source!.icon.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12.0,
-                            vertical: 4.0,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                series.sourceId,
-                                style: CommonTextStyles.twelveBold,
-                              ),
-                              const SizedBox(width: 6),
-                              Image.network(
-                                source!.icon,
-                                width: 24,
-                                height: 24,
-                              ),
-                            ],
-                          ),
-                        )
-                      else
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12.0,
-                            vertical: 4.0,
-                          ),
-                          child: Text(
-                            series.sourceId,
-                            style: CommonTextStyles.twelveBold,
-                          ),
-                        ),
-                      _WebMetadataList(
-                        manga: manga,
-                        series: series,
-                        source: source,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const VerticalDivider(thickness: 1, width: 1),
-            Expanded(
-              child: Column(
-                children: [
-                  if (hasArtwork)
-                    Material(
-                      elevation: 2,
-                      child: TabBar(
-                        controller: tabController,
-                        tabs: [
-                          Tab(text: tr.mangaView.chapters),
-                          Tab(text: tr.mangaView.art),
-                        ],
-                      ),
-                    ),
-                  if (!hasArtwork || activeTab == _WebMangaTab.chapters)
-                    _WebChapterHeader(manga: manga, series: series),
-                  Expanded(
-                    child: _UnpagedWebMangaViewBody(
-                      controller: tabController,
-                      chaptersView: CustomScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        controller: chapterScrollController,
-                        scrollBehavior: const MouseTouchScrollBehavior(),
-                        slivers: [
-                          _WebChapterList(manga: manga, series: series),
-                        ],
-                      ),
-                      coversView: _WebMangaCoversView(
-                        series: series,
-                        artworkUrls: artworkUrls,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: ScrollToTopFab(
-        controller: chapterScrollController,
-        visibleCondition: () =>
-            !hasArtwork || activeTab == _WebMangaTab.chapters,
-      ),
-    );
-  }
-}
-
-class _WebMangaNarrowLayout extends HookConsumerWidget {
-  const _WebMangaNarrowLayout({
-    required this.manga,
-    required this.series,
-    required this.link,
-    required this.source,
-    required this.chapterScrollController,
-    required this.artworkUrls,
-    required this.tabController,
-  });
-
-  final WebManga manga;
-  final WebSeriesRef series;
-  final HistoryLink link;
-  final WebSourceInfo? source;
-  final ScrollController chapterScrollController;
-  final List<String> artworkUrls;
-  final TabController tabController;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final tr = context.t;
-    final api = ref.watch(webSourceBrokerProvider);
-    final headers = ref.watch(sourceHeadersProvider(series.sourceId));
-    final imageCache = ref.watch(extensionImageCacheProvider);
-    final hasArtwork = artworkUrls.isNotEmpty;
-    final activeTab = useListenableSelector(
-      tabController,
-      () => _WebMangaTab.values[tabController.index],
-    );
-
-    final isPhoneLandscape =
-        !DeviceContext.isPortraitMode(context) &&
-        DeviceContext.screenWidthSmall(context);
-    final bannerExpandedHeight = isPhoneLandscape ? 120.0 : 250.0;
-    final bannerTitleScale = isPhoneLandscape ? 1.5 : 2.0;
-
-    return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await api.invalidateAll(series.key);
-          return ref.refresh(_fetchWebMangaInfoProvider(series).future);
-        },
-        notificationPredicate: (notification) {
-          // Depth 1 is the top of the NestedScrollView
-          if (notification is OverscrollNotification &&
-              notification.velocity == 0.0 &&
-              notification.overscroll < 0.0) {
-            return notification.depth == 1;
-          }
-
-          return notification.depth == 0;
-        },
-        child: NestedScrollView(
-          controller: chapterScrollController,
-          headerSliverBuilder: (context, innerBoxIsScrolled) => [
-            SliverAppBar(
-              pinned: true,
-              snap: false,
-              floating: false,
-              expandedHeight: bannerExpandedHeight,
-              forceElevated: innerBoxIsScrolled,
-              leading: BackButton(
-                onPressed: () => WebMangaViewPage._handleBack(context),
-              ),
-              flexibleSpace: FlexibleSpaceBar(
-                expandedTitleScale: bannerTitleScale,
-                title: Text(
-                  manga.title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    shadows: <Shadow>[
-                      Shadow(
-                        offset: Offset(1.0, 1.0),
-                        color: Color.fromARGB(255, 0, 0, 0),
-                      ),
-                    ],
-                  ),
-                ),
-                background: Stack(
-                  fit: StackFit.passthrough,
-                  children: [
-                    CachedNetworkImage(
-                      imageUrl: manga.cover,
-                      httpHeaders: headers,
-                      cacheManager: imageCache,
-                      memCacheWidth: 256,
-                      maxWidthDiskCache: 256,
-                      colorBlendMode: BlendMode.modulate,
-                      color: Colors.grey,
-                      fit: BoxFit.cover,
-                      progressIndicatorBuilder:
-                          (context, url, downloadProgress) =>
-                              const Center(child: CircularProgressIndicator()),
-                      errorBuilder: (context, error, stacktrace) => Tooltip(
-                        message: error.toString(),
-                        child: const Icon(Icons.error),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          right: 20.0,
-                          bottom: 10.0,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              series.sourceId,
-                              style: CommonTextStyles.twelveBold,
-                            ),
-                            if (source != null && source!.icon.isNotEmpty)
-                              Image.network(
-                                source!.icon,
-                                width: 24,
-                                height: 24,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                _WebActionBar(
-                  manga: manga,
-                  series: series,
-                  link: link,
-                  source: source,
-                ),
-              ],
-            ),
-            SliverToBoxAdapter(
-              child: _WebMetadataList(
-                manga: manga,
-                series: series,
-                source: source,
-              ),
-            ),
-            if (hasArtwork)
-              SliverToBoxAdapter(
-                child: Material(
-                  elevation: 2,
-                  child: TabBar(
-                    controller: tabController,
-                    tabs: [
-                      Tab(text: tr.mangaView.chapters),
-                      Tab(text: tr.mangaView.art),
-                    ],
-                  ),
-                ),
-              ),
-            if (!hasArtwork || activeTab == _WebMangaTab.chapters)
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _PinnedHeaderDelegate(
-                  child: _WebChapterHeader(manga: manga, series: series),
-                  height: 56.0,
-                ),
-              ),
-          ],
-          body: SafeArea(
-            top: false,
-            bottom: true,
-            child: _UnpagedWebMangaViewBody(
-              controller: tabController,
-              chaptersView: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                scrollBehavior: const MouseTouchScrollBehavior(),
-                slivers: [_WebChapterList(manga: manga, series: series)],
-              ),
-              coversView: _WebMangaCoversView(
-                series: series,
-                artworkUrls: artworkUrls,
-              ),
-            ),
-          ),
-        ),
-      ),
-      floatingActionButton: ScrollToTopFab(
-        controller: chapterScrollController,
-        visibleCondition: () =>
-            !hasArtwork || activeTab == _WebMangaTab.chapters,
-      ),
-    );
-  }
-}
-
 class _WebMangaCoversView extends StatelessWidget {
-  const _WebMangaCoversView({required this.series, required this.artworkUrls});
+  const _WebMangaCoversView({
+    required this.series,
+    required this.artworkUrls,
+    required this.headers,
+  });
 
   final WebSeriesRef series;
   final List<String> artworkUrls;
+  final Map<String, String>? headers;
 
   @override
   Widget build(BuildContext context) {
@@ -1083,17 +730,35 @@ class _WebMangaCoversView extends StatelessWidget {
               crossAxisSpacing: 8,
               childAspectRatio: 0.7,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) => _WebCoverArtItem(
-                key: ValueKey(
-                  _webArtworkHeroTag(series, index, artworkUrls[index]),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final heroTag = _webArtworkHeroTag(
+                series,
+                index,
+                artworkUrls[index],
+              );
+              return CoverArtGridItem(
+                key: ValueKey(heroTag),
+                url: artworkUrls[index],
+                headers: headers,
+                heroTag: heroTag,
+                onTap: () => Navigator.push(
+                  context,
+                  TransparentOverlay(
+                    builder: (context) => CoverArtPagedOverlay(
+                      index: index,
+                      headers: headers,
+                      items: [
+                        for (final (i, url) in artworkUrls.indexed)
+                          (
+                            url: url,
+                            heroTag: _webArtworkHeroTag(series, i, url),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
-                series: series,
-                artworkUrls: artworkUrls,
-                page: index,
-              ),
-              childCount: artworkUrls.length,
-            ),
+              );
+            }, childCount: artworkUrls.length),
           ),
         ),
       ],
@@ -1101,174 +766,8 @@ class _WebMangaCoversView extends StatelessWidget {
   }
 }
 
-class _WebCoverArtItem extends HookConsumerWidget {
-  const _WebCoverArtItem({
-    super.key,
-    required this.series,
-    required this.artworkUrls,
-    required this.page,
-  });
-
-  final WebSeriesRef series;
-  final List<String> artworkUrls;
-  final int page;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final aniController = useAnimationController(
-      duration: const Duration(milliseconds: 100),
-    );
-    final headers = ref.watch(sourceHeadersProvider(series.sourceId));
-    final imageCache = ref.watch(extensionImageCacheProvider);
-    final url = artworkUrls[page];
-    final heroTag = _webArtworkHeroTag(series, page, url);
-
-    final image = GridAlbumImage(
-      animation: aniController.drive(Styles.coverArtGradientTween),
-      child: CachedNetworkImage(
-        imageUrl: url,
-        httpHeaders: headers,
-        cacheManager: imageCache,
-        width: 256.0,
-        progressIndicatorBuilder: (context, url, downloadProgress) =>
-            const Center(child: CircularProgressIndicator()),
-        errorBuilder: (context, error, stacktrace) =>
-            Tooltip(message: error.toString(), child: const Icon(Icons.error)),
-        fit: BoxFit.cover,
-      ),
-    );
-
-    return Hero(
-      tag: heroTag,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () async {
-            await Navigator.push(
-              context,
-              TransparentOverlay(
-                builder: (context) => _WebCoverArtPagedOverlay(
-                  index: page,
-                  series: series,
-                  items: artworkUrls,
-                ),
-              ),
-            );
-          },
-          onHover: (hovering) {
-            if (hovering) {
-              aniController.forward();
-            } else {
-              aniController.reverse();
-            }
-          },
-          child: image,
-        ),
-      ),
-    );
-  }
-}
-
-class _WebCoverArtPagedOverlay extends HookConsumerWidget {
-  const _WebCoverArtPagedOverlay({
-    required this.index,
-    required this.series,
-    required this.items,
-  });
-
-  final int index;
-  final WebSeriesRef series;
-  final List<String> items;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final controller = usePageController(initialPage: index);
-    final activePage = useState(index);
-    final headers = ref.watch(sourceHeadersProvider(series.sourceId));
-    final imageCache = ref.watch(extensionImageCacheProvider);
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: const OverlayCloseButton(),
-      ),
-      backgroundColor: Colors.transparent,
-      extendBody: true,
-      extendBodyBehindAppBar: true,
-      body: PageView.builder(
-        scrollBehavior: const MouseTouchScrollBehavior(),
-        itemBuilder: (BuildContext context, int id) {
-          final url = items[id];
-          final heroTag = _webArtworkHeroTag(series, id, url);
-
-          final child = Container(
-            padding: const EdgeInsets.all(10.0),
-            color: Colors.transparent,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: CachedNetworkImage(
-                cacheManager: imageCache,
-                httpHeaders: headers,
-                imageUrl: url,
-                imageBuilder: (context, imageProvider) {
-                  return PhotoView(
-                    backgroundDecoration: const BoxDecoration(
-                      color: Colors.transparent,
-                    ),
-                    imageProvider: imageProvider,
-                    minScale: PhotoViewComputedScale.contained * 0.8,
-                    maxScale: PhotoViewComputedScale.covered * 5.0,
-                    initialScale: PhotoViewComputedScale.contained,
-                  );
-                },
-                fit: BoxFit.contain,
-                progressIndicatorBuilder: (context, url, downloadProgress) =>
-                    const Center(child: CircularProgressIndicator()),
-                errorBuilder: (context, error, stacktrace) => Tooltip(
-                  message: error.toString(),
-                  child: const Icon(Icons.error),
-                ),
-              ),
-            ),
-          );
-
-          return activePage.value == id
-              ? Hero(key: ValueKey(heroTag), tag: heroTag, child: child)
-              : KeyedSubtree(key: ValueKey(heroTag), child: child);
-        },
-        itemCount: items.length,
-        controller: controller,
-        onPageChanged: (id) => activePage.value = id,
-        scrollDirection: Axis.horizontal,
-      ),
-    );
-  }
-}
-
 String _webArtworkHeroTag(WebSeriesRef series, int index, String url) =>
     '${series.key}/artwork/$index/$url';
-
-class _PinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
-  const _PinnedHeaderDelegate({required this.child, required this.height});
-  final Widget child;
-  final double height;
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) => child;
-  @override
-  double get maxExtent => height;
-  @override
-  double get minExtent => height;
-  @override
-  bool shouldRebuild(_PinnedHeaderDelegate old) =>
-      old.height != height || old.child != child;
-}
 
 class MangaStatisticsRow extends StatelessWidget {
   const MangaStatisticsRow({super.key, required this.manga});

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
@@ -439,9 +439,8 @@ void main() {
 
       await tester.tap(find.text('Show update snackbar'));
       await tester.pump();
-      ScaffoldMessenger.of(
-        tester.element(find.text('Show update snackbar')),
-      ).hideCurrentSnackBar();
+      ScaffoldMessenger.of(tester.element(find.text('Show update snackbar')))
+          .hideCurrentSnackBar();
       await tester.pumpAndSettle();
 
       expect(dismissed, 1);
@@ -630,8 +629,7 @@ Map<String, Object?> _androidAsset({String? digest}) {
     'name': 'app-release.apk',
     'state': 'uploaded',
     'content_type': 'application/vnd.android.package-archive',
-    'browser_download_url':
-        'https://github.com/r52/gagaku/releases/download/v1.0.1/app-release.apk',
+    'browser_download_url': 'https://github.com/r52/gagaku/releases/download/v1.0.1/app-release.apk',
     'size': 12345,
     'digest': digest ?? 'sha256:${'a' * 64}',
   };

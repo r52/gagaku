@@ -179,55 +179,47 @@ final class WebSourceBrokerProvider
   }
 }
 
-String _$webSourceBrokerHash() => r'd0423fd57936f967e9985ee646d246f933678cdd';
+String _$webSourceBrokerHash() => r'56c8a586cc5056c95d1633b275a9a96ac2641b3e';
 
-@ProviderFor(webSourceTransport)
-final webSourceTransportProvider = WebSourceTransportProvider._();
+@ProviderFor(webSourceDio)
+final webSourceDioProvider = WebSourceDioProvider._();
 
-final class WebSourceTransportProvider
-    extends
-        $FunctionalProvider<
-          WebSourceTransport,
-          WebSourceTransport,
-          WebSourceTransport
-        >
-    with $Provider<WebSourceTransport> {
-  WebSourceTransportProvider._()
+final class WebSourceDioProvider extends $FunctionalProvider<Dio, Dio, Dio>
+    with $Provider<Dio> {
+  WebSourceDioProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'webSourceTransportProvider',
+        name: r'webSourceDioProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$webSourceTransportHash();
+  String debugGetCreateSourceHash() => _$webSourceDioHash();
 
   @$internal
   @override
-  $ProviderElement<WebSourceTransport> $createElement(
-    $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
+  $ProviderElement<Dio> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
-  WebSourceTransport create(Ref ref) {
-    return webSourceTransport(ref);
+  Dio create(Ref ref) {
+    return webSourceDio(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(WebSourceTransport value) {
+  Override overrideWithValue(Dio value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<WebSourceTransport>(value),
+      providerOverride: $SyncValueProvider<Dio>(value),
     );
   }
 }
 
-String _$webSourceTransportHash() =>
-    r'9a639821d13753e27ade897ce341fdea04d916d4';
+String _$webSourceDioHash() => r'bd2b8559eee79fcb3d19de25997ef97e6d5c23f2';
 
 @ProviderFor(webLinkResolver)
 final webLinkResolverProvider = WebLinkResolverProvider._();
@@ -269,7 +261,7 @@ final class WebLinkResolverProvider
   }
 }
 
-String _$webLinkResolverHash() => r'5371a46160caaa2af0637a94783b45e72252d2a4';
+String _$webLinkResolverHash() => r'0439168440a9e61a371e5f191757c9f6921b90b1';
 
 @ProviderFor(WebReadMarkers)
 final webReadMarkersProvider = WebReadMarkersProvider._();
@@ -301,7 +293,7 @@ abstract class _$WebReadMarkers extends $AsyncNotifier<ReadMarkersDB> {
   FutureOr<ReadMarkersDB> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<ReadMarkersDB>, ReadMarkersDB>;
     final element =
         ref.element
@@ -311,7 +303,7 @@ abstract class _$WebReadMarkers extends $AsyncNotifier<ReadMarkersDB> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
 
@@ -397,7 +389,7 @@ final class ExtensionSourceProvider
   }
 }
 
-String _$extensionSourceHash() => r'f97ce629679a3173d004f9da1e00040894569cc7';
+String _$extensionSourceHash() => r'07c161fafe0749cf74bad053174879cf0f7325a6';
 
 final class ExtensionSourceFamily extends $Family
     with
@@ -431,7 +423,7 @@ abstract class _$ExtensionSource extends $AsyncNotifier<WebSourceInfo> {
   FutureOr<WebSourceInfo> build(String sourceId);
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<WebSourceInfo>, WebSourceInfo>;
     final element =
         ref.element
@@ -441,7 +433,7 @@ abstract class _$ExtensionSource extends $AsyncNotifier<WebSourceInfo> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, () => build(_$args));
+    return element.handleCreate(ref, () => build(_$args));
   }
 }
 

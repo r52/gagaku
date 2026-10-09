@@ -65,7 +65,7 @@ abstract class _$LocalConfig extends $Notifier<LocalLibConfig> {
   LocalLibConfig build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<LocalLibConfig, LocalLibConfig>;
     final element =
         ref.element
@@ -75,6 +75,6 @@ abstract class _$LocalConfig extends $Notifier<LocalLibConfig> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }

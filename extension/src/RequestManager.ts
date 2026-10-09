@@ -68,6 +68,8 @@ export class MockRequestManager implements RequestManager {
     return this.defaultUserAgentHeaders["user-agent"];
   }
 
+  // Mirrors diagnosticUserAgentFingerprint in lib/web/model/cloudflare.dart so
+  // Dart and JS logs correlate; keep the two implementations identical.
   private diagnosticFingerprint(value: string): string {
     let hash = 0x811c9dc5;
     for (let i = 0; i < value.length; i++) {

@@ -3,27 +3,24 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
-
-import 'package:flutter/material.dart';
-import 'package:gagaku/objectbox.g.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:gagaku/log.dart';
 import 'package:gagaku/model/cache.dart';
+import 'package:gagaku/model/model.dart';
+import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/http.dart';
-import 'package:gagaku/log.dart';
-import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/cloudflare.dart';
 import 'package:gagaku/web/model/config.dart';
+import 'package:gagaku/web/model/extension_repository.dart';
 import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/fjs_extension_runtime.dart';
-import 'package:gagaku/web/model/extension_repository.dart';
 import 'package:gagaku/web/model/link_resolver.dart';
-import 'package:gagaku/web/model/source_adapter.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
 import 'package:native_dio_adapter/native_dio_adapter.dart' hide URLRequest;
 import 'package:pool/pool.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -116,34 +113,28 @@ Map<String, String> sourceHeaders(Ref ref, String sourceId) {
 
 @Riverpod(keepAlive: true)
 WebSourceBroker webSourceBroker(Ref ref) {
-  final transport = ref.watch(webSourceTransportProvider);
   return WebSourceBroker(
+    ref: ref,
     cache: ref.watch(cacheProvider),
-    proxyAdapter: ProxyWebSourceAdapter(transport: transport),
-    extensionAdapter: ExtensionWebSourceAdapter(
-      fetchManga: (sourceId, mangaId) async {
-        await ref.readAsync(extensionSourceProvider(sourceId).future);
-        return ref
-            .read(extensionSourceProvider(sourceId).notifier)
-            .getManga(mangaId);
-      },
-      fetchChapterContent: (sourceId, chapter) async {
-        final provider = extensionSourceProvider(sourceId);
-        final source = await ref.readAsync(provider.future);
-        final notifier = ref.read(provider.notifier);
-        return ExtensionChapterContent(
-          runtime: await notifier.getRuntime(),
-          details: await notifier.getChapterDetails(chapter),
-          sourceBaseUrl: source.baseUrl,
-        );
-      },
-    ),
+    dio: ref.watch(webSourceDioProvider),
   );
 }
 
 @Riverpod(keepAlive: true)
-WebSourceTransport webSourceTransport(Ref ref) {
-  return _DioWebSourceTransport(_createWebSourceDio());
+Dio webSourceDio(Ref ref) {
+  final dio = Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 5),
+      receiveTimeout: const Duration(seconds: 5),
+      validateStatus: (status) => true,
+    ),
+  );
+  dio.httpClientAdapter = NativeAdapter(
+    createCronetEngine: () => createCronetEngine(getUserAgent(false)),
+  );
+  dio.interceptors.add(RateLimitingInterceptor());
+  ref.onDispose(dio.close);
+  return dio;
 }
 
 @Riverpod(keepAlive: true)
@@ -156,74 +147,21 @@ WebLinkResolver webLinkResolver(Ref ref) {
       query.close();
       return source != null;
     },
-    redirectTransport: _WebSourceRedirectTransport(
-      ref.watch(webSourceTransportProvider),
-    ),
+    dio: ref.watch(webSourceDioProvider),
   );
 }
 
-class _DioWebSourceTransport implements WebSourceTransport {
-  _DioWebSourceTransport(this.dio);
-
-  final Dio dio;
-
-  @override
-  Future<Response<dynamic>> getUri(Uri uri, {bool followRedirects = true}) {
-    return dio.getUri(uri, options: Options(followRedirects: followRedirects));
-  }
-}
-
-class _WebSourceRedirectTransport implements WebLinkRedirectTransport {
-  _WebSourceRedirectTransport(this.transport);
-
-  final WebSourceTransport transport;
-
-  @override
-  Future<Uri?> resolveRedirect(Uri uri) async {
-    logger.d('WebLinkResolver: retrieving redirect for ${uri.toString()}');
-
-    final response = await transport.getUri(uri, followRedirects: false);
-    if (response.statusCode != 302) {
-      return null;
-    }
-
-    final location = response.headers.value('location');
-    if (location == null || location.isEmpty) {
-      return null;
-    }
-
-    logger.d('WebLinkResolver: redirect location $location');
-    return Uri.tryParse(location);
-  }
-}
-
-Dio _createWebSourceDio() {
-  final dio = Dio(
-    BaseOptions(
-      connectTimeout: const Duration(seconds: 5),
-      receiveTimeout: const Duration(seconds: 5),
-      validateStatus: (status) => true,
-    ),
-  );
-  dio.httpClientAdapter = NativeAdapter(
-    createCronetEngine: () => createCronetEngine(getUserAgent(false)),
-  );
-  dio.interceptors.add(RateLimitingInterceptor());
-  return dio;
-}
-
+/// Caches manga and dispatches source-specific work to privately owned adapters.
+///
+/// The adapters do not own the shared HTTP client or extension runtimes.
 class WebSourceBroker {
-  WebSourceBroker({
-    required CacheManager cache,
-    required ProxyWebSourceAdapter proxyAdapter,
-    required ExtensionWebSourceAdapter extensionAdapter,
-  }) : _cache = cache,
-       _proxyAdapter = proxyAdapter,
-       _extensionAdapter = extensionAdapter;
+  WebSourceBroker({required Ref ref, required this._cache, required Dio dio})
+    : _proxy = _ProxyWebSourceAdapter(dio: dio),
+      _extension = _ExtensionWebSourceAdapter(ref: ref);
 
   final CacheManager _cache;
-  final ProxyWebSourceAdapter _proxyAdapter;
-  final ExtensionWebSourceAdapter _extensionAdapter;
+  final _ProxyWebSourceAdapter _proxy;
+  final _ExtensionWebSourceAdapter _extension;
 
   Future<void> invalidateCacheItem(String item) async {
     if (await _cache.exists(item)) {
@@ -235,10 +173,8 @@ class WebSourceBroker {
     await _cache.invalidateAll(startsWith);
   }
 
-  Future<WebManga?> _fetchWithCache(
-    String key,
-    Future<WebManga?> Function() fetcher,
-  ) async {
+  Future<WebManga?> getManga(WebSeriesRef series) async {
+    final key = series.key;
     if (await _cache.exists(key)) {
       logger.d('CacheManager: retrieving entry $key');
       try {
@@ -249,7 +185,10 @@ class WebSourceBroker {
       }
     }
 
-    final manga = await fetcher();
+    final manga = await switch (series) {
+      ProxySeriesRef() => _proxy.fetchManga(series),
+      ExtensionSeriesRef() => _extension.fetchManga(series),
+    };
 
     if (manga != null) {
       const expiry = Duration(days: 1);
@@ -260,24 +199,93 @@ class WebSourceBroker {
     return manga;
   }
 
-  Future<WebManga?> getManga(WebSeriesRef series) {
-    return _fetchWithCache(
-      series.key,
-      () => switch (series) {
-        ProxySeriesRef() => _proxyAdapter.fetchManga(series),
-        ExtensionSeriesRef() => _extensionAdapter.fetchManga(series),
-      },
-    );
-  }
-
   Future<ExtensionChapterContent> getExtensionChapterContent(
     ExtensionSeriesRef series,
     Chapter chapter,
-  ) {
-    return _extensionAdapter.fetchChapterContent(series, chapter);
+  ) => _extension.fetchChapterContent(series, chapter);
+
+  Future<dynamic> getProxyAPI(String path) => _proxy.fetchApiPath(path);
+}
+
+class _ProxyWebSourceAdapter {
+  _ProxyWebSourceAdapter({required this._dio});
+
+  /// Shared client; [webSourceDioProvider] owns its disposal.
+  final Dio _dio;
+
+  Future<WebManga?> fetchManga(ProxySeriesRef series) async {
+    final response = await _dio.getUri(
+      Uri.parse(
+        'https://cubari.moe/read/api/${series.proxyId}/series/${series.seriesId}/',
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      final data = Map<String, dynamic>.from(response.data as Map);
+      data['source_type'] = 'cubari';
+      return WebManga.fromJson(data);
+    }
+
+    logger.d(
+      'Failed to download manga data.\n'
+      'Server returned response code ${response.statusCode}: '
+      '${response.statusMessage}',
+    );
+    return null;
   }
 
-  Future<dynamic> getProxyAPI(String path) => _proxyAdapter.fetchApiPath(path);
+  Future<dynamic> fetchApiPath(String path) async {
+    final response = await _dio.getUri(Uri.parse('https://cubari.moe$path'));
+
+    if (response.statusCode == 200) {
+      return response.data;
+    }
+
+    throw ApiException(
+      message: 'Failed to download API data',
+      statusCode: response.statusCode,
+      statusMessage: response.statusMessage,
+    );
+  }
+}
+
+/// Resolves provider-owned sources per operation rather than retaining notifiers.
+class _ExtensionWebSourceAdapter {
+  _ExtensionWebSourceAdapter({required this._ref});
+
+  final Ref _ref;
+
+  Future<WebManga?> fetchManga(ExtensionSeriesRef series) async {
+    final provider = extensionSourceProvider(series.sourceId);
+    await _ref.readAsync(provider.future);
+    return _ref.read(provider.notifier).getManga(series.mangaId);
+  }
+
+  Future<ExtensionChapterContent> fetchChapterContent(
+    ExtensionSeriesRef series,
+    Chapter chapter,
+  ) async {
+    final provider = extensionSourceProvider(series.sourceId);
+    final source = await _ref.readAsync(provider.future);
+    final notifier = _ref.read(provider.notifier);
+    return ExtensionChapterContent(
+      runtime: await notifier.getRuntime(),
+      details: await notifier.getChapterDetails(chapter),
+      sourceBaseUrl: source.baseUrl,
+    );
+  }
+}
+
+class ExtensionChapterContent {
+  const ExtensionChapterContent({
+    required this.runtime,
+    required this.details,
+    required this.sourceBaseUrl,
+  });
+
+  final ExtensionRuntime runtime;
+  final ChapterDetails details;
+  final String? sourceBaseUrl;
 }
 
 class WebFavoritesManager extends ChangeNotifier {
@@ -729,11 +737,6 @@ Stream<List<WebSourceInfo>> installedSources(Ref ref) async* {
 class ExtensionSource extends _$ExtensionSource {
   ExtensionRuntime? _runtime;
 
-  int? get runtimeGeneration => switch (_runtime) {
-    FjsExtensionRuntime(:final runtimeGeneration) => runtimeGeneration,
-    _ => null,
-  };
-
   @override
   Future<WebSourceInfo> build(String sourceId) async {
     final repo = ExtensionRepository();
@@ -838,8 +841,8 @@ class ExtensionSource extends _$ExtensionSource {
             ? runtime.runtimeGeneration
             : null;
         logger.i(
-          'ExtensionSource($sourceId) time='
-          '${DateTime.now().toUtc().toIso8601String()} '
+          'ExtensionSource($sourceId) '
+          'time=${cloudflareDiagnosticTimestamp()} '
           'Cloudflare read retry operation=$operation attempt=$attempt '
           'delayMs=${delay.inMilliseconds} '
           'runtimeGeneration=$generation',

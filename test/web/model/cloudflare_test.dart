@@ -124,4 +124,65 @@ void main() {
       expect(notifier.take('source'), same(newerState));
     },
   );
+
+  test('only a changed clearance counts as a new solve', () {
+    final cookies = [
+      Cookie(name: 'session', value: 'session-value'),
+      Cookie(name: 'cf_clearance', value: 'fresh'),
+    ];
+
+    expect(findCloudflareClearance(cookies)?.value, 'fresh');
+    expect(hasNewCloudflareClearance(cookies, null), isTrue);
+    expect(hasNewCloudflareClearance(cookies, 'stale'), isTrue);
+    expect(hasNewCloudflareClearance(cookies, 'fresh'), isFalse);
+    expect(hasNewCloudflareClearance(cookies.take(1), null), isFalse);
+  });
+
+  test('challenge signals match browser and HTTP evidence', () {
+    expect(
+      isCloudflareChallengeUrl(
+        Uri.parse('https://example.com/?__cf_chl_rt_tk=token'),
+      ),
+      isTrue,
+    );
+    expect(
+      isCloudflareChallengeUrl(Uri.parse('https://example.com/?page=1')),
+      isFalse,
+    );
+    expect(isCloudflareChallengeUrl(null), isFalse);
+
+    expect(isCloudflareChallengeTitle('Just a moment...'), isTrue);
+    expect(isCloudflareChallengeTitle('Example'), isFalse);
+    expect(isCloudflareChallengeTitle(null), isFalse);
+
+    expect(isCloudflareChallengeHeaders({'cf-mitigated': 'challenge'}), isTrue);
+    expect(isCloudflareChallengeHeaders({'CF-Mitigated': 'Challenge'}), isTrue);
+    expect(isCloudflareChallengeHeaders({'server': 'cloudflare'}), isFalse);
+    expect(isCloudflareChallengeHeaders(null), isFalse);
+  });
+
+  test('serializes valued cookies into a request header', () {
+    expect(
+      serializeBrowserCookies([
+        Cookie(name: 'a', value: '1'),
+        Cookie(name: 'b', value: null),
+        Cookie(name: 'cf_clearance', value: 'clearance'),
+      ]),
+      'a=1; cf_clearance=clearance',
+    );
+    expect(serializeBrowserCookies(const []), isNull);
+  });
+
+  test('cookie selection keeps host-only cookies without a domain', () {
+    final selection = selectBrowserCookiesForUrl([
+      Cookie(name: 'cf_clearance', value: 'clearance'),
+      Cookie(name: 'other', value: 'x', domain: 'other.example'),
+    ], Uri.parse('https://comix.to/series'));
+
+    expect(selection.cookies.map((cookie) => cookie.name), ['cf_clearance']);
+    expect(
+      selection.diagnosticSummary,
+      'input=2 selected=1 discarded=1 duplicateNames=[]',
+    );
+  });
 }

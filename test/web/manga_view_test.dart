@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
@@ -9,7 +9,6 @@ import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/web/manga_view.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
-import 'package:gagaku/web/model/source_adapter.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -41,7 +40,7 @@ void main() {
   });
 
   for (final testCase in [
-    (name: 'narrow', size: const Size(600, 800)),
+    (name: 'narrow', size: const Size(400, 800)),
     (name: 'wide', size: const Size(1200, 800)),
   ]) {
     testWidgets('artwork-enabled ${testCase.name} layout can pull to refresh', (
@@ -69,21 +68,18 @@ void main() {
       );
       const manga = WebManga.extension(data: sourceManga, chaptersList: []);
       final cache = _RecordingCacheManager();
-      final broker = WebSourceBroker(
-        cache: cache,
-        proxyAdapter: ProxyWebSourceAdapter(
-          transport: _StaticTransport(const {}),
-        ),
-        extensionAdapter: ExtensionWebSourceAdapter(
-          fetchManga: (_, _) async => manga,
-          fetchChapterContent: (_, _) => throw UnimplementedError(),
-        ),
-      );
+      final dio = Dio();
+      addTearDown(dio.close);
       final link = HistoryLink.fromSeries(title: manga.title, series: series);
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [webSourceBrokerProvider.overrideWithValue(broker)],
+          overrides: [
+            cacheProvider.overrideWithValue(cache),
+            webSourceDioProvider.overrideWithValue(dio),
+            extensionSourceProvider('source-1')
+                .overrideWith(() => _TestExtensionSource(manga)),
+          ],
           child: TranslationProvider(
             child: MaterialApp(
               home: WebMangaViewWidget(
@@ -115,22 +111,17 @@ void main() {
   }
 }
 
-class _StaticTransport implements WebSourceTransport {
-  const _StaticTransport(this.data);
+class _TestExtensionSource extends ExtensionSource {
+  _TestExtensionSource(this.manga);
 
-  final Object data;
+  final WebManga manga;
 
   @override
-  Future<Response<dynamic>> getUri(
-    Uri uri, {
-    bool followRedirects = true,
-  }) async {
-    return Response<dynamic>(
-      requestOptions: RequestOptions(path: uri.toString()),
-      statusCode: 200,
-      data: data,
-    );
-  }
+  Future<WebSourceInfo> build(String sourceId) async =>
+      WebSourceInfo(id: sourceId, name: 'Test source', repo: 'test', icon: '');
+
+  @override
+  Future<WebManga?> getManga(String mangaId) async => manga;
 }
 
 class _RecordingCacheManager implements CacheManager {

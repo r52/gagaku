@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'config.dart';
@@ -9,13 +9,14 @@ part of 'config.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$MangaDexConfig {
 
- int get dbid; set dbid(int value); Set<Language> get translatedLanguages; set translatedLanguages(Set<Language> value); Set<Language> get originalLanguage; set originalLanguage(Set<Language> value); Set<ContentRating> get contentRating; set contentRating(Set<ContentRating> value); bool get dataSaver; set dataSaver(bool value); Set<String> get groupBlacklist; set groupBlacklist(Set<String> value);
+
 /// Create a copy of MangaDexConfig
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,7 +29,8 @@ $MangaDexConfigCopyWith<MangaDexConfig> get copyWith => _$MangaDexConfigCopyWith
 
 @override
 String toString() {
-  return 'MangaDexConfig(dbid: $dbid, translatedLanguages: $translatedLanguages, originalLanguage: $originalLanguage, contentRating: $contentRating, dataSaver: $dataSaver, groupBlacklist: $groupBlacklist)';
+  final _this = this as MangaDexConfig;
+  return 'MangaDexConfig(dbid: ${_this.dbid}, translatedLanguages: ${_this.translatedLanguages}, originalLanguage: ${_this.originalLanguage}, contentRating: ${_this.contentRating}, dataSaver: ${_this.dataSaver}, groupBlacklist: ${_this.groupBlacklist})';
 }
 
 

@@ -16,6 +16,8 @@ Gagaku is licensed under the MIT license.
 
 ### [Downloads](https://github.com/r52/gagaku/releases)
 
+### [Quick-Start Guide](https://r52.github.io/gagaku/)
+
 ## Features
 
 - MangaDex client
@@ -28,7 +30,7 @@ Gagaku is licensed under the MIT license.
 - Deep link support
   - Android only, supports mangadex.org/cubari.moe links
   - Must be manually enabled in Default Apps settings in Android 12+
-- Automatic database synchronization through user-controlled storage
+- Server-less automatic database synchronization through user-controlled storage
   - Native directories, synced through external means such as Syncthing or mounted shared folder
   - Android document provider folders, including Google Drive and any other cloud storage providers that exposes an Android Document provider
 

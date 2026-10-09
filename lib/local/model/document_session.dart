@@ -41,8 +41,10 @@ abstract interface class LocalDocumentReadium {
   Future<void> setEPUBPreferences(EPUBPreferences preferences);
 }
 
-typedef LocalEpubPreferencesChanged =
-    FutureOr<void> Function(double fontSize, bool scroll);
+typedef LocalEpubPreferencesChanged = FutureOr<void> Function(
+  double fontSize,
+  bool scroll,
+);
 
 class FlutterLocalDocumentReadium implements LocalDocumentReadium {
   FlutterLocalDocumentReadium([FlutterReadium? readium])
@@ -202,19 +204,16 @@ class LocalDocumentSessionController extends ChangeNotifier {
     LocalDocumentSessionCoordinator? coordinator,
     double initialEpubFontSize = 1.0,
     bool initialEpubScroll = false,
-    Color? epubBackgroundColor,
-    Color? epubTextColor,
-    LocalEpubPreferencesChanged? onEpubPreferencesChanged,
+    this._epubBackgroundColor,
+    this._epubTextColor,
+    this._onEpubPreferencesChanged,
   }) : _readium = readium ?? FlutterLocalDocumentReadium(),
        _coordinator = coordinator ?? defaultCoordinator,
        _epubFontSize = initialEpubFontSize.clamp(
          epubFontSizeMin,
          epubFontSizeMax,
        ),
-       _epubScroll = initialEpubScroll,
-       _epubBackgroundColor = epubBackgroundColor,
-       _epubTextColor = epubTextColor,
-       _onEpubPreferencesChanged = onEpubPreferencesChanged;
+       _epubScroll = initialEpubScroll;
 
   static final LocalDocumentSessionCoordinator defaultCoordinator =
       LocalDocumentSessionCoordinator();

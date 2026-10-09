@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:collection/collection.dart';
 import 'package:fjs/fjs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -426,20 +425,6 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
         );
       }
 
-      final contentBlockers = <ContentBlocker>[];
-      if (defaultTargetPlatform == TargetPlatform.android) {
-        for (final filter in GagakuData().blockers) {
-          contentBlockers.add(
-            ContentBlocker(
-              trigger: ContentBlockerTrigger(urlFilter: filter),
-              action: ContentBlockerAction(
-                type: ContentBlockerActionType.BLOCK,
-              ),
-            ),
-          );
-        }
-      }
-
       // Failures travel as values until setup/cleanup have been supervised. A
       // deadline may fire before a platform call returns, without an error Future
       // escaping to the zone before its listener is attached.
@@ -537,7 +522,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
           }
 
           void observeUrl(WebUri? url) {
-            if (_isCloudflareChallengeUrl(url)) {
+            if (isCloudflareChallengeUrl(url)) {
               markChallengeObserved();
             }
           }
@@ -575,7 +560,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
               }
               _logCookieSelection('headless-loaded', cookieSelection);
               latestCookies = cookieSelection.cookies;
-              final titleChallenged = _isCloudflareChallengeTitle(title);
+              final titleChallenged = isCloudflareChallengeTitle(title);
               if (titleChallenged) {
                 markChallengeObserved();
               }
@@ -588,7 +573,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
               if (requiresCloudflare &&
                   (response?.challenged == true ||
                       titleChallenged ||
-                      _isCloudflareChallengeUrl(url))) {
+                      isCloudflareChallengeUrl(url))) {
                 return;
               }
               final httpError = response?.error;
@@ -600,7 +585,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
               }
               if (requiresCloudflare &&
                   challengeObserved &&
-                  !_hasNewCloudflareClearance(
+                  !hasNewCloudflareClearance(
                     latestCookies,
                     initialCloudflareClearance,
                   )) {
@@ -630,7 +615,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
                 return;
               }
               if (requiresCloudflare &&
-                  _isCloudflareChallengeTitle(finalTitle)) {
+                  isCloudflareChallengeTitle(finalTitle)) {
                 markChallengeObserved();
                 return;
               }
@@ -644,8 +629,9 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
               if (!isCurrentNavigation(revision, url)) {
                 return;
               }
-              final hasClearance = _cloudflareClearance(finalCookies) != null;
-              final newClearance = _hasNewCloudflareClearance(
+              final hasClearance =
+                  findCloudflareClearance(finalCookies) != null;
+              final newClearance = hasNewCloudflareClearance(
                 finalCookies,
                 initialCloudflareClearance,
               );
@@ -691,19 +677,14 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
             if (completer.isCompleted) return null;
             _logCookieSelection('headless-initial', cookieSelection);
             latestCookies = cookieSelection.cookies;
-            initialCloudflareClearance = _cloudflareClearance(
-              latestCookies,
-            )?.value;
+            initialCloudflareClearance = findCloudflareClearance(latestCookies)
+                ?.value;
           }
           if (completer.isCompleted) return null;
 
           startupView = HeadlessInAppWebView(
             initialUrlRequest: URLRequest(url: baseWebUri),
-            initialSettings: InAppWebViewSettings(
-              contentBlockers: contentBlockers.isEmpty ? null : contentBlockers,
-              browserAcceleratorKeysEnabled: false,
-              isInspectable: false,
-            ),
+            initialSettings: createExtensionBrowserSettings(),
             onLoadStart: (controller, url) {
               if (completer.isCompleted) {
                 return;
@@ -734,7 +715,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
                 return;
               }
               evidenceRevision++;
-              if (_isCloudflareChallengeTitle(title)) {
+              if (isCloudflareChallengeTitle(title)) {
                 markChallengeObserved();
               }
               unawaited(tryCompletePage(controller));
@@ -747,7 +728,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
               pageLoaded = false;
               incomingResponseUrl = request.url;
               observeUrl(request.url);
-              final challenged = _isCloudflareChallengeResponse(
+              final challenged = isCloudflareChallengeHeaders(
                 errorResponse.headers,
               );
               if (challenged) markChallengeObserved();
@@ -958,10 +939,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
   void _logCookieSelection(String stage, BrowserCookieSelection selection) {
     debugPrint(
       '$_logName time=${cloudflareDiagnosticTimestamp()} '
-      'cookie selection stage=$stage '
-      'input=${selection.inputCount} selected=${selection.cookies.length} '
-      'discarded=${selection.discardedCount} '
-      'duplicateNames=${selection.duplicateNames}',
+      'cookie selection stage=$stage ${selection.diagnosticSummary}',
     );
   }
 
@@ -973,10 +951,6 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     return parsed.replace(query: null, fragment: null).toString();
   }
 
-  Cookie? _cloudflareClearance(List<Cookie> cookies) {
-    return cookies.firstWhereOrNull((cookie) => cookie.name == 'cf_clearance');
-  }
-
   String _browserStateSummary(
     List<Cookie> cookies,
     Map<String, String> localStorage,
@@ -986,62 +960,18 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
           (cookie) =>
               '${cookie.name}[domain=${cookie.domain},path=${cookie.path},'
               'expires=${cookie.expiresDate},secure=${cookie.isSecure}'
-              '${cookie.name == 'cf_clearance' ? ',fingerprint=${diagnosticValueFingerprint(cookie.value)}' : ''}]',
+              '${cookie.name == cloudflareClearanceCookieName ? ',fingerprint=${diagnosticValueFingerprint(cookie.value)}' : ''}]',
         )
         .join(',');
     final storageKeys = localStorage.keys.toList()..sort();
     return 'cookies=[$cookieMetadata], localStorageKeys=$storageKeys';
   }
 
-  bool _hasNewCloudflareClearance(
-    List<Cookie> cookies,
-    String? initialClearance,
-  ) {
-    final clearance = _cloudflareClearance(cookies);
-    return clearance != null && clearance.value != initialClearance;
-  }
-
-  bool _isCloudflareChallengeUrl(WebUri? url) {
-    return url?.queryParameters.keys.any(
-          (name) => name.startsWith('__cf_chl_'),
-        ) ==
-        true;
-  }
-
-  bool _isCloudflareChallengeResponse(Map<String, String>? headers) {
-    return headers?.entries.any(
-          (header) =>
-              header.key.toLowerCase() == 'cf-mitigated' &&
-              header.value.toLowerCase() == 'challenge',
-        ) ==
-        true;
-  }
-
-  bool _isCloudflareChallengeTitle(String? title) {
-    return title?.toLowerCase().contains('just a moment') == true;
-  }
-
   Future<Map<String, String>> _readLocalStorage(
     InAppWebViewController controller,
   ) async {
     try {
-      final encoded = await controller.evaluateJavascript(
-        source:
-            'JSON.stringify(Object.fromEntries(Object.entries(localStorage)))',
-      );
-      if (encoded is! String) {
-        return const {};
-      }
-
-      final values = jsonDecode(encoded);
-      if (values is! Map) {
-        return const {};
-      }
-
-      return {
-        for (final MapEntry(:key, :value) in values.entries)
-          key.toString(): value.toString(),
-      };
+      return await readBrowserLocalStorage(controller);
     } catch (error, stackTrace) {
       debugPrint(
         '$_logName failed to read Cloudflare local storage\n'
@@ -1056,7 +986,7 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
     StartupBrowserState result,
   ) async {
     if (!source.hasCapability(SourceIntents.cloudflareBypassRequired) ||
-        !result.cookies.any((cookie) => cookie.name == 'cf_clearance')) {
+        findCloudflareClearance(result.cookies) == null) {
       return;
     }
 

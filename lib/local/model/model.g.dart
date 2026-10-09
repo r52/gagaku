@@ -47,7 +47,7 @@ abstract class _$LibrarySortType extends $Notifier<LibrarySort> {
   LibrarySort build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<LibrarySort, LibrarySort>;
     final element =
         ref.element
@@ -57,7 +57,7 @@ abstract class _$LibrarySortType extends $Notifier<LibrarySort> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
 
@@ -91,7 +91,7 @@ abstract class _$LocalLibrary extends $StreamNotifier<LocalLibraryItem> {
   Stream<LocalLibraryItem> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref =
         this.ref as $Ref<AsyncValue<LocalLibraryItem>, LocalLibraryItem>;
     final element =
@@ -102,7 +102,7 @@ abstract class _$LocalLibrary extends $StreamNotifier<LocalLibraryItem> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
 
@@ -136,7 +136,7 @@ abstract class _$SupportedFormats extends $AsyncNotifier<FormatInfo> {
   FutureOr<FormatInfo> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<FormatInfo>, FormatInfo>;
     final element =
         ref.element
@@ -146,6 +146,6 @@ abstract class _$SupportedFormats extends $AsyncNotifier<FormatInfo> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
