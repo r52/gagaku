@@ -1,7 +1,7 @@
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/i18n/strings.g.dart';
-import 'package:gagaku/util/manga_detail.dart';
+import 'package:gagaku/util/detail_scaffold.dart';
 import 'package:gagaku/util/material_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
@@ -16,6 +16,7 @@ void main() {
     required Size size,
     RefreshCallback? onRefresh,
     double textScale = 1.0,
+    bool withCover = true,
   }) async {
     tester.view.devicePixelRatio = 1.0;
     tester.view.physicalSize = size;
@@ -31,7 +32,10 @@ void main() {
                   .copyWith(textScaler: TextScaler.linear(textScale)),
               child: child!,
             ),
-            home: _Host(onRefresh: onRefresh ?? () async {}),
+            home: _Host(
+              onRefresh: onRefresh ?? () async {},
+              withCover: withCover,
+            ),
           ),
         ),
       ),
@@ -104,6 +108,23 @@ void main() {
     expect(find.text('Chapter header'), findsNothing);
   });
 
+  testWidgets('layout switch on a scrolled scrollToTop tab', (tester) async {
+    await pumpHost(tester, size: const Size(400, 800));
+
+    await tester.drag(find.text('Chapter 3'), const Offset(0, -500));
+    await tester.pumpAndSettle();
+
+    tester.view.physicalSize = const Size(1200, 800);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.byType(VerticalDivider), findsOneWidget);
+
+    tester.view.physicalSize = const Size(400, 800);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.byType(NestedScrollView), findsOneWidget);
+  });
+
   testWidgets('chapter header stays pinned below the collapsed banner', (
     tester,
   ) async {
@@ -164,26 +185,73 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(fabScale(tester), 0.0);
   });
+
+  for (final testCase in [
+    (name: 'single-pane', size: const Size(400, 800), twoPane: false),
+    (name: 'two-pane', size: const Size(1200, 800), twoPane: true),
+  ]) {
+    testWidgets('${testCase.name} layout works without a cover', (
+      tester,
+    ) async {
+      var refreshes = 0;
+      await pumpHost(
+        tester,
+        size: testCase.size,
+        withCover: false,
+        onRefresh: () async => refreshes++,
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(DetailCover), findsNothing);
+      expect(find.text('Test title'), findsWidgets);
+      expect(find.text('badge'), findsOneWidget);
+
+      await tester.fling(
+        find.text(testCase.twoPane ? 'Chapter header' : 'metadata'),
+        const Offset(0, 300),
+        1000,
+      );
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(seconds: 1));
+      expect(refreshes, 1);
+    });
+  }
+
+  testWidgets('chapter header pins below the plain app bar without a cover', (
+    tester,
+  ) async {
+    await pumpHost(tester, size: const Size(400, 800), withCover: false);
+
+    await tester.drag(find.text('Chapter header'), const Offset(0, -3000));
+    await tester.pumpAndSettle();
+
+    final appBarBottom = tester.getBottomLeft(find.byType(AppBar)).dy;
+    final headerTop = tester.getTopLeft(find.text('Chapter header')).dy;
+    expect(headerTop - appBarBottom, moreOrLessEquals(8.0));
+    expect(find.text('Chapter 0'), findsNothing);
+  });
 }
 
 class _Host extends HookWidget {
-  const _Host({required this.onRefresh});
+  const _Host({required this.onRefresh, required this.withCover});
 
   final RefreshCallback onRefresh;
+  final bool withCover;
 
   @override
   Widget build(BuildContext context) {
     final tabController = useMaterialTabController(initialLength: 2);
     final scrollController = useScrollController();
 
-    return MangaDetailScaffold(
+    return DetailScaffold(
       title: 'Test title',
-      coverUrl: 'https://example.invalid/cover.jpg',
+      coverUrl: withCover ? 'https://example.invalid/cover.jpg' : null,
       badge: const Text('badge'),
       metadata: const SizedBox(height: 200, child: Text('metadata')),
       tabController: tabController,
       tabs: [
-        MangaDetailTab(
+        DetailTab(
           label: 'Chapters',
           scrollToTop: true,
           body: CustomScrollView(
@@ -208,7 +276,7 @@ class _Host extends HookWidget {
             ],
           ),
         ),
-        MangaDetailTab(
+        DetailTab(
           label: 'Art',
           body: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),

@@ -14,7 +14,7 @@ import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
-import 'package:gagaku/util/manga_detail.dart';
+import 'package:gagaku/util/detail_scaffold.dart';
 import 'package:gagaku/util/material_hooks.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -282,7 +282,7 @@ class _MangaDexMangaViewWidgetState
 
     final scrollController = useScrollController();
 
-    return MangaDetailScaffold(
+    return DetailScaffold(
       title: widget.manga.attributes!.title.get(tr.$meta.locale.languageCode),
       coverUrl: widget.manga.getFirstCoverUrl(quality: CoverArtQuality.medium),
       badge: CountryFlag(
@@ -294,7 +294,7 @@ class _MangaDexMangaViewWidgetState
       collapsedBannerHeight: 100.0,
       tabController: tabController,
       tabs: [
-        MangaDetailTab(
+        DetailTab(
           label: tr.mangaView.chapters,
           scrollToTop: true,
           body: _MangaChaptersView(
@@ -302,7 +302,7 @@ class _MangaDexMangaViewWidgetState
             controller: _chapterController,
           ),
         ),
-        MangaDetailTab(
+        DetailTab(
           label: tr.mangaView.art,
           body: _MangaCoversView(
             manga: widget.manga,
@@ -310,7 +310,7 @@ class _MangaDexMangaViewWidgetState
           ),
         ),
         if (hasRelated)
-          MangaDetailTab(
+          DetailTab(
             label: tr.mangaView.related,
             body: _MangaRelatedView(
               manga: widget.manga,

@@ -1090,6 +1090,15 @@ class Translations$tracking$en {
 	/// en: 'Website'
 	String get website => 'Website';
 
+	/// en: 'Twitter'
+	String get twitter => 'Twitter';
+
+	/// en: 'Pixiv'
+	String get pixiv => 'Pixiv';
+
+	/// en: 'YouTube'
+	String get youtube => 'YouTube';
+
 	/// en: 'Nothing here!'
 	String get nothing => 'Nothing here!';
 }
@@ -2643,6 +2652,9 @@ extension on Translations {
 			'tracking.links' => 'Links',
 			'tracking.discord' => 'Discord',
 			'tracking.website' => 'Website',
+			'tracking.twitter' => 'Twitter',
+			'tracking.pixiv' => 'Pixiv',
+			'tracking.youtube' => 'YouTube',
 			'tracking.nothing' => 'Nothing here!',
 			'contentRating.safe' => 'Safe',
 			'contentRating.suggestive' => 'Suggestive',
@@ -2759,11 +2771,11 @@ extension on Translations {
 			'sync.statusIncompatible' => 'Incompatible or corrupt profile',
 			'sync.statusNoValidSnapshot' => 'No valid snapshot found',
 			'sync.statusProfileMissing' => 'Remote profile disappeared; sync paused',
+			_ => null,
+		} ?? switch (path) {
 			'sync.statusForked' => 'Conflict requires resolution',
 			'sync.statusCleanupWarning' => 'Synchronized with cleanup warning',
 			'sync.statusDisposed' => 'Stopped',
-			_ => null,
-		} ?? switch (path) {
 			'sync.profileId' => ({required Object id}) => 'Profile: ${id}',
 			'sync.deviceId' => ({required Object id}) => 'Device: ${id}',
 			'sync.location' => ({required Object path}) => 'Directory: ${path}',

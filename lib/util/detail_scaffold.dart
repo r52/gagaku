@@ -9,9 +9,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:photo_view/photo_view.dart';
 
-/// A tab shown by [MangaDetailScaffold].
-class MangaDetailTab {
-  const MangaDetailTab({
+/// A tab shown by [DetailScaffold].
+class DetailTab {
+  const DetailTab({
     required this.label,
     required this.body,
     this.scrollToTop = false,
@@ -29,22 +29,23 @@ class MangaDetailTab {
   final bool scrollToTop;
 }
 
-/// Shared adaptive layout for manga detail pages.
+/// Shared adaptive layout for detail pages: a title, optional cover, metadata
+/// and one or more tabs.
 ///
 /// The layout is chosen from the space available to the page rather than the
 /// window, so navigation chrome is accounted for. Short viewports, such as
 /// phones in landscape, keep the collapsing single-pane layout.
-class MangaDetailScaffold extends StatelessWidget {
+class DetailScaffold extends StatelessWidget {
   static const minTwoPaneWidth = 600.0;
   static const minTwoPaneHeight = 480.0;
 
   static bool useTwoPane(Size size) =>
       size.width >= minTwoPaneWidth && size.height >= minTwoPaneHeight;
 
-  const MangaDetailScaffold({
+  const DetailScaffold({
     super.key,
     required this.title,
-    required this.coverUrl,
+    this.coverUrl,
     this.coverHeaders,
     this.badge,
     this.actions,
@@ -58,7 +59,10 @@ class MangaDetailScaffold extends StatelessWidget {
   }) : assert(tabs.length > 0);
 
   final String title;
-  final String coverUrl;
+
+  /// Without a cover, the single-pane layout uses a plain medium app bar and
+  /// the side pane starts with the title.
+  final String? coverUrl;
   final Map<String, String>? coverHeaders;
 
   /// Small source/language marker shown on the banner or below the title.
@@ -66,14 +70,16 @@ class MangaDetailScaffold extends StatelessWidget {
   final Widget? actions;
   final Widget metadata;
   final TabController tabController;
-  final List<MangaDetailTab> tabs;
+  final List<DetailTab> tabs;
   final RefreshCallback onRefresh;
 
   /// Used by the scroll-to-top button. In the single-pane layout it drives
   /// the whole [NestedScrollView]; in the two-pane layout it is attached to
-  /// the active [MangaDetailTab.scrollToTop] tab.
+  /// the active [DetailTab.scrollToTop] tab.
   final ScrollController scrollController;
   final VoidCallback? onBack;
+
+  /// Collapsed height of the cover banner; ignored without a cover.
   final double? collapsedBannerHeight;
 
   @override
@@ -82,9 +88,9 @@ class MangaDetailScaffold extends StatelessWidget {
       builder: (context, constraints) {
         final size = constraints.biggest;
         if (useTwoPane(size)) {
-          return _MangaDetailTwoPane(config: this, width: size.width);
+          return _DetailTwoPane(config: this, width: size.width);
         }
-        return _MangaDetailSinglePane(
+        return _DetailSinglePane(
           config: this,
           width: size.width,
           compactHeight: size.height < minTwoPaneHeight,
@@ -94,13 +100,16 @@ class MangaDetailScaffold extends StatelessWidget {
   }
 }
 
-MangaDetailTab _activeTab(MangaDetailScaffold config, int index) =>
+/// Collapsed height of the medium app bar used without a cover.
+const _plainToolbarHeight = 64.0;
+
+DetailTab _activeTab(DetailScaffold config, int index) =>
     config.tabs[index.clamp(0, config.tabs.length - 1)];
 
-class _MangaDetailTabBar extends StatelessWidget {
-  const _MangaDetailTabBar({required this.config});
+class _DetailTabBar extends StatelessWidget {
+  const _DetailTabBar({required this.config});
 
-  final MangaDetailScaffold config;
+  final DetailScaffold config;
 
   @override
   Widget build(BuildContext context) {
@@ -114,10 +123,10 @@ class _MangaDetailTabBar extends StatelessWidget {
   }
 }
 
-class _MangaDetailTwoPane extends HookWidget {
-  const _MangaDetailTwoPane({required this.config, required this.width});
+class _DetailTwoPane extends HookWidget {
+  const _DetailTwoPane({required this.config, required this.width});
 
-  final MangaDetailScaffold config;
+  final DetailScaffold config;
   final double width;
 
   @override
@@ -130,6 +139,7 @@ class _MangaDetailTwoPane extends HookWidget {
     final active = _activeTab(config, index);
     final paneWidth = (width * 0.35).clamp(240.0, 360.0);
     const coverPadding = 12.0;
+    final coverUrl = config.coverUrl;
 
     return Scaffold(
       // The title lives in the side pane, where long titles can wrap, so the
@@ -148,20 +158,23 @@ class _MangaDetailTwoPane extends HookWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(coverPadding),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: AspectRatio(
-                        aspectRatio: 2 / 3,
-                        child: MangaDetailCover(
-                          url: config.coverUrl,
-                          headers: config.coverHeaders,
-                          displayWidth: paneWidth - coverPadding * 2,
+                  if (coverUrl != null)
+                    Padding(
+                      padding: const EdgeInsets.all(coverPadding),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: AspectRatio(
+                          aspectRatio: 2 / 3,
+                          child: DetailCover(
+                            url: coverUrl,
+                            headers: config.coverHeaders,
+                            displayWidth: paneWidth - coverPadding * 2,
+                          ),
                         ),
                       ),
-                    ),
-                  ),
+                    )
+                  else
+                    const SizedBox(height: coverPadding),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: coverPadding,
@@ -188,7 +201,7 @@ class _MangaDetailTwoPane extends HookWidget {
           Expanded(
             child: Column(
               children: [
-                if (config.tabs.length > 1) _MangaDetailTabBar(config: config),
+                if (config.tabs.length > 1) _DetailTabBar(config: config),
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: config.onRefresh,
@@ -224,14 +237,14 @@ class _MangaDetailTwoPane extends HookWidget {
   }
 }
 
-class _MangaDetailSinglePane extends HookWidget {
-  const _MangaDetailSinglePane({
+class _DetailSinglePane extends HookWidget {
+  const _DetailSinglePane({
     required this.config,
     required this.width,
     required this.compactHeight,
   });
 
-  final MangaDetailScaffold config;
+  final DetailScaffold config;
   final double width;
   final bool compactHeight;
 
@@ -242,10 +255,14 @@ class _MangaDetailSinglePane extends HookWidget {
       () => config.tabController.index,
     );
     final active = _activeTab(config, index);
+    final coverUrl = config.coverUrl;
     // Matches the collapsed SliverAppBar extent below.
     final padding = MediaQuery.paddingOf(context);
     final pinnedExtent =
-        (config.collapsedBannerHeight ?? kToolbarHeight) + padding.top;
+        (coverUrl == null
+            ? _plainToolbarHeight
+            : config.collapsedBannerHeight ?? kToolbarHeight) +
+        padding.top;
     // The toolbar's leading button respects side insets (e.g. a landscape
     // display cutout); the banner title and badge must too.
     final titleStart =
@@ -277,67 +294,85 @@ class _MangaDetailSinglePane extends HookWidget {
               extent: pinnedExtent,
               sliver: SliverMainAxisGroup(
                 slivers: [
-                  SliverAppBar(
-                    pinned: true,
-                    snap: false,
-                    floating: false,
-                    forceElevated: innerBoxIsScrolled,
-                    expandedHeight: compactHeight ? 120.0 : 250.0,
-                    collapsedHeight: config.collapsedBannerHeight,
-                    leading: BackButton(onPressed: config.onBack),
-                    flexibleSpace: FlexibleSpaceBar(
-                      expandedTitleScale: compactHeight ? 1.5 : 2.0,
-                      titlePadding: EdgeInsetsDirectional.only(
-                        start: titleStart,
-                        bottom: 16.0,
-                      ),
-                      title: Text(
-                        config.title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          shadows: <Shadow>[
-                            Shadow(
-                              offset: Offset(1.0, 1.0),
-                              color: Color.fromARGB(255, 0, 0, 0),
+                  if (coverUrl == null)
+                    SliverAppBar.medium(
+                      pinned: true,
+                      forceElevated: innerBoxIsScrolled,
+                      toolbarHeight: _plainToolbarHeight,
+                      leading: BackButton(onPressed: config.onBack),
+                      title: Text(config.title),
+                      actions: [?config.actions],
+                    )
+                  else
+                    SliverAppBar(
+                      pinned: true,
+                      snap: false,
+                      floating: false,
+                      forceElevated: innerBoxIsScrolled,
+                      expandedHeight: compactHeight ? 120.0 : 250.0,
+                      collapsedHeight: config.collapsedBannerHeight,
+                      leading: BackButton(onPressed: config.onBack),
+                      flexibleSpace: FlexibleSpaceBar(
+                        expandedTitleScale: compactHeight ? 1.5 : 2.0,
+                        titlePadding: EdgeInsetsDirectional.only(
+                          start: titleStart,
+                          bottom: 16.0,
+                        ),
+                        title: Text(
+                          config.title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            shadows: <Shadow>[
+                              Shadow(
+                                offset: Offset(1.0, 1.0),
+                                color: Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ],
+                          ),
+                        ),
+                        background: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            // Dimmed so the banner title stays legible.
+                            DetailCover(
+                              url: coverUrl,
+                              headers: config.coverHeaders,
+                              displayWidth: width,
+                              dimmed: true,
                             ),
+                            // Beside the back button: clear of the expanded
+                            // title, and faded out with the background before
+                            // the collapsed title appears in the toolbar.
+                            if (config.badge != null)
+                              PositionedDirectional(
+                                top: padding.top,
+                                start: titleStart,
+                                height: kToolbarHeight,
+                                child: Align(
+                                  alignment: AlignmentDirectional.centerStart,
+                                  child: config.badge,
+                                ),
+                              ),
                           ],
                         ),
                       ),
-                      background: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          // Dimmed so the banner title stays legible.
-                          MangaDetailCover(
-                            url: config.coverUrl,
-                            headers: config.coverHeaders,
-                            displayWidth: width,
-                            dimmed: true,
-                          ),
-                          // Beside the back button: clear of the expanded
-                          // title, and faded out with the background before
-                          // the collapsed title appears in the toolbar.
-                          if (config.badge != null)
-                            PositionedDirectional(
-                              top: padding.top,
-                              start: titleStart,
-                              height: kToolbarHeight,
-                              child: Align(
-                                alignment: AlignmentDirectional.centerStart,
-                                child: config.badge,
-                              ),
-                            ),
-                        ],
-                      ),
+                      actions: [?config.actions],
                     ),
-                    actions: [?config.actions],
-                  ),
+                  // The cover banner carries the badge; without one it
+                  // leads the metadata.
+                  if (coverUrl == null && config.badge != null)
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0,
+                        vertical: 4.0,
+                      ),
+                      sliver: SliverToBoxAdapter(child: config.badge),
+                    ),
                   SliverToBoxAdapter(child: config.metadata),
                   if (config.tabs.length > 1)
-                    SliverToBoxAdapter(
-                      child: _MangaDetailTabBar(config: config),
-                    ),
+                    SliverToBoxAdapter(child: _DetailTabBar(config: config)),
                 ],
               ),
             ),
@@ -409,12 +444,12 @@ class _RenderSliverPinnedOverlap extends RenderProxySliver {
 }
 
 /// Cover image decoded close to its rendered size.
-class MangaDetailCover extends ConsumerWidget {
+class DetailCover extends ConsumerWidget {
   /// Decode widths are rounded up to this step so resizing a window does not
   /// re-decode the image on every frame.
   static const _decodeStep = 128;
 
-  const MangaDetailCover({
+  const DetailCover({
     super.key,
     required this.url,
     this.headers,

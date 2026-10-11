@@ -7,7 +7,7 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/exception.dart';
-import 'package:gagaku/util/manga_detail.dart';
+import 'package:gagaku/util/detail_scaffold.dart';
 import 'package:gagaku/util/material_hooks.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -156,7 +156,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
       keys: [hasArtwork],
     );
 
-    return MangaDetailScaffold(
+    return DetailScaffold(
       title: manga.title,
       coverUrl: manga.cover,
       coverHeaders: headers,
@@ -170,7 +170,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
       metadata: _WebMetadataList(manga: manga, series: series, source: source),
       tabController: tabController,
       tabs: [
-        MangaDetailTab(
+        DetailTab(
           label: tr.mangaView.chapters,
           scrollToTop: true,
           body: CustomScrollView(
@@ -185,7 +185,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
           ),
         ),
         if (hasArtwork)
-          MangaDetailTab(
+          DetailTab(
             label: tr.mangaView.art,
             body: _WebMangaCoversView(
               series: series,

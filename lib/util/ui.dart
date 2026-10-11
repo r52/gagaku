@@ -162,12 +162,17 @@ class ScrollToTopFab extends StatelessWidget {
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
-        // Check the condition first: while a scroll view is being swapped
-        // out, the controller can briefly have more than one position.
+        // While a scroll view is being swapped out (a tab or layout switch),
+        // the controller can briefly have more than one position; the most
+        // recently attached one is current.
+        final position = controller.hasClients
+            ? controller.positions.last
+            : null;
         final visible =
             (visibleCondition?.call() ?? true) &&
-            controller.hasClients &&
-            controller.offset > 0;
+            position != null &&
+            position.hasPixels &&
+            position.pixels > 0;
         return AnimatedScale(
           scale: visible ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 200),

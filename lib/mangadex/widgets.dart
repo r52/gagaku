@@ -521,20 +521,24 @@ class MarkReadButton extends ConsumerWidget {
   }
 }
 
-class ChapterFeedWidget extends HookWidget {
+class ChapterFeedWidget extends StatelessWidget {
   const ChapterFeedWidget({
     super.key,
     required this.controller,
     required this.mangaCache,
-    required this.onRefresh,
+    this.onRefresh,
     this.title,
     this.scrollController,
     this.restorationId,
     this.leading = const [],
   });
 
-  final RefreshCallback onRefresh;
+  /// Wraps the feed in a [RefreshIndicator]; leave null when an ancestor
+  /// already provides one.
+  final RefreshCallback? onRefresh;
   final String? title;
+
+  /// Uses the [PrimaryScrollController] when null.
   final ScrollController? scrollController;
   final String? restorationId;
   final List<Widget> leading;
@@ -544,89 +548,85 @@ class ChapterFeedWidget extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scroller = scrollController ?? useScrollController();
-
-    return Center(
-      child: RefreshIndicator(
-        onRefresh: onRefresh,
-        child: CustomScrollView(
-          scrollCacheExtent: const ScrollCacheExtent.viewport(1.5),
-          scrollBehavior: const MouseTouchScrollBehavior(),
-          physics: const AlwaysScrollableScrollPhysics(),
-          controller: scroller,
-          restorationId: restorationId,
-          slivers: [
-            ...leading,
-            if (title != null)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0,
-                    vertical: 10.0,
-                  ),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(title!, style: CommonTextStyles.twentyfour),
-                  ),
-                ),
+    final feed = CustomScrollView(
+      scrollCacheExtent: const ScrollCacheExtent.viewport(1.5),
+      scrollBehavior: const MouseTouchScrollBehavior(),
+      physics: const AlwaysScrollableScrollPhysics(),
+      controller: scrollController,
+      restorationId: restorationId,
+      slivers: [
+        ...leading,
+        if (title != null)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 10.0,
               ),
-            PagingListener(
-              controller: controller,
-              builder: (context, state, fetchNextPage) => HookBuilder(
-                builder: (context) {
-                  final chapters = state.items;
-
-                  // Because this is now 100% synchronous, using [state] is perfectly safe.
-                  // It will instantly return the new state without ever unmounting the list.
-                  final newState = useMemoized(() {
-                    final items = chapters != null
-                        ? ChapterFeedItemData.toData(chapters, mangaCache)
-                        : <ChapterFeedItemData>[];
-
-                    return PagingState<int, ChapterFeedItemData>(
-                      error: state.error,
-                      pages: state.keys == null
-                          ? null
-                          : List.generate(
-                              state.keys!.length,
-                              (i) => i == 0 ? items : [],
-                            ),
-                      keys: state.keys,
-                      hasNextPage: state.hasNextPage,
-                      isLoading: state.isLoading,
-                    );
-                  }, [state]);
-
-                  return PagedSuperSliverList(
-                    state: newState,
-                    fetchNextPage: fetchNextPage,
-                    findChildIndexCallback: (key) {
-                      final valueKey = key as ValueKey<int>;
-                      final val = newState.items!.indexWhere(
-                        (i) => i.id == valueKey.value,
-                      );
-                      return val >= 0 ? val : null;
-                    },
-                    builderDelegate:
-                        ErrorReportingPagedChildBuilderDelegate<
-                          ChapterFeedItemData
-                        >(
-                          error: newState.error,
-                          fetchNextPage: fetchNextPage,
-                          animateTransitions: true,
-                          itemBuilder: (context, item, index) =>
-                              ChapterFeedItem(
-                                key: ValueKey(item.id),
-                                state: item,
-                              ),
-                        ),
-                  );
-                },
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(title!, style: CommonTextStyles.twentyfour),
               ),
             ),
-          ],
+          ),
+        PagingListener(
+          controller: controller,
+          builder: (context, state, fetchNextPage) => HookBuilder(
+            builder: (context) {
+              final chapters = state.items;
+
+              // Because this is now 100% synchronous, using [state] is perfectly safe.
+              // It will instantly return the new state without ever unmounting the list.
+              final newState = useMemoized(() {
+                final items = chapters != null
+                    ? ChapterFeedItemData.toData(chapters, mangaCache)
+                    : <ChapterFeedItemData>[];
+
+                return PagingState<int, ChapterFeedItemData>(
+                  error: state.error,
+                  pages: state.keys == null
+                      ? null
+                      : List.generate(
+                          state.keys!.length,
+                          (i) => i == 0 ? items : [],
+                        ),
+                  keys: state.keys,
+                  hasNextPage: state.hasNextPage,
+                  isLoading: state.isLoading,
+                );
+              }, [state]);
+
+              return PagedSuperSliverList(
+                state: newState,
+                fetchNextPage: fetchNextPage,
+                findChildIndexCallback: (key) {
+                  final valueKey = key as ValueKey<int>;
+                  final val = newState.items!.indexWhere(
+                    (i) => i.id == valueKey.value,
+                  );
+                  return val >= 0 ? val : null;
+                },
+                builderDelegate:
+                    ErrorReportingPagedChildBuilderDelegate<
+                      ChapterFeedItemData
+                    >(
+                      error: newState.error,
+                      fetchNextPage: fetchNextPage,
+                      animateTransitions: true,
+                      itemBuilder: (context, item, index) =>
+                          ChapterFeedItem(key: ValueKey(item.id), state: item),
+                    ),
+              );
+            },
+          ),
         ),
-      ),
+      ],
+    );
+
+    return Center(
+      child: onRefresh == null
+          ? feed
+          : RefreshIndicator(onRefresh: onRefresh!, child: feed),
     );
   }
 }
@@ -665,76 +665,31 @@ class InfiniteScrollChapterFeedWidget extends ConsumerStatefulWidget {
 
 class _InfiniteScrollFeedState
     extends ConsumerState<InfiniteScrollChapterFeedWidget> {
-  final Map<String, Manga> _mangaCache = {};
-
-  late final _pagingManager = OffsetPagingManager<Chapter>(limit: widget.limit);
-
-  late final _pagingController = PagingController<int, Chapter>(
-    getNextPageKey: _pagingManager.getNextPageKey,
-    fetchPage: (pageKey) async {
-      final me = await ref.readAsync(loggedUserProvider.future);
-      final api = ref.read(mangadexProvider);
-
-      final chapterlist = await api.fetchChapterFeed(
-        path: widget.path,
-        feedKey: widget.feedKey,
-        limit: widget.limit,
-        offset: pageKey,
-        entity: widget.entity,
-        order: widget.order,
-      );
-
-      _pagingManager.totalItems = chapterlist.total;
-
-      final chapters = chapterlist.data.cast<Chapter>();
-
-      final mangaIds = chapters.map((e) => e.manga.id).toSet();
-      final mangas = await api.fetchMangaById(
-        ids: mangaIds,
-        limit: MangaDexEndpoints.breakLimit,
-      );
-
-      for (final m in mangas) {
-        _mangaCache[m.id] = m;
-      }
-
-      try {
-        await (
-          ref.run((tsx) async {
-            return await tsx.get(statisticsProvider.notifier).get(mangas);
-          }),
-          ref.run((tsx) async {
-            return await tsx
-                .get(readChaptersProvider(me?.id).notifier)
-                .get(mangas);
-          }),
-          ref.run((tsx) async {
-            return await tsx.get(chapterStatsProvider.notifier).get(chapters);
-          }),
-        ).wait;
-      } catch (e) {
-        logger.e(e, error: e);
-      }
-
-      return chapters;
-    },
+  late final _pager = ChapterFeedPager(
+    ref: ref,
+    feedKey: widget.feedKey,
+    limit: widget.limit,
+    path: widget.path,
+    entity: widget.entity,
+    order: widget.order,
   );
 
   @override
   void dispose() {
-    _pagingController.dispose();
+    _pager.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    _pagingController.addListener(_showError);
+    _pager.controller.addListener(_showError);
   }
 
   Future<void> _showError() async {
-    if (_pagingController.value.status == PagingStatus.subsequentPageError ||
-        _pagingController.value.status == PagingStatus.firstPageError) {
+    final controller = _pager.controller;
+    if (controller.value.status == PagingStatus.subsequentPageError ||
+        controller.value.status == PagingStatus.firstPageError) {
       final tr = context.t;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -742,7 +697,7 @@ class _InfiniteScrollFeedState
           duration: const Duration(seconds: 5),
           action: SnackBarAction(
             label: tr.ui.retry,
-            onPressed: () => _pagingController.fetchNextPage(),
+            onPressed: () => controller.fetchNextPage(),
           ),
         ),
       );
@@ -752,25 +707,156 @@ class _InfiniteScrollFeedState
   @override
   Widget build(BuildContext context) {
     return ChapterFeedWidget(
-      controller: _pagingController,
-      mangaCache: _mangaCache,
-      onRefresh: () async {
-        _pagingManager.reset();
-        _mangaCache.clear();
-        final api = ref.watch(mangadexProvider);
-        await api.invalidateAll(
-          widget.entity == null
-              ? widget.feedKey
-              : '${widget.feedKey}(${widget.entity!.id}',
-        );
-        _pagingController.refresh();
-      },
+      controller: _pager.controller,
+      mangaCache: _pager.mangaCache,
+      onRefresh: _pager.refresh,
       title: widget.title,
       scrollController: widget.scrollController,
       restorationId: widget.restorationId,
       leading: widget.leading,
     );
   }
+}
+
+/// Paging state for an offset-paged chapter feed, for pages that own the
+/// feed's refresh indicator.
+class ChapterFeedPager {
+  ChapterFeedPager({
+    required this.ref,
+    required this.feedKey,
+    required this.limit,
+    required this.path,
+    this.entity,
+    this.order = ChapterFilterOrder.publishAt_desc,
+  });
+
+  final WidgetRef ref;
+  final String feedKey;
+  final int limit;
+  final String path;
+  final MangaDexEntity? entity;
+  final ChapterFilterOrder order;
+
+  final Map<String, Manga> mangaCache = {};
+
+  late final _manager = OffsetPagingManager<Chapter>(limit: limit);
+
+  late final controller = PagingController<int, Chapter>(
+    getNextPageKey: _manager.getNextPageKey,
+    fetchPage: _fetchPage,
+  );
+
+  Future<List<Chapter>> _fetchPage(int pageKey) async {
+    final me = await ref.readAsync(loggedUserProvider.future);
+    final api = ref.read(mangadexProvider);
+
+    final chapterlist = await api.fetchChapterFeed(
+      path: path,
+      feedKey: feedKey,
+      limit: limit,
+      offset: pageKey,
+      entity: entity,
+      order: order,
+    );
+
+    _manager.totalItems = chapterlist.total;
+
+    final chapters = chapterlist.data.cast<Chapter>();
+
+    final mangaIds = chapters.map((e) => e.manga.id).toSet();
+    final mangas = await api.fetchMangaById(
+      ids: mangaIds,
+      limit: MangaDexEndpoints.breakLimit,
+    );
+
+    for (final m in mangas) {
+      mangaCache[m.id] = m;
+    }
+
+    try {
+      await (
+        ref.run((tsx) async {
+          return await tsx.get(statisticsProvider.notifier).get(mangas);
+        }),
+        ref.run((tsx) async {
+          return await tsx
+              .get(readChaptersProvider(me?.id).notifier)
+              .get(mangas);
+        }),
+        ref.run((tsx) async {
+          return await tsx.get(chapterStatsProvider.notifier).get(chapters);
+        }),
+      ).wait;
+    } catch (e) {
+      logger.e(e, error: e);
+    }
+
+    return chapters;
+  }
+
+  Future<void> refresh() async {
+    _manager.reset();
+    mangaCache.clear();
+    await ref
+        .read(mangadexProvider)
+        .invalidateAll(entity == null ? feedKey : '$feedKey(${entity!.id}');
+    controller.refresh();
+  }
+
+  void dispose() => controller.dispose();
+}
+
+/// Paging state for the titles of a group or creator.
+class EntityTitlesPager {
+  EntityTitlesPager({
+    required this.ref,
+    required this.info,
+    required this.entity,
+  });
+
+  final WidgetRef ref;
+  final FeedInfo info;
+  final MangaDexUUID entity;
+
+  late final _manager = OffsetPagingManager<Manga>(limit: info.limit);
+
+  late final controller = PagingController<int, Manga>(
+    getNextPageKey: _manager.getNextPageKey,
+    fetchPage: _fetchPage,
+  );
+
+  Future<List<Manga>> _fetchPage(int pageKey) async {
+    final list = await ref
+        .read(mangadexProvider)
+        .fetchMangaList(
+          limit: info.limit,
+          feedKey: info.key,
+          offset: pageKey,
+          entity: entity,
+        );
+
+    _manager.totalItems = list.total;
+
+    final newItems = list.data.cast<Manga>();
+
+    try {
+      ref.run((tsx) async {
+        return await tsx.get(statisticsProvider.notifier).get(newItems);
+      });
+    } catch (e) {
+      logger.e(e, error: e);
+    }
+
+    return newItems;
+  }
+
+  Future<void> refresh() async {
+    _manager.reset();
+    await ref.read(mangadexProvider).invalidateAll('${info.key}(${entity.id}');
+    controller.refresh();
+  }
+
+  void dispose() => controller.dispose();
 }
 
 class _CoverButton extends ConsumerWidget {
