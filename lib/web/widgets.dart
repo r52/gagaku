@@ -71,20 +71,12 @@ class WebSourceSliverAppBar extends ConsumerWidget {
     final nav = Navigator.of(context);
     final resolver = ref.watch(webLinkResolverProvider);
 
-    return SliverAppBar.medium(
-      pinned: true,
-      automaticallyImplyLeading: false,
+    return PageSliverAppBar(
+      title: title ?? tr.webSources.text,
+      controller: controller,
       leading: AppNavigationScaffold.usesMenuButton(context)
           ? const AppNavigationButton()
           : null,
-      title: GestureDetector(
-        onTap: () => controller?.animateTo(
-          0.0,
-          duration: const Duration(milliseconds: 1000),
-          curve: Curves.easeOutCirc,
-        ),
-        child: Text(title ?? tr.webSources.text),
-      ),
       actions: [
         OverflowBar(
           spacing: 0.0,

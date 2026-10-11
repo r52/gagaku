@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/util/ui.dart';
 
 class MangaDexGlobalFeedPage extends HookWidget {
   const MangaDexGlobalFeedPage({super.key});
@@ -21,17 +22,9 @@ class MangaDexGlobalFeedPage extends HookWidget {
         scrollController: controller,
         restorationId: 'global_list_offset',
         leading: [
-          SliverAppBar.medium(
-            pinned: true,
-            leading: const BackButton(),
-            title: GestureDetector(
-              onTap: () => controller.animateTo(
-                0.0,
-                duration: const Duration(milliseconds: 1000),
-                curve: Curves.easeOutCirc,
-              ),
-              child: Text(t.chapterFeed.latestUpdates),
-            ),
+          PageSliverAppBar(
+            title: t.chapterFeed.latestUpdates,
+            controller: controller,
           ),
         ],
       ),

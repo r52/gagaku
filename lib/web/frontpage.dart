@@ -642,17 +642,9 @@ class ExtensionHomeWidget extends HookConsumerWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             controller: controller,
             slivers: [
-              SliverAppBar.medium(
-                pinned: true,
-                leading: const BackButton(),
-                title: GestureDetector(
-                  onTap: () => controller.animateTo(
-                    0.0,
-                    duration: const Duration(milliseconds: 1000),
-                    curve: Curves.easeOutCirc,
-                  ),
-                  child: Text(source.name),
-                ),
+              PageSliverAppBar(
+                title: source.name,
+                controller: controller,
                 actions: [
                   OverflowBar(
                     spacing: 0.0,
@@ -752,17 +744,9 @@ class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
           controller: controller,
           showToggle: false,
           leading: [
-            SliverAppBar.medium(
-              pinned: true,
-              leading: const BackButton(),
-              title: GestureDetector(
-                onTap: () => controller.animateTo(
-                  0.0,
-                  duration: const Duration(milliseconds: 1000),
-                  curve: Curves.easeOutCirc,
-                ),
-                child: Text(widget.section.title),
-              ),
+            PageSliverAppBar(
+              title: widget.section.title,
+              controller: controller,
             ),
           ],
           children: [

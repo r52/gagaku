@@ -8,6 +8,7 @@ import 'package:gagaku/mangadex/model/config.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -30,7 +31,7 @@ class _MangaDexRecentFeedPageState
   late final _pagingController = PagingController<int, Manga>(
     getNextPageKey: _pagingManager.getNextPageKey,
     fetchPage: (pageKey) async {
-      final api = ref.watch(mangadexProvider);
+      final api = ref.read(mangadexProvider);
       final settings = ref.read(mdConfigProvider);
 
       final extraParams = {
@@ -83,7 +84,7 @@ class _MangaDexRecentFeedPageState
         child: RefreshIndicator(
           onRefresh: () async {
             _pagingManager.reset();
-            final api = ref.watch(mangadexProvider);
+            final api = ref.read(mangadexProvider);
             await api.invalidateAll(info.key);
             return _pagingController.refresh();
           },
@@ -91,17 +92,9 @@ class _MangaDexRecentFeedPageState
             physics: const AlwaysScrollableScrollPhysics(),
             controller: ctrler,
             leading: [
-              SliverAppBar.medium(
-                pinned: true,
-                leading: const BackButton(),
-                title: GestureDetector(
-                  onTap: () => ctrler.animateTo(
-                    0.0,
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.easeInOut,
-                  ),
-                  child: Text(tr.mangadex.recentlyAdded),
-                ),
+              PageSliverAppBar(
+                title: tr.mangadex.recentlyAdded,
+                controller: ctrler,
               ),
             ],
             children: [MangaListViewSliver(controller: _pagingController)],

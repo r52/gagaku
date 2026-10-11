@@ -196,6 +196,47 @@ class ScrollToTopFab extends StatelessWidget {
   }
 }
 
+/// A pinned medium app bar for a scrolling page. Tapping the title scrolls
+/// [controller] back to the top.
+class PageSliverAppBar extends StatelessWidget {
+  const PageSliverAppBar({
+    super.key,
+    required this.title,
+    this.controller,
+    this.leading = const BackButton(),
+    this.actions,
+  });
+
+  final String title;
+  final ScrollController? controller;
+
+  /// Defaults to a back button. Pass null to show no leading widget.
+  final Widget? leading;
+  final List<Widget>? actions;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverAppBar.medium(
+      pinned: true,
+      automaticallyImplyLeading: false,
+      leading: leading,
+      title: GestureDetector(
+        onTap: () {
+          final controller = this.controller;
+          if (controller == null || !controller.hasClients) return;
+          controller.animateTo(
+            0.0,
+            duration: const Duration(milliseconds: 1000),
+            curve: Curves.easeOutCirc,
+          );
+        },
+        child: Text(title),
+      ),
+      actions: actions,
+    );
+  }
+}
+
 class MultiChildExpansionTile extends StatelessWidget {
   const MultiChildExpansionTile({
     super.key,

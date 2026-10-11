@@ -389,22 +389,12 @@ class MangaDexSliverAppBar extends StatelessWidget {
       ),
     ];
 
-    return SliverAppBar.medium(
-      pinned: true,
-      automaticallyImplyLeading: false,
+    return PageSliverAppBar(
+      title: title ?? 'MangaDex',
+      controller: controller,
       leading: AppNavigationScaffold.usesMenuButton(context)
           ? const AppNavigationButton()
           : null,
-      title: GestureDetector(
-        onTap: () {
-          controller?.animateTo(
-            0.0,
-            duration: const Duration(milliseconds: 1000),
-            curve: Curves.easeOutCirc,
-          );
-        },
-        child: Text(title ?? 'MangaDex'),
-      ),
       actions: actions,
     );
   }
