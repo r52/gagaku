@@ -5,6 +5,8 @@ on:
     types: [opened, closed, synchronize, reopened, ready_for_review]
     branches:
       - main
+    paths-ignore:
+      - "docs/**"
   workflow_dispatch:
     inputs:
       tagName:
@@ -28,8 +30,45 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validate_release:
+    name: Validate release tag
+    if: ${{ github.event.inputs.doRelease == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Validate tag against pubspec version
+        run: |
+          set -e
+          if [[ ! "$TAGNAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Tag '$TAGNAME' must use the format vMAJOR.MINOR.PATCH (e.g. v1.0.0)"
+            exit 1
+          fi
+          PUBSPEC_VERSION="$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | tr -d "\"'[:space:]")"
+          PUBSPEC_VERSION="${PUBSPEC_VERSION%%+*}"
+          if [[ "${TAGNAME#v}" != "$PUBSPEC_VERSION" ]]; then
+            echo "::error::Tag '$TAGNAME' does not match pubspec.yaml version '$PUBSPEC_VERSION'"
+            exit 1
+          fi
+        env:
+          TAGNAME: ${{ github.event.inputs.tagName }}
+      - name: Ensure tag does not already exist
+        run: |
+          set +e
+          git ls-remote --exit-code --tags origin "refs/tags/$TAGNAME" > /dev/null
+          STATUS=$?
+          set -e
+          case "$STATUS" in
+            0) echo "::error::Tag '$TAGNAME' already exists; releases are immutable"; exit 1 ;;
+            2) echo "Tag '$TAGNAME' is available" ;;
+            *) echo "::error::Could not query remote tags (git exit $STATUS)"; exit 1 ;;
+          esac
+        env:
+          TAGNAME: ${{ github.event.inputs.tagName }}
+
   build:
-    if: ${{ github.event.pull_request.draft == false && (github.event.action != 'closed' || github.event.pull_request.merged == true) }}
+    needs: validate_release
+    if: ${{ !cancelled() && (needs.validate_release.result == 'success' || needs.validate_release.result == 'skipped') && github.event.pull_request.draft == false && (github.event.action != 'closed' || github.event.pull_request.merged == true) }}
     strategy:
       fail-fast: true
       matrix:
@@ -149,19 +188,28 @@ jobs:
         with:
           merge-multiple: true
           path: artifacts
+      - name: Verify release assets
+        run: |
+          set -e
+          for asset in app-release.apk gagaku-windows.zip; do
+            if [[ ! -s "artifacts/$asset" ]]; then
+              echo "::error::Missing release asset: $asset"
+              exit 1
+            fi
+          done
       - name: Create release
         id: create_release
         run: |
           set -xe
           shopt -s nullglob
           RELDATE="$(date +'%Y-%m-%d %H:%M')"
-          NAME="${{ github.event.inputs.tagName }}"
-          TAGNAME="${{ github.event.inputs.tagName }}"
-          gh release create "$TAGNAME" --target "main" --title "$NAME" artifacts/*
+          gh release create "$TAGNAME" --target "$COMMIT_SHA" --title "$TAGNAME" --generate-notes artifacts/*
           echo "tag_name=${TAGNAME}" >> $GITHUB_OUTPUT
           echo "rel_date=${RELDATE}" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          TAGNAME: ${{ github.event.inputs.tagName }}
+          COMMIT_SHA: ${{ github.sha }}
 
   publish_dev:
     name: Publish Dev Preview
