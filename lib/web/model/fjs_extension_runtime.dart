@@ -271,6 +271,15 @@ return JSON.stringify(value);
           ),
         ),
       );
+      if (kDebugMode) {
+        await _runInitStep(
+          'enable native image profiling',
+          () => _evalGlobal(
+            'globalThis.gagaku?.nativeImage?.setProfiling?.(true);',
+            label: 'enable native image profiling',
+          ),
+        );
+      }
       final startupBrowserState = await _runInitStep(
         'load startup browser state',
         () => _loadStartupBrowserState(source),

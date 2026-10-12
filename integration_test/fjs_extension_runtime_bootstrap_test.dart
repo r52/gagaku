@@ -821,9 +821,8 @@ globalThis.source.phase2source = {
 
     final container = ProviderContainer(
       overrides: [
-        extensionSourceProvider(
-          source.id,
-        ).overrideWith(() => _InitializedExtensionSource(source, runtime)),
+        extensionSourceProvider(source.id)
+            .overrideWith(() => _InitializedExtensionSource(source, runtime)),
       ],
     );
     addTearDown(container.dispose);
@@ -954,14 +953,19 @@ globalThis.source.phase2source = {
   nativeImageData.data[1] = 260;
   nativeImageData.data[2] = -20;
   nativeImageData.data[3] = 7;
+  const roundTripCanvas = new HTMLCanvasElement();
+  roundTripCanvas.width = 1;
+  roundTripCanvas.height = 2;
+  const roundTripContext = roundTripCanvas.getContext("2d");
+  roundTripContext.putImageData(nativeImageData, 0, 0);
   return {
     pixels: Array.from(context.getImageData(0, 0, 1, 1).data),
     dataUrl: canvas.toDataURL(),
     imageDataLength: new ImageData(1, 1).data.length,
     inferredImageDataHeight:
       new ImageData(new Uint8ClampedArray(8), 1).height,
-    nativeImageDataProbe:
-      globalThis.gagaku?.nativeCanvas?.inspectImageData(nativeImageData)
+    imageDataRoundTrip:
+      Array.from(roundTripContext.getImageData(0, 0, 1, 2).data)
   };
 })()
 ''');
@@ -970,16 +974,7 @@ globalThis.source.phase2source = {
     expect(canvasData['pixels'], [255, 0, 0, 255]);
     expect(canvasData['imageDataLength'], 4);
     expect(canvasData['inferredImageDataHeight'], 2);
-    expect(canvasData['nativeImageDataProbe'], {
-      'width': 1,
-      'height': 2,
-      'length': 8,
-      'checksum': 267,
-      'first': 5,
-      'second': 255,
-      'third': 0,
-      'fourth': 7,
-    });
+    expect(canvasData['imageDataRoundTrip'], [5, 255, 0, 7, 0, 0, 0, 0]);
     final dataUrl = canvasData['dataUrl'] as String;
     expect(dataUrl, startsWith('data:image/png;base64,'));
     final pngComma = dataUrl.indexOf(',');
@@ -1121,9 +1116,9 @@ globalThis.source.phase2source = {
         isA<Map>()
             .having((cookie) => cookie['name'], 'name', 'phase4-precedence')
             .having(
-              (cookie) => DateTime.parse(
-                cookie['expires'] as String,
-              ).isAfter(DateTime.now()),
+              (cookie) =>
+                  DateTime.parse(cookie['expires'] as String)
+                      .isAfter(DateTime.now()),
               'expires',
               isTrue,
             ),
