@@ -2053,6 +2053,9 @@ class Translations$webSources$source$en {
 	/// en: 'Extension enabled'
 	String get sourceAddOK => 'Extension enabled';
 
+	/// en: 'Tracker'
+	String get tracker => 'Tracker';
+
 	late final Translations$webSources$source$install$en install = Translations$webSources$source$install$en.internal(_root);
 }
 
@@ -2442,6 +2445,7 @@ extension on Translations {
 			'webSources.source.delete' => ({required Object arg}) => '${_root.ui.delete} ${arg}',
 			'webSources.source.sourceDeleteOK' => 'Extension disabled',
 			'webSources.source.sourceAddOK' => 'Extension enabled',
+			'webSources.source.tracker' => 'Tracker',
 			'webSources.source.install.title' => 'Install Extensions',
 			'webSources.source.install.warning' => 'Only install extensions from sources you trust. Are you sure you want to install these extensions?',
 			'webSources.source.install.alreadyInstalled' => 'Already installed',
@@ -2770,9 +2774,9 @@ extension on Translations {
 			'sync.statusOffline' => 'Storage unavailable; retry pending',
 			'sync.statusIncompatible' => 'Incompatible or corrupt profile',
 			'sync.statusNoValidSnapshot' => 'No valid snapshot found',
-			'sync.statusProfileMissing' => 'Remote profile disappeared; sync paused',
 			_ => null,
 		} ?? switch (path) {
+			'sync.statusProfileMissing' => 'Remote profile disappeared; sync paused',
 			'sync.statusForked' => 'Conflict requires resolution',
 			'sync.statusCleanupWarning' => 'Synchronized with cleanup warning',
 			'sync.statusDisposed' => 'Stopped',

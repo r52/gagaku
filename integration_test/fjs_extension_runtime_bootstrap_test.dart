@@ -2586,4 +2586,239 @@ globalThis.source.identitySource = {initialise: async () => {}};
       },
     );
   }
+
+  test('fjs runtime hosts a progress-tracking extension', () async {
+    final receivedOrigins = <String?>[];
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    addTearDown(() => server.close(force: true));
+    server.listen((request) async {
+      receivedOrigins.add(request.headers.value('origin'));
+      await utf8.decoder.bind(request).join();
+      request.response
+        ..headers.contentType = ContentType.json
+        ..write('{"ok":true}');
+      await request.response.close();
+    });
+
+    Map<String, dynamic> storedState = {};
+    final runtime = FjsExtensionRuntime(
+      sourceId: 'fictionalTracker',
+      extensionHost: await rootBundle.loadString(
+        'assets/extensionhost/bundle.js',
+      ),
+      onResetAllState: (_) {},
+      onSetExtensionState: (_, state) {
+        storedState = Map<String, dynamic>.from(state as Map);
+      },
+      onSetExtensionSecureState: (_, _) {},
+      getExtensionState: (_) => storedState,
+      getExtensionSecureState: (_) => {},
+    );
+    var disposed = false;
+    addTearDown(() async {
+      if (!disposed) await runtime.dispose();
+    });
+
+    final source = WebSourceInfo(
+      id: 'fictionalTracker',
+      name: 'Fictional Tracker',
+      repo: 'tracker-fixture',
+      icon: '',
+      capabilities: const [
+        SourceIntents.mangaProgress,
+        SourceIntents.collectionManagement,
+        SourceIntents.settingsUI,
+        SourceIntents.mangaSearch,
+      ],
+    );
+    expect(source.isTracker, isTrue);
+
+    await runtime.init(source, '''
+const endpoint = ${jsonEncode('http://127.0.0.1:${server.port}/progress')};
+const trackerEntry = (mangaId) => ({
+  mangaId,
+  mangaInfo: {
+    thumbnailUrl: "",
+    synopsis: "",
+    primaryTitle: `Fictional Entry \${mangaId}`,
+    secondaryTitles: [],
+    contentRating: "EVERYONE"
+  }
+});
+const deletionForm = {
+  getSections: () => [
+    {
+      id: "delete",
+      type: "flowSection",
+      items: [
+        { id: "deleted", type: "labelRow", isHidden: false, title: "Deleted" }
+      ]
+    }
+  ]
+};
+globalThis.source ??= {};
+globalThis.source.fictionalTracker = {
+  initialise: async () => {},
+  getMangaDetails: async (mangaId) => trackerEntry(mangaId),
+  getMangaProgress: async (manga) => {
+    if (manga.mangaId === "untracked") return undefined;
+    const lastReadTime = new Date(0);
+    lastReadTime.setUTCSeconds(1700000000);
+    return {
+      sourceManga: manga,
+      lastReadChapter: {
+        chapterId: "42",
+        sourceManga: manga,
+        langCode: "unknown",
+        chapNum: 42
+      },
+      lastReadTime,
+      userRating: 8.5
+    };
+  },
+  getMangaProgressManagementForm: async (manga) => ({
+    requiresExplicitSubmission: true,
+    getSections: () => [
+      {
+        id: "progress",
+        type: "flowSection",
+        items: [
+          {
+            id: "delete",
+            type: "navigationRow",
+            isHidden: false,
+            title: "Delete",
+            form: deletionForm
+          }
+        ]
+      }
+    ],
+    formDidSubmit: async () => {
+      Application.setState(manga.mangaId, "submitted-progress");
+    }
+  }),
+  processChapterReadActionQueue: async (actions) => {
+    if (actions.some((action) => action.chapterId === "throw")) {
+      throw new Error("fictional tracker failure");
+    }
+    await Application.scheduleRequest({
+      url: endpoint,
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(actions.map((action) => action.chapterNum))
+    });
+    // Log right before returning: the console bridge call is still in flight
+    // when the eval completes and when the engine is later closed.
+    console.log(`processed \${actions.length} fictional actions`);
+    return {
+      successfulItems: actions
+        .filter((action) => action.chapterNum === 2)
+        .map((action) => action.id),
+      failedItems: actions
+        .filter((action) => action.chapterNum === 3)
+        .map((action) => action.id)
+    };
+  },
+  getManagedLibraryCollections: async () => [{ id: "reading", title: "Reading" }],
+  getSourceMangaInManagedCollection: async (collection) => [
+    trackerEntry(`\${collection.id}-1`)
+  ],
+  commitManagedCollectionChanges: async () => {
+    throw new Error("fictional collections are read-only");
+  }
+};
+''');
+
+    final manga = await runtime.getManga('entry-1');
+    expect(manga, isNotNull);
+    expect(await runtime.getMangaDetails('entry-1'), isA<SourceManga>());
+    final entry = await runtime.getMangaDetails('entry-1');
+    expect(entry.mangaInfo.primaryTitle, 'Fictional Entry entry-1');
+
+    final progress = await runtime.getMangaProgress(source, entry);
+    expect(progress?.lastReadChapter.chapNum, 42);
+    expect(progress?.lastReadTime, DateTime.utc(2023, 11, 14, 22, 13, 20));
+    expect(progress?.userRating, 8.5);
+    expect(
+      await runtime.getMangaProgress(
+        source,
+        await runtime.getMangaDetails('untracked'),
+      ),
+      isNull,
+    );
+
+    final form = await runtime.getMangaProgressManagementForm(source, entry);
+    final deleteRow =
+        (await form.sections).single.items.single as NavigationRowElement;
+    // Read from the form once its sections have loaded.
+    expect(form.requiresExplicitSubmission, isTrue);
+    final nestedForm = await runtime.getForm(source, deleteRow.form);
+    expect(
+      (await nestedForm.sections).single.items.single,
+      isA<LabelRowElement>(),
+    );
+    await form.formDidSubmit();
+    expect(storedState['submitted-progress'], 'entry-1');
+
+    TrackedMangaChapterReadAction action(String id, num chapterNum) =>
+        TrackedMangaChapterReadAction(
+          id: id,
+          sourceManga: entry,
+          chapterId: id,
+          chapterSourceId: 'FictionalSource',
+          chapterMangaId: 'fictional-series-1',
+          chapterNum: chapterNum,
+          creationDate: DateTime.utc(2026, 1, 1),
+          errorCount: 0,
+        );
+    final result = await runtime.processChapterReadActionQueue(source, [
+      action('succeeds', 2),
+      action('fails', 3),
+      action('not-attempted', 4),
+    ]);
+    expect(result.successfulItems, ['succeeds']);
+    expect(result.failedItems, ['fails']);
+    // LLRT must not synthesize a same-host Origin for non-GET requests.
+    expect(receivedOrigins, [null]);
+
+    await expectLater(
+      runtime.processChapterReadActionQueue(source, [action('throw', 1)]),
+      throwsA(anything),
+    );
+
+    final collections = await runtime.getManagedLibraryCollections(source);
+    expect(collections.single.title, 'Reading');
+    final collectionManga = await runtime.getSourceMangaInManagedCollection(
+      source,
+      collections.single,
+    );
+    expect(collectionManga.single.mangaId, 'reading-1');
+    await expectLater(
+      runtime.commitManagedCollectionChanges(
+        source,
+        ManagedCollectionChangeset(
+          collection: collections.single,
+          additions: const [],
+          deletions: const [],
+        ),
+      ),
+      throwsA(anything),
+    );
+
+    final readingSource = WebSourceInfo(
+      id: 'fictionalTracker',
+      name: 'Fictional Reader',
+      repo: 'tracker-fixture',
+      icon: '',
+    );
+    expect(
+      () => runtime.getMangaProgress(readingSource, entry),
+      throwsUnsupportedError,
+    );
+
+    // A console call left in flight by the last eval must not fail disposal.
+    await runtime.processChapterReadActionQueue(source, [action('last', 2)]);
+    disposed = true;
+    await runtime.dispose();
+  });
 }

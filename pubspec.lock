@@ -470,7 +470,7 @@ packages:
     description:
       path: "."
       ref: gagaku
-      resolved-ref: ec0a5354d5e70040a35a94ee66be8ee7af87c7f1
+      resolved-ref: "0751804df272393bf925d61085ed976366d8fbfa"
       url: "https://github.com/r52/fjs.git"
     source: git
     version: "3.3.2"

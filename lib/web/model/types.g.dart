@@ -546,6 +546,123 @@ Map<String, dynamic> _$ChapterToJson(_Chapter instance) => <String, dynamic>{
   'sortingIndex': instance.sortingIndex,
 };
 
+_MangaProgress _$MangaProgressFromJson(Map<String, dynamic> json) =>
+    _MangaProgress(
+      sourceManga: SourceManga.fromJson(
+        json['sourceManga'] as Map<String, dynamic>,
+      ),
+      lastReadChapter: Chapter.fromJson(
+        json['lastReadChapter'] as Map<String, dynamic>,
+      ),
+      lastReadTime: const NullableTimestampSerializer().fromJson(
+        json['lastReadTime'],
+      ),
+      userRating: json['userRating'] as num?,
+    );
+
+Map<String, dynamic> _$MangaProgressToJson(_MangaProgress instance) =>
+    <String, dynamic>{
+      'sourceManga': instance.sourceManga.toJson(),
+      'lastReadChapter': instance.lastReadChapter.toJson(),
+      'lastReadTime': const NullableTimestampSerializer().toJson(
+        instance.lastReadTime,
+      ),
+      'userRating': instance.userRating,
+    };
+
+_TrackedMangaChapterReadAction _$TrackedMangaChapterReadActionFromJson(
+  Map<String, dynamic> json,
+) => _TrackedMangaChapterReadAction(
+  id: json['id'] as String,
+  sourceManga: SourceManga.fromJson(
+    json['sourceManga'] as Map<String, dynamic>,
+  ),
+  readChapter: json['readChapter'] == null
+      ? null
+      : Chapter.fromJson(json['readChapter'] as Map<String, dynamic>),
+  chapterId: json['chapterId'] as String,
+  chapterSourceId: json['chapterSourceId'] as String,
+  chapterMangaId: json['chapterMangaId'] as String,
+  chapterNum: json['chapterNum'] as num,
+  chapterVolume: json['chapterVolume'] as num?,
+  creationDate: const TimestampSerializer().fromJson(json['creationDate']),
+  errorCount: (json['errorCount'] as num).toInt(),
+  lastErrorDate: const NullableTimestampSerializer().fromJson(
+    json['lastErrorDate'],
+  ),
+);
+
+Map<String, dynamic> _$TrackedMangaChapterReadActionToJson(
+  _TrackedMangaChapterReadAction instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'sourceManga': instance.sourceManga.toJson(),
+  'readChapter': instance.readChapter?.toJson(),
+  'chapterId': instance.chapterId,
+  'chapterSourceId': instance.chapterSourceId,
+  'chapterMangaId': instance.chapterMangaId,
+  'chapterNum': instance.chapterNum,
+  'chapterVolume': instance.chapterVolume,
+  'creationDate': const TimestampSerializer().toJson(instance.creationDate),
+  'errorCount': instance.errorCount,
+  'lastErrorDate': const NullableTimestampSerializer().toJson(
+    instance.lastErrorDate,
+  ),
+};
+
+_ChapterReadActionQueueProcessingResult
+_$ChapterReadActionQueueProcessingResultFromJson(Map<String, dynamic> json) =>
+    _ChapterReadActionQueueProcessingResult(
+      successfulItems:
+          (json['successfulItems'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      failedItems:
+          (json['failedItems'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+    );
+
+Map<String, dynamic> _$ChapterReadActionQueueProcessingResultToJson(
+  _ChapterReadActionQueueProcessingResult instance,
+) => <String, dynamic>{
+  'successfulItems': instance.successfulItems,
+  'failedItems': instance.failedItems,
+};
+
+_ManagedCollection _$ManagedCollectionFromJson(Map<String, dynamic> json) =>
+    _ManagedCollection(
+      id: json['id'] as String,
+      title: json['title'] as String,
+    );
+
+Map<String, dynamic> _$ManagedCollectionToJson(_ManagedCollection instance) =>
+    <String, dynamic>{'id': instance.id, 'title': instance.title};
+
+_ManagedCollectionChangeset _$ManagedCollectionChangesetFromJson(
+  Map<String, dynamic> json,
+) => _ManagedCollectionChangeset(
+  collection: ManagedCollection.fromJson(
+    json['collection'] as Map<String, dynamic>,
+  ),
+  additions: (json['additions'] as List<dynamic>)
+      .map((e) => SourceManga.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  deletions: (json['deletions'] as List<dynamic>)
+      .map((e) => SourceManga.fromJson(e as Map<String, dynamic>))
+      .toList(),
+);
+
+Map<String, dynamic> _$ManagedCollectionChangesetToJson(
+  _ManagedCollectionChangeset instance,
+) => <String, dynamic>{
+  'collection': instance.collection.toJson(),
+  'additions': instance.additions.map((e) => e.toJson()).toList(),
+  'deletions': instance.deletions.map((e) => e.toJson()).toList(),
+};
+
 _PaperbackRequest _$PaperbackRequestFromJson(Map<String, dynamic> json) =>
     _PaperbackRequest(
       url: json['url'] as String,

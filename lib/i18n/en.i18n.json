@@ -210,6 +210,7 @@
       "delete": "@:ui.delete $arg",
       "sourceDeleteOK": "Extension disabled",
       "sourceAddOK": "Extension enabled",
+      "tracker": "Tracker",
       "install": {
         "title": "Install Extensions",
         "warning": "Only install extensions from sources you trust. Are you sure you want to install these extensions?",

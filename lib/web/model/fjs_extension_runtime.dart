@@ -119,13 +119,15 @@ globalThis.console = Object.fromEntries(
   ["debug", "info", "log", "warn", "error"].map((level) => [
     level,
     (...args) => {
-      void fjs.bridge_call(
+      // Logging is best effort. A call still in flight when the engine closes
+      // rejects; leaving that unhandled fails the next eval or dispose().
+      fjs.bridge_call(
         JSON.stringify({
           channel: "console",
           level,
           values: args.map(formatValue)
         })
-      );
+      ).catch(() => {});
     }
   ])
 );
@@ -134,6 +136,7 @@ globalThis.console = Object.fromEntries(
   JsEngine? _engine;
   bool _hasAdvancedSearchForm = false;
   bool _hasSortOps = false;
+  bool _hasChapters = false;
   List<Cookie>? _cookies;
   Map<String, String> _browserUserAgentHeaders = const {};
   StartupBrowserOutcome? _startupBrowserOutcome;
@@ -1150,6 +1153,11 @@ if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
       'return typeof globalThis.$sourceId.getSortingOptions === "function";',
     );
     _hasSortOps = sortOptionsCheck.value == true;
+
+    final chaptersCheck = await _evalScoped(
+      'return typeof globalThis.$sourceId.getChapters === "function";',
+    );
+    _hasChapters = chaptersCheck.value == true;
   }
 
   FutureOr<JsResult> _handleBridgeCall(JsValue value) {
@@ -1394,9 +1402,7 @@ return await globalThis.$sourceId.getDiscoverSectionItems(
 
   @override
   Future<ExtensionForm> getForm(WebSourceInfo source, FormID id) async {
-    if (!source.hasCapability(SourceIntents.settingsUI)) {
-      throw UnsupportedError("Source does not support settings");
-    }
+    _requireFormSupport(source);
 
     final result = await _evalScoped("""
 const formid = ${_json(id)};
@@ -1423,13 +1429,11 @@ return formid;
       return null;
     }
 
-    final mangaDetails = await _evalJsonScoped(
-      'return await globalThis.$sourceId.getMangaDetails(${_json(mangaId)});',
-      label: 'get manga details',
-    );
-    final sourceManga = SourceManga.fromJson(
-      _normalizeBridgeJsonMap(mangaDetails, 'getMangaDetails'),
-    );
+    final sourceManga = await getMangaDetails(mangaId);
+    if (!_hasChapters) {
+      // Trackers provide details without chapters.
+      return WebManga.extension(data: sourceManga, chaptersList: const []);
+    }
 
     final chapterList = await _evalJsonScoped('''
 const manga = ${_json(sourceManga.toJson())};
@@ -1453,6 +1457,166 @@ return await globalThis.$sourceId.getChapters(manga);
     chapters.sort(WebManga.compareExtensionChaptersDescending);
 
     return WebManga.extension(data: sourceManga, chaptersList: chapters);
+  }
+
+  @override
+  Future<SourceManga> getMangaDetails(String mangaId) async {
+    final mangaDetails = await _evalJsonScoped(
+      'return await globalThis.$sourceId.getMangaDetails(${_json(mangaId)});',
+      label: 'get manga details',
+    );
+    return SourceManga.fromJson(
+      _normalizeBridgeJsonMap(mangaDetails, 'getMangaDetails'),
+    );
+  }
+
+  /// Settings forms and tracker progress-management forms share form state,
+  /// including nested navigation forms.
+  void _requireFormSupport(WebSourceInfo source) {
+    if (!source.hasCapability(SourceIntents.settingsUI) &&
+        !source.hasCapability(SourceIntents.mangaProgress)) {
+      throw UnsupportedError("Source does not support forms");
+    }
+  }
+
+  void _requireCapability(
+    WebSourceInfo source,
+    SourceIntents intent,
+    String description,
+  ) {
+    if (!source.hasCapability(intent)) {
+      throw UnsupportedError('Source does not support $description');
+    }
+  }
+
+  List<dynamic> _normalizeBridgeJsonList(dynamic value, String label) {
+    final normalized = _normalizeBridgeJson(value);
+    if (normalized is! List) {
+      throw StateError(
+        'Expected $label to return a list, got ${normalized.runtimeType}',
+      );
+    }
+    return normalized;
+  }
+
+  @override
+  Future<MangaProgress?> getMangaProgress(
+    WebSourceInfo source,
+    SourceManga manga,
+  ) async {
+    _requireCapability(source, SourceIntents.mangaProgress, 'progress');
+    final progress = await _evalJsonScoped('''
+const manga = ${_json(manga.toJson())};
+return await globalThis.$sourceId.getMangaProgress(manga) ?? null;
+''', label: 'get manga progress');
+    if (progress == null) {
+      return null;
+    }
+
+    return MangaProgress.fromJson(
+      _normalizeBridgeJsonMap(progress, 'getMangaProgress'),
+    );
+  }
+
+  @override
+  Future<ExtensionForm> getMangaProgressManagementForm(
+    WebSourceInfo source,
+    SourceManga manga,
+  ) async {
+    _requireCapability(source, SourceIntents.mangaProgress, 'progress');
+    final result = await _evalScoped('''
+const manga = ${_json(manga.toJson())};
+const form = await globalThis.$sourceId.getMangaProgressManagementForm(manga);
+form.formWillAppear?.();
+const id = await globalThis.Application.initializeForm("mangaProgress", form);
+return id;
+''');
+
+    final formId = result.value as FormID;
+    return _forms[formId] ??
+        (throw StateError('Failed to create form $formId'));
+  }
+
+  @override
+  Future<ChapterReadActionQueueProcessingResult> processChapterReadActionQueue(
+    WebSourceInfo source,
+    List<TrackedMangaChapterReadAction> actions,
+  ) async {
+    _requireCapability(source, SourceIntents.mangaProgress, 'progress');
+    final result = await _evalJsonScoped('''
+const actions = ${_json(actions.map((e) => e.toJson()).toList())};
+return await globalThis.$sourceId.processChapterReadActionQueue(actions);
+''', label: 'process chapter read action queue');
+
+    return ChapterReadActionQueueProcessingResult.fromJson(
+      _normalizeBridgeJsonMap(result, 'processChapterReadActionQueue'),
+    );
+  }
+
+  @override
+  Future<List<ManagedCollection>> getManagedLibraryCollections(
+    WebSourceInfo source,
+  ) async {
+    _requireCapability(
+      source,
+      SourceIntents.collectionManagement,
+      'managed collections',
+    );
+    final collections = await _evalJsonScoped(
+      'return await globalThis.$sourceId.getManagedLibraryCollections();',
+      label: 'get managed library collections',
+    );
+
+    return _normalizeBridgeJsonList(collections, 'getManagedLibraryCollections')
+        .map(
+          (item) => ManagedCollection.fromJson(
+            _normalizeBridgeJsonMap(item, 'getManagedLibraryCollections item'),
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Future<List<SourceManga>> getSourceMangaInManagedCollection(
+    WebSourceInfo source,
+    ManagedCollection collection,
+  ) async {
+    _requireCapability(
+      source,
+      SourceIntents.collectionManagement,
+      'managed collections',
+    );
+    final manga = await _evalJsonScoped('''
+const collection = ${_json(collection.toJson())};
+return await globalThis.$sourceId.getSourceMangaInManagedCollection(collection);
+''', label: 'get source manga in managed collection');
+
+    return _normalizeBridgeJsonList(manga, 'getSourceMangaInManagedCollection')
+        .map(
+          (item) => SourceManga.fromJson(
+            _normalizeBridgeJsonMap(
+              item,
+              'getSourceMangaInManagedCollection item',
+            ),
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Future<void> commitManagedCollectionChanges(
+    WebSourceInfo source,
+    ManagedCollectionChangeset changeset,
+  ) async {
+    _requireCapability(
+      source,
+      SourceIntents.collectionManagement,
+      'managed collections',
+    );
+    await _evalScoped('''
+const changeset = ${_json(changeset.toJson())};
+await globalThis.$sourceId.commitManagedCollectionChanges(changeset);
+''');
   }
 
   @override
@@ -1628,9 +1792,7 @@ return await globalThis.$sourceId.getSearchResults(
 
   @override
   Future<void> uninitializeForms(WebSourceInfo source) async {
-    if (!source.hasCapability(SourceIntents.settingsUI)) {
-      throw UnsupportedError("Source does not support settings");
-    }
+    _requireFormSupport(source);
 
     await _evalScoped('globalThis.Application.uninitializeForms();');
   }

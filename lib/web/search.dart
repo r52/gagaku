@@ -44,7 +44,8 @@ class ExtensionSearchPage extends StatelessWidget {
       ),
       builder: (context, extensions) {
         final firstSearchable = extensions.firstWhereOrNull(
-          (ext) => ext.hasCapability(SourceIntents.mangaSearch),
+          (ext) =>
+              ext.hasCapability(SourceIntents.mangaSearch) && !ext.isTracker,
         );
 
         if (firstSearchable == null) {
@@ -185,7 +186,12 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
               final searchExtensions = useMemoized(
                 () => Map.fromEntries(
                   extensions
-                      .where((e) => e.hasCapability(SourceIntents.mangaSearch))
+                      // Trackers search their own catalog, not readable series.
+                      .where(
+                        (e) =>
+                            e.hasCapability(SourceIntents.mangaSearch) &&
+                            !e.isTracker,
+                      )
                       .map((e) => MapEntry(e.id, e)),
                 ),
                 [extensions],

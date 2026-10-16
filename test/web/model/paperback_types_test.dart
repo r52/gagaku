@@ -305,4 +305,66 @@ void main() {
       );
     });
   });
+
+  group('Paperback alpha 92 tracker types', () {
+    const trackedManga = {
+      'mangaId': 'tracker-entry-1',
+      'mangaInfo': {
+        'thumbnailUrl': '',
+        'synopsis': '',
+        'primaryTitle': 'Fictional Tracked Title',
+        'secondaryTitles': <String>[],
+        'contentRating': 'EVERYONE',
+      },
+    };
+
+    test('parses manga progress with a bridged Date', () {
+      final progress = MangaProgress.fromJson({
+        'sourceManga': trackedManga,
+        'lastReadChapter': {
+          'chapterId': '42',
+          'sourceManga': trackedManga,
+          'langCode': 'unknown',
+          'chapNum': 42,
+          'volume': 5,
+        },
+        // JSON.stringify output of an AniList-style `Date`.
+        'lastReadTime': '2023-11-14T22:13:20.000Z',
+        'userRating': 8.5,
+      });
+
+      expect(progress.lastReadChapter.chapNum, 42);
+      expect(progress.lastReadTime, DateTime.utc(2023, 11, 14, 22, 13, 20));
+      expect(progress.userRating, 8.5);
+    });
+
+    test('serializes read actions with nested tracker entries', () {
+      final action = TrackedMangaChapterReadAction(
+        id: 'action-1',
+        sourceManga: SourceManga.fromJson(trackedManga),
+        chapterId: 'chapter-7',
+        chapterSourceId: 'FictionalSource',
+        chapterMangaId: 'series-1',
+        chapterNum: 7.5,
+        chapterVolume: 2,
+        creationDate: DateTime.utc(2026, 1, 2),
+        errorCount: 0,
+      );
+
+      final json = action.toJson();
+      expect(json['sourceManga'], isA<Map>());
+      expect((json['sourceManga'] as Map)['mangaId'], 'tracker-entry-1');
+      expect(json['chapterNum'], 7.5);
+      expect(TrackedMangaChapterReadAction.fromJson(json), action);
+    });
+
+    test('defaults missing queue result lists to empty', () {
+      final result = ChapterReadActionQueueProcessingResult.fromJson({
+        'failedItems': ['action-2'],
+      });
+
+      expect(result.successfulItems, isEmpty);
+      expect(result.failedItems, ['action-2']);
+    });
+  });
 }
