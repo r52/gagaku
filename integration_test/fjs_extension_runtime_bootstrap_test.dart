@@ -2821,4 +2821,200 @@ globalThis.source.fictionalTracker = {
     disposed = true;
     await runtime.dispose();
   });
+
+  test(
+    'extension-requested form reloads do not re-run formWillAppear',
+    () async {
+      Map<String, dynamic> storedState = {};
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'reloadLoopSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, state) {
+          storedState = Map<String, dynamic>.from(state as Map);
+        },
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => storedState,
+        getExtensionSecureState: (_) => {},
+      );
+      addTearDown(runtime.dispose);
+
+      final source = WebSourceInfo(
+        id: 'reloadLoopSource',
+        name: 'Reload Loop Source',
+        repo: 'tracker-fixture',
+        icon: '',
+        capabilities: const [SourceIntents.settingsUI],
+      );
+
+      // Mirrors AniList's ProfileViewForm: load in formWillAppear, then ask the
+      // host to re-render through the extension's own reloadForm().
+      await runtime.init(source, r'''
+const profileForm = {
+  loaded: false,
+  formWillAppear() {
+    Application.setState(
+      (Application.getState("appear-count") ?? 0) + 1,
+      "appear-count"
+    );
+    Application.sleep(0.01).finally(() => {
+      this.loaded = true;
+      Application.formDidChange(this.__underlying_formId);
+    });
+  },
+  getSections() {
+    return [
+      {
+        id: "profile",
+        type: "flowSection",
+        items: [
+          {
+            id: "status",
+            type: "labelRow",
+            isHidden: false,
+            title: this.loaded ? "Loaded" : "Loading"
+          }
+        ]
+      }
+    ];
+  }
+};
+globalThis.source ??= {};
+globalThis.source.reloadLoopSource = {
+  initialise: async () => {},
+  getSettingsForm: async () => ({
+    getSections: () => [
+      {
+        id: "settings",
+        type: "flowSection",
+        items: [
+          {
+            id: "profile",
+            type: "navigationRow",
+            isHidden: false,
+            title: "Profile",
+            form: profileForm
+          }
+        ]
+      }
+    ]
+  })
+};
+''');
+
+      final settings = await runtime.getSettingsForm(source);
+      final profileRow =
+          (await settings.sections).single.items.single as NavigationRowElement;
+      final profile = await runtime.getForm(source, profileRow.form);
+
+      // Resolving the handle (as a navigation row does while rendering) must
+      // not run the appearance hook.
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(storedState['appear-count'], isNull);
+
+      Future<String> statusTitle() async {
+        final status = (await profile.sections).single.items.single;
+        return (status as LabelRowElement).title;
+      }
+
+      await profile.formWillAppear();
+      final deadline = DateTime.now().add(const Duration(seconds: 5));
+      while (await statusTitle() != 'Loaded') {
+        if (DateTime.now().isAfter(deadline)) {
+          fail('form did not reload after its formWillAppear load');
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      }
+
+      // A loop would keep re-running formWillAppear after every reload.
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      expect(storedState['appear-count'], 1);
+    },
+  );
+
+  test('interceptors may share an id within one extension', () async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    addTearDown(() => server.close(force: true));
+    server.listen((request) async {
+      request.response
+        ..headers.contentType = ContentType.text
+        ..write(request.headers.value('x-interceptors') ?? '');
+      await request.response.close();
+    });
+
+    final runtime = FjsExtensionRuntime(
+      sourceId: 'sharedInterceptorSource',
+      extensionHost: await rootBundle.loadString(
+        'assets/extensionhost/bundle.js',
+      ),
+      onResetAllState: (_) {},
+      onSetExtensionState: (_, _) {},
+      onSetExtensionSecureState: (_, _) {},
+      getExtensionState: (_) => {},
+      getExtensionSecureState: (_) => {},
+    );
+    addTearDown(runtime.dispose);
+
+    // Mirrors AniList: BasicRateLimiter("main") and AniListInterceptor("main").
+    await runtime.init(
+      WebSourceInfo(
+        id: 'sharedInterceptorSource',
+        name: 'Shared Interceptor Source',
+        repo: 'tracker-fixture',
+        icon: '',
+      ),
+      '''
+const endpoint = ${jsonEncode('http://127.0.0.1:${server.port}/')};
+const marker = (name) => ({
+  interceptRequest: async (request) => {
+    const previous = request.headers?.["x-interceptors"];
+    return {
+      ...request,
+      headers: {
+        ...(request.headers ?? {}),
+        "x-interceptors": previous ? `\${previous},\${name}` : name
+      }
+    };
+  },
+  interceptResponse: async (request, response, data) => data
+});
+const register = (id, interceptor) =>
+  Application.registerInterceptor(
+    id,
+    Application.Selector(interceptor, "interceptRequest"),
+    Application.Selector(interceptor, "interceptResponse")
+  );
+const limiter = marker("limiter");
+const passthrough = marker("passthrough");
+const other = marker("other");
+globalThis.source ??= {};
+globalThis.source.sharedInterceptorSource = {
+  initialise: async () => {
+    register("main", limiter);
+    register("main", passthrough);
+    register("main", limiter); // exact repeat: skipped
+    register("other", other);
+  },
+  probe: async () => {
+    const [, body] = await Application.scheduleRequest({
+      url: endpoint,
+      method: "GET"
+    });
+    return Application.arrayBufferToUTF8String(body);
+  }
+};
+''',
+    );
+
+    Future<String> probe() async => await runtime.evalForTesting(
+      'await globalThis.sharedInterceptorSource.probe()',
+    ) as String;
+
+    expect(await probe(), 'limiter,passthrough,other');
+
+    await runtime.evalForTesting('Application.unregisterInterceptor("main")');
+    expect(await probe(), 'other');
+  });
 }

@@ -96,6 +96,10 @@ abstract class ExtensionForm extends ChangeNotifier {
 
   Future<void> reloadForm();
 
+  /// Runs the extension's `formWillAppear` hook; call when the form is about
+  /// to be shown. Obtaining a form handle does not run it.
+  Future<void> formWillAppear();
+
   Future<void> uninitialize();
 
   Future<void> formDidSubmit();

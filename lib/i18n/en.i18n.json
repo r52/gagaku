@@ -85,7 +85,8 @@
     "authenticating": "Authenticating...",
     "loginSuccess": "Login Successful",
     "loginFailed": "Login Failed: $error",
-    "loggingIn": "Logging in..."
+    "loggingIn": "Logging in...",
+    "missingAccessToken": "The sign-in response did not include an access token."
   },
   "library": "Library",
   "history": {

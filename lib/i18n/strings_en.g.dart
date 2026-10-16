@@ -385,6 +385,9 @@ class Translations$auth$en {
 
 	/// en: 'Logging in...'
 	String get loggingIn => 'Logging in...';
+
+	/// en: 'The sign-in response did not include an access token.'
+	String get missingAccessToken => 'The sign-in response did not include an access token.';
 }
 
 // Path: history
@@ -2340,6 +2343,7 @@ extension on Translations {
 			'auth.loginSuccess' => 'Login Successful',
 			'auth.loginFailed' => ({required Object error}) => 'Login Failed: ${error}',
 			'auth.loggingIn' => 'Logging in...',
+			'auth.missingAccessToken' => 'The sign-in response did not include an access token.',
 			'library' => 'Library',
 			'history.text' => 'History',
 			'history.clear' => 'Clear History',
@@ -2773,9 +2777,9 @@ extension on Translations {
 			'sync.statusPulling' => 'Applying remote data',
 			'sync.statusOffline' => 'Storage unavailable; retry pending',
 			'sync.statusIncompatible' => 'Incompatible or corrupt profile',
-			'sync.statusNoValidSnapshot' => 'No valid snapshot found',
 			_ => null,
 		} ?? switch (path) {
+			'sync.statusNoValidSnapshot' => 'No valid snapshot found',
 			'sync.statusProfileMissing' => 'Remote profile disappeared; sync paused',
 			'sync.statusForked' => 'Conflict requires resolution',
 			'sync.statusCleanupWarning' => 'Synchronized with cleanup warning',

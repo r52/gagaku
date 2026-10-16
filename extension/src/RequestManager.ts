@@ -42,7 +42,21 @@ export class MockRequestManager implements RequestManager {
     interceptRequestSelectorId: SelectorID<RequestInterceptor>,
     interceptResponseSelectorId: SelectorID<ResponseInterceptor>,
   ): void {
-    this.unregisterInterceptor(interceptorId);
+    // Ids are not unique: extensions register several interceptors under one
+    // id (AniList: BasicRateLimiter("main") and AniListInterceptor("main")).
+    // Each runtime owns its list, so only an exact repeat is skipped; selector
+    // ids are canonical per (object, method), so re-registering the same
+    // interceptor matches.
+    const alreadyRegistered = this.registeredInterceptors.some(
+      (interceptor) =>
+        interceptor.interceptorId === interceptorId &&
+        interceptor.interceptRequestSelectorId === interceptRequestSelectorId &&
+        interceptor.interceptResponseSelectorId === interceptResponseSelectorId,
+    );
+    if (alreadyRegistered) {
+      return;
+    }
+
     this.registeredInterceptors.push({
       interceptorId,
       interceptRequestSelectorId,
@@ -50,16 +64,11 @@ export class MockRequestManager implements RequestManager {
     });
   }
 
+  /** Removes every interceptor registered under [interceptorId]. */
   unregisterInterceptor(interceptorId: string): void {
-    for (let i = 0; i < this.registeredInterceptors.length; i++) {
-      const { interceptorId: registeredInterceptorId } =
-        this.registeredInterceptors[i]!;
-
-      if (interceptorId == registeredInterceptorId) {
-        this.registeredInterceptors.splice(i, 1);
-        return;
-      }
-    }
+    this.registeredInterceptors = this.registeredInterceptors.filter(
+      (interceptor) => interceptor.interceptorId !== interceptorId,
+    );
   }
 
   setRedirectHandler(): void {}

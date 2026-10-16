@@ -1231,7 +1231,10 @@ if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
       case 'formDidChange':
         final formId = args.isEmpty ? null : args.first;
         if (formId is String) {
-          unawaited(_forms[formId]?.reloadForm());
+          // The extension's own `reloadForm()`: re-render only. Calling
+          // `formWillAppear` here loops for forms that load in
+          // `formWillAppear` and reload when done (AniList's profile form).
+          _forms[formId]?.refreshSections();
         }
         return JsResult.ok(const JsValue.none());
       case 'initializeForm':
@@ -1410,7 +1413,6 @@ const form = globalThis.Application.getForm(formid);
 if (typeof form === "undefined") {
   return null;
 }
-form.formWillAppear?.();
 return formid;
 """);
 
@@ -1915,8 +1917,12 @@ if (typeof form !== "undefined") {
 """, label: 'form[$id] call $method');
   }
 
+  /// The form is shown again (for example after a nested form is popped).
   @override
-  Future<void> reloadForm() async {
+  Future<void> reloadForm() => formWillAppear();
+
+  @override
+  Future<void> formWillAppear() async {
     await runtime.evalForForm("""
 const form = globalThis.Application.getForm(
   ${jsonEncode(id)},
@@ -1925,10 +1931,16 @@ const form = globalThis.Application.getForm(
 if (typeof form !== "undefined") {
   form.formWillAppear?.();
 }
-""", label: 'form[$id] reload');
+""", label: 'form[$id] will appear');
 
+    // The hook may change what the sections render without reloading.
+    refreshSections();
+  }
+
+  /// Re-reads sections without the appearance lifecycle; used when the
+  /// extension itself asks for a reload.
+  void refreshSections() {
     _sections = _getSections();
-
     notifyListeners();
   }
 

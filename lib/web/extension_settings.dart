@@ -8,6 +8,7 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/web/extension_stepper.dart';
 import 'package:gagaku/web/model/extension_runtime.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/oauth.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/deeplink.dart';
 import 'package:go_router/go_router.dart';
@@ -525,6 +526,9 @@ class NavigationRowBuilder extends HookConsumerWidget {
             final currentForm = await ref
                 .read(extensionSourceProvider(source.id).notifier)
                 .getForm(element.form);
+            // Rows resolve their form handle while rendering; only opening
+            // the form runs its appearance hook.
+            await currentForm.formWillAppear();
             await nav.push(
               PageTransitionRouteBuilder(
                 pageTransitionsBuilder:
@@ -799,62 +803,89 @@ class OAuthButtonRowBuilder extends ConsumerWidget {
         title: Text(element.title),
         subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
         onTap: () async {
-          final tokenEndpoint = switch (element.responseType) {
-            OAuthTokenResponse() => null,
-            OAuthCodeResponse(tokenEndpoint: final te) => te,
-            OAuthPKCEResponse(tokenEndpoint: final te) => te,
-            _ => null,
-          };
+          final redirectParsed = PaperbackOAuth.redirectUri(source, element);
+          final Uri authUrl;
+          final Future<List<String>> Function(Uri callback) credentials;
 
-          String issuerUrl;
-          try {
-            final uri = Uri.parse(element.authorizeEndpoint);
-            if (uri.hasScheme && uri.hasAuthority) {
-              issuerUrl = uri.origin;
-            } else {
-              issuerUrl = element.authorizeEndpoint;
-            }
-          } catch (_) {
-            issuerUrl = element.authorizeEndpoint;
+          switch (element.responseType) {
+            case OAuthTokenResponse():
+              // Implicit grant: the extension's endpoint is used as given and
+              // the token is read from the redirect fragment.
+              authUrl = PaperbackOAuth.tokenFlowAuthorizationUri(element);
+              credentials = (callback) async =>
+                  PaperbackOAuth.tokenFlowSuccessArguments(
+                    PaperbackOAuth.accessTokenFromCallback(callback),
+                  );
+            case OAuthCodeResponse(:final tokenEndpoint) ||
+                OAuthPKCEResponse(:final tokenEndpoint):
+              final endpoint = Uri.parse(element.authorizeEndpoint);
+              final metadata = oidc.OpenIdProviderMetadata.fromJson({
+                'issuer': endpoint.hasScheme && endpoint.hasAuthority
+                    ? endpoint.origin
+                    : element.authorizeEndpoint,
+                'authorization_endpoint': element.authorizeEndpoint,
+                'token_endpoint': tokenEndpoint,
+              });
+              final client = oidc.Client(
+                oidc.Issuer(metadata),
+                element.clientId ?? 'paperback',
+              );
+              final extraParameters = PaperbackOAuth.endpointParameters(
+                element,
+              );
+              final flow = element.responseType is OAuthPKCEResponse
+                  ? oidc.Flow.authorizationCodeWithPKCE(
+                      client,
+                      additionalParameters: extraParameters,
+                    )
+                  : oidc.Flow.authorizationCode(
+                      client,
+                      additionalParameters: extraParameters,
+                    );
+
+              if (element.scopes?.isNotEmpty == true) {
+                flow.scopes.clear();
+                flow.scopes.addAll(element.scopes!);
+              }
+              flow.redirectUri = redirectParsed;
+
+              authUrl = flow.authenticationUri;
+              credentials = (callback) async {
+                final cred = await flow.callback(
+                  PaperbackOAuth.callbackParameters(callback),
+                );
+                final tokenResp = await cred.getTokenResponse();
+                return [
+                  tokenResp.refreshToken ?? '',
+                  tokenResp.accessToken ?? '',
+                ];
+              };
+            default:
+              throw UnsupportedError(
+                'Unsupported OAuth response type ${element.responseType}',
+              );
           }
 
-          final metadata = oidc.OpenIdProviderMetadata.fromJson({
-            'issuer': issuerUrl,
-            'authorization_endpoint': element.authorizeEndpoint,
-            'token_endpoint': tokenEndpoint,
-          });
-
-          final issuer = oidc.Issuer(metadata);
-          final client = oidc.Client(issuer, element.clientId ?? 'paperback');
-
-          final flow = switch (element.responseType) {
-            OAuthTokenResponse() => oidc.Flow.implicit(client),
-            OAuthCodeResponse() => oidc.Flow.authorizationCode(client),
-            OAuthPKCEResponse() => oidc.Flow.authorizationCodeWithPKCE(client),
-            _ => oidc.Flow.implicit(client),
-          };
-
-          if (element.scopes?.isNotEmpty == true) {
-            flow.scopes.clear();
-            flow.scopes.addAll(element.scopes!);
-          }
-
-          final redirectUri =
-              element.redirectUri ?? 'paperback://${source.id}-login';
-          final redirectParsed = Uri.parse(redirectUri);
-          flow.redirectUri = redirectParsed;
-
-          final authUrl = flow.authenticationUri;
-
-          PBLinkDelegate().addHandler(redirectParsed.host, (
+          // An attempt abandoned before its redirect keeps its handler
+          // registered; replace it so this attempt's flow receives the result.
+          await PBLinkDelegate().removeHandler(redirectParsed.host);
+          await PBLinkDelegate().addHandler(redirectParsed.host, (
             context,
             uri,
             router,
           ) async {
             PBLinkDelegate().removeHandler(redirectParsed.host);
             return Block.then(() async {
+              // Deep-link handlers receive the router's context, which sits
+              // above its Navigator; dialogs need the navigator's own context.
+              final dialogContext =
+                  router.routerDelegate.navigatorKey.currentContext;
+              if (dialogContext == null || !dialogContext.mounted) {
+                return;
+              }
+
               await showDialog(
-                context: context,
+                context: dialogContext,
                 barrierDismissible: false,
                 builder: (context) {
                   return HookConsumer(
@@ -862,19 +893,13 @@ class OAuthButtonRowBuilder extends ConsumerWidget {
                       useEffect(() {
                         void process() async {
                           try {
-                            final cred = await flow.callback(
-                              uri.queryParameters,
-                            );
-                            final tokenResp = await cred.getTokenResponse();
+                            final args = await credentials(uri);
 
                             await ref
                                 .read(
                                   extensionSourceProvider(source.id).notifier,
                                 )
-                                .callBinding(element.onSuccess, [
-                                  tokenResp.refreshToken ?? '',
-                                  tokenResp.accessToken ?? '',
-                                ]);
+                                .callBinding(element.onSuccess, args);
 
                             if (context.mounted) {
                               ScaffoldMessenger.of(context)
@@ -889,14 +914,17 @@ class OAuthButtonRowBuilder extends ConsumerWidget {
                             }
                           } catch (e) {
                             if (context.mounted) {
+                              final error = switch (e) {
+                                OAuthMissingAccessToken() =>
+                                  context.t.auth.missingAccessToken,
+                                _ => e.toString(),
+                              };
                               ScaffoldMessenger.of(context)
                                 ..removeCurrentSnackBar()
                                 ..showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      context.t.auth.loginFailed(
-                                        error: e.toString(),
-                                      ),
+                                      context.t.auth.loginFailed(error: error),
                                     ),
                                     backgroundColor: Colors.red,
                                   ),
