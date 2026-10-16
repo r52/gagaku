@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -250,9 +250,8 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
       bytes: utf8.encode(jsonEncode(data)),
     );
     if (result != null && mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(context.t.sync.exportSuccess)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(context.t.sync.exportSuccess)));
     }
   }
 
@@ -330,9 +329,8 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
       final message = result.failures.isEmpty
           ? context.t.sync.deletedCount(count: result.deleted.length)
           : context.t.sync.failureCount(count: result.failures.length);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
     });
   }
 

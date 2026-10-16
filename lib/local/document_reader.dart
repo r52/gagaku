@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_readium/flutter_readium.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/local/model/config.dart';
@@ -10,8 +10,10 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-typedef LocalDocumentReaderBuilder =
-    Widget Function(BuildContext context, Publication publication);
+typedef LocalDocumentReaderBuilder = Widget Function(
+  BuildContext context,
+  Publication publication,
+);
 
 class LocalDocumentReaderRouteBuilder<T>
     extends SlideTransitionRouteBuilder<T> {
@@ -269,18 +271,16 @@ class _DocumentChrome extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: Material(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.surfaceContainer.withValues(alpha: 0.86),
+                    color: Theme.of(context).colorScheme.surfaceContainer
+                        .withValues(alpha: 0.86),
                     borderRadius: BorderRadius.circular(24),
                     clipBehavior: Clip.antiAlias,
                     child: Row(
                       children: [
                         IconButton(
                           onPressed: onBack,
-                          tooltip: MaterialLocalizations.of(
-                            context,
-                          ).backButtonTooltip,
+                          tooltip: MaterialLocalizations.of(context)
+                              .backButtonTooltip,
                           icon: const Icon(Icons.arrow_back),
                         ),
                         Expanded(
@@ -308,9 +308,8 @@ class _DocumentChrome extends StatelessWidget {
                   ignoring: !visible,
                   child: Material(
                     key: const ValueKey('document-side-controls'),
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.surfaceContainer.withValues(alpha: 0.78),
+                    color: Theme.of(context).colorScheme.surfaceContainer
+                        .withValues(alpha: 0.78),
                     borderRadius: BorderRadius.circular(28),
                     clipBehavior: Clip.antiAlias,
                     child: Column(
@@ -370,9 +369,8 @@ class _DocumentChrome extends StatelessWidget {
                 ignoring: !visible,
                 child: Material(
                   key: const ValueKey('document-bottom-controls'),
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.surfaceContainer.withValues(alpha: 0.82),
+                  color: Theme.of(context).colorScheme.surfaceContainer
+                      .withValues(alpha: 0.82),
                   borderRadius: BorderRadius.circular(28),
                   clipBehavior: Clip.antiAlias,
                   child: Row(
@@ -506,9 +504,8 @@ class _TocButton extends StatelessWidget {
   }
 
   Future<void> _showToc(BuildContext context, List<Link> toc) async {
-    final sheetColor = Theme.of(
-      context,
-    ).colorScheme.surfaceContainerHigh.withValues(alpha: 1);
+    final sheetColor = Theme.of(context).colorScheme.surfaceContainerHigh
+        .withValues(alpha: 1);
     final link = await showModalBottomSheet<Link>(
       context: context,
       backgroundColor: sheetColor,
@@ -550,9 +547,8 @@ class _ProgressionButton extends StatelessWidget {
   Future<void> _showProgression(BuildContext context) async {
     var progression =
         controller.state.locator?.locations?.progression?.clamp(0.0, 1.0) ?? 0;
-    final sheetColor = Theme.of(
-      context,
-    ).colorScheme.surfaceContainerHigh.withValues(alpha: 1);
+    final sheetColor = Theme.of(context).colorScheme.surfaceContainerHigh
+        .withValues(alpha: 1);
     final selected = await showModalBottomSheet<double>(
       context: context,
       backgroundColor: sheetColor,

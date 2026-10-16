@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/local/main.dart';
 import 'package:gagaku/mangadex/chapter_feed.dart';
 import 'package:gagaku/mangadex/creator_view.dart';

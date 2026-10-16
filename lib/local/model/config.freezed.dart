@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'config.dart';
@@ -9,6 +9,7 @@ part of 'config.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -28,16 +29,21 @@ $LocalLibConfigCopyWith<LocalLibConfig> get copyWith => _$LocalLibConfigCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LocalLibConfig&&(identical(other.libraryDirectory, libraryDirectory) || other.libraryDirectory == libraryDirectory)&&(identical(other.epubFontSize, epubFontSize) || other.epubFontSize == epubFontSize)&&(identical(other.epubScroll, epubScroll) || other.epubScroll == epubScroll));
+  final _this = this as LocalLibConfig;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LocalLibConfig&&(identical(other.libraryDirectory, _this.libraryDirectory) || other.libraryDirectory == _this.libraryDirectory)&&(identical(other.epubFontSize, _this.epubFontSize) || other.epubFontSize == _this.epubFontSize)&&(identical(other.epubScroll, _this.epubScroll) || other.epubScroll == _this.epubScroll));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,libraryDirectory,epubFontSize,epubScroll);
+int get hashCode {
+  final _this = this as LocalLibConfig;
+  return Object.hash(runtimeType,_this.libraryDirectory,_this.epubFontSize,_this.epubScroll);
+}
 
 @override
 String toString() {
-  return 'LocalLibConfig(libraryDirectory: $libraryDirectory, epubFontSize: $epubFontSize, epubScroll: $epubScroll)';
+  final _this = this as LocalLibConfig;
+  return 'LocalLibConfig(libraryDirectory: ${_this.libraryDirectory}, epubFontSize: ${_this.epubFontSize}, epubScroll: ${_this.epubScroll})';
 }
 
 
@@ -66,7 +72,7 @@ class _$LocalLibConfigCopyWithImpl<$Res>
 /// Create a copy of LocalLibConfig
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? libraryDirectory = null,Object? epubFontSize = null,Object? epubScroll = null,}) {
-  return _then(_self.copyWith(
+  return _then(LocalLibConfig(
 libraryDirectory: null == libraryDirectory ? _self.libraryDirectory : libraryDirectory // ignore: cast_nullable_to_non_nullable
 as String,epubFontSize: null == epubFontSize ? _self.epubFontSize : epubFontSize // ignore: cast_nullable_to_non_nullable
 as double,epubScroll: null == epubScroll ? _self.epubScroll : epubScroll // ignore: cast_nullable_to_non_nullable
@@ -102,16 +108,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LocalLibConfig&&(identical(other.libraryDirectory, libraryDirectory) || other.libraryDirectory == libraryDirectory)&&(identical(other.epubFontSize, epubFontSize) || other.epubFontSize == epubFontSize)&&(identical(other.epubScroll, epubScroll) || other.epubScroll == epubScroll));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _LocalLibConfig&&(identical(other.libraryDirectory, libraryDirectory) || other.libraryDirectory == libraryDirectory)&&(identical(other.epubFontSize, epubFontSize) || other.epubFontSize == epubFontSize)&&(identical(other.epubScroll, epubScroll) || other.epubScroll == epubScroll));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,libraryDirectory,epubFontSize,epubScroll);
+int get hashCode {
+    return Object.hash(runtimeType,libraryDirectory,epubFontSize,epubScroll);
+}
 
 @override
 String toString() {
-  return 'LocalLibConfig(libraryDirectory: $libraryDirectory, epubFontSize: $epubFontSize, epubScroll: $epubScroll)';
+    return 'LocalLibConfig(libraryDirectory: $libraryDirectory, epubFontSize: $epubFontSize, epubScroll: $epubScroll)';
 }
 
 

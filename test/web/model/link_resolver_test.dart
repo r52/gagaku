@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/web/model/link_resolver.dart';
 import 'package:gagaku/web/model/model.dart';
-import 'package:gagaku/web/model/source_adapter.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -15,19 +14,39 @@ void main() {
     logger = Logger(level: Level.off);
   });
 
-  late _FakeRedirectTransport redirects;
+  late Dio dio;
+  late Queue<({int statusCode, String? location})> responses;
+  late List<RequestOptions> requests;
   late WebLinkResolver resolver;
-  late List<String> extensionChecks;
 
   setUp(() {
-    redirects = _FakeRedirectTransport();
-    extensionChecks = [];
+    responses = Queue();
+    requests = [];
+    dio = Dio(BaseOptions(validateStatus: (_) => true));
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          requests.add(options);
+          final response = responses.isEmpty
+              ? (statusCode: 404, location: null)
+              : responses.removeFirst();
+          handler.resolve(
+            Response<dynamic>(
+              requestOptions: options,
+              statusCode: response.statusCode,
+              headers: Headers.fromMap({
+                if (response.location case final location?)
+                  'location': [location],
+              }),
+            ),
+          );
+        },
+      ),
+    );
+    addTearDown(dio.close);
     resolver = WebLinkResolver(
-      extensionExists: (sourceId) async {
-        extensionChecks.add(sourceId);
-        return sourceId == 'installed';
-      },
-      redirectTransport: redirects,
+      extensionExists: (sourceId) async => sourceId == 'installed',
+      dio: dio,
     );
   });
 
@@ -43,16 +62,14 @@ void main() {
         ),
       ),
     );
-    expect(extensionChecks, ['installed']);
-    expect(redirects.requests, isEmpty);
+    expect(requests, isEmpty);
   });
 
   test('rejects missing, malformed, and external extension links', () async {
     expect(await resolver.resolve('missing/manga-1'), isNull);
     expect(await resolver.resolve('installed'), isNull);
     expect(await resolver.resolve('https://example.com/manga-1'), isNull);
-    expect(extensionChecks, ['missing']);
-    expect(redirects.requests, isEmpty);
+    expect(requests, isEmpty);
   });
 
   test('resolves Cubari series and direct chapter links', () async {
@@ -76,53 +93,47 @@ void main() {
         initialChapterId: '4',
       ),
     );
-    expect(redirects.requests, isEmpty);
+    expect(requests, isEmpty);
   });
 
-  test('resolves a Cubari redirect through the injected transport', () async {
-    redirects.enqueue(Uri.parse('/read/gist/series-1/7/'));
+  test(
+    'resolves Cubari redirects without automatically following them',
+    () async {
+      responses.add((statusCode: 302, location: '/read/gist/series-1/7/'));
+      final container = ProviderContainer(
+        overrides: [webSourceDioProvider.overrideWithValue(dio)],
+      );
+      addTearDown(container.dispose);
 
-    final resolved = await resolver.resolve('https://cubari.moe/legacy-link');
+      final resolved = await container
+          .read(webLinkResolverProvider)
+          .resolve('https://cubari.moe/legacy-link');
 
-    expect(
-      resolved,
-      const ResolvedWebLink(
-        series: WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1'),
-        initialChapterId: '7',
-      ),
-    );
-    expect(redirects.requests, [Uri.parse('https://cubari.moe/legacy-link')]);
-  });
+      expect(
+        resolved,
+        const ResolvedWebLink(
+          series: WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1'),
+          initialChapterId: '7',
+        ),
+      );
+      expect(requests.single.uri, Uri.parse('https://cubari.moe/legacy-link'));
+      expect(requests.single.followRedirects, isFalse);
+    },
+  );
 
-  test('production redirect adapter disables automatic redirects', () async {
-    final transport = _RecordingWebSourceTransport(
-      statusCode: 302,
-      location: '/read/gist/series-1/7/',
-    );
-    final container = ProviderContainer(
-      overrides: [webSourceTransportProvider.overrideWithValue(transport)],
-    );
-    addTearDown(container.dispose);
-
-    final resolved = await container
-        .read(webLinkResolverProvider)
-        .resolve('https://cubari.moe/legacy-link');
-
-    expect(
-      resolved,
-      const ResolvedWebLink(
-        series: WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1'),
-        initialChapterId: '7',
-      ),
-    );
-    expect(transport.followRedirects, isFalse);
+  test('ignores Location headers on non-redirect responses', () async {
+    responses.add((statusCode: 200, location: '/read/gist/series-1/7/'));
+    expect(await resolver.resolve('https://cubari.moe/legacy-link'), isNull);
   });
 
   test('rejects redirects outside Cubari read paths', () async {
-    redirects.enqueue(Uri.parse('https://example.com/not-supported'));
+    responses.add((
+      statusCode: 302,
+      location: 'https://example.com/not-supported',
+    ));
     expect(await resolver.resolve('https://cubari.moe/legacy-link'), isNull);
 
-    redirects.enqueue(Uri.parse('/not-a-read-path'));
+    responses.add((statusCode: 302, location: '/not-a-read-path'));
     expect(await resolver.resolve('https://cubari.moe/another-link'), isNull);
   });
 
@@ -136,8 +147,7 @@ void main() {
         initialChapterId: '1',
       ),
     );
-    expect(redirects.requests, isEmpty);
-    expect(extensionChecks, isEmpty);
+    expect(requests, isEmpty);
   });
 
   test('rejects malformed Imgur and Cubari links', () async {
@@ -180,45 +190,4 @@ void main() {
       expect(await resolver.resolveHistoryLink(unsupported), unsupported);
     },
   );
-}
-
-class _FakeRedirectTransport implements WebLinkRedirectTransport {
-  final Queue<Uri?> _responses = Queue();
-  final List<Uri> requests = [];
-
-  void enqueue(Uri? uri) {
-    _responses.add(uri);
-  }
-
-  @override
-  Future<Uri?> resolveRedirect(Uri uri) async {
-    requests.add(uri);
-    return _responses.isEmpty ? null : _responses.removeFirst();
-  }
-}
-
-class _RecordingWebSourceTransport implements WebSourceTransport {
-  _RecordingWebSourceTransport({
-    required this.statusCode,
-    required this.location,
-  });
-
-  final int statusCode;
-  final String location;
-  bool? followRedirects;
-
-  @override
-  Future<Response<dynamic>> getUri(
-    Uri uri, {
-    bool followRedirects = true,
-  }) async {
-    this.followRedirects = followRedirects;
-    return Response<dynamic>(
-      requestOptions: RequestOptions(path: uri.toString()),
-      statusCode: statusCode,
-      headers: Headers.fromMap({
-        'location': [location],
-      }),
-    );
-  }
 }

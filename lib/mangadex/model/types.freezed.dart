@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'types.dart';
@@ -9,6 +9,7 @@ part of 'types.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
@@ -24,23 +25,29 @@ $MangaFiltersCopyWith<MangaFilters> get copyWith => _$MangaFiltersCopyWithImpl<M
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as MangaFilters;
   properties
     ..add(DiagnosticsProperty('type', 'MangaFilters'))
-    ..add(DiagnosticsProperty('includedTags', includedTags))..add(DiagnosticsProperty('includedTagsMode', includedTagsMode))..add(DiagnosticsProperty('excludedTags', excludedTags))..add(DiagnosticsProperty('excludedTagsMode', excludedTagsMode))..add(DiagnosticsProperty('author', author))..add(DiagnosticsProperty('artist', artist))..add(DiagnosticsProperty('status', status))..add(DiagnosticsProperty('publicationDemographic', publicationDemographic))..add(DiagnosticsProperty('contentRating', contentRating))..add(DiagnosticsProperty('order', order));
+    ..add(DiagnosticsProperty('includedTags', _this.includedTags))..add(DiagnosticsProperty('includedTagsMode', _this.includedTagsMode))..add(DiagnosticsProperty('excludedTags', _this.excludedTags))..add(DiagnosticsProperty('excludedTagsMode', _this.excludedTagsMode))..add(DiagnosticsProperty('author', _this.author))..add(DiagnosticsProperty('artist', _this.artist))..add(DiagnosticsProperty('status', _this.status))..add(DiagnosticsProperty('publicationDemographic', _this.publicationDemographic))..add(DiagnosticsProperty('contentRating', _this.contentRating))..add(DiagnosticsProperty('order', _this.order));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaFilters&&const DeepCollectionEquality().equals(other.includedTags, includedTags)&&(identical(other.includedTagsMode, includedTagsMode) || other.includedTagsMode == includedTagsMode)&&const DeepCollectionEquality().equals(other.excludedTags, excludedTags)&&(identical(other.excludedTagsMode, excludedTagsMode) || other.excludedTagsMode == excludedTagsMode)&&const DeepCollectionEquality().equals(other.author, author)&&const DeepCollectionEquality().equals(other.artist, artist)&&const DeepCollectionEquality().equals(other.status, status)&&const DeepCollectionEquality().equals(other.publicationDemographic, publicationDemographic)&&const DeepCollectionEquality().equals(other.contentRating, contentRating)&&(identical(other.order, order) || other.order == order));
+  final _this = this as MangaFilters;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaFilters&&const DeepCollectionEquality().equals(other.includedTags, _this.includedTags)&&(identical(other.includedTagsMode, _this.includedTagsMode) || other.includedTagsMode == _this.includedTagsMode)&&const DeepCollectionEquality().equals(other.excludedTags, _this.excludedTags)&&(identical(other.excludedTagsMode, _this.excludedTagsMode) || other.excludedTagsMode == _this.excludedTagsMode)&&const DeepCollectionEquality().equals(other.author, _this.author)&&const DeepCollectionEquality().equals(other.artist, _this.artist)&&const DeepCollectionEquality().equals(other.status, _this.status)&&const DeepCollectionEquality().equals(other.publicationDemographic, _this.publicationDemographic)&&const DeepCollectionEquality().equals(other.contentRating, _this.contentRating)&&(identical(other.order, _this.order) || other.order == _this.order));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(includedTags),includedTagsMode,const DeepCollectionEquality().hash(excludedTags),excludedTagsMode,const DeepCollectionEquality().hash(author),const DeepCollectionEquality().hash(artist),const DeepCollectionEquality().hash(status),const DeepCollectionEquality().hash(publicationDemographic),const DeepCollectionEquality().hash(contentRating),order);
+int get hashCode {
+  final _this = this as MangaFilters;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.includedTags),_this.includedTagsMode,const DeepCollectionEquality().hash(_this.excludedTags),_this.excludedTagsMode,const DeepCollectionEquality().hash(_this.author),const DeepCollectionEquality().hash(_this.artist),const DeepCollectionEquality().hash(_this.status),const DeepCollectionEquality().hash(_this.publicationDemographic),const DeepCollectionEquality().hash(_this.contentRating),_this.order);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaFilters(includedTags: $includedTags, includedTagsMode: $includedTagsMode, excludedTags: $excludedTags, excludedTagsMode: $excludedTagsMode, author: $author, artist: $artist, status: $status, publicationDemographic: $publicationDemographic, contentRating: $contentRating, order: $order)';
+  final _this = this as MangaFilters;
+  return 'MangaFilters(includedTags: ${_this.includedTags}, includedTagsMode: ${_this.includedTagsMode}, excludedTags: ${_this.excludedTags}, excludedTagsMode: ${_this.excludedTagsMode}, author: ${_this.author}, artist: ${_this.artist}, status: ${_this.status}, publicationDemographic: ${_this.publicationDemographic}, contentRating: ${_this.contentRating}, order: ${_this.order})';
 }
 
 
@@ -69,7 +76,7 @@ class _$MangaFiltersCopyWithImpl<$Res>
 /// Create a copy of MangaFilters
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? includedTags = null,Object? includedTagsMode = null,Object? excludedTags = null,Object? excludedTagsMode = null,Object? author = null,Object? artist = null,Object? status = null,Object? publicationDemographic = null,Object? contentRating = null,Object? order = null,}) {
-  return _then(_self.copyWith(
+  return _then(MangaFilters(
 includedTags: null == includedTags ? _self.includedTags : includedTags // ignore: cast_nullable_to_non_nullable
 as Set<Tag>,includedTagsMode: null == includedTagsMode ? _self.includedTagsMode : includedTagsMode // ignore: cast_nullable_to_non_nullable
 as TagMode,excludedTags: null == excludedTags ? _self.excludedTags : excludedTags // ignore: cast_nullable_to_non_nullable
@@ -92,7 +99,7 @@ as MangaFilterOrder,
 
 
 class _MangaFilters extends MangaFilters with DiagnosticableTreeMixin {
-  const _MangaFilters({final  Set<Tag> includedTags = const {}, this.includedTagsMode = TagMode.and, final  Set<Tag> excludedTags = const {}, this.excludedTagsMode = TagMode.or, final  Set<CreatorType> author = const {}, final  Set<CreatorType> artist = const {}, final  Set<MangaStatus> status = const {}, final  Set<MangaDemographic> publicationDemographic = const {}, final  Set<ContentRating> contentRating = const {}, this.order = MangaFilterOrder.relevance_desc}): _includedTags = includedTags,_excludedTags = excludedTags,_author = author,_artist = artist,_status = status,_publicationDemographic = publicationDemographic,_contentRating = contentRating,super._();
+  const _MangaFilters({ Set<Tag> includedTags = const {}, this.includedTagsMode = TagMode.and,  Set<Tag> excludedTags = const {}, this.excludedTagsMode = TagMode.or,  Set<CreatorType> author = const {},  Set<CreatorType> artist = const {},  Set<MangaStatus> status = const {},  Set<MangaDemographic> publicationDemographic = const {},  Set<ContentRating> contentRating = const {}, this.order = MangaFilterOrder.relevance_desc}): _includedTags = includedTags,_excludedTags = excludedTags,_author = author,_artist = artist,_status = status,_publicationDemographic = publicationDemographic,_contentRating = contentRating,super._();
   
 
  final  Set<Tag> _includedTags;
@@ -157,23 +164,25 @@ _$MangaFiltersCopyWith<_MangaFilters> get copyWith => __$MangaFiltersCopyWithImp
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaFilters'))
     ..add(DiagnosticsProperty('includedTags', includedTags))..add(DiagnosticsProperty('includedTagsMode', includedTagsMode))..add(DiagnosticsProperty('excludedTags', excludedTags))..add(DiagnosticsProperty('excludedTagsMode', excludedTagsMode))..add(DiagnosticsProperty('author', author))..add(DiagnosticsProperty('artist', artist))..add(DiagnosticsProperty('status', status))..add(DiagnosticsProperty('publicationDemographic', publicationDemographic))..add(DiagnosticsProperty('contentRating', contentRating))..add(DiagnosticsProperty('order', order));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaFilters&&const DeepCollectionEquality().equals(other._includedTags, _includedTags)&&(identical(other.includedTagsMode, includedTagsMode) || other.includedTagsMode == includedTagsMode)&&const DeepCollectionEquality().equals(other._excludedTags, _excludedTags)&&(identical(other.excludedTagsMode, excludedTagsMode) || other.excludedTagsMode == excludedTagsMode)&&const DeepCollectionEquality().equals(other._author, _author)&&const DeepCollectionEquality().equals(other._artist, _artist)&&const DeepCollectionEquality().equals(other._status, _status)&&const DeepCollectionEquality().equals(other._publicationDemographic, _publicationDemographic)&&const DeepCollectionEquality().equals(other._contentRating, _contentRating)&&(identical(other.order, order) || other.order == order));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaFilters&&const DeepCollectionEquality().equals(other.includedTags, _includedTags)&&(identical(other.includedTagsMode, includedTagsMode) || other.includedTagsMode == includedTagsMode)&&const DeepCollectionEquality().equals(other.excludedTags, _excludedTags)&&(identical(other.excludedTagsMode, excludedTagsMode) || other.excludedTagsMode == excludedTagsMode)&&const DeepCollectionEquality().equals(other.author, _author)&&const DeepCollectionEquality().equals(other.artist, _artist)&&const DeepCollectionEquality().equals(other.status, _status)&&const DeepCollectionEquality().equals(other.publicationDemographic, _publicationDemographic)&&const DeepCollectionEquality().equals(other.contentRating, _contentRating)&&(identical(other.order, order) || other.order == order));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_includedTags),includedTagsMode,const DeepCollectionEquality().hash(_excludedTags),excludedTagsMode,const DeepCollectionEquality().hash(_author),const DeepCollectionEquality().hash(_artist),const DeepCollectionEquality().hash(_status),const DeepCollectionEquality().hash(_publicationDemographic),const DeepCollectionEquality().hash(_contentRating),order);
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_includedTags),includedTagsMode,const DeepCollectionEquality().hash(_excludedTags),excludedTagsMode,const DeepCollectionEquality().hash(_author),const DeepCollectionEquality().hash(_artist),const DeepCollectionEquality().hash(_status),const DeepCollectionEquality().hash(_publicationDemographic),const DeepCollectionEquality().hash(_contentRating),order);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaFilters(includedTags: $includedTags, includedTagsMode: $includedTagsMode, excludedTags: $excludedTags, excludedTagsMode: $excludedTagsMode, author: $author, artist: $artist, status: $status, publicationDemographic: $publicationDemographic, contentRating: $contentRating, order: $order)';
+    return 'MangaFilters(includedTags: $includedTags, includedTagsMode: $includedTagsMode, excludedTags: $excludedTags, excludedTagsMode: $excludedTagsMode, author: $author, artist: $artist, status: $status, publicationDemographic: $publicationDemographic, contentRating: $contentRating, order: $order)';
 }
 
 
@@ -233,23 +242,29 @@ $MangaSearchParametersCopyWith<MangaSearchParameters> get copyWith => _$MangaSea
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as MangaSearchParameters;
   properties
     ..add(DiagnosticsProperty('type', 'MangaSearchParameters'))
-    ..add(DiagnosticsProperty('query', query))..add(DiagnosticsProperty('filter', filter));
+    ..add(DiagnosticsProperty('query', _this.query))..add(DiagnosticsProperty('filter', _this.filter));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaSearchParameters&&(identical(other.query, query) || other.query == query)&&(identical(other.filter, filter) || other.filter == filter));
+  final _this = this as MangaSearchParameters;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaSearchParameters&&(identical(other.query, _this.query) || other.query == _this.query)&&(identical(other.filter, _this.filter) || other.filter == _this.filter));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,query,filter);
+int get hashCode {
+  final _this = this as MangaSearchParameters;
+  return Object.hash(runtimeType,_this.query,_this.filter);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaSearchParameters(query: $query, filter: $filter)';
+  final _this = this as MangaSearchParameters;
+  return 'MangaSearchParameters(query: ${_this.query}, filter: ${_this.filter})';
 }
 
 
@@ -278,7 +293,7 @@ class _$MangaSearchParametersCopyWithImpl<$Res>
 /// Create a copy of MangaSearchParameters
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? query = null,Object? filter = null,}) {
-  return _then(_self.copyWith(
+  return _then(MangaSearchParameters(
 query: null == query ? _self.query : query // ignore: cast_nullable_to_non_nullable
 as String,filter: null == filter ? _self.filter : filter // ignore: cast_nullable_to_non_nullable
 as MangaFilters,
@@ -317,23 +332,25 @@ _$MangaSearchParametersCopyWith<_MangaSearchParameters> get copyWith => __$Manga
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaSearchParameters'))
     ..add(DiagnosticsProperty('query', query))..add(DiagnosticsProperty('filter', filter));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaSearchParameters&&(identical(other.query, query) || other.query == query)&&(identical(other.filter, filter) || other.filter == filter));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaSearchParameters&&(identical(other.query, query) || other.query == query)&&(identical(other.filter, filter) || other.filter == filter));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,query,filter);
+int get hashCode {
+    return Object.hash(runtimeType,query,filter);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaSearchParameters(query: $query, filter: $filter)';
+    return 'MangaSearchParameters(query: $query, filter: $filter)';
 }
 
 
@@ -456,23 +473,29 @@ $MangaDexEntityCopyWith<MangaDexEntity> get copyWith => _$MangaDexEntityCopyWith
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as MangaDexEntity;
   properties
     ..add(DiagnosticsProperty('type', 'MangaDexEntity'))
-    ..add(DiagnosticsProperty('id', id));
+    ..add(DiagnosticsProperty('id', _this.id));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaDexEntity&&(identical(other.id, id) || other.id == id));
+  final _this = this as MangaDexEntity;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaDexEntity&&(identical(other.id, _this.id) || other.id == _this.id));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id);
+int get hashCode {
+  final _this = this as MangaDexEntity;
+  return Object.hash(runtimeType,_this.id);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexEntity(id: $id)';
+  final _this = this as MangaDexEntity;
+  return 'MangaDexEntity(id: ${_this.id})';
 }
 
 
@@ -515,7 +538,7 @@ as String,
 @JsonSerializable()
 
 class Chapter extends MangaDexEntity with DiagnosticableTreeMixin, ChapterOps {
-   Chapter({required this.id, required this.attributes, required final  List<MangaDexEntity> relationships, final  String? $type}): _relationships = relationships,$type = $type ?? 'chapter',super._();
+   Chapter({required this.id, required this.attributes, required  List<MangaDexEntity> relationships,  String? $type}): _relationships = relationships,$type = $type ?? 'chapter',super._();
   factory Chapter.fromJson(Map<String, dynamic> json) => _$ChapterFromJson(json);
 
 @override final  String id;
@@ -544,23 +567,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaDexEntity.chapter'))
     ..add(DiagnosticsProperty('id', id))..add(DiagnosticsProperty('attributes', attributes))..add(DiagnosticsProperty('relationships', relationships));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Chapter&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes)&&const DeepCollectionEquality().equals(other._relationships, _relationships));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is Chapter&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes)&&const DeepCollectionEquality().equals(other.relationships, _relationships));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,attributes,const DeepCollectionEquality().hash(_relationships));
+int get hashCode {
+    return Object.hash(runtimeType,id,attributes,const DeepCollectionEquality().hash(_relationships));
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexEntity.chapter(id: $id, attributes: $attributes, relationships: $relationships)';
+    return 'MangaDexEntity.chapter(id: $id, attributes: $attributes, relationships: $relationships)';
 }
 
 
@@ -613,7 +638,7 @@ $ChapterAttributesCopyWith<$Res> get attributes {
 @JsonSerializable()
 
 class Manga extends MangaDexEntity with DiagnosticableTreeMixin, MangaOps {
-   Manga({required this.id, this.attributes, final  List<MangaDexEntity>? relationships, this.related, final  String? $type}): _relationships = relationships,$type = $type ?? 'manga',super._();
+   Manga({required this.id, this.attributes,  List<MangaDexEntity>? relationships, this.related,  String? $type}): _relationships = relationships,$type = $type ?? 'manga',super._();
   factory Manga.fromJson(Map<String, dynamic> json) => _$MangaFromJson(json);
 
 @override final  String id;
@@ -645,23 +670,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaDexEntity.manga'))
     ..add(DiagnosticsProperty('id', id))..add(DiagnosticsProperty('attributes', attributes))..add(DiagnosticsProperty('relationships', relationships))..add(DiagnosticsProperty('related', related));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Manga&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes)&&const DeepCollectionEquality().equals(other._relationships, _relationships)&&(identical(other.related, related) || other.related == related));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is Manga&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes)&&const DeepCollectionEquality().equals(other.relationships, _relationships)&&(identical(other.related, related) || other.related == related));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,attributes,const DeepCollectionEquality().hash(_relationships),related);
+int get hashCode {
+    return Object.hash(runtimeType,id,attributes,const DeepCollectionEquality().hash(_relationships),related);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexEntity.manga(id: $id, attributes: $attributes, relationships: $relationships, related: $related)';
+    return 'MangaDexEntity.manga(id: $id, attributes: $attributes, relationships: $relationships, related: $related)';
 }
 
 
@@ -718,7 +745,7 @@ $MangaAttributesCopyWith<$Res>? get attributes {
 @JsonSerializable()
 
 class User extends MangaDexEntity with DiagnosticableTreeMixin, UserOps {
-  const User({required this.id, this.attributes, final  String? $type}): $type = $type ?? 'user',super._();
+  const User({required this.id, this.attributes,  String? $type}): $type = $type ?? 'user',super._();
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
 @override final  String id;
@@ -740,23 +767,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaDexEntity.user'))
     ..add(DiagnosticsProperty('id', id))..add(DiagnosticsProperty('attributes', attributes));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,attributes);
+int get hashCode {
+    return Object.hash(runtimeType,id,attributes);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexEntity.user(id: $id, attributes: $attributes)';
+    return 'MangaDexEntity.user(id: $id, attributes: $attributes)';
 }
 
 
@@ -811,7 +840,7 @@ $UserAttributesCopyWith<$Res>? get attributes {
 @JsonSerializable()
 
 class Artist extends MangaDexEntity with DiagnosticableTreeMixin implements CreatorType {
-  const Artist({required this.id, required this.attributes, final  String? $type}): $type = $type ?? 'artist',super._();
+  const Artist({required this.id, required this.attributes,  String? $type}): $type = $type ?? 'artist',super._();
   factory Artist.fromJson(Map<String, dynamic> json) => _$ArtistFromJson(json);
 
 @override final  String id;
@@ -833,23 +862,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaDexEntity.artist'))
     ..add(DiagnosticsProperty('id', id))..add(DiagnosticsProperty('attributes', attributes));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Artist&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is Artist&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,attributes);
+int get hashCode {
+    return Object.hash(runtimeType,id,attributes);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexEntity.artist(id: $id, attributes: $attributes)';
+    return 'MangaDexEntity.artist(id: $id, attributes: $attributes)';
 }
 
 
@@ -901,7 +932,7 @@ $AuthorAttributesCopyWith<$Res> get attributes {
 @JsonSerializable()
 
 class Author extends MangaDexEntity with DiagnosticableTreeMixin implements CreatorType {
-  const Author({required this.id, required this.attributes, final  String? $type}): $type = $type ?? 'author',super._();
+  const Author({required this.id, required this.attributes,  String? $type}): $type = $type ?? 'author',super._();
   factory Author.fromJson(Map<String, dynamic> json) => _$AuthorFromJson(json);
 
 @override final  String id;
@@ -923,23 +954,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaDexEntity.author'))
     ..add(DiagnosticsProperty('id', id))..add(DiagnosticsProperty('attributes', attributes));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Author&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is Author&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,attributes);
+int get hashCode {
+    return Object.hash(runtimeType,id,attributes);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexEntity.author(id: $id, attributes: $attributes)';
+    return 'MangaDexEntity.author(id: $id, attributes: $attributes)';
 }
 
 
@@ -991,7 +1024,7 @@ $AuthorAttributesCopyWith<$Res> get attributes {
 @JsonSerializable()
 
 class CreatorID extends MangaDexEntity with DiagnosticableTreeMixin {
-  const CreatorID({required this.id, final  String? $type}): $type = $type ?? 'creator',super._();
+  const CreatorID({required this.id,  String? $type}): $type = $type ?? 'creator',super._();
   factory CreatorID.fromJson(Map<String, dynamic> json) => _$CreatorIDFromJson(json);
 
 @override final  String id;
@@ -1012,23 +1045,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaDexEntity.creator'))
     ..add(DiagnosticsProperty('id', id));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreatorID&&(identical(other.id, id) || other.id == id));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is CreatorID&&(identical(other.id, id) || other.id == id));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id);
+int get hashCode {
+    return Object.hash(runtimeType,id);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexEntity.creator(id: $id)';
+    return 'MangaDexEntity.creator(id: $id)';
 }
 
 
@@ -1070,7 +1105,7 @@ as String,
 @JsonSerializable()
 
 class CoverArt extends MangaDexEntity with DiagnosticableTreeMixin {
-  const CoverArt({required this.id, this.attributes, final  String? $type}): $type = $type ?? 'cover_art',super._();
+  const CoverArt({required this.id, this.attributes,  String? $type}): $type = $type ?? 'cover_art',super._();
   factory CoverArt.fromJson(Map<String, dynamic> json) => _$CoverArtFromJson(json);
 
 @override final  String id;
@@ -1092,23 +1127,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaDexEntity.cover'))
     ..add(DiagnosticsProperty('id', id))..add(DiagnosticsProperty('attributes', attributes));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CoverArt&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is CoverArt&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,attributes);
+int get hashCode {
+    return Object.hash(runtimeType,id,attributes);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexEntity.cover(id: $id, attributes: $attributes)';
+    return 'MangaDexEntity.cover(id: $id, attributes: $attributes)';
 }
 
 
@@ -1163,7 +1200,7 @@ $CoverArtAttributesCopyWith<$Res>? get attributes {
 @JsonSerializable()
 
 class Group extends MangaDexEntity with DiagnosticableTreeMixin {
-  const Group({required this.id, required this.attributes, final  String? $type}): $type = $type ?? 'scanlation_group',super._();
+  const Group({required this.id, required this.attributes,  String? $type}): $type = $type ?? 'scanlation_group',super._();
   factory Group.fromJson(Map<String, dynamic> json) => _$GroupFromJson(json);
 
 @override final  String id;
@@ -1185,23 +1222,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaDexEntity.group'))
     ..add(DiagnosticsProperty('id', id))..add(DiagnosticsProperty('attributes', attributes));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Group&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is Group&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,attributes);
+int get hashCode {
+    return Object.hash(runtimeType,id,attributes);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexEntity.group(id: $id, attributes: $attributes)';
+    return 'MangaDexEntity.group(id: $id, attributes: $attributes)';
 }
 
 
@@ -1253,7 +1292,7 @@ $ScanlationGroupAttributesCopyWith<$Res> get attributes {
 @JsonSerializable()
 
 class CustomList extends MangaDexEntity with DiagnosticableTreeMixin, CustomListOps {
-   CustomList({required this.id, required this.attributes, required final  List<MangaDexEntity> relationships, final  String? $type}): _relationships = relationships,$type = $type ?? 'custom_list',super._();
+   CustomList({required this.id, required this.attributes, required  List<MangaDexEntity> relationships,  String? $type}): _relationships = relationships,$type = $type ?? 'custom_list',super._();
   factory CustomList.fromJson(Map<String, dynamic> json) => _$CustomListFromJson(json);
 
 @override final  String id;
@@ -1282,23 +1321,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaDexEntity.customList'))
     ..add(DiagnosticsProperty('id', id))..add(DiagnosticsProperty('attributes', attributes))..add(DiagnosticsProperty('relationships', relationships));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomList&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes)&&const DeepCollectionEquality().equals(other._relationships, _relationships));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomList&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes)&&const DeepCollectionEquality().equals(other.relationships, _relationships));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,attributes,const DeepCollectionEquality().hash(_relationships));
+int get hashCode {
+    return Object.hash(runtimeType,id,attributes,const DeepCollectionEquality().hash(_relationships));
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexEntity.customList(id: $id, attributes: $attributes, relationships: $relationships)';
+    return 'MangaDexEntity.customList(id: $id, attributes: $attributes, relationships: $relationships)';
 }
 
 
@@ -1351,7 +1392,7 @@ $CustomListAttributesCopyWith<$Res> get attributes {
 @JsonSerializable()
 
 class MDError extends MangaDexEntity with DiagnosticableTreeMixin {
-  const MDError({required this.id, required this.status, required this.title, this.detail, this.context, final  String? $type}): $type = $type ?? 'error',super._();
+  const MDError({required this.id, required this.status, required this.title, this.detail, this.context,  String? $type}): $type = $type ?? 'error',super._();
   factory MDError.fromJson(Map<String, dynamic> json) => _$MDErrorFromJson(json);
 
 @override final  String id;
@@ -1376,23 +1417,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaDexEntity.error'))
     ..add(DiagnosticsProperty('id', id))..add(DiagnosticsProperty('status', status))..add(DiagnosticsProperty('title', title))..add(DiagnosticsProperty('detail', detail))..add(DiagnosticsProperty('context', context));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MDError&&(identical(other.id, id) || other.id == id)&&(identical(other.status, status) || other.status == status)&&(identical(other.title, title) || other.title == title)&&(identical(other.detail, detail) || other.detail == detail)&&(identical(other.context, context) || other.context == context));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is MDError&&(identical(other.id, id) || other.id == id)&&(identical(other.status, status) || other.status == status)&&(identical(other.title, title) || other.title == title)&&(identical(other.detail, detail) || other.detail == detail)&&(identical(other.context, context) || other.context == context));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,status,title,detail,context);
+int get hashCode {
+    return Object.hash(runtimeType,id,status,title,detail,context);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexEntity.error(id: $id, status: $status, title: $title, detail: $detail, context: $context)';
+    return 'MangaDexEntity.error(id: $id, status: $status, title: $title, detail: $detail, context: $context)';
 }
 
 
@@ -1438,7 +1481,7 @@ as String?,
 @JsonSerializable()
 
 class Tag extends MangaDexEntity with DiagnosticableTreeMixin {
-  const Tag({required this.id, required this.attributes, final  String? $type}): $type = $type ?? 'tag',super._();
+  const Tag({required this.id, required this.attributes,  String? $type}): $type = $type ?? 'tag',super._();
   factory Tag.fromJson(Map<String, dynamic> json) => _$TagFromJson(json);
 
 @override final  String id;
@@ -1460,23 +1503,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaDexEntity.tag'))
     ..add(DiagnosticsProperty('id', id))..add(DiagnosticsProperty('attributes', attributes));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Tag&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is Tag&&(identical(other.id, id) || other.id == id)&&(identical(other.attributes, attributes) || other.attributes == attributes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,attributes);
+int get hashCode {
+    return Object.hash(runtimeType,id,attributes);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexEntity.tag(id: $id, attributes: $attributes)';
+    return 'MangaDexEntity.tag(id: $id, attributes: $attributes)';
 }
 
 
@@ -1540,23 +1585,29 @@ $ChapterAPIDataCopyWith<ChapterAPIData> get copyWith => _$ChapterAPIDataCopyWith
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as ChapterAPIData;
   properties
     ..add(DiagnosticsProperty('type', 'ChapterAPIData'))
-    ..add(DiagnosticsProperty('hash', hash))..add(DiagnosticsProperty('data', data))..add(DiagnosticsProperty('dataSaver', dataSaver));
+    ..add(DiagnosticsProperty('hash', _this.hash))..add(DiagnosticsProperty('data', _this.data))..add(DiagnosticsProperty('dataSaver', _this.dataSaver));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterAPIData&&(identical(other.hash, hash) || other.hash == hash)&&const DeepCollectionEquality().equals(other.data, data)&&const DeepCollectionEquality().equals(other.dataSaver, dataSaver));
+  final _this = this as ChapterAPIData;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterAPIData&&(identical(other.hash, _this.hash) || other.hash == _this.hash)&&const DeepCollectionEquality().equals(other.data, _this.data)&&const DeepCollectionEquality().equals(other.dataSaver, _this.dataSaver));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,hash,const DeepCollectionEquality().hash(data),const DeepCollectionEquality().hash(dataSaver));
+int get hashCode {
+  final _this = this as ChapterAPIData;
+  return Object.hash(runtimeType,_this.hash,const DeepCollectionEquality().hash(_this.data),const DeepCollectionEquality().hash(_this.dataSaver));
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ChapterAPIData(hash: $hash, data: $data, dataSaver: $dataSaver)';
+  final _this = this as ChapterAPIData;
+  return 'ChapterAPIData(hash: ${_this.hash}, data: ${_this.data}, dataSaver: ${_this.dataSaver})';
 }
 
 
@@ -1585,7 +1636,7 @@ class _$ChapterAPIDataCopyWithImpl<$Res>
 /// Create a copy of ChapterAPIData
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? hash = null,Object? data = null,Object? dataSaver = null,}) {
-  return _then(_self.copyWith(
+  return _then(ChapterAPIData(
 hash: null == hash ? _self.hash : hash // ignore: cast_nullable_to_non_nullable
 as String,data: null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as List<String>,dataSaver: null == dataSaver ? _self.dataSaver : dataSaver // ignore: cast_nullable_to_non_nullable
@@ -1601,7 +1652,7 @@ as List<String>,
 @JsonSerializable()
 
 class _ChapterAPIData with DiagnosticableTreeMixin implements ChapterAPIData {
-  const _ChapterAPIData({required this.hash, required final  List<String> data, required final  List<String> dataSaver}): _data = data,_dataSaver = dataSaver;
+  const _ChapterAPIData({required this.hash, required  List<String> data, required  List<String> dataSaver}): _data = data,_dataSaver = dataSaver;
   factory _ChapterAPIData.fromJson(Map<String, dynamic> json) => _$ChapterAPIDataFromJson(json);
 
 @override final  String hash;
@@ -1632,23 +1683,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'ChapterAPIData'))
     ..add(DiagnosticsProperty('hash', hash))..add(DiagnosticsProperty('data', data))..add(DiagnosticsProperty('dataSaver', dataSaver));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterAPIData&&(identical(other.hash, hash) || other.hash == hash)&&const DeepCollectionEquality().equals(other._data, _data)&&const DeepCollectionEquality().equals(other._dataSaver, _dataSaver));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterAPIData&&(identical(other.hash, hash) || other.hash == hash)&&const DeepCollectionEquality().equals(other.data, _data)&&const DeepCollectionEquality().equals(other.dataSaver, _dataSaver));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,hash,const DeepCollectionEquality().hash(_data),const DeepCollectionEquality().hash(_dataSaver));
+int get hashCode {
+    return Object.hash(runtimeType,hash,const DeepCollectionEquality().hash(_data),const DeepCollectionEquality().hash(_dataSaver));
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ChapterAPIData(hash: $hash, data: $data, dataSaver: $dataSaver)';
+    return 'ChapterAPIData(hash: $hash, data: $data, dataSaver: $dataSaver)';
 }
 
 
@@ -1704,23 +1757,29 @@ $ChapterAPICopyWith<ChapterAPI> get copyWith => _$ChapterAPICopyWithImpl<Chapter
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as ChapterAPI;
   properties
     ..add(DiagnosticsProperty('type', 'ChapterAPI'))
-    ..add(DiagnosticsProperty('baseUrl', baseUrl))..add(DiagnosticsProperty('chapter', chapter));
+    ..add(DiagnosticsProperty('baseUrl', _this.baseUrl))..add(DiagnosticsProperty('chapter', _this.chapter));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterAPI&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.chapter, chapter) || other.chapter == chapter));
+  final _this = this as ChapterAPI;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterAPI&&(identical(other.baseUrl, _this.baseUrl) || other.baseUrl == _this.baseUrl)&&(identical(other.chapter, _this.chapter) || other.chapter == _this.chapter));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,baseUrl,chapter);
+int get hashCode {
+  final _this = this as ChapterAPI;
+  return Object.hash(runtimeType,_this.baseUrl,_this.chapter);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ChapterAPI(baseUrl: $baseUrl, chapter: $chapter)';
+  final _this = this as ChapterAPI;
+  return 'ChapterAPI(baseUrl: ${_this.baseUrl}, chapter: ${_this.chapter})';
 }
 
 
@@ -1749,7 +1808,7 @@ class _$ChapterAPICopyWithImpl<$Res>
 /// Create a copy of ChapterAPI
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? baseUrl = null,Object? chapter = null,}) {
-  return _then(_self.copyWith(
+  return _then(ChapterAPI(
 baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,chapter: null == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
 as ChapterAPIData,
@@ -1791,23 +1850,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'ChapterAPI'))
     ..add(DiagnosticsProperty('baseUrl', baseUrl))..add(DiagnosticsProperty('chapter', chapter));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterAPI&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.chapter, chapter) || other.chapter == chapter));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterAPI&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.chapter, chapter) || other.chapter == chapter));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,baseUrl,chapter);
+int get hashCode {
+    return Object.hash(runtimeType,baseUrl,chapter);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ChapterAPI(baseUrl: $baseUrl, chapter: $chapter)';
+    return 'ChapterAPI(baseUrl: $baseUrl, chapter: $chapter)';
 }
 
 
@@ -1871,23 +1932,29 @@ $MDEntityListCopyWith<MDEntityList> get copyWith => _$MDEntityListCopyWithImpl<M
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as MDEntityList;
   properties
     ..add(DiagnosticsProperty('type', 'MDEntityList'))
-    ..add(DiagnosticsProperty('result', result))..add(DiagnosticsProperty('response', response))..add(DiagnosticsProperty('data', data))..add(DiagnosticsProperty('limit', limit))..add(DiagnosticsProperty('offset', offset))..add(DiagnosticsProperty('total', total));
+    ..add(DiagnosticsProperty('result', _this.result))..add(DiagnosticsProperty('response', _this.response))..add(DiagnosticsProperty('data', _this.data))..add(DiagnosticsProperty('limit', _this.limit))..add(DiagnosticsProperty('offset', _this.offset))..add(DiagnosticsProperty('total', _this.total));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MDEntityList&&(identical(other.result, result) || other.result == result)&&(identical(other.response, response) || other.response == response)&&const DeepCollectionEquality().equals(other.data, data)&&(identical(other.limit, limit) || other.limit == limit)&&(identical(other.offset, offset) || other.offset == offset)&&(identical(other.total, total) || other.total == total));
+  final _this = this as MDEntityList;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MDEntityList&&(identical(other.result, _this.result) || other.result == _this.result)&&(identical(other.response, _this.response) || other.response == _this.response)&&const DeepCollectionEquality().equals(other.data, _this.data)&&(identical(other.limit, _this.limit) || other.limit == _this.limit)&&(identical(other.offset, _this.offset) || other.offset == _this.offset)&&(identical(other.total, _this.total) || other.total == _this.total));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,result,response,const DeepCollectionEquality().hash(data),limit,offset,total);
+int get hashCode {
+  final _this = this as MDEntityList;
+  return Object.hash(runtimeType,_this.result,_this.response,const DeepCollectionEquality().hash(_this.data),_this.limit,_this.offset,_this.total);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MDEntityList(result: $result, response: $response, data: $data, limit: $limit, offset: $offset, total: $total)';
+  final _this = this as MDEntityList;
+  return 'MDEntityList(result: ${_this.result}, response: ${_this.response}, data: ${_this.data}, limit: ${_this.limit}, offset: ${_this.offset}, total: ${_this.total})';
 }
 
 
@@ -1916,7 +1983,7 @@ class _$MDEntityListCopyWithImpl<$Res>
 /// Create a copy of MDEntityList
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? result = null,Object? response = null,Object? data = null,Object? limit = null,Object? offset = null,Object? total = null,}) {
-  return _then(_self.copyWith(
+  return _then(MDEntityList(
 result: null == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
 as String,response: null == response ? _self.response : response // ignore: cast_nullable_to_non_nullable
 as String,data: null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
@@ -1935,7 +2002,7 @@ as int,
 @JsonSerializable()
 
 class _MDEntityList with DiagnosticableTreeMixin implements MDEntityList {
-  const _MDEntityList({required this.result, required this.response, required final  List<MangaDexEntity> data, required this.limit, required this.offset, required this.total}): _data = data;
+  const _MDEntityList({required this.result, required this.response, required  List<MangaDexEntity> data, required this.limit, required this.offset, required this.total}): _data = data;
   factory _MDEntityList.fromJson(Map<String, dynamic> json) => _$MDEntityListFromJson(json);
 
 @override final  String result;
@@ -1963,23 +2030,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MDEntityList'))
     ..add(DiagnosticsProperty('result', result))..add(DiagnosticsProperty('response', response))..add(DiagnosticsProperty('data', data))..add(DiagnosticsProperty('limit', limit))..add(DiagnosticsProperty('offset', offset))..add(DiagnosticsProperty('total', total));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MDEntityList&&(identical(other.result, result) || other.result == result)&&(identical(other.response, response) || other.response == response)&&const DeepCollectionEquality().equals(other._data, _data)&&(identical(other.limit, limit) || other.limit == limit)&&(identical(other.offset, offset) || other.offset == offset)&&(identical(other.total, total) || other.total == total));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MDEntityList&&(identical(other.result, result) || other.result == result)&&(identical(other.response, response) || other.response == response)&&const DeepCollectionEquality().equals(other.data, _data)&&(identical(other.limit, limit) || other.limit == limit)&&(identical(other.offset, offset) || other.offset == offset)&&(identical(other.total, total) || other.total == total));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,result,response,const DeepCollectionEquality().hash(_data),limit,offset,total);
+int get hashCode {
+    return Object.hash(runtimeType,result,response,const DeepCollectionEquality().hash(_data),limit,offset,total);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MDEntityList(result: $result, response: $response, data: $data, limit: $limit, offset: $offset, total: $total)';
+    return 'MDEntityList(result: $result, response: $response, data: $data, limit: $limit, offset: $offset, total: $total)';
 }
 
 
@@ -2038,23 +2107,29 @@ $MangaLinksCopyWith<MangaLinks> get copyWith => _$MangaLinksCopyWithImpl<MangaLi
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as MangaLinks;
   properties
     ..add(DiagnosticsProperty('type', 'MangaLinks'))
-    ..add(DiagnosticsProperty('raw', raw))..add(DiagnosticsProperty('al', al))..add(DiagnosticsProperty('mu', mu))..add(DiagnosticsProperty('mal', mal));
+    ..add(DiagnosticsProperty('raw', _this.raw))..add(DiagnosticsProperty('al', _this.al))..add(DiagnosticsProperty('mu', _this.mu))..add(DiagnosticsProperty('mal', _this.mal));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaLinks&&(identical(other.raw, raw) || other.raw == raw)&&(identical(other.al, al) || other.al == al)&&(identical(other.mu, mu) || other.mu == mu)&&(identical(other.mal, mal) || other.mal == mal));
+  final _this = this as MangaLinks;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaLinks&&(identical(other.raw, _this.raw) || other.raw == _this.raw)&&(identical(other.al, _this.al) || other.al == _this.al)&&(identical(other.mu, _this.mu) || other.mu == _this.mu)&&(identical(other.mal, _this.mal) || other.mal == _this.mal));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,raw,al,mu,mal);
+int get hashCode {
+  final _this = this as MangaLinks;
+  return Object.hash(runtimeType,_this.raw,_this.al,_this.mu,_this.mal);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaLinks(raw: $raw, al: $al, mu: $mu, mal: $mal)';
+  final _this = this as MangaLinks;
+  return 'MangaLinks(raw: ${_this.raw}, al: ${_this.al}, mu: ${_this.mu}, mal: ${_this.mal})';
 }
 
 
@@ -2083,7 +2158,7 @@ class _$MangaLinksCopyWithImpl<$Res>
 /// Create a copy of MangaLinks
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? raw = freezed,Object? al = freezed,Object? mu = freezed,Object? mal = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(MangaLinks(
 raw: freezed == raw ? _self.raw : raw // ignore: cast_nullable_to_non_nullable
 as String?,al: freezed == al ? _self.al : al // ignore: cast_nullable_to_non_nullable
 as String?,mu: freezed == mu ? _self.mu : mu // ignore: cast_nullable_to_non_nullable
@@ -2120,23 +2195,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaLinks'))
     ..add(DiagnosticsProperty('raw', raw))..add(DiagnosticsProperty('al', al))..add(DiagnosticsProperty('mu', mu))..add(DiagnosticsProperty('mal', mal));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaLinks&&(identical(other.raw, raw) || other.raw == raw)&&(identical(other.al, al) || other.al == al)&&(identical(other.mu, mu) || other.mu == mu)&&(identical(other.mal, mal) || other.mal == mal));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaLinks&&(identical(other.raw, raw) || other.raw == raw)&&(identical(other.al, al) || other.al == al)&&(identical(other.mu, mu) || other.mu == mu)&&(identical(other.mal, mal) || other.mal == mal));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,raw,al,mu,mal);
+int get hashCode {
+    return Object.hash(runtimeType,raw,al,mu,mal);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaLinks(raw: $raw, al: $al, mu: $mu, mal: $mal)';
+    return 'MangaLinks(raw: $raw, al: $al, mu: $mu, mal: $mal)';
 }
 
 
@@ -2193,23 +2270,29 @@ $MangaAttributesCopyWith<MangaAttributes> get copyWith => _$MangaAttributesCopyW
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as MangaAttributes;
   properties
     ..add(DiagnosticsProperty('type', 'MangaAttributes'))
-    ..add(DiagnosticsProperty('title', title))..add(DiagnosticsProperty('altTitles', altTitles))..add(DiagnosticsProperty('description', description))..add(DiagnosticsProperty('links', links))..add(DiagnosticsProperty('originalLanguage', originalLanguage))..add(DiagnosticsProperty('lastVolume', lastVolume))..add(DiagnosticsProperty('lastChapter', lastChapter))..add(DiagnosticsProperty('publicationDemographic', publicationDemographic))..add(DiagnosticsProperty('status', status))..add(DiagnosticsProperty('year', year))..add(DiagnosticsProperty('contentRating', contentRating))..add(DiagnosticsProperty('tags', tags))..add(DiagnosticsProperty('version', version))..add(DiagnosticsProperty('createdAt', createdAt))..add(DiagnosticsProperty('updatedAt', updatedAt));
+    ..add(DiagnosticsProperty('title', _this.title))..add(DiagnosticsProperty('altTitles', _this.altTitles))..add(DiagnosticsProperty('description', _this.description))..add(DiagnosticsProperty('links', _this.links))..add(DiagnosticsProperty('originalLanguage', _this.originalLanguage))..add(DiagnosticsProperty('lastVolume', _this.lastVolume))..add(DiagnosticsProperty('lastChapter', _this.lastChapter))..add(DiagnosticsProperty('publicationDemographic', _this.publicationDemographic))..add(DiagnosticsProperty('status', _this.status))..add(DiagnosticsProperty('year', _this.year))..add(DiagnosticsProperty('contentRating', _this.contentRating))..add(DiagnosticsProperty('tags', _this.tags))..add(DiagnosticsProperty('version', _this.version))..add(DiagnosticsProperty('createdAt', _this.createdAt))..add(DiagnosticsProperty('updatedAt', _this.updatedAt));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaAttributes&&const DeepCollectionEquality().equals(other.title, title)&&const DeepCollectionEquality().equals(other.altTitles, altTitles)&&const DeepCollectionEquality().equals(other.description, description)&&(identical(other.links, links) || other.links == links)&&(identical(other.originalLanguage, originalLanguage) || other.originalLanguage == originalLanguage)&&(identical(other.lastVolume, lastVolume) || other.lastVolume == lastVolume)&&(identical(other.lastChapter, lastChapter) || other.lastChapter == lastChapter)&&(identical(other.publicationDemographic, publicationDemographic) || other.publicationDemographic == publicationDemographic)&&(identical(other.status, status) || other.status == status)&&(identical(other.year, year) || other.year == year)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&const DeepCollectionEquality().equals(other.tags, tags)&&(identical(other.version, version) || other.version == version)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  final _this = this as MangaAttributes;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaAttributes&&const DeepCollectionEquality().equals(other.title, _this.title)&&const DeepCollectionEquality().equals(other.altTitles, _this.altTitles)&&const DeepCollectionEquality().equals(other.description, _this.description)&&(identical(other.links, _this.links) || other.links == _this.links)&&(identical(other.originalLanguage, _this.originalLanguage) || other.originalLanguage == _this.originalLanguage)&&(identical(other.lastVolume, _this.lastVolume) || other.lastVolume == _this.lastVolume)&&(identical(other.lastChapter, _this.lastChapter) || other.lastChapter == _this.lastChapter)&&(identical(other.publicationDemographic, _this.publicationDemographic) || other.publicationDemographic == _this.publicationDemographic)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.year, _this.year) || other.year == _this.year)&&(identical(other.contentRating, _this.contentRating) || other.contentRating == _this.contentRating)&&const DeepCollectionEquality().equals(other.tags, _this.tags)&&(identical(other.version, _this.version) || other.version == _this.version)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(title),const DeepCollectionEquality().hash(altTitles),const DeepCollectionEquality().hash(description),links,originalLanguage,lastVolume,lastChapter,publicationDemographic,status,year,contentRating,const DeepCollectionEquality().hash(tags),version,createdAt,updatedAt);
+int get hashCode {
+  final _this = this as MangaAttributes;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.title),const DeepCollectionEquality().hash(_this.altTitles),const DeepCollectionEquality().hash(_this.description),_this.links,_this.originalLanguage,_this.lastVolume,_this.lastChapter,_this.publicationDemographic,_this.status,_this.year,_this.contentRating,const DeepCollectionEquality().hash(_this.tags),_this.version,_this.createdAt,_this.updatedAt);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaAttributes(title: $title, altTitles: $altTitles, description: $description, links: $links, originalLanguage: $originalLanguage, lastVolume: $lastVolume, lastChapter: $lastChapter, publicationDemographic: $publicationDemographic, status: $status, year: $year, contentRating: $contentRating, tags: $tags, version: $version, createdAt: $createdAt, updatedAt: $updatedAt)';
+  final _this = this as MangaAttributes;
+  return 'MangaAttributes(title: ${_this.title}, altTitles: ${_this.altTitles}, description: ${_this.description}, links: ${_this.links}, originalLanguage: ${_this.originalLanguage}, lastVolume: ${_this.lastVolume}, lastChapter: ${_this.lastChapter}, publicationDemographic: ${_this.publicationDemographic}, status: ${_this.status}, year: ${_this.year}, contentRating: ${_this.contentRating}, tags: ${_this.tags}, version: ${_this.version}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt})';
 }
 
 
@@ -2238,7 +2321,7 @@ class _$MangaAttributesCopyWithImpl<$Res>
 /// Create a copy of MangaAttributes
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? altTitles = null,Object? description = null,Object? links = freezed,Object? originalLanguage = null,Object? lastVolume = freezed,Object? lastChapter = freezed,Object? publicationDemographic = freezed,Object? status = null,Object? year = freezed,Object? contentRating = null,Object? tags = null,Object? version = null,Object? createdAt = null,Object? updatedAt = null,}) {
-  return _then(_self.copyWith(
+  return _then(MangaAttributes(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as Map<String, String>,altTitles: null == altTitles ? _self.altTitles : altTitles // ignore: cast_nullable_to_non_nullable
 as List<Map<String, String>>,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -2278,7 +2361,7 @@ $MangaLinksCopyWith<$Res>? get links {
 @JsonSerializable()
 
 class _MangaAttributes with DiagnosticableTreeMixin implements MangaAttributes {
-  const _MangaAttributes({required final  Map<String, String> title, required final  List<Map<String, String>> altTitles, required final  Map<String, String> description, this.links, @LanguageConverter() required this.originalLanguage, this.lastVolume, this.lastChapter, this.publicationDemographic, required this.status, this.year, required this.contentRating, required final  List<Tag> tags, required this.version, @TimestampSerializer() required this.createdAt, @TimestampSerializer() required this.updatedAt}): _title = title,_altTitles = altTitles,_description = description,_tags = tags;
+  const _MangaAttributes({required  Map<String, String> title, required  List<Map<String, String>> altTitles, required  Map<String, String> description, this.links, @LanguageConverter() required this.originalLanguage, this.lastVolume, this.lastChapter, this.publicationDemographic, required this.status, this.year, required this.contentRating, required  List<Tag> tags, required this.version, @TimestampSerializer() required this.createdAt, @TimestampSerializer() required this.updatedAt}): _title = title,_altTitles = altTitles,_description = description,_tags = tags;
   factory _MangaAttributes.fromJson(Map<String, dynamic> json) => _$MangaAttributesFromJson(json);
 
  final  Map<String, String> _title;
@@ -2333,23 +2416,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaAttributes'))
     ..add(DiagnosticsProperty('title', title))..add(DiagnosticsProperty('altTitles', altTitles))..add(DiagnosticsProperty('description', description))..add(DiagnosticsProperty('links', links))..add(DiagnosticsProperty('originalLanguage', originalLanguage))..add(DiagnosticsProperty('lastVolume', lastVolume))..add(DiagnosticsProperty('lastChapter', lastChapter))..add(DiagnosticsProperty('publicationDemographic', publicationDemographic))..add(DiagnosticsProperty('status', status))..add(DiagnosticsProperty('year', year))..add(DiagnosticsProperty('contentRating', contentRating))..add(DiagnosticsProperty('tags', tags))..add(DiagnosticsProperty('version', version))..add(DiagnosticsProperty('createdAt', createdAt))..add(DiagnosticsProperty('updatedAt', updatedAt));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaAttributes&&const DeepCollectionEquality().equals(other._title, _title)&&const DeepCollectionEquality().equals(other._altTitles, _altTitles)&&const DeepCollectionEquality().equals(other._description, _description)&&(identical(other.links, links) || other.links == links)&&(identical(other.originalLanguage, originalLanguage) || other.originalLanguage == originalLanguage)&&(identical(other.lastVolume, lastVolume) || other.lastVolume == lastVolume)&&(identical(other.lastChapter, lastChapter) || other.lastChapter == lastChapter)&&(identical(other.publicationDemographic, publicationDemographic) || other.publicationDemographic == publicationDemographic)&&(identical(other.status, status) || other.status == status)&&(identical(other.year, year) || other.year == year)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&const DeepCollectionEquality().equals(other._tags, _tags)&&(identical(other.version, version) || other.version == version)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaAttributes&&const DeepCollectionEquality().equals(other.title, _title)&&const DeepCollectionEquality().equals(other.altTitles, _altTitles)&&const DeepCollectionEquality().equals(other.description, _description)&&(identical(other.links, links) || other.links == links)&&(identical(other.originalLanguage, originalLanguage) || other.originalLanguage == originalLanguage)&&(identical(other.lastVolume, lastVolume) || other.lastVolume == lastVolume)&&(identical(other.lastChapter, lastChapter) || other.lastChapter == lastChapter)&&(identical(other.publicationDemographic, publicationDemographic) || other.publicationDemographic == publicationDemographic)&&(identical(other.status, status) || other.status == status)&&(identical(other.year, year) || other.year == year)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&const DeepCollectionEquality().equals(other.tags, _tags)&&(identical(other.version, version) || other.version == version)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_title),const DeepCollectionEquality().hash(_altTitles),const DeepCollectionEquality().hash(_description),links,originalLanguage,lastVolume,lastChapter,publicationDemographic,status,year,contentRating,const DeepCollectionEquality().hash(_tags),version,createdAt,updatedAt);
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_title),const DeepCollectionEquality().hash(_altTitles),const DeepCollectionEquality().hash(_description),links,originalLanguage,lastVolume,lastChapter,publicationDemographic,status,year,contentRating,const DeepCollectionEquality().hash(_tags),version,createdAt,updatedAt);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaAttributes(title: $title, altTitles: $altTitles, description: $description, links: $links, originalLanguage: $originalLanguage, lastVolume: $lastVolume, lastChapter: $lastChapter, publicationDemographic: $publicationDemographic, status: $status, year: $year, contentRating: $contentRating, tags: $tags, version: $version, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'MangaAttributes(title: $title, altTitles: $altTitles, description: $description, links: $links, originalLanguage: $originalLanguage, lastVolume: $lastVolume, lastChapter: $lastChapter, publicationDemographic: $publicationDemographic, status: $status, year: $year, contentRating: $contentRating, tags: $tags, version: $version, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -2429,23 +2514,29 @@ $ChapterAttributesCopyWith<ChapterAttributes> get copyWith => _$ChapterAttribute
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as ChapterAttributes;
   properties
     ..add(DiagnosticsProperty('type', 'ChapterAttributes'))
-    ..add(DiagnosticsProperty('title', title))..add(DiagnosticsProperty('volume', volume))..add(DiagnosticsProperty('chapter', chapter))..add(DiagnosticsProperty('translatedLanguage', translatedLanguage))..add(DiagnosticsProperty('uploader', uploader))..add(DiagnosticsProperty('externalUrl', externalUrl))..add(DiagnosticsProperty('version', version))..add(DiagnosticsProperty('createdAt', createdAt))..add(DiagnosticsProperty('updatedAt', updatedAt))..add(DiagnosticsProperty('publishAt', publishAt));
+    ..add(DiagnosticsProperty('title', _this.title))..add(DiagnosticsProperty('volume', _this.volume))..add(DiagnosticsProperty('chapter', _this.chapter))..add(DiagnosticsProperty('translatedLanguage', _this.translatedLanguage))..add(DiagnosticsProperty('uploader', _this.uploader))..add(DiagnosticsProperty('externalUrl', _this.externalUrl))..add(DiagnosticsProperty('version', _this.version))..add(DiagnosticsProperty('createdAt', _this.createdAt))..add(DiagnosticsProperty('updatedAt', _this.updatedAt))..add(DiagnosticsProperty('publishAt', _this.publishAt));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterAttributes&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.chapter, chapter) || other.chapter == chapter)&&(identical(other.translatedLanguage, translatedLanguage) || other.translatedLanguage == translatedLanguage)&&(identical(other.uploader, uploader) || other.uploader == uploader)&&(identical(other.externalUrl, externalUrl) || other.externalUrl == externalUrl)&&(identical(other.version, version) || other.version == version)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.publishAt, publishAt) || other.publishAt == publishAt));
+  final _this = this as ChapterAttributes;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterAttributes&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.volume, _this.volume) || other.volume == _this.volume)&&(identical(other.chapter, _this.chapter) || other.chapter == _this.chapter)&&(identical(other.translatedLanguage, _this.translatedLanguage) || other.translatedLanguage == _this.translatedLanguage)&&(identical(other.uploader, _this.uploader) || other.uploader == _this.uploader)&&(identical(other.externalUrl, _this.externalUrl) || other.externalUrl == _this.externalUrl)&&(identical(other.version, _this.version) || other.version == _this.version)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt)&&(identical(other.publishAt, _this.publishAt) || other.publishAt == _this.publishAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,volume,chapter,translatedLanguage,uploader,externalUrl,version,createdAt,updatedAt,publishAt);
+int get hashCode {
+  final _this = this as ChapterAttributes;
+  return Object.hash(runtimeType,_this.title,_this.volume,_this.chapter,_this.translatedLanguage,_this.uploader,_this.externalUrl,_this.version,_this.createdAt,_this.updatedAt,_this.publishAt);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ChapterAttributes(title: $title, volume: $volume, chapter: $chapter, translatedLanguage: $translatedLanguage, uploader: $uploader, externalUrl: $externalUrl, version: $version, createdAt: $createdAt, updatedAt: $updatedAt, publishAt: $publishAt)';
+  final _this = this as ChapterAttributes;
+  return 'ChapterAttributes(title: ${_this.title}, volume: ${_this.volume}, chapter: ${_this.chapter}, translatedLanguage: ${_this.translatedLanguage}, uploader: ${_this.uploader}, externalUrl: ${_this.externalUrl}, version: ${_this.version}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt}, publishAt: ${_this.publishAt})';
 }
 
 
@@ -2474,7 +2565,7 @@ class _$ChapterAttributesCopyWithImpl<$Res>
 /// Create a copy of ChapterAttributes
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? title = freezed,Object? volume = freezed,Object? chapter = freezed,Object? translatedLanguage = null,Object? uploader = freezed,Object? externalUrl = freezed,Object? version = null,Object? createdAt = null,Object? updatedAt = null,Object? publishAt = null,}) {
-  return _then(_self.copyWith(
+  return _then(ChapterAttributes(
 title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,volume: freezed == volume ? _self.volume : volume // ignore: cast_nullable_to_non_nullable
 as String?,chapter: freezed == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
@@ -2523,23 +2614,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'ChapterAttributes'))
     ..add(DiagnosticsProperty('title', title))..add(DiagnosticsProperty('volume', volume))..add(DiagnosticsProperty('chapter', chapter))..add(DiagnosticsProperty('translatedLanguage', translatedLanguage))..add(DiagnosticsProperty('uploader', uploader))..add(DiagnosticsProperty('externalUrl', externalUrl))..add(DiagnosticsProperty('version', version))..add(DiagnosticsProperty('createdAt', createdAt))..add(DiagnosticsProperty('updatedAt', updatedAt))..add(DiagnosticsProperty('publishAt', publishAt));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterAttributes&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.chapter, chapter) || other.chapter == chapter)&&(identical(other.translatedLanguage, translatedLanguage) || other.translatedLanguage == translatedLanguage)&&(identical(other.uploader, uploader) || other.uploader == uploader)&&(identical(other.externalUrl, externalUrl) || other.externalUrl == externalUrl)&&(identical(other.version, version) || other.version == version)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.publishAt, publishAt) || other.publishAt == publishAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterAttributes&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.chapter, chapter) || other.chapter == chapter)&&(identical(other.translatedLanguage, translatedLanguage) || other.translatedLanguage == translatedLanguage)&&(identical(other.uploader, uploader) || other.uploader == uploader)&&(identical(other.externalUrl, externalUrl) || other.externalUrl == externalUrl)&&(identical(other.version, version) || other.version == version)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.publishAt, publishAt) || other.publishAt == publishAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,volume,chapter,translatedLanguage,uploader,externalUrl,version,createdAt,updatedAt,publishAt);
+int get hashCode {
+    return Object.hash(runtimeType,title,volume,chapter,translatedLanguage,uploader,externalUrl,version,createdAt,updatedAt,publishAt);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ChapterAttributes(title: $title, volume: $volume, chapter: $chapter, translatedLanguage: $translatedLanguage, uploader: $uploader, externalUrl: $externalUrl, version: $version, createdAt: $createdAt, updatedAt: $updatedAt, publishAt: $publishAt)';
+    return 'ChapterAttributes(title: $title, volume: $volume, chapter: $chapter, translatedLanguage: $translatedLanguage, uploader: $uploader, externalUrl: $externalUrl, version: $version, createdAt: $createdAt, updatedAt: $updatedAt, publishAt: $publishAt)';
 }
 
 
@@ -2602,23 +2695,29 @@ $ScanlationGroupAttributesCopyWith<ScanlationGroupAttributes> get copyWith => _$
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as ScanlationGroupAttributes;
   properties
     ..add(DiagnosticsProperty('type', 'ScanlationGroupAttributes'))
-    ..add(DiagnosticsProperty('name', name))..add(DiagnosticsProperty('website', website))..add(DiagnosticsProperty('discord', discord))..add(DiagnosticsProperty('description', description));
+    ..add(DiagnosticsProperty('name', _this.name))..add(DiagnosticsProperty('website', _this.website))..add(DiagnosticsProperty('discord', _this.discord))..add(DiagnosticsProperty('description', _this.description));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ScanlationGroupAttributes&&(identical(other.name, name) || other.name == name)&&(identical(other.website, website) || other.website == website)&&(identical(other.discord, discord) || other.discord == discord)&&(identical(other.description, description) || other.description == description));
+  final _this = this as ScanlationGroupAttributes;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ScanlationGroupAttributes&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.website, _this.website) || other.website == _this.website)&&(identical(other.discord, _this.discord) || other.discord == _this.discord)&&(identical(other.description, _this.description) || other.description == _this.description));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,website,discord,description);
+int get hashCode {
+  final _this = this as ScanlationGroupAttributes;
+  return Object.hash(runtimeType,_this.name,_this.website,_this.discord,_this.description);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ScanlationGroupAttributes(name: $name, website: $website, discord: $discord, description: $description)';
+  final _this = this as ScanlationGroupAttributes;
+  return 'ScanlationGroupAttributes(name: ${_this.name}, website: ${_this.website}, discord: ${_this.discord}, description: ${_this.description})';
 }
 
 
@@ -2647,7 +2746,7 @@ class _$ScanlationGroupAttributesCopyWithImpl<$Res>
 /// Create a copy of ScanlationGroupAttributes
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? website = freezed,Object? discord = freezed,Object? description = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(ScanlationGroupAttributes(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,website: freezed == website ? _self.website : website // ignore: cast_nullable_to_non_nullable
 as String?,discord: freezed == discord ? _self.discord : discord // ignore: cast_nullable_to_non_nullable
@@ -2684,23 +2783,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'ScanlationGroupAttributes'))
     ..add(DiagnosticsProperty('name', name))..add(DiagnosticsProperty('website', website))..add(DiagnosticsProperty('discord', discord))..add(DiagnosticsProperty('description', description));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ScanlationGroupAttributes&&(identical(other.name, name) || other.name == name)&&(identical(other.website, website) || other.website == website)&&(identical(other.discord, discord) || other.discord == discord)&&(identical(other.description, description) || other.description == description));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ScanlationGroupAttributes&&(identical(other.name, name) || other.name == name)&&(identical(other.website, website) || other.website == website)&&(identical(other.discord, discord) || other.discord == discord)&&(identical(other.description, description) || other.description == description));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,website,discord,description);
+int get hashCode {
+    return Object.hash(runtimeType,name,website,discord,description);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ScanlationGroupAttributes(name: $name, website: $website, discord: $discord, description: $description)';
+    return 'ScanlationGroupAttributes(name: $name, website: $website, discord: $discord, description: $description)';
 }
 
 
@@ -2757,23 +2858,29 @@ $CoverArtAttributesCopyWith<CoverArtAttributes> get copyWith => _$CoverArtAttrib
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as CoverArtAttributes;
   properties
     ..add(DiagnosticsProperty('type', 'CoverArtAttributes'))
-    ..add(DiagnosticsProperty('volume', volume))..add(DiagnosticsProperty('fileName', fileName))..add(DiagnosticsProperty('description', description))..add(DiagnosticsProperty('locale', locale));
+    ..add(DiagnosticsProperty('volume', _this.volume))..add(DiagnosticsProperty('fileName', _this.fileName))..add(DiagnosticsProperty('description', _this.description))..add(DiagnosticsProperty('locale', _this.locale));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CoverArtAttributes&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.fileName, fileName) || other.fileName == fileName)&&(identical(other.description, description) || other.description == description)&&(identical(other.locale, locale) || other.locale == locale));
+  final _this = this as CoverArtAttributes;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CoverArtAttributes&&(identical(other.volume, _this.volume) || other.volume == _this.volume)&&(identical(other.fileName, _this.fileName) || other.fileName == _this.fileName)&&(identical(other.description, _this.description) || other.description == _this.description)&&(identical(other.locale, _this.locale) || other.locale == _this.locale));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,volume,fileName,description,locale);
+int get hashCode {
+  final _this = this as CoverArtAttributes;
+  return Object.hash(runtimeType,_this.volume,_this.fileName,_this.description,_this.locale);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'CoverArtAttributes(volume: $volume, fileName: $fileName, description: $description, locale: $locale)';
+  final _this = this as CoverArtAttributes;
+  return 'CoverArtAttributes(volume: ${_this.volume}, fileName: ${_this.fileName}, description: ${_this.description}, locale: ${_this.locale})';
 }
 
 
@@ -2802,7 +2909,7 @@ class _$CoverArtAttributesCopyWithImpl<$Res>
 /// Create a copy of CoverArtAttributes
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? volume = freezed,Object? fileName = null,Object? description = freezed,Object? locale = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(CoverArtAttributes(
 volume: freezed == volume ? _self.volume : volume // ignore: cast_nullable_to_non_nullable
 as String?,fileName: null == fileName ? _self.fileName : fileName // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -2839,23 +2946,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'CoverArtAttributes'))
     ..add(DiagnosticsProperty('volume', volume))..add(DiagnosticsProperty('fileName', fileName))..add(DiagnosticsProperty('description', description))..add(DiagnosticsProperty('locale', locale));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CoverArtAttributes&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.fileName, fileName) || other.fileName == fileName)&&(identical(other.description, description) || other.description == description)&&(identical(other.locale, locale) || other.locale == locale));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CoverArtAttributes&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.fileName, fileName) || other.fileName == fileName)&&(identical(other.description, description) || other.description == description)&&(identical(other.locale, locale) || other.locale == locale));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,volume,fileName,description,locale);
+int get hashCode {
+    return Object.hash(runtimeType,volume,fileName,description,locale);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'CoverArtAttributes(volume: $volume, fileName: $fileName, description: $description, locale: $locale)';
+    return 'CoverArtAttributes(volume: $volume, fileName: $fileName, description: $description, locale: $locale)';
 }
 
 
@@ -2912,23 +3021,29 @@ $UserAttributesCopyWith<UserAttributes> get copyWith => _$UserAttributesCopyWith
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as UserAttributes;
   properties
     ..add(DiagnosticsProperty('type', 'UserAttributes'))
-    ..add(DiagnosticsProperty('username', username))..add(DiagnosticsProperty('avatarFileName', avatarFileName));
+    ..add(DiagnosticsProperty('username', _this.username))..add(DiagnosticsProperty('avatarFileName', _this.avatarFileName));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserAttributes&&(identical(other.username, username) || other.username == username)&&(identical(other.avatarFileName, avatarFileName) || other.avatarFileName == avatarFileName));
+  final _this = this as UserAttributes;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserAttributes&&(identical(other.username, _this.username) || other.username == _this.username)&&(identical(other.avatarFileName, _this.avatarFileName) || other.avatarFileName == _this.avatarFileName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,username,avatarFileName);
+int get hashCode {
+  final _this = this as UserAttributes;
+  return Object.hash(runtimeType,_this.username,_this.avatarFileName);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'UserAttributes(username: $username, avatarFileName: $avatarFileName)';
+  final _this = this as UserAttributes;
+  return 'UserAttributes(username: ${_this.username}, avatarFileName: ${_this.avatarFileName})';
 }
 
 
@@ -2957,7 +3072,7 @@ class _$UserAttributesCopyWithImpl<$Res>
 /// Create a copy of UserAttributes
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? username = null,Object? avatarFileName = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(UserAttributes(
 username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,avatarFileName: freezed == avatarFileName ? _self.avatarFileName : avatarFileName // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -2990,23 +3105,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'UserAttributes'))
     ..add(DiagnosticsProperty('username', username))..add(DiagnosticsProperty('avatarFileName', avatarFileName));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserAttributes&&(identical(other.username, username) || other.username == username)&&(identical(other.avatarFileName, avatarFileName) || other.avatarFileName == avatarFileName));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserAttributes&&(identical(other.username, username) || other.username == username)&&(identical(other.avatarFileName, avatarFileName) || other.avatarFileName == avatarFileName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,username,avatarFileName);
+int get hashCode {
+    return Object.hash(runtimeType,username,avatarFileName);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'UserAttributes(username: $username, avatarFileName: $avatarFileName)';
+    return 'UserAttributes(username: $username, avatarFileName: $avatarFileName)';
 }
 
 
@@ -3061,23 +3178,29 @@ $AuthorAttributesCopyWith<AuthorAttributes> get copyWith => _$AuthorAttributesCo
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as AuthorAttributes;
   properties
     ..add(DiagnosticsProperty('type', 'AuthorAttributes'))
-    ..add(DiagnosticsProperty('name', name))..add(DiagnosticsProperty('imageUrl', imageUrl))..add(DiagnosticsProperty('biography', biography))..add(DiagnosticsProperty('twitter', twitter))..add(DiagnosticsProperty('pixiv', pixiv))..add(DiagnosticsProperty('youtube', youtube))..add(DiagnosticsProperty('website', website))..add(DiagnosticsProperty('createdAt', createdAt))..add(DiagnosticsProperty('updatedAt', updatedAt));
+    ..add(DiagnosticsProperty('name', _this.name))..add(DiagnosticsProperty('imageUrl', _this.imageUrl))..add(DiagnosticsProperty('biography', _this.biography))..add(DiagnosticsProperty('twitter', _this.twitter))..add(DiagnosticsProperty('pixiv', _this.pixiv))..add(DiagnosticsProperty('youtube', _this.youtube))..add(DiagnosticsProperty('website', _this.website))..add(DiagnosticsProperty('createdAt', _this.createdAt))..add(DiagnosticsProperty('updatedAt', _this.updatedAt));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthorAttributes&&(identical(other.name, name) || other.name == name)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&const DeepCollectionEquality().equals(other.biography, biography)&&(identical(other.twitter, twitter) || other.twitter == twitter)&&(identical(other.pixiv, pixiv) || other.pixiv == pixiv)&&(identical(other.youtube, youtube) || other.youtube == youtube)&&(identical(other.website, website) || other.website == website)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  final _this = this as AuthorAttributes;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthorAttributes&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.imageUrl, _this.imageUrl) || other.imageUrl == _this.imageUrl)&&const DeepCollectionEquality().equals(other.biography, _this.biography)&&(identical(other.twitter, _this.twitter) || other.twitter == _this.twitter)&&(identical(other.pixiv, _this.pixiv) || other.pixiv == _this.pixiv)&&(identical(other.youtube, _this.youtube) || other.youtube == _this.youtube)&&(identical(other.website, _this.website) || other.website == _this.website)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,imageUrl,const DeepCollectionEquality().hash(biography),twitter,pixiv,youtube,website,createdAt,updatedAt);
+int get hashCode {
+  final _this = this as AuthorAttributes;
+  return Object.hash(runtimeType,_this.name,_this.imageUrl,const DeepCollectionEquality().hash(_this.biography),_this.twitter,_this.pixiv,_this.youtube,_this.website,_this.createdAt,_this.updatedAt);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'AuthorAttributes(name: $name, imageUrl: $imageUrl, biography: $biography, twitter: $twitter, pixiv: $pixiv, youtube: $youtube, website: $website, createdAt: $createdAt, updatedAt: $updatedAt)';
+  final _this = this as AuthorAttributes;
+  return 'AuthorAttributes(name: ${_this.name}, imageUrl: ${_this.imageUrl}, biography: ${_this.biography}, twitter: ${_this.twitter}, pixiv: ${_this.pixiv}, youtube: ${_this.youtube}, website: ${_this.website}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt})';
 }
 
 
@@ -3106,7 +3229,7 @@ class _$AuthorAttributesCopyWithImpl<$Res>
 /// Create a copy of AuthorAttributes
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? imageUrl = freezed,Object? biography = null,Object? twitter = freezed,Object? pixiv = freezed,Object? youtube = freezed,Object? website = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
-  return _then(_self.copyWith(
+  return _then(AuthorAttributes(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String?,biography: null == biography ? _self.biography : biography // ignore: cast_nullable_to_non_nullable
@@ -3128,7 +3251,7 @@ as DateTime,
 @JsonSerializable()
 
 class _AuthorAttributes with DiagnosticableTreeMixin implements AuthorAttributes {
-  const _AuthorAttributes({required this.name, this.imageUrl, required final  Map<String, String> biography, this.twitter, this.pixiv, this.youtube, this.website, @TimestampSerializer() required this.createdAt, @TimestampSerializer() required this.updatedAt}): _biography = biography;
+  const _AuthorAttributes({required this.name, this.imageUrl, required  Map<String, String> biography, this.twitter, this.pixiv, this.youtube, this.website, @TimestampSerializer() required this.createdAt, @TimestampSerializer() required this.updatedAt}): _biography = biography;
   factory _AuthorAttributes.fromJson(Map<String, dynamic> json) => _$AuthorAttributesFromJson(json);
 
 @override final  String name;
@@ -3159,23 +3282,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'AuthorAttributes'))
     ..add(DiagnosticsProperty('name', name))..add(DiagnosticsProperty('imageUrl', imageUrl))..add(DiagnosticsProperty('biography', biography))..add(DiagnosticsProperty('twitter', twitter))..add(DiagnosticsProperty('pixiv', pixiv))..add(DiagnosticsProperty('youtube', youtube))..add(DiagnosticsProperty('website', website))..add(DiagnosticsProperty('createdAt', createdAt))..add(DiagnosticsProperty('updatedAt', updatedAt));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthorAttributes&&(identical(other.name, name) || other.name == name)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&const DeepCollectionEquality().equals(other._biography, _biography)&&(identical(other.twitter, twitter) || other.twitter == twitter)&&(identical(other.pixiv, pixiv) || other.pixiv == pixiv)&&(identical(other.youtube, youtube) || other.youtube == youtube)&&(identical(other.website, website) || other.website == website)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthorAttributes&&(identical(other.name, name) || other.name == name)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&const DeepCollectionEquality().equals(other.biography, _biography)&&(identical(other.twitter, twitter) || other.twitter == twitter)&&(identical(other.pixiv, pixiv) || other.pixiv == pixiv)&&(identical(other.youtube, youtube) || other.youtube == youtube)&&(identical(other.website, website) || other.website == website)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,imageUrl,const DeepCollectionEquality().hash(_biography),twitter,pixiv,youtube,website,createdAt,updatedAt);
+int get hashCode {
+    return Object.hash(runtimeType,name,imageUrl,const DeepCollectionEquality().hash(_biography),twitter,pixiv,youtube,website,createdAt,updatedAt);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'AuthorAttributes(name: $name, imageUrl: $imageUrl, biography: $biography, twitter: $twitter, pixiv: $pixiv, youtube: $youtube, website: $website, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'AuthorAttributes(name: $name, imageUrl: $imageUrl, biography: $biography, twitter: $twitter, pixiv: $pixiv, youtube: $youtube, website: $website, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -3237,23 +3362,29 @@ $TagAttributesCopyWith<TagAttributes> get copyWith => _$TagAttributesCopyWithImp
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as TagAttributes;
   properties
     ..add(DiagnosticsProperty('type', 'TagAttributes'))
-    ..add(DiagnosticsProperty('name', name))..add(DiagnosticsProperty('description', description))..add(DiagnosticsProperty('group', group));
+    ..add(DiagnosticsProperty('name', _this.name))..add(DiagnosticsProperty('description', _this.description))..add(DiagnosticsProperty('group', _this.group));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TagAttributes&&const DeepCollectionEquality().equals(other.name, name)&&const DeepCollectionEquality().equals(other.description, description)&&(identical(other.group, group) || other.group == group));
+  final _this = this as TagAttributes;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TagAttributes&&const DeepCollectionEquality().equals(other.name, _this.name)&&const DeepCollectionEquality().equals(other.description, _this.description)&&(identical(other.group, _this.group) || other.group == _this.group));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(name),const DeepCollectionEquality().hash(description),group);
+int get hashCode {
+  final _this = this as TagAttributes;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.name),const DeepCollectionEquality().hash(_this.description),_this.group);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'TagAttributes(name: $name, description: $description, group: $group)';
+  final _this = this as TagAttributes;
+  return 'TagAttributes(name: ${_this.name}, description: ${_this.description}, group: ${_this.group})';
 }
 
 
@@ -3282,7 +3413,7 @@ class _$TagAttributesCopyWithImpl<$Res>
 /// Create a copy of TagAttributes
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? description = null,Object? group = null,}) {
-  return _then(_self.copyWith(
+  return _then(TagAttributes(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as Map<String, String>,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as Map<String, String>,group: null == group ? _self.group : group // ignore: cast_nullable_to_non_nullable
@@ -3298,7 +3429,7 @@ as TagGroup,
 @JsonSerializable()
 
 class _TagAttributes with DiagnosticableTreeMixin implements TagAttributes {
-  const _TagAttributes({required final  Map<String, String> name, required final  Map<String, String> description, required this.group}): _name = name,_description = description;
+  const _TagAttributes({required  Map<String, String> name, required  Map<String, String> description, required this.group}): _name = name,_description = description;
   factory _TagAttributes.fromJson(Map<String, dynamic> json) => _$TagAttributesFromJson(json);
 
  final  Map<String, String> _name;
@@ -3329,23 +3460,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'TagAttributes'))
     ..add(DiagnosticsProperty('name', name))..add(DiagnosticsProperty('description', description))..add(DiagnosticsProperty('group', group));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TagAttributes&&const DeepCollectionEquality().equals(other._name, _name)&&const DeepCollectionEquality().equals(other._description, _description)&&(identical(other.group, group) || other.group == group));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TagAttributes&&const DeepCollectionEquality().equals(other.name, _name)&&const DeepCollectionEquality().equals(other.description, _description)&&(identical(other.group, group) || other.group == group));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_name),const DeepCollectionEquality().hash(_description),group);
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_name),const DeepCollectionEquality().hash(_description),group);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'TagAttributes(name: $name, description: $description, group: $group)';
+    return 'TagAttributes(name: $name, description: $description, group: $group)';
 }
 
 
@@ -3401,23 +3534,29 @@ $MangaStatisticsResponseCopyWith<MangaStatisticsResponse> get copyWith => _$Mang
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as MangaStatisticsResponse;
   properties
     ..add(DiagnosticsProperty('type', 'MangaStatisticsResponse'))
-    ..add(DiagnosticsProperty('statistics', statistics));
+    ..add(DiagnosticsProperty('statistics', _this.statistics));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaStatisticsResponse&&const DeepCollectionEquality().equals(other.statistics, statistics));
+  final _this = this as MangaStatisticsResponse;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaStatisticsResponse&&const DeepCollectionEquality().equals(other.statistics, _this.statistics));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(statistics));
+int get hashCode {
+  final _this = this as MangaStatisticsResponse;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.statistics));
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaStatisticsResponse(statistics: $statistics)';
+  final _this = this as MangaStatisticsResponse;
+  return 'MangaStatisticsResponse(statistics: ${_this.statistics})';
 }
 
 
@@ -3446,8 +3585,8 @@ class _$MangaStatisticsResponseCopyWithImpl<$Res>
 /// Create a copy of MangaStatisticsResponse
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? statistics = null,}) {
-  return _then(_self.copyWith(
-statistics: null == statistics ? _self.statistics : statistics // ignore: cast_nullable_to_non_nullable
+  return _then(MangaStatisticsResponse(
+null == statistics ? _self.statistics : statistics // ignore: cast_nullable_to_non_nullable
 as Map<String, MangaStatistics>,
   ));
 }
@@ -3460,7 +3599,7 @@ as Map<String, MangaStatistics>,
 @JsonSerializable()
 
 class _MangaStatisticsResponse with DiagnosticableTreeMixin implements MangaStatisticsResponse {
-  const _MangaStatisticsResponse(final  Map<String, MangaStatistics> statistics): _statistics = statistics;
+  const _MangaStatisticsResponse( Map<String, MangaStatistics> statistics): _statistics = statistics;
   factory _MangaStatisticsResponse.fromJson(Map<String, dynamic> json) => _$MangaStatisticsResponseFromJson(json);
 
  final  Map<String, MangaStatistics> _statistics;
@@ -3483,23 +3622,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaStatisticsResponse'))
     ..add(DiagnosticsProperty('statistics', statistics));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaStatisticsResponse&&const DeepCollectionEquality().equals(other._statistics, _statistics));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaStatisticsResponse&&const DeepCollectionEquality().equals(other.statistics, _statistics));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_statistics));
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_statistics));
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaStatisticsResponse(statistics: $statistics)';
+    return 'MangaStatisticsResponse(statistics: $statistics)';
 }
 
 
@@ -3553,23 +3694,29 @@ $ChapterStatisticsResponseCopyWith<ChapterStatisticsResponse> get copyWith => _$
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as ChapterStatisticsResponse;
   properties
     ..add(DiagnosticsProperty('type', 'ChapterStatisticsResponse'))
-    ..add(DiagnosticsProperty('statistics', statistics));
+    ..add(DiagnosticsProperty('statistics', _this.statistics));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterStatisticsResponse&&const DeepCollectionEquality().equals(other.statistics, statistics));
+  final _this = this as ChapterStatisticsResponse;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterStatisticsResponse&&const DeepCollectionEquality().equals(other.statistics, _this.statistics));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(statistics));
+int get hashCode {
+  final _this = this as ChapterStatisticsResponse;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.statistics));
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ChapterStatisticsResponse(statistics: $statistics)';
+  final _this = this as ChapterStatisticsResponse;
+  return 'ChapterStatisticsResponse(statistics: ${_this.statistics})';
 }
 
 
@@ -3598,8 +3745,8 @@ class _$ChapterStatisticsResponseCopyWithImpl<$Res>
 /// Create a copy of ChapterStatisticsResponse
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? statistics = null,}) {
-  return _then(_self.copyWith(
-statistics: null == statistics ? _self.statistics : statistics // ignore: cast_nullable_to_non_nullable
+  return _then(ChapterStatisticsResponse(
+null == statistics ? _self.statistics : statistics // ignore: cast_nullable_to_non_nullable
 as Map<String, ChapterStatistics>,
   ));
 }
@@ -3612,7 +3759,7 @@ as Map<String, ChapterStatistics>,
 @JsonSerializable()
 
 class _ChapterStatisticsResponse with DiagnosticableTreeMixin implements ChapterStatisticsResponse {
-  const _ChapterStatisticsResponse(final  Map<String, ChapterStatistics> statistics): _statistics = statistics;
+  const _ChapterStatisticsResponse( Map<String, ChapterStatistics> statistics): _statistics = statistics;
   factory _ChapterStatisticsResponse.fromJson(Map<String, dynamic> json) => _$ChapterStatisticsResponseFromJson(json);
 
  final  Map<String, ChapterStatistics> _statistics;
@@ -3635,23 +3782,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'ChapterStatisticsResponse'))
     ..add(DiagnosticsProperty('statistics', statistics));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterStatisticsResponse&&const DeepCollectionEquality().equals(other._statistics, _statistics));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterStatisticsResponse&&const DeepCollectionEquality().equals(other.statistics, _statistics));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_statistics));
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_statistics));
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ChapterStatisticsResponse(statistics: $statistics)';
+    return 'ChapterStatisticsResponse(statistics: $statistics)';
 }
 
 
@@ -3705,23 +3854,29 @@ $MangaStatisticsCopyWith<MangaStatistics> get copyWith => _$MangaStatisticsCopyW
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as MangaStatistics;
   properties
     ..add(DiagnosticsProperty('type', 'MangaStatistics'))
-    ..add(DiagnosticsProperty('comments', comments))..add(DiagnosticsProperty('rating', rating))..add(DiagnosticsProperty('follows', follows));
+    ..add(DiagnosticsProperty('comments', _this.comments))..add(DiagnosticsProperty('rating', _this.rating))..add(DiagnosticsProperty('follows', _this.follows));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaStatistics&&(identical(other.comments, comments) || other.comments == comments)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.follows, follows) || other.follows == follows));
+  final _this = this as MangaStatistics;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaStatistics&&(identical(other.comments, _this.comments) || other.comments == _this.comments)&&(identical(other.rating, _this.rating) || other.rating == _this.rating)&&(identical(other.follows, _this.follows) || other.follows == _this.follows));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,comments,rating,follows);
+int get hashCode {
+  final _this = this as MangaStatistics;
+  return Object.hash(runtimeType,_this.comments,_this.rating,_this.follows);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaStatistics(comments: $comments, rating: $rating, follows: $follows)';
+  final _this = this as MangaStatistics;
+  return 'MangaStatistics(comments: ${_this.comments}, rating: ${_this.rating}, follows: ${_this.follows})';
 }
 
 
@@ -3750,7 +3905,7 @@ class _$MangaStatisticsCopyWithImpl<$Res>
 /// Create a copy of MangaStatistics
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? comments = freezed,Object? rating = null,Object? follows = null,}) {
-  return _then(_self.copyWith(
+  return _then(MangaStatistics(
 comments: freezed == comments ? _self.comments : comments // ignore: cast_nullable_to_non_nullable
 as StatisticsDetailsComments?,rating: null == rating ? _self.rating : rating // ignore: cast_nullable_to_non_nullable
 as StatisticsDetailsRating,follows: null == follows ? _self.follows : follows // ignore: cast_nullable_to_non_nullable
@@ -3806,23 +3961,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaStatistics'))
     ..add(DiagnosticsProperty('comments', comments))..add(DiagnosticsProperty('rating', rating))..add(DiagnosticsProperty('follows', follows));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaStatistics&&(identical(other.comments, comments) || other.comments == comments)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.follows, follows) || other.follows == follows));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaStatistics&&(identical(other.comments, comments) || other.comments == comments)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.follows, follows) || other.follows == follows));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,comments,rating,follows);
+int get hashCode {
+    return Object.hash(runtimeType,comments,rating,follows);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaStatistics(comments: $comments, rating: $rating, follows: $follows)';
+    return 'MangaStatistics(comments: $comments, rating: $rating, follows: $follows)';
 }
 
 
@@ -3899,23 +4056,29 @@ $ChapterStatisticsCopyWith<ChapterStatistics> get copyWith => _$ChapterStatistic
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as ChapterStatistics;
   properties
     ..add(DiagnosticsProperty('type', 'ChapterStatistics'))
-    ..add(DiagnosticsProperty('comments', comments));
+    ..add(DiagnosticsProperty('comments', _this.comments));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterStatistics&&(identical(other.comments, comments) || other.comments == comments));
+  final _this = this as ChapterStatistics;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterStatistics&&(identical(other.comments, _this.comments) || other.comments == _this.comments));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,comments);
+int get hashCode {
+  final _this = this as ChapterStatistics;
+  return Object.hash(runtimeType,_this.comments);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ChapterStatistics(comments: $comments)';
+  final _this = this as ChapterStatistics;
+  return 'ChapterStatistics(comments: ${_this.comments})';
 }
 
 
@@ -3944,7 +4107,7 @@ class _$ChapterStatisticsCopyWithImpl<$Res>
 /// Create a copy of ChapterStatistics
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? comments = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(ChapterStatistics(
 comments: freezed == comments ? _self.comments : comments // ignore: cast_nullable_to_non_nullable
 as StatisticsDetailsComments?,
   ));
@@ -3987,23 +4150,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'ChapterStatistics'))
     ..add(DiagnosticsProperty('comments', comments));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterStatistics&&(identical(other.comments, comments) || other.comments == comments));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterStatistics&&(identical(other.comments, comments) || other.comments == comments));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,comments);
+int get hashCode {
+    return Object.hash(runtimeType,comments);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ChapterStatistics(comments: $comments)';
+    return 'ChapterStatistics(comments: $comments)';
 }
 
 
@@ -4069,23 +4234,29 @@ $StatisticsDetailsCommentsCopyWith<StatisticsDetailsComments> get copyWith => _$
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as StatisticsDetailsComments;
   properties
     ..add(DiagnosticsProperty('type', 'StatisticsDetailsComments'))
-    ..add(DiagnosticsProperty('threadId', threadId))..add(DiagnosticsProperty('repliesCount', repliesCount));
+    ..add(DiagnosticsProperty('threadId', _this.threadId))..add(DiagnosticsProperty('repliesCount', _this.repliesCount));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StatisticsDetailsComments&&(identical(other.threadId, threadId) || other.threadId == threadId)&&(identical(other.repliesCount, repliesCount) || other.repliesCount == repliesCount));
+  final _this = this as StatisticsDetailsComments;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StatisticsDetailsComments&&(identical(other.threadId, _this.threadId) || other.threadId == _this.threadId)&&(identical(other.repliesCount, _this.repliesCount) || other.repliesCount == _this.repliesCount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,threadId,repliesCount);
+int get hashCode {
+  final _this = this as StatisticsDetailsComments;
+  return Object.hash(runtimeType,_this.threadId,_this.repliesCount);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'StatisticsDetailsComments(threadId: $threadId, repliesCount: $repliesCount)';
+  final _this = this as StatisticsDetailsComments;
+  return 'StatisticsDetailsComments(threadId: ${_this.threadId}, repliesCount: ${_this.repliesCount})';
 }
 
 
@@ -4114,7 +4285,7 @@ class _$StatisticsDetailsCommentsCopyWithImpl<$Res>
 /// Create a copy of StatisticsDetailsComments
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? threadId = null,Object? repliesCount = null,}) {
-  return _then(_self.copyWith(
+  return _then(StatisticsDetailsComments(
 threadId: null == threadId ? _self.threadId : threadId // ignore: cast_nullable_to_non_nullable
 as int,repliesCount: null == repliesCount ? _self.repliesCount : repliesCount // ignore: cast_nullable_to_non_nullable
 as int,
@@ -4147,23 +4318,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'StatisticsDetailsComments'))
     ..add(DiagnosticsProperty('threadId', threadId))..add(DiagnosticsProperty('repliesCount', repliesCount));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StatisticsDetailsComments&&(identical(other.threadId, threadId) || other.threadId == threadId)&&(identical(other.repliesCount, repliesCount) || other.repliesCount == repliesCount));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _StatisticsDetailsComments&&(identical(other.threadId, threadId) || other.threadId == threadId)&&(identical(other.repliesCount, repliesCount) || other.repliesCount == repliesCount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,threadId,repliesCount);
+int get hashCode {
+    return Object.hash(runtimeType,threadId,repliesCount);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'StatisticsDetailsComments(threadId: $threadId, repliesCount: $repliesCount)';
+    return 'StatisticsDetailsComments(threadId: $threadId, repliesCount: $repliesCount)';
 }
 
 
@@ -4218,23 +4391,29 @@ $StatisticsDetailsRatingCopyWith<StatisticsDetailsRating> get copyWith => _$Stat
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as StatisticsDetailsRating;
   properties
     ..add(DiagnosticsProperty('type', 'StatisticsDetailsRating'))
-    ..add(DiagnosticsProperty('average', average))..add(DiagnosticsProperty('bayesian', bayesian));
+    ..add(DiagnosticsProperty('average', _this.average))..add(DiagnosticsProperty('bayesian', _this.bayesian));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StatisticsDetailsRating&&(identical(other.average, average) || other.average == average)&&(identical(other.bayesian, bayesian) || other.bayesian == bayesian));
+  final _this = this as StatisticsDetailsRating;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StatisticsDetailsRating&&(identical(other.average, _this.average) || other.average == _this.average)&&(identical(other.bayesian, _this.bayesian) || other.bayesian == _this.bayesian));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,average,bayesian);
+int get hashCode {
+  final _this = this as StatisticsDetailsRating;
+  return Object.hash(runtimeType,_this.average,_this.bayesian);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'StatisticsDetailsRating(average: $average, bayesian: $bayesian)';
+  final _this = this as StatisticsDetailsRating;
+  return 'StatisticsDetailsRating(average: ${_this.average}, bayesian: ${_this.bayesian})';
 }
 
 
@@ -4263,7 +4442,7 @@ class _$StatisticsDetailsRatingCopyWithImpl<$Res>
 /// Create a copy of StatisticsDetailsRating
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? average = freezed,Object? bayesian = null,}) {
-  return _then(_self.copyWith(
+  return _then(StatisticsDetailsRating(
 average: freezed == average ? _self.average : average // ignore: cast_nullable_to_non_nullable
 as double?,bayesian: null == bayesian ? _self.bayesian : bayesian // ignore: cast_nullable_to_non_nullable
 as double,
@@ -4296,23 +4475,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'StatisticsDetailsRating'))
     ..add(DiagnosticsProperty('average', average))..add(DiagnosticsProperty('bayesian', bayesian));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StatisticsDetailsRating&&(identical(other.average, average) || other.average == average)&&(identical(other.bayesian, bayesian) || other.bayesian == bayesian));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _StatisticsDetailsRating&&(identical(other.average, average) || other.average == average)&&(identical(other.bayesian, bayesian) || other.bayesian == bayesian));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,average,bayesian);
+int get hashCode {
+    return Object.hash(runtimeType,average,bayesian);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'StatisticsDetailsRating(average: $average, bayesian: $bayesian)';
+    return 'StatisticsDetailsRating(average: $average, bayesian: $bayesian)';
 }
 
 
@@ -4367,23 +4548,29 @@ $SelfRatingResponseCopyWith<SelfRatingResponse> get copyWith => _$SelfRatingResp
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as SelfRatingResponse;
   properties
     ..add(DiagnosticsProperty('type', 'SelfRatingResponse'))
-    ..add(DiagnosticsProperty('ratings', ratings));
+    ..add(DiagnosticsProperty('ratings', _this.ratings));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SelfRatingResponse&&const DeepCollectionEquality().equals(other.ratings, ratings));
+  final _this = this as SelfRatingResponse;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SelfRatingResponse&&const DeepCollectionEquality().equals(other.ratings, _this.ratings));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(ratings));
+int get hashCode {
+  final _this = this as SelfRatingResponse;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.ratings));
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'SelfRatingResponse(ratings: $ratings)';
+  final _this = this as SelfRatingResponse;
+  return 'SelfRatingResponse(ratings: ${_this.ratings})';
 }
 
 
@@ -4412,8 +4599,8 @@ class _$SelfRatingResponseCopyWithImpl<$Res>
 /// Create a copy of SelfRatingResponse
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? ratings = null,}) {
-  return _then(_self.copyWith(
-ratings: null == ratings ? _self.ratings : ratings // ignore: cast_nullable_to_non_nullable
+  return _then(SelfRatingResponse(
+null == ratings ? _self.ratings : ratings // ignore: cast_nullable_to_non_nullable
 as Map<String, SelfRating>,
   ));
 }
@@ -4426,7 +4613,7 @@ as Map<String, SelfRating>,
 @JsonSerializable()
 
 class _SelfRatingResponse with DiagnosticableTreeMixin implements SelfRatingResponse {
-  const _SelfRatingResponse(final  Map<String, SelfRating> ratings): _ratings = ratings;
+  const _SelfRatingResponse( Map<String, SelfRating> ratings): _ratings = ratings;
   factory _SelfRatingResponse.fromJson(Map<String, dynamic> json) => _$SelfRatingResponseFromJson(json);
 
  final  Map<String, SelfRating> _ratings;
@@ -4449,23 +4636,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'SelfRatingResponse'))
     ..add(DiagnosticsProperty('ratings', ratings));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SelfRatingResponse&&const DeepCollectionEquality().equals(other._ratings, _ratings));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SelfRatingResponse&&const DeepCollectionEquality().equals(other.ratings, _ratings));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_ratings));
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_ratings));
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'SelfRatingResponse(ratings: $ratings)';
+    return 'SelfRatingResponse(ratings: $ratings)';
 }
 
 
@@ -4519,23 +4708,29 @@ $SelfRatingCopyWith<SelfRating> get copyWith => _$SelfRatingCopyWithImpl<SelfRat
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as SelfRating;
   properties
     ..add(DiagnosticsProperty('type', 'SelfRating'))
-    ..add(DiagnosticsProperty('rating', rating))..add(DiagnosticsProperty('createdAt', createdAt));
+    ..add(DiagnosticsProperty('rating', _this.rating))..add(DiagnosticsProperty('createdAt', _this.createdAt));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SelfRating&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  final _this = this as SelfRating;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SelfRating&&(identical(other.rating, _this.rating) || other.rating == _this.rating)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,rating,createdAt);
+int get hashCode {
+  final _this = this as SelfRating;
+  return Object.hash(runtimeType,_this.rating,_this.createdAt);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'SelfRating(rating: $rating, createdAt: $createdAt)';
+  final _this = this as SelfRating;
+  return 'SelfRating(rating: ${_this.rating}, createdAt: ${_this.createdAt})';
 }
 
 
@@ -4564,7 +4759,7 @@ class _$SelfRatingCopyWithImpl<$Res>
 /// Create a copy of SelfRating
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? rating = null,Object? createdAt = null,}) {
-  return _then(_self.copyWith(
+  return _then(SelfRating(
 rating: null == rating ? _self.rating : rating // ignore: cast_nullable_to_non_nullable
 as int,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
@@ -4597,23 +4792,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'SelfRating'))
     ..add(DiagnosticsProperty('rating', rating))..add(DiagnosticsProperty('createdAt', createdAt));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SelfRating&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SelfRating&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,rating,createdAt);
+int get hashCode {
+    return Object.hash(runtimeType,rating,createdAt);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'SelfRating(rating: $rating, createdAt: $createdAt)';
+    return 'SelfRating(rating: $rating, createdAt: $createdAt)';
 }
 
 
@@ -4668,23 +4865,29 @@ $CustomListAttributesCopyWith<CustomListAttributes> get copyWith => _$CustomList
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as CustomListAttributes;
   properties
     ..add(DiagnosticsProperty('type', 'CustomListAttributes'))
-    ..add(DiagnosticsProperty('name', name))..add(DiagnosticsProperty('visibility', visibility))..add(DiagnosticsProperty('version', version));
+    ..add(DiagnosticsProperty('name', _this.name))..add(DiagnosticsProperty('visibility', _this.visibility))..add(DiagnosticsProperty('version', _this.version));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomListAttributes&&(identical(other.name, name) || other.name == name)&&(identical(other.visibility, visibility) || other.visibility == visibility)&&(identical(other.version, version) || other.version == version));
+  final _this = this as CustomListAttributes;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomListAttributes&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.visibility, _this.visibility) || other.visibility == _this.visibility)&&(identical(other.version, _this.version) || other.version == _this.version));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,visibility,version);
+int get hashCode {
+  final _this = this as CustomListAttributes;
+  return Object.hash(runtimeType,_this.name,_this.visibility,_this.version);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'CustomListAttributes(name: $name, visibility: $visibility, version: $version)';
+  final _this = this as CustomListAttributes;
+  return 'CustomListAttributes(name: ${_this.name}, visibility: ${_this.visibility}, version: ${_this.version})';
 }
 
 
@@ -4713,7 +4916,7 @@ class _$CustomListAttributesCopyWithImpl<$Res>
 /// Create a copy of CustomListAttributes
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? visibility = null,Object? version = null,}) {
-  return _then(_self.copyWith(
+  return _then(CustomListAttributes(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,visibility: null == visibility ? _self.visibility : visibility // ignore: cast_nullable_to_non_nullable
 as CustomListVisibility,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
@@ -4748,23 +4951,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'CustomListAttributes'))
     ..add(DiagnosticsProperty('name', name))..add(DiagnosticsProperty('visibility', visibility))..add(DiagnosticsProperty('version', version));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CustomListAttributes&&(identical(other.name, name) || other.name == name)&&(identical(other.visibility, visibility) || other.visibility == visibility)&&(identical(other.version, version) || other.version == version));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CustomListAttributes&&(identical(other.name, name) || other.name == name)&&(identical(other.visibility, visibility) || other.visibility == visibility)&&(identical(other.version, version) || other.version == version));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,visibility,version);
+int get hashCode {
+    return Object.hash(runtimeType,name,visibility,version);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'CustomListAttributes(name: $name, visibility: $visibility, version: $version)';
+    return 'CustomListAttributes(name: $name, visibility: $visibility, version: $version)';
 }
 
 
@@ -4820,23 +5025,29 @@ $ErrorResponseCopyWith<ErrorResponse> get copyWith => _$ErrorResponseCopyWithImp
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as ErrorResponse;
   properties
     ..add(DiagnosticsProperty('type', 'ErrorResponse'))
-    ..add(DiagnosticsProperty('result', result))..add(DiagnosticsProperty('errors', errors));
+    ..add(DiagnosticsProperty('result', _this.result))..add(DiagnosticsProperty('errors', _this.errors));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ErrorResponse&&(identical(other.result, result) || other.result == result)&&const DeepCollectionEquality().equals(other.errors, errors));
+  final _this = this as ErrorResponse;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ErrorResponse&&(identical(other.result, _this.result) || other.result == _this.result)&&const DeepCollectionEquality().equals(other.errors, _this.errors));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,result,const DeepCollectionEquality().hash(errors));
+int get hashCode {
+  final _this = this as ErrorResponse;
+  return Object.hash(runtimeType,_this.result,const DeepCollectionEquality().hash(_this.errors));
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ErrorResponse(result: $result, errors: $errors)';
+  final _this = this as ErrorResponse;
+  return 'ErrorResponse(result: ${_this.result}, errors: ${_this.errors})';
 }
 
 
@@ -4865,9 +5076,9 @@ class _$ErrorResponseCopyWithImpl<$Res>
 /// Create a copy of ErrorResponse
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? result = null,Object? errors = null,}) {
-  return _then(_self.copyWith(
-result: null == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
-as String,errors: null == errors ? _self.errors : errors // ignore: cast_nullable_to_non_nullable
+  return _then(ErrorResponse(
+null == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
+as String,null == errors ? _self.errors : errors // ignore: cast_nullable_to_non_nullable
 as List<MDError>,
   ));
 }
@@ -4880,7 +5091,7 @@ as List<MDError>,
 @JsonSerializable()
 
 class _ErrorResponse with DiagnosticableTreeMixin implements ErrorResponse {
-  const _ErrorResponse(this.result, final  List<MDError> errors): _errors = errors;
+  const _ErrorResponse(this.result,  List<MDError> errors): _errors = errors;
   factory _ErrorResponse.fromJson(Map<String, dynamic> json) => _$ErrorResponseFromJson(json);
 
 @override final  String result;
@@ -4904,23 +5115,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'ErrorResponse'))
     ..add(DiagnosticsProperty('result', result))..add(DiagnosticsProperty('errors', errors));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ErrorResponse&&(identical(other.result, result) || other.result == result)&&const DeepCollectionEquality().equals(other._errors, _errors));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ErrorResponse&&(identical(other.result, result) || other.result == result)&&const DeepCollectionEquality().equals(other.errors, _errors));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,result,const DeepCollectionEquality().hash(_errors));
+int get hashCode {
+    return Object.hash(runtimeType,result,const DeepCollectionEquality().hash(_errors));
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ErrorResponse(result: $result, errors: $errors)';
+    return 'ErrorResponse(result: $result, errors: $errors)';
 }
 
 
@@ -4975,23 +5188,29 @@ $FrontPageDataCopyWith<FrontPageData> get copyWith => _$FrontPageDataCopyWithImp
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as FrontPageData;
   properties
     ..add(DiagnosticsProperty('type', 'FrontPageData'))
-    ..add(DiagnosticsProperty('staffPicks', staffPicks))..add(DiagnosticsProperty('seasonal', seasonal));
+    ..add(DiagnosticsProperty('staffPicks', _this.staffPicks))..add(DiagnosticsProperty('seasonal', _this.seasonal));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FrontPageData&&(identical(other.staffPicks, staffPicks) || other.staffPicks == staffPicks)&&(identical(other.seasonal, seasonal) || other.seasonal == seasonal));
+  final _this = this as FrontPageData;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FrontPageData&&(identical(other.staffPicks, _this.staffPicks) || other.staffPicks == _this.staffPicks)&&(identical(other.seasonal, _this.seasonal) || other.seasonal == _this.seasonal));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,staffPicks,seasonal);
+int get hashCode {
+  final _this = this as FrontPageData;
+  return Object.hash(runtimeType,_this.staffPicks,_this.seasonal);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'FrontPageData(staffPicks: $staffPicks, seasonal: $seasonal)';
+  final _this = this as FrontPageData;
+  return 'FrontPageData(staffPicks: ${_this.staffPicks}, seasonal: ${_this.seasonal})';
 }
 
 
@@ -5020,7 +5239,7 @@ class _$FrontPageDataCopyWithImpl<$Res>
 /// Create a copy of FrontPageData
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? staffPicks = null,Object? seasonal = null,}) {
-  return _then(_self.copyWith(
+  return _then(FrontPageData(
 staffPicks: null == staffPicks ? _self.staffPicks : staffPicks // ignore: cast_nullable_to_non_nullable
 as String,seasonal: null == seasonal ? _self.seasonal : seasonal // ignore: cast_nullable_to_non_nullable
 as String,
@@ -5053,23 +5272,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'FrontPageData'))
     ..add(DiagnosticsProperty('staffPicks', staffPicks))..add(DiagnosticsProperty('seasonal', seasonal));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FrontPageData&&(identical(other.staffPicks, staffPicks) || other.staffPicks == staffPicks)&&(identical(other.seasonal, seasonal) || other.seasonal == seasonal));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _FrontPageData&&(identical(other.staffPicks, staffPicks) || other.staffPicks == staffPicks)&&(identical(other.seasonal, seasonal) || other.seasonal == seasonal));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,staffPicks,seasonal);
+int get hashCode {
+    return Object.hash(runtimeType,staffPicks,seasonal);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'FrontPageData(staffPicks: $staffPicks, seasonal: $seasonal)';
+    return 'FrontPageData(staffPicks: $staffPicks, seasonal: $seasonal)';
 }
 
 
@@ -5124,23 +5345,29 @@ $MangaDexCredentialsCopyWith<MangaDexCredentials> get copyWith => _$MangaDexCred
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as MangaDexCredentials;
   properties
     ..add(DiagnosticsProperty('type', 'MangaDexCredentials'))
-    ..add(DiagnosticsProperty('username', username))..add(DiagnosticsProperty('clientId', clientId))..add(DiagnosticsProperty('clientSecret', clientSecret));
+    ..add(DiagnosticsProperty('username', _this.username))..add(DiagnosticsProperty('clientId', _this.clientId))..add(DiagnosticsProperty('clientSecret', _this.clientSecret));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaDexCredentials&&(identical(other.username, username) || other.username == username)&&(identical(other.clientId, clientId) || other.clientId == clientId)&&(identical(other.clientSecret, clientSecret) || other.clientSecret == clientSecret));
+  final _this = this as MangaDexCredentials;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaDexCredentials&&(identical(other.username, _this.username) || other.username == _this.username)&&(identical(other.clientId, _this.clientId) || other.clientId == _this.clientId)&&(identical(other.clientSecret, _this.clientSecret) || other.clientSecret == _this.clientSecret));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,username,clientId,clientSecret);
+int get hashCode {
+  final _this = this as MangaDexCredentials;
+  return Object.hash(runtimeType,_this.username,_this.clientId,_this.clientSecret);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexCredentials(username: $username, clientId: $clientId, clientSecret: $clientSecret)';
+  final _this = this as MangaDexCredentials;
+  return 'MangaDexCredentials(username: ${_this.username}, clientId: ${_this.clientId}, clientSecret: ${_this.clientSecret})';
 }
 
 
@@ -5169,7 +5396,7 @@ class _$MangaDexCredentialsCopyWithImpl<$Res>
 /// Create a copy of MangaDexCredentials
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? username = null,Object? clientId = null,Object? clientSecret = null,}) {
-  return _then(_self.copyWith(
+  return _then(MangaDexCredentials(
 username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,clientId: null == clientId ? _self.clientId : clientId // ignore: cast_nullable_to_non_nullable
 as String,clientSecret: null == clientSecret ? _self.clientSecret : clientSecret // ignore: cast_nullable_to_non_nullable
@@ -5204,23 +5431,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaDexCredentials'))
     ..add(DiagnosticsProperty('username', username))..add(DiagnosticsProperty('clientId', clientId))..add(DiagnosticsProperty('clientSecret', clientSecret));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaDexCredentials&&(identical(other.username, username) || other.username == username)&&(identical(other.clientId, clientId) || other.clientId == clientId)&&(identical(other.clientSecret, clientSecret) || other.clientSecret == clientSecret));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaDexCredentials&&(identical(other.username, username) || other.username == username)&&(identical(other.clientId, clientId) || other.clientId == clientId)&&(identical(other.clientSecret, clientSecret) || other.clientSecret == clientSecret));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,username,clientId,clientSecret);
+int get hashCode {
+    return Object.hash(runtimeType,username,clientId,clientSecret);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexCredentials(username: $username, clientId: $clientId, clientSecret: $clientSecret)';
+    return 'MangaDexCredentials(username: $username, clientId: $clientId, clientSecret: $clientSecret)';
 }
 
 
@@ -5276,23 +5505,29 @@ $MangaDexTokensCopyWith<MangaDexTokens> get copyWith => _$MangaDexTokensCopyWith
 
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as MangaDexTokens;
   properties
     ..add(DiagnosticsProperty('type', 'MangaDexTokens'))
-    ..add(DiagnosticsProperty('accessToken', accessToken))..add(DiagnosticsProperty('refreshToken', refreshToken))..add(DiagnosticsProperty('tokenType', tokenType))..add(DiagnosticsProperty('idToken', idToken));
+    ..add(DiagnosticsProperty('accessToken', _this.accessToken))..add(DiagnosticsProperty('refreshToken', _this.refreshToken))..add(DiagnosticsProperty('tokenType', _this.tokenType))..add(DiagnosticsProperty('idToken', _this.idToken));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaDexTokens&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.tokenType, tokenType) || other.tokenType == tokenType)&&(identical(other.idToken, idToken) || other.idToken == idToken));
+  final _this = this as MangaDexTokens;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaDexTokens&&(identical(other.accessToken, _this.accessToken) || other.accessToken == _this.accessToken)&&(identical(other.refreshToken, _this.refreshToken) || other.refreshToken == _this.refreshToken)&&(identical(other.tokenType, _this.tokenType) || other.tokenType == _this.tokenType)&&(identical(other.idToken, _this.idToken) || other.idToken == _this.idToken));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,accessToken,refreshToken,tokenType,idToken);
+int get hashCode {
+  final _this = this as MangaDexTokens;
+  return Object.hash(runtimeType,_this.accessToken,_this.refreshToken,_this.tokenType,_this.idToken);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexTokens(accessToken: $accessToken, refreshToken: $refreshToken, tokenType: $tokenType, idToken: $idToken)';
+  final _this = this as MangaDexTokens;
+  return 'MangaDexTokens(accessToken: ${_this.accessToken}, refreshToken: ${_this.refreshToken}, tokenType: ${_this.tokenType}, idToken: ${_this.idToken})';
 }
 
 
@@ -5321,7 +5556,7 @@ class _$MangaDexTokensCopyWithImpl<$Res>
 /// Create a copy of MangaDexTokens
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? accessToken = freezed,Object? refreshToken = freezed,Object? tokenType = freezed,Object? idToken = null,}) {
-  return _then(_self.copyWith(
+  return _then(MangaDexTokens(
 accessToken: freezed == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
 as String?,refreshToken: freezed == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
 as String?,tokenType: freezed == tokenType ? _self.tokenType : tokenType // ignore: cast_nullable_to_non_nullable
@@ -5358,23 +5593,25 @@ Map<String, dynamic> toJson() {
 }
 @override
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  properties
+    properties
     ..add(DiagnosticsProperty('type', 'MangaDexTokens'))
     ..add(DiagnosticsProperty('accessToken', accessToken))..add(DiagnosticsProperty('refreshToken', refreshToken))..add(DiagnosticsProperty('tokenType', tokenType))..add(DiagnosticsProperty('idToken', idToken));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaDexTokens&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.tokenType, tokenType) || other.tokenType == tokenType)&&(identical(other.idToken, idToken) || other.idToken == idToken));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaDexTokens&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.tokenType, tokenType) || other.tokenType == tokenType)&&(identical(other.idToken, idToken) || other.idToken == idToken));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,accessToken,refreshToken,tokenType,idToken);
+int get hashCode {
+    return Object.hash(runtimeType,accessToken,refreshToken,tokenType,idToken);
+}
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'MangaDexTokens(accessToken: $accessToken, refreshToken: $refreshToken, tokenType: $tokenType, idToken: $idToken)';
+    return 'MangaDexTokens(accessToken: $accessToken, refreshToken: $refreshToken, tokenType: $tokenType, idToken: $idToken)';
 }
 
 

@@ -1,13 +1,30 @@
 import 'dart:async';
+import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/reader/model/types.dart';
 
-abstract interface class ReaderViewportController {
-  void jumpToPage(int page);
-}
-
 enum ReaderPageTurnResult { handled, closeReader }
+
+abstract interface class ReaderViewportController {
+  /// Whether horizontal turns move between pages in this viewport.
+  bool get turnsPages;
+
+  /// Prepares the viewport to open at [page] when its widget next mounts.
+  ///
+  /// Called while the viewport's widget is not built yet, before the session
+  /// schedules [jumpToPage] for after the first frame.
+  void prepareInitialPage(int page);
+
+  void jumpToPage(int page);
+
+  /// Scrolls or pans by [delta] logical pixels; positive values move towards
+  /// the end of the chapter.
+  ReaderPageTurnResult scrollBy(double delta, {required int currentPage});
+
+  void togglePageSize(int currentPage);
+}
 
 final class ReaderPrefetchPolicy {
   const ReaderPrefetchPolicy({
@@ -15,6 +32,13 @@ final class ReaderPrefetchPolicy {
     this.backwardCount = 3,
     this.cacheWidth,
   });
+
+  /// Largest selectable preload count; the option above it preloads as many
+  /// pages as fit in the image cache.
+  static const maxPreloadCount = 9;
+
+  static bool isUnboundedPreload(int configuredCount) =>
+      configuredCount > maxPreloadCount;
 
   factory ReaderPrefetchPolicy.forReader({
     required ReaderFormat format,
@@ -24,11 +48,13 @@ final class ReaderPrefetchPolicy {
   }) {
     return switch (format) {
       ReaderFormat.longstrip => ReaderPrefetchPolicy(
-        forwardCount: configuredCount.clamp(1, 9),
+        forwardCount: configuredCount.clamp(1, maxPreloadCount),
         cacheWidth: longStripCacheWidth,
       ),
       ReaderFormat.single => ReaderPrefetchPolicy(
-        forwardCount: configuredCount > 9 ? pageCount : configuredCount,
+        forwardCount: isUnboundedPreload(configuredCount)
+            ? pageCount
+            : configuredCount,
       ),
     };
   }
@@ -36,8 +62,6 @@ final class ReaderPrefetchPolicy {
   final int forwardCount;
   final int backwardCount;
   final int? cacheWidth;
-
-  bool get retainsCompletedPages => cacheWidth == null;
 
   @override
   bool operator ==(Object other) {
@@ -51,44 +75,79 @@ final class ReaderPrefetchPolicy {
   int get hashCode => Object.hash(forwardCount, backwardCount, cacheWidth);
 }
 
-typedef ReaderPrecacheImage =
-    Future<void> Function(ImageProvider<Object> provider);
+/// Decodes [provider] into the image cache and returns its decoded size in
+/// bytes, or null if it failed to load.
+typedef ReaderPrecacheImage = Future<int?> Function(
+  ImageProvider<Object> provider,
+);
 typedef ReaderPostFrameScheduler = void Function(VoidCallback callback);
 
-void _scheduleAfterFrame(VoidCallback callback) {
+void scheduleReaderPostFrame(VoidCallback callback) {
   WidgetsBinding.instance.addPostFrameCallback((_) => callback());
+}
+
+int _imageCacheBudgetBytes() =>
+    PaintingBinding.instance.imageCache.maximumSizeBytes;
+
+/// Resolves [provider] like [precacheImage], additionally reporting the
+/// decoded size so the prefetch window can be sized to the image cache.
+Future<int?> precacheReaderImage(
+  ImageProvider<Object> provider,
+  ImageConfiguration configuration,
+) {
+  final completer = Completer<int?>();
+  final stream = provider.resolve(configuration);
+  ImageStreamListener? listener;
+  listener = ImageStreamListener(
+    (image, sync) {
+      if (!completer.isCompleted) {
+        completer.complete(image.sizeBytes);
+      }
+      image.dispose();
+      // Same as precacheImage: keep the stream alive until the end of the
+      // frame so the cache can retain the completed image.
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        stream.removeListener(listener!);
+      });
+    },
+    onError: (exception, stackTrace) {
+      if (!completer.isCompleted) {
+        completer.complete(null);
+      }
+      stream.removeListener(listener!);
+    },
+  );
+  stream.addListener(listener);
+  return completer.future;
 }
 
 class ReaderSession {
   ReaderSession({
-    required List<ReaderPage> pages,
-    required String? subtitle,
-    required ReaderPrecacheImage precacheImage,
-    ReaderPostFrameScheduler schedulePostFrame = _scheduleAfterFrame,
-  }) : _pages = pages,
-       _subtitle = subtitle,
-       _precacheImage = precacheImage,
-       _schedulePostFrame = schedulePostFrame,
-       currentPage = ValueNotifier<int>(0),
-       subtext = ValueNotifier<String?>(
-         subtitle ?? (pages.isNotEmpty ? pages.first.sortKey : ''),
-       ),
+    required this._pages,
+    required this._precacheImage,
+    this._schedulePostFrame = scheduleReaderPostFrame,
+    this._cacheBudgetBytes = _imageCacheBudgetBytes,
+  }) : currentPage = ValueNotifier<int>(0),
        chromeVisible = ValueNotifier<bool>(false);
 
-  List<ReaderPage> _pages;
-  String? _subtitle;
+  /// Share of the image cache the prefetch window may occupy, leaving room
+  /// for pages that are on screen or kept by the viewport.
+  static const _prefetchCacheShare = 0.75;
+
+  final List<ReaderPage> _pages;
   final ReaderPrecacheImage _precacheImage;
   final ReaderPostFrameScheduler _schedulePostFrame;
+  final int Function() _cacheBudgetBytes;
   ReaderViewportController? _viewport;
   ReaderPrefetchPolicy? _prefetchPolicy;
 
   final Set<ImageProvider<Object>> _precacheInFlight = {};
-  final Set<ImageProvider<Object>> _completedPrecache = {};
+  final Map<int, int> _decodedPageBytes = {};
+  int? _lastPrefetchCapacity;
   int _cacheScheduleToken = 0;
   bool _disposed = false;
 
   final ValueNotifier<int> currentPage;
-  final ValueNotifier<String?> subtext;
   final ValueNotifier<bool> chromeVisible;
 
   int get pageCount => _pages.length;
@@ -97,53 +156,32 @@ class ReaderSession {
     if (identical(_viewport, viewport)) return;
     _viewport = viewport;
 
+    final page = currentPage.value;
+    viewport.prepareInitialPage(page);
     _schedulePostFrame(() {
       if (_disposed || !identical(_viewport, viewport)) return;
-      viewport.jumpToPage(currentPage.value);
+      viewport.jumpToPage(page);
     });
   }
 
-  void updateContent({
-    required List<ReaderPage> pages,
-    required String? subtitle,
-  }) {
-    _pages = pages;
-    _subtitle = subtitle;
-
-    if (_pages.isEmpty) {
-      currentPage.value = 0;
-      subtext.value = subtitle ?? '';
-      return;
-    }
-
-    final page = currentPage.value.clamp(0, _pages.length - 1);
-    reportVisiblePage(page);
-    _schedulePrefetch();
-  }
-
   void updatePrefetchPolicy(ReaderPrefetchPolicy policy) {
-    if (_prefetchPolicy == policy) return;
+    final previous = _prefetchPolicy;
+    if (previous == policy) return;
     _prefetchPolicy = policy;
+
+    // Decoded sizes depend on the decode width; measure again after a change.
+    if (previous?.cacheWidth != policy.cacheWidth) {
+      _decodedPageBytes.clear();
+    }
     _schedulePrefetch();
   }
 
   void reportVisiblePage(int page, {ReaderViewportController? source}) {
     if (source != null && !identical(_viewport, source)) return;
-    if (!_isValidPage(page)) return;
+    if (!_isValidPage(page) || currentPage.value == page) return;
 
-    final changed = currentPage.value != page;
-    if (changed) {
-      currentPage.value = page;
-    }
-
-    final nextSubtext = _subtitle ?? _pages[page].sortKey;
-    if (subtext.value != nextSubtext) {
-      subtext.value = nextSubtext;
-    }
-
-    if (changed) {
-      _schedulePrefetch();
-    }
+    currentPage.value = page;
+    _schedulePrefetch();
   }
 
   void jumpToPage(int page) {
@@ -160,6 +198,8 @@ class ReaderSession {
   }
 
   ReaderPageTurnResult turnLeft(ReaderDirection direction) {
+    if (_viewport?.turnsPages != true) return ReaderPageTurnResult.handled;
+
     return switch (direction) {
       ReaderDirection.leftToRight => _turnPrevious(),
       ReaderDirection.rightToLeft => _turnNext(),
@@ -167,10 +207,21 @@ class ReaderSession {
   }
 
   ReaderPageTurnResult turnRight(ReaderDirection direction) {
+    if (_viewport?.turnsPages != true) return ReaderPageTurnResult.handled;
+
     return switch (direction) {
       ReaderDirection.leftToRight => _turnNext(),
       ReaderDirection.rightToLeft => _turnPrevious(),
     };
+  }
+
+  ReaderPageTurnResult scrollBy(double delta) {
+    return _viewport?.scrollBy(delta, currentPage: currentPage.value) ??
+        ReaderPageTurnResult.handled;
+  }
+
+  void togglePageSize() {
+    _viewport?.togglePageSize(currentPage.value);
   }
 
   void toggleChrome() {
@@ -204,33 +255,62 @@ class ReaderSession {
     });
   }
 
+  /// How many pages besides the current one fit in the cache share, or null
+  /// until a decoded page size has been measured.
+  int? _prefetchCapacity() {
+    if (_decodedPageBytes.isEmpty) return null;
+
+    final totalBytes = _decodedPageBytes.values.reduce((a, b) => a + b);
+    final averageBytes = max(1, totalBytes ~/ _decodedPageBytes.length);
+    final budget = (_cacheBudgetBytes() * _prefetchCacheShare) ~/ averageBytes;
+    return max(1, budget - 1);
+  }
+
   void _prefetch(ReaderPrefetchPolicy policy) {
+    final capacity = _prefetchCapacity();
+    _lastPrefetchCapacity = capacity;
+
+    // Until a page size is known, probe a single page rather than flooding
+    // the cache with an unbounded window.
+    final forwardCount = min(policy.forwardCount, capacity ?? 1);
+    final backwardCount = capacity == null
+        ? 0
+        : min(policy.backwardCount, capacity - forwardCount);
+
     for (final index in readerPrecacheIndices(
       currentIndex: currentPage.value,
       pageCount: _pages.length,
-      forwardCount: policy.forwardCount,
-      backwardCount: policy.backwardCount,
+      forwardCount: forwardCount,
+      backwardCount: backwardCount,
     )) {
-      final page = _pages[index];
-      final provider = switch (policy.cacheWidth) {
-        final width? => ResizeImage.resizeIfNeeded(width, null, page.provider),
-        null => page.provider,
-      };
+      final provider = readerImageProvider(
+        _pages[index],
+        cacheWidth: policy.cacheWidth,
+      );
 
-      if (policy.retainsCompletedPages &&
-          _completedPrecache.contains(provider)) {
-        continue;
-      }
+      // Pages that already completed are requested again: a cache hit is a
+      // cheap synchronous resolve that also refreshes their LRU position,
+      // and an evicted page is decoded anew.
       if (!_precacheInFlight.add(provider)) continue;
 
       unawaited(
-        _precacheImage(provider).whenComplete(() {
-          _precacheInFlight.remove(provider);
-          if (policy.retainsCompletedPages) {
-            _completedPrecache.add(provider);
-          }
-        }),
+        _precacheImage(provider)
+            .then(
+              (bytes) => _handlePrecached(policy, index, bytes),
+              onError: (Object _) {},
+            )
+            .whenComplete(() => _precacheInFlight.remove(provider)),
       );
+    }
+  }
+
+  void _handlePrecached(ReaderPrefetchPolicy policy, int index, int? bytes) {
+    if (_disposed || bytes == null || bytes <= 0) return;
+    if (policy.cacheWidth != _prefetchPolicy?.cacheWidth) return;
+
+    _decodedPageBytes[index] = bytes;
+    if (_prefetchCapacity() != _lastPrefetchCapacity) {
+      _schedulePrefetch();
     }
   }
 
@@ -238,7 +318,6 @@ class ReaderSession {
     _disposed = true;
     _viewport = null;
     currentPage.dispose();
-    subtext.dispose();
     chromeVisible.dispose();
   }
 }

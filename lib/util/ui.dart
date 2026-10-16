@@ -1,7 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/common.dart';
@@ -11,6 +11,8 @@ import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart';
 import 'package:url_launcher/url_launcher.dart' show launchUrl;
+
+typedef CtxCallback = void Function(BuildContext);
 
 class MouseTouchScrollBehavior extends MaterialScrollBehavior {
   const MouseTouchScrollBehavior();
@@ -160,10 +162,17 @@ class ScrollToTopFab extends StatelessWidget {
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
+        // While a scroll view is being swapped out (a tab or layout switch),
+        // the controller can briefly have more than one position; the most
+        // recently attached one is current.
+        final position = controller.hasClients
+            ? controller.positions.last
+            : null;
         final visible =
-            controller.hasClients &&
-            controller.offset > 0 &&
-            (visibleCondition?.call() ?? true);
+            (visibleCondition?.call() ?? true) &&
+            position != null &&
+            position.hasPixels &&
+            position.pixels > 0;
         return AnimatedScale(
           scale: visible ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 200),
@@ -183,6 +192,47 @@ class ScrollToTopFab extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// A pinned medium app bar for a scrolling page. Tapping the title scrolls
+/// [controller] back to the top.
+class PageSliverAppBar extends StatelessWidget {
+  const PageSliverAppBar({
+    super.key,
+    required this.title,
+    this.controller,
+    this.leading = const BackButton(),
+    this.actions,
+  });
+
+  final String title;
+  final ScrollController? controller;
+
+  /// Defaults to a back button. Pass null to show no leading widget.
+  final Widget? leading;
+  final List<Widget>? actions;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverAppBar.medium(
+      pinned: true,
+      automaticallyImplyLeading: false,
+      leading: leading,
+      title: GestureDetector(
+        onTap: () {
+          final controller = this.controller;
+          if (controller == null || !controller.hasClients) return;
+          controller.animateTo(
+            0.0,
+            duration: const Duration(milliseconds: 1000),
+            curve: Curves.easeOutCirc,
+          );
+        },
+        child: Text(title),
+      ),
+      actions: actions,
     );
   }
 }
@@ -249,9 +299,8 @@ class ButtonChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textStyle = TextStyle(
-      color: theme.colorScheme.onTertiaryContainer,
-    ).merge(style);
+    final textStyle = TextStyle(color: theme.colorScheme.onTertiaryContainer)
+        .merge(style);
 
     final bstyle = Styles.buttonStyle(
       backgroundColor: color ?? theme.colorScheme.tertiaryContainer,
@@ -296,9 +345,8 @@ class IconTextChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final textStyle = TextStyle(
-      color: colorScheme.onTertiaryContainer,
-    ).merge(style);
+    final textStyle = TextStyle(color: colorScheme.onTertiaryContainer)
+        .merge(style);
 
     Widget child = Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
@@ -877,15 +925,17 @@ class ListSpinner extends StatelessWidget {
 
 typedef DataBuilder<T> = Widget Function(BuildContext context, T data);
 typedef LoadingBuilder = Widget Function(BuildContext context, num? progress);
-typedef ErrorWrapperBuilder =
-    Widget Function(
-      BuildContext context,
-      Widget defaultChild,
-      Object error,
-      StackTrace stacktrace,
-    );
-typedef ErrorBuilder =
-    Widget Function(BuildContext context, Object error, StackTrace stacktrace);
+typedef ErrorWrapperBuilder = Widget Function(
+  BuildContext context,
+  Widget defaultChild,
+  Object error,
+  StackTrace stacktrace,
+);
+typedef ErrorBuilder = Widget Function(
+  BuildContext context,
+  Object error,
+  StackTrace stacktrace,
+);
 
 class DataProviderWhenWidget<T> extends ConsumerWidget {
   const DataProviderWhenWidget({

@@ -1,19 +1,12 @@
+import 'package:dio/dio.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/web/model/types.dart';
 
-abstract interface class WebLinkRedirectTransport {
-  Future<Uri?> resolveRedirect(Uri uri);
-}
-
 class WebLinkResolver {
-  WebLinkResolver({
-    required Future<bool> Function(String sourceId) extensionExists,
-    required WebLinkRedirectTransport redirectTransport,
-  }) : _extensionExists = extensionExists,
-       _redirectTransport = redirectTransport;
+  WebLinkResolver({required this._extensionExists, required this._dio});
 
   final Future<bool> Function(String sourceId) _extensionExists;
-  final WebLinkRedirectTransport _redirectTransport;
+  final Dio _dio;
 
   static const _imgurHost = 'imgur.com';
   static const _cubariHost = 'cubari.moe';
@@ -63,7 +56,7 @@ class WebLinkResolver {
 
   Future<ResolvedWebLink?> _resolveCubari(Uri uri) async {
     if (!_isCubariReadPath(uri)) {
-      final redirect = await _redirectTransport.resolveRedirect(uri);
+      final redirect = await _resolveRedirect(uri);
       if (redirect == null ||
           (redirect.hasAuthority && redirect.host != _cubariHost) ||
           !_isCubariReadPath(redirect)) {
@@ -81,6 +74,26 @@ class WebLinkResolver {
       series: WebSeriesRef.proxy(proxyId: parts[1], seriesId: parts[2]),
       initialChapterId: parts.length >= 4 ? parts[3] : null,
     );
+  }
+
+  Future<Uri?> _resolveRedirect(Uri uri) async {
+    logger.d('WebLinkResolver: retrieving redirect for ${uri.toString()}');
+
+    final response = await _dio.getUri(
+      uri,
+      options: Options(followRedirects: false),
+    );
+    if (response.statusCode != 302) {
+      return null;
+    }
+
+    final location = response.headers.value('location');
+    if (location == null || location.isEmpty) {
+      return null;
+    }
+
+    logger.d('WebLinkResolver: redirect location $location');
+    return Uri.tryParse(location);
   }
 
   bool _isCubariReadPath(Uri uri) {

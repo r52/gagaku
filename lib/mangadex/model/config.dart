@@ -11,29 +11,23 @@ part 'config.g.dart';
 @Entity()
 @JsonSerializable()
 class MangaDexConfig with _$MangaDexConfig {
-  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @Id()
   int dbid;
 
-  @override
   @Transient()
   @LanguageConverter()
   Set<Language> translatedLanguages;
 
-  @override
   @Transient()
   @LanguageConverter()
   Set<Language> originalLanguage;
 
-  @override
   @Transient()
   Set<ContentRating> contentRating;
 
-  @override
   bool dataSaver;
 
-  @override
   @Transient()
   Set<String> groupBlacklist;
 

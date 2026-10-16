@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'types.dart';
@@ -9,6 +9,7 @@ part of 'types.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 WebSeriesRef _$WebSeriesRefFromJson(
@@ -46,7 +47,7 @@ mixin _$WebSeriesRef {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebSeriesRef);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is WebSeriesRef);
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -55,7 +56,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'WebSeriesRef()';
+    return 'WebSeriesRef()';
 }
 
 
@@ -72,7 +73,7 @@ $WebSeriesRefCopyWith(WebSeriesRef _, $Res Function(WebSeriesRef) __);
 @JsonSerializable()
 
 class ProxySeriesRef extends WebSeriesRef {
-  const ProxySeriesRef({required this.proxyId, required this.seriesId, final  String? $type}): $type = $type ?? 'proxy',super._();
+  const ProxySeriesRef({required this.proxyId, required this.seriesId,  String? $type}): $type = $type ?? 'proxy',super._();
   factory ProxySeriesRef.fromJson(Map<String, dynamic> json) => _$ProxySeriesRefFromJson(json);
 
  final  String proxyId;
@@ -95,16 +96,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProxySeriesRef&&(identical(other.proxyId, proxyId) || other.proxyId == proxyId)&&(identical(other.seriesId, seriesId) || other.seriesId == seriesId));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ProxySeriesRef&&(identical(other.proxyId, proxyId) || other.proxyId == proxyId)&&(identical(other.seriesId, seriesId) || other.seriesId == seriesId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,proxyId,seriesId);
+int get hashCode {
+    return Object.hash(runtimeType,proxyId,seriesId);
+}
 
 @override
 String toString() {
-  return 'WebSeriesRef.proxy(proxyId: $proxyId, seriesId: $seriesId)';
+    return 'WebSeriesRef.proxy(proxyId: $proxyId, seriesId: $seriesId)';
 }
 
 
@@ -147,7 +150,7 @@ as String,
 @JsonSerializable()
 
 class ExtensionSeriesRef extends WebSeriesRef {
-  const ExtensionSeriesRef({required this.sourceId, required this.mangaId, final  String? $type}): $type = $type ?? 'extension',super._();
+  const ExtensionSeriesRef({required this.sourceId, required this.mangaId,  String? $type}): $type = $type ?? 'extension',super._();
   factory ExtensionSeriesRef.fromJson(Map<String, dynamic> json) => _$ExtensionSeriesRefFromJson(json);
 
  final  String sourceId;
@@ -170,16 +173,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExtensionSeriesRef&&(identical(other.sourceId, sourceId) || other.sourceId == sourceId)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ExtensionSeriesRef&&(identical(other.sourceId, sourceId) || other.sourceId == sourceId)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,sourceId,mangaId);
+int get hashCode {
+    return Object.hash(runtimeType,sourceId,mangaId);
+}
 
 @override
 String toString() {
-  return 'WebSeriesRef.extension(sourceId: $sourceId, mangaId: $mangaId)';
+    return 'WebSeriesRef.extension(sourceId: $sourceId, mangaId: $mangaId)';
 }
 
 
@@ -235,16 +240,21 @@ $WebChapterRefCopyWith<WebChapterRef> get copyWith => _$WebChapterRefCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapterRef&&(identical(other.series, series) || other.series == series)&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId));
+  final _this = this as WebChapterRef;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapterRef&&(identical(other.series, _this.series) || other.series == _this.series)&&(identical(other.chapterId, _this.chapterId) || other.chapterId == _this.chapterId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,series,chapterId);
+int get hashCode {
+  final _this = this as WebChapterRef;
+  return Object.hash(runtimeType,_this.series,_this.chapterId);
+}
 
 @override
 String toString() {
-  return 'WebChapterRef(series: $series, chapterId: $chapterId)';
+  final _this = this as WebChapterRef;
+  return 'WebChapterRef(series: ${_this.series}, chapterId: ${_this.chapterId})';
 }
 
 
@@ -273,7 +283,7 @@ class _$WebChapterRefCopyWithImpl<$Res>
 /// Create a copy of WebChapterRef
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? series = null,Object? chapterId = null,}) {
-  return _then(_self.copyWith(
+  return _then(WebChapterRef(
 series: null == series ? _self.series : series // ignore: cast_nullable_to_non_nullable
 as WebSeriesRef,chapterId: null == chapterId ? _self.chapterId : chapterId // ignore: cast_nullable_to_non_nullable
 as String,
@@ -316,16 +326,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebChapterRef&&(identical(other.series, series) || other.series == series)&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebChapterRef&&(identical(other.series, series) || other.series == series)&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,series,chapterId);
+int get hashCode {
+    return Object.hash(runtimeType,series,chapterId);
+}
 
 @override
 String toString() {
-  return 'WebChapterRef(series: $series, chapterId: $chapterId)';
+    return 'WebChapterRef(series: $series, chapterId: $chapterId)';
 }
 
 
@@ -390,16 +402,21 @@ $ResolvedWebLinkCopyWith<ResolvedWebLink> get copyWith => _$ResolvedWebLinkCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ResolvedWebLink&&(identical(other.series, series) || other.series == series)&&(identical(other.initialChapterId, initialChapterId) || other.initialChapterId == initialChapterId));
+  final _this = this as ResolvedWebLink;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ResolvedWebLink&&(identical(other.series, _this.series) || other.series == _this.series)&&(identical(other.initialChapterId, _this.initialChapterId) || other.initialChapterId == _this.initialChapterId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,series,initialChapterId);
+int get hashCode {
+  final _this = this as ResolvedWebLink;
+  return Object.hash(runtimeType,_this.series,_this.initialChapterId);
+}
 
 @override
 String toString() {
-  return 'ResolvedWebLink(series: $series, initialChapterId: $initialChapterId)';
+  final _this = this as ResolvedWebLink;
+  return 'ResolvedWebLink(series: ${_this.series}, initialChapterId: ${_this.initialChapterId})';
 }
 
 
@@ -428,7 +445,7 @@ class _$ResolvedWebLinkCopyWithImpl<$Res>
 /// Create a copy of ResolvedWebLink
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? series = null,Object? initialChapterId = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(ResolvedWebLink(
 series: null == series ? _self.series : series // ignore: cast_nullable_to_non_nullable
 as WebSeriesRef,initialChapterId: freezed == initialChapterId ? _self.initialChapterId : initialChapterId // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -471,16 +488,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ResolvedWebLink&&(identical(other.series, series) || other.series == series)&&(identical(other.initialChapterId, initialChapterId) || other.initialChapterId == initialChapterId));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ResolvedWebLink&&(identical(other.series, series) || other.series == series)&&(identical(other.initialChapterId, initialChapterId) || other.initialChapterId == initialChapterId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,series,initialChapterId);
+int get hashCode {
+    return Object.hash(runtimeType,series,initialChapterId);
+}
 
 @override
 String toString() {
-  return 'ResolvedWebLink(series: $series, initialChapterId: $initialChapterId)';
+    return 'ResolvedWebLink(series: $series, initialChapterId: $initialChapterId)';
 }
 
 
@@ -545,16 +564,21 @@ $UpdateFeedItemCopyWith<UpdateFeedItem> get copyWith => _$UpdateFeedItemCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateFeedItem&&(identical(other.link, link) || other.link == link)&&(identical(other.manga, manga) || other.manga == manga));
+  final _this = this as UpdateFeedItem;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateFeedItem&&(identical(other.link, _this.link) || other.link == _this.link)&&(identical(other.manga, _this.manga) || other.manga == _this.manga));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,link,manga);
+int get hashCode {
+  final _this = this as UpdateFeedItem;
+  return Object.hash(runtimeType,_this.link,_this.manga);
+}
 
 @override
 String toString() {
-  return 'UpdateFeedItem(link: $link, manga: $manga)';
+  final _this = this as UpdateFeedItem;
+  return 'UpdateFeedItem(link: ${_this.link}, manga: ${_this.manga})';
 }
 
 
@@ -583,7 +607,7 @@ class _$UpdateFeedItemCopyWithImpl<$Res>
 /// Create a copy of UpdateFeedItem
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? link = null,Object? manga = null,}) {
-  return _then(_self.copyWith(
+  return _then(UpdateFeedItem(
 link: null == link ? _self.link : link // ignore: cast_nullable_to_non_nullable
 as HistoryLink,manga: null == manga ? _self.manga : manga // ignore: cast_nullable_to_non_nullable
 as WebManga,
@@ -635,16 +659,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateFeedItem&&(identical(other.link, link) || other.link == link)&&(identical(other.manga, manga) || other.manga == manga));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateFeedItem&&(identical(other.link, link) || other.link == link)&&(identical(other.manga, manga) || other.manga == manga));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,link,manga);
+int get hashCode {
+    return Object.hash(runtimeType,link,manga);
+}
 
 @override
 String toString() {
-  return 'UpdateFeedItem(link: $link, manga: $manga)';
+    return 'UpdateFeedItem(link: $link, manga: $manga)';
 }
 
 
@@ -705,7 +731,7 @@ $WebMangaCopyWith<$Res> get manga {
 /// @nodoc
 mixin _$HistoryLink {
 
- int get dbid; set dbid(int value); String get title; set title(String value); String get url; set url(String value); String? get cover; set cover(String? value); WebSeriesRef? get series; set series(WebSeriesRef? value); DateTime? get lastAccessed; set lastAccessed(DateTime? value); dynamic get lists;
+
 /// Create a copy of HistoryLink
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -718,7 +744,8 @@ $HistoryLinkCopyWith<HistoryLink> get copyWith => _$HistoryLinkCopyWithImpl<Hist
 
 @override
 String toString() {
-  return 'HistoryLink(dbid: $dbid, title: $title, url: $url, cover: $cover, series: $series, lastAccessed: $lastAccessed, lists: $lists)';
+  final _this = this as HistoryLink;
+  return 'HistoryLink(dbid: ${_this.dbid}, title: ${_this.title}, url: ${_this.url}, cover: ${_this.cover}, series: ${_this.series}, lastAccessed: ${_this.lastAccessed}, lists: ${_this.lists})';
 }
 
 
@@ -733,7 +760,7 @@ $Res call({
 });
 
 
-
+$WebSeriesRefCopyWith<$Res>? get series;
 
 }
 /// @nodoc
@@ -757,7 +784,19 @@ as WebSeriesRef?,lastAccessed: freezed == lastAccessed ? _self.lastAccessed : la
 as DateTime?,
   ));
 }
+/// Create a copy of HistoryLink
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebSeriesRefCopyWith<$Res>? get series {
+    if (_self.series == null) {
+    return null;
+  }
 
+  return $WebSeriesRefCopyWith<$Res>(_self.series!, (value) {
+    return _then(_self.copyWith(series: value));
+  });
+}
 }
 
 
@@ -779,16 +818,21 @@ $CubariChapterEntryCopyWith<CubariChapterEntry> get copyWith => _$CubariChapterE
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CubariChapterEntry&&(identical(other.name, name) || other.name == name)&&(identical(other.chapter, chapter) || other.chapter == chapter));
+  final _this = this as CubariChapterEntry;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CubariChapterEntry&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.chapter, _this.chapter) || other.chapter == _this.chapter));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,chapter);
+int get hashCode {
+  final _this = this as CubariChapterEntry;
+  return Object.hash(runtimeType,_this.name,_this.chapter);
+}
 
 @override
 String toString() {
-  return 'CubariChapterEntry(name: $name, chapter: $chapter)';
+  final _this = this as CubariChapterEntry;
+  return 'CubariChapterEntry(name: ${_this.name}, chapter: ${_this.chapter})';
 }
 
 
@@ -817,7 +861,7 @@ class _$CubariChapterEntryCopyWithImpl<$Res>
 /// Create a copy of CubariChapterEntry
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? chapter = null,}) {
-  return _then(_self.copyWith(
+  return _then(CubariChapterEntry(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,chapter: null == chapter ? _self.chapter : chapter // ignore: cast_nullable_to_non_nullable
 as CubariChapter,
@@ -860,16 +904,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CubariChapterEntry&&(identical(other.name, name) || other.name == name)&&(identical(other.chapter, chapter) || other.chapter == chapter));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CubariChapterEntry&&(identical(other.name, name) || other.name == name)&&(identical(other.chapter, chapter) || other.chapter == chapter));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,chapter);
+int get hashCode {
+    return Object.hash(runtimeType,name,chapter);
+}
 
 @override
 String toString() {
-  return 'CubariChapterEntry(name: $name, chapter: $chapter)';
+    return 'CubariChapterEntry(name: $name, chapter: $chapter)';
 }
 
 
@@ -926,7 +972,7 @@ mixin _$WebChapterItem {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapterItem);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapterItem);
 }
 
 
@@ -935,7 +981,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'WebChapterItem()';
+    return 'WebChapterItem()';
 }
 
 
@@ -967,16 +1013,18 @@ $WebChapterItemCubariCopyWith<WebChapterItemCubari> get copyWith => _$WebChapter
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapterItemCubari&&(identical(other.entry, entry) || other.entry == entry));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapterItemCubari&&(identical(other.entry, entry) || other.entry == entry));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,entry);
+int get hashCode {
+    return Object.hash(runtimeType,entry);
+}
 
 @override
 String toString() {
-  return 'WebChapterItem.cubari(entry: $entry)';
+    return 'WebChapterItem.cubari(entry: $entry)';
 }
 
 
@@ -1042,16 +1090,18 @@ $WebChapterItemExtensionCopyWith<WebChapterItemExtension> get copyWith => _$WebC
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapterItemExtension&&(identical(other.chapter, chapter) || other.chapter == chapter));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is WebChapterItemExtension&&(identical(other.chapter, chapter) || other.chapter == chapter));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,chapter);
+int get hashCode {
+    return Object.hash(runtimeType,chapter);
+}
 
 @override
 String toString() {
-  return 'WebChapterItem.extension(chapter: $chapter)';
+    return 'WebChapterItem.extension(chapter: $chapter)';
 }
 
 
@@ -1133,7 +1183,7 @@ mixin _$WebManga {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebManga);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is WebManga);
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1142,7 +1192,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'WebManga()';
+    return 'WebManga()';
 }
 
 
@@ -1159,7 +1209,7 @@ $WebMangaCopyWith(WebManga _, $Res Function(WebManga) __);
 
 @JsonSerializable(explicitToJson: true)
 class WebMangaCubari extends WebManga {
-  const WebMangaCubari({required this.title, required this.description, required this.artist, required this.author, required this.cover, final  Map<String, String>? groups, @JsonKey(name: 'chapters')@CubariChapterListConverter() required final  List<CubariChapterEntry> cubariChapters, final  String? $type}): _groups = groups,_cubariChapters = cubariChapters,$type = $type ?? 'cubari',super._();
+  const WebMangaCubari({required this.title, required this.description, required this.artist, required this.author, required this.cover,  Map<String, String>? groups, @JsonKey(name: 'chapters')@CubariChapterListConverter() required  List<CubariChapterEntry> cubariChapters,  String? $type}): _groups = groups,_cubariChapters = cubariChapters,$type = $type ?? 'cubari',super._();
   factory WebMangaCubari.fromJson(Map<String, dynamic> json) => _$WebMangaCubariFromJson(json);
 
  final  String title;
@@ -1201,16 +1251,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebMangaCubari&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.cover, cover) || other.cover == cover)&&const DeepCollectionEquality().equals(other._groups, _groups)&&const DeepCollectionEquality().equals(other._cubariChapters, _cubariChapters));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is WebMangaCubari&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.cover, cover) || other.cover == cover)&&const DeepCollectionEquality().equals(other.groups, _groups)&&const DeepCollectionEquality().equals(other.cubariChapters, _cubariChapters));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,description,artist,author,cover,const DeepCollectionEquality().hash(_groups),const DeepCollectionEquality().hash(_cubariChapters));
+int get hashCode {
+    return Object.hash(runtimeType,title,description,artist,author,cover,const DeepCollectionEquality().hash(_groups),const DeepCollectionEquality().hash(_cubariChapters));
+}
 
 @override
 String toString() {
-  return 'WebManga.cubari(title: $title, description: $description, artist: $artist, author: $author, cover: $cover, groups: $groups, cubariChapters: $cubariChapters)';
+    return 'WebManga.cubari(title: $title, description: $description, artist: $artist, author: $author, cover: $cover, groups: $groups, cubariChapters: $cubariChapters)';
 }
 
 
@@ -1258,7 +1310,7 @@ as List<CubariChapterEntry>,
 
 @JsonSerializable(explicitToJson: true)
 class WebMangaExtension extends WebManga {
-  const WebMangaExtension({required this.data, required final  List<Chapter> chaptersList, final  String? $type}): _chaptersList = chaptersList,$type = $type ?? 'extension',super._();
+  const WebMangaExtension({required this.data, required  List<Chapter> chaptersList,  String? $type}): _chaptersList = chaptersList,$type = $type ?? 'extension',super._();
   factory WebMangaExtension.fromJson(Map<String, dynamic> json) => _$WebMangaExtensionFromJson(json);
 
  final  SourceManga data;
@@ -1287,16 +1339,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebMangaExtension&&(identical(other.data, data) || other.data == data)&&const DeepCollectionEquality().equals(other._chaptersList, _chaptersList));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is WebMangaExtension&&(identical(other.data, data) || other.data == data)&&const DeepCollectionEquality().equals(other.chaptersList, _chaptersList));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,data,const DeepCollectionEquality().hash(_chaptersList));
+int get hashCode {
+    return Object.hash(runtimeType,data,const DeepCollectionEquality().hash(_chaptersList));
+}
 
 @override
 String toString() {
-  return 'WebManga.extension(data: $data, chaptersList: $chaptersList)';
+    return 'WebManga.extension(data: $data, chaptersList: $chaptersList)';
 }
 
 
@@ -1361,16 +1415,21 @@ $CubariChapterCopyWith<CubariChapter> get copyWith => _$CubariChapterCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CubariChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other.groups, groups));
+  final _this = this as CubariChapter;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CubariChapter&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.volume, _this.volume) || other.volume == _this.volume)&&(identical(other.lastUpdated, _this.lastUpdated) || other.lastUpdated == _this.lastUpdated)&&(identical(other.releaseDate, _this.releaseDate) || other.releaseDate == _this.releaseDate)&&const DeepCollectionEquality().equals(other.groups, _this.groups));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(groups));
+int get hashCode {
+  final _this = this as CubariChapter;
+  return Object.hash(runtimeType,_this.title,_this.volume,_this.lastUpdated,_this.releaseDate,const DeepCollectionEquality().hash(_this.groups));
+}
 
 @override
 String toString() {
-  return 'CubariChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups)';
+  final _this = this as CubariChapter;
+  return 'CubariChapter(title: ${_this.title}, volume: ${_this.volume}, lastUpdated: ${_this.lastUpdated}, releaseDate: ${_this.releaseDate}, groups: ${_this.groups})';
 }
 
 
@@ -1399,7 +1458,7 @@ class _$CubariChapterCopyWithImpl<$Res>
 /// Create a copy of CubariChapter
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? title = freezed,Object? volume = freezed,Object? lastUpdated = freezed,Object? releaseDate = freezed,Object? groups = null,}) {
-  return _then(_self.copyWith(
+  return _then(CubariChapter(
 title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,volume: freezed == volume ? _self.volume : volume // ignore: cast_nullable_to_non_nullable
 as String?,lastUpdated: freezed == lastUpdated ? _self.lastUpdated : lastUpdated // ignore: cast_nullable_to_non_nullable
@@ -1417,7 +1476,7 @@ as Map<String, dynamic>,
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class _CubariChapter extends CubariChapter {
-  const _CubariChapter({this.title, this.volume, @EpochTimestampSerializer() this.lastUpdated, @MappedEpochTimestampSerializer() this.releaseDate, required final  Map<String, dynamic> groups}): _groups = groups,super._();
+  const _CubariChapter({this.title, this.volume, @EpochTimestampSerializer() this.lastUpdated, @MappedEpochTimestampSerializer() this.releaseDate, required  Map<String, dynamic> groups}): _groups = groups,super._();
   factory _CubariChapter.fromJson(Map<String, dynamic> json) => _$CubariChapterFromJson(json);
 
 @override final  String? title;
@@ -1445,16 +1504,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CubariChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other._groups, _groups));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CubariChapter&&(identical(other.title, title) || other.title == title)&&(identical(other.volume, volume) || other.volume == volume)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated)&&(identical(other.releaseDate, releaseDate) || other.releaseDate == releaseDate)&&const DeepCollectionEquality().equals(other.groups, _groups));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(_groups));
+int get hashCode {
+    return Object.hash(runtimeType,title,volume,lastUpdated,releaseDate,const DeepCollectionEquality().hash(_groups));
+}
 
 @override
 String toString() {
-  return 'CubariChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups)';
+    return 'CubariChapter(title: $title, volume: $volume, lastUpdated: $lastUpdated, releaseDate: $releaseDate, groups: $groups)';
 }
 
 
@@ -1513,16 +1574,21 @@ $ImgurPageCopyWith<ImgurPage> get copyWith => _$ImgurPageCopyWithImpl<ImgurPage>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ImgurPage&&(identical(other.description, description) || other.description == description)&&(identical(other.src, src) || other.src == src));
+  final _this = this as ImgurPage;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ImgurPage&&(identical(other.description, _this.description) || other.description == _this.description)&&(identical(other.src, _this.src) || other.src == _this.src));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,description,src);
+int get hashCode {
+  final _this = this as ImgurPage;
+  return Object.hash(runtimeType,_this.description,_this.src);
+}
 
 @override
 String toString() {
-  return 'ImgurPage(description: $description, src: $src)';
+  final _this = this as ImgurPage;
+  return 'ImgurPage(description: ${_this.description}, src: ${_this.src})';
 }
 
 
@@ -1551,7 +1617,7 @@ class _$ImgurPageCopyWithImpl<$Res>
 /// Create a copy of ImgurPage
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? description = null,Object? src = null,}) {
-  return _then(_self.copyWith(
+  return _then(ImgurPage(
 description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,src: null == src ? _self.src : src // ignore: cast_nullable_to_non_nullable
 as String,
@@ -1585,16 +1651,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ImgurPage&&(identical(other.description, description) || other.description == description)&&(identical(other.src, src) || other.src == src));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ImgurPage&&(identical(other.description, description) || other.description == description)&&(identical(other.src, src) || other.src == src));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,description,src);
+int get hashCode {
+    return Object.hash(runtimeType,description,src);
+}
 
 @override
 String toString() {
-  return 'ImgurPage(description: $description, src: $src)';
+    return 'ImgurPage(description: $description, src: $src)';
 }
 
 
@@ -1637,7 +1705,7 @@ as String,
 /// @nodoc
 mixin _$WebSourceInfo {
 
- int get dbid; set dbid(int value); String get id; String get name; String get repo; String? get baseUrl; SupportedVersion get version; set version(SupportedVersion value); String get icon; List<SourceIntents> get capabilities; set capabilities(List<SourceIntents> value);
+
 /// Create a copy of WebSourceInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1650,7 +1718,8 @@ $WebSourceInfoCopyWith<WebSourceInfo> get copyWith => _$WebSourceInfoCopyWithImp
 
 @override
 String toString() {
-  return 'WebSourceInfo(dbid: $dbid, id: $id, name: $name, repo: $repo, baseUrl: $baseUrl, version: $version, icon: $icon, capabilities: $capabilities)';
+  final _this = this as WebSourceInfo;
+  return 'WebSourceInfo(dbid: ${_this.dbid}, id: ${_this.id}, name: ${_this.name}, repo: ${_this.repo}, baseUrl: ${_this.baseUrl}, version: ${_this.version}, icon: ${_this.icon}, capabilities: ${_this.capabilities})';
 }
 
 
@@ -1713,16 +1782,21 @@ $SourceBadgeCopyWith<SourceBadge> get copyWith => _$SourceBadgeCopyWithImpl<Sour
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceBadge&&(identical(other.label, label) || other.label == label)&&(identical(other.textColor, textColor) || other.textColor == textColor)&&(identical(other.backgroundColor, backgroundColor) || other.backgroundColor == backgroundColor));
+  final _this = this as SourceBadge;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceBadge&&(identical(other.label, _this.label) || other.label == _this.label)&&(identical(other.textColor, _this.textColor) || other.textColor == _this.textColor)&&(identical(other.backgroundColor, _this.backgroundColor) || other.backgroundColor == _this.backgroundColor));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,label,textColor,backgroundColor);
+int get hashCode {
+  final _this = this as SourceBadge;
+  return Object.hash(runtimeType,_this.label,_this.textColor,_this.backgroundColor);
+}
 
 @override
 String toString() {
-  return 'SourceBadge(label: $label, textColor: $textColor, backgroundColor: $backgroundColor)';
+  final _this = this as SourceBadge;
+  return 'SourceBadge(label: ${_this.label}, textColor: ${_this.textColor}, backgroundColor: ${_this.backgroundColor})';
 }
 
 
@@ -1751,7 +1825,7 @@ class _$SourceBadgeCopyWithImpl<$Res>
 /// Create a copy of SourceBadge
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? label = null,Object? textColor = null,Object? backgroundColor = null,}) {
-  return _then(_self.copyWith(
+  return _then(SourceBadge(
 label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
 as String,textColor: null == textColor ? _self.textColor : textColor // ignore: cast_nullable_to_non_nullable
 as String,backgroundColor: null == backgroundColor ? _self.backgroundColor : backgroundColor // ignore: cast_nullable_to_non_nullable
@@ -1787,16 +1861,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SourceBadge&&(identical(other.label, label) || other.label == label)&&(identical(other.textColor, textColor) || other.textColor == textColor)&&(identical(other.backgroundColor, backgroundColor) || other.backgroundColor == backgroundColor));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SourceBadge&&(identical(other.label, label) || other.label == label)&&(identical(other.textColor, textColor) || other.textColor == textColor)&&(identical(other.backgroundColor, backgroundColor) || other.backgroundColor == backgroundColor));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,label,textColor,backgroundColor);
+int get hashCode {
+    return Object.hash(runtimeType,label,textColor,backgroundColor);
+}
 
 @override
 String toString() {
-  return 'SourceBadge(label: $label, textColor: $textColor, backgroundColor: $backgroundColor)';
+    return 'SourceBadge(label: $label, textColor: $textColor, backgroundColor: $backgroundColor)';
 }
 
 
@@ -1853,16 +1929,21 @@ $SourceDeveloperCopyWith<SourceDeveloper> get copyWith => _$SourceDeveloperCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceDeveloper&&(identical(other.name, name) || other.name == name)&&(identical(other.website, website) || other.website == website)&&(identical(other.github, github) || other.github == github));
+  final _this = this as SourceDeveloper;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceDeveloper&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.website, _this.website) || other.website == _this.website)&&(identical(other.github, _this.github) || other.github == _this.github));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,website,github);
+int get hashCode {
+  final _this = this as SourceDeveloper;
+  return Object.hash(runtimeType,_this.name,_this.website,_this.github);
+}
 
 @override
 String toString() {
-  return 'SourceDeveloper(name: $name, website: $website, github: $github)';
+  final _this = this as SourceDeveloper;
+  return 'SourceDeveloper(name: ${_this.name}, website: ${_this.website}, github: ${_this.github})';
 }
 
 
@@ -1891,7 +1972,7 @@ class _$SourceDeveloperCopyWithImpl<$Res>
 /// Create a copy of SourceDeveloper
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? website = freezed,Object? github = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(SourceDeveloper(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,website: freezed == website ? _self.website : website // ignore: cast_nullable_to_non_nullable
 as String?,github: freezed == github ? _self.github : github // ignore: cast_nullable_to_non_nullable
@@ -1927,16 +2008,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SourceDeveloper&&(identical(other.name, name) || other.name == name)&&(identical(other.website, website) || other.website == website)&&(identical(other.github, github) || other.github == github));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SourceDeveloper&&(identical(other.name, name) || other.name == name)&&(identical(other.website, website) || other.website == website)&&(identical(other.github, github) || other.github == github));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,website,github);
+int get hashCode {
+    return Object.hash(runtimeType,name,website,github);
+}
 
 @override
 String toString() {
-  return 'SourceDeveloper(name: $name, website: $website, github: $github)';
+    return 'SourceDeveloper(name: $name, website: $website, github: $github)';
 }
 
 
@@ -2000,16 +2083,21 @@ $SourceVersionCopyWith<SourceVersion> get copyWith => _$SourceVersionCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceVersion&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.language, language) || other.language == language)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&const DeepCollectionEquality().equals(other.badges, badges)&&const DeepCollectionEquality().equals(other.developers, developers)&&const DeepCollectionEquality().equals(other.capabilities, capabilities));
+  final _this = this as SourceVersion;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceVersion&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.description, _this.description) || other.description == _this.description)&&(identical(other.version, _this.version) || other.version == _this.version)&&(identical(other.icon, _this.icon) || other.icon == _this.icon)&&(identical(other.language, _this.language) || other.language == _this.language)&&(identical(other.contentRating, _this.contentRating) || other.contentRating == _this.contentRating)&&const DeepCollectionEquality().equals(other.badges, _this.badges)&&const DeepCollectionEquality().equals(other.developers, _this.developers)&&const DeepCollectionEquality().equals(other.capabilities, _this.capabilities));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,version,icon,language,contentRating,const DeepCollectionEquality().hash(badges),const DeepCollectionEquality().hash(developers),const DeepCollectionEquality().hash(capabilities));
+int get hashCode {
+  final _this = this as SourceVersion;
+  return Object.hash(runtimeType,_this.id,_this.name,_this.description,_this.version,_this.icon,_this.language,_this.contentRating,const DeepCollectionEquality().hash(_this.badges),const DeepCollectionEquality().hash(_this.developers),const DeepCollectionEquality().hash(_this.capabilities));
+}
 
 @override
 String toString() {
-  return 'SourceVersion(id: $id, name: $name, description: $description, version: $version, icon: $icon, language: $language, contentRating: $contentRating, badges: $badges, developers: $developers, capabilities: $capabilities)';
+  final _this = this as SourceVersion;
+  return 'SourceVersion(id: ${_this.id}, name: ${_this.name}, description: ${_this.description}, version: ${_this.version}, icon: ${_this.icon}, language: ${_this.language}, contentRating: ${_this.contentRating}, badges: ${_this.badges}, developers: ${_this.developers}, capabilities: ${_this.capabilities})';
 }
 
 
@@ -2038,7 +2126,7 @@ class _$SourceVersionCopyWithImpl<$Res>
 /// Create a copy of SourceVersion
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? version = null,Object? icon = null,Object? language = freezed,Object? contentRating = null,Object? badges = null,Object? developers = null,Object? capabilities = null,}) {
-  return _then(_self.copyWith(
+  return _then(SourceVersion.zero_nine(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -2060,8 +2148,8 @@ as List<SourceIntents>,
 /// @nodoc
 @JsonSerializable()
 
-class SourceVersion09 extends SourceVersion {
-  const SourceVersion09({required this.id, required this.name, required this.description, required this.version, required this.icon, this.language, @ContentRatingParser() required this.contentRating, required final  List<SourceBadge> badges, required final  List<SourceDeveloper> developers, @SourceIntentOrListParser() required final  List<SourceIntents> capabilities}): _badges = badges,_developers = developers,_capabilities = capabilities,super._();
+class SourceVersion09 implements SourceVersion {
+  const SourceVersion09({required this.id, required this.name, required this.description, required this.version, required this.icon, this.language, @ContentRatingParser() required this.contentRating, required  List<SourceBadge> badges, required  List<SourceDeveloper> developers, @SourceIntentOrListParser() required  List<SourceIntents> capabilities}): _badges = badges,_developers = developers,_capabilities = capabilities;
   factory SourceVersion09.fromJson(Map<String, dynamic> json) => _$SourceVersion09FromJson(json);
 
 @override final  String id;
@@ -2106,16 +2194,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceVersion09&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.language, language) || other.language == language)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&const DeepCollectionEquality().equals(other._badges, _badges)&&const DeepCollectionEquality().equals(other._developers, _developers)&&const DeepCollectionEquality().equals(other._capabilities, _capabilities));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceVersion09&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.version, version) || other.version == version)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.language, language) || other.language == language)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&const DeepCollectionEquality().equals(other.badges, _badges)&&const DeepCollectionEquality().equals(other.developers, _developers)&&const DeepCollectionEquality().equals(other.capabilities, _capabilities));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,version,icon,language,contentRating,const DeepCollectionEquality().hash(_badges),const DeepCollectionEquality().hash(_developers),const DeepCollectionEquality().hash(_capabilities));
+int get hashCode {
+    return Object.hash(runtimeType,id,name,description,version,icon,language,contentRating,const DeepCollectionEquality().hash(_badges),const DeepCollectionEquality().hash(_developers),const DeepCollectionEquality().hash(_capabilities));
+}
 
 @override
 String toString() {
-  return 'SourceVersion.zero_nine(id: $id, name: $name, description: $description, version: $version, icon: $icon, language: $language, contentRating: $contentRating, badges: $badges, developers: $developers, capabilities: $capabilities)';
+    return 'SourceVersion.zero_nine(id: $id, name: $name, description: $description, version: $version, icon: $icon, language: $language, contentRating: $contentRating, badges: $badges, developers: $developers, capabilities: $capabilities)';
 }
 
 
@@ -2179,16 +2269,21 @@ $BuiltWithCopyWith<BuiltWith> get copyWith => _$BuiltWithCopyWithImpl<BuiltWith>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BuiltWith&&(identical(other.toolchain, toolchain) || other.toolchain == toolchain)&&(identical(other.types, types) || other.types == types));
+  final _this = this as BuiltWith;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BuiltWith&&(identical(other.toolchain, _this.toolchain) || other.toolchain == _this.toolchain)&&(identical(other.types, _this.types) || other.types == _this.types));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,toolchain,types);
+int get hashCode {
+  final _this = this as BuiltWith;
+  return Object.hash(runtimeType,_this.toolchain,_this.types);
+}
 
 @override
 String toString() {
-  return 'BuiltWith(toolchain: $toolchain, types: $types)';
+  final _this = this as BuiltWith;
+  return 'BuiltWith(toolchain: ${_this.toolchain}, types: ${_this.types})';
 }
 
 
@@ -2217,7 +2312,7 @@ class _$BuiltWithCopyWithImpl<$Res>
 /// Create a copy of BuiltWith
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? toolchain = null,Object? types = null,}) {
-  return _then(_self.copyWith(
+  return _then(BuiltWith(
 toolchain: null == toolchain ? _self.toolchain : toolchain // ignore: cast_nullable_to_non_nullable
 as String,types: null == types ? _self.types : types // ignore: cast_nullable_to_non_nullable
 as String,
@@ -2251,16 +2346,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BuiltWith&&(identical(other.toolchain, toolchain) || other.toolchain == toolchain)&&(identical(other.types, types) || other.types == types));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _BuiltWith&&(identical(other.toolchain, toolchain) || other.toolchain == toolchain)&&(identical(other.types, types) || other.types == types));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,toolchain,types);
+int get hashCode {
+    return Object.hash(runtimeType,toolchain,types);
+}
 
 @override
 String toString() {
-  return 'BuiltWith(toolchain: $toolchain, types: $types)';
+    return 'BuiltWith(toolchain: $toolchain, types: $types)';
 }
 
 
@@ -2316,16 +2413,21 @@ $RepositoryDescriptionCopyWith<RepositoryDescription> get copyWith => _$Reposito
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RepositoryDescription&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description));
+  final _this = this as RepositoryDescription;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RepositoryDescription&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.description, _this.description) || other.description == _this.description));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,description);
+int get hashCode {
+  final _this = this as RepositoryDescription;
+  return Object.hash(runtimeType,_this.name,_this.description);
+}
 
 @override
 String toString() {
-  return 'RepositoryDescription(name: $name, description: $description)';
+  final _this = this as RepositoryDescription;
+  return 'RepositoryDescription(name: ${_this.name}, description: ${_this.description})';
 }
 
 
@@ -2354,7 +2456,7 @@ class _$RepositoryDescriptionCopyWithImpl<$Res>
 /// Create a copy of RepositoryDescription
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? description = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(RepositoryDescription(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -2388,16 +2490,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RepositoryDescription&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RepositoryDescription&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,description);
+int get hashCode {
+    return Object.hash(runtimeType,name,description);
+}
 
 @override
 String toString() {
-  return 'RepositoryDescription(name: $name, description: $description)';
+    return 'RepositoryDescription(name: $name, description: $description)';
 }
 
 
@@ -2453,16 +2557,21 @@ $VersioningCopyWith<Versioning> get copyWith => _$VersioningCopyWithImpl<Version
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Versioning&&(identical(other.buildTime, buildTime) || other.buildTime == buildTime)&&const DeepCollectionEquality().equals(other.sources, sources)&&(identical(other.builtWith, builtWith) || other.builtWith == builtWith)&&(identical(other.repository, repository) || other.repository == repository));
+  final _this = this as Versioning;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Versioning&&(identical(other.buildTime, _this.buildTime) || other.buildTime == _this.buildTime)&&const DeepCollectionEquality().equals(other.sources, _this.sources)&&(identical(other.builtWith, _this.builtWith) || other.builtWith == _this.builtWith)&&(identical(other.repository, _this.repository) || other.repository == _this.repository));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,buildTime,const DeepCollectionEquality().hash(sources),builtWith,repository);
+int get hashCode {
+  final _this = this as Versioning;
+  return Object.hash(runtimeType,_this.buildTime,const DeepCollectionEquality().hash(_this.sources),_this.builtWith,_this.repository);
+}
 
 @override
 String toString() {
-  return 'Versioning(buildTime: $buildTime, sources: $sources, builtWith: $builtWith, repository: $repository)';
+  final _this = this as Versioning;
+  return 'Versioning(buildTime: ${_this.buildTime}, sources: ${_this.sources}, builtWith: ${_this.builtWith}, repository: ${_this.repository})';
 }
 
 
@@ -2491,7 +2600,7 @@ class _$VersioningCopyWithImpl<$Res>
 /// Create a copy of Versioning
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? buildTime = null,Object? sources = null,Object? builtWith = null,Object? repository = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(Versioning(
 buildTime: null == buildTime ? _self.buildTime : buildTime // ignore: cast_nullable_to_non_nullable
 as String,sources: null == sources ? _self.sources : sources // ignore: cast_nullable_to_non_nullable
 as List<dynamic>,builtWith: null == builtWith ? _self.builtWith : builtWith // ignore: cast_nullable_to_non_nullable
@@ -2529,7 +2638,7 @@ $RepositoryDescriptionCopyWith<$Res>? get repository {
 @JsonSerializable()
 
 class _Versioning implements Versioning {
-  const _Versioning({required this.buildTime, required final  List<dynamic> sources, required this.builtWith, this.repository}): _sources = sources;
+  const _Versioning({required this.buildTime, required  List<dynamic> sources, required this.builtWith, this.repository}): _sources = sources;
   factory _Versioning.fromJson(Map<String, dynamic> json) => _$VersioningFromJson(json);
 
 @override final  String buildTime;
@@ -2556,16 +2665,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Versioning&&(identical(other.buildTime, buildTime) || other.buildTime == buildTime)&&const DeepCollectionEquality().equals(other._sources, _sources)&&(identical(other.builtWith, builtWith) || other.builtWith == builtWith)&&(identical(other.repository, repository) || other.repository == repository));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Versioning&&(identical(other.buildTime, buildTime) || other.buildTime == buildTime)&&const DeepCollectionEquality().equals(other.sources, _sources)&&(identical(other.builtWith, builtWith) || other.builtWith == builtWith)&&(identical(other.repository, repository) || other.repository == repository));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,buildTime,const DeepCollectionEquality().hash(_sources),builtWith,repository);
+int get hashCode {
+    return Object.hash(runtimeType,buildTime,const DeepCollectionEquality().hash(_sources),builtWith,repository);
+}
 
 @override
 String toString() {
-  return 'Versioning(buildTime: $buildTime, sources: $sources, builtWith: $builtWith, repository: $repository)';
+    return 'Versioning(buildTime: $buildTime, sources: $sources, builtWith: $builtWith, repository: $repository)';
 }
 
 
@@ -2631,7 +2742,7 @@ $RepositoryDescriptionCopyWith<$Res>? get repository {
 /// @nodoc
 mixin _$RepoInfo {
 
- int get dbid; set dbid(int value); String get name; String get url;
+
 /// Create a copy of RepoInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2642,16 +2753,21 @@ $RepoInfoCopyWith<RepoInfo> get copyWith => _$RepoInfoCopyWithImpl<RepoInfo>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RepoInfo&&(identical(other.dbid, dbid) || other.dbid == dbid)&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url));
+  final _this = this as RepoInfo;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RepoInfo&&(identical(other.dbid, _this.dbid) || other.dbid == _this.dbid)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.url, _this.url) || other.url == _this.url));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,dbid,name,url);
+int get hashCode {
+  final _this = this as RepoInfo;
+  return Object.hash(runtimeType,_this.dbid,_this.name,_this.url);
+}
 
 @override
 String toString() {
-  return 'RepoInfo(dbid: $dbid, name: $name, url: $url)';
+  final _this = this as RepoInfo;
+  return 'RepoInfo(dbid: ${_this.dbid}, name: ${_this.name}, url: ${_this.url})';
 }
 
 
@@ -2696,7 +2812,7 @@ as String,
 /// @nodoc
 mixin _$RepoData {
 
- int get dbid; set dbid(int value); String get name; String get url; SupportedVersion get version;
+
 /// Create a copy of RepoData
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2707,16 +2823,21 @@ $RepoDataCopyWith<RepoData> get copyWith => _$RepoDataCopyWithImpl<RepoData>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RepoData&&(identical(other.dbid, dbid) || other.dbid == dbid)&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url)&&(identical(other.version, version) || other.version == version));
+  final _this = this as RepoData;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RepoData&&(identical(other.dbid, _this.dbid) || other.dbid == _this.dbid)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.url, _this.url) || other.url == _this.url)&&(identical(other.version, _this.version) || other.version == _this.version));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,dbid,name,url,version);
+int get hashCode {
+  final _this = this as RepoData;
+  return Object.hash(runtimeType,_this.dbid,_this.name,_this.url,_this.version);
+}
 
 @override
 String toString() {
-  return 'RepoData(dbid: $dbid, name: $name, url: $url, version: $version)';
+  final _this = this as RepoData;
+  return 'RepoData(dbid: ${_this.dbid}, name: ${_this.name}, url: ${_this.url}, version: ${_this.version})';
 }
 
 
@@ -2797,7 +2918,7 @@ mixin _$OAuthResponseType {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OAuthResponseType);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is OAuthResponseType);
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2806,7 +2927,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'OAuthResponseType()';
+    return 'OAuthResponseType()';
 }
 
 
@@ -2823,7 +2944,7 @@ $OAuthResponseTypeCopyWith(OAuthResponseType _, $Res Function(OAuthResponseType)
 @JsonSerializable()
 
 class OAuthTokenResponse implements OAuthResponseType {
-  const OAuthTokenResponse({final  String? $type}): $type = $type ?? 'token';
+  const OAuthTokenResponse({ String? $type}): $type = $type ?? 'token';
   factory OAuthTokenResponse.fromJson(Map<String, dynamic> json) => _$OAuthTokenResponseFromJson(json);
 
 
@@ -2840,7 +2961,7 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OAuthTokenResponse);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is OAuthTokenResponse);
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2849,7 +2970,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'OAuthResponseType.token()';
+    return 'OAuthResponseType.token()';
 }
 
 
@@ -2862,7 +2983,7 @@ String toString() {
 @JsonSerializable()
 
 class OAuthCodeResponse implements OAuthResponseType {
-  const OAuthCodeResponse({required this.tokenEndpoint, final  String? $type}): $type = $type ?? 'code';
+  const OAuthCodeResponse({required this.tokenEndpoint,  String? $type}): $type = $type ?? 'code';
   factory OAuthCodeResponse.fromJson(Map<String, dynamic> json) => _$OAuthCodeResponseFromJson(json);
 
  final  String tokenEndpoint;
@@ -2884,16 +3005,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OAuthCodeResponse&&(identical(other.tokenEndpoint, tokenEndpoint) || other.tokenEndpoint == tokenEndpoint));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is OAuthCodeResponse&&(identical(other.tokenEndpoint, tokenEndpoint) || other.tokenEndpoint == tokenEndpoint));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,tokenEndpoint);
+int get hashCode {
+    return Object.hash(runtimeType,tokenEndpoint);
+}
 
 @override
 String toString() {
-  return 'OAuthResponseType.code(tokenEndpoint: $tokenEndpoint)';
+    return 'OAuthResponseType.code(tokenEndpoint: $tokenEndpoint)';
 }
 
 
@@ -2935,7 +3058,7 @@ as String,
 @JsonSerializable()
 
 class OAuthPKCEResponse implements OAuthResponseType {
-  const OAuthPKCEResponse({required this.tokenEndpoint, required this.pkceCodeLength, required this.pkceCodeMethod, required this.formEncodeGrant, final  String? $type}): $type = $type ?? 'pkce';
+  const OAuthPKCEResponse({required this.tokenEndpoint, required this.pkceCodeLength, required this.pkceCodeMethod, required this.formEncodeGrant,  String? $type}): $type = $type ?? 'pkce';
   factory OAuthPKCEResponse.fromJson(Map<String, dynamic> json) => _$OAuthPKCEResponseFromJson(json);
 
  final  String tokenEndpoint;
@@ -2960,16 +3083,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OAuthPKCEResponse&&(identical(other.tokenEndpoint, tokenEndpoint) || other.tokenEndpoint == tokenEndpoint)&&(identical(other.pkceCodeLength, pkceCodeLength) || other.pkceCodeLength == pkceCodeLength)&&(identical(other.pkceCodeMethod, pkceCodeMethod) || other.pkceCodeMethod == pkceCodeMethod)&&(identical(other.formEncodeGrant, formEncodeGrant) || other.formEncodeGrant == formEncodeGrant));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is OAuthPKCEResponse&&(identical(other.tokenEndpoint, tokenEndpoint) || other.tokenEndpoint == tokenEndpoint)&&(identical(other.pkceCodeLength, pkceCodeLength) || other.pkceCodeLength == pkceCodeLength)&&(identical(other.pkceCodeMethod, pkceCodeMethod) || other.pkceCodeMethod == pkceCodeMethod)&&(identical(other.formEncodeGrant, formEncodeGrant) || other.formEncodeGrant == formEncodeGrant));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,tokenEndpoint,pkceCodeLength,pkceCodeMethod,formEncodeGrant);
+int get hashCode {
+    return Object.hash(runtimeType,tokenEndpoint,pkceCodeLength,pkceCodeMethod,formEncodeGrant);
+}
 
 @override
 String toString() {
-  return 'OAuthResponseType.pkce(tokenEndpoint: $tokenEndpoint, pkceCodeLength: $pkceCodeLength, pkceCodeMethod: $pkceCodeMethod, formEncodeGrant: $formEncodeGrant)';
+    return 'OAuthResponseType.pkce(tokenEndpoint: $tokenEndpoint, pkceCodeLength: $pkceCodeLength, pkceCodeMethod: $pkceCodeMethod, formEncodeGrant: $formEncodeGrant)';
 }
 
 
@@ -3027,16 +3152,21 @@ $SortingOptionCopyWith<SortingOption> get copyWith => _$SortingOptionCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SortingOption&&(identical(other.id, id) || other.id == id)&&(identical(other.label, label) || other.label == label));
+  final _this = this as SortingOption;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SortingOption&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.label, _this.label) || other.label == _this.label));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,label);
+int get hashCode {
+  final _this = this as SortingOption;
+  return Object.hash(runtimeType,_this.id,_this.label);
+}
 
 @override
 String toString() {
-  return 'SortingOption(id: $id, label: $label)';
+  final _this = this as SortingOption;
+  return 'SortingOption(id: ${_this.id}, label: ${_this.label})';
 }
 
 
@@ -3065,7 +3195,7 @@ class _$SortingOptionCopyWithImpl<$Res>
 /// Create a copy of SortingOption
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? label = null,}) {
-  return _then(_self.copyWith(
+  return _then(SortingOption(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
 as String,
@@ -3099,16 +3229,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SortingOption&&(identical(other.id, id) || other.id == id)&&(identical(other.label, label) || other.label == label));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SortingOption&&(identical(other.id, id) || other.id == id)&&(identical(other.label, label) || other.label == label));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,label);
+int get hashCode {
+    return Object.hash(runtimeType,id,label);
+}
 
 @override
 String toString() {
-  return 'SortingOption(id: $id, label: $label)';
+    return 'SortingOption(id: $id, label: $label)';
 }
 
 
@@ -3164,16 +3296,21 @@ $SearchQueryCopyWith<SearchQuery> get copyWith => _$SearchQueryCopyWithImpl<Sear
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SearchQuery&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.metadata, metadata));
+  final _this = this as SearchQuery;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SearchQuery&&(identical(other.title, _this.title) || other.title == _this.title)&&const DeepCollectionEquality().equals(other.metadata, _this.metadata));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,const DeepCollectionEquality().hash(metadata));
+int get hashCode {
+  final _this = this as SearchQuery;
+  return Object.hash(runtimeType,_this.title,const DeepCollectionEquality().hash(_this.metadata));
+}
 
 @override
 String toString() {
-  return 'SearchQuery(title: $title, metadata: $metadata)';
+  final _this = this as SearchQuery;
+  return 'SearchQuery(title: ${_this.title}, metadata: ${_this.metadata})';
 }
 
 
@@ -3202,7 +3339,7 @@ class _$SearchQueryCopyWithImpl<$Res>
 /// Create a copy of SearchQuery
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? metadata = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(SearchQuery(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,metadata: freezed == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
 as dynamic,
@@ -3236,16 +3373,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SearchQuery&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.metadata, metadata));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SearchQuery&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.metadata, metadata));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,const DeepCollectionEquality().hash(metadata));
+int get hashCode {
+    return Object.hash(runtimeType,title,const DeepCollectionEquality().hash(metadata));
+}
 
 @override
 String toString() {
-  return 'SearchQuery(title: $title, metadata: $metadata)';
+    return 'SearchQuery(title: $title, metadata: $metadata)';
 }
 
 
@@ -3301,16 +3440,21 @@ $SearchResultItemCopyWith<SearchResultItem> get copyWith => _$SearchResultItemCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SearchResultItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&const DeepCollectionEquality().equals(other.metadata, metadata));
+  final _this = this as SearchResultItem;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SearchResultItem&&(identical(other.mangaId, _this.mangaId) || other.mangaId == _this.mangaId)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.subtitle, _this.subtitle) || other.subtitle == _this.subtitle)&&(identical(other.imageUrl, _this.imageUrl) || other.imageUrl == _this.imageUrl)&&const DeepCollectionEquality().equals(other.metadata, _this.metadata));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,mangaId,title,subtitle,imageUrl,const DeepCollectionEquality().hash(metadata));
+int get hashCode {
+  final _this = this as SearchResultItem;
+  return Object.hash(runtimeType,_this.mangaId,_this.title,_this.subtitle,_this.imageUrl,const DeepCollectionEquality().hash(_this.metadata));
+}
 
 @override
 String toString() {
-  return 'SearchResultItem(mangaId: $mangaId, title: $title, subtitle: $subtitle, imageUrl: $imageUrl, metadata: $metadata)';
+  final _this = this as SearchResultItem;
+  return 'SearchResultItem(mangaId: ${_this.mangaId}, title: ${_this.title}, subtitle: ${_this.subtitle}, imageUrl: ${_this.imageUrl}, metadata: ${_this.metadata})';
 }
 
 
@@ -3339,7 +3483,7 @@ class _$SearchResultItemCopyWithImpl<$Res>
 /// Create a copy of SearchResultItem
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? mangaId = null,Object? title = null,Object? subtitle = freezed,Object? imageUrl = null,Object? metadata = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(SearchResultItem(
 mangaId: null == mangaId ? _self.mangaId : mangaId // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
@@ -3379,16 +3523,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SearchResultItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&const DeepCollectionEquality().equals(other.metadata, metadata));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SearchResultItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&const DeepCollectionEquality().equals(other.metadata, metadata));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,mangaId,title,subtitle,imageUrl,const DeepCollectionEquality().hash(metadata));
+int get hashCode {
+    return Object.hash(runtimeType,mangaId,title,subtitle,imageUrl,const DeepCollectionEquality().hash(metadata));
+}
 
 @override
 String toString() {
-  return 'SearchResultItem(mangaId: $mangaId, title: $title, subtitle: $subtitle, imageUrl: $imageUrl, metadata: $metadata)';
+    return 'SearchResultItem(mangaId: $mangaId, title: $title, subtitle: $subtitle, imageUrl: $imageUrl, metadata: $metadata)';
 }
 
 
@@ -3447,16 +3593,21 @@ $PagedResultsCopyWith<T, PagedResults<T>> get copyWith => _$PagedResultsCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PagedResults<T>&&const DeepCollectionEquality().equals(other.items, items)&&const DeepCollectionEquality().equals(other.metadata, metadata));
+  final _this = this as PagedResults<T>;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PagedResults<T>&&const DeepCollectionEquality().equals(other.items, _this.items)&&const DeepCollectionEquality().equals(other.metadata, _this.metadata));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(items),const DeepCollectionEquality().hash(metadata));
+int get hashCode {
+  final _this = this as PagedResults<T>;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.items),const DeepCollectionEquality().hash(_this.metadata));
+}
 
 @override
 String toString() {
-  return 'PagedResults<$T>(items: $items, metadata: $metadata)';
+  final _this = this as PagedResults<T>;
+  return 'PagedResults<$T>(items: ${_this.items}, metadata: ${_this.metadata})';
 }
 
 
@@ -3485,7 +3636,7 @@ class _$PagedResultsCopyWithImpl<T,$Res>
 /// Create a copy of PagedResults
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? items = null,Object? metadata = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(PagedResults(
 items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
 as List<T>,metadata: freezed == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
 as dynamic,
@@ -3500,7 +3651,7 @@ as dynamic,
 @JsonSerializable(genericArgumentFactories: true)
 
 class _PagedResults<T> implements PagedResults<T> {
-   _PagedResults({required final  List<T> items, this.metadata}): _items = items;
+   _PagedResults({required  List<T> items, this.metadata}): _items = items;
   factory _PagedResults.fromJson(Map<String, dynamic> json,T Function(Object?) fromJsonT) => _$PagedResultsFromJson(json,fromJsonT);
 
  final  List<T> _items;
@@ -3525,16 +3676,18 @@ Map<String, dynamic> toJson(Object? Function(T) toJsonT) {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PagedResults<T>&&const DeepCollectionEquality().equals(other._items, _items)&&const DeepCollectionEquality().equals(other.metadata, metadata));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PagedResults<T>&&const DeepCollectionEquality().equals(other.items, _items)&&const DeepCollectionEquality().equals(other.metadata, metadata));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_items),const DeepCollectionEquality().hash(metadata));
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_items),const DeepCollectionEquality().hash(metadata));
+}
 
 @override
 String toString() {
-  return 'PagedResults<$T>(items: $items, metadata: $metadata)';
+    return 'PagedResults<$T>(items: $items, metadata: $metadata)';
 }
 
 
@@ -3590,16 +3743,21 @@ $SourceMangaCopyWith<SourceManga> get copyWith => _$SourceMangaCopyWithImpl<Sour
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceManga&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.mangaInfo, mangaInfo) || other.mangaInfo == mangaInfo));
+  final _this = this as SourceManga;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SourceManga&&(identical(other.mangaId, _this.mangaId) || other.mangaId == _this.mangaId)&&(identical(other.mangaInfo, _this.mangaInfo) || other.mangaInfo == _this.mangaInfo));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,mangaId,mangaInfo);
+int get hashCode {
+  final _this = this as SourceManga;
+  return Object.hash(runtimeType,_this.mangaId,_this.mangaInfo);
+}
 
 @override
 String toString() {
-  return 'SourceManga(mangaId: $mangaId, mangaInfo: $mangaInfo)';
+  final _this = this as SourceManga;
+  return 'SourceManga(mangaId: ${_this.mangaId}, mangaInfo: ${_this.mangaInfo})';
 }
 
 
@@ -3628,7 +3786,7 @@ class _$SourceMangaCopyWithImpl<$Res>
 /// Create a copy of SourceManga
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? mangaId = null,Object? mangaInfo = null,}) {
-  return _then(_self.copyWith(
+  return _then(SourceManga(
 mangaId: null == mangaId ? _self.mangaId : mangaId // ignore: cast_nullable_to_non_nullable
 as String,mangaInfo: null == mangaInfo ? _self.mangaInfo : mangaInfo // ignore: cast_nullable_to_non_nullable
 as MangaInfo,
@@ -3671,16 +3829,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SourceManga&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.mangaInfo, mangaInfo) || other.mangaInfo == mangaInfo));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SourceManga&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.mangaInfo, mangaInfo) || other.mangaInfo == mangaInfo));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,mangaId,mangaInfo);
+int get hashCode {
+    return Object.hash(runtimeType,mangaId,mangaInfo);
+}
 
 @override
 String toString() {
-  return 'SourceManga(mangaId: $mangaId, mangaInfo: $mangaInfo)';
+    return 'SourceManga(mangaId: $mangaId, mangaInfo: $mangaInfo)';
 }
 
 
@@ -3745,16 +3905,21 @@ $MangaInfoCopyWith<MangaInfo> get copyWith => _$MangaInfoCopyWithImpl<MangaInfo>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfo&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.synopsis, synopsis) || other.synopsis == synopsis)&&(identical(other.primaryTitle, primaryTitle) || other.primaryTitle == primaryTitle)&&const DeepCollectionEquality().equals(other.secondaryTitles, secondaryTitles)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.contentType, contentType) || other.contentType == contentType)&&(identical(other.status, status) || other.status == status)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.rating, rating) || other.rating == rating)&&const DeepCollectionEquality().equals(other.tagGroups, tagGroups)&&const DeepCollectionEquality().equals(other.artworkUrls, artworkUrls)&&const DeepCollectionEquality().equals(other.additionalInfo, additionalInfo)&&(identical(other.shareUrl, shareUrl) || other.shareUrl == shareUrl));
+  final _this = this as MangaInfo;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfo&&(identical(other.thumbnailUrl, _this.thumbnailUrl) || other.thumbnailUrl == _this.thumbnailUrl)&&(identical(other.synopsis, _this.synopsis) || other.synopsis == _this.synopsis)&&(identical(other.primaryTitle, _this.primaryTitle) || other.primaryTitle == _this.primaryTitle)&&const DeepCollectionEquality().equals(other.secondaryTitles, _this.secondaryTitles)&&(identical(other.contentRating, _this.contentRating) || other.contentRating == _this.contentRating)&&(identical(other.contentType, _this.contentType) || other.contentType == _this.contentType)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.artist, _this.artist) || other.artist == _this.artist)&&(identical(other.author, _this.author) || other.author == _this.author)&&(identical(other.bannerUrl, _this.bannerUrl) || other.bannerUrl == _this.bannerUrl)&&(identical(other.rating, _this.rating) || other.rating == _this.rating)&&const DeepCollectionEquality().equals(other.tagGroups, _this.tagGroups)&&const DeepCollectionEquality().equals(other.artworkUrls, _this.artworkUrls)&&const DeepCollectionEquality().equals(other.additionalInfo, _this.additionalInfo)&&(identical(other.shareUrl, _this.shareUrl) || other.shareUrl == _this.shareUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,thumbnailUrl,synopsis,primaryTitle,const DeepCollectionEquality().hash(secondaryTitles),contentRating,contentType,status,artist,author,bannerUrl,rating,const DeepCollectionEquality().hash(tagGroups),const DeepCollectionEquality().hash(artworkUrls),const DeepCollectionEquality().hash(additionalInfo),shareUrl);
+int get hashCode {
+  final _this = this as MangaInfo;
+  return Object.hash(runtimeType,_this.thumbnailUrl,_this.synopsis,_this.primaryTitle,const DeepCollectionEquality().hash(_this.secondaryTitles),_this.contentRating,_this.contentType,_this.status,_this.artist,_this.author,_this.bannerUrl,_this.rating,const DeepCollectionEquality().hash(_this.tagGroups),const DeepCollectionEquality().hash(_this.artworkUrls),const DeepCollectionEquality().hash(_this.additionalInfo),_this.shareUrl);
+}
 
 @override
 String toString() {
-  return 'MangaInfo(thumbnailUrl: $thumbnailUrl, synopsis: $synopsis, primaryTitle: $primaryTitle, secondaryTitles: $secondaryTitles, contentRating: $contentRating, contentType: $contentType, status: $status, artist: $artist, author: $author, bannerUrl: $bannerUrl, rating: $rating, tagGroups: $tagGroups, artworkUrls: $artworkUrls, additionalInfo: $additionalInfo, shareUrl: $shareUrl)';
+  final _this = this as MangaInfo;
+  return 'MangaInfo(thumbnailUrl: ${_this.thumbnailUrl}, synopsis: ${_this.synopsis}, primaryTitle: ${_this.primaryTitle}, secondaryTitles: ${_this.secondaryTitles}, contentRating: ${_this.contentRating}, contentType: ${_this.contentType}, status: ${_this.status}, artist: ${_this.artist}, author: ${_this.author}, bannerUrl: ${_this.bannerUrl}, rating: ${_this.rating}, tagGroups: ${_this.tagGroups}, artworkUrls: ${_this.artworkUrls}, additionalInfo: ${_this.additionalInfo}, shareUrl: ${_this.shareUrl})';
 }
 
 
@@ -3783,7 +3948,7 @@ class _$MangaInfoCopyWithImpl<$Res>
 /// Create a copy of MangaInfo
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? thumbnailUrl = null,Object? synopsis = null,Object? primaryTitle = null,Object? secondaryTitles = null,Object? contentRating = null,Object? contentType = freezed,Object? status = freezed,Object? artist = freezed,Object? author = freezed,Object? bannerUrl = freezed,Object? rating = freezed,Object? tagGroups = freezed,Object? artworkUrls = freezed,Object? additionalInfo = freezed,Object? shareUrl = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(MangaInfo(
 thumbnailUrl: null == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String,synopsis: null == synopsis ? _self.synopsis : synopsis // ignore: cast_nullable_to_non_nullable
 as String,primaryTitle: null == primaryTitle ? _self.primaryTitle : primaryTitle // ignore: cast_nullable_to_non_nullable
@@ -3811,7 +3976,7 @@ as String?,
 @JsonSerializable()
 
 class _MangaInfo implements MangaInfo {
-  const _MangaInfo({required this.thumbnailUrl, required this.synopsis, required this.primaryTitle, required final  List<String> secondaryTitles, @ContentRatingParser() required this.contentRating, this.contentType, this.status, this.artist, this.author, this.bannerUrl, this.rating, final  List<TagSection>? tagGroups, final  List<String>? artworkUrls, final  Map<String, String>? additionalInfo, this.shareUrl}): _secondaryTitles = secondaryTitles,_tagGroups = tagGroups,_artworkUrls = artworkUrls,_additionalInfo = additionalInfo;
+  const _MangaInfo({required this.thumbnailUrl, required this.synopsis, required this.primaryTitle, required  List<String> secondaryTitles, @ContentRatingParser() required this.contentRating, this.contentType, this.status, this.artist, this.author, this.bannerUrl, this.rating,  List<TagSection>? tagGroups,  List<String>? artworkUrls,  Map<String, String>? additionalInfo, this.shareUrl}): _secondaryTitles = secondaryTitles,_tagGroups = tagGroups,_artworkUrls = artworkUrls,_additionalInfo = additionalInfo;
   factory _MangaInfo.fromJson(Map<String, dynamic> json) => _$MangaInfoFromJson(json);
 
 @override final  String thumbnailUrl;
@@ -3873,16 +4038,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaInfo&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.synopsis, synopsis) || other.synopsis == synopsis)&&(identical(other.primaryTitle, primaryTitle) || other.primaryTitle == primaryTitle)&&const DeepCollectionEquality().equals(other._secondaryTitles, _secondaryTitles)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.contentType, contentType) || other.contentType == contentType)&&(identical(other.status, status) || other.status == status)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.rating, rating) || other.rating == rating)&&const DeepCollectionEquality().equals(other._tagGroups, _tagGroups)&&const DeepCollectionEquality().equals(other._artworkUrls, _artworkUrls)&&const DeepCollectionEquality().equals(other._additionalInfo, _additionalInfo)&&(identical(other.shareUrl, shareUrl) || other.shareUrl == shareUrl));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaInfo&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.synopsis, synopsis) || other.synopsis == synopsis)&&(identical(other.primaryTitle, primaryTitle) || other.primaryTitle == primaryTitle)&&const DeepCollectionEquality().equals(other.secondaryTitles, _secondaryTitles)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.contentType, contentType) || other.contentType == contentType)&&(identical(other.status, status) || other.status == status)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.rating, rating) || other.rating == rating)&&const DeepCollectionEquality().equals(other.tagGroups, _tagGroups)&&const DeepCollectionEquality().equals(other.artworkUrls, _artworkUrls)&&const DeepCollectionEquality().equals(other.additionalInfo, _additionalInfo)&&(identical(other.shareUrl, shareUrl) || other.shareUrl == shareUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,thumbnailUrl,synopsis,primaryTitle,const DeepCollectionEquality().hash(_secondaryTitles),contentRating,contentType,status,artist,author,bannerUrl,rating,const DeepCollectionEquality().hash(_tagGroups),const DeepCollectionEquality().hash(_artworkUrls),const DeepCollectionEquality().hash(_additionalInfo),shareUrl);
+int get hashCode {
+    return Object.hash(runtimeType,thumbnailUrl,synopsis,primaryTitle,const DeepCollectionEquality().hash(_secondaryTitles),contentRating,contentType,status,artist,author,bannerUrl,rating,const DeepCollectionEquality().hash(_tagGroups),const DeepCollectionEquality().hash(_artworkUrls),const DeepCollectionEquality().hash(_additionalInfo),shareUrl);
+}
 
 @override
 String toString() {
-  return 'MangaInfo(thumbnailUrl: $thumbnailUrl, synopsis: $synopsis, primaryTitle: $primaryTitle, secondaryTitles: $secondaryTitles, contentRating: $contentRating, contentType: $contentType, status: $status, artist: $artist, author: $author, bannerUrl: $bannerUrl, rating: $rating, tagGroups: $tagGroups, artworkUrls: $artworkUrls, additionalInfo: $additionalInfo, shareUrl: $shareUrl)';
+    return 'MangaInfo(thumbnailUrl: $thumbnailUrl, synopsis: $synopsis, primaryTitle: $primaryTitle, secondaryTitles: $secondaryTitles, contentRating: $contentRating, contentType: $contentType, status: $status, artist: $artist, author: $author, bannerUrl: $bannerUrl, rating: $rating, tagGroups: $tagGroups, artworkUrls: $artworkUrls, additionalInfo: $additionalInfo, shareUrl: $shareUrl)';
 }
 
 
@@ -3951,16 +4118,21 @@ $TagSectionCopyWith<TagSection> get copyWith => _$TagSectionCopyWithImpl<TagSect
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TagSection&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.tags, tags));
+  final _this = this as TagSection;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TagSection&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title)&&const DeepCollectionEquality().equals(other.tags, _this.tags));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(tags));
+int get hashCode {
+  final _this = this as TagSection;
+  return Object.hash(runtimeType,_this.id,_this.title,const DeepCollectionEquality().hash(_this.tags));
+}
 
 @override
 String toString() {
-  return 'TagSection(id: $id, title: $title, tags: $tags)';
+  final _this = this as TagSection;
+  return 'TagSection(id: ${_this.id}, title: ${_this.title}, tags: ${_this.tags})';
 }
 
 
@@ -3989,7 +4161,7 @@ class _$TagSectionCopyWithImpl<$Res>
 /// Create a copy of TagSection
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? tags = null,}) {
-  return _then(_self.copyWith(
+  return _then(TagSection(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,tags: null == tags ? _self.tags : tags // ignore: cast_nullable_to_non_nullable
@@ -4005,7 +4177,7 @@ as List<Tag>,
 @JsonSerializable()
 
 class _TagSection implements TagSection {
-  const _TagSection({required this.id, required this.title, required final  List<Tag> tags}): _tags = tags;
+  const _TagSection({required this.id, required this.title, required  List<Tag> tags}): _tags = tags;
   factory _TagSection.fromJson(Map<String, dynamic> json) => _$TagSectionFromJson(json);
 
 @override final  String id;
@@ -4031,16 +4203,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TagSection&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other._tags, _tags));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TagSection&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.tags, _tags));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(_tags));
+int get hashCode {
+    return Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(_tags));
+}
 
 @override
 String toString() {
-  return 'TagSection(id: $id, title: $title, tags: $tags)';
+    return 'TagSection(id: $id, title: $title, tags: $tags)';
 }
 
 
@@ -4097,16 +4271,21 @@ $TagCopyWith<Tag> get copyWith => _$TagCopyWithImpl<Tag>(this as Tag, _$identity
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Tag&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title));
+  final _this = this as Tag;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Tag&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title);
+int get hashCode {
+  final _this = this as Tag;
+  return Object.hash(runtimeType,_this.id,_this.title);
+}
 
 @override
 String toString() {
-  return 'Tag(id: $id, title: $title)';
+  final _this = this as Tag;
+  return 'Tag(id: ${_this.id}, title: ${_this.title})';
 }
 
 
@@ -4135,7 +4314,7 @@ class _$TagCopyWithImpl<$Res>
 /// Create a copy of Tag
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,}) {
-  return _then(_self.copyWith(
+  return _then(Tag(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,
@@ -4169,16 +4348,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Tag&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Tag&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title);
+int get hashCode {
+    return Object.hash(runtimeType,id,title);
+}
 
 @override
 String toString() {
-  return 'Tag(id: $id, title: $title)';
+    return 'Tag(id: $id, title: $title)';
 }
 
 
@@ -4234,16 +4415,21 @@ $ChapterCopyWith<Chapter> get copyWith => _$ChapterCopyWithImpl<Chapter>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Chapter&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.sourceManga, sourceManga) || other.sourceManga == sourceManga)&&(identical(other.langCode, langCode) || other.langCode == langCode)&&(identical(other.chapNum, chapNum) || other.chapNum == chapNum)&&(identical(other.title, title) || other.title == title)&&(identical(other.version, version) || other.version == version)&&(identical(other.volume, volume) || other.volume == volume)&&const DeepCollectionEquality().equals(other.additionalInfo, additionalInfo)&&(identical(other.publishDate, publishDate) || other.publishDate == publishDate)&&(identical(other.creationDate, creationDate) || other.creationDate == creationDate)&&(identical(other.sortingIndex, sortingIndex) || other.sortingIndex == sortingIndex));
+  final _this = this as Chapter;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Chapter&&(identical(other.chapterId, _this.chapterId) || other.chapterId == _this.chapterId)&&(identical(other.sourceManga, _this.sourceManga) || other.sourceManga == _this.sourceManga)&&(identical(other.langCode, _this.langCode) || other.langCode == _this.langCode)&&(identical(other.chapNum, _this.chapNum) || other.chapNum == _this.chapNum)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.version, _this.version) || other.version == _this.version)&&(identical(other.volume, _this.volume) || other.volume == _this.volume)&&const DeepCollectionEquality().equals(other.additionalInfo, _this.additionalInfo)&&(identical(other.publishDate, _this.publishDate) || other.publishDate == _this.publishDate)&&(identical(other.creationDate, _this.creationDate) || other.creationDate == _this.creationDate)&&(identical(other.sortingIndex, _this.sortingIndex) || other.sortingIndex == _this.sortingIndex));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,chapterId,sourceManga,langCode,chapNum,title,version,volume,const DeepCollectionEquality().hash(additionalInfo),publishDate,creationDate,sortingIndex);
+int get hashCode {
+  final _this = this as Chapter;
+  return Object.hash(runtimeType,_this.chapterId,_this.sourceManga,_this.langCode,_this.chapNum,_this.title,_this.version,_this.volume,const DeepCollectionEquality().hash(_this.additionalInfo),_this.publishDate,_this.creationDate,_this.sortingIndex);
+}
 
 @override
 String toString() {
-  return 'Chapter(chapterId: $chapterId, sourceManga: $sourceManga, langCode: $langCode, chapNum: $chapNum, title: $title, version: $version, volume: $volume, additionalInfo: $additionalInfo, publishDate: $publishDate, creationDate: $creationDate, sortingIndex: $sortingIndex)';
+  final _this = this as Chapter;
+  return 'Chapter(chapterId: ${_this.chapterId}, sourceManga: ${_this.sourceManga}, langCode: ${_this.langCode}, chapNum: ${_this.chapNum}, title: ${_this.title}, version: ${_this.version}, volume: ${_this.volume}, additionalInfo: ${_this.additionalInfo}, publishDate: ${_this.publishDate}, creationDate: ${_this.creationDate}, sortingIndex: ${_this.sortingIndex})';
 }
 
 
@@ -4272,7 +4458,7 @@ class _$ChapterCopyWithImpl<$Res>
 /// Create a copy of Chapter
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? chapterId = null,Object? sourceManga = null,Object? langCode = null,Object? chapNum = null,Object? title = freezed,Object? version = freezed,Object? volume = freezed,Object? additionalInfo = freezed,Object? publishDate = freezed,Object? creationDate = freezed,Object? sortingIndex = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(Chapter(
 chapterId: null == chapterId ? _self.chapterId : chapterId // ignore: cast_nullable_to_non_nullable
 as String,sourceManga: null == sourceManga ? _self.sourceManga : sourceManga // ignore: cast_nullable_to_non_nullable
 as SourceManga,langCode: null == langCode ? _self.langCode : langCode // ignore: cast_nullable_to_non_nullable
@@ -4305,7 +4491,7 @@ $SourceMangaCopyWith<$Res> get sourceManga {
 @JsonSerializable()
 
 class _Chapter implements Chapter {
-  const _Chapter({required this.chapterId, required this.sourceManga, required this.langCode, required this.chapNum, this.title, this.version, this.volume, final  Map<String, String>? additionalInfo, @NullableTimestampSerializer() this.publishDate, @NullableTimestampSerializer() this.creationDate, this.sortingIndex}): _additionalInfo = additionalInfo;
+  const _Chapter({required this.chapterId, required this.sourceManga, required this.langCode, required this.chapNum, this.title, this.version, this.volume,  Map<String, String>? additionalInfo, @NullableTimestampSerializer() this.publishDate, @NullableTimestampSerializer() this.creationDate, this.sortingIndex}): _additionalInfo = additionalInfo;
   factory _Chapter.fromJson(Map<String, dynamic> json) => _$ChapterFromJson(json);
 
 @override final  String chapterId;
@@ -4341,16 +4527,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Chapter&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.sourceManga, sourceManga) || other.sourceManga == sourceManga)&&(identical(other.langCode, langCode) || other.langCode == langCode)&&(identical(other.chapNum, chapNum) || other.chapNum == chapNum)&&(identical(other.title, title) || other.title == title)&&(identical(other.version, version) || other.version == version)&&(identical(other.volume, volume) || other.volume == volume)&&const DeepCollectionEquality().equals(other._additionalInfo, _additionalInfo)&&(identical(other.publishDate, publishDate) || other.publishDate == publishDate)&&(identical(other.creationDate, creationDate) || other.creationDate == creationDate)&&(identical(other.sortingIndex, sortingIndex) || other.sortingIndex == sortingIndex));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Chapter&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.sourceManga, sourceManga) || other.sourceManga == sourceManga)&&(identical(other.langCode, langCode) || other.langCode == langCode)&&(identical(other.chapNum, chapNum) || other.chapNum == chapNum)&&(identical(other.title, title) || other.title == title)&&(identical(other.version, version) || other.version == version)&&(identical(other.volume, volume) || other.volume == volume)&&const DeepCollectionEquality().equals(other.additionalInfo, _additionalInfo)&&(identical(other.publishDate, publishDate) || other.publishDate == publishDate)&&(identical(other.creationDate, creationDate) || other.creationDate == creationDate)&&(identical(other.sortingIndex, sortingIndex) || other.sortingIndex == sortingIndex));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,chapterId,sourceManga,langCode,chapNum,title,version,volume,const DeepCollectionEquality().hash(_additionalInfo),publishDate,creationDate,sortingIndex);
+int get hashCode {
+    return Object.hash(runtimeType,chapterId,sourceManga,langCode,chapNum,title,version,volume,const DeepCollectionEquality().hash(_additionalInfo),publishDate,creationDate,sortingIndex);
+}
 
 @override
 String toString() {
-  return 'Chapter(chapterId: $chapterId, sourceManga: $sourceManga, langCode: $langCode, chapNum: $chapNum, title: $title, version: $version, volume: $volume, additionalInfo: $additionalInfo, publishDate: $publishDate, creationDate: $creationDate, sortingIndex: $sortingIndex)';
+    return 'Chapter(chapterId: $chapterId, sourceManga: $sourceManga, langCode: $langCode, chapNum: $chapNum, title: $title, version: $version, volume: $volume, additionalInfo: $additionalInfo, publishDate: $publishDate, creationDate: $creationDate, sortingIndex: $sortingIndex)';
 }
 
 
@@ -4424,16 +4612,21 @@ $PaperbackRequestCopyWith<PaperbackRequest> get copyWith => _$PaperbackRequestCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaperbackRequest&&(identical(other.url, url) || other.url == url)&&(identical(other.method, method) || other.method == method)&&const DeepCollectionEquality().equals(other.headers, headers)&&const DeepCollectionEquality().equals(other.body, body)&&const DeepCollectionEquality().equals(other.cookies, cookies));
+  final _this = this as PaperbackRequest;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaperbackRequest&&(identical(other.url, _this.url) || other.url == _this.url)&&(identical(other.method, _this.method) || other.method == _this.method)&&const DeepCollectionEquality().equals(other.headers, _this.headers)&&const DeepCollectionEquality().equals(other.body, _this.body)&&const DeepCollectionEquality().equals(other.cookies, _this.cookies));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,url,method,const DeepCollectionEquality().hash(headers),const DeepCollectionEquality().hash(body),const DeepCollectionEquality().hash(cookies));
+int get hashCode {
+  final _this = this as PaperbackRequest;
+  return Object.hash(runtimeType,_this.url,_this.method,const DeepCollectionEquality().hash(_this.headers),const DeepCollectionEquality().hash(_this.body),const DeepCollectionEquality().hash(_this.cookies));
+}
 
 @override
 String toString() {
-  return 'PaperbackRequest(url: $url, method: $method, headers: $headers, body: $body, cookies: $cookies)';
+  final _this = this as PaperbackRequest;
+  return 'PaperbackRequest(url: ${_this.url}, method: ${_this.method}, headers: ${_this.headers}, body: ${_this.body}, cookies: ${_this.cookies})';
 }
 
 
@@ -4462,7 +4655,7 @@ class _$PaperbackRequestCopyWithImpl<$Res>
 /// Create a copy of PaperbackRequest
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? url = null,Object? method = null,Object? headers = freezed,Object? body = freezed,Object? cookies = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(PaperbackRequest(
 url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String,method: null == method ? _self.method : method // ignore: cast_nullable_to_non_nullable
 as String,headers: freezed == headers ? _self.headers : headers // ignore: cast_nullable_to_non_nullable
@@ -4480,7 +4673,7 @@ as Map<String, String>?,
 @JsonSerializable()
 
 class _PaperbackRequest implements PaperbackRequest {
-  const _PaperbackRequest({required this.url, required this.method, final  Map<String, String>? headers, this.body, final  Map<String, String>? cookies}): _headers = headers,_cookies = cookies;
+  const _PaperbackRequest({required this.url, required this.method,  Map<String, String>? headers, this.body,  Map<String, String>? cookies}): _headers = headers,_cookies = cookies;
   factory _PaperbackRequest.fromJson(Map<String, dynamic> json) => _$PaperbackRequestFromJson(json);
 
 @override final  String url;
@@ -4518,16 +4711,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaperbackRequest&&(identical(other.url, url) || other.url == url)&&(identical(other.method, method) || other.method == method)&&const DeepCollectionEquality().equals(other._headers, _headers)&&const DeepCollectionEquality().equals(other.body, body)&&const DeepCollectionEquality().equals(other._cookies, _cookies));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaperbackRequest&&(identical(other.url, url) || other.url == url)&&(identical(other.method, method) || other.method == method)&&const DeepCollectionEquality().equals(other.headers, _headers)&&const DeepCollectionEquality().equals(other.body, body)&&const DeepCollectionEquality().equals(other.cookies, _cookies));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,url,method,const DeepCollectionEquality().hash(_headers),const DeepCollectionEquality().hash(body),const DeepCollectionEquality().hash(_cookies));
+int get hashCode {
+    return Object.hash(runtimeType,url,method,const DeepCollectionEquality().hash(_headers),const DeepCollectionEquality().hash(body),const DeepCollectionEquality().hash(_cookies));
+}
 
 @override
 String toString() {
-  return 'PaperbackRequest(url: $url, method: $method, headers: $headers, body: $body, cookies: $cookies)';
+    return 'PaperbackRequest(url: $url, method: $method, headers: $headers, body: $body, cookies: $cookies)';
 }
 
 
@@ -4606,16 +4801,21 @@ $ChapterDetailsCopyWith<ChapterDetails> get copyWith => _$ChapterDetailsCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId));
+  final _this = this as ChapterDetails;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterDetails&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.mangaId, _this.mangaId) || other.mangaId == _this.mangaId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,mangaId);
+int get hashCode {
+  final _this = this as ChapterDetails;
+  return Object.hash(runtimeType,_this.id,_this.mangaId);
+}
 
 @override
 String toString() {
-  return 'ChapterDetails(id: $id, mangaId: $mangaId)';
+  final _this = this as ChapterDetails;
+  return 'ChapterDetails(id: ${_this.id}, mangaId: ${_this.mangaId})';
 }
 
 
@@ -4659,7 +4859,7 @@ as String,
 @JsonSerializable()
 
 class ImageChapterDetails implements ChapterDetails {
-  const ImageChapterDetails({required this.id, required this.mangaId, required final  List<String> pages, final  String? $type}): _pages = pages,$type = $type ?? 'images';
+  const ImageChapterDetails({required this.id, required this.mangaId, required  List<String> pages,  String? $type}): _pages = pages,$type = $type ?? 'images';
   factory ImageChapterDetails.fromJson(Map<String, dynamic> json) => _$ImageChapterDetailsFromJson(json);
 
 @override final  String id;
@@ -4689,16 +4889,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ImageChapterDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&const DeepCollectionEquality().equals(other._pages, _pages));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ImageChapterDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&const DeepCollectionEquality().equals(other.pages, _pages));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,mangaId,const DeepCollectionEquality().hash(_pages));
+int get hashCode {
+    return Object.hash(runtimeType,id,mangaId,const DeepCollectionEquality().hash(_pages));
+}
 
 @override
 String toString() {
-  return 'ChapterDetails.images(id: $id, mangaId: $mangaId, pages: $pages)';
+    return 'ChapterDetails.images(id: $id, mangaId: $mangaId, pages: $pages)';
 }
 
 
@@ -4742,7 +4944,7 @@ as List<String>,
 @JsonSerializable()
 
 class HtmlChapterDetails implements ChapterDetails {
-  const HtmlChapterDetails({required this.id, required this.mangaId, required this.html, final  String? $type}): $type = $type ?? 'html';
+  const HtmlChapterDetails({required this.id, required this.mangaId, required this.html,  String? $type}): $type = $type ?? 'html';
   factory HtmlChapterDetails.fromJson(Map<String, dynamic> json) => _$HtmlChapterDetailsFromJson(json);
 
 @override final  String id;
@@ -4766,16 +4968,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HtmlChapterDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.html, html) || other.html == html));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is HtmlChapterDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.html, html) || other.html == html));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,mangaId,html);
+int get hashCode {
+    return Object.hash(runtimeType,id,mangaId,html);
+}
 
 @override
 String toString() {
-  return 'ChapterDetails.html(id: $id, mangaId: $mangaId, html: $html)';
+    return 'ChapterDetails.html(id: $id, mangaId: $mangaId, html: $html)';
 }
 
 
@@ -4819,7 +5023,7 @@ as String,
 @JsonSerializable()
 
 class FileChapterDetails implements ChapterDetails {
-  const FileChapterDetails({required this.id, required this.mangaId, required this.format, required this.request, final  String? $type}): $type = $type ?? 'file';
+  const FileChapterDetails({required this.id, required this.mangaId, required this.format, required this.request,  String? $type}): $type = $type ?? 'file';
   factory FileChapterDetails.fromJson(Map<String, dynamic> json) => _$FileChapterDetailsFromJson(json);
 
 @override final  String id;
@@ -4844,16 +5048,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FileChapterDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.format, format) || other.format == format)&&(identical(other.request, request) || other.request == request));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is FileChapterDetails&&(identical(other.id, id) || other.id == id)&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.format, format) || other.format == format)&&(identical(other.request, request) || other.request == request));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,mangaId,format,request);
+int get hashCode {
+    return Object.hash(runtimeType,id,mangaId,format,request);
+}
 
 @override
 String toString() {
-  return 'ChapterDetails.file(id: $id, mangaId: $mangaId, format: $format, request: $request)';
+    return 'ChapterDetails.file(id: $id, mangaId: $mangaId, format: $format, request: $request)';
 }
 
 
@@ -4920,16 +5126,21 @@ $DiscoverSectionCopyWith<DiscoverSection> get copyWith => _$DiscoverSectionCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiscoverSection&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.type, type) || other.type == type));
+  final _this = this as DiscoverSection;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiscoverSection&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.subtitle, _this.subtitle) || other.subtitle == _this.subtitle)&&(identical(other.type, _this.type) || other.type == _this.type));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,subtitle,type);
+int get hashCode {
+  final _this = this as DiscoverSection;
+  return Object.hash(runtimeType,_this.id,_this.title,_this.subtitle,_this.type);
+}
 
 @override
 String toString() {
-  return 'DiscoverSection(id: $id, title: $title, subtitle: $subtitle, type: $type)';
+  final _this = this as DiscoverSection;
+  return 'DiscoverSection(id: ${_this.id}, title: ${_this.title}, subtitle: ${_this.subtitle}, type: ${_this.type})';
 }
 
 
@@ -4958,7 +5169,7 @@ class _$DiscoverSectionCopyWithImpl<$Res>
 /// Create a copy of DiscoverSection
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? subtitle = freezed,Object? type = null,}) {
-  return _then(_self.copyWith(
+  return _then(DiscoverSection(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
@@ -4996,16 +5207,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiscoverSection&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.type, type) || other.type == type));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiscoverSection&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.type, type) || other.type == type));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,subtitle,type);
+int get hashCode {
+    return Object.hash(runtimeType,id,title,subtitle,type);
+}
 
 @override
 String toString() {
-  return 'DiscoverSection(id: $id, title: $title, subtitle: $subtitle, type: $type)';
+    return 'DiscoverSection(id: $id, title: $title, subtitle: $subtitle, type: $type)';
 }
 
 
@@ -5098,16 +5311,21 @@ $DiscoverSectionItemCopyWith<DiscoverSectionItem> get copyWith => _$DiscoverSect
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiscoverSectionItem&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
+  final _this = this as DiscoverSectionItem;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiscoverSectionItem&&const DeepCollectionEquality().equals(other.metadata, _this.metadata)&&(identical(other.contentRating, _this.contentRating) || other.contentRating == _this.contentRating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(metadata),contentRating);
+int get hashCode {
+  final _this = this as DiscoverSectionItem;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.metadata),_this.contentRating);
+}
 
 @override
 String toString() {
-  return 'DiscoverSectionItem(metadata: $metadata, contentRating: $contentRating)';
+  final _this = this as DiscoverSectionItem;
+  return 'DiscoverSectionItem(metadata: ${_this.metadata}, contentRating: ${_this.contentRating})';
 }
 
 
@@ -5151,7 +5369,7 @@ as ContentRating?,
 @JsonSerializable()
 
 class GenresCarouselItem implements DiscoverSectionItem {
-  const GenresCarouselItem({required this.searchQuery, required this.name, this.metadata, @NullableContentRatingParser() this.contentRating, final  String? $type}): $type = $type ?? 'genresCarouselItem';
+  const GenresCarouselItem({required this.searchQuery, required this.name, this.metadata, @NullableContentRatingParser() this.contentRating,  String? $type}): $type = $type ?? 'genresCarouselItem';
   factory GenresCarouselItem.fromJson(Map<String, dynamic> json) => _$GenresCarouselItemFromJson(json);
 
  final  SearchQuery searchQuery;
@@ -5176,16 +5394,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GenresCarouselItem&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is GenresCarouselItem&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,searchQuery,name,const DeepCollectionEquality().hash(metadata),contentRating);
+int get hashCode {
+    return Object.hash(runtimeType,searchQuery,name,const DeepCollectionEquality().hash(metadata),contentRating);
+}
 
 @override
 String toString() {
-  return 'DiscoverSectionItem.genresCarouselItem(searchQuery: $searchQuery, name: $name, metadata: $metadata, contentRating: $contentRating)';
+    return 'DiscoverSectionItem.genresCarouselItem(searchQuery: $searchQuery, name: $name, metadata: $metadata, contentRating: $contentRating)';
 }
 
 
@@ -5239,7 +5459,7 @@ $SearchQueryCopyWith<$Res> get searchQuery {
 @JsonSerializable()
 
 class ChapterUpdatesCarouselItem implements DiscoverSectionItem {
-  const ChapterUpdatesCarouselItem({required this.mangaId, required this.chapterId, required this.imageUrl, required this.title, this.subtitle, @NullableTimestampSerializer() this.publishDate, this.metadata, @NullableContentRatingParser() this.contentRating, final  String? $type}): $type = $type ?? 'chapterUpdatesCarouselItem';
+  const ChapterUpdatesCarouselItem({required this.mangaId, required this.chapterId, required this.imageUrl, required this.title, this.subtitle, @NullableTimestampSerializer() this.publishDate, this.metadata, @NullableContentRatingParser() this.contentRating,  String? $type}): $type = $type ?? 'chapterUpdatesCarouselItem';
   factory ChapterUpdatesCarouselItem.fromJson(Map<String, dynamic> json) => _$ChapterUpdatesCarouselItemFromJson(json);
 
  final  String mangaId;
@@ -5268,16 +5488,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterUpdatesCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.publishDate, publishDate) || other.publishDate == publishDate)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterUpdatesCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.publishDate, publishDate) || other.publishDate == publishDate)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,mangaId,chapterId,imageUrl,title,subtitle,publishDate,const DeepCollectionEquality().hash(metadata),contentRating);
+int get hashCode {
+    return Object.hash(runtimeType,mangaId,chapterId,imageUrl,title,subtitle,publishDate,const DeepCollectionEquality().hash(metadata),contentRating);
+}
 
 @override
 String toString() {
-  return 'DiscoverSectionItem.chapterUpdatesCarouselItem(mangaId: $mangaId, chapterId: $chapterId, imageUrl: $imageUrl, title: $title, subtitle: $subtitle, publishDate: $publishDate, metadata: $metadata, contentRating: $contentRating)';
+    return 'DiscoverSectionItem.chapterUpdatesCarouselItem(mangaId: $mangaId, chapterId: $chapterId, imageUrl: $imageUrl, title: $title, subtitle: $subtitle, publishDate: $publishDate, metadata: $metadata, contentRating: $contentRating)';
 }
 
 
@@ -5326,7 +5548,7 @@ as ContentRating?,
 @JsonSerializable()
 
 class ProminentCarouselItem implements DiscoverSectionItem {
-  const ProminentCarouselItem({required this.mangaId, required this.imageUrl, required this.title, this.subtitle, this.metadata, @NullableContentRatingParser() this.contentRating, final  String? $type}): $type = $type ?? 'prominentCarouselItem';
+  const ProminentCarouselItem({required this.mangaId, required this.imageUrl, required this.title, this.subtitle, this.metadata, @NullableContentRatingParser() this.contentRating,  String? $type}): $type = $type ?? 'prominentCarouselItem';
   factory ProminentCarouselItem.fromJson(Map<String, dynamic> json) => _$ProminentCarouselItemFromJson(json);
 
  final  String mangaId;
@@ -5353,16 +5575,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProminentCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ProminentCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,mangaId,imageUrl,title,subtitle,const DeepCollectionEquality().hash(metadata),contentRating);
+int get hashCode {
+    return Object.hash(runtimeType,mangaId,imageUrl,title,subtitle,const DeepCollectionEquality().hash(metadata),contentRating);
+}
 
 @override
 String toString() {
-  return 'DiscoverSectionItem.prominentCarouselItem(mangaId: $mangaId, imageUrl: $imageUrl, title: $title, subtitle: $subtitle, metadata: $metadata, contentRating: $contentRating)';
+    return 'DiscoverSectionItem.prominentCarouselItem(mangaId: $mangaId, imageUrl: $imageUrl, title: $title, subtitle: $subtitle, metadata: $metadata, contentRating: $contentRating)';
 }
 
 
@@ -5409,7 +5633,7 @@ as ContentRating?,
 @JsonSerializable()
 
 class SimpleCarouselItem implements DiscoverSectionItem {
-  const SimpleCarouselItem({required this.mangaId, required this.imageUrl, required this.title, this.subtitle, this.metadata, @NullableContentRatingParser() this.contentRating, final  String? $type}): $type = $type ?? 'simpleCarouselItem';
+  const SimpleCarouselItem({required this.mangaId, required this.imageUrl, required this.title, this.subtitle, this.metadata, @NullableContentRatingParser() this.contentRating,  String? $type}): $type = $type ?? 'simpleCarouselItem';
   factory SimpleCarouselItem.fromJson(Map<String, dynamic> json) => _$SimpleCarouselItemFromJson(json);
 
  final  String mangaId;
@@ -5436,16 +5660,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SimpleCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is SimpleCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,mangaId,imageUrl,title,subtitle,const DeepCollectionEquality().hash(metadata),contentRating);
+int get hashCode {
+    return Object.hash(runtimeType,mangaId,imageUrl,title,subtitle,const DeepCollectionEquality().hash(metadata),contentRating);
+}
 
 @override
 String toString() {
-  return 'DiscoverSectionItem.simpleCarouselItem(mangaId: $mangaId, imageUrl: $imageUrl, title: $title, subtitle: $subtitle, metadata: $metadata, contentRating: $contentRating)';
+    return 'DiscoverSectionItem.simpleCarouselItem(mangaId: $mangaId, imageUrl: $imageUrl, title: $title, subtitle: $subtitle, metadata: $metadata, contentRating: $contentRating)';
 }
 
 
@@ -5492,7 +5718,7 @@ as ContentRating?,
 @JsonSerializable()
 
 class FeaturedCarouselItem implements DiscoverSectionItem {
-  const FeaturedCarouselItem({required this.mangaId, required this.imageUrl, required this.title, this.supertitle, this.summary, final  List<InfoItem>? infoItems, this.metadata, @NullableContentRatingParser() this.contentRating, final  String? $type}): _infoItems = infoItems,$type = $type ?? 'featuredCarouselItem';
+  const FeaturedCarouselItem({required this.mangaId, required this.imageUrl, required this.title, this.supertitle, this.summary,  List<InfoItem>? infoItems, this.metadata, @NullableContentRatingParser() this.contentRating,  String? $type}): _infoItems = infoItems,$type = $type ?? 'featuredCarouselItem';
   factory FeaturedCarouselItem.fromJson(Map<String, dynamic> json) => _$FeaturedCarouselItemFromJson(json);
 
  final  String mangaId;
@@ -5529,16 +5755,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeaturedCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.supertitle, supertitle) || other.supertitle == supertitle)&&(identical(other.summary, summary) || other.summary == summary)&&const DeepCollectionEquality().equals(other._infoItems, _infoItems)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is FeaturedCarouselItem&&(identical(other.mangaId, mangaId) || other.mangaId == mangaId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.supertitle, supertitle) || other.supertitle == supertitle)&&(identical(other.summary, summary) || other.summary == summary)&&const DeepCollectionEquality().equals(other.infoItems, _infoItems)&&const DeepCollectionEquality().equals(other.metadata, metadata)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,mangaId,imageUrl,title,supertitle,summary,const DeepCollectionEquality().hash(_infoItems),const DeepCollectionEquality().hash(metadata),contentRating);
+int get hashCode {
+    return Object.hash(runtimeType,mangaId,imageUrl,title,supertitle,summary,const DeepCollectionEquality().hash(_infoItems),const DeepCollectionEquality().hash(metadata),contentRating);
+}
 
 @override
 String toString() {
-  return 'DiscoverSectionItem.featuredCarouselItem(mangaId: $mangaId, imageUrl: $imageUrl, title: $title, supertitle: $supertitle, summary: $summary, infoItems: $infoItems, metadata: $metadata, contentRating: $contentRating)';
+    return 'DiscoverSectionItem.featuredCarouselItem(mangaId: $mangaId, imageUrl: $imageUrl, title: $title, supertitle: $supertitle, summary: $summary, infoItems: $infoItems, metadata: $metadata, contentRating: $contentRating)';
 }
 
 
@@ -5600,16 +5828,21 @@ $InfoItemCopyWith<InfoItem> get copyWith => _$InfoItemCopyWithImpl<InfoItem>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InfoItem&&(identical(other.symbol, symbol) || other.symbol == symbol)&&(identical(other.text, text) || other.text == text));
+  final _this = this as InfoItem;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InfoItem&&(identical(other.symbol, _this.symbol) || other.symbol == _this.symbol)&&(identical(other.text, _this.text) || other.text == _this.text));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,symbol,text);
+int get hashCode {
+  final _this = this as InfoItem;
+  return Object.hash(runtimeType,_this.symbol,_this.text);
+}
 
 @override
 String toString() {
-  return 'InfoItem(symbol: $symbol, text: $text)';
+  final _this = this as InfoItem;
+  return 'InfoItem(symbol: ${_this.symbol}, text: ${_this.text})';
 }
 
 
@@ -5638,7 +5871,7 @@ class _$InfoItemCopyWithImpl<$Res>
 /// Create a copy of InfoItem
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? symbol = null,Object? text = null,}) {
-  return _then(_self.copyWith(
+  return _then(InfoItem(
 symbol: null == symbol ? _self.symbol : symbol // ignore: cast_nullable_to_non_nullable
 as String,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String,
@@ -5672,16 +5905,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InfoItem&&(identical(other.symbol, symbol) || other.symbol == symbol)&&(identical(other.text, text) || other.text == text));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _InfoItem&&(identical(other.symbol, symbol) || other.symbol == symbol)&&(identical(other.text, text) || other.text == text));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,symbol,text);
+int get hashCode {
+    return Object.hash(runtimeType,symbol,text);
+}
 
 @override
 String toString() {
-  return 'InfoItem(symbol: $symbol, text: $text)';
+    return 'InfoItem(symbol: $symbol, text: $text)';
 }
 
 
@@ -5737,16 +5972,21 @@ $LabelRowValueCopyWith<LabelRowValue> get copyWith => _$LabelRowValueCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LabelRowValue&&(identical(other.text, text) || other.text == text)&&(identical(other.symbol, symbol) || other.symbol == symbol)&&(identical(other.style, style) || other.style == style));
+  final _this = this as LabelRowValue;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LabelRowValue&&(identical(other.text, _this.text) || other.text == _this.text)&&(identical(other.symbol, _this.symbol) || other.symbol == _this.symbol)&&(identical(other.style, _this.style) || other.style == _this.style));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,text,symbol,style);
+int get hashCode {
+  final _this = this as LabelRowValue;
+  return Object.hash(runtimeType,_this.text,_this.symbol,_this.style);
+}
 
 @override
 String toString() {
-  return 'LabelRowValue(text: $text, symbol: $symbol, style: $style)';
+  final _this = this as LabelRowValue;
+  return 'LabelRowValue(text: ${_this.text}, symbol: ${_this.symbol}, style: ${_this.style})';
 }
 
 
@@ -5775,7 +6015,7 @@ class _$LabelRowValueCopyWithImpl<$Res>
 /// Create a copy of LabelRowValue
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? text = freezed,Object? symbol = freezed,Object? style = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(LabelRowValue(
 text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String?,symbol: freezed == symbol ? _self.symbol : symbol // ignore: cast_nullable_to_non_nullable
 as String?,style: freezed == style ? _self.style : style // ignore: cast_nullable_to_non_nullable
@@ -5811,16 +6051,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LabelRowValue&&(identical(other.text, text) || other.text == text)&&(identical(other.symbol, symbol) || other.symbol == symbol)&&(identical(other.style, style) || other.style == style));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _LabelRowValue&&(identical(other.text, text) || other.text == text)&&(identical(other.symbol, symbol) || other.symbol == symbol)&&(identical(other.style, style) || other.style == style));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,text,symbol,style);
+int get hashCode {
+    return Object.hash(runtimeType,text,symbol,style);
+}
 
 @override
 String toString() {
-  return 'LabelRowValue(text: $text, symbol: $symbol, style: $style)';
+    return 'LabelRowValue(text: $text, symbol: $symbol, style: $style)';
 }
 
 
@@ -5924,16 +6166,21 @@ $FormItemElementCopyWith<FormItemElement> get copyWith => _$FormItemElementCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FormItemElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title));
+  final _this = this as FormItemElement;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FormItemElement&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.isHidden, _this.isHidden) || other.isHidden == _this.isHidden)&&(identical(other.title, _this.title) || other.title == _this.title));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title);
+int get hashCode {
+  final _this = this as FormItemElement;
+  return Object.hash(runtimeType,_this.id,_this.isHidden,_this.title);
+}
 
 @override
 String toString() {
-  return 'FormItemElement(id: $id, isHidden: $isHidden, title: $title)';
+  final _this = this as FormItemElement;
+  return 'FormItemElement(id: ${_this.id}, isHidden: ${_this.isHidden}, title: ${_this.title})';
 }
 
 
@@ -5978,7 +6225,7 @@ as String,
 @JsonSerializable()
 
 class LabelRowElement implements FormItemElement {
-  const LabelRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, @LabelRowValueConverter() this.value, this.style, this.onSelect, final  String? $type}): $type = $type ?? 'labelRow';
+  const LabelRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, @LabelRowValueConverter() this.value, this.style, this.onSelect,  String? $type}): $type = $type ?? 'labelRow';
   factory LabelRowElement.fromJson(Map<String, dynamic> json) => _$LabelRowElementFromJson(json);
 
 @override final  String id;
@@ -5986,7 +6233,6 @@ class LabelRowElement implements FormItemElement {
 @override final  String title;
  final  String? subtitle;
 @LabelRowValueConverter() final  dynamic value;
-// String | LabelRowValue
  final  RowStyle? style;
  final  SelectorID? onSelect;
 
@@ -6007,16 +6253,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LabelRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.value, value)&&(identical(other.style, style) || other.style == style)&&(identical(other.onSelect, onSelect) || other.onSelect == onSelect));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is LabelRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.value, value)&&(identical(other.style, style) || other.style == style)&&(identical(other.onSelect, onSelect) || other.onSelect == onSelect));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title,subtitle,const DeepCollectionEquality().hash(value),style,onSelect);
+int get hashCode {
+    return Object.hash(runtimeType,id,isHidden,title,subtitle,const DeepCollectionEquality().hash(value),style,onSelect);
+}
 
 @override
 String toString() {
-  return 'FormItemElement.labelRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, style: $style, onSelect: $onSelect)';
+    return 'FormItemElement.labelRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, style: $style, onSelect: $onSelect)';
 }
 
 
@@ -6064,7 +6312,7 @@ as SelectorID?,
 @JsonSerializable()
 
 class InputRowElement implements FormItemElement {
-  const InputRowElement({required this.id, required this.isHidden, required this.title, required this.value, this.isSecureEntry, required this.onValueChange, final  String? $type}): $type = $type ?? 'inputRow';
+  const InputRowElement({required this.id, required this.isHidden, required this.title, required this.value, this.isSecureEntry, required this.onValueChange,  String? $type}): $type = $type ?? 'inputRow';
   factory InputRowElement.fromJson(Map<String, dynamic> json) => _$InputRowElementFromJson(json);
 
 @override final  String id;
@@ -6091,16 +6339,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InputRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.value, value) || other.value == value)&&(identical(other.isSecureEntry, isSecureEntry) || other.isSecureEntry == isSecureEntry)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InputRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.value, value) || other.value == value)&&(identical(other.isSecureEntry, isSecureEntry) || other.isSecureEntry == isSecureEntry)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title,value,isSecureEntry,onValueChange);
+int get hashCode {
+    return Object.hash(runtimeType,id,isHidden,title,value,isSecureEntry,onValueChange);
+}
 
 @override
 String toString() {
-  return 'FormItemElement.inputRow(id: $id, isHidden: $isHidden, title: $title, value: $value, isSecureEntry: $isSecureEntry, onValueChange: $onValueChange)';
+    return 'FormItemElement.inputRow(id: $id, isHidden: $isHidden, title: $title, value: $value, isSecureEntry: $isSecureEntry, onValueChange: $onValueChange)';
 }
 
 
@@ -6147,7 +6397,7 @@ as SelectorID,
 @JsonSerializable()
 
 class ToggleRowElement implements FormItemElement {
-  const ToggleRowElement({required this.id, required this.isHidden, required this.title, required this.value, required this.onValueChange, final  String? $type}): $type = $type ?? 'toggleRow';
+  const ToggleRowElement({required this.id, required this.isHidden, required this.title, required this.value, required this.onValueChange,  String? $type}): $type = $type ?? 'toggleRow';
   factory ToggleRowElement.fromJson(Map<String, dynamic> json) => _$ToggleRowElementFromJson(json);
 
 @override final  String id;
@@ -6173,16 +6423,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ToggleRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.value, value) || other.value == value)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ToggleRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.value, value) || other.value == value)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title,value,onValueChange);
+int get hashCode {
+    return Object.hash(runtimeType,id,isHidden,title,value,onValueChange);
+}
 
 @override
 String toString() {
-  return 'FormItemElement.toggleRow(id: $id, isHidden: $isHidden, title: $title, value: $value, onValueChange: $onValueChange)';
+    return 'FormItemElement.toggleRow(id: $id, isHidden: $isHidden, title: $title, value: $value, onValueChange: $onValueChange)';
 }
 
 
@@ -6228,7 +6480,7 @@ as SelectorID,
 @JsonSerializable()
 
 class ButtonRowElement implements FormItemElement {
-  const ButtonRowElement({required this.id, required this.isHidden, required this.title, required this.onSelect, final  String? $type}): $type = $type ?? 'buttonRow';
+  const ButtonRowElement({required this.id, required this.isHidden, required this.title, required this.onSelect,  String? $type}): $type = $type ?? 'buttonRow';
   factory ButtonRowElement.fromJson(Map<String, dynamic> json) => _$ButtonRowElementFromJson(json);
 
 @override final  String id;
@@ -6253,16 +6505,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ButtonRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.onSelect, onSelect) || other.onSelect == onSelect));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ButtonRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.onSelect, onSelect) || other.onSelect == onSelect));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title,onSelect);
+int get hashCode {
+    return Object.hash(runtimeType,id,isHidden,title,onSelect);
+}
 
 @override
 String toString() {
-  return 'FormItemElement.buttonRow(id: $id, isHidden: $isHidden, title: $title, onSelect: $onSelect)';
+    return 'FormItemElement.buttonRow(id: $id, isHidden: $isHidden, title: $title, onSelect: $onSelect)';
 }
 
 
@@ -6307,7 +6561,7 @@ as SelectorID,
 @JsonSerializable()
 
 class NavigationRowElement implements FormItemElement {
-  const NavigationRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, this.value, required this.form, final  String? $type}): $type = $type ?? 'navigationRow';
+  const NavigationRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, this.value, required this.form,  String? $type}): $type = $type ?? 'navigationRow';
   factory NavigationRowElement.fromJson(Map<String, dynamic> json) => _$NavigationRowElementFromJson(json);
 
 @override final  String id;
@@ -6334,16 +6588,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is NavigationRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.value, value) || other.value == value)&&(identical(other.form, form) || other.form == form));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is NavigationRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.value, value) || other.value == value)&&(identical(other.form, form) || other.form == form));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title,subtitle,value,form);
+int get hashCode {
+    return Object.hash(runtimeType,id,isHidden,title,subtitle,value,form);
+}
 
 @override
 String toString() {
-  return 'FormItemElement.navigationRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, form: $form)';
+    return 'FormItemElement.navigationRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, form: $form)';
 }
 
 
@@ -6390,7 +6646,7 @@ as FormID,
 @JsonSerializable()
 
 class StepperRowElement implements FormItemElement {
-  const StepperRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, required this.value, required this.minValue, required this.maxValue, required this.stepValue, required this.loopOver, required this.onValueChange, final  String? $type}): $type = $type ?? 'stepperRow';
+  const StepperRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, required this.value, required this.minValue, required this.maxValue, required this.stepValue, required this.loopOver, required this.onValueChange,  String? $type}): $type = $type ?? 'stepperRow';
   factory StepperRowElement.fromJson(Map<String, dynamic> json) => _$StepperRowElementFromJson(json);
 
 @override final  String id;
@@ -6421,16 +6677,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StepperRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.value, value) || other.value == value)&&(identical(other.minValue, minValue) || other.minValue == minValue)&&(identical(other.maxValue, maxValue) || other.maxValue == maxValue)&&(identical(other.stepValue, stepValue) || other.stepValue == stepValue)&&(identical(other.loopOver, loopOver) || other.loopOver == loopOver)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is StepperRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.value, value) || other.value == value)&&(identical(other.minValue, minValue) || other.minValue == minValue)&&(identical(other.maxValue, maxValue) || other.maxValue == maxValue)&&(identical(other.stepValue, stepValue) || other.stepValue == stepValue)&&(identical(other.loopOver, loopOver) || other.loopOver == loopOver)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title,subtitle,value,minValue,maxValue,stepValue,loopOver,onValueChange);
+int get hashCode {
+    return Object.hash(runtimeType,id,isHidden,title,subtitle,value,minValue,maxValue,stepValue,loopOver,onValueChange);
+}
 
 @override
 String toString() {
-  return 'FormItemElement.stepperRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, minValue: $minValue, maxValue: $maxValue, stepValue: $stepValue, loopOver: $loopOver, onValueChange: $onValueChange)';
+    return 'FormItemElement.stepperRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, minValue: $minValue, maxValue: $maxValue, stepValue: $stepValue, loopOver: $loopOver, onValueChange: $onValueChange)';
 }
 
 
@@ -6481,7 +6739,7 @@ as SelectorID,
 @JsonSerializable()
 
 class OAuthButtonRowElement implements FormItemElement {
-  const OAuthButtonRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, required this.onSuccess, required this.authorizeEndpoint, required this.responseType, this.clientId, this.redirectUri, final  List<String>? scopes, final  String? $type}): _scopes = scopes,$type = $type ?? 'oauthButtonRow';
+  const OAuthButtonRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, required this.onSuccess, required this.authorizeEndpoint, required this.responseType, this.clientId, this.redirectUri,  List<String>? scopes,  String? $type}): _scopes = scopes,$type = $type ?? 'oauthButtonRow';
   factory OAuthButtonRowElement.fromJson(Map<String, dynamic> json) => _$OAuthButtonRowElementFromJson(json);
 
 @override final  String id;
@@ -6489,7 +6747,6 @@ class OAuthButtonRowElement implements FormItemElement {
 @override final  String title;
  final  String? subtitle;
  final  SelectorID onSuccess;
-// (refreshToken: string, accessToken: string) => Promise<void>
  final  String authorizeEndpoint;
  final  OAuthResponseType responseType;
  final  String? clientId;
@@ -6521,16 +6778,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OAuthButtonRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.onSuccess, onSuccess) || other.onSuccess == onSuccess)&&(identical(other.authorizeEndpoint, authorizeEndpoint) || other.authorizeEndpoint == authorizeEndpoint)&&(identical(other.responseType, responseType) || other.responseType == responseType)&&(identical(other.clientId, clientId) || other.clientId == clientId)&&(identical(other.redirectUri, redirectUri) || other.redirectUri == redirectUri)&&const DeepCollectionEquality().equals(other._scopes, _scopes));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is OAuthButtonRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.onSuccess, onSuccess) || other.onSuccess == onSuccess)&&(identical(other.authorizeEndpoint, authorizeEndpoint) || other.authorizeEndpoint == authorizeEndpoint)&&(identical(other.responseType, responseType) || other.responseType == responseType)&&(identical(other.clientId, clientId) || other.clientId == clientId)&&(identical(other.redirectUri, redirectUri) || other.redirectUri == redirectUri)&&const DeepCollectionEquality().equals(other.scopes, _scopes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title,subtitle,onSuccess,authorizeEndpoint,responseType,clientId,redirectUri,const DeepCollectionEquality().hash(_scopes));
+int get hashCode {
+    return Object.hash(runtimeType,id,isHidden,title,subtitle,onSuccess,authorizeEndpoint,responseType,clientId,redirectUri,const DeepCollectionEquality().hash(_scopes));
+}
 
 @override
 String toString() {
-  return 'FormItemElement.oauthButtonRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, onSuccess: $onSuccess, authorizeEndpoint: $authorizeEndpoint, responseType: $responseType, clientId: $clientId, redirectUri: $redirectUri, scopes: $scopes)';
+    return 'FormItemElement.oauthButtonRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, onSuccess: $onSuccess, authorizeEndpoint: $authorizeEndpoint, responseType: $responseType, clientId: $clientId, redirectUri: $redirectUri, scopes: $scopes)';
 }
 
 
@@ -6590,7 +6849,7 @@ $OAuthResponseTypeCopyWith<$Res> get responseType {
 @JsonSerializable()
 
 class WebViewRowElement implements FormItemElement {
-  const WebViewRowElement({required this.id, required this.isHidden, required this.title, final  String? $type}): $type = $type ?? 'webViewRow';
+  const WebViewRowElement({required this.id, required this.isHidden, required this.title,  String? $type}): $type = $type ?? 'webViewRow';
   factory WebViewRowElement.fromJson(Map<String, dynamic> json) => _$WebViewRowElementFromJson(json);
 
 @override final  String id;
@@ -6614,16 +6873,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebViewRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is WebViewRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,isHidden,title);
+int get hashCode {
+    return Object.hash(runtimeType,id,isHidden,title);
+}
 
 @override
 String toString() {
-  return 'FormItemElement.webViewRow(id: $id, isHidden: $isHidden, title: $title)';
+    return 'FormItemElement.webViewRow(id: $id, isHidden: $isHidden, title: $title)';
 }
 
 
@@ -6696,16 +6957,21 @@ $FormSectionElementCopyWith<FormSectionElement> get copyWith => _$FormSectionEle
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FormSectionElement&&(identical(other.id, id) || other.id == id)&&(identical(other.header, header) || other.header == header)&&(identical(other.footer, footer) || other.footer == footer)&&const DeepCollectionEquality().equals(other.items, items));
+  final _this = this as FormSectionElement;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FormSectionElement&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.header, _this.header) || other.header == _this.header)&&(identical(other.footer, _this.footer) || other.footer == _this.footer)&&const DeepCollectionEquality().equals(other.items, _this.items));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,header,footer,const DeepCollectionEquality().hash(items));
+int get hashCode {
+  final _this = this as FormSectionElement;
+  return Object.hash(runtimeType,_this.id,_this.header,_this.footer,const DeepCollectionEquality().hash(_this.items));
+}
 
 @override
 String toString() {
-  return 'FormSectionElement(id: $id, header: $header, footer: $footer, items: $items)';
+  final _this = this as FormSectionElement;
+  return 'FormSectionElement(id: ${_this.id}, header: ${_this.header}, footer: ${_this.footer}, items: ${_this.items})';
 }
 
 
@@ -6751,7 +7017,7 @@ as List<FormItemElement>,
 @JsonSerializable()
 
 class FlowSectionElement implements FormSectionElement {
-  const FlowSectionElement({required this.id, this.header, this.footer, required final  List<FormItemElement> items, final  String? $type}): _items = items,$type = $type ?? 'flowSection';
+  const FlowSectionElement({required this.id, this.header, this.footer, required  List<FormItemElement> items,  String? $type}): _items = items,$type = $type ?? 'flowSection';
   factory FlowSectionElement.fromJson(Map<String, dynamic> json) => _$FlowSectionElementFromJson(json);
 
 @override final  String id;
@@ -6782,16 +7048,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FlowSectionElement&&(identical(other.id, id) || other.id == id)&&(identical(other.header, header) || other.header == header)&&(identical(other.footer, footer) || other.footer == footer)&&const DeepCollectionEquality().equals(other._items, _items));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is FlowSectionElement&&(identical(other.id, id) || other.id == id)&&(identical(other.header, header) || other.header == header)&&(identical(other.footer, footer) || other.footer == footer)&&const DeepCollectionEquality().equals(other.items, _items));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,header,footer,const DeepCollectionEquality().hash(_items));
+int get hashCode {
+    return Object.hash(runtimeType,id,header,footer,const DeepCollectionEquality().hash(_items));
+}
 
 @override
 String toString() {
-  return 'FormSectionElement.flowSection(id: $id, header: $header, footer: $footer, items: $items)';
+    return 'FormSectionElement.flowSection(id: $id, header: $header, footer: $footer, items: $items)';
 }
 
 
@@ -6836,7 +7104,7 @@ as List<FormItemElement>,
 @JsonSerializable()
 
 class ListSectionElement implements FormSectionElement {
-  const ListSectionElement({required this.id, this.header, this.footer, required final  List<FormItemElement> items, required this.allowDeletion, required this.allowAddition, required this.allowReorder, this.onReorder, this.onDeletion, this.onAddition, final  String? $type}): _items = items,$type = $type ?? 'listSection';
+  const ListSectionElement({required this.id, this.header, this.footer, required  List<FormItemElement> items, required this.allowDeletion, required this.allowAddition, required this.allowReorder, this.onReorder, this.onDeletion, this.onAddition,  String? $type}): _items = items,$type = $type ?? 'listSection';
   factory ListSectionElement.fromJson(Map<String, dynamic> json) => _$ListSectionElementFromJson(json);
 
 @override final  String id;
@@ -6853,9 +7121,7 @@ class ListSectionElement implements FormSectionElement {
  final  bool allowAddition;
  final  bool allowReorder;
  final  SelectorID? onReorder;
-// (srcIndex: number, destIndex: number) => Promise<void>
  final  SelectorID? onDeletion;
-// (index: number) => Promise<void>
  final  SelectorID? onAddition;
 
 @JsonKey(name: 'type')
@@ -6875,16 +7141,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ListSectionElement&&(identical(other.id, id) || other.id == id)&&(identical(other.header, header) || other.header == header)&&(identical(other.footer, footer) || other.footer == footer)&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.allowDeletion, allowDeletion) || other.allowDeletion == allowDeletion)&&(identical(other.allowAddition, allowAddition) || other.allowAddition == allowAddition)&&(identical(other.allowReorder, allowReorder) || other.allowReorder == allowReorder)&&(identical(other.onReorder, onReorder) || other.onReorder == onReorder)&&(identical(other.onDeletion, onDeletion) || other.onDeletion == onDeletion)&&(identical(other.onAddition, onAddition) || other.onAddition == onAddition));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ListSectionElement&&(identical(other.id, id) || other.id == id)&&(identical(other.header, header) || other.header == header)&&(identical(other.footer, footer) || other.footer == footer)&&const DeepCollectionEquality().equals(other.items, _items)&&(identical(other.allowDeletion, allowDeletion) || other.allowDeletion == allowDeletion)&&(identical(other.allowAddition, allowAddition) || other.allowAddition == allowAddition)&&(identical(other.allowReorder, allowReorder) || other.allowReorder == allowReorder)&&(identical(other.onReorder, onReorder) || other.onReorder == onReorder)&&(identical(other.onDeletion, onDeletion) || other.onDeletion == onDeletion)&&(identical(other.onAddition, onAddition) || other.onAddition == onAddition));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,header,footer,const DeepCollectionEquality().hash(_items),allowDeletion,allowAddition,allowReorder,onReorder,onDeletion,onAddition);
+int get hashCode {
+    return Object.hash(runtimeType,id,header,footer,const DeepCollectionEquality().hash(_items),allowDeletion,allowAddition,allowReorder,onReorder,onDeletion,onAddition);
+}
 
 @override
 String toString() {
-  return 'FormSectionElement.listSection(id: $id, header: $header, footer: $footer, items: $items, allowDeletion: $allowDeletion, allowAddition: $allowAddition, allowReorder: $allowReorder, onReorder: $onReorder, onDeletion: $onDeletion, onAddition: $onAddition)';
+    return 'FormSectionElement.listSection(id: $id, header: $header, footer: $footer, items: $items, allowDeletion: $allowDeletion, allowAddition: $allowAddition, allowReorder: $allowReorder, onReorder: $onReorder, onDeletion: $onDeletion, onAddition: $onAddition)';
 }
 
 
@@ -6948,16 +7216,21 @@ $ExecuteInWebViewSourceCopyWith<ExecuteInWebViewSource> get copyWith => _$Execut
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExecuteInWebViewSource&&(identical(other.html, html) || other.html == html)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.loadCSS, loadCSS) || other.loadCSS == loadCSS)&&(identical(other.loadImages, loadImages) || other.loadImages == loadImages)&&(identical(other.userAgent, userAgent) || other.userAgent == userAgent));
+  final _this = this as ExecuteInWebViewSource;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExecuteInWebViewSource&&(identical(other.html, _this.html) || other.html == _this.html)&&(identical(other.baseUrl, _this.baseUrl) || other.baseUrl == _this.baseUrl)&&(identical(other.loadCSS, _this.loadCSS) || other.loadCSS == _this.loadCSS)&&(identical(other.loadImages, _this.loadImages) || other.loadImages == _this.loadImages)&&(identical(other.userAgent, _this.userAgent) || other.userAgent == _this.userAgent));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,html,baseUrl,loadCSS,loadImages,userAgent);
+int get hashCode {
+  final _this = this as ExecuteInWebViewSource;
+  return Object.hash(runtimeType,_this.html,_this.baseUrl,_this.loadCSS,_this.loadImages,_this.userAgent);
+}
 
 @override
 String toString() {
-  return 'ExecuteInWebViewSource(html: $html, baseUrl: $baseUrl, loadCSS: $loadCSS, loadImages: $loadImages, userAgent: $userAgent)';
+  final _this = this as ExecuteInWebViewSource;
+  return 'ExecuteInWebViewSource(html: ${_this.html}, baseUrl: ${_this.baseUrl}, loadCSS: ${_this.loadCSS}, loadImages: ${_this.loadImages}, userAgent: ${_this.userAgent})';
 }
 
 
@@ -6986,7 +7259,7 @@ class _$ExecuteInWebViewSourceCopyWithImpl<$Res>
 /// Create a copy of ExecuteInWebViewSource
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? html = null,Object? baseUrl = null,Object? loadCSS = null,Object? loadImages = null,Object? userAgent = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(ExecuteInWebViewSource(
 html: null == html ? _self.html : html // ignore: cast_nullable_to_non_nullable
 as String,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,loadCSS: null == loadCSS ? _self.loadCSS : loadCSS // ignore: cast_nullable_to_non_nullable
@@ -7026,16 +7299,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExecuteInWebViewSource&&(identical(other.html, html) || other.html == html)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.loadCSS, loadCSS) || other.loadCSS == loadCSS)&&(identical(other.loadImages, loadImages) || other.loadImages == loadImages)&&(identical(other.userAgent, userAgent) || other.userAgent == userAgent));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExecuteInWebViewSource&&(identical(other.html, html) || other.html == html)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.loadCSS, loadCSS) || other.loadCSS == loadCSS)&&(identical(other.loadImages, loadImages) || other.loadImages == loadImages)&&(identical(other.userAgent, userAgent) || other.userAgent == userAgent));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,html,baseUrl,loadCSS,loadImages,userAgent);
+int get hashCode {
+    return Object.hash(runtimeType,html,baseUrl,loadCSS,loadImages,userAgent);
+}
 
 @override
 String toString() {
-  return 'ExecuteInWebViewSource(html: $html, baseUrl: $baseUrl, loadCSS: $loadCSS, loadImages: $loadImages, userAgent: $userAgent)';
+    return 'ExecuteInWebViewSource(html: $html, baseUrl: $baseUrl, loadCSS: $loadCSS, loadImages: $loadImages, userAgent: $userAgent)';
 }
 
 
@@ -7094,16 +7369,21 @@ $PaperbackCookieCopyWith<PaperbackCookie> get copyWith => _$PaperbackCookieCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaperbackCookie&&(identical(other.name, name) || other.name == name)&&(identical(other.value, value) || other.value == value)&&(identical(other.domain, domain) || other.domain == domain)&&(identical(other.path, path) || other.path == path)&&(identical(other.created, created) || other.created == created)&&(identical(other.expires, expires) || other.expires == expires));
+  final _this = this as PaperbackCookie;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaperbackCookie&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.value, _this.value) || other.value == _this.value)&&(identical(other.domain, _this.domain) || other.domain == _this.domain)&&(identical(other.path, _this.path) || other.path == _this.path)&&(identical(other.created, _this.created) || other.created == _this.created)&&(identical(other.expires, _this.expires) || other.expires == _this.expires));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,value,domain,path,created,expires);
+int get hashCode {
+  final _this = this as PaperbackCookie;
+  return Object.hash(runtimeType,_this.name,_this.value,_this.domain,_this.path,_this.created,_this.expires);
+}
 
 @override
 String toString() {
-  return 'PaperbackCookie(name: $name, value: $value, domain: $domain, path: $path, created: $created, expires: $expires)';
+  final _this = this as PaperbackCookie;
+  return 'PaperbackCookie(name: ${_this.name}, value: ${_this.value}, domain: ${_this.domain}, path: ${_this.path}, created: ${_this.created}, expires: ${_this.expires})';
 }
 
 
@@ -7132,7 +7412,7 @@ class _$PaperbackCookieCopyWithImpl<$Res>
 /// Create a copy of PaperbackCookie
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? value = null,Object? domain = null,Object? path = freezed,Object? created = freezed,Object? expires = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(PaperbackCookie(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
 as String,domain: null == domain ? _self.domain : domain // ignore: cast_nullable_to_non_nullable
@@ -7174,16 +7454,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaperbackCookie&&(identical(other.name, name) || other.name == name)&&(identical(other.value, value) || other.value == value)&&(identical(other.domain, domain) || other.domain == domain)&&(identical(other.path, path) || other.path == path)&&(identical(other.created, created) || other.created == created)&&(identical(other.expires, expires) || other.expires == expires));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaperbackCookie&&(identical(other.name, name) || other.name == name)&&(identical(other.value, value) || other.value == value)&&(identical(other.domain, domain) || other.domain == domain)&&(identical(other.path, path) || other.path == path)&&(identical(other.created, created) || other.created == created)&&(identical(other.expires, expires) || other.expires == expires));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,value,domain,path,created,expires);
+int get hashCode {
+    return Object.hash(runtimeType,name,value,domain,path,created,expires);
+}
 
 @override
 String toString() {
-  return 'PaperbackCookie(name: $name, value: $value, domain: $domain, path: $path, created: $created, expires: $expires)';
+    return 'PaperbackCookie(name: $name, value: $value, domain: $domain, path: $path, created: $created, expires: $expires)';
 }
 
 
@@ -7243,16 +7525,21 @@ $WebViewStorageCopyWith<WebViewStorage> get copyWith => _$WebViewStorageCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebViewStorage&&const DeepCollectionEquality().equals(other.cookies, cookies));
+  final _this = this as WebViewStorage;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebViewStorage&&const DeepCollectionEquality().equals(other.cookies, _this.cookies));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(cookies));
+int get hashCode {
+  final _this = this as WebViewStorage;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.cookies));
+}
 
 @override
 String toString() {
-  return 'WebViewStorage(cookies: $cookies)';
+  final _this = this as WebViewStorage;
+  return 'WebViewStorage(cookies: ${_this.cookies})';
 }
 
 
@@ -7281,7 +7568,7 @@ class _$WebViewStorageCopyWithImpl<$Res>
 /// Create a copy of WebViewStorage
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? cookies = null,}) {
-  return _then(_self.copyWith(
+  return _then(WebViewStorage(
 cookies: null == cookies ? _self.cookies : cookies // ignore: cast_nullable_to_non_nullable
 as List<PaperbackCookie>,
   ));
@@ -7295,7 +7582,7 @@ as List<PaperbackCookie>,
 @JsonSerializable()
 
 class _WebViewStorage implements WebViewStorage {
-  const _WebViewStorage({final  List<PaperbackCookie> cookies = const []}): _cookies = cookies;
+  const _WebViewStorage({ List<PaperbackCookie> cookies = const []}): _cookies = cookies;
   factory _WebViewStorage.fromJson(Map<String, dynamic> json) => _$WebViewStorageFromJson(json);
 
  final  List<PaperbackCookie> _cookies;
@@ -7319,16 +7606,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebViewStorage&&const DeepCollectionEquality().equals(other._cookies, _cookies));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebViewStorage&&const DeepCollectionEquality().equals(other.cookies, _cookies));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_cookies));
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_cookies));
+}
 
 @override
 String toString() {
-  return 'WebViewStorage(cookies: $cookies)';
+    return 'WebViewStorage(cookies: $cookies)';
 }
 
 
@@ -7383,16 +7672,21 @@ $ExecuteInWebViewContextCopyWith<ExecuteInWebViewContext> get copyWith => _$Exec
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExecuteInWebViewContext&&(identical(other.source, source) || other.source == source)&&(identical(other.inject, inject) || other.inject == inject)&&(identical(other.storage, storage) || other.storage == storage));
+  final _this = this as ExecuteInWebViewContext;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExecuteInWebViewContext&&(identical(other.source, _this.source) || other.source == _this.source)&&(identical(other.inject, _this.inject) || other.inject == _this.inject)&&(identical(other.storage, _this.storage) || other.storage == _this.storage));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,source,inject,storage);
+int get hashCode {
+  final _this = this as ExecuteInWebViewContext;
+  return Object.hash(runtimeType,_this.source,_this.inject,_this.storage);
+}
 
 @override
 String toString() {
-  return 'ExecuteInWebViewContext(source: $source, inject: $inject, storage: $storage)';
+  final _this = this as ExecuteInWebViewContext;
+  return 'ExecuteInWebViewContext(source: ${_this.source}, inject: ${_this.inject}, storage: ${_this.storage})';
 }
 
 
@@ -7421,7 +7715,7 @@ class _$ExecuteInWebViewContextCopyWithImpl<$Res>
 /// Create a copy of ExecuteInWebViewContext
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? source = null,Object? inject = null,Object? storage = null,}) {
-  return _then(_self.copyWith(
+  return _then(ExecuteInWebViewContext(
 source: null == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
 as ExecuteInWebViewSource,inject: null == inject ? _self.inject : inject // ignore: cast_nullable_to_non_nullable
 as String,storage: null == storage ? _self.storage : storage // ignore: cast_nullable_to_non_nullable
@@ -7475,16 +7769,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExecuteInWebViewContext&&(identical(other.source, source) || other.source == source)&&(identical(other.inject, inject) || other.inject == inject)&&(identical(other.storage, storage) || other.storage == storage));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExecuteInWebViewContext&&(identical(other.source, source) || other.source == source)&&(identical(other.inject, inject) || other.inject == inject)&&(identical(other.storage, storage) || other.storage == storage));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,source,inject,storage);
+int get hashCode {
+    return Object.hash(runtimeType,source,inject,storage);
+}
 
 @override
 String toString() {
-  return 'ExecuteInWebViewContext(source: $source, inject: $inject, storage: $storage)';
+    return 'ExecuteInWebViewContext(source: $source, inject: $inject, storage: $storage)';
 }
 
 
@@ -7559,16 +7855,21 @@ $WebViewExecutionResultCopyWith<WebViewExecutionResult> get copyWith => _$WebVie
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebViewExecutionResult&&const DeepCollectionEquality().equals(other.result, result)&&(identical(other.storage, storage) || other.storage == storage));
+  final _this = this as WebViewExecutionResult;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebViewExecutionResult&&const DeepCollectionEquality().equals(other.result, _this.result)&&(identical(other.storage, _this.storage) || other.storage == _this.storage));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(result),storage);
+int get hashCode {
+  final _this = this as WebViewExecutionResult;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.result),_this.storage);
+}
 
 @override
 String toString() {
-  return 'WebViewExecutionResult(result: $result, storage: $storage)';
+  final _this = this as WebViewExecutionResult;
+  return 'WebViewExecutionResult(result: ${_this.result}, storage: ${_this.storage})';
 }
 
 
@@ -7597,7 +7898,7 @@ class _$WebViewExecutionResultCopyWithImpl<$Res>
 /// Create a copy of WebViewExecutionResult
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? result = freezed,Object? storage = null,}) {
-  return _then(_self.copyWith(
+  return _then(WebViewExecutionResult(
 result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
 as dynamic,storage: null == storage ? _self.storage : storage // ignore: cast_nullable_to_non_nullable
 as WebViewStorage,
@@ -7640,16 +7941,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebViewExecutionResult&&const DeepCollectionEquality().equals(other.result, result)&&(identical(other.storage, storage) || other.storage == storage));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebViewExecutionResult&&const DeepCollectionEquality().equals(other.result, result)&&(identical(other.storage, storage) || other.storage == storage));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(result),storage);
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(result),storage);
+}
 
 @override
 String toString() {
-  return 'WebViewExecutionResult(result: $result, storage: $storage)';
+    return 'WebViewExecutionResult(result: $result, storage: $storage)';
 }
 
 

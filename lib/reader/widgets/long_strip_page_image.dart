@@ -1,11 +1,13 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/reader/model/types.dart';
 
-ImageProvider<Object> readerImageProvider(
-  ReaderPage page, {
-  required int cacheWidth,
-}) {
-  return ResizeImage.resizeIfNeeded(cacheWidth, null, page.provider);
+/// Granularity of long-strip decode widths, so small width changes such as
+/// a window resize reuse decoded images instead of decoding every page again.
+const longStripCacheWidthStep = 256;
+
+int longStripCacheWidth(double physicalWidth) {
+  final steps = (physicalWidth / longStripCacheWidthStep).ceil();
+  return (steps < 1 ? 1 : steps) * longStripCacheWidthStep;
 }
 
 class LongStripPageImage extends StatefulWidget {
@@ -14,12 +16,17 @@ class LongStripPageImage extends StatefulWidget {
     required this.page,
     required this.displayWidth,
     required this.cacheWidth,
+    this.placeholderExtent,
     this.onAspectRatioChanged,
   });
 
   final ReaderPage page;
   final double displayWidth;
   final int cacheWidth;
+
+  /// Height reserved until the image size is known. Should match the list's
+  /// extent estimate so jumps computed from estimates land where expected.
+  final double? placeholderExtent;
   final VoidCallback? onAspectRatioChanged;
 
   @override
@@ -122,6 +129,7 @@ class _LongStripPageImageState extends State<LongStripPageImage> {
     final aspectRatio = widget.page.aspectRatio;
     return SizedBox(
       width: widget.displayWidth,
+      height: aspectRatio == null ? widget.placeholderExtent : null,
       child: aspectRatio == null
           ? image
           : AspectRatio(aspectRatio: aspectRatio, child: image),

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/config.dart';
@@ -191,19 +191,9 @@ class MangaDexTagViewWidget extends HookConsumerWidget {
               future: popularFuture,
               title: Text(tr.mangadex.byPopularity, style: style),
               leading: [
-                SliverAppBar.medium(
-                  pinned: true,
-                  leading: const BackButton(),
-                  title: GestureDetector(
-                    onTap: () => scrollController.animateTo(
-                      0.0,
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.easeInOut,
-                    ),
-                    child: Text(
-                      tag.attributes.name.get(tr.$meta.locale.languageCode),
-                    ),
-                  ),
+                PageSliverAppBar(
+                  title: tag.attributes.name.get(tr.$meta.locale.languageCode),
+                  controller: scrollController,
                 ),
                 SliverList.separated(
                   itemCount: widgets.length,

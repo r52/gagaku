@@ -39,7 +39,7 @@ abstract class _$UpdateChecker extends $AsyncNotifier<UpdateResult> {
   FutureOr<UpdateResult> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<UpdateResult>, UpdateResult>;
     final element =
         ref.element
@@ -49,6 +49,6 @@ abstract class _$UpdateChecker extends $AsyncNotifier<UpdateResult> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }

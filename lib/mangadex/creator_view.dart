@@ -1,14 +1,12 @@
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
-import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/util/infinite_scroll.dart';
+import 'package:gagaku/util/detail_scaffold.dart';
+import 'package:gagaku/util/material_hooks.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -70,152 +68,134 @@ class MangaDexCreatorViewWidget extends StatefulHookConsumerWidget {
 
 class _MangaDexCreatorViewWidgetState
     extends ConsumerState<MangaDexCreatorViewWidget> {
-  static const info = MangaDexFeeds.creatorTitles;
-
-  late final _pagingManager = OffsetPagingManager<Manga>(limit: info.limit);
-
-  late final _pagingController = PagingController<int, Manga>(
-    getNextPageKey: _pagingManager.getNextPageKey,
-    fetchPage: (pageKey) async {
-      final api = ref.watch(mangadexProvider);
-      final list = await api.fetchMangaList(
-        limit: info.limit,
-        feedKey: info.key,
-        offset: pageKey,
-        entity: widget.creator,
-      );
-
-      _pagingManager.totalItems = list.total;
-
-      final newItems = list.data.cast<Manga>();
-
-      try {
-        ref.run((tsx) async {
-          return await tsx.get(statisticsProvider.notifier).get(newItems);
-        });
-      } catch (e) {
-        logger.e(e, error: e);
-      }
-
-      return newItems;
-    },
+  late final _works = EntityTitlesPager(
+    ref: ref,
+    info: MangaDexFeeds.creatorTitles,
+    entity: widget.creator,
   );
 
   @override
   void dispose() {
-    _pagingController.dispose();
+    _works.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
+    final tabController = useMaterialTabController(initialLength: 1);
     final scrollController = useScrollController();
-    final theme = Theme.of(context);
 
-    return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () async {
-          _pagingManager.reset();
-          final api = ref.watch(mangadexProvider);
-          await api.invalidateAll('${info.key}(${widget.creator.id}');
-          return _pagingController.refresh();
-        },
-        child: MangaListWidget(
-          leading: [
-            SliverAppBar.medium(
-              pinned: true,
-              leading: const BackButton(),
-              title: GestureDetector(
-                onTap: () {
-                  scrollController.animateTo(
-                    0.0,
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.easeInOut,
-                  );
-                },
-                child: Text(widget.creator.attributes.name),
-              ),
+    return DetailScaffold(
+      title: widget.creator.attributes.name,
+      metadata: _CreatorInfo(creator: widget.creator),
+      tabController: tabController,
+      tabs: [
+        DetailTab(
+          label: tr.mangadex.creator.works,
+          scrollToTop: true,
+          // A single tab has no tab bar, so the list carries the heading.
+          body: MangaListWidget(
+            title: Text(
+              tr.mangadex.creator.works,
+              style: CommonTextStyles.twentyfour,
             ),
-            SliverList.list(
-              children: [
-                if (widget.creator.attributes.biography.isNotEmpty)
-                  ExpansionTile(
-                    title: Text(tr.mangadex.creator.biography),
-                    children: [
-                      for (final MapEntry(key: prop, value: desc)
-                          in widget.creator.attributes.biography.entries)
-                        ExpansionTile(
-                          title: Text(prop),
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(8),
-                              color: theme.colorScheme.surfaceContainerHighest,
-                              child: MarkdownBody(
-                                data: desc,
-                                onTapLink: (text, url, title) async {
-                                  if (url != null) {
-                                    await Styles.tryLaunchUrl(context, url);
-                                  }
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                    ],
-                  ),
-                if (widget.creator.attributes.twitter != null ||
-                    widget.creator.attributes.pixiv != null ||
-                    widget.creator.attributes.youtube != null ||
-                    widget.creator.attributes.website != null)
-                  ExpansionTile(
-                    expandedAlignment: Alignment.centerLeft,
-                    title: Text(tr.mangadex.creator.follow),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Wrap(
-                          spacing: 4.0,
-                          runSpacing: 4.0,
-                          children: [
-                            if (widget.creator.attributes.twitter != null)
-                              _LinkChip(
-                                url: widget.creator.attributes.twitter!,
-                                text: 'Twitter',
-                              ),
-                            if (widget.creator.attributes.pixiv != null)
-                              _LinkChip(
-                                url: widget.creator.attributes.pixiv!,
-                                text: 'Pixiv',
-                              ),
-                            if (widget.creator.attributes.youtube != null)
-                              _LinkChip(
-                                url: widget.creator.attributes.youtube!,
-                                text: 'Youtube',
-                              ),
-                            if (widget.creator.attributes.website != null)
-                              _LinkChip(
-                                url: widget.creator.attributes.website!,
-                                text: 'Website',
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
-          ],
-          title: Text(
-            tr.mangadex.creator.works,
-            style: CommonTextStyles.twentyfour,
+            physics: const AlwaysScrollableScrollPhysics(),
+            noController: true,
+            children: [MangaListViewSliver(controller: _works.controller)],
           ),
-          physics: const AlwaysScrollableScrollPhysics(),
-          controller: scrollController,
-          children: [MangaListViewSliver(controller: _pagingController)],
         ),
-      ),
+      ],
+      onRefresh: _works.refresh,
+      scrollController: scrollController,
+    );
+  }
+}
+
+class _CreatorInfo extends StatelessWidget {
+  const _CreatorInfo({required this.creator});
+
+  final CreatorType creator;
+
+  @override
+  Widget build(BuildContext context) {
+    final tr = context.t;
+    final theme = Theme.of(context);
+    final attributes = creator.attributes;
+    final biography = attributes.biography;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (biography.isNotEmpty)
+          ExpansionTile(
+            initiallyExpanded: true,
+            title: Text(tr.mangadex.creator.biography),
+            children: [
+              for (final MapEntry(key: prop, value: desc) in biography.entries)
+                ExpansionTile(
+                  // Several translations would push the works far down.
+                  initiallyExpanded: biography.length == 1,
+                  title: Text(prop),
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(8),
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      child: MarkdownBody(
+                        data: desc,
+                        onTapLink: (text, url, title) async {
+                          if (url != null) {
+                            await Styles.tryLaunchUrl(context, url);
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        if (attributes.twitter != null ||
+            attributes.pixiv != null ||
+            attributes.youtube != null ||
+            attributes.website != null)
+          ExpansionTile(
+            initiallyExpanded: true,
+            expandedAlignment: Alignment.centerLeft,
+            title: Text(tr.mangadex.creator.follow),
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Wrap(
+                  spacing: 4.0,
+                  runSpacing: 4.0,
+                  children: [
+                    if (attributes.twitter != null)
+                      _LinkChip(
+                        url: attributes.twitter!,
+                        text: tr.tracking.twitter,
+                      ),
+                    if (attributes.pixiv != null)
+                      _LinkChip(
+                        url: attributes.pixiv!,
+                        text: tr.tracking.pixiv,
+                      ),
+                    if (attributes.youtube != null)
+                      _LinkChip(
+                        url: attributes.youtube!,
+                        text: tr.tracking.youtube,
+                      ),
+                    if (attributes.website != null)
+                      _LinkChip(
+                        url: attributes.website!,
+                        text: tr.tracking.website,
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+      ],
     );
   }
 }

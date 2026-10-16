@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -139,21 +139,21 @@ class MangaDexListsWidget extends HookConsumerWidget {
         label: Text(t.mangadex.newList),
         onPressed: () {
           final messenger = ScaffoldMessenger.of(context);
-          MangaDexEditListRoute(listId: 'new').push<bool>(context).then((
-            success,
-          ) {
-            if (!context.mounted) return;
-            if (success == true) {
-              messenger
-                ..removeCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text(t.mangadex.newListOk),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-            }
-          });
+          MangaDexEditListRoute(listId: 'new')
+              .push<bool>(context)
+              .then((success) {
+                if (!context.mounted) return;
+                if (success == true) {
+                  messenger
+                    ..removeCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(t.mangadex.newListOk),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                }
+              });
         },
       ),
       body: switch (view.value) {
@@ -255,17 +255,16 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                       item.attributes.name,
                                     );
                                     if (result == true) {
-                                      userListDeleteMutation(me?.id).run(ref, (
-                                        tsx,
-                                      ) async {
-                                        return await tsx
-                                            .get(
-                                              customListCommandsProvider(
-                                                me?.id,
-                                              ),
-                                            )
-                                            .deleteList(tsx, item);
-                                      });
+                                      userListDeleteMutation(me?.id)
+                                          .run(ref, (tsx) async {
+                                            return await tsx
+                                                .get(
+                                                  customListCommandsProvider(
+                                                    me?.id,
+                                                  ),
+                                                )
+                                                .deleteList(tsx, item);
+                                          });
                                     }
                                   },
                                   child: Text(t.ui.delete),
@@ -385,17 +384,16 @@ class MangaDexListsWidget extends HookConsumerWidget {
                                         item.attributes.name,
                                       );
                                       if (result == true) {
-                                        userListDeleteMutation(me.id).run(ref, (
-                                          tsx,
-                                        ) async {
-                                          return await tsx
-                                              .get(
-                                                customListCommandsProvider(
-                                                  me.id,
-                                                ),
-                                              )
-                                              .deleteList(tsx, item);
-                                        });
+                                        userListDeleteMutation(me.id)
+                                            .run(ref, (tsx) async {
+                                              return await tsx
+                                                  .get(
+                                                    customListCommandsProvider(
+                                                      me.id,
+                                                    ),
+                                                  )
+                                                  .deleteList(tsx, item);
+                                            });
                                       }
                                     },
                                     child: Text(t.ui.delete),

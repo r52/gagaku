@@ -225,7 +225,7 @@ abstract class _$WebUpdateFeedController
   FutureOr<UpdateFeedState> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<UpdateFeedState>, UpdateFeedState>;
     final element =
         ref.element
@@ -235,6 +235,6 @@ abstract class _$WebUpdateFeedController
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }

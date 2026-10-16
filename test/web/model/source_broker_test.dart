@@ -7,10 +7,11 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/model/cache.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
+import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/web/model/model.dart';
-import 'package:gagaku/web/model/source_adapter.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/reader.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
 void main() {
@@ -18,84 +19,111 @@ void main() {
     logger = Logger(level: Level.off);
   });
 
-  group('WebSourceBroker execution dispatch', () {
-    late _RecordingWebSourceTransport transport;
+  group('WebSourceBroker', () {
+    late Queue<({int statusCode, Object? data})> responses;
+    late List<RequestOptions> requests;
     late _MemoryCacheManager cache;
+    late _TestExtensionSource extension;
     late WebSourceBroker broker;
-    var extensionFetches = 0;
 
     setUp(() {
-      transport = _RecordingWebSourceTransport();
+      responses = Queue();
+      requests = [];
       cache = _MemoryCacheManager();
-      extensionFetches = 0;
-
-      broker = WebSourceBroker(
-        cache: cache,
-        proxyAdapter: ProxyWebSourceAdapter(transport: transport),
-        extensionAdapter: ExtensionWebSourceAdapter(
-          fetchManga: (sourceId, mangaId) async {
-            extensionFetches++;
-            return _cubariManga(title: '$sourceId/$mangaId');
+      extension = _TestExtensionSource(_extensionManga('Original title'));
+      final dio = Dio(BaseOptions(validateStatus: (_) => true));
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            requests.add(options);
+            final response = responses.removeFirst();
+            handler.resolve(
+              Response<dynamic>(
+                requestOptions: options,
+                statusCode: response.statusCode,
+                data: response.data,
+              ),
+            );
           },
-          fetchChapterContent: (_, _) => throw UnimplementedError(),
         ),
       );
+      addTearDown(dio.close);
+      final container = ProviderContainer(
+        overrides: [
+          cacheProvider.overrideWithValue(cache),
+          webSourceDioProvider.overrideWithValue(dio),
+          extensionSourceProvider('source-1').overrideWith(() => extension),
+        ],
+      );
+      addTearDown(container.dispose);
+      broker = container.read(webSourceBrokerProvider);
+    });
+
+    test('serves cached extension manga until invalidated', () async {
+      const series = WebSeriesRef.extension(
+        sourceId: 'source-1',
+        mangaId: 'manga-1',
+      );
+
+      expect((await broker.getManga(series))?.title, 'Original title');
+      extension._manga = _extensionManga('Updated title');
+      expect((await broker.getManga(series))?.title, 'Original title');
+
+      await broker.invalidateAll(series.key);
+      expect((await broker.getManga(series))?.title, 'Updated title');
+      expect(requests, isEmpty);
     });
 
     test(
-      'dispatches extension manga fetches and caches by series key',
+      'fetches and caches proxy manga independently of extensions',
       () async {
-        const series = WebSeriesRef.extension(
-          sourceId: 'source-1',
-          mangaId: 'manga-1',
-        );
-
-        final first = await broker.getManga(series);
-        final second = await broker.getManga(series);
-
-        expect(first?.title, 'source-1/manga-1');
-        expect(second, same(first));
-        expect(extensionFetches, 1);
-        expect(transport.requests, isEmpty);
-        expect(cache.values, contains(series.key));
-      },
-    );
-
-    test(
-      'dispatches proxy manga fetches through the local transport',
-      () async {
-        transport.enqueue(statusCode: 200, data: _cubariResponse());
+        responses.add((statusCode: 200, data: _cubariResponse()));
         const series = WebSeriesRef.proxy(
           proxyId: 'gist',
           seriesId: 'series-1',
         );
 
         final manga = await broker.getManga(series);
+        final cached = await broker.getManga(series);
 
         expect(manga?.title, 'Proxy series');
+        expect(cached?.title, 'Proxy series');
         expect(
-          transport.requests.single.uri.toString(),
+          requests.single.uri.toString(),
           'https://cubari.moe/read/api/gist/series/series-1/',
         );
-        expect(cache.values, contains(series.key));
-        expect(extensionFetches, 0);
       },
     );
 
-    test('proxy chapter API failures remain observable', () async {
-      transport.enqueue(
-        statusCode: 503,
-        statusMessage: 'Unavailable',
-        data: {'error': 'offline'},
-      );
+    test('refetches a corrupt cache entry', () async {
+      const series = WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1');
+      cache.values[series.key] = 'invalid cached manga';
+      responses.add((statusCode: 200, data: _cubariResponse()));
+
+      expect((await broker.getManga(series))?.title, 'Proxy series');
+      expect((await broker.getManga(series))?.title, 'Proxy series');
+      expect(requests, hasLength(1));
+    });
+
+    test('does not cache an unsuccessful proxy manga response', () async {
+      const series = WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'series-1');
+      responses.add((statusCode: 503, data: null));
+      expect(await broker.getManga(series), isNull);
+
+      responses.add((statusCode: 200, data: _cubariResponse()));
+      expect((await broker.getManga(series))?.title, 'Proxy series');
+    });
+
+    test('reports proxy chapter API failures with their status', () async {
+      responses.add((statusCode: 503, data: {'error': 'offline'}));
 
       await expectLater(
         broker.getProxyAPI('/read/api/imgur/chapter/album-1'),
         throwsA(
-          isA<Exception>().having(
-            (error) => error.toString(),
-            'message',
-            contains('Failed to download API data'),
+          isA<ApiException>().having(
+            (error) => error.statusCode,
+            'statusCode',
+            503,
           ),
         ),
       );
@@ -318,65 +346,17 @@ void main() {
   });
 }
 
-class _RecordedWebRequest {
-  const _RecordedWebRequest(this.uri, this.followRedirects);
+class _TestExtensionSource extends ExtensionSource {
+  _TestExtensionSource(this._manga);
 
-  final Uri uri;
-  final bool followRedirects;
-}
-
-class _QueuedWebResponse {
-  const _QueuedWebResponse({
-    required this.statusCode,
-    required this.data,
-    required this.statusMessage,
-    required this.headers,
-  });
-
-  final int? statusCode;
-  final dynamic data;
-  final String? statusMessage;
-  final Map<String, List<String>> headers;
-}
-
-class _RecordingWebSourceTransport implements WebSourceTransport {
-  final Queue<_QueuedWebResponse> _responses = Queue();
-  final List<_RecordedWebRequest> requests = [];
-
-  void enqueue({
-    required int? statusCode,
-    dynamic data,
-    String? statusMessage,
-    Map<String, List<String>> headers = const {},
-  }) {
-    _responses.add(
-      _QueuedWebResponse(
-        statusCode: statusCode,
-        data: data,
-        statusMessage: statusMessage,
-        headers: headers,
-      ),
-    );
-  }
+  WebManga _manga;
 
   @override
-  Future<Response<dynamic>> getUri(
-    Uri uri, {
-    bool followRedirects = true,
-  }) async {
-    requests.add(_RecordedWebRequest(uri, followRedirects));
-    if (_responses.isEmpty) {
-      throw StateError('No local response queued for $uri');
-    }
-    final response = _responses.removeFirst();
-    return Response<dynamic>(
-      requestOptions: RequestOptions(path: uri.toString()),
-      data: response.data,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      headers: Headers.fromMap(response.headers),
-    );
-  }
+  Future<WebSourceInfo> build(String sourceId) async =>
+      WebSourceInfo(id: sourceId, name: 'Test source', repo: 'test', icon: '');
+
+  @override
+  Future<WebManga?> getManga(String mangaId) async => _manga;
 }
 
 class _MemoryCacheManager implements CacheManager {
@@ -414,14 +394,19 @@ class _MemoryCacheManager implements CacheManager {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-WebManga _cubariManga({required String title}) {
-  return WebManga.cubari(
-    title: title,
-    description: 'Description',
-    artist: 'Artist',
-    author: 'Author',
-    cover: 'https://example.com/cover.jpg',
-    cubariChapters: const [],
+WebManga _extensionManga(String title) {
+  return WebManga.extension(
+    data: SourceManga(
+      mangaId: 'manga-1',
+      mangaInfo: MangaInfo(
+        thumbnailUrl: 'https://example.com/cover.jpg',
+        synopsis: 'Description',
+        primaryTitle: title,
+        secondaryTitles: const [],
+        contentRating: ContentRating.EVERYONE,
+      ),
+    ),
+    chaptersList: const [],
   );
 }
 

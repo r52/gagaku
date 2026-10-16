@@ -175,22 +175,17 @@ class HistoryLink with _$HistoryLink {
     this.lastAccessed,
   });
 
-  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @Id()
   int dbid;
 
-  @override
   String title;
 
-  @override
   @Unique(onConflict: ConflictStrategy.fail)
   String url;
 
-  @override
   String? cover;
 
-  @override
   @Transient()
   @JsonKey(
     fromJson: _historySeriesFromJson,
@@ -199,11 +194,9 @@ class HistoryLink with _$HistoryLink {
   )
   WebSeriesRef? series;
 
-  @override
   @Property(type: PropertyType.date)
   DateTime? lastAccessed;
 
-  @override
   @Backlink('list')
   final lists = ToMany<WebFavoritesList>();
 
@@ -723,32 +716,24 @@ class WebSourceInfo with _$WebSourceInfo {
     this.capabilities = const [SourceIntents.mangaChapters],
   });
 
-  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @Id()
   int dbid;
 
-  @override
   @Unique(onConflict: ConflictStrategy.replace)
   final String id;
 
-  @override
   final String name;
 
-  @override
   final String repo;
 
-  @override
   final String? baseUrl;
 
-  @override
   @Transient()
   SupportedVersion version;
 
-  @override
   final String icon;
 
-  @override
   @SourceIntentParser()
   @Transient()
   List<SourceIntents> capabilities;
@@ -901,8 +886,6 @@ abstract class SourceDeveloper with _$SourceDeveloper {
 
 @freezed
 sealed class SourceVersion with _$SourceVersion {
-  const SourceVersion._();
-
   const factory SourceVersion.zero_nine({
     required String id,
     required String name,
@@ -918,7 +901,9 @@ sealed class SourceVersion with _$SourceVersion {
 
   factory SourceVersion.fromJson(Map<String, dynamic> json) =>
       _$SourceVersionFromJson(json);
+}
 
+extension SourceVersionMetadata on SourceVersion {
   String getDescription() {
     return switch (this) {
       SourceVersion09(:final description) => description,
@@ -1011,15 +996,12 @@ abstract class Versioning with _$Versioning {
 class RepoInfo with _$RepoInfo {
   RepoInfo({this.dbid = 0, required this.name, required this.url});
 
-  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @Id()
   int dbid;
 
-  @override
   final String name;
 
-  @override
   @Unique(onConflict: ConflictStrategy.replace)
   final String url;
 
@@ -1046,7 +1028,6 @@ class RepoData with _$RepoData implements RepoInfo {
   final String name;
   @override
   final String url;
-  @override
   final SupportedVersion version;
 
   factory RepoData.fromInfo(RepoInfo info, SupportedVersion version) =>

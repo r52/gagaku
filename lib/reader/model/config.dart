@@ -11,35 +11,28 @@ part 'config.g.dart';
 @Entity()
 @JsonSerializable()
 class ReaderConfig with _$ReaderConfig {
-  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @Id()
   int dbid;
 
   /// Reader format
-  @override
   @Transient()
   ReaderFormat format;
 
   /// Reader direction
-  @override
   @Transient()
   ReaderDirection direction;
 
   /// Displays progress bar if true (default false)
-  @override
   bool showProgressBar;
 
   /// Enable click/tap to turn page gesture
-  @override
   bool clickToTurn;
 
   /// Enable swipe gestures
-  @override
   bool swipeGestures;
 
   /// The number of images/pages to preload
-  @override
   int precacheCount;
 
   @JsonKey(includeFromJson: false, includeToJson: false)
