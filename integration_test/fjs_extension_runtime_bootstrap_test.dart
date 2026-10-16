@@ -3017,4 +3017,74 @@ globalThis.source.sharedInterceptorSource = {
     await runtime.evalForTesting('Application.unregisterInterceptor("main")');
     expect(await probe(), 'other');
   });
+
+  test('type-less discover items take their section type', () async {
+    final runtime = FjsExtensionRuntime(
+      sourceId: 'typelessDiscoverSource',
+      extensionHost: await rootBundle.loadString(
+        'assets/extensionhost/bundle.js',
+      ),
+      onResetAllState: (_) {},
+      onSetExtensionState: (_, _) {},
+      onSetExtensionSecureState: (_, _) {},
+      getExtensionState: (_) => {},
+      getExtensionSecureState: (_) => {},
+    );
+    addTearDown(runtime.dispose);
+
+    final source = WebSourceInfo(
+      id: 'typelessDiscoverSource',
+      name: 'Typeless Discover Source',
+      repo: 'tracker-fixture',
+      icon: '',
+      capabilities: const [SourceIntents.discoverSections],
+    );
+
+    // Mirrors MangaUpdates' `Omit<...CarouselItem, "type">` items.
+    await runtime.init(source, r'''
+globalThis.source ??= {};
+globalThis.source.typelessDiscoverSource = {
+  initialise: async () => {},
+  getDiscoverSections: async () => [
+    { id: "featured", title: "Featured", type: 0 },
+    { id: "simple", title: "Simple", type: 1 },
+    { id: "prominent", title: "Prominent", type: 2 },
+    { id: "updates", title: "Updates", type: 3 }
+  ],
+  getDiscoverSectionItems: async (section) => ({
+    items: [
+      {
+        mangaId: `${section.id}-1`,
+        title: "Fictional Title",
+        imageUrl: "https://example.com/cover.jpg",
+        contentRating: "EVERYONE",
+        subtitle: "Chs. 12",
+        supertitle: section.type === 0 ? "Fictional Author" : undefined
+      }
+    ]
+  })
+};
+''');
+
+    final sections = await runtime.getDiscoverSections(source);
+    Future<DiscoverSectionItem> firstItem(int index) async =>
+        (await runtime.getDiscoverSectionItems(
+          source,
+          sections[index],
+          null,
+        )).items.single;
+
+    expect(
+      await firstItem(0),
+      isA<FeaturedCarouselItem>().having(
+        (e) => e.supertitle,
+        'supertitle',
+        'Fictional Author',
+      ),
+    );
+    expect(await firstItem(1), isA<SimpleCarouselItem>());
+    expect(await firstItem(2), isA<ProminentCarouselItem>());
+    // Chapter-update items need a chapterId; nothing is inferred.
+    await expectLater(firstItem(3), throwsA(anything));
+  });
 }

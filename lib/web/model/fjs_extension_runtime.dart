@@ -1397,8 +1397,9 @@ return await globalThis.$sourceId.getDiscoverSectionItems(
 
     return PagedResults.fromJson(
       _normalizeBridgeJsonMap(resultsJson, 'getDiscoverSectionItems'),
-      (item) => DiscoverSectionItem.fromJson(
+      (item) => DiscoverSectionItem.fromSectionJson(
         _normalizeBridgeJsonMap(item, 'getDiscoverSectionItems item'),
+        section,
       ),
     );
   }

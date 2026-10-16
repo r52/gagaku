@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 void main() {
   group('Paperback alpha 91 types', () {
@@ -365,6 +366,88 @@ void main() {
 
       expect(result.successfulItems, isEmpty);
       expect(result.failedItems, ['action-2']);
+    });
+  });
+
+  group('DiscoverSectionItem type inference', () {
+    DiscoverSection section(DiscoverSectionType type) => DiscoverSection(
+      id: 'fictional-section',
+      title: 'Fictional',
+      type: type,
+    );
+
+    // Shape of AniList's search-helper items and MangaUpdates'
+    // `Omit<...CarouselItem, "type">` items.
+    const typeless = {
+      'mangaId': 'fictional-1',
+      'title': 'Fictional Title',
+      'imageUrl': 'https://example.com/cover.jpg',
+      'contentRating': 'EVERYONE',
+      'subtitle': 'Chs. 12',
+    };
+
+    test('infers the item type from the section type when missing', () {
+      expect(
+        DiscoverSectionItem.fromSectionJson({
+          ...typeless,
+          'supertitle': 'Fictional Author',
+          'summary': 'Fictional summary',
+          'infoItems': [
+            {'symbol': 'star', 'text': '80%'},
+          ],
+        }, section(DiscoverSectionType.featured)),
+        isA<FeaturedCarouselItem>()
+            .having((e) => e.supertitle, 'supertitle', 'Fictional Author')
+            .having((e) => e.infoItems?.single.text, 'infoItem', '80%'),
+      );
+      expect(
+        DiscoverSectionItem.fromSectionJson(
+          typeless,
+          section(DiscoverSectionType.simpleCarousel),
+        ),
+        isA<SimpleCarouselItem>().having(
+          (e) => e.subtitle,
+          'subtitle',
+          'Chs. 12',
+        ),
+      );
+      expect(
+        DiscoverSectionItem.fromSectionJson(
+          typeless,
+          section(DiscoverSectionType.prominentCarousel),
+        ),
+        isA<ProminentCarouselItem>(),
+      );
+    });
+
+    test('decodes an explicit type as given', () {
+      expect(
+        DiscoverSectionItem.fromSectionJson({
+          ...typeless,
+          'type': 'simpleCarouselItem',
+        }, section(DiscoverSectionType.prominentCarousel)),
+        isA<SimpleCarouselItem>(),
+      );
+      expect(
+        () => DiscoverSectionItem.fromSectionJson({
+          ...typeless,
+          'type': 'notACarouselItem',
+        }, section(DiscoverSectionType.simpleCarousel)),
+        throwsA(isA<CheckedFromJsonException>()),
+      );
+    });
+
+    test('does not infer for sections whose items need extra fields', () {
+      for (final type in [
+        DiscoverSectionType.chapterUpdates,
+        DiscoverSectionType.genres,
+      ]) {
+        expect(
+          () => DiscoverSectionItem.fromSectionJson(typeless, section(type)),
+          throwsA(isA<CheckedFromJsonException>()),
+          reason: '$type',
+        );
+      }
     });
   });
 }
