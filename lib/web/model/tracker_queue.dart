@@ -178,6 +178,16 @@ class TrackerQueueStore {
     ),
   );
 
+  /// Points items queued for [oldLinkKey] at a migrated link.
+  Future<void> rekeyLink(
+    String oldLinkKey,
+    String newLinkKey,
+    TrackedSeriesRef series,
+  ) => _update(
+    items.where((e) => e.linkKey == oldLinkKey).map((e) => e.id),
+    (item) => item.copyWith(linkKey: newLinkKey, series: series),
+  );
+
   Future<void> removeForLink(String linkKey) =>
       _box.deleteAll(items.where((e) => e.linkKey == linkKey).map((e) => e.id));
 

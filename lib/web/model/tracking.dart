@@ -97,6 +97,74 @@ class TrackerLinkRepository {
     _box.remove(link.dbid);
     await queue.removeForLink(link.linkKey);
   }
+
+  /// Links that can no longer be served: the tracker is not installed, or a
+  /// Paperback extension series' reading source is not installed. Native
+  /// MangaDex links are never checked against installed extensions, so an
+  /// uninstalled extension with id `mangadex` cannot orphan them.
+  List<TrackerLink> staleLinks(Set<String> installedIds) =>
+      _box.getAll().where((link) {
+        if (!installedIds.contains(link.trackerId)) {
+          return true;
+        }
+        return switch (link.series) {
+          WebTrackedSeries(series: ExtensionSeriesRef(:final sourceId)) =>
+            !installedIds.contains(sourceId),
+          _ => false,
+        };
+      }).toList();
+
+  Future<void> pruneLinks(Iterable<TrackerLink> links) async {
+    for (final link in links) {
+      await unlink(link);
+    }
+  }
+
+  /// Queued reads whose link no longer exists (for example after a backup
+  /// restore or sync import removed it).
+  List<TrackerQueueItem> orphanedQueueItems() {
+    final linkKeys = _box.getAll().map((e) => e.linkKey).toSet();
+    return queue.items.where((e) => !linkKeys.contains(e.linkKey)).toList();
+  }
+
+  /// Moves Paperback extension-series links from [oldSourceId] to
+  /// [newSourceId], as when a reading source's series are migrated to another
+  /// extension id. Queued reads follow their links. Native MangaDex links are
+  /// never touched. Returns the number of links moved.
+  Future<int> migrateSource(String oldSourceId, String newSourceId) async {
+    var moved = 0;
+    for (final link in _box.getAll()) {
+      final mangaId = switch (link.series) {
+        WebTrackedSeries(
+          series: ExtensionSeriesRef(:final sourceId, :final mangaId),
+        )
+            when sourceId == oldSourceId =>
+          mangaId,
+        _ => null,
+      };
+      if (mangaId == null) {
+        continue;
+      }
+
+      final series = TrackedSeriesRef.web(
+        WebSeriesRef.extension(sourceId: newSourceId, mangaId: mangaId),
+      );
+      final migrated = TrackerLink.create(
+        trackerId: link.trackerId,
+        series: series,
+        trackedManga: link.trackedManga,
+      );
+      migrated
+        ..createdAt = link.createdAt
+        ..updatedAt = link.updatedAt;
+
+      _box.remove(link.dbid);
+      _box.put(migrated);
+      await queue.rekeyLink(link.linkKey, migrated.linkKey, series);
+      moved++;
+    }
+    return moved;
+  }
 }
 
 typedef TrackerQueueProcessor =
@@ -243,6 +311,17 @@ class TrackerReadReporter {
   }
 }
 
+/// Why a tracker is backed off. Rendered by the UI; no user-facing text here.
+@freezed
+sealed class TrackerSyncError with _$TrackerSyncError {
+  /// The tracker reported every action in a batch as failed.
+  const factory TrackerSyncError.rejected(int count) = TrackerRejectedUpdates;
+
+  /// The batch call threw; [message] is the extension's or runtime's error.
+  const factory TrackerSyncError.exception(String message) =
+      TrackerBatchException;
+}
+
 @freezed
 abstract class TrackerSyncStatus with _$TrackerSyncStatus {
   const factory TrackerSyncStatus({
@@ -252,7 +331,7 @@ abstract class TrackerSyncStatus with _$TrackerSyncStatus {
     DateTime? lastSuccess,
 
     /// The tracker's last tracker-wide failure, until a batch succeeds.
-    String? lastError,
+    TrackerSyncError? lastError,
 
     /// Tracker-wide backoff after a batch with no successes.
     DateTime? retryAfter,
@@ -280,7 +359,7 @@ class TrackerQueueCoordinator extends _$TrackerQueueCoordinator {
   final _trackerFailures = <String, int>{};
   final _retryAfter = <String, DateTime>{};
   final _lastSuccess = <String, DateTime>{};
-  final _lastError = <String, String>{};
+  final _lastError = <String, TrackerSyncError>{};
 
   TrackerQueueStore get _queue => ref.read(trackerQueueStoreProvider);
   DateTime _now() => ref.read(trackerClockProvider)();
@@ -379,7 +458,11 @@ class TrackerQueueCoordinator extends _$TrackerQueueCoordinator {
         );
       } catch (error) {
         logger.w('Tracker $trackerId queue batch failed: $error');
-        await _trackerWideFailure(trackerId, ids, error.toString());
+        await _trackerWideFailure(
+          trackerId,
+          ids,
+          TrackerSyncError.exception(error.toString()),
+        );
         return;
       }
 
@@ -397,7 +480,7 @@ class TrackerQueueCoordinator extends _$TrackerQueueCoordinator {
           await _trackerWideFailure(
             trackerId,
             ids,
-            'Tracker reported ${failed.length} failed update(s)',
+            TrackerSyncError.rejected(failed.length),
           );
         } else {
           await _queue.defer(notAttempted, now.add(notAttemptedDelay));
@@ -417,7 +500,7 @@ class TrackerQueueCoordinator extends _$TrackerQueueCoordinator {
   Future<void> _trackerWideFailure(
     String trackerId,
     Set<String> ids,
-    String error,
+    TrackerSyncError error,
   ) async {
     final failures = (_trackerFailures[trackerId] ?? 0) + 1;
     _trackerFailures[trackerId] = failures;

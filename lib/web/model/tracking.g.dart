@@ -523,7 +523,7 @@ final class TrackerQueueCoordinatorProvider
 }
 
 String _$trackerQueueCoordinatorHash() =>
-    r'ad41eff35b4ab08a901f59a195aa63e35d8c924e';
+    r'd5ae0fa6c30796a73d0edef85369215733f2e664';
 
 /// Sends queued reads to trackers and reports per-tracker status.
 

@@ -13,10 +13,177 @@ part of 'tracking.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
+mixin _$TrackerSyncError {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is TrackerSyncError);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+    return 'TrackerSyncError()';
+}
+
+
+}
+
+/// @nodoc
+class $TrackerSyncErrorCopyWith<$Res>  {
+$TrackerSyncErrorCopyWith(TrackerSyncError _, $Res Function(TrackerSyncError) __);
+}
+
+
+
+/// @nodoc
+
+
+class TrackerRejectedUpdates implements TrackerSyncError {
+  const TrackerRejectedUpdates(this.count);
+  
+
+ final  int count;
+
+/// Create a copy of TrackerSyncError
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TrackerRejectedUpdatesCopyWith<TrackerRejectedUpdates> get copyWith => _$TrackerRejectedUpdatesCopyWithImpl<TrackerRejectedUpdates>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is TrackerRejectedUpdates&&(identical(other.count, count) || other.count == count));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,count);
+}
+
+@override
+String toString() {
+    return 'TrackerSyncError.rejected(count: $count)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TrackerRejectedUpdatesCopyWith<$Res> implements $TrackerSyncErrorCopyWith<$Res> {
+  factory $TrackerRejectedUpdatesCopyWith(TrackerRejectedUpdates value, $Res Function(TrackerRejectedUpdates) _then) = _$TrackerRejectedUpdatesCopyWithImpl;
+@useResult
+$Res call({
+ int count
+});
+
+
+
+
+}
+/// @nodoc
+class _$TrackerRejectedUpdatesCopyWithImpl<$Res>
+    implements $TrackerRejectedUpdatesCopyWith<$Res> {
+  _$TrackerRejectedUpdatesCopyWithImpl(this._self, this._then);
+
+  final TrackerRejectedUpdates _self;
+  final $Res Function(TrackerRejectedUpdates) _then;
+
+/// Create a copy of TrackerSyncError
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? count = null,}) {
+  return _then(TrackerRejectedUpdates(
+null == count ? _self.count : count // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class TrackerBatchException implements TrackerSyncError {
+  const TrackerBatchException(this.message);
+  
+
+ final  String message;
+
+/// Create a copy of TrackerSyncError
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TrackerBatchExceptionCopyWith<TrackerBatchException> get copyWith => _$TrackerBatchExceptionCopyWithImpl<TrackerBatchException>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is TrackerBatchException&&(identical(other.message, message) || other.message == message));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,message);
+}
+
+@override
+String toString() {
+    return 'TrackerSyncError.exception(message: $message)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TrackerBatchExceptionCopyWith<$Res> implements $TrackerSyncErrorCopyWith<$Res> {
+  factory $TrackerBatchExceptionCopyWith(TrackerBatchException value, $Res Function(TrackerBatchException) _then) = _$TrackerBatchExceptionCopyWithImpl;
+@useResult
+$Res call({
+ String message
+});
+
+
+
+
+}
+/// @nodoc
+class _$TrackerBatchExceptionCopyWithImpl<$Res>
+    implements $TrackerBatchExceptionCopyWith<$Res> {
+  _$TrackerBatchExceptionCopyWithImpl(this._self, this._then);
+
+  final TrackerBatchException _self;
+  final $Res Function(TrackerBatchException) _then;
+
+/// Create a copy of TrackerSyncError
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
+  return _then(TrackerBatchException(
+null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
 mixin _$TrackerSyncStatus {
 
  int get pending; int get dead; bool get running; DateTime? get lastSuccess;/// The tracker's last tracker-wide failure, until a batch succeeds.
- String? get lastError;/// Tracker-wide backoff after a batch with no successes.
+ TrackerSyncError? get lastError;/// Tracker-wide backoff after a batch with no successes.
  DateTime? get retryAfter;
 /// Create a copy of TrackerSyncStatus
 /// with the given fields replaced by the non-null parameter values.
@@ -53,11 +220,11 @@ abstract mixin class $TrackerSyncStatusCopyWith<$Res>  {
   factory $TrackerSyncStatusCopyWith(TrackerSyncStatus value, $Res Function(TrackerSyncStatus) _then) = _$TrackerSyncStatusCopyWithImpl;
 @useResult
 $Res call({
- int pending, int dead, bool running, DateTime? lastSuccess, String? lastError, DateTime? retryAfter
+ int pending, int dead, bool running, DateTime? lastSuccess, TrackerSyncError? lastError, DateTime? retryAfter
 });
 
 
-
+$TrackerSyncErrorCopyWith<$Res>? get lastError;
 
 }
 /// @nodoc
@@ -77,11 +244,23 @@ as int,dead: null == dead ? _self.dead : dead // ignore: cast_nullable_to_non_nu
 as int,running: null == running ? _self.running : running // ignore: cast_nullable_to_non_nullable
 as bool,lastSuccess: freezed == lastSuccess ? _self.lastSuccess : lastSuccess // ignore: cast_nullable_to_non_nullable
 as DateTime?,lastError: freezed == lastError ? _self.lastError : lastError // ignore: cast_nullable_to_non_nullable
-as String?,retryAfter: freezed == retryAfter ? _self.retryAfter : retryAfter // ignore: cast_nullable_to_non_nullable
+as TrackerSyncError?,retryAfter: freezed == retryAfter ? _self.retryAfter : retryAfter // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
 }
+/// Create a copy of TrackerSyncStatus
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TrackerSyncErrorCopyWith<$Res>? get lastError {
+    if (_self.lastError == null) {
+    return null;
+  }
 
+  return $TrackerSyncErrorCopyWith<$Res>(_self.lastError!, (value) {
+    return _then(_self.copyWith(lastError: value));
+  });
+}
 }
 
 
@@ -98,7 +277,7 @@ class _TrackerSyncStatus implements TrackerSyncStatus {
 @override@JsonKey() final  bool running;
 @override final  DateTime? lastSuccess;
 /// The tracker's last tracker-wide failure, until a batch succeeds.
-@override final  String? lastError;
+@override final  TrackerSyncError? lastError;
 /// Tracker-wide backoff after a batch with no successes.
 @override final  DateTime? retryAfter;
 
@@ -134,11 +313,11 @@ abstract mixin class _$TrackerSyncStatusCopyWith<$Res> implements $TrackerSyncSt
   factory _$TrackerSyncStatusCopyWith(_TrackerSyncStatus value, $Res Function(_TrackerSyncStatus) _then) = __$TrackerSyncStatusCopyWithImpl;
 @override @useResult
 $Res call({
- int pending, int dead, bool running, DateTime? lastSuccess, String? lastError, DateTime? retryAfter
+ int pending, int dead, bool running, DateTime? lastSuccess, TrackerSyncError? lastError, DateTime? retryAfter
 });
 
 
-
+@override $TrackerSyncErrorCopyWith<$Res>? get lastError;
 
 }
 /// @nodoc
@@ -158,12 +337,24 @@ as int,dead: null == dead ? _self.dead : dead // ignore: cast_nullable_to_non_nu
 as int,running: null == running ? _self.running : running // ignore: cast_nullable_to_non_nullable
 as bool,lastSuccess: freezed == lastSuccess ? _self.lastSuccess : lastSuccess // ignore: cast_nullable_to_non_nullable
 as DateTime?,lastError: freezed == lastError ? _self.lastError : lastError // ignore: cast_nullable_to_non_nullable
-as String?,retryAfter: freezed == retryAfter ? _self.retryAfter : retryAfter // ignore: cast_nullable_to_non_nullable
+as TrackerSyncError?,retryAfter: freezed == retryAfter ? _self.retryAfter : retryAfter // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
 }
 
+/// Create a copy of TrackerSyncStatus
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TrackerSyncErrorCopyWith<$Res>? get lastError {
+    if (_self.lastError == null) {
+    return null;
+  }
 
+  return $TrackerSyncErrorCopyWith<$Res>(_self.lastError!, (value) {
+    return _then(_self.copyWith(lastError: value));
+  });
+}
 }
 
 // dart format on

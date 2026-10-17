@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/log.dart';
+import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/tracking.dart';
 import 'package:gagaku/web/model/tracking_types.dart';
 import 'package:gagaku/web/model/types.dart';
@@ -139,4 +140,59 @@ void main() {
     expect(find.widgetWithText(FilledButton, 'Link'), findsOneWidget);
     expect(find.text('Manage trackers'), findsOneWidget);
   });
+
+  testWidgets('the trackers screen renders tracker errors as text', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        installedTrackersProvider.overrideWith(
+          (ref) => Stream.value([_tracker('LinkedTracker')]),
+        ),
+        trackerQueueCoordinatorProvider.overrideWith(
+          () => _FixedCoordinator({
+            'LinkedTracker': const TrackerSyncStatus(
+              pending: 2,
+              dead: 1,
+              lastError: TrackerSyncError.rejected(2),
+            ),
+          }),
+        ),
+        webConfigProvider.overrideWith(_FixedWebConfig.new),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: TranslationProvider(
+          child: const MaterialApp(home: TrackersPage()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Last error: The tracker rejected 2 update(s)'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Pending: 2'), findsOneWidget);
+    expect(find.text('Retry failed'), findsOneWidget);
+    expect(find.text('Discard failed'), findsOneWidget);
+  });
+}
+
+class _FixedCoordinator extends TrackerQueueCoordinator {
+  _FixedCoordinator(this.statuses);
+
+  final Map<String, TrackerSyncStatus> statuses;
+
+  @override
+  Map<String, TrackerSyncStatus> build() => statuses;
+}
+
+class _FixedWebConfig extends WebConfig {
+  @override
+  ExtensionConfig build() => ExtensionConfig();
 }

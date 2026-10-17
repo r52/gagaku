@@ -1935,8 +1935,8 @@ class Translations$webSources$settings$en {
 	/// en: 'Prune Unused Data'
 	String get pruneExtension => 'Prune Unused Data';
 
-	/// en: 'Remove unused extension settings and read markers for items not in your history.'
-	String get pruneExtensionDesc => 'Remove unused extension settings and read markers for items not in your history.';
+	/// en: 'Remove unused extension settings, read markers for items not in your history, and tracker links to uninstalled extensions.'
+	String get pruneExtensionDesc => 'Remove unused extension settings, read markers for items not in your history, and tracker links to uninstalled extensions.';
 
 	/// en: 'Data to be removed:'
 	String get pruneSummary => 'Data to be removed:';
@@ -1949,6 +1949,12 @@ class Translations$webSources$settings$en {
 
 	/// en: 'Read Markers: $count'
 	String pruneReadMarkers({required Object count}) => 'Read Markers: ${count}';
+
+	/// en: 'Tracker Links: $count'
+	String pruneTrackerLinks({required Object count}) => 'Tracker Links: ${count}';
+
+	/// en: 'Queued Tracker Updates: $count'
+	String pruneTrackerQueue({required Object count}) => 'Queued Tracker Updates: ${count}';
 
 	/// en: 'No unused data found.'
 	String get pruneEmpty => 'No unused data found.';
@@ -2107,6 +2113,9 @@ class Translations$webSources$trackers$en {
 
 	/// en: 'Last error: $error'
 	String lastError({required Object error}) => 'Last error: ${error}';
+
+	/// en: 'The tracker rejected $count update(s)'
+	String rejectedUpdates({required Object count}) => 'The tracker rejected ${count} update(s)';
 
 	/// en: 'Retrying $time'
 	String retryAt({required Object time}) => 'Retrying ${time}';
@@ -2521,11 +2530,13 @@ extension on Translations {
 			'webSources.settings.chooseExtension' => 'Choose an extension',
 			'webSources.settings.migrateSuccess' => 'Data migrated. Please completely restart the app for the changes to take effect.',
 			'webSources.settings.pruneExtension' => 'Prune Unused Data',
-			'webSources.settings.pruneExtensionDesc' => 'Remove unused extension settings and read markers for items not in your history.',
+			'webSources.settings.pruneExtensionDesc' => 'Remove unused extension settings, read markers for items not in your history, and tracker links to uninstalled extensions.',
 			'webSources.settings.pruneSummary' => 'Data to be removed:',
 			'webSources.settings.pruneState' => ({required Object count}) => 'Extension States: ${count}',
 			'webSources.settings.pruneSecureState' => ({required Object count}) => 'Secure States: ${count}',
 			'webSources.settings.pruneReadMarkers' => ({required Object count}) => 'Read Markers: ${count}',
+			'webSources.settings.pruneTrackerLinks' => ({required Object count}) => 'Tracker Links: ${count}',
+			'webSources.settings.pruneTrackerQueue' => ({required Object count}) => 'Queued Tracker Updates: ${count}',
 			'webSources.settings.pruneEmpty' => 'No unused data found.',
 			'webSources.settings.pruneSuccess' => 'Data successfully pruned.',
 			'webSources.repo.manage' => 'Manage Repos',
@@ -2586,6 +2597,7 @@ extension on Translations {
 			'webSources.trackers.lastSync' => ({required Object time}) => 'Last sync: ${time}',
 			'webSources.trackers.notSynced' => 'Not synced yet',
 			'webSources.trackers.lastError' => ({required Object error}) => 'Last error: ${error}',
+			'webSources.trackers.rejectedUpdates' => ({required Object count}) => 'The tracker rejected ${count} update(s)',
 			'webSources.trackers.retryAt' => ({required Object time}) => 'Retrying ${time}',
 			'webSources.trackers.syncNow' => 'Sync now',
 			'webSources.trackers.retryFailed' => 'Retry failed',
@@ -2881,11 +2893,11 @@ extension on Translations {
 			'backup.dataSub' => 'Backup all gagaku data and settings (excludes MangaDex login and local library files)',
 			'backup.restore' => 'Restore Backup',
 			'backup.restoreWarning' => 'Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?',
+			_ => null,
+		} ?? switch (path) {
 			'backup.fromFile' => 'Restore Data from File',
 			'backup.success' => 'Backup saved',
 			'backup.restoreSuccess' => 'Backup restored',
-			_ => null,
-		} ?? switch (path) {
 			'backup.cancelled' => 'Backup cancelled',
 			'backup.restoreCancelled' => 'Backup restore cancelled',
 			'backup.restoreFail' => 'Backup restore failed',

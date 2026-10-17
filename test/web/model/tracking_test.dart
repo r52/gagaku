@@ -254,7 +254,7 @@ void main() {
       expect(item.state, TrackerQueueState.pending);
       final retryAfter = now.add(TrackerQueueStore.backoffFor(1));
       expect(item.nextAttempt, retryAfter);
-      expect(status()?.lastError, isNotNull);
+      expect(status()?.lastError, const TrackerSyncError.rejected(1));
       expect(status()?.retryAfter, retryAfter);
 
       // The tracker stays backed off until a manual sync.
@@ -279,7 +279,14 @@ void main() {
       await coordinator().flush();
 
       expect(queue.items.single.errorCount, 0);
-      expect(status()?.lastError, contains('fictional runtime failure'));
+      expect(
+        status()?.lastError,
+        isA<TrackerBatchException>().having(
+          (e) => e.message,
+          'message',
+          contains('fictional runtime failure'),
+        ),
+      );
     });
 
     test('defers actions that were not attempted without an error', () async {
@@ -324,6 +331,99 @@ void main() {
       expect(processor.calls.expand((c) => c).length, 2);
       expect(queue.items, isEmpty);
       expect(status()?.running, isFalse);
+    });
+  });
+
+  group('TrackerLinkRepository maintenance', () {
+    const nativeSeries = TrackedSeriesRef.nativeMangaDex(
+      '00000000-0000-4000-8000-000000000001',
+    );
+    const mangadexExtensionSeries = TrackedSeriesRef.web(
+      WebSeriesRef.extension(
+        sourceId: 'mangadex',
+        mangaId: '00000000-0000-4000-8000-000000000001',
+      ),
+    );
+
+    TrackerLink linkTo(
+      TrackedSeriesRef series, {
+      String tracker = _trackerId,
+    }) => links().link(
+      trackerId: tracker,
+      series: series,
+      trackedManga: _entry('entry-${series.key}'),
+    );
+
+    test('finds links whose tracker or reading source is gone', () {
+      final healthy = linkTo(_series);
+      final goneTracker = linkTo(_otherSeries, tracker: 'UninstalledTracker');
+      final goneSource = linkTo(mangadexExtensionSeries);
+      final native = linkTo(nativeSeries);
+      final proxy = linkTo(
+        const TrackedSeriesRef.web(
+          WebSeriesRef.proxy(proxyId: 'gist', seriesId: 'fictional'),
+        ),
+      );
+
+      final stale = links()
+          .staleLinks({_trackerId, 'FictionalSource'})
+          .map((e) => e.linkKey)
+          .toSet();
+
+      expect(stale, {goneTracker.linkKey, goneSource.linkKey});
+      // An uninstalled `mangadex` extension never orphans native links.
+      expect(stale, isNot(contains(native.linkKey)));
+      expect(stale, isNot(contains(proxy.linkKey)));
+      expect(stale, isNot(contains(healthy.linkKey)));
+    });
+
+    test('prunes links with their queued reads, and orphaned reads', () async {
+      await linkAndRead([1]);
+      await linkAndRead([2], series: _otherSeries);
+      final orphan = queue.items.singleWhere((e) => e.series == _otherSeries);
+      store.box<TrackerLink>().remove(
+        links().linksFor(_otherSeries).single.dbid,
+      );
+
+      expect(links().orphanedQueueItems().map((e) => e.id), [orphan.id]);
+
+      await links().pruneLinks(links().linksFor(_series));
+      expect(links().linksFor(_series), isEmpty);
+      expect(queue.items.map((e) => e.id), [orphan.id]);
+    });
+
+    test('migrates extension links and their queued reads only', () async {
+      final original = linkTo(mangadexExtensionSeries);
+      final native = linkTo(nativeSeries);
+      await reporter().reportRead(mangadexExtensionSeries, [_read(3)]);
+      await reporter().reportRead(nativeSeries, [_read(4)]);
+
+      final moved = await links().migrateSource('mangadex', 'MangaDexV2');
+
+      expect(moved, 1);
+      const migratedSeries = TrackedSeriesRef.web(
+        WebSeriesRef.extension(
+          sourceId: 'MangaDexV2',
+          mangaId: '00000000-0000-4000-8000-000000000001',
+        ),
+      );
+      expect(links().linksFor(mangadexExtensionSeries), isEmpty);
+      final migrated = links().linksFor(migratedSeries).single;
+      expect(migrated.trackedManga.mangaId, original.trackedMangaId);
+      // ObjectBox stores dates to the millisecond.
+      expect(
+        migrated.createdAt.millisecondsSinceEpoch,
+        original.createdAt.millisecondsSinceEpoch,
+      );
+      expect(links().linksFor(nativeSeries).single.linkKey, native.linkKey);
+
+      final item = queue.items.singleWhere((e) => e.chapterNum == 3);
+      expect(item.linkKey, migrated.linkKey);
+      expect(item.series, migratedSeries);
+      expect(
+        queue.items.singleWhere((e) => e.chapterNum == 4).linkKey,
+        native.linkKey,
+      );
     });
   });
 }

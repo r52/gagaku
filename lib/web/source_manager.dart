@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
@@ -9,6 +10,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/tracking.dart';
 import 'package:gagaku/web/repo_list.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -235,6 +237,15 @@ class SourceManager extends HookConsumerWidget {
                     final messenger = ScaffoldMessenger.of(context);
                     sourcesBox.remove(item.dbid);
                     ref.invalidate(extensionSourceProvider(item.id));
+                    if (item.hasCapability(SourceIntents.mangaProgress)) {
+                      // Links stay so a reinstall restores them; queued reads
+                      // can no longer be sent.
+                      unawaited(
+                        ref
+                            .read(trackerQueueStoreProvider)
+                            .removeForTracker(item.id),
+                      );
+                    }
 
                     messenger
                       ..removeCurrentSnackBar()
@@ -354,6 +365,15 @@ class SourceManager extends HookConsumerWidget {
                       onPressed: () {
                         sourcesBox.remove(isInstalledId.dbid);
                         ref.invalidate(extensionSourceProvider(source.id));
+                        if (isInstalledId.hasCapability(
+                          SourceIntents.mangaProgress,
+                        )) {
+                          unawaited(
+                            ref
+                                .read(trackerQueueStoreProvider)
+                                .removeForTracker(source.id),
+                          );
+                        }
                         ScaffoldMessenger.of(context)
                           ..removeCurrentSnackBar()
                           ..showSnackBar(

@@ -5,6 +5,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/tracking.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -163,6 +164,12 @@ class MigrateExtensionDialog extends HookConsumerWidget {
                   await ref
                       .read(webReadMarkersProvider.notifier)
                       .migrate(oldId.value!, newId.value!);
+
+                  // 4. Migrate tracker links (and their queued reads) for the
+                  // migrated series
+                  await ref
+                      .read(trackerLinkRepositoryProvider)
+                      .migrateSource(oldId.value!, newId.value!);
 
                   // Optional: Delete old WebSourceInfo if it exists
                   final sourceBox = store.box<WebSourceInfo>();

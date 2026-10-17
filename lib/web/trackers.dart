@@ -126,7 +126,14 @@ class _TrackerStatusCard extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                tr.lastError(error: error),
+                tr.lastError(
+                  error: switch (error) {
+                    TrackerRejectedUpdates(:final count) => tr.rejectedUpdates(
+                      count: count,
+                    ),
+                    TrackerBatchException(:final message) => message,
+                  },
+                ),
                 style: TextStyle(color: theme.colorScheme.error),
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
