@@ -10,6 +10,7 @@ import 'package:gagaku/reader/model/config.dart';
 import 'package:gagaku/settings/convert.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/tracking_types.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -118,6 +119,11 @@ void main() {
       final repo = store.box<RepoInfo>().getAll().single;
       expect(repo.name, 'Synthetic Repository');
       expect(repo.url, 'https://example.invalid/repository');
+
+      final trackerLink = store.box<TrackerLink>().getAll().single;
+      expect(trackerLink.trackerId, 'synthetic-tracker');
+      expect(trackerLink.series, _syntheticTrackedSeries);
+      expect(trackerLink.trackedManga.mangaInfo.primaryTitle, 'Tracked Entry');
     });
 
     test('rolls back every entity change when import fails', () async {
@@ -136,6 +142,7 @@ void main() {
           url: 'https://example.invalid/baseline-repository',
         ),
       );
+      store.box<TrackerLink>().put(_syntheticTrackerLink());
 
       var refreshed = false;
       final malformed = <String, dynamic>{
@@ -143,6 +150,7 @@ void main() {
         'ext-installed-sources': <dynamic>[],
         'ext-repo-list': <dynamic>[],
         'link-cache': <dynamic>[42],
+        'tracker-links': <dynamic>[],
       };
 
       await expectLater(
@@ -159,6 +167,7 @@ void main() {
       expect(store.box<RepoInfo>().getAll().single.name, 'Baseline Repository');
       expect(store.box<HistoryLink>().count(), 0);
       expect(store.box<WebFavoritesList>().count(), 0);
+      expect(store.box<TrackerLink>().count(), 1);
     });
 
     test('refresh callback makes cached provider state visible', () async {
@@ -205,6 +214,29 @@ void main() {
     });
   });
 }
+
+const _syntheticTrackedSeries = TrackedSeriesRef.web(
+  WebSeriesRef.extension(
+    sourceId: 'synthetic-extension',
+    mangaId: 'synthetic-series',
+  ),
+);
+
+TrackerLink _syntheticTrackerLink() => TrackerLink.create(
+  trackerId: 'synthetic-tracker',
+  series: _syntheticTrackedSeries,
+  trackedManga: const SourceManga(
+    mangaId: 'synthetic-entry',
+    mangaInfo: MangaInfo(
+      thumbnailUrl: 'https://example.invalid/tracked.jpg',
+      synopsis: '',
+      primaryTitle: 'Tracked Entry',
+      secondaryTitles: [],
+      contentRating: ContentRating.EVERYONE,
+    ),
+  ),
+  now: DateTime.utc(2026, 1, 1),
+);
 
 void _seedAllEntities(Store store) {
   store.box<GagakuConfig>().put(
@@ -284,6 +316,7 @@ void _seedAllEntities(Store store) {
       url: 'https://example.invalid/repository',
     ),
   );
+  store.box<TrackerLink>().put(_syntheticTrackerLink());
 }
 
 void _clearAllEntities(Store store) {
@@ -298,4 +331,5 @@ void _clearAllEntities(Store store) {
   store.box<ReadMarkersDB>().removeAll();
   store.box<WebSourceInfo>().removeAll();
   store.box<RepoInfo>().removeAll();
+  store.box<TrackerLink>().removeAll();
 }

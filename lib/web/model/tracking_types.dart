@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:objectbox/objectbox.dart';
 
 part 'tracking_types.freezed.dart';
 
@@ -94,4 +97,133 @@ abstract final class TrackedSeriesRefCodec {
         throw FormatException('Unknown tracked series kind: $kind');
     }
   }
+}
+
+class TrackedSeriesRefConverter
+    implements JsonConverter<TrackedSeriesRef, Object?> {
+  const TrackedSeriesRefConverter();
+
+  @override
+  TrackedSeriesRef fromJson(Object? json) => TrackedSeriesRefCodec.decode(json);
+
+  @override
+  Object? toJson(TrackedSeriesRef object) =>
+      TrackedSeriesRefCodec.encode(object);
+}
+
+/// A link between a reading series and a tracker extension's entry.
+///
+/// Synchronized user data: covered by `GagakuDataCodec`. One link per
+/// (tracker, series); a series may link to several trackers.
+@Entity()
+class TrackerLink {
+  TrackerLink({
+    this.dbid = 0,
+    required this.linkKey,
+    required this.trackerId,
+    required this.seriesKey,
+    required this.dbSeries,
+    required this.trackedMangaId,
+    required this.dbTrackedManga,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory TrackerLink.create({
+    required String trackerId,
+    required TrackedSeriesRef series,
+    required SourceManga trackedManga,
+    DateTime? now,
+  }) {
+    final timestamp = (now ?? DateTime.now()).toUtc();
+    return TrackerLink(
+      linkKey: keyFor(trackerId, series),
+      trackerId: trackerId,
+      seriesKey: series.key,
+      dbSeries: json.encode(TrackedSeriesRefCodec.encode(series)),
+      trackedMangaId: trackedManga.mangaId,
+      dbTrackedManga: json.encode(trackedManga.toJson()),
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    );
+  }
+
+  /// Decodes a backup/sync entry. Keys are recomputed from the decoded series
+  /// rather than trusted from the payload.
+  factory TrackerLink.fromJson(Map<String, dynamic> data) {
+    final trackerId = data['trackerId'];
+    final trackedManga = data['trackedManga'];
+    if (trackerId is! String || trackerId.isEmpty || trackedManga is! Map) {
+      throw const FormatException('Invalid tracker link');
+    }
+
+    final link = TrackerLink.create(
+      trackerId: trackerId,
+      series: TrackedSeriesRefCodec.decode(data['series']),
+      trackedManga: SourceManga.fromJson(
+        Map<String, dynamic>.from(trackedManga),
+      ),
+    );
+    link.createdAt = DateTime.parse(data['createdAt'] as String).toUtc();
+    link.updatedAt = DateTime.parse(data['updatedAt'] as String).toUtc();
+    return link;
+  }
+
+  static String keyFor(String trackerId, TrackedSeriesRef series) =>
+      '$trackerId|${series.key}';
+
+  @Id()
+  int dbid;
+
+  @Unique(onConflict: ConflictStrategy.replace)
+  String linkKey;
+
+  @Index()
+  String trackerId;
+
+  /// [TrackedSeriesRef.key], indexed for per-series lookups.
+  @Index()
+  String seriesKey;
+
+  /// Versioned [TrackedSeriesRef] JSON ([TrackedSeriesRefCodec]).
+  String dbSeries;
+
+  /// The tracker's own `SourceManga.mangaId`.
+  String trackedMangaId;
+
+  /// Snapshot of the tracker's `SourceManga`, passed back to the tracker.
+  String dbTrackedManga;
+
+  @Property(type: PropertyType.date)
+  DateTime createdAt;
+
+  @Property(type: PropertyType.date)
+  DateTime updatedAt;
+
+  TrackedSeriesRef get series =>
+      TrackedSeriesRefCodec.decode(json.decode(dbSeries));
+
+  SourceManga get trackedManga =>
+      SourceManga.fromJson(json.decode(dbTrackedManga) as Map<String, dynamic>);
+
+  /// Refreshes the stored tracker entry (for example after `getMangaDetails`).
+  void updateTrackedManga(SourceManga manga, {DateTime? now}) {
+    if (manga.mangaId != trackedMangaId) {
+      throw ArgumentError.value(
+        manga.mangaId,
+        'manga',
+        'does not match the linked entry $trackedMangaId',
+      );
+    }
+    dbTrackedManga = json.encode(manga.toJson());
+    updatedAt = (now ?? DateTime.now()).toUtc();
+  }
+
+  Map<String, dynamic> toJson() => {
+    'trackerId': trackerId,
+    'series': TrackedSeriesRefCodec.encode(series),
+    'trackedManga': trackedManga.toJson(),
+    'createdAt': createdAt.toUtc().toIso8601String(),
+    'updatedAt': updatedAt.toUtc().toIso8601String(),
+  };
 }

@@ -94,6 +94,8 @@ abstract class GagakuRoute {
 const gagakuLocalBox =
     'gagaku_box'; // local, device specific, or secure sensitive data
 const gagakuCache = 'gagaku_cache'; // disk cache
+const trackerQueueBox =
+    'gagaku_tracker_queue'; // device-local tracker read actions
 
 const _blockers =
     'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/blockers.txt';
@@ -118,9 +120,8 @@ Map<String, String>? deriveBrowserUserAgentHeaders(
     return null;
   }
 
-  final chromiumVersion = RegExp(
-    r'(?:Chrome|Chromium)/(\d+)(?:\.\d+){0,3}',
-  ).firstMatch(userAgent);
+  final chromiumVersion = RegExp(r'(?:Chrome|Chromium)/(\d+)(?:\.\d+){0,3}')
+      .firstMatch(userAgent);
   if (chromiumVersion == null) {
     return null;
   }
@@ -135,9 +136,8 @@ Map<String, String>? deriveBrowserUserAgentHeaders(
     case TargetPlatform.android when userAgent.contains('; wv)'):
       identity = ('Android WebView', '$majorVersion', 'Android');
     case TargetPlatform.windows:
-      final edgeVersion = RegExp(
-        r'Edg/(\d+)(?:\.\d+){0,3}',
-      ).firstMatch(userAgent);
+      final edgeVersion = RegExp(r'Edg/(\d+)(?:\.\d+){0,3}')
+          .firstMatch(userAgent);
       if (edgeVersion == null) {
         return null;
       }
@@ -302,6 +302,7 @@ class GagakuData {
   Future<void> initGagakuBoxes() async {
     final appDir = await getApplicationDocumentsDirectory();
     await Hive.openBox(gagakuLocalBox);
+    await Hive.openBox<String>(trackerQueueBox);
 
     final storage = Hive.box(gagakuLocalBox);
     // On Windows debug builds, always use the default appDir.path to avoid issues
