@@ -20,6 +20,7 @@ import 'package:gagaku/update_checker.dart';
 import 'package:gagaku/update_installer.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/deeplink.dart';
+import 'package:gagaku/web/model/tracking.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -98,6 +99,7 @@ void main() async {
 
   final providerContainer = ProviderContainer();
   await GagakuSyncService().start(providerContainer);
+  providerContainer.read(trackerQueueCoordinatorProvider.notifier).start();
   // ignore: riverpod_lint/missing_provider_scope
   runApp(
     _GagakuRoot(

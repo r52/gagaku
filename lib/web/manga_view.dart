@@ -13,6 +13,8 @@ import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/tracking.dart';
+import 'package:gagaku/web/model/tracking_types.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -612,7 +614,7 @@ class _WebChapterHeader extends ConsumerWidget {
                     );
                     if (result == true) {
                       ref.run((tsx) async {
-                        return await tsx
+                        final markers = await tsx
                             .get(webReadMarkersProvider.notifier)
                             .setBulk(
                               mangakey,
@@ -621,6 +623,18 @@ class _WebChapterHeader extends ConsumerWidget {
                                   ? manga.removableReadMarkerKeys
                                   : null,
                             );
+                        if (!allRead) {
+                          // The reporter sends only the highest chapter.
+                          await tsx
+                              .get(trackerReadReporterProvider)
+                              .reportRead(
+                                TrackedSeriesRef.web(series),
+                                manga.chapters
+                                    .map(TrackedChapterRead.fromItem)
+                                    .nonNulls,
+                              );
+                        }
+                        return markers;
                       });
                     }
                   },

@@ -28,7 +28,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 111371867039964082),
     name: 'ExtensionConfig',
-    lastPropertyId: const obx_int.IdUid(4, 477225497001240540),
+    lastPropertyId: const obx_int.IdUid(5, 6869006301448342076),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -46,6 +46,12 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(4, 477225497001240540),
         name: 'preserveHistory',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 6869006301448342076),
+        name: 'pauseTrackerUpdates',
         type: 1,
         flags: 0,
       ),
@@ -597,10 +603,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
               .map(fbb.writeString)
               .toList(growable: false),
         );
-        fbb.startTable(5);
+        fbb.startTable(6);
         fbb.addInt64(0, object.dbid);
         fbb.addOffset(2, categoriesToUpdateOffset);
         fbb.addBool(3, object.preserveHistory);
+        fbb.addBool(4, object.pauseTrackerUpdates);
         fbb.finish(fbb.endTable());
         return object.dbid;
       },
@@ -623,10 +630,17 @@ obx_int.ModelDefinition getObjectBoxModel() {
           10,
           false,
         );
+        final pauseTrackerUpdatesParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          false,
+        );
         final object = ExtensionConfig(
           dbid: dbidParam,
           categoriesToUpdate: categoriesToUpdateParam,
           preserveHistory: preserveHistoryParam,
+          pauseTrackerUpdates: pauseTrackerUpdatesParam,
         );
 
         return object;
@@ -1276,6 +1290,11 @@ class ExtensionConfig_ {
   /// See [ExtensionConfig.preserveHistory].
   static final preserveHistory = obx.QueryBooleanProperty<ExtensionConfig>(
     _entities[0].properties[2],
+  );
+
+  /// See [ExtensionConfig.pauseTrackerUpdates].
+  static final pauseTrackerUpdates = obx.QueryBooleanProperty<ExtensionConfig>(
+    _entities[0].properties[3],
   );
 }
 

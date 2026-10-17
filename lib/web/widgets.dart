@@ -15,6 +15,8 @@ import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/tracking.dart';
+import 'package:gagaku/web/model/tracking_types.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/settings.dart';
 import 'package:gagaku/web/source_manager.dart';
@@ -846,7 +848,14 @@ class ChapterButtonWidget extends HookConsumerWidget {
           ref.run((tsx) async {
             final notifier = tsx.get(webReadMarkersProvider.notifier);
             if (set) {
-              return await notifier.set(mangakey, readMarkerKey, true);
+              final markers = await notifier.set(mangakey, readMarkerKey, true);
+              if (TrackedChapterRead.fromItem(data) case final read?) {
+                await tsx.get(trackerReadReporterProvider).reportRead(
+                  TrackedSeriesRef.web(series),
+                  [read],
+                );
+              }
+              return markers;
             }
 
             return await notifier.setBulk(

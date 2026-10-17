@@ -16,7 +16,13 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ExtensionConfig {
 
-@JsonKey(includeFromJson: false, includeToJson: false)@Id() int get dbid;@JsonKey(includeFromJson: false, includeToJson: false)@Id() set dbid(int value); List<String> get categoriesToUpdate; set categoriesToUpdate(List<String> value); bool get preserveHistory; set preserveHistory(bool value);
+@JsonKey(includeFromJson: false, includeToJson: false)@Id() int get dbid;@JsonKey(includeFromJson: false, includeToJson: false)@Id() set dbid(int value); List<String> get categoriesToUpdate; set categoriesToUpdate(List<String> value); bool get preserveHistory; set preserveHistory(bool value);/// Stops reporting chapter reads to tracker extensions. Phrased as a pause
+/// so existing ObjectBox rows, which load a new bool as `false`, keep
+/// updates on.
+ bool get pauseTrackerUpdates;/// Stops reporting chapter reads to tracker extensions. Phrased as a pause
+/// so existing ObjectBox rows, which load a new bool as `false`, keep
+/// updates on.
+ set pauseTrackerUpdates(bool value);
 /// Create a copy of ExtensionConfig
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -32,7 +38,7 @@ $ExtensionConfigCopyWith<ExtensionConfig> get copyWith => _$ExtensionConfigCopyW
 @override
 String toString() {
   final _this = this as ExtensionConfig;
-  return 'ExtensionConfig(dbid: ${_this.dbid}, categoriesToUpdate: ${_this.categoriesToUpdate}, preserveHistory: ${_this.preserveHistory})';
+  return 'ExtensionConfig(dbid: ${_this.dbid}, categoriesToUpdate: ${_this.categoriesToUpdate}, preserveHistory: ${_this.preserveHistory}, pauseTrackerUpdates: ${_this.pauseTrackerUpdates})';
 }
 
 
@@ -43,7 +49,7 @@ abstract mixin class $ExtensionConfigCopyWith<$Res>  {
   factory $ExtensionConfigCopyWith(ExtensionConfig value, $Res Function(ExtensionConfig) _then) = _$ExtensionConfigCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(includeFromJson: false, includeToJson: false)@Id() int dbid, List<String> categoriesToUpdate, bool preserveHistory
+@JsonKey(includeFromJson: false, includeToJson: false)@Id() int dbid, List<String> categoriesToUpdate, bool preserveHistory, bool pauseTrackerUpdates
 });
 
 
@@ -60,11 +66,12 @@ class _$ExtensionConfigCopyWithImpl<$Res>
 
 /// Create a copy of ExtensionConfig
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? dbid = null,Object? categoriesToUpdate = null,Object? preserveHistory = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? dbid = null,Object? categoriesToUpdate = null,Object? preserveHistory = null,Object? pauseTrackerUpdates = null,}) {
   return _then(ExtensionConfig(
 dbid: null == dbid ? _self.dbid : dbid // ignore: cast_nullable_to_non_nullable
 as int,categoriesToUpdate: null == categoriesToUpdate ? _self.categoriesToUpdate : categoriesToUpdate // ignore: cast_nullable_to_non_nullable
 as List<String>,preserveHistory: null == preserveHistory ? _self.preserveHistory : preserveHistory // ignore: cast_nullable_to_non_nullable
+as bool,pauseTrackerUpdates: null == pauseTrackerUpdates ? _self.pauseTrackerUpdates : pauseTrackerUpdates // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -77,12 +84,16 @@ as bool,
 @JsonSerializable()
 @Entity(realClass: ExtensionConfig)
 class _ExtensionConfig implements ExtensionConfig {
-   _ExtensionConfig({@JsonKey(includeFromJson: false, includeToJson: false)@Id() this.dbid = 0, this.categoriesToUpdate = const [], this.preserveHistory = true});
+   _ExtensionConfig({@JsonKey(includeFromJson: false, includeToJson: false)@Id() this.dbid = 0, this.categoriesToUpdate = const [], this.preserveHistory = true, this.pauseTrackerUpdates = false});
   factory _ExtensionConfig.fromJson(Map<String, dynamic> json) => _$ExtensionConfigFromJson(json);
 
 @override@JsonKey(includeFromJson: false, includeToJson: false)@Id()  int dbid;
 @override@JsonKey()  List<String> categoriesToUpdate;
 @override@JsonKey()  bool preserveHistory;
+/// Stops reporting chapter reads to tracker extensions. Phrased as a pause
+/// so existing ObjectBox rows, which load a new bool as `false`, keep
+/// updates on.
+@override@JsonKey()  bool pauseTrackerUpdates;
 
 /// Create a copy of ExtensionConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -99,7 +110,7 @@ Map<String, dynamic> toJson() {
 
 @override
 String toString() {
-    return 'ExtensionConfig(dbid: $dbid, categoriesToUpdate: $categoriesToUpdate, preserveHistory: $preserveHistory)';
+    return 'ExtensionConfig(dbid: $dbid, categoriesToUpdate: $categoriesToUpdate, preserveHistory: $preserveHistory, pauseTrackerUpdates: $pauseTrackerUpdates)';
 }
 
 
@@ -110,7 +121,7 @@ abstract mixin class _$ExtensionConfigCopyWith<$Res> implements $ExtensionConfig
   factory _$ExtensionConfigCopyWith(_ExtensionConfig value, $Res Function(_ExtensionConfig) _then) = __$ExtensionConfigCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(includeFromJson: false, includeToJson: false)@Id() int dbid, List<String> categoriesToUpdate, bool preserveHistory
+@JsonKey(includeFromJson: false, includeToJson: false)@Id() int dbid, List<String> categoriesToUpdate, bool preserveHistory, bool pauseTrackerUpdates
 });
 
 
@@ -127,11 +138,12 @@ class __$ExtensionConfigCopyWithImpl<$Res>
 
 /// Create a copy of ExtensionConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? dbid = null,Object? categoriesToUpdate = null,Object? preserveHistory = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? dbid = null,Object? categoriesToUpdate = null,Object? preserveHistory = null,Object? pauseTrackerUpdates = null,}) {
   return _then(_ExtensionConfig(
 dbid: null == dbid ? _self.dbid : dbid // ignore: cast_nullable_to_non_nullable
 as int,categoriesToUpdate: null == categoriesToUpdate ? _self.categoriesToUpdate : categoriesToUpdate // ignore: cast_nullable_to_non_nullable
 as List<String>,preserveHistory: null == preserveHistory ? _self.preserveHistory : preserveHistory // ignore: cast_nullable_to_non_nullable
+as bool,pauseTrackerUpdates: null == pauseTrackerUpdates ? _self.pauseTrackerUpdates : pauseTrackerUpdates // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
