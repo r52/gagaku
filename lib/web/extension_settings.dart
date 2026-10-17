@@ -16,18 +16,27 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:openid_client/openid_client_io.dart' as oidc;
 import 'package:url_launcher/url_launcher.dart';
 
+/// Shows a top-level extension form: the settings form by default, or the
+/// form returned by [loadForm] (for example a tracker's progress form).
 class ExtensionSettingsPage extends HookConsumerWidget {
-  const ExtensionSettingsPage({super.key, required this.source});
+  const ExtensionSettingsPage({
+    super.key,
+    required this.source,
+    this.loadForm,
+    this.title,
+  });
 
   final WebSourceInfo source;
+  final Future<ExtensionForm> Function(ExtensionSource extension)? loadForm;
+  final String? title;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final results = useMemoized(() async {
-      final form = await ref
-          .read(extensionSourceProvider(source.id).notifier)
-          .getSettingsForm();
+      final extension = ref.read(extensionSourceProvider(source.id).notifier);
+      final form =
+          await (loadForm?.call(extension) ?? extension.getSettingsForm());
 
       await form.call('formDidAppear');
 
@@ -46,12 +55,17 @@ class ExtensionSettingsPage extends HookConsumerWidget {
 
     if (future.data != null) {
       final data = future.data!;
-      return FormBuilder(source: source, form: data, isTopLevel: true);
+      return FormBuilder(
+        source: source,
+        form: data,
+        isTopLevel: true,
+        title: title,
+      );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(tr.arg_settings(arg: source.name)),
+        title: Text(title ?? tr.arg_settings(arg: source.name)),
         leading: BackButton(
           onPressed: () {
             ExtensionForm? form;
@@ -75,11 +89,13 @@ class FormBuilder extends StatefulHookConsumerWidget {
     required this.source,
     required this.form,
     required this.isTopLevel,
+    this.title,
   });
 
   final WebSourceInfo source;
   final ExtensionForm form;
   final bool isTopLevel;
+  final String? title;
 
   @override
   ConsumerState<FormBuilder> createState() => _FormBuilderState();
@@ -138,7 +154,7 @@ class _FormBuilderState extends ConsumerState<FormBuilder> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(tr.arg_settings(arg: widget.source.name)),
+        title: Text(widget.title ?? tr.arg_settings(arg: widget.source.name)),
         leading: BackButton(
           onPressed: () {
             widget.form.formDidCancel();

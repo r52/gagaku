@@ -62,6 +62,15 @@ class TrackerLinkRepository {
     }
   }
 
+  TrackerLink? linkByKey(String linkKey) {
+    final query = _box.query(TrackerLink_.linkKey.equals(linkKey)).build();
+    try {
+      return query.findFirst();
+    } finally {
+      query.close();
+    }
+  }
+
   Stream<List<TrackerLink>> watchLinksFor(TrackedSeriesRef series) => _box
       .query(TrackerLink_.seriesKey.equals(series.key))
       .watch(triggerImmediately: true)
@@ -112,6 +121,32 @@ Stream<List<TrackerLink>> trackerLinksForSeries(
   Ref ref,
   TrackedSeriesRef series,
 ) => ref.watch(trackerLinkRepositoryProvider).watchLinksFor(series);
+
+/// Installed extensions that can receive progress, kept current.
+@riverpod
+Stream<List<WebSourceInfo>> installedTrackers(Ref ref) async* {
+  final sources = await ref.watch(installedSourcesProvider.future);
+  yield sources
+      .where((e) => e.hasCapability(SourceIntents.mangaProgress))
+      .toList();
+}
+
+/// The tracker's current progress for a link, fetched when first watched.
+/// Auto-disposed so each view of it asks the tracker afresh.
+@riverpod
+Future<MangaProgress?> trackerProgress(
+  Ref ref,
+  String trackerId,
+  String linkKey,
+) async {
+  final link = ref.watch(trackerLinkRepositoryProvider).linkByKey(linkKey);
+  if (link == null) {
+    return null;
+  }
+  return ref
+      .read(extensionSourceProvider(trackerId).notifier)
+      .getMangaProgress(link.trackedManga);
+}
 
 /// Sends a batch to the tracker's runtime. Overridden in tests.
 @Riverpod(keepAlive: true)

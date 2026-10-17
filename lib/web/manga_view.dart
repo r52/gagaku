@@ -16,6 +16,7 @@ import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/tracking.dart';
 import 'package:gagaku/web/model/tracking_types.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:gagaku/web/trackers.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -269,6 +270,8 @@ class _WebActionBar extends ConsumerWidget {
           ).push(context),
           icon: const Icon(Icons.search),
         ),
+        if (TrackingButton.isAvailable(ref, series))
+          TrackingButton(series: series, title: manga.title),
         MenuAnchor(
           builder: (context, controller, child) => IconButton(
             style: Styles.squareIconButtonStyle(

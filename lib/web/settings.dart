@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -131,6 +132,12 @@ class WebSourceSettingsWidget extends HookConsumerWidget {
                   );
                 }
               },
+            ),
+            SettingTile(
+              title: Text(tr.webSources.trackers.title, style: titleStyle),
+              subtitle: Text(tr.webSources.trackers.settingsDesc),
+              trailing: const Icon(Icons.bookmark_added),
+              onTap: () => const TrackersRoute().push(context),
             ),
             SettingTile(
               title: Text(t.webSources.settings.clearAll, style: titleStyle),

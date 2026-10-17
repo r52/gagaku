@@ -247,3 +247,20 @@ class InstallExtensionsRoute extends GoRouteData with $InstallExtensionsRoute {
     );
   }
 }
+
+@TypedGoRoute<TrackersRoute>(path: GagakuRoute.extensionTrackers)
+class TrackersRoute extends GoRouteData with $TrackersRoute {
+  const TrackersRoute();
+
+  @override
+  CustomTransitionPage<void> buildPage(
+    BuildContext context,
+    GoRouterState state,
+  ) {
+    return CustomTransitionPage<void>(
+      key: state.pageKey,
+      child: const TrackersPage(),
+      transitionsBuilder: Styles.slideTransitionBuilder,
+    );
+  }
+}

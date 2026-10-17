@@ -33,6 +33,7 @@ import 'package:gagaku/web/reader.dart';
 import 'package:gagaku/web/repo_list.dart';
 import 'package:gagaku/web/search.dart';
 import 'package:gagaku/web/source_manager.dart';
+import 'package:gagaku/web/trackers.dart';
 import 'package:gagaku/web/updates_feed.dart';
 import 'package:go_router/go_router.dart';
 

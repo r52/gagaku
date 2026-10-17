@@ -569,6 +569,8 @@ class Translations$webSources$en {
 
 	/// en: 'This extension requires CF bypass. It may not work correctly Try connecting to this page from a browser before installing this extension'
 	String get cfRequired => 'This extension requires CF bypass. It may not work correctly\nTry connecting to this page from a browser before installing this extension';
+
+	late final Translations$webSources$trackers$en trackers = Translations$webSources$trackers$en.internal(_root);
 }
 
 // Path: search
@@ -2062,6 +2064,111 @@ class Translations$webSources$source$en {
 	late final Translations$webSources$source$install$en install = Translations$webSources$source$install$en.internal(_root);
 }
 
+// Path: webSources.trackers
+class Translations$webSources$trackers$en {
+	Translations$webSources$trackers$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Trackers'
+	String get title => 'Trackers';
+
+	/// en: 'Tracker accounts and pending progress updates'
+	String get settingsDesc => 'Tracker accounts and pending progress updates';
+
+	/// en: 'No tracker extensions are installed. Trackers such as AniList can be installed from the Extension Manager.'
+	String get noneInstalled => 'No tracker extensions are installed. Trackers such as AniList can be installed from the Extension Manager.';
+
+	/// en: 'Pause tracker updates'
+	String get pauseUpdates => 'Pause tracker updates';
+
+	/// en: 'Stop reporting chapter reads to linked trackers'
+	String get pauseUpdatesDesc => 'Stop reporting chapter reads to linked trackers';
+
+	/// en: 'Account settings'
+	String get account => 'Account settings';
+
+	/// en: 'Pending: $count'
+	String pendingCount({required Object count}) => 'Pending: ${count}';
+
+	/// en: 'Failed: $count'
+	String failedCount({required Object count}) => 'Failed: ${count}';
+
+	/// en: 'Syncing…'
+	String get syncing => 'Syncing…';
+
+	/// en: 'Last sync: $time'
+	String lastSync({required Object time}) => 'Last sync: ${time}';
+
+	/// en: 'Not synced yet'
+	String get notSynced => 'Not synced yet';
+
+	/// en: 'Last error: $error'
+	String lastError({required Object error}) => 'Last error: ${error}';
+
+	/// en: 'Retrying $time'
+	String retryAt({required Object time}) => 'Retrying ${time}';
+
+	/// en: 'Sync now'
+	String get syncNow => 'Sync now';
+
+	/// en: 'Retry failed'
+	String get retryFailed => 'Retry failed';
+
+	/// en: 'Discard failed'
+	String get discardFailed => 'Discard failed';
+
+	/// en: 'Discard $count failed updates for $tracker? They will not be sent.'
+	String discardFailedWarning({required Object count, required Object tracker}) => 'Discard ${count} failed updates for ${tracker}? They will not be sent.';
+
+	/// en: 'Tracking'
+	String get tracking => 'Tracking';
+
+	/// en: 'Manage trackers'
+	String get manageTrackers => 'Manage trackers';
+
+	/// en: 'Not linked'
+	String get notLinked => 'Not linked';
+
+	/// en: 'Link'
+	String get link => 'Link';
+
+	/// en: 'Change'
+	String get changeLink => 'Change';
+
+	/// en: 'Unlink'
+	String get unlink => 'Unlink';
+
+	/// en: 'Stop tracking this series on $tracker? Its pending updates are discarded.'
+	String unlinkWarning({required Object tracker}) => 'Stop tracking this series on ${tracker}? Its pending updates are discarded.';
+
+	/// en: 'Edit progress'
+	String get editProgress => 'Edit progress';
+
+	/// en: 'Ch. $chapter'
+	String chapterProgress({required Object chapter}) => 'Ch. ${chapter}';
+
+	/// en: 'Rating: $rating'
+	String rating({required Object rating}) => 'Rating: ${rating}';
+
+	/// en: 'Not on your list yet'
+	String get notOnList => 'Not on your list yet';
+
+	/// en: 'Link on $tracker'
+	String linkOn({required Object tracker}) => 'Link on ${tracker}';
+
+	/// en: 'Search $tracker'
+	String searchHint({required Object tracker}) => 'Search ${tracker}';
+
+	/// en: 'No results'
+	String get noResults => 'No results';
+
+	/// en: 'Linked to $title'
+	String linked({required Object title}) => 'Linked to ${title}';
+}
+
 // Path: reader.direction
 class Translations$reader$direction$en {
 	Translations$reader$direction$en.internal(this._root);
@@ -2467,6 +2574,38 @@ extension on Translations {
 			'webSources.historyHere' => 'Your manga browsing history appears here',
 			'webSources.saveHistory' => 'Save History?',
 			'webSources.cfRequired' => 'This extension requires CF bypass. It may not work correctly\nTry connecting to this page from a browser before installing this extension',
+			'webSources.trackers.title' => 'Trackers',
+			'webSources.trackers.settingsDesc' => 'Tracker accounts and pending progress updates',
+			'webSources.trackers.noneInstalled' => 'No tracker extensions are installed. Trackers such as AniList can be installed from the Extension Manager.',
+			'webSources.trackers.pauseUpdates' => 'Pause tracker updates',
+			'webSources.trackers.pauseUpdatesDesc' => 'Stop reporting chapter reads to linked trackers',
+			'webSources.trackers.account' => 'Account settings',
+			'webSources.trackers.pendingCount' => ({required Object count}) => 'Pending: ${count}',
+			'webSources.trackers.failedCount' => ({required Object count}) => 'Failed: ${count}',
+			'webSources.trackers.syncing' => 'Syncing…',
+			'webSources.trackers.lastSync' => ({required Object time}) => 'Last sync: ${time}',
+			'webSources.trackers.notSynced' => 'Not synced yet',
+			'webSources.trackers.lastError' => ({required Object error}) => 'Last error: ${error}',
+			'webSources.trackers.retryAt' => ({required Object time}) => 'Retrying ${time}',
+			'webSources.trackers.syncNow' => 'Sync now',
+			'webSources.trackers.retryFailed' => 'Retry failed',
+			'webSources.trackers.discardFailed' => 'Discard failed',
+			'webSources.trackers.discardFailedWarning' => ({required Object count, required Object tracker}) => 'Discard ${count} failed updates for ${tracker}? They will not be sent.',
+			'webSources.trackers.tracking' => 'Tracking',
+			'webSources.trackers.manageTrackers' => 'Manage trackers',
+			'webSources.trackers.notLinked' => 'Not linked',
+			'webSources.trackers.link' => 'Link',
+			'webSources.trackers.changeLink' => 'Change',
+			'webSources.trackers.unlink' => 'Unlink',
+			'webSources.trackers.unlinkWarning' => ({required Object tracker}) => 'Stop tracking this series on ${tracker}? Its pending updates are discarded.',
+			'webSources.trackers.editProgress' => 'Edit progress',
+			'webSources.trackers.chapterProgress' => ({required Object chapter}) => 'Ch. ${chapter}',
+			'webSources.trackers.rating' => ({required Object rating}) => 'Rating: ${rating}',
+			'webSources.trackers.notOnList' => 'Not on your list yet',
+			'webSources.trackers.linkOn' => ({required Object tracker}) => 'Link on ${tracker}',
+			'webSources.trackers.searchHint' => ({required Object tracker}) => 'Search ${tracker}',
+			'webSources.trackers.noResults' => 'No results',
+			'webSources.trackers.linked' => ({required Object title}) => 'Linked to ${title}',
 			'search.text' => 'Search',
 			'search.arg' => ({required Object arg}) => 'Search ${arg}',
 			'search.filters' => 'Search Filters',
@@ -2745,6 +2884,8 @@ extension on Translations {
 			'backup.fromFile' => 'Restore Data from File',
 			'backup.success' => 'Backup saved',
 			'backup.restoreSuccess' => 'Backup restored',
+			_ => null,
+		} ?? switch (path) {
 			'backup.cancelled' => 'Backup cancelled',
 			'backup.restoreCancelled' => 'Backup restore cancelled',
 			'backup.restoreFail' => 'Backup restore failed',
@@ -2777,8 +2918,6 @@ extension on Translations {
 			'sync.statusPulling' => 'Applying remote data',
 			'sync.statusOffline' => 'Storage unavailable; retry pending',
 			'sync.statusIncompatible' => 'Incompatible or corrupt profile',
-			_ => null,
-		} ?? switch (path) {
 			'sync.statusNoValidSnapshot' => 'No valid snapshot found',
 			'sync.statusProfileMissing' => 'Remote profile disappeared; sync paused',
 			'sync.statusForked' => 'Conflict requires resolution',

@@ -52,6 +52,7 @@ abstract class GagakuRoute {
   static const extensionChapter = '/read-chapter/:sourceId/:mangaId/:chapterId';
   static const extensionAddRepo = '/extensions/addrepo';
   static const extensionInstall = '/extensions/install';
+  static const extensionTrackers = '/extensions/trackers';
 
   static const config = '/config';
 

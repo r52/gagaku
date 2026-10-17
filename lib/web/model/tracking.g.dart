@@ -192,6 +192,141 @@ final class TrackerLinksForSeriesFamily extends $Family
   String toString() => r'trackerLinksForSeriesProvider';
 }
 
+/// Installed extensions that can receive progress, kept current.
+
+@ProviderFor(installedTrackers)
+final installedTrackersProvider = InstalledTrackersProvider._();
+
+/// Installed extensions that can receive progress, kept current.
+
+final class InstalledTrackersProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<WebSourceInfo>>,
+          List<WebSourceInfo>,
+          Stream<List<WebSourceInfo>>
+        >
+    with
+        $FutureModifier<List<WebSourceInfo>>,
+        $StreamProvider<List<WebSourceInfo>> {
+  /// Installed extensions that can receive progress, kept current.
+  InstalledTrackersProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'installedTrackersProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$installedTrackersHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<List<WebSourceInfo>> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<List<WebSourceInfo>> create(Ref ref) {
+    return installedTrackers(ref);
+  }
+}
+
+String _$installedTrackersHash() => r'ec33cefa8eccef48d7f642ab86747b335efbb415';
+
+/// The tracker's current progress for a link, fetched when first watched.
+/// Auto-disposed so each view of it asks the tracker afresh.
+
+@ProviderFor(trackerProgress)
+final trackerProgressProvider = TrackerProgressFamily._();
+
+/// The tracker's current progress for a link, fetched when first watched.
+/// Auto-disposed so each view of it asks the tracker afresh.
+
+final class TrackerProgressProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<MangaProgress?>,
+          MangaProgress?,
+          FutureOr<MangaProgress?>
+        >
+    with $FutureModifier<MangaProgress?>, $FutureProvider<MangaProgress?> {
+  /// The tracker's current progress for a link, fetched when first watched.
+  /// Auto-disposed so each view of it asks the tracker afresh.
+  TrackerProgressProvider._({
+    required TrackerProgressFamily super.from,
+    required (String, String) super.argument,
+  }) : super(
+         retry: null,
+         name: r'trackerProgressProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$trackerProgressHash();
+
+  @override
+  String toString() {
+    return r'trackerProgressProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<MangaProgress?> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<MangaProgress?> create(Ref ref) {
+    final argument = this.argument as (String, String);
+    return trackerProgress(ref, argument.$1, argument.$2);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TrackerProgressProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$trackerProgressHash() => r'3dc9ff446e467c6213b538445bd128c697694b9b';
+
+/// The tracker's current progress for a link, fetched when first watched.
+/// Auto-disposed so each view of it asks the tracker afresh.
+
+final class TrackerProgressFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<MangaProgress?>, (String, String)> {
+  TrackerProgressFamily._()
+    : super(
+        retry: null,
+        name: r'trackerProgressProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// The tracker's current progress for a link, fetched when first watched.
+  /// Auto-disposed so each view of it asks the tracker afresh.
+
+  TrackerProgressProvider call(String trackerId, String linkKey) =>
+      TrackerProgressProvider._(argument: (trackerId, linkKey), from: this);
+
+  @override
+  String toString() => r'trackerProgressProvider';
+}
+
 /// Sends a batch to the tracker's runtime. Overridden in tests.
 
 @ProviderFor(trackerQueueProcessor)
