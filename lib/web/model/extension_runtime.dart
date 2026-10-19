@@ -11,6 +11,9 @@ abstract interface class ExtensionRuntime {
   /// The immutable browser identity selected before extension initialization.
   Map<String, String> get browserUserAgentHeaders;
 
+  /// Changes whenever the cookies the extension can send may have changed.
+  int get cookieStateRevision;
+
   Future<void> init(WebSourceInfo source, String extensionBody);
 
   FutureOr<void> dispose();

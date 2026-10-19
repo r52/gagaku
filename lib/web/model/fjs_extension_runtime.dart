@@ -141,6 +141,8 @@ globalThis.console = Object.fromEntries(
   Map<String, String> _browserUserAgentHeaders = const {};
   StartupBrowserOutcome? _startupBrowserOutcome;
   Map<String, _CookieStateDiagnostic>? _lastCookieStoreCookies;
+  String? _cookieStoreSnapshot;
+  int _cookieStateRevision = 0;
   final Map<String, FjsExtensionForm> _forms = {};
   final _evalExecutor = _RuntimeEvalExecutor();
   Future<void>? _disposeFuture;
@@ -155,6 +157,9 @@ globalThis.console = Object.fromEntries(
 
   @override
   Map<String, String> get browserUserAgentHeaders => _browserUserAgentHeaders;
+
+  @override
+  int get cookieStateRevision => _cookieStateRevision;
 
   @visibleForTesting
   StartupBrowserOutcome? get startupBrowserOutcome => _startupBrowserOutcome;
@@ -1133,8 +1138,22 @@ if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
     }
   }
 
+  /// Bumps [cookieStateRevision] when the persisted Paperback cookie store
+  /// content changes. Writes that keep the same cookies do not count.
+  void _trackCookieStore(dynamic state) {
+    final snapshot = jsonEncode(
+      state is Map ? state['cookie_store_cookies'] : null,
+    );
+    if (snapshot != _cookieStoreSnapshot) {
+      _cookieStoreSnapshot = snapshot;
+      _cookieStateRevision++;
+    }
+  }
+
   Future<void> _hydrateExtensionState(String sourceId) async {
-    final state = jsonEncode(getExtensionState(sourceId));
+    final initialState = getExtensionState(sourceId);
+    _trackCookieStore(initialState);
+    final state = jsonEncode(initialState);
     await _evalScoped('globalThis.Application.createExtensionState($state);');
 
     final secureState = jsonEncode(getExtensionSecureState(sourceId));
@@ -1211,6 +1230,7 @@ if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
 
     switch (handlerName) {
       case 'resetAllState':
+        _trackCookieStore(null);
         onResetAllState(sourceId);
         return JsResult.ok(const JsValue.none());
       case 'setExtensionState':
@@ -1220,6 +1240,7 @@ if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
         if (args.length > 1 && args[1] == 'cookie_store_cookies') {
           _logCookieStoreChange(normalizedState);
         }
+        _trackCookieStore(normalizedState);
         onSetExtensionState(sourceId, normalizedState);
         return JsResult.ok(const JsValue.none());
       case 'setExtensionSecureState':

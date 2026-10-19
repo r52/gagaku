@@ -848,6 +848,15 @@ class ExtensionSource extends _$ExtensionSource {
           'runtimeGeneration=$generation',
         );
       },
+      cookieStateRevision: () => runtime.cookieStateRevision,
+      onCookieStateUnchanged: (attempt) {
+        logger.i(
+          'ExtensionSource($sourceId) '
+          'time=${cloudflareDiagnosticTimestamp()} '
+          'Cloudflare read not retried operation=$operation attempt=$attempt '
+          'reason=cookieStateUnchanged',
+        );
+      },
     );
   }
 
