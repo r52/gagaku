@@ -69,4 +69,56 @@ void main() {
 
     expect(attempts, 1);
   });
+
+  test(
+    'retryCloudflareRead fails fast when the cookie state is unchanged',
+    () async {
+      var attempts = 0;
+      var retried = false;
+      int? unchangedAttempt;
+
+      await expectLater(
+        retryCloudflareRead<void>(
+          () async {
+            attempts++;
+            throw _RuntimeCloudflareError();
+          },
+          retryDelays: const [Duration.zero, Duration.zero],
+          onRetry: (_, _) => retried = true,
+          cookieStateRevision: () => 1,
+          onCookieStateUnchanged: (attempt) => unchangedAttempt = attempt,
+        ),
+        throwsA(isA<CloudflareBypassException>()),
+      );
+
+      expect(attempts, 1);
+      expect(retried, isFalse);
+      expect(unchangedAttempt, 1);
+    },
+  );
+
+  test(
+    'retryCloudflareRead retries when the attempt changed the cookie state',
+    () async {
+      var attempts = 0;
+      var revision = 0;
+
+      final result = await retryCloudflareRead(
+        () async {
+          attempts++;
+          if (attempts == 1) {
+            revision++;
+            throw _RuntimeCloudflareError();
+          }
+          return 'ready';
+        },
+        retryDelays: const [Duration.zero],
+        cookieStateRevision: () => revision,
+        onCookieStateUnchanged: (_) => fail('cookie state changed'),
+      );
+
+      expect(result, 'ready');
+      expect(attempts, 2);
+    },
+  );
 }

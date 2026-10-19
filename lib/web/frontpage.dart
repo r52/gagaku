@@ -525,9 +525,7 @@ class ExtensionHomeWidget extends HookConsumerWidget {
           ),
         ),
       );
-    }
-
-    if (homepageSnapshot.connectionState == ConnectionState.waiting ||
+    } else if (homepageSnapshot.connectionState == ConnectionState.waiting ||
         !homepageSnapshot.hasData) {
       slivers.add(
         const SliverToBoxAdapter(

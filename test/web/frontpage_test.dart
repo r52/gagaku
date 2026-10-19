@@ -40,6 +40,7 @@ void main() {
     expect(notifier._calls, 1);
     expect(find.text(t.ui.retry), findsOneWidget);
     expect(find.text(t.webSources.source.cloudflareResolve), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
 
     await tester.tap(find.text(t.ui.retry));
     await tester.pump();

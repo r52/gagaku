@@ -848,6 +848,15 @@ class ExtensionSource extends _$ExtensionSource {
           'runtimeGeneration=$generation',
         );
       },
+      cookieStateRevision: () => runtime.cookieStateRevision,
+      onCookieStateUnchanged: (attempt) {
+        logger.i(
+          'ExtensionSource($sourceId) '
+          'time=${cloudflareDiagnosticTimestamp()} '
+          'Cloudflare read not retried operation=$operation attempt=$attempt '
+          'reason=cookieStateUnchanged',
+        );
+      },
     );
   }
 
@@ -885,6 +894,63 @@ class ExtensionSource extends _$ExtensionSource {
   Future<WebManga?> getManga(String mangaId) async {
     await future;
     return await _retryRead('getManga', (runtime) => runtime.getManga(mangaId));
+  }
+
+  Future<SourceManga> getMangaDetails(String mangaId) async {
+    await future;
+    return await _retryRead(
+      'getMangaDetails',
+      (runtime) => runtime.getMangaDetails(mangaId),
+    );
+  }
+
+  Future<MangaProgress?> getMangaProgress(SourceManga manga) async {
+    final source = await future;
+    return await _retryRead(
+      'getMangaProgress',
+      (runtime) => runtime.getMangaProgress(source, manga),
+    );
+  }
+
+  Future<ExtensionForm> getMangaProgressManagementForm(
+    SourceManga manga,
+  ) async {
+    final source = await future;
+    return await _runtime!.getMangaProgressManagementForm(source, manga);
+  }
+
+  /// Not retried: a batch may have partially applied before failing.
+  Future<ChapterReadActionQueueProcessingResult> processChapterReadActionQueue(
+    List<TrackedMangaChapterReadAction> actions,
+  ) async {
+    final source = await future;
+    return await _runtime!.processChapterReadActionQueue(source, actions);
+  }
+
+  Future<List<ManagedCollection>> getManagedLibraryCollections() async {
+    final source = await future;
+    return await _retryRead(
+      'getManagedLibraryCollections',
+      (runtime) => runtime.getManagedLibraryCollections(source),
+    );
+  }
+
+  Future<List<SourceManga>> getSourceMangaInManagedCollection(
+    ManagedCollection collection,
+  ) async {
+    final source = await future;
+    return await _retryRead(
+      'getSourceMangaInManagedCollection',
+      (runtime) =>
+          runtime.getSourceMangaInManagedCollection(source, collection),
+    );
+  }
+
+  Future<void> commitManagedCollectionChanges(
+    ManagedCollectionChangeset changeset,
+  ) async {
+    final source = await future;
+    await _runtime!.commitManagedCollectionChanges(source, changeset);
   }
 
   Future<ChapterDetails> getChapterDetails(Chapter chapter) async {

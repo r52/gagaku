@@ -4597,6 +4597,882 @@ $SourceMangaCopyWith<$Res> get sourceManga {
 
 
 /// @nodoc
+mixin _$MangaProgress {
+
+ SourceManga get sourceManga; Chapter get lastReadChapter;@NullableTimestampSerializer() DateTime? get lastReadTime; num? get userRating;
+/// Create a copy of MangaProgress
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MangaProgressCopyWith<MangaProgress> get copyWith => _$MangaProgressCopyWithImpl<MangaProgress>(this as MangaProgress, _$identity);
+
+  /// Serializes this MangaProgress to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as MangaProgress;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaProgress&&(identical(other.sourceManga, _this.sourceManga) || other.sourceManga == _this.sourceManga)&&(identical(other.lastReadChapter, _this.lastReadChapter) || other.lastReadChapter == _this.lastReadChapter)&&(identical(other.lastReadTime, _this.lastReadTime) || other.lastReadTime == _this.lastReadTime)&&(identical(other.userRating, _this.userRating) || other.userRating == _this.userRating));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as MangaProgress;
+  return Object.hash(runtimeType,_this.sourceManga,_this.lastReadChapter,_this.lastReadTime,_this.userRating);
+}
+
+@override
+String toString() {
+  final _this = this as MangaProgress;
+  return 'MangaProgress(sourceManga: ${_this.sourceManga}, lastReadChapter: ${_this.lastReadChapter}, lastReadTime: ${_this.lastReadTime}, userRating: ${_this.userRating})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MangaProgressCopyWith<$Res>  {
+  factory $MangaProgressCopyWith(MangaProgress value, $Res Function(MangaProgress) _then) = _$MangaProgressCopyWithImpl;
+@useResult
+$Res call({
+ SourceManga sourceManga, Chapter lastReadChapter,@NullableTimestampSerializer() DateTime? lastReadTime, num? userRating
+});
+
+
+$SourceMangaCopyWith<$Res> get sourceManga;$ChapterCopyWith<$Res> get lastReadChapter;
+
+}
+/// @nodoc
+class _$MangaProgressCopyWithImpl<$Res>
+    implements $MangaProgressCopyWith<$Res> {
+  _$MangaProgressCopyWithImpl(this._self, this._then);
+
+  final MangaProgress _self;
+  final $Res Function(MangaProgress) _then;
+
+/// Create a copy of MangaProgress
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? sourceManga = null,Object? lastReadChapter = null,Object? lastReadTime = freezed,Object? userRating = freezed,}) {
+  return _then(MangaProgress(
+sourceManga: null == sourceManga ? _self.sourceManga : sourceManga // ignore: cast_nullable_to_non_nullable
+as SourceManga,lastReadChapter: null == lastReadChapter ? _self.lastReadChapter : lastReadChapter // ignore: cast_nullable_to_non_nullable
+as Chapter,lastReadTime: freezed == lastReadTime ? _self.lastReadTime : lastReadTime // ignore: cast_nullable_to_non_nullable
+as DateTime?,userRating: freezed == userRating ? _self.userRating : userRating // ignore: cast_nullable_to_non_nullable
+as num?,
+  ));
+}
+/// Create a copy of MangaProgress
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SourceMangaCopyWith<$Res> get sourceManga {
+  
+  return $SourceMangaCopyWith<$Res>(_self.sourceManga, (value) {
+    return _then(_self.copyWith(sourceManga: value));
+  });
+}/// Create a copy of MangaProgress
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChapterCopyWith<$Res> get lastReadChapter {
+  
+  return $ChapterCopyWith<$Res>(_self.lastReadChapter, (value) {
+    return _then(_self.copyWith(lastReadChapter: value));
+  });
+}
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _MangaProgress implements MangaProgress {
+  const _MangaProgress({required this.sourceManga, required this.lastReadChapter, @NullableTimestampSerializer() this.lastReadTime, this.userRating});
+  factory _MangaProgress.fromJson(Map<String, dynamic> json) => _$MangaProgressFromJson(json);
+
+@override final  SourceManga sourceManga;
+@override final  Chapter lastReadChapter;
+@override@NullableTimestampSerializer() final  DateTime? lastReadTime;
+@override final  num? userRating;
+
+/// Create a copy of MangaProgress
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$MangaProgressCopyWith<_MangaProgress> get copyWith => __$MangaProgressCopyWithImpl<_MangaProgress>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MangaProgressToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaProgress&&(identical(other.sourceManga, sourceManga) || other.sourceManga == sourceManga)&&(identical(other.lastReadChapter, lastReadChapter) || other.lastReadChapter == lastReadChapter)&&(identical(other.lastReadTime, lastReadTime) || other.lastReadTime == lastReadTime)&&(identical(other.userRating, userRating) || other.userRating == userRating));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,sourceManga,lastReadChapter,lastReadTime,userRating);
+}
+
+@override
+String toString() {
+    return 'MangaProgress(sourceManga: $sourceManga, lastReadChapter: $lastReadChapter, lastReadTime: $lastReadTime, userRating: $userRating)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$MangaProgressCopyWith<$Res> implements $MangaProgressCopyWith<$Res> {
+  factory _$MangaProgressCopyWith(_MangaProgress value, $Res Function(_MangaProgress) _then) = __$MangaProgressCopyWithImpl;
+@override @useResult
+$Res call({
+ SourceManga sourceManga, Chapter lastReadChapter,@NullableTimestampSerializer() DateTime? lastReadTime, num? userRating
+});
+
+
+@override $SourceMangaCopyWith<$Res> get sourceManga;@override $ChapterCopyWith<$Res> get lastReadChapter;
+
+}
+/// @nodoc
+class __$MangaProgressCopyWithImpl<$Res>
+    implements _$MangaProgressCopyWith<$Res> {
+  __$MangaProgressCopyWithImpl(this._self, this._then);
+
+  final _MangaProgress _self;
+  final $Res Function(_MangaProgress) _then;
+
+/// Create a copy of MangaProgress
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? sourceManga = null,Object? lastReadChapter = null,Object? lastReadTime = freezed,Object? userRating = freezed,}) {
+  return _then(_MangaProgress(
+sourceManga: null == sourceManga ? _self.sourceManga : sourceManga // ignore: cast_nullable_to_non_nullable
+as SourceManga,lastReadChapter: null == lastReadChapter ? _self.lastReadChapter : lastReadChapter // ignore: cast_nullable_to_non_nullable
+as Chapter,lastReadTime: freezed == lastReadTime ? _self.lastReadTime : lastReadTime // ignore: cast_nullable_to_non_nullable
+as DateTime?,userRating: freezed == userRating ? _self.userRating : userRating // ignore: cast_nullable_to_non_nullable
+as num?,
+  ));
+}
+
+/// Create a copy of MangaProgress
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SourceMangaCopyWith<$Res> get sourceManga {
+  
+  return $SourceMangaCopyWith<$Res>(_self.sourceManga, (value) {
+    return _then(_self.copyWith(sourceManga: value));
+  });
+}/// Create a copy of MangaProgress
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChapterCopyWith<$Res> get lastReadChapter {
+  
+  return $ChapterCopyWith<$Res>(_self.lastReadChapter, (value) {
+    return _then(_self.copyWith(lastReadChapter: value));
+  });
+}
+}
+
+
+/// @nodoc
+mixin _$TrackedMangaChapterReadAction {
+
+ String get id; SourceManga get sourceManga; Chapter? get readChapter; String get chapterId; String get chapterSourceId; String get chapterMangaId; num get chapterNum; num? get chapterVolume;@TimestampSerializer() DateTime get creationDate; int get errorCount;@NullableTimestampSerializer() DateTime? get lastErrorDate;
+/// Create a copy of TrackedMangaChapterReadAction
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TrackedMangaChapterReadActionCopyWith<TrackedMangaChapterReadAction> get copyWith => _$TrackedMangaChapterReadActionCopyWithImpl<TrackedMangaChapterReadAction>(this as TrackedMangaChapterReadAction, _$identity);
+
+  /// Serializes this TrackedMangaChapterReadAction to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as TrackedMangaChapterReadAction;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TrackedMangaChapterReadAction&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.sourceManga, _this.sourceManga) || other.sourceManga == _this.sourceManga)&&(identical(other.readChapter, _this.readChapter) || other.readChapter == _this.readChapter)&&(identical(other.chapterId, _this.chapterId) || other.chapterId == _this.chapterId)&&(identical(other.chapterSourceId, _this.chapterSourceId) || other.chapterSourceId == _this.chapterSourceId)&&(identical(other.chapterMangaId, _this.chapterMangaId) || other.chapterMangaId == _this.chapterMangaId)&&(identical(other.chapterNum, _this.chapterNum) || other.chapterNum == _this.chapterNum)&&(identical(other.chapterVolume, _this.chapterVolume) || other.chapterVolume == _this.chapterVolume)&&(identical(other.creationDate, _this.creationDate) || other.creationDate == _this.creationDate)&&(identical(other.errorCount, _this.errorCount) || other.errorCount == _this.errorCount)&&(identical(other.lastErrorDate, _this.lastErrorDate) || other.lastErrorDate == _this.lastErrorDate));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as TrackedMangaChapterReadAction;
+  return Object.hash(runtimeType,_this.id,_this.sourceManga,_this.readChapter,_this.chapterId,_this.chapterSourceId,_this.chapterMangaId,_this.chapterNum,_this.chapterVolume,_this.creationDate,_this.errorCount,_this.lastErrorDate);
+}
+
+@override
+String toString() {
+  final _this = this as TrackedMangaChapterReadAction;
+  return 'TrackedMangaChapterReadAction(id: ${_this.id}, sourceManga: ${_this.sourceManga}, readChapter: ${_this.readChapter}, chapterId: ${_this.chapterId}, chapterSourceId: ${_this.chapterSourceId}, chapterMangaId: ${_this.chapterMangaId}, chapterNum: ${_this.chapterNum}, chapterVolume: ${_this.chapterVolume}, creationDate: ${_this.creationDate}, errorCount: ${_this.errorCount}, lastErrorDate: ${_this.lastErrorDate})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TrackedMangaChapterReadActionCopyWith<$Res>  {
+  factory $TrackedMangaChapterReadActionCopyWith(TrackedMangaChapterReadAction value, $Res Function(TrackedMangaChapterReadAction) _then) = _$TrackedMangaChapterReadActionCopyWithImpl;
+@useResult
+$Res call({
+ String id, SourceManga sourceManga, Chapter? readChapter, String chapterId, String chapterSourceId, String chapterMangaId, num chapterNum, num? chapterVolume,@TimestampSerializer() DateTime creationDate, int errorCount,@NullableTimestampSerializer() DateTime? lastErrorDate
+});
+
+
+$SourceMangaCopyWith<$Res> get sourceManga;$ChapterCopyWith<$Res>? get readChapter;
+
+}
+/// @nodoc
+class _$TrackedMangaChapterReadActionCopyWithImpl<$Res>
+    implements $TrackedMangaChapterReadActionCopyWith<$Res> {
+  _$TrackedMangaChapterReadActionCopyWithImpl(this._self, this._then);
+
+  final TrackedMangaChapterReadAction _self;
+  final $Res Function(TrackedMangaChapterReadAction) _then;
+
+/// Create a copy of TrackedMangaChapterReadAction
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? sourceManga = null,Object? readChapter = freezed,Object? chapterId = null,Object? chapterSourceId = null,Object? chapterMangaId = null,Object? chapterNum = null,Object? chapterVolume = freezed,Object? creationDate = null,Object? errorCount = null,Object? lastErrorDate = freezed,}) {
+  return _then(TrackedMangaChapterReadAction(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,sourceManga: null == sourceManga ? _self.sourceManga : sourceManga // ignore: cast_nullable_to_non_nullable
+as SourceManga,readChapter: freezed == readChapter ? _self.readChapter : readChapter // ignore: cast_nullable_to_non_nullable
+as Chapter?,chapterId: null == chapterId ? _self.chapterId : chapterId // ignore: cast_nullable_to_non_nullable
+as String,chapterSourceId: null == chapterSourceId ? _self.chapterSourceId : chapterSourceId // ignore: cast_nullable_to_non_nullable
+as String,chapterMangaId: null == chapterMangaId ? _self.chapterMangaId : chapterMangaId // ignore: cast_nullable_to_non_nullable
+as String,chapterNum: null == chapterNum ? _self.chapterNum : chapterNum // ignore: cast_nullable_to_non_nullable
+as num,chapterVolume: freezed == chapterVolume ? _self.chapterVolume : chapterVolume // ignore: cast_nullable_to_non_nullable
+as num?,creationDate: null == creationDate ? _self.creationDate : creationDate // ignore: cast_nullable_to_non_nullable
+as DateTime,errorCount: null == errorCount ? _self.errorCount : errorCount // ignore: cast_nullable_to_non_nullable
+as int,lastErrorDate: freezed == lastErrorDate ? _self.lastErrorDate : lastErrorDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+/// Create a copy of TrackedMangaChapterReadAction
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SourceMangaCopyWith<$Res> get sourceManga {
+  
+  return $SourceMangaCopyWith<$Res>(_self.sourceManga, (value) {
+    return _then(_self.copyWith(sourceManga: value));
+  });
+}/// Create a copy of TrackedMangaChapterReadAction
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChapterCopyWith<$Res>? get readChapter {
+    if (_self.readChapter == null) {
+    return null;
+  }
+
+  return $ChapterCopyWith<$Res>(_self.readChapter!, (value) {
+    return _then(_self.copyWith(readChapter: value));
+  });
+}
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _TrackedMangaChapterReadAction implements TrackedMangaChapterReadAction {
+  const _TrackedMangaChapterReadAction({required this.id, required this.sourceManga, this.readChapter, required this.chapterId, required this.chapterSourceId, required this.chapterMangaId, required this.chapterNum, this.chapterVolume, @TimestampSerializer() required this.creationDate, required this.errorCount, @NullableTimestampSerializer() this.lastErrorDate});
+  factory _TrackedMangaChapterReadAction.fromJson(Map<String, dynamic> json) => _$TrackedMangaChapterReadActionFromJson(json);
+
+@override final  String id;
+@override final  SourceManga sourceManga;
+@override final  Chapter? readChapter;
+@override final  String chapterId;
+@override final  String chapterSourceId;
+@override final  String chapterMangaId;
+@override final  num chapterNum;
+@override final  num? chapterVolume;
+@override@TimestampSerializer() final  DateTime creationDate;
+@override final  int errorCount;
+@override@NullableTimestampSerializer() final  DateTime? lastErrorDate;
+
+/// Create a copy of TrackedMangaChapterReadAction
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$TrackedMangaChapterReadActionCopyWith<_TrackedMangaChapterReadAction> get copyWith => __$TrackedMangaChapterReadActionCopyWithImpl<_TrackedMangaChapterReadAction>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$TrackedMangaChapterReadActionToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TrackedMangaChapterReadAction&&(identical(other.id, id) || other.id == id)&&(identical(other.sourceManga, sourceManga) || other.sourceManga == sourceManga)&&(identical(other.readChapter, readChapter) || other.readChapter == readChapter)&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.chapterSourceId, chapterSourceId) || other.chapterSourceId == chapterSourceId)&&(identical(other.chapterMangaId, chapterMangaId) || other.chapterMangaId == chapterMangaId)&&(identical(other.chapterNum, chapterNum) || other.chapterNum == chapterNum)&&(identical(other.chapterVolume, chapterVolume) || other.chapterVolume == chapterVolume)&&(identical(other.creationDate, creationDate) || other.creationDate == creationDate)&&(identical(other.errorCount, errorCount) || other.errorCount == errorCount)&&(identical(other.lastErrorDate, lastErrorDate) || other.lastErrorDate == lastErrorDate));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,sourceManga,readChapter,chapterId,chapterSourceId,chapterMangaId,chapterNum,chapterVolume,creationDate,errorCount,lastErrorDate);
+}
+
+@override
+String toString() {
+    return 'TrackedMangaChapterReadAction(id: $id, sourceManga: $sourceManga, readChapter: $readChapter, chapterId: $chapterId, chapterSourceId: $chapterSourceId, chapterMangaId: $chapterMangaId, chapterNum: $chapterNum, chapterVolume: $chapterVolume, creationDate: $creationDate, errorCount: $errorCount, lastErrorDate: $lastErrorDate)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$TrackedMangaChapterReadActionCopyWith<$Res> implements $TrackedMangaChapterReadActionCopyWith<$Res> {
+  factory _$TrackedMangaChapterReadActionCopyWith(_TrackedMangaChapterReadAction value, $Res Function(_TrackedMangaChapterReadAction) _then) = __$TrackedMangaChapterReadActionCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, SourceManga sourceManga, Chapter? readChapter, String chapterId, String chapterSourceId, String chapterMangaId, num chapterNum, num? chapterVolume,@TimestampSerializer() DateTime creationDate, int errorCount,@NullableTimestampSerializer() DateTime? lastErrorDate
+});
+
+
+@override $SourceMangaCopyWith<$Res> get sourceManga;@override $ChapterCopyWith<$Res>? get readChapter;
+
+}
+/// @nodoc
+class __$TrackedMangaChapterReadActionCopyWithImpl<$Res>
+    implements _$TrackedMangaChapterReadActionCopyWith<$Res> {
+  __$TrackedMangaChapterReadActionCopyWithImpl(this._self, this._then);
+
+  final _TrackedMangaChapterReadAction _self;
+  final $Res Function(_TrackedMangaChapterReadAction) _then;
+
+/// Create a copy of TrackedMangaChapterReadAction
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? sourceManga = null,Object? readChapter = freezed,Object? chapterId = null,Object? chapterSourceId = null,Object? chapterMangaId = null,Object? chapterNum = null,Object? chapterVolume = freezed,Object? creationDate = null,Object? errorCount = null,Object? lastErrorDate = freezed,}) {
+  return _then(_TrackedMangaChapterReadAction(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,sourceManga: null == sourceManga ? _self.sourceManga : sourceManga // ignore: cast_nullable_to_non_nullable
+as SourceManga,readChapter: freezed == readChapter ? _self.readChapter : readChapter // ignore: cast_nullable_to_non_nullable
+as Chapter?,chapterId: null == chapterId ? _self.chapterId : chapterId // ignore: cast_nullable_to_non_nullable
+as String,chapterSourceId: null == chapterSourceId ? _self.chapterSourceId : chapterSourceId // ignore: cast_nullable_to_non_nullable
+as String,chapterMangaId: null == chapterMangaId ? _self.chapterMangaId : chapterMangaId // ignore: cast_nullable_to_non_nullable
+as String,chapterNum: null == chapterNum ? _self.chapterNum : chapterNum // ignore: cast_nullable_to_non_nullable
+as num,chapterVolume: freezed == chapterVolume ? _self.chapterVolume : chapterVolume // ignore: cast_nullable_to_non_nullable
+as num?,creationDate: null == creationDate ? _self.creationDate : creationDate // ignore: cast_nullable_to_non_nullable
+as DateTime,errorCount: null == errorCount ? _self.errorCount : errorCount // ignore: cast_nullable_to_non_nullable
+as int,lastErrorDate: freezed == lastErrorDate ? _self.lastErrorDate : lastErrorDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+/// Create a copy of TrackedMangaChapterReadAction
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SourceMangaCopyWith<$Res> get sourceManga {
+  
+  return $SourceMangaCopyWith<$Res>(_self.sourceManga, (value) {
+    return _then(_self.copyWith(sourceManga: value));
+  });
+}/// Create a copy of TrackedMangaChapterReadAction
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChapterCopyWith<$Res>? get readChapter {
+    if (_self.readChapter == null) {
+    return null;
+  }
+
+  return $ChapterCopyWith<$Res>(_self.readChapter!, (value) {
+    return _then(_self.copyWith(readChapter: value));
+  });
+}
+}
+
+
+/// @nodoc
+mixin _$ChapterReadActionQueueProcessingResult {
+
+ List<String> get successfulItems; List<String> get failedItems;
+/// Create a copy of ChapterReadActionQueueProcessingResult
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChapterReadActionQueueProcessingResultCopyWith<ChapterReadActionQueueProcessingResult> get copyWith => _$ChapterReadActionQueueProcessingResultCopyWithImpl<ChapterReadActionQueueProcessingResult>(this as ChapterReadActionQueueProcessingResult, _$identity);
+
+  /// Serializes this ChapterReadActionQueueProcessingResult to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as ChapterReadActionQueueProcessingResult;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterReadActionQueueProcessingResult&&const DeepCollectionEquality().equals(other.successfulItems, _this.successfulItems)&&const DeepCollectionEquality().equals(other.failedItems, _this.failedItems));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as ChapterReadActionQueueProcessingResult;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.successfulItems),const DeepCollectionEquality().hash(_this.failedItems));
+}
+
+@override
+String toString() {
+  final _this = this as ChapterReadActionQueueProcessingResult;
+  return 'ChapterReadActionQueueProcessingResult(successfulItems: ${_this.successfulItems}, failedItems: ${_this.failedItems})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ChapterReadActionQueueProcessingResultCopyWith<$Res>  {
+  factory $ChapterReadActionQueueProcessingResultCopyWith(ChapterReadActionQueueProcessingResult value, $Res Function(ChapterReadActionQueueProcessingResult) _then) = _$ChapterReadActionQueueProcessingResultCopyWithImpl;
+@useResult
+$Res call({
+ List<String> successfulItems, List<String> failedItems
+});
+
+
+
+
+}
+/// @nodoc
+class _$ChapterReadActionQueueProcessingResultCopyWithImpl<$Res>
+    implements $ChapterReadActionQueueProcessingResultCopyWith<$Res> {
+  _$ChapterReadActionQueueProcessingResultCopyWithImpl(this._self, this._then);
+
+  final ChapterReadActionQueueProcessingResult _self;
+  final $Res Function(ChapterReadActionQueueProcessingResult) _then;
+
+/// Create a copy of ChapterReadActionQueueProcessingResult
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? successfulItems = null,Object? failedItems = null,}) {
+  return _then(ChapterReadActionQueueProcessingResult(
+successfulItems: null == successfulItems ? _self.successfulItems : successfulItems // ignore: cast_nullable_to_non_nullable
+as List<String>,failedItems: null == failedItems ? _self.failedItems : failedItems // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _ChapterReadActionQueueProcessingResult implements ChapterReadActionQueueProcessingResult {
+  const _ChapterReadActionQueueProcessingResult({ List<String> successfulItems = const [],  List<String> failedItems = const []}): _successfulItems = successfulItems,_failedItems = failedItems;
+  factory _ChapterReadActionQueueProcessingResult.fromJson(Map<String, dynamic> json) => _$ChapterReadActionQueueProcessingResultFromJson(json);
+
+ final  List<String> _successfulItems;
+@override@JsonKey() List<String> get successfulItems {
+  if (_successfulItems is EqualUnmodifiableListView) return _successfulItems;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_successfulItems);
+}
+
+ final  List<String> _failedItems;
+@override@JsonKey() List<String> get failedItems {
+  if (_failedItems is EqualUnmodifiableListView) return _failedItems;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_failedItems);
+}
+
+
+/// Create a copy of ChapterReadActionQueueProcessingResult
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ChapterReadActionQueueProcessingResultCopyWith<_ChapterReadActionQueueProcessingResult> get copyWith => __$ChapterReadActionQueueProcessingResultCopyWithImpl<_ChapterReadActionQueueProcessingResult>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ChapterReadActionQueueProcessingResultToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterReadActionQueueProcessingResult&&const DeepCollectionEquality().equals(other.successfulItems, _successfulItems)&&const DeepCollectionEquality().equals(other.failedItems, _failedItems));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_successfulItems),const DeepCollectionEquality().hash(_failedItems));
+}
+
+@override
+String toString() {
+    return 'ChapterReadActionQueueProcessingResult(successfulItems: $successfulItems, failedItems: $failedItems)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ChapterReadActionQueueProcessingResultCopyWith<$Res> implements $ChapterReadActionQueueProcessingResultCopyWith<$Res> {
+  factory _$ChapterReadActionQueueProcessingResultCopyWith(_ChapterReadActionQueueProcessingResult value, $Res Function(_ChapterReadActionQueueProcessingResult) _then) = __$ChapterReadActionQueueProcessingResultCopyWithImpl;
+@override @useResult
+$Res call({
+ List<String> successfulItems, List<String> failedItems
+});
+
+
+
+
+}
+/// @nodoc
+class __$ChapterReadActionQueueProcessingResultCopyWithImpl<$Res>
+    implements _$ChapterReadActionQueueProcessingResultCopyWith<$Res> {
+  __$ChapterReadActionQueueProcessingResultCopyWithImpl(this._self, this._then);
+
+  final _ChapterReadActionQueueProcessingResult _self;
+  final $Res Function(_ChapterReadActionQueueProcessingResult) _then;
+
+/// Create a copy of ChapterReadActionQueueProcessingResult
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? successfulItems = null,Object? failedItems = null,}) {
+  return _then(_ChapterReadActionQueueProcessingResult(
+successfulItems: null == successfulItems ? _self._successfulItems : successfulItems // ignore: cast_nullable_to_non_nullable
+as List<String>,failedItems: null == failedItems ? _self._failedItems : failedItems // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$ManagedCollection {
+
+ String get id; String get title;
+/// Create a copy of ManagedCollection
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ManagedCollectionCopyWith<ManagedCollection> get copyWith => _$ManagedCollectionCopyWithImpl<ManagedCollection>(this as ManagedCollection, _$identity);
+
+  /// Serializes this ManagedCollection to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as ManagedCollection;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ManagedCollection&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as ManagedCollection;
+  return Object.hash(runtimeType,_this.id,_this.title);
+}
+
+@override
+String toString() {
+  final _this = this as ManagedCollection;
+  return 'ManagedCollection(id: ${_this.id}, title: ${_this.title})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ManagedCollectionCopyWith<$Res>  {
+  factory $ManagedCollectionCopyWith(ManagedCollection value, $Res Function(ManagedCollection) _then) = _$ManagedCollectionCopyWithImpl;
+@useResult
+$Res call({
+ String id, String title
+});
+
+
+
+
+}
+/// @nodoc
+class _$ManagedCollectionCopyWithImpl<$Res>
+    implements $ManagedCollectionCopyWith<$Res> {
+  _$ManagedCollectionCopyWithImpl(this._self, this._then);
+
+  final ManagedCollection _self;
+  final $Res Function(ManagedCollection) _then;
+
+/// Create a copy of ManagedCollection
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,}) {
+  return _then(ManagedCollection(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _ManagedCollection implements ManagedCollection {
+  const _ManagedCollection({required this.id, required this.title});
+  factory _ManagedCollection.fromJson(Map<String, dynamic> json) => _$ManagedCollectionFromJson(json);
+
+@override final  String id;
+@override final  String title;
+
+/// Create a copy of ManagedCollection
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ManagedCollectionCopyWith<_ManagedCollection> get copyWith => __$ManagedCollectionCopyWithImpl<_ManagedCollection>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ManagedCollectionToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ManagedCollection&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,title);
+}
+
+@override
+String toString() {
+    return 'ManagedCollection(id: $id, title: $title)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ManagedCollectionCopyWith<$Res> implements $ManagedCollectionCopyWith<$Res> {
+  factory _$ManagedCollectionCopyWith(_ManagedCollection value, $Res Function(_ManagedCollection) _then) = __$ManagedCollectionCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String title
+});
+
+
+
+
+}
+/// @nodoc
+class __$ManagedCollectionCopyWithImpl<$Res>
+    implements _$ManagedCollectionCopyWith<$Res> {
+  __$ManagedCollectionCopyWithImpl(this._self, this._then);
+
+  final _ManagedCollection _self;
+  final $Res Function(_ManagedCollection) _then;
+
+/// Create a copy of ManagedCollection
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,}) {
+  return _then(_ManagedCollection(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$ManagedCollectionChangeset {
+
+ ManagedCollection get collection; List<SourceManga> get additions; List<SourceManga> get deletions;
+/// Create a copy of ManagedCollectionChangeset
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ManagedCollectionChangesetCopyWith<ManagedCollectionChangeset> get copyWith => _$ManagedCollectionChangesetCopyWithImpl<ManagedCollectionChangeset>(this as ManagedCollectionChangeset, _$identity);
+
+  /// Serializes this ManagedCollectionChangeset to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as ManagedCollectionChangeset;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ManagedCollectionChangeset&&(identical(other.collection, _this.collection) || other.collection == _this.collection)&&const DeepCollectionEquality().equals(other.additions, _this.additions)&&const DeepCollectionEquality().equals(other.deletions, _this.deletions));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as ManagedCollectionChangeset;
+  return Object.hash(runtimeType,_this.collection,const DeepCollectionEquality().hash(_this.additions),const DeepCollectionEquality().hash(_this.deletions));
+}
+
+@override
+String toString() {
+  final _this = this as ManagedCollectionChangeset;
+  return 'ManagedCollectionChangeset(collection: ${_this.collection}, additions: ${_this.additions}, deletions: ${_this.deletions})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ManagedCollectionChangesetCopyWith<$Res>  {
+  factory $ManagedCollectionChangesetCopyWith(ManagedCollectionChangeset value, $Res Function(ManagedCollectionChangeset) _then) = _$ManagedCollectionChangesetCopyWithImpl;
+@useResult
+$Res call({
+ ManagedCollection collection, List<SourceManga> additions, List<SourceManga> deletions
+});
+
+
+$ManagedCollectionCopyWith<$Res> get collection;
+
+}
+/// @nodoc
+class _$ManagedCollectionChangesetCopyWithImpl<$Res>
+    implements $ManagedCollectionChangesetCopyWith<$Res> {
+  _$ManagedCollectionChangesetCopyWithImpl(this._self, this._then);
+
+  final ManagedCollectionChangeset _self;
+  final $Res Function(ManagedCollectionChangeset) _then;
+
+/// Create a copy of ManagedCollectionChangeset
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? collection = null,Object? additions = null,Object? deletions = null,}) {
+  return _then(ManagedCollectionChangeset(
+collection: null == collection ? _self.collection : collection // ignore: cast_nullable_to_non_nullable
+as ManagedCollection,additions: null == additions ? _self.additions : additions // ignore: cast_nullable_to_non_nullable
+as List<SourceManga>,deletions: null == deletions ? _self.deletions : deletions // ignore: cast_nullable_to_non_nullable
+as List<SourceManga>,
+  ));
+}
+/// Create a copy of ManagedCollectionChangeset
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ManagedCollectionCopyWith<$Res> get collection {
+  
+  return $ManagedCollectionCopyWith<$Res>(_self.collection, (value) {
+    return _then(_self.copyWith(collection: value));
+  });
+}
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _ManagedCollectionChangeset implements ManagedCollectionChangeset {
+  const _ManagedCollectionChangeset({required this.collection, required  List<SourceManga> additions, required  List<SourceManga> deletions}): _additions = additions,_deletions = deletions;
+  factory _ManagedCollectionChangeset.fromJson(Map<String, dynamic> json) => _$ManagedCollectionChangesetFromJson(json);
+
+@override final  ManagedCollection collection;
+ final  List<SourceManga> _additions;
+@override List<SourceManga> get additions {
+  if (_additions is EqualUnmodifiableListView) return _additions;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_additions);
+}
+
+ final  List<SourceManga> _deletions;
+@override List<SourceManga> get deletions {
+  if (_deletions is EqualUnmodifiableListView) return _deletions;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_deletions);
+}
+
+
+/// Create a copy of ManagedCollectionChangeset
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ManagedCollectionChangesetCopyWith<_ManagedCollectionChangeset> get copyWith => __$ManagedCollectionChangesetCopyWithImpl<_ManagedCollectionChangeset>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ManagedCollectionChangesetToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ManagedCollectionChangeset&&(identical(other.collection, collection) || other.collection == collection)&&const DeepCollectionEquality().equals(other.additions, _additions)&&const DeepCollectionEquality().equals(other.deletions, _deletions));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,collection,const DeepCollectionEquality().hash(_additions),const DeepCollectionEquality().hash(_deletions));
+}
+
+@override
+String toString() {
+    return 'ManagedCollectionChangeset(collection: $collection, additions: $additions, deletions: $deletions)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ManagedCollectionChangesetCopyWith<$Res> implements $ManagedCollectionChangesetCopyWith<$Res> {
+  factory _$ManagedCollectionChangesetCopyWith(_ManagedCollectionChangeset value, $Res Function(_ManagedCollectionChangeset) _then) = __$ManagedCollectionChangesetCopyWithImpl;
+@override @useResult
+$Res call({
+ ManagedCollection collection, List<SourceManga> additions, List<SourceManga> deletions
+});
+
+
+@override $ManagedCollectionCopyWith<$Res> get collection;
+
+}
+/// @nodoc
+class __$ManagedCollectionChangesetCopyWithImpl<$Res>
+    implements _$ManagedCollectionChangesetCopyWith<$Res> {
+  __$ManagedCollectionChangesetCopyWithImpl(this._self, this._then);
+
+  final _ManagedCollectionChangeset _self;
+  final $Res Function(_ManagedCollectionChangeset) _then;
+
+/// Create a copy of ManagedCollectionChangeset
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? collection = null,Object? additions = null,Object? deletions = null,}) {
+  return _then(_ManagedCollectionChangeset(
+collection: null == collection ? _self.collection : collection // ignore: cast_nullable_to_non_nullable
+as ManagedCollection,additions: null == additions ? _self._additions : additions // ignore: cast_nullable_to_non_nullable
+as List<SourceManga>,deletions: null == deletions ? _self._deletions : deletions // ignore: cast_nullable_to_non_nullable
+as List<SourceManga>,
+  ));
+}
+
+/// Create a copy of ManagedCollectionChangeset
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ManagedCollectionCopyWith<$Res> get collection {
+  
+  return $ManagedCollectionCopyWith<$Res>(_self.collection, (value) {
+    return _then(_self.copyWith(collection: value));
+  });
+}
+}
+
+
+/// @nodoc
 mixin _$PaperbackRequest {
 
  String get url; String get method; Map<String, String>? get headers; dynamic get body; Map<String, String>? get cookies;

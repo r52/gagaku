@@ -4,5 +4,5 @@ License: Creative Commons Attribution 4.0 International (CC BY 4.0).
 https://creativecommons.org/licenses/by/4.0/
 See MaterialIcons-LICENSE.txt for the complete license.
 
-The font has been subset to the nine glyphs used by the Gagaku guide and
+The font has been subset to the thirteen glyphs used by the Gagaku guide and
 converted from OpenType to WOFF2. Its glyph designs are unchanged.

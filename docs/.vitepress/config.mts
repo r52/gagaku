@@ -27,6 +27,7 @@ export default defineConfig({
         text: 'Use Gagaku',
         items: [
           { text: 'Reading & favorites', link: '/reading' },
+          { text: 'Trackers', link: '/trackers' },
           { text: 'Troubleshooting', link: '/troubleshooting' },
         ],
       },
@@ -34,6 +35,7 @@ export default defineConfig({
         text: 'Configure Gagaku',
         items: [
           { text: 'App settings', link: '/app-settings' },
+          { text: 'Database Sync', link: '/database-sync' },
           { text: 'Web Sources settings', link: '/web-source-settings' },
         ],
       },

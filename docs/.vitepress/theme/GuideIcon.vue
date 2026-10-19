@@ -9,6 +9,10 @@ const glyphs = {
   search: '\ue567',
   settings: '\ue57f',
   more_vert: '\ue404',
+  bookmark_add: '\ue0f2',
+  bookmark_added: '\ue0f3',
+  manage_accounts: '\ue3c6',
+  tune: '\ue683',
 } as const
 
 // Code points from Flutter's Icons class; Google's web font uses a different map.

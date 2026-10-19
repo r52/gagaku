@@ -385,6 +385,9 @@ class Translations$auth$en {
 
 	/// en: 'Logging in...'
 	String get loggingIn => 'Logging in...';
+
+	/// en: 'The sign-in response did not include an access token.'
+	String get missingAccessToken => 'The sign-in response did not include an access token.';
 }
 
 // Path: history
@@ -566,6 +569,8 @@ class Translations$webSources$en {
 
 	/// en: 'This extension requires CF bypass. It may not work correctly Try connecting to this page from a browser before installing this extension'
 	String get cfRequired => 'This extension requires CF bypass. It may not work correctly\nTry connecting to this page from a browser before installing this extension';
+
+	late final Translations$webSources$trackers$en trackers = Translations$webSources$trackers$en.internal(_root);
 }
 
 // Path: search
@@ -1930,8 +1935,8 @@ class Translations$webSources$settings$en {
 	/// en: 'Prune Unused Data'
 	String get pruneExtension => 'Prune Unused Data';
 
-	/// en: 'Remove unused extension settings and read markers for items not in your history.'
-	String get pruneExtensionDesc => 'Remove unused extension settings and read markers for items not in your history.';
+	/// en: 'Remove unused extension settings, read markers for items not in your history, and tracker links to uninstalled extensions.'
+	String get pruneExtensionDesc => 'Remove unused extension settings, read markers for items not in your history, and tracker links to uninstalled extensions.';
 
 	/// en: 'Data to be removed:'
 	String get pruneSummary => 'Data to be removed:';
@@ -1944,6 +1949,12 @@ class Translations$webSources$settings$en {
 
 	/// en: 'Read Markers: $count'
 	String pruneReadMarkers({required Object count}) => 'Read Markers: ${count}';
+
+	/// en: 'Tracker Links: $count'
+	String pruneTrackerLinks({required Object count}) => 'Tracker Links: ${count}';
+
+	/// en: 'Queued Tracker Updates: $count'
+	String pruneTrackerQueue({required Object count}) => 'Queued Tracker Updates: ${count}';
 
 	/// en: 'No unused data found.'
 	String get pruneEmpty => 'No unused data found.';
@@ -2053,7 +2064,118 @@ class Translations$webSources$source$en {
 	/// en: 'Extension enabled'
 	String get sourceAddOK => 'Extension enabled';
 
+	/// en: 'Tracker'
+	String get tracker => 'Tracker';
+
 	late final Translations$webSources$source$install$en install = Translations$webSources$source$install$en.internal(_root);
+}
+
+// Path: webSources.trackers
+class Translations$webSources$trackers$en {
+	Translations$webSources$trackers$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Trackers'
+	String get title => 'Trackers';
+
+	/// en: 'Tracker accounts and pending progress updates'
+	String get settingsDesc => 'Tracker accounts and pending progress updates';
+
+	/// en: 'No tracker extensions are installed. Trackers such as AniList can be installed from the Extension Manager.'
+	String get noneInstalled => 'No tracker extensions are installed. Trackers such as AniList can be installed from the Extension Manager.';
+
+	/// en: 'Pause tracker updates'
+	String get pauseUpdates => 'Pause tracker updates';
+
+	/// en: 'Stop reporting chapter reads to linked trackers'
+	String get pauseUpdatesDesc => 'Stop reporting chapter reads to linked trackers';
+
+	/// en: 'Account settings'
+	String get account => 'Account settings';
+
+	/// en: 'Pending: $count'
+	String pendingCount({required Object count}) => 'Pending: ${count}';
+
+	/// en: 'Failed: $count'
+	String failedCount({required Object count}) => 'Failed: ${count}';
+
+	/// en: 'Syncing…'
+	String get syncing => 'Syncing…';
+
+	/// en: 'Last sync: $time'
+	String lastSync({required Object time}) => 'Last sync: ${time}';
+
+	/// en: 'Not synced yet'
+	String get notSynced => 'Not synced yet';
+
+	/// en: 'Last error: $error'
+	String lastError({required Object error}) => 'Last error: ${error}';
+
+	/// en: 'The tracker rejected $count update(s)'
+	String rejectedUpdates({required Object count}) => 'The tracker rejected ${count} update(s)';
+
+	/// en: 'Retrying $time'
+	String retryAt({required Object time}) => 'Retrying ${time}';
+
+	/// en: 'Sync now'
+	String get syncNow => 'Sync now';
+
+	/// en: 'Retry failed'
+	String get retryFailed => 'Retry failed';
+
+	/// en: 'Discard failed'
+	String get discardFailed => 'Discard failed';
+
+	/// en: 'Discard $count failed updates for $tracker? They will not be sent.'
+	String discardFailedWarning({required Object count, required Object tracker}) => 'Discard ${count} failed updates for ${tracker}? They will not be sent.';
+
+	/// en: 'Tracking'
+	String get tracking => 'Tracking';
+
+	/// en: 'Manage trackers'
+	String get manageTrackers => 'Manage trackers';
+
+	/// en: 'Not linked'
+	String get notLinked => 'Not linked';
+
+	/// en: 'Link'
+	String get link => 'Link';
+
+	/// en: 'Change'
+	String get changeLink => 'Change';
+
+	/// en: 'Unlink'
+	String get unlink => 'Unlink';
+
+	/// en: 'Stop tracking this series on $tracker? Its pending updates are discarded.'
+	String unlinkWarning({required Object tracker}) => 'Stop tracking this series on ${tracker}? Its pending updates are discarded.';
+
+	/// en: 'Edit progress'
+	String get editProgress => 'Edit progress';
+
+	/// en: 'Ch. $chapter'
+	String chapterProgress({required Object chapter}) => 'Ch. ${chapter}';
+
+	/// en: 'Rating: $rating'
+	String rating({required Object rating}) => 'Rating: ${rating}';
+
+	/// en: 'Not on your list yet'
+	String get notOnList => 'Not on your list yet';
+
+	/// en: 'Link on $tracker'
+	String linkOn({required Object tracker}) => 'Link on ${tracker}';
+
+	/// en: 'Search $tracker'
+	String searchHint({required Object tracker}) => 'Search ${tracker}';
+
+	/// en: 'No results'
+	String get noResults => 'No results';
+
+	/// en: 'Linked to $title'
+	String linked({required Object title}) => 'Linked to ${title}';
 }
 
 // Path: reader.direction
@@ -2337,6 +2459,7 @@ extension on Translations {
 			'auth.loginSuccess' => 'Login Successful',
 			'auth.loginFailed' => ({required Object error}) => 'Login Failed: ${error}',
 			'auth.loggingIn' => 'Logging in...',
+			'auth.missingAccessToken' => 'The sign-in response did not include an access token.',
 			'library' => 'Library',
 			'history.text' => 'History',
 			'history.clear' => 'Clear History',
@@ -2407,11 +2530,13 @@ extension on Translations {
 			'webSources.settings.chooseExtension' => 'Choose an extension',
 			'webSources.settings.migrateSuccess' => 'Data migrated. Please completely restart the app for the changes to take effect.',
 			'webSources.settings.pruneExtension' => 'Prune Unused Data',
-			'webSources.settings.pruneExtensionDesc' => 'Remove unused extension settings and read markers for items not in your history.',
+			'webSources.settings.pruneExtensionDesc' => 'Remove unused extension settings, read markers for items not in your history, and tracker links to uninstalled extensions.',
 			'webSources.settings.pruneSummary' => 'Data to be removed:',
 			'webSources.settings.pruneState' => ({required Object count}) => 'Extension States: ${count}',
 			'webSources.settings.pruneSecureState' => ({required Object count}) => 'Secure States: ${count}',
 			'webSources.settings.pruneReadMarkers' => ({required Object count}) => 'Read Markers: ${count}',
+			'webSources.settings.pruneTrackerLinks' => ({required Object count}) => 'Tracker Links: ${count}',
+			'webSources.settings.pruneTrackerQueue' => ({required Object count}) => 'Queued Tracker Updates: ${count}',
 			'webSources.settings.pruneEmpty' => 'No unused data found.',
 			'webSources.settings.pruneSuccess' => 'Data successfully pruned.',
 			'webSources.repo.manage' => 'Manage Repos',
@@ -2442,6 +2567,7 @@ extension on Translations {
 			'webSources.source.delete' => ({required Object arg}) => '${_root.ui.delete} ${arg}',
 			'webSources.source.sourceDeleteOK' => 'Extension disabled',
 			'webSources.source.sourceAddOK' => 'Extension enabled',
+			'webSources.source.tracker' => 'Tracker',
 			'webSources.source.install.title' => 'Install Extensions',
 			'webSources.source.install.warning' => 'Only install extensions from sources you trust. Are you sure you want to install these extensions?',
 			'webSources.source.install.alreadyInstalled' => 'Already installed',
@@ -2459,6 +2585,39 @@ extension on Translations {
 			'webSources.historyHere' => 'Your manga browsing history appears here',
 			'webSources.saveHistory' => 'Save History?',
 			'webSources.cfRequired' => 'This extension requires CF bypass. It may not work correctly\nTry connecting to this page from a browser before installing this extension',
+			'webSources.trackers.title' => 'Trackers',
+			'webSources.trackers.settingsDesc' => 'Tracker accounts and pending progress updates',
+			'webSources.trackers.noneInstalled' => 'No tracker extensions are installed. Trackers such as AniList can be installed from the Extension Manager.',
+			'webSources.trackers.pauseUpdates' => 'Pause tracker updates',
+			'webSources.trackers.pauseUpdatesDesc' => 'Stop reporting chapter reads to linked trackers',
+			'webSources.trackers.account' => 'Account settings',
+			'webSources.trackers.pendingCount' => ({required Object count}) => 'Pending: ${count}',
+			'webSources.trackers.failedCount' => ({required Object count}) => 'Failed: ${count}',
+			'webSources.trackers.syncing' => 'Syncing…',
+			'webSources.trackers.lastSync' => ({required Object time}) => 'Last sync: ${time}',
+			'webSources.trackers.notSynced' => 'Not synced yet',
+			'webSources.trackers.lastError' => ({required Object error}) => 'Last error: ${error}',
+			'webSources.trackers.rejectedUpdates' => ({required Object count}) => 'The tracker rejected ${count} update(s)',
+			'webSources.trackers.retryAt' => ({required Object time}) => 'Retrying ${time}',
+			'webSources.trackers.syncNow' => 'Sync now',
+			'webSources.trackers.retryFailed' => 'Retry failed',
+			'webSources.trackers.discardFailed' => 'Discard failed',
+			'webSources.trackers.discardFailedWarning' => ({required Object count, required Object tracker}) => 'Discard ${count} failed updates for ${tracker}? They will not be sent.',
+			'webSources.trackers.tracking' => 'Tracking',
+			'webSources.trackers.manageTrackers' => 'Manage trackers',
+			'webSources.trackers.notLinked' => 'Not linked',
+			'webSources.trackers.link' => 'Link',
+			'webSources.trackers.changeLink' => 'Change',
+			'webSources.trackers.unlink' => 'Unlink',
+			'webSources.trackers.unlinkWarning' => ({required Object tracker}) => 'Stop tracking this series on ${tracker}? Its pending updates are discarded.',
+			'webSources.trackers.editProgress' => 'Edit progress',
+			'webSources.trackers.chapterProgress' => ({required Object chapter}) => 'Ch. ${chapter}',
+			'webSources.trackers.rating' => ({required Object rating}) => 'Rating: ${rating}',
+			'webSources.trackers.notOnList' => 'Not on your list yet',
+			'webSources.trackers.linkOn' => ({required Object tracker}) => 'Link on ${tracker}',
+			'webSources.trackers.searchHint' => ({required Object tracker}) => 'Search ${tracker}',
+			'webSources.trackers.noResults' => 'No results',
+			'webSources.trackers.linked' => ({required Object title}) => 'Linked to ${title}',
 			'search.text' => 'Search',
 			'search.arg' => ({required Object arg}) => 'Search ${arg}',
 			'search.filters' => 'Search Filters',
@@ -2734,6 +2893,8 @@ extension on Translations {
 			'backup.dataSub' => 'Backup all gagaku data and settings (excludes MangaDex login and local library files)',
 			'backup.restore' => 'Restore Backup',
 			'backup.restoreWarning' => 'Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?',
+			_ => null,
+		} ?? switch (path) {
 			'backup.fromFile' => 'Restore Data from File',
 			'backup.success' => 'Backup saved',
 			'backup.restoreSuccess' => 'Backup restored',
@@ -2771,8 +2932,6 @@ extension on Translations {
 			'sync.statusIncompatible' => 'Incompatible or corrupt profile',
 			'sync.statusNoValidSnapshot' => 'No valid snapshot found',
 			'sync.statusProfileMissing' => 'Remote profile disappeared; sync paused',
-			_ => null,
-		} ?? switch (path) {
 			'sync.statusForked' => 'Conflict requires resolution',
 			'sync.statusCleanupWarning' => 'Synchronized with cleanup warning',
 			'sync.statusDisposed' => 'Stopped',

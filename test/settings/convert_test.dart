@@ -8,6 +8,7 @@ import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/web/model/config.dart';
+import 'package:gagaku/web/model/tracking_types.dart';
 import 'package:gagaku/web/model/types.dart';
 
 import 'package:gagaku/model/config.dart';
@@ -32,6 +33,7 @@ void main() {
       store.box<ExtensionStateDB>().removeAll();
       store.box<HistoryLink>().removeAll();
       store.box<WebFavoritesList>().removeAll();
+      store.box<TrackerLink>().removeAll();
       store.box<WebFavoritesList>().put(
         WebFavoritesList(id: historyListUUID, name: 'History'),
       );
@@ -231,6 +233,129 @@ void main() {
           mangaId: 'legacy_location',
         ),
       );
+    });
+
+    group('tracker links', () {
+      TrackerLink link(String trackerId, TrackedSeriesRef series) =>
+          TrackerLink.create(
+            trackerId: trackerId,
+            series: series,
+            trackedManga: SourceManga(
+              mangaId: 'fictional-entry-$trackerId',
+              mangaInfo: const MangaInfo(
+                thumbnailUrl: 'https://example.invalid/cover.jpg',
+                synopsis: '',
+                primaryTitle: 'Fictional Tracked Title',
+                secondaryTitles: [],
+                contentRating: ContentRating.EVERYONE,
+              ),
+            ),
+            now: DateTime.utc(2026, 1, 2),
+          );
+
+      const extensionSeries = TrackedSeriesRef.web(
+        WebSeriesRef.extension(
+          sourceId: 'FictionalSource',
+          mangaId: 'fictional-series',
+        ),
+      );
+      const nativeSeries = TrackedSeriesRef.nativeMangaDex(
+        '00000000-0000-4000-8000-000000000001',
+      );
+
+      Set<String> storedKeys() =>
+          store.box<TrackerLink>().getAll().map((e) => e.linkKey).toSet();
+
+      test('V2 backups round-trip tracker links', () async {
+        store.box<TrackerLink>().putMany([
+          link('FictionalTracker', extensionSeries),
+          link('FictionalTracker', nativeSeries),
+        ]);
+
+        const converter = GagakuBackupDataV2();
+        final backup =
+            json.decode(await converter.write({})) as Map<String, dynamic>;
+        expect(backup['tracker-links'], hasLength(2));
+
+        store.box<TrackerLink>().removeAll();
+        await converter.read(backup);
+
+        final restored = store.box<TrackerLink>().getAll();
+        expect(restored.map((e) => e.series).toSet(), {
+          extensionSeries,
+          nativeSeries,
+        });
+        expect(
+          restored.first.trackedManga.mangaId,
+          'fictional-entry-FictionalTracker',
+        );
+        // ObjectBox returns dates in local time.
+        expect(restored.first.createdAt.toUtc(), DateTime.utc(2026, 1, 2));
+      });
+
+      test('a V2 payload without tracker links keeps local links', () async {
+        store.box<TrackerLink>().put(link('FictionalTracker', extensionSeries));
+
+        await const GagakuBackupDataV2().read({'version': 2});
+
+        expect(storedKeys(), {
+          'FictionalTracker|web:FictionalSource/fictional-series',
+        });
+      });
+
+      test('an empty tracker link list clears local links', () async {
+        store.box<TrackerLink>().put(link('FictionalTracker', extensionSeries));
+
+        await const GagakuBackupDataV2().read({
+          'version': 2,
+          'tracker-links': <dynamic>[],
+        });
+
+        expect(store.box<TrackerLink>().count(), 0);
+      });
+
+      test('malformed tracker links fail and roll back the import', () async {
+        store.box<TrackerLink>().put(link('FictionalTracker', extensionSeries));
+        store.box<GagakuConfig>().put(GagakuConfig(theme: GagakuTheme.lime));
+
+        for (final malformed in [
+          'not-a-list',
+          [42],
+          [
+            {
+              ...link('OtherTracker', nativeSeries).toJson(),
+              'series': {'version': 99, 'kind': 'web'},
+            },
+          ],
+        ]) {
+          await expectLater(
+            const GagakuBackupDataV2().read({
+              'version': 2,
+              'gagaku': GagakuConfig(theme: GagakuTheme.blue).toJson(),
+              'tracker-links': malformed,
+            }),
+            throwsA(anything),
+            reason: '$malformed',
+          );
+          expect(storedKeys(), {
+            'FictionalTracker|web:FictionalSource/fictional-series',
+          });
+          expect(
+            store.box<GagakuConfig>().getAll().single.theme,
+            GagakuTheme.lime,
+          );
+        }
+      });
+
+      test('V1 backups leave tracker links untouched', () async {
+        store.box<TrackerLink>().put(link('FictionalTracker', nativeSeries));
+
+        await const GagakuBackupDataV1().read({'version': 1});
+
+        expect(storedKeys(), {
+          'FictionalTracker|native-mangadex:00000000-0000-4000-8000-000000000001',
+        });
+      });
     });
   });
 }

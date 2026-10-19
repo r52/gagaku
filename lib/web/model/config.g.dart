@@ -14,12 +14,14 @@ _ExtensionConfig _$ExtensionConfigFromJson(Map<String, dynamic> json) =>
               .toList() ??
           const [],
       preserveHistory: json['preserveHistory'] as bool? ?? true,
+      pauseTrackerUpdates: json['pauseTrackerUpdates'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$ExtensionConfigToJson(_ExtensionConfig instance) =>
     <String, dynamic>{
       'categoriesToUpdate': instance.categoriesToUpdate,
       'preserveHistory': instance.preserveHistory,
+      'pauseTrackerUpdates': instance.pauseTrackerUpdates,
     };
 
 // **************************************************************************
@@ -61,7 +63,7 @@ final class WebConfigProvider
   }
 }
 
-String _$webConfigHash() => r'82047ba484958c37d164589d9a338be3a6fa04da';
+String _$webConfigHash() => r'54254156d9f974cb5e1c924d7f18afbefe21fd5a';
 
 abstract class _$WebConfig extends $Notifier<ExtensionConfig> {
   ExtensionConfig build();

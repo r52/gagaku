@@ -765,6 +765,13 @@ class WebSourceInfo with _$WebSourceInfo {
     return capabilities.contains(intent);
   }
 
+  /// A progress tracker rather than a reading source.
+  @Transient()
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  bool get isTracker =>
+      hasCapability(SourceIntents.mangaProgress) &&
+      !hasCapability(SourceIntents.mangaChapters);
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
@@ -1212,6 +1219,79 @@ abstract class Chapter with _$Chapter {
       _$ChapterFromJson(json);
 }
 
+/// A tracker's view of reading progress. [sourceManga] is the tracker's own
+/// entry, not the reading source's.
+@freezed
+abstract class MangaProgress with _$MangaProgress {
+  const factory MangaProgress({
+    required SourceManga sourceManga,
+    required Chapter lastReadChapter,
+    @NullableTimestampSerializer() DateTime? lastReadTime,
+    num? userRating,
+  }) = _MangaProgress;
+
+  factory MangaProgress.fromJson(Map<String, dynamic> json) =>
+      _$MangaProgressFromJson(json);
+}
+
+/// A chapter read reported to a tracker. [sourceManga] is the tracker's
+/// entry; the `chapter*` fields describe the reading source.
+@freezed
+abstract class TrackedMangaChapterReadAction
+    with _$TrackedMangaChapterReadAction {
+  const factory TrackedMangaChapterReadAction({
+    required String id,
+    required SourceManga sourceManga,
+    Chapter? readChapter,
+    required String chapterId,
+    required String chapterSourceId,
+    required String chapterMangaId,
+    required num chapterNum,
+    num? chapterVolume,
+    @TimestampSerializer() required DateTime creationDate,
+    required int errorCount,
+    @NullableTimestampSerializer() DateTime? lastErrorDate,
+  }) = _TrackedMangaChapterReadAction;
+
+  factory TrackedMangaChapterReadAction.fromJson(Map<String, dynamic> json) =>
+      _$TrackedMangaChapterReadActionFromJson(json);
+}
+
+/// Action ids absent from both lists were not attempted.
+@freezed
+abstract class ChapterReadActionQueueProcessingResult
+    with _$ChapterReadActionQueueProcessingResult {
+  const factory ChapterReadActionQueueProcessingResult({
+    @Default([]) List<String> successfulItems,
+    @Default([]) List<String> failedItems,
+  }) = _ChapterReadActionQueueProcessingResult;
+
+  factory ChapterReadActionQueueProcessingResult.fromJson(
+    Map<String, dynamic> json,
+  ) => _$ChapterReadActionQueueProcessingResultFromJson(json);
+}
+
+@freezed
+abstract class ManagedCollection with _$ManagedCollection {
+  const factory ManagedCollection({required String id, required String title}) =
+      _ManagedCollection;
+
+  factory ManagedCollection.fromJson(Map<String, dynamic> json) =>
+      _$ManagedCollectionFromJson(json);
+}
+
+@freezed
+abstract class ManagedCollectionChangeset with _$ManagedCollectionChangeset {
+  const factory ManagedCollectionChangeset({
+    required ManagedCollection collection,
+    required List<SourceManga> additions,
+    required List<SourceManga> deletions,
+  }) = _ManagedCollectionChangeset;
+
+  factory ManagedCollectionChangeset.fromJson(Map<String, dynamic> json) =>
+      _$ManagedCollectionChangesetFromJson(json);
+}
+
 @freezed
 abstract class PaperbackRequest with _$PaperbackRequest {
   const factory PaperbackRequest({
@@ -1337,6 +1417,32 @@ sealed class DiscoverSectionItem with _$DiscoverSectionItem {
 
   factory DiscoverSectionItem.fromJson(Map<String, dynamic> json) =>
       _$DiscoverSectionItemFromJson(json);
+
+  /// Decodes an item returned for [section], inferring a missing `type`.
+  ///
+  /// Items are rendered by their section's type. Some extensions omit the
+  /// discriminator. Only a missing key is inferred; an explicit type is
+  /// decoded as given, and sections whose items need extra fields
+  /// (`chapterUpdates`, `genres`) are not inferred.
+  factory DiscoverSectionItem.fromSectionJson(
+    Map<String, dynamic> json,
+    DiscoverSection section,
+  ) {
+    if (json.containsKey('type')) {
+      return DiscoverSectionItem.fromJson(json);
+    }
+
+    final inferred = switch (section.type) {
+      DiscoverSectionType.featured => 'featuredCarouselItem',
+      DiscoverSectionType.simpleCarousel => 'simpleCarouselItem',
+      DiscoverSectionType.prominentCarousel => 'prominentCarouselItem',
+      DiscoverSectionType.chapterUpdates || DiscoverSectionType.genres => null,
+    };
+
+    return DiscoverSectionItem.fromJson(
+      inferred == null ? json : {...json, 'type': inferred},
+    );
+  }
 }
 
 @freezed

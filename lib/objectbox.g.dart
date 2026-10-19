@@ -19,6 +19,7 @@ import 'mangadex/model/model.dart';
 import 'model/config.dart';
 import 'reader/model/config.dart';
 import 'web/model/config.dart';
+import 'web/model/tracking_types.dart';
 import 'web/model/types.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
@@ -27,7 +28,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 111371867039964082),
     name: 'ExtensionConfig',
-    lastPropertyId: const obx_int.IdUid(4, 477225497001240540),
+    lastPropertyId: const obx_int.IdUid(5, 6869006301448342076),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -45,6 +46,12 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(4, 477225497001240540),
         name: 'preserveHistory',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 6869006301448342076),
+        name: 'pauseTrackerUpdates',
         type: 1,
         flags: 0,
       ),
@@ -456,6 +463,73 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(12, 8812061823961753288),
+    name: 'TrackerLink',
+    lastPropertyId: const obx_int.IdUid(9, 8369077615206443326),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 402681421407082243),
+        name: 'dbid',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 8898750344364911696),
+        name: 'linkKey',
+        type: 9,
+        flags: 34848,
+        indexId: const obx_int.IdUid(5, 7342571391954661673),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 1334005354712427469),
+        name: 'trackerId',
+        type: 9,
+        flags: 2048,
+        indexId: const obx_int.IdUid(6, 4761964335011227509),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 7099214247900985338),
+        name: 'seriesKey',
+        type: 9,
+        flags: 2048,
+        indexId: const obx_int.IdUid(7, 9211145360414018807),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 1913021406719902196),
+        name: 'dbSeries',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 2575678133285836365),
+        name: 'trackedMangaId',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 5600799829745125817),
+        name: 'dbTrackedManga',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 3289642332156542394),
+        name: 'createdAt',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 8369077615206443326),
+        name: 'updatedAt',
+        type: 10,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -497,8 +571,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
     // Typically, this is done with `dart run build_runner build`.
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(11, 1274503423913450017),
-    lastIndexId: const obx_int.IdUid(4, 7797636678653461826),
+    lastEntityId: const obx_int.IdUid(12, 8812061823961753288),
+    lastIndexId: const obx_int.IdUid(7, 9211145360414018807),
     lastRelationId: const obx_int.IdUid(1, 5189061811819065121),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
@@ -529,10 +603,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
               .map(fbb.writeString)
               .toList(growable: false),
         );
-        fbb.startTable(5);
+        fbb.startTable(6);
         fbb.addInt64(0, object.dbid);
         fbb.addOffset(2, categoriesToUpdateOffset);
         fbb.addBool(3, object.preserveHistory);
+        fbb.addBool(4, object.pauseTrackerUpdates);
         fbb.finish(fbb.endTable());
         return object.dbid;
       },
@@ -555,10 +630,17 @@ obx_int.ModelDefinition getObjectBoxModel() {
           10,
           false,
         );
+        final pauseTrackerUpdatesParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          false,
+        );
         final object = ExtensionConfig(
           dbid: dbidParam,
           categoriesToUpdate: categoriesToUpdateParam,
           preserveHistory: preserveHistoryParam,
+          pauseTrackerUpdates: pauseTrackerUpdatesParam,
         );
 
         return object;
@@ -1115,6 +1197,78 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    TrackerLink: obx_int.EntityDefinition<TrackerLink>(
+      model: _entities[11],
+      toOneRelations: (TrackerLink object) => [],
+      toManyRelations: (TrackerLink object) => {},
+      getId: (TrackerLink object) => object.dbid,
+      setId: (TrackerLink object, int id) {
+        object.dbid = id;
+      },
+      objectToFB: (TrackerLink object, fb.Builder fbb) {
+        final linkKeyOffset = fbb.writeString(object.linkKey);
+        final trackerIdOffset = fbb.writeString(object.trackerId);
+        final seriesKeyOffset = fbb.writeString(object.seriesKey);
+        final dbSeriesOffset = fbb.writeString(object.dbSeries);
+        final trackedMangaIdOffset = fbb.writeString(object.trackedMangaId);
+        final dbTrackedMangaOffset = fbb.writeString(object.dbTrackedManga);
+        fbb.startTable(10);
+        fbb.addInt64(0, object.dbid);
+        fbb.addOffset(1, linkKeyOffset);
+        fbb.addOffset(2, trackerIdOffset);
+        fbb.addOffset(3, seriesKeyOffset);
+        fbb.addOffset(4, dbSeriesOffset);
+        fbb.addOffset(5, trackedMangaIdOffset);
+        fbb.addOffset(6, dbTrackedMangaOffset);
+        fbb.addInt64(7, object.createdAt.millisecondsSinceEpoch);
+        fbb.addInt64(8, object.updatedAt.millisecondsSinceEpoch);
+        fbb.finish(fbb.endTable());
+        return object.dbid;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final dbidParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final linkKeyParam = const fb.StringReader(asciiOptimization: true)
+            .vTableGet(buffer, rootOffset, 6, '');
+        final trackerIdParam = const fb.StringReader(asciiOptimization: true)
+            .vTableGet(buffer, rootOffset, 8, '');
+        final seriesKeyParam = const fb.StringReader(asciiOptimization: true)
+            .vTableGet(buffer, rootOffset, 10, '');
+        final dbSeriesParam = const fb.StringReader(asciiOptimization: true)
+            .vTableGet(buffer, rootOffset, 12, '');
+        final trackedMangaIdParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 14, '');
+        final dbTrackedMangaParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 16, '');
+        final createdAtParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0),
+        );
+        final updatedAtParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 20, 0),
+        );
+        final object = TrackerLink(
+          dbid: dbidParam,
+          linkKey: linkKeyParam,
+          trackerId: trackerIdParam,
+          seriesKey: seriesKeyParam,
+          dbSeries: dbSeriesParam,
+          trackedMangaId: trackedMangaIdParam,
+          dbTrackedManga: dbTrackedMangaParam,
+          createdAt: createdAtParam,
+          updatedAt: updatedAtParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -1136,6 +1290,11 @@ class ExtensionConfig_ {
   /// See [ExtensionConfig.preserveHistory].
   static final preserveHistory = obx.QueryBooleanProperty<ExtensionConfig>(
     _entities[0].properties[2],
+  );
+
+  /// See [ExtensionConfig.pauseTrackerUpdates].
+  static final pauseTrackerUpdates = obx.QueryBooleanProperty<ExtensionConfig>(
+    _entities[0].properties[3],
   );
 }
 
@@ -1408,5 +1567,53 @@ class WebSourceInfo_ {
   /// See [WebSourceInfo.dbCapabilities].
   static final dbCapabilities = obx.QueryIntegerVectorProperty<WebSourceInfo>(
     _entities[10].properties[7],
+  );
+}
+
+/// [TrackerLink] entity fields to define ObjectBox queries.
+class TrackerLink_ {
+  /// See [TrackerLink.dbid].
+  static final dbid = obx.QueryIntegerProperty<TrackerLink>(
+    _entities[11].properties[0],
+  );
+
+  /// See [TrackerLink.linkKey].
+  static final linkKey = obx.QueryStringProperty<TrackerLink>(
+    _entities[11].properties[1],
+  );
+
+  /// See [TrackerLink.trackerId].
+  static final trackerId = obx.QueryStringProperty<TrackerLink>(
+    _entities[11].properties[2],
+  );
+
+  /// See [TrackerLink.seriesKey].
+  static final seriesKey = obx.QueryStringProperty<TrackerLink>(
+    _entities[11].properties[3],
+  );
+
+  /// See [TrackerLink.dbSeries].
+  static final dbSeries = obx.QueryStringProperty<TrackerLink>(
+    _entities[11].properties[4],
+  );
+
+  /// See [TrackerLink.trackedMangaId].
+  static final trackedMangaId = obx.QueryStringProperty<TrackerLink>(
+    _entities[11].properties[5],
+  );
+
+  /// See [TrackerLink.dbTrackedManga].
+  static final dbTrackedManga = obx.QueryStringProperty<TrackerLink>(
+    _entities[11].properties[6],
+  );
+
+  /// See [TrackerLink.createdAt].
+  static final createdAt = obx.QueryDateProperty<TrackerLink>(
+    _entities[11].properties[7],
+  );
+
+  /// See [TrackerLink.updatedAt].
+  static final updatedAt = obx.QueryDateProperty<TrackerLink>(
+    _entities[11].properties[8],
   );
 }

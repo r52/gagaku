@@ -25,7 +25,6 @@ Gagaku is licensed under the MIT license.
   - PDF and EPUB support is Android only
 - Basic PB extension support
   - v0.9 extensions only
-  - manga source providers only (tracking extensions not supported)
 - cubari.moe links
 - Deep link support
   - Android only, supports mangadex.org/cubari.moe links

@@ -2586,4 +2586,505 @@ globalThis.source.identitySource = {initialise: async () => {}};
       },
     );
   }
+
+  test('fjs runtime hosts a progress-tracking extension', () async {
+    final receivedOrigins = <String?>[];
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    addTearDown(() => server.close(force: true));
+    server.listen((request) async {
+      receivedOrigins.add(request.headers.value('origin'));
+      await utf8.decoder.bind(request).join();
+      request.response
+        ..headers.contentType = ContentType.json
+        ..write('{"ok":true}');
+      await request.response.close();
+    });
+
+    Map<String, dynamic> storedState = {};
+    final runtime = FjsExtensionRuntime(
+      sourceId: 'fictionalTracker',
+      extensionHost: await rootBundle.loadString(
+        'assets/extensionhost/bundle.js',
+      ),
+      onResetAllState: (_) {},
+      onSetExtensionState: (_, state) {
+        storedState = Map<String, dynamic>.from(state as Map);
+      },
+      onSetExtensionSecureState: (_, _) {},
+      getExtensionState: (_) => storedState,
+      getExtensionSecureState: (_) => {},
+    );
+    var disposed = false;
+    addTearDown(() async {
+      if (!disposed) await runtime.dispose();
+    });
+
+    final source = WebSourceInfo(
+      id: 'fictionalTracker',
+      name: 'Fictional Tracker',
+      repo: 'tracker-fixture',
+      icon: '',
+      capabilities: const [
+        SourceIntents.mangaProgress,
+        SourceIntents.collectionManagement,
+        SourceIntents.settingsUI,
+        SourceIntents.mangaSearch,
+      ],
+    );
+    expect(source.isTracker, isTrue);
+
+    await runtime.init(source, '''
+const endpoint = ${jsonEncode('http://127.0.0.1:${server.port}/progress')};
+const trackerEntry = (mangaId) => ({
+  mangaId,
+  mangaInfo: {
+    thumbnailUrl: "",
+    synopsis: "",
+    primaryTitle: `Fictional Entry \${mangaId}`,
+    secondaryTitles: [],
+    contentRating: "EVERYONE"
+  }
+});
+const deletionForm = {
+  getSections: () => [
+    {
+      id: "delete",
+      type: "flowSection",
+      items: [
+        { id: "deleted", type: "labelRow", isHidden: false, title: "Deleted" }
+      ]
+    }
+  ]
+};
+globalThis.source ??= {};
+globalThis.source.fictionalTracker = {
+  initialise: async () => {},
+  getMangaDetails: async (mangaId) => trackerEntry(mangaId),
+  getMangaProgress: async (manga) => {
+    if (manga.mangaId === "untracked") return undefined;
+    const lastReadTime = new Date(0);
+    lastReadTime.setUTCSeconds(1700000000);
+    return {
+      sourceManga: manga,
+      lastReadChapter: {
+        chapterId: "42",
+        sourceManga: manga,
+        langCode: "unknown",
+        chapNum: 42
+      },
+      lastReadTime,
+      userRating: 8.5
+    };
+  },
+  getMangaProgressManagementForm: async (manga) => ({
+    requiresExplicitSubmission: true,
+    getSections: () => [
+      {
+        id: "progress",
+        type: "flowSection",
+        items: [
+          {
+            id: "delete",
+            type: "navigationRow",
+            isHidden: false,
+            title: "Delete",
+            form: deletionForm
+          }
+        ]
+      }
+    ],
+    formDidSubmit: async () => {
+      Application.setState(manga.mangaId, "submitted-progress");
+    }
+  }),
+  processChapterReadActionQueue: async (actions) => {
+    if (actions.some((action) => action.chapterId === "throw")) {
+      throw new Error("fictional tracker failure");
+    }
+    await Application.scheduleRequest({
+      url: endpoint,
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(actions.map((action) => action.chapterNum))
+    });
+    // Log right before returning: the console bridge call is still in flight
+    // when the eval completes and when the engine is later closed.
+    console.log(`processed \${actions.length} fictional actions`);
+    return {
+      successfulItems: actions
+        .filter((action) => action.chapterNum === 2)
+        .map((action) => action.id),
+      failedItems: actions
+        .filter((action) => action.chapterNum === 3)
+        .map((action) => action.id)
+    };
+  },
+  getManagedLibraryCollections: async () => [{ id: "reading", title: "Reading" }],
+  getSourceMangaInManagedCollection: async (collection) => [
+    trackerEntry(`\${collection.id}-1`)
+  ],
+  commitManagedCollectionChanges: async () => {
+    throw new Error("fictional collections are read-only");
+  }
+};
+''');
+
+    final manga = await runtime.getManga('entry-1');
+    expect(manga, isNotNull);
+    expect(await runtime.getMangaDetails('entry-1'), isA<SourceManga>());
+    final entry = await runtime.getMangaDetails('entry-1');
+    expect(entry.mangaInfo.primaryTitle, 'Fictional Entry entry-1');
+
+    final progress = await runtime.getMangaProgress(source, entry);
+    expect(progress?.lastReadChapter.chapNum, 42);
+    expect(progress?.lastReadTime, DateTime.utc(2023, 11, 14, 22, 13, 20));
+    expect(progress?.userRating, 8.5);
+    expect(
+      await runtime.getMangaProgress(
+        source,
+        await runtime.getMangaDetails('untracked'),
+      ),
+      isNull,
+    );
+
+    final form = await runtime.getMangaProgressManagementForm(source, entry);
+    final deleteRow =
+        (await form.sections).single.items.single as NavigationRowElement;
+    // Read from the form once its sections have loaded.
+    expect(form.requiresExplicitSubmission, isTrue);
+    final nestedForm = await runtime.getForm(source, deleteRow.form);
+    expect(
+      (await nestedForm.sections).single.items.single,
+      isA<LabelRowElement>(),
+    );
+    await form.formDidSubmit();
+    expect(storedState['submitted-progress'], 'entry-1');
+
+    TrackedMangaChapterReadAction action(String id, num chapterNum) =>
+        TrackedMangaChapterReadAction(
+          id: id,
+          sourceManga: entry,
+          chapterId: id,
+          chapterSourceId: 'FictionalSource',
+          chapterMangaId: 'fictional-series-1',
+          chapterNum: chapterNum,
+          creationDate: DateTime.utc(2026, 1, 1),
+          errorCount: 0,
+        );
+    final result = await runtime.processChapterReadActionQueue(source, [
+      action('succeeds', 2),
+      action('fails', 3),
+      action('not-attempted', 4),
+    ]);
+    expect(result.successfulItems, ['succeeds']);
+    expect(result.failedItems, ['fails']);
+    // LLRT must not synthesize a same-host Origin for non-GET requests.
+    expect(receivedOrigins, [null]);
+
+    await expectLater(
+      runtime.processChapterReadActionQueue(source, [action('throw', 1)]),
+      throwsA(anything),
+    );
+
+    final collections = await runtime.getManagedLibraryCollections(source);
+    expect(collections.single.title, 'Reading');
+    final collectionManga = await runtime.getSourceMangaInManagedCollection(
+      source,
+      collections.single,
+    );
+    expect(collectionManga.single.mangaId, 'reading-1');
+    await expectLater(
+      runtime.commitManagedCollectionChanges(
+        source,
+        ManagedCollectionChangeset(
+          collection: collections.single,
+          additions: const [],
+          deletions: const [],
+        ),
+      ),
+      throwsA(anything),
+    );
+
+    final readingSource = WebSourceInfo(
+      id: 'fictionalTracker',
+      name: 'Fictional Reader',
+      repo: 'tracker-fixture',
+      icon: '',
+    );
+    expect(
+      () => runtime.getMangaProgress(readingSource, entry),
+      throwsUnsupportedError,
+    );
+
+    // A console call left in flight by the last eval must not fail disposal.
+    await runtime.processChapterReadActionQueue(source, [action('last', 2)]);
+    disposed = true;
+    await runtime.dispose();
+  });
+
+  test(
+    'extension-requested form reloads do not re-run formWillAppear',
+    () async {
+      Map<String, dynamic> storedState = {};
+      final runtime = FjsExtensionRuntime(
+        sourceId: 'reloadLoopSource',
+        extensionHost: await rootBundle.loadString(
+          'assets/extensionhost/bundle.js',
+        ),
+        onResetAllState: (_) {},
+        onSetExtensionState: (_, state) {
+          storedState = Map<String, dynamic>.from(state as Map);
+        },
+        onSetExtensionSecureState: (_, _) {},
+        getExtensionState: (_) => storedState,
+        getExtensionSecureState: (_) => {},
+      );
+      addTearDown(runtime.dispose);
+
+      final source = WebSourceInfo(
+        id: 'reloadLoopSource',
+        name: 'Reload Loop Source',
+        repo: 'tracker-fixture',
+        icon: '',
+        capabilities: const [SourceIntents.settingsUI],
+      );
+
+      // Mirrors AniList's ProfileViewForm: load in formWillAppear, then ask the
+      // host to re-render through the extension's own reloadForm().
+      await runtime.init(source, r'''
+const profileForm = {
+  loaded: false,
+  formWillAppear() {
+    Application.setState(
+      (Application.getState("appear-count") ?? 0) + 1,
+      "appear-count"
+    );
+    Application.sleep(0.01).finally(() => {
+      this.loaded = true;
+      Application.formDidChange(this.__underlying_formId);
+    });
+  },
+  getSections() {
+    return [
+      {
+        id: "profile",
+        type: "flowSection",
+        items: [
+          {
+            id: "status",
+            type: "labelRow",
+            isHidden: false,
+            title: this.loaded ? "Loaded" : "Loading"
+          }
+        ]
+      }
+    ];
+  }
+};
+globalThis.source ??= {};
+globalThis.source.reloadLoopSource = {
+  initialise: async () => {},
+  getSettingsForm: async () => ({
+    getSections: () => [
+      {
+        id: "settings",
+        type: "flowSection",
+        items: [
+          {
+            id: "profile",
+            type: "navigationRow",
+            isHidden: false,
+            title: "Profile",
+            form: profileForm
+          }
+        ]
+      }
+    ]
+  })
+};
+''');
+
+      final settings = await runtime.getSettingsForm(source);
+      final profileRow =
+          (await settings.sections).single.items.single as NavigationRowElement;
+      final profile = await runtime.getForm(source, profileRow.form);
+
+      // Resolving the handle (as a navigation row does while rendering) must
+      // not run the appearance hook.
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(storedState['appear-count'], isNull);
+
+      Future<String> statusTitle() async {
+        final status = (await profile.sections).single.items.single;
+        return (status as LabelRowElement).title;
+      }
+
+      await profile.formWillAppear();
+      final deadline = DateTime.now().add(const Duration(seconds: 5));
+      while (await statusTitle() != 'Loaded') {
+        if (DateTime.now().isAfter(deadline)) {
+          fail('form did not reload after its formWillAppear load');
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      }
+
+      // A loop would keep re-running formWillAppear after every reload.
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      expect(storedState['appear-count'], 1);
+    },
+  );
+
+  test('interceptors may share an id within one extension', () async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    addTearDown(() => server.close(force: true));
+    server.listen((request) async {
+      request.response
+        ..headers.contentType = ContentType.text
+        ..write(request.headers.value('x-interceptors') ?? '');
+      await request.response.close();
+    });
+
+    final runtime = FjsExtensionRuntime(
+      sourceId: 'sharedInterceptorSource',
+      extensionHost: await rootBundle.loadString(
+        'assets/extensionhost/bundle.js',
+      ),
+      onResetAllState: (_) {},
+      onSetExtensionState: (_, _) {},
+      onSetExtensionSecureState: (_, _) {},
+      getExtensionState: (_) => {},
+      getExtensionSecureState: (_) => {},
+    );
+    addTearDown(runtime.dispose);
+
+    // Mirrors AniList: BasicRateLimiter("main") and AniListInterceptor("main").
+    await runtime.init(
+      WebSourceInfo(
+        id: 'sharedInterceptorSource',
+        name: 'Shared Interceptor Source',
+        repo: 'tracker-fixture',
+        icon: '',
+      ),
+      '''
+const endpoint = ${jsonEncode('http://127.0.0.1:${server.port}/')};
+const marker = (name) => ({
+  interceptRequest: async (request) => {
+    const previous = request.headers?.["x-interceptors"];
+    return {
+      ...request,
+      headers: {
+        ...(request.headers ?? {}),
+        "x-interceptors": previous ? `\${previous},\${name}` : name
+      }
+    };
+  },
+  interceptResponse: async (request, response, data) => data
+});
+const register = (id, interceptor) =>
+  Application.registerInterceptor(
+    id,
+    Application.Selector(interceptor, "interceptRequest"),
+    Application.Selector(interceptor, "interceptResponse")
+  );
+const limiter = marker("limiter");
+const passthrough = marker("passthrough");
+const other = marker("other");
+globalThis.source ??= {};
+globalThis.source.sharedInterceptorSource = {
+  initialise: async () => {
+    register("main", limiter);
+    register("main", passthrough);
+    register("main", limiter); // exact repeat: skipped
+    register("other", other);
+  },
+  probe: async () => {
+    const [, body] = await Application.scheduleRequest({
+      url: endpoint,
+      method: "GET"
+    });
+    return Application.arrayBufferToUTF8String(body);
+  }
+};
+''',
+    );
+
+    Future<String> probe() async => await runtime.evalForTesting(
+      'await globalThis.sharedInterceptorSource.probe()',
+    ) as String;
+
+    expect(await probe(), 'limiter,passthrough,other');
+
+    await runtime.evalForTesting('Application.unregisterInterceptor("main")');
+    expect(await probe(), 'other');
+  });
+
+  test('type-less discover items take their section type', () async {
+    final runtime = FjsExtensionRuntime(
+      sourceId: 'typelessDiscoverSource',
+      extensionHost: await rootBundle.loadString(
+        'assets/extensionhost/bundle.js',
+      ),
+      onResetAllState: (_) {},
+      onSetExtensionState: (_, _) {},
+      onSetExtensionSecureState: (_, _) {},
+      getExtensionState: (_) => {},
+      getExtensionSecureState: (_) => {},
+    );
+    addTearDown(runtime.dispose);
+
+    final source = WebSourceInfo(
+      id: 'typelessDiscoverSource',
+      name: 'Typeless Discover Source',
+      repo: 'tracker-fixture',
+      icon: '',
+      capabilities: const [SourceIntents.discoverSections],
+    );
+
+    // Mirrors MangaUpdates' `Omit<...CarouselItem, "type">` items.
+    await runtime.init(source, r'''
+globalThis.source ??= {};
+globalThis.source.typelessDiscoverSource = {
+  initialise: async () => {},
+  getDiscoverSections: async () => [
+    { id: "featured", title: "Featured", type: 0 },
+    { id: "simple", title: "Simple", type: 1 },
+    { id: "prominent", title: "Prominent", type: 2 },
+    { id: "updates", title: "Updates", type: 3 }
+  ],
+  getDiscoverSectionItems: async (section) => ({
+    items: [
+      {
+        mangaId: `${section.id}-1`,
+        title: "Fictional Title",
+        imageUrl: "https://example.com/cover.jpg",
+        contentRating: "EVERYONE",
+        subtitle: "Chs. 12",
+        supertitle: section.type === 0 ? "Fictional Author" : undefined
+      }
+    ]
+  })
+};
+''');
+
+    final sections = await runtime.getDiscoverSections(source);
+    Future<DiscoverSectionItem> firstItem(int index) async =>
+        (await runtime.getDiscoverSectionItems(
+          source,
+          sections[index],
+          null,
+        )).items.single;
+
+    expect(
+      await firstItem(0),
+      isA<FeaturedCarouselItem>().having(
+        (e) => e.supertitle,
+        'supertitle',
+        'Fictional Author',
+      ),
+    );
+    expect(await firstItem(1), isA<SimpleCarouselItem>());
+    expect(await firstItem(2), isA<ProminentCarouselItem>());
+    // Chapter-update items need a chapterId; nothing is inferred.
+    await expectLater(firstItem(3), throwsA(anything));
+  });
 }

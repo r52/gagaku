@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
@@ -9,6 +10,7 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/tracking.dart';
 import 'package:gagaku/web/repo_list.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -235,6 +237,15 @@ class SourceManager extends HookConsumerWidget {
                     final messenger = ScaffoldMessenger.of(context);
                     sourcesBox.remove(item.dbid);
                     ref.invalidate(extensionSourceProvider(item.id));
+                    if (item.hasCapability(SourceIntents.mangaProgress)) {
+                      // Links stay so a reinstall restores them; queued reads
+                      // can no longer be sent.
+                      unawaited(
+                        ref
+                            .read(trackerQueueStoreProvider)
+                            .removeForTracker(item.id),
+                      );
+                    }
 
                     messenger
                       ..removeCurrentSnackBar()
@@ -325,9 +336,12 @@ class SourceManager extends HookConsumerWidget {
 
                   final icon = '${repo.url}/${source.getIconPath()}';
                   final capabilities = source.getCapabilities();
-                  final supportedSource = capabilities.contains(
-                    SourceIntents.mangaChapters,
-                  );
+                  final isTracker =
+                      capabilities.contains(SourceIntents.mangaProgress) &&
+                      !capabilities.contains(SourceIntents.mangaChapters);
+                  final supportedSource =
+                      capabilities.contains(SourceIntents.mangaChapters) ||
+                      isTracker;
                   final cfRequired = capabilities.contains(
                     SourceIntents.cloudflareBypassRequired,
                   );
@@ -351,6 +365,15 @@ class SourceManager extends HookConsumerWidget {
                       onPressed: () {
                         sourcesBox.remove(isInstalledId.dbid);
                         ref.invalidate(extensionSourceProvider(source.id));
+                        if (isInstalledId.hasCapability(
+                          SourceIntents.mangaProgress,
+                        )) {
+                          unawaited(
+                            ref
+                                .read(trackerQueueStoreProvider)
+                                .removeForTracker(source.id),
+                          );
+                        }
                         ScaffoldMessenger.of(context)
                           ..removeCurrentSnackBar()
                           ..showSnackBar(
@@ -444,6 +467,7 @@ class SourceManager extends HookConsumerWidget {
                       author: source.getAuthor(),
                       version: source.version,
                       badges: source.getBadges(),
+                      isTracker: isTracker,
                       cfRequired: cfRequired,
                       trailing: trailing,
                     ),
@@ -477,6 +501,7 @@ class _SourceItem extends StatelessWidget {
     required this.author,
     required this.version,
     required this.badges,
+    this.isTracker = false,
     this.cfRequired = false,
     this.trailing,
   });
@@ -487,6 +512,7 @@ class _SourceItem extends StatelessWidget {
   final String author;
   final String version;
   final List<SourceBadge> badges;
+  final bool isTracker;
   final bool cfRequired;
   final Widget? trailing;
 
@@ -529,18 +555,24 @@ class _SourceItem extends StatelessWidget {
                 child: Wrap(
                   spacing: 4.0,
                   runSpacing: 4.0,
-                  children: badges
-                      .map(
-                        (e) => IconTextChip(
-                          text: e.label,
-                          color: HexColor.fromHex(e.backgroundColor),
-                          style: TextStyle(
-                            color: HexColor.fromHex(e.textColor),
-                            fontSize: 10.0,
-                          ),
+                  children: [
+                    if (isTracker)
+                      IconTextChip(
+                        icon: const Icon(Icons.bookmark_added, size: 12.0),
+                        text: tr.webSources.source.tracker,
+                        style: const TextStyle(fontSize: 10.0),
+                      ),
+                    ...badges.map(
+                      (e) => IconTextChip(
+                        text: e.label,
+                        color: HexColor.fromHex(e.backgroundColor),
+                        style: TextStyle(
+                          color: HexColor.fromHex(e.textColor),
+                          fontSize: 10.0,
                         ),
-                      )
-                      .toList(),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               if (cfRequired || trailing != null)

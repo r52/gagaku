@@ -23,6 +23,11 @@ abstract class ExtensionConfig with _$ExtensionConfig {
     int dbid,
     @Default([]) List<String> categoriesToUpdate,
     @Default(true) bool preserveHistory,
+
+    /// Stops reporting chapter reads to tracker extensions. Phrased as a pause
+    /// so existing ObjectBox rows, which load a new bool as `false`, keep
+    /// updates on.
+    @Default(false) bool pauseTrackerUpdates,
   }) = _ExtensionConfig;
 
   factory ExtensionConfig.fromJson(Map<String, dynamic> json) =>
@@ -55,6 +60,7 @@ class WebConfig extends _$WebConfig {
   ExtensionConfig saveWith({
     List<String>? categoriesToUpdate,
     bool? preserveHistory,
+    bool? pauseTrackerUpdates,
   }) {
     var update = state;
 
@@ -64,6 +70,10 @@ class WebConfig extends _$WebConfig {
 
     if (preserveHistory != null) {
       update = update.copyWith(preserveHistory: preserveHistory);
+    }
+
+    if (pauseTrackerUpdates != null) {
+      update = update.copyWith(pauseTrackerUpdates: pauseTrackerUpdates);
     }
 
     state = update;

@@ -38,10 +38,12 @@ See [Reading & favorites](./reading.md) for the few controls you will need most 
 
 Open the navigation panel, choose **Settings**, and change **Startup Section** to **MangaDex**, **Web Sources**, or **Local Library**. This changes the normal startup destination; it does not combine the three libraries.
 
-## Configure and protect your data
+## Configure Gagaku
 
-- [App settings](./app-settings.md): appearance, app updates, database sync, backup/restore, and database storage.
+- [App settings](./app-settings.md): appearance, app updates, backup/restore, and database storage.
+- [Database Sync](./database-sync.md): share your data between devices through a folder you control.
 - [Web Sources settings](./web-source-settings.md): organize favorites categories and choose which lists appear in Latest Updates.
+- [Trackers](./trackers.md): send Web Sources reading progress to a tracking service such as AniList.
 
 ## What Gagaku does not do
 

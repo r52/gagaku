@@ -62,8 +62,13 @@ Future<T> retryCloudflareRead<T>(
     Duration(seconds: 15),
   ],
   void Function(int nextAttempt, Duration delay)? onRetry,
+  int Function()? cookieStateRevision,
+  void Function(int attempt)? onCookieStateUnchanged,
 }) async {
   for (var attempt = 1; ; attempt++) {
+    // A challenge does not clear by waiting; retry only when the attempt
+    // changed the cookies the runtime can send.
+    final revision = cookieStateRevision?.call();
     try {
       return await operation();
     } catch (error, stackTrace) {
@@ -71,7 +76,13 @@ Future<T> retryCloudflareRead<T>(
         Error.throwWithStackTrace(error, stackTrace);
       }
 
-      if (attempt > retryDelays.length) {
+      final cookiesUnchanged =
+          revision != null && cookieStateRevision!() == revision;
+      if (cookiesUnchanged) {
+        onCookieStateUnchanged?.call(attempt);
+      }
+
+      if (cookiesUnchanged || attempt > retryDelays.length) {
         Error.throwWithStackTrace(
           const CloudflareBypassException(),
           stackTrace,

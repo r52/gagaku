@@ -20,7 +20,7 @@ Categories are named lists for titles you save in Web Sources. For example, you 
 The category editor's **Save** returns your edited list to Web Sources Settings. **Save Settings** writes it to the database. Leaving the parent screen with Back instead can discard your changes.
 :::
 
-**Delete** removes a category after confirmation; its entries are removed from that favorites list when you save the parent settings. Move titles you want to retain to another category first. Deleting a category is not a chapter-download or local-file operation.
+**Delete** removes a category after confirmation; its titles are removed from that list when you save the parent settings. Move titles you want to keep to another category first.
 
 ## Put a title in a category
 
@@ -44,12 +44,20 @@ With no categories selected, a refresh has no titles to check—even if your Fav
 
 <img class="guide-screen" src="/images/categories-to-update.webp" alt="Categories to Update dialog on Android, with Reading checked, Plan to read and Finished unchecked, and Cancel and Ok buttons." width="540" height="1200" />
 
-This selection controls which favorites are queried for chapter updates. It does not move titles between categories, install sources, mark chapters read, or schedule downloads. Adding or editing categories does not automatically put them in **Categories to Update**; check the selection again after changing your lists.
+This selection only controls which favorites are checked for new chapters. New categories are not added to it automatically, so check the selection again after changing your lists.
 
 ## Keep categories across devices
 
-Categories, list membership/order, and the saved update-category selection are included in Gagaku's database backups and **Database Sync**. They do not require a MangaDex account and are not MangaDex account lists. See [App settings](./app-settings.md#database-sync) before configuring sync or restoring a backup.
+Categories, list membership/order, and the saved update-category selection are included in Gagaku's database backups and **Database Sync**. They do not require a MangaDex account and are not MangaDex account lists. See [Database Sync](./database-sync.md) and [backup and restore](./app-settings.md#backup-and-restore) before configuring sync or restoring a backup.
 
-## Do not confuse categories with extension maintenance
+## Trackers
 
-**Clear All Extension Settings** clears extensions' persisted settings/state, including their secure state. It is not the way to remove a favorites category and may remove source-specific configuration or login state. **Migrate Extension Data** and **Prune Unused Data** are separate maintenance tools, not part of ordinary category setup. Do not run them just to rearrange your lists.
+**Trackers** <GuideIcon name="bookmark_added" /> opens tracker accounts and their pending progress updates. See [Trackers](./trackers.md).
+
+## Extension maintenance tools
+
+The bottom of the screen has maintenance tools. You do not need them for everyday use, and they do not affect your categories.
+
+- **Migrate Extension Data** moves favorites, history, read markers, extension settings, and tracker links from one extension to another, for example when a source is republished under a new extension.
+- **Prune Unused Data** removes leftover settings for uninstalled extensions, read markers for titles not in your history, and tracker links to uninstalled extensions. It shows what it will remove before you confirm.
+- **Clear All Extension Settings** erases every extension's settings and saved logins, including tracker logins. Use it only as a last resort.

@@ -10,6 +10,7 @@ import 'package:gagaku/web/manga_view.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:gagaku/web/trackers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
@@ -95,6 +96,9 @@ void main() {
 
       expect(find.byType(TabBarView), findsNothing);
       expect(find.byType(CustomScrollView), findsOneWidget);
+      // Without installed trackers the action bar has no tracking child at
+      // all, so the OverflowBar adds no spacing for it.
+      expect(find.byType(TrackingButton), findsNothing);
 
       await tester.fling(
         find.byType(CustomScrollView),

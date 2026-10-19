@@ -4,6 +4,7 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/tracking.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -34,10 +35,16 @@ class PruneExtensionDialog extends HookConsumerWidget {
           .read(webReadMarkersProvider.notifier)
           .getStaleKeys(validUrls);
 
+      final trackerLinks = ref.read(trackerLinkRepositoryProvider);
+      final staleTrackerLinks = trackerLinks.staleLinks(installedIds);
+      final orphanedTrackerItems = trackerLinks.orphanedQueueItems();
+
       return (
         state: staleState,
         secure: staleSecureState,
         markers: staleReadMarkers,
+        trackerLinks: staleTrackerLinks,
+        trackerQueue: orphanedTrackerItems,
       );
     }, []);
 
@@ -47,9 +54,15 @@ class PruneExtensionDialog extends HookConsumerWidget {
     final staleState = pruneDataSnapshot.data?.state ?? [];
     final staleSecureState = pruneDataSnapshot.data?.secure ?? [];
     final staleReadMarkers = pruneDataSnapshot.data?.markers ?? [];
+    final staleTrackerLinks = pruneDataSnapshot.data?.trackerLinks ?? [];
+    final orphanedTrackerItems = pruneDataSnapshot.data?.trackerQueue ?? [];
 
     final totalStale =
-        staleState.length + staleSecureState.length + staleReadMarkers.length;
+        staleState.length +
+        staleSecureState.length +
+        staleReadMarkers.length +
+        staleTrackerLinks.length +
+        orphanedTrackerItems.length;
 
     return AlertDialog(
       title: Text(tr.webSources.settings.pruneExtension),
@@ -77,6 +90,16 @@ class PruneExtensionDialog extends HookConsumerWidget {
               Text(
                 tr.webSources.settings.pruneReadMarkers(
                   count: staleReadMarkers.length,
+                ),
+              ),
+              Text(
+                tr.webSources.settings.pruneTrackerLinks(
+                  count: staleTrackerLinks.length,
+                ),
+              ),
+              Text(
+                tr.webSources.settings.pruneTrackerQueue(
+                  count: orphanedTrackerItems.length,
                 ),
               ),
               const SizedBox(height: 16),
@@ -135,6 +158,12 @@ class PruneExtensionDialog extends HookConsumerWidget {
                   await ref
                       .read(webReadMarkersProvider.notifier)
                       .pruneKeys(staleReadMarkers);
+                  await ref
+                      .read(trackerLinkRepositoryProvider)
+                      .pruneLinks(staleTrackerLinks);
+                  await ref
+                      .read(trackerQueueStoreProvider)
+                      .discard(orphanedTrackerItems.map((e) => e.id));
 
                   if (!context.mounted) return;
                   nav.pop();

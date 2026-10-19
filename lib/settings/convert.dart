@@ -12,6 +12,7 @@ import 'package:gagaku/reader/model/config.dart';
 import 'package:gagaku/settings/types.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/model.dart' show historyListUUID;
+import 'package:gagaku/web/model/tracking_types.dart';
 import 'package:gagaku/web/model/types.dart';
 
 const _versionKey = "version";
@@ -490,6 +491,7 @@ base class GagakuBackupDataV2 extends GagakuBackupBase {
   static const _extRepoListKey = "ext-repo-list";
   static const _extInstalledSourcesKey = "ext-installed-sources";
   static const _linkCacheKey = "link-cache";
+  static const _trackerLinksKey = "tracker-links";
 
   @override
   Future<void> read(Map<String, dynamic> data) =>
@@ -670,6 +672,38 @@ base class GagakuBackupDataV2 extends GagakuBackupBase {
     data[_extRepoListKey] = repos.map((e) => e.toJson()).toList();
   }
 
+  /// Always written, even when empty, so an import can tell "no links" from
+  /// a payload produced before tracker links existed.
+  void writeTrackerLinks(Store store, Map<String, dynamic> data) {
+    data[_trackerLinksKey] = store
+        .box<TrackerLink>()
+        .getAll()
+        .map((e) => e.toJson())
+        .toList();
+  }
+
+  /// A missing key preserves local links: older backups, and sync snapshots
+  /// from devices running older builds, cannot have edited them. A present
+  /// key (even an empty list) replaces them. Malformed data throws, rolling
+  /// back the whole import.
+  void importTrackerLinks(Store store, Map<String, dynamic> data) {
+    if (!data.containsKey(_trackerLinksKey)) {
+      return;
+    }
+
+    final list = data[_trackerLinksKey];
+    if (list is! List) {
+      throw const FormatException('tracker-links must be a list');
+    }
+
+    final links = list
+        .map((e) => TrackerLink.fromJson(Map<String, dynamic>.from(e as Map)))
+        .toList();
+    final box = store.box<TrackerLink>();
+    box.removeAll();
+    box.putMany(links);
+  }
+
   @override
   void writeWebConfigFavoritesHistory(Store store, Map<String, dynamic> data) {
     writeExtensionConfig(store, data);
@@ -720,6 +754,7 @@ final class GagakuDataCodec {
     WebFavoritesList,
     WebSourceInfo,
     RepoInfo,
+    TrackerLink,
   };
 
   Store get _store => store ?? GagakuData().store;
@@ -735,6 +770,7 @@ final class GagakuDataCodec {
       converter.writeMangadexHistory(store, data);
       converter.writeWebReadHistory(store, data);
       converter.writeWebConfigFavoritesHistory(store, data);
+      converter.writeTrackerLinks(store, data);
       return data;
     }, Map<String, dynamic>.of(seed));
   }
@@ -753,6 +789,7 @@ final class GagakuDataCodec {
       converter.importMangadexHistory(store, data);
       converter.importWebReadHistory(store, data);
       converter.importWebConfigFavoritesHistory(store, data);
+      converter.importTrackerLinks(store, data);
     }, data);
 
     await refresh?.call();

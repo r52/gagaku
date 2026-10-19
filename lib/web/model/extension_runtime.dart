@@ -11,6 +11,9 @@ abstract interface class ExtensionRuntime {
   /// The immutable browser identity selected before extension initialization.
   Map<String, String> get browserUserAgentHeaders;
 
+  /// Changes whenever the cookies the extension can send may have changed.
+  int get cookieStateRevision;
+
   Future<void> init(WebSourceInfo source, String extensionBody);
 
   FutureOr<void> dispose();
@@ -37,7 +40,40 @@ abstract interface class ExtensionRuntime {
     SortingOption? sortOp,
   });
 
+  /// Details and, for chapter-providing sources, the chapter list.
   Future<WebManga?> getManga(String mangaId);
+
+  /// Details only. Tracker extensions implement this but not `getChapters`.
+  Future<SourceManga> getMangaDetails(String mangaId);
+
+  Future<MangaProgress?> getMangaProgress(
+    WebSourceInfo source,
+    SourceManga manga,
+  );
+
+  Future<ExtensionForm> getMangaProgressManagementForm(
+    WebSourceInfo source,
+    SourceManga manga,
+  );
+
+  Future<ChapterReadActionQueueProcessingResult> processChapterReadActionQueue(
+    WebSourceInfo source,
+    List<TrackedMangaChapterReadAction> actions,
+  );
+
+  Future<List<ManagedCollection>> getManagedLibraryCollections(
+    WebSourceInfo source,
+  );
+
+  Future<List<SourceManga>> getSourceMangaInManagedCollection(
+    WebSourceInfo source,
+    ManagedCollection collection,
+  );
+
+  Future<void> commitManagedCollectionChanges(
+    WebSourceInfo source,
+    ManagedCollectionChangeset changeset,
+  );
 
   Future<ChapterDetails> getChapterDetails(Chapter chapter);
 
@@ -62,6 +98,10 @@ abstract class ExtensionForm extends ChangeNotifier {
   Future<void> call(String method);
 
   Future<void> reloadForm();
+
+  /// Runs the extension's `formWillAppear` hook; call when the form is about
+  /// to be shown. Obtaining a form handle does not run it.
+  Future<void> formWillAppear();
 
   Future<void> uninitialize();
 

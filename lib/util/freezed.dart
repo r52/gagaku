@@ -49,6 +49,35 @@ class EpochTimestampSerializer implements JsonConverter<DateTime?, dynamic> {
   }
 }
 
+/// Millisecond Unix epoch as an `int`; decodes to UTC.
+///
+/// Unlike [TimestampSerializer], the stored value is an absolute instant even
+/// when the encoded `DateTime` is local, so it survives time zone and DST
+/// changes between write and read.
+class EpochMillisTimestampSerializer implements JsonConverter<DateTime, int> {
+  const EpochMillisTimestampSerializer();
+
+  @override
+  DateTime fromJson(int timestamp) =>
+      DateTime.fromMillisecondsSinceEpoch(timestamp, isUtc: true);
+
+  @override
+  int toJson(DateTime date) => date.millisecondsSinceEpoch;
+}
+
+class NullableEpochMillisTimestampSerializer
+    implements JsonConverter<DateTime?, int?> {
+  const NullableEpochMillisTimestampSerializer();
+
+  @override
+  DateTime? fromJson(int? timestamp) => timestamp == null
+      ? null
+      : DateTime.fromMillisecondsSinceEpoch(timestamp, isUtc: true);
+
+  @override
+  int? toJson(DateTime? date) => date?.millisecondsSinceEpoch;
+}
+
 class MappedEpochTimestampSerializer
     implements JsonConverter<DateTime?, dynamic> {
   const MappedEpochTimestampSerializer();

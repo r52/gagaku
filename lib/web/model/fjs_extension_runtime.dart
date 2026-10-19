@@ -119,13 +119,15 @@ globalThis.console = Object.fromEntries(
   ["debug", "info", "log", "warn", "error"].map((level) => [
     level,
     (...args) => {
-      void fjs.bridge_call(
+      // Logging is best effort. A call still in flight when the engine closes
+      // rejects; leaving that unhandled fails the next eval or dispose().
+      fjs.bridge_call(
         JSON.stringify({
           channel: "console",
           level,
           values: args.map(formatValue)
         })
-      );
+      ).catch(() => {});
     }
   ])
 );
@@ -134,10 +136,13 @@ globalThis.console = Object.fromEntries(
   JsEngine? _engine;
   bool _hasAdvancedSearchForm = false;
   bool _hasSortOps = false;
+  bool _hasChapters = false;
   List<Cookie>? _cookies;
   Map<String, String> _browserUserAgentHeaders = const {};
   StartupBrowserOutcome? _startupBrowserOutcome;
   Map<String, _CookieStateDiagnostic>? _lastCookieStoreCookies;
+  String? _cookieStoreSnapshot;
+  int _cookieStateRevision = 0;
   final Map<String, FjsExtensionForm> _forms = {};
   final _evalExecutor = _RuntimeEvalExecutor();
   Future<void>? _disposeFuture;
@@ -152,6 +157,9 @@ globalThis.console = Object.fromEntries(
 
   @override
   Map<String, String> get browserUserAgentHeaders => _browserUserAgentHeaders;
+
+  @override
+  int get cookieStateRevision => _cookieStateRevision;
 
   @visibleForTesting
   StartupBrowserOutcome? get startupBrowserOutcome => _startupBrowserOutcome;
@@ -1130,8 +1138,22 @@ if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
     }
   }
 
+  /// Bumps [cookieStateRevision] when the persisted Paperback cookie store
+  /// content changes. Writes that keep the same cookies do not count.
+  void _trackCookieStore(dynamic state) {
+    final snapshot = jsonEncode(
+      state is Map ? state['cookie_store_cookies'] : null,
+    );
+    if (snapshot != _cookieStoreSnapshot) {
+      _cookieStoreSnapshot = snapshot;
+      _cookieStateRevision++;
+    }
+  }
+
   Future<void> _hydrateExtensionState(String sourceId) async {
-    final state = jsonEncode(getExtensionState(sourceId));
+    final initialState = getExtensionState(sourceId);
+    _trackCookieStore(initialState);
+    final state = jsonEncode(initialState);
     await _evalScoped('globalThis.Application.createExtensionState($state);');
 
     final secureState = jsonEncode(getExtensionSecureState(sourceId));
@@ -1150,6 +1172,11 @@ if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
       'return typeof globalThis.$sourceId.getSortingOptions === "function";',
     );
     _hasSortOps = sortOptionsCheck.value == true;
+
+    final chaptersCheck = await _evalScoped(
+      'return typeof globalThis.$sourceId.getChapters === "function";',
+    );
+    _hasChapters = chaptersCheck.value == true;
   }
 
   FutureOr<JsResult> _handleBridgeCall(JsValue value) {
@@ -1203,6 +1230,7 @@ if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
 
     switch (handlerName) {
       case 'resetAllState':
+        _trackCookieStore(null);
         onResetAllState(sourceId);
         return JsResult.ok(const JsValue.none());
       case 'setExtensionState':
@@ -1212,6 +1240,7 @@ if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
         if (args.length > 1 && args[1] == 'cookie_store_cookies') {
           _logCookieStoreChange(normalizedState);
         }
+        _trackCookieStore(normalizedState);
         onSetExtensionState(sourceId, normalizedState);
         return JsResult.ok(const JsValue.none());
       case 'setExtensionSecureState':
@@ -1223,7 +1252,10 @@ if (typeof globalThis.${source.id}.cloudflareBypassCompleted === "function") {
       case 'formDidChange':
         final formId = args.isEmpty ? null : args.first;
         if (formId is String) {
-          unawaited(_forms[formId]?.reloadForm());
+          // The extension's own `reloadForm()`: re-render only. Calling
+          // `formWillAppear` here loops for forms that load in
+          // `formWillAppear` and reload when done (AniList's profile form).
+          _forms[formId]?.refreshSections();
         }
         return JsResult.ok(const JsValue.none());
       case 'initializeForm':
@@ -1386,17 +1418,16 @@ return await globalThis.$sourceId.getDiscoverSectionItems(
 
     return PagedResults.fromJson(
       _normalizeBridgeJsonMap(resultsJson, 'getDiscoverSectionItems'),
-      (item) => DiscoverSectionItem.fromJson(
+      (item) => DiscoverSectionItem.fromSectionJson(
         _normalizeBridgeJsonMap(item, 'getDiscoverSectionItems item'),
+        section,
       ),
     );
   }
 
   @override
   Future<ExtensionForm> getForm(WebSourceInfo source, FormID id) async {
-    if (!source.hasCapability(SourceIntents.settingsUI)) {
-      throw UnsupportedError("Source does not support settings");
-    }
+    _requireFormSupport(source);
 
     final result = await _evalScoped("""
 const formid = ${_json(id)};
@@ -1404,7 +1435,6 @@ const form = globalThis.Application.getForm(formid);
 if (typeof form === "undefined") {
   return null;
 }
-form.formWillAppear?.();
 return formid;
 """);
 
@@ -1423,13 +1453,11 @@ return formid;
       return null;
     }
 
-    final mangaDetails = await _evalJsonScoped(
-      'return await globalThis.$sourceId.getMangaDetails(${_json(mangaId)});',
-      label: 'get manga details',
-    );
-    final sourceManga = SourceManga.fromJson(
-      _normalizeBridgeJsonMap(mangaDetails, 'getMangaDetails'),
-    );
+    final sourceManga = await getMangaDetails(mangaId);
+    if (!_hasChapters) {
+      // Trackers provide details without chapters.
+      return WebManga.extension(data: sourceManga, chaptersList: const []);
+    }
 
     final chapterList = await _evalJsonScoped('''
 const manga = ${_json(sourceManga.toJson())};
@@ -1453,6 +1481,166 @@ return await globalThis.$sourceId.getChapters(manga);
     chapters.sort(WebManga.compareExtensionChaptersDescending);
 
     return WebManga.extension(data: sourceManga, chaptersList: chapters);
+  }
+
+  @override
+  Future<SourceManga> getMangaDetails(String mangaId) async {
+    final mangaDetails = await _evalJsonScoped(
+      'return await globalThis.$sourceId.getMangaDetails(${_json(mangaId)});',
+      label: 'get manga details',
+    );
+    return SourceManga.fromJson(
+      _normalizeBridgeJsonMap(mangaDetails, 'getMangaDetails'),
+    );
+  }
+
+  /// Settings forms and tracker progress-management forms share form state,
+  /// including nested navigation forms.
+  void _requireFormSupport(WebSourceInfo source) {
+    if (!source.hasCapability(SourceIntents.settingsUI) &&
+        !source.hasCapability(SourceIntents.mangaProgress)) {
+      throw UnsupportedError("Source does not support forms");
+    }
+  }
+
+  void _requireCapability(
+    WebSourceInfo source,
+    SourceIntents intent,
+    String description,
+  ) {
+    if (!source.hasCapability(intent)) {
+      throw UnsupportedError('Source does not support $description');
+    }
+  }
+
+  List<dynamic> _normalizeBridgeJsonList(dynamic value, String label) {
+    final normalized = _normalizeBridgeJson(value);
+    if (normalized is! List) {
+      throw StateError(
+        'Expected $label to return a list, got ${normalized.runtimeType}',
+      );
+    }
+    return normalized;
+  }
+
+  @override
+  Future<MangaProgress?> getMangaProgress(
+    WebSourceInfo source,
+    SourceManga manga,
+  ) async {
+    _requireCapability(source, SourceIntents.mangaProgress, 'progress');
+    final progress = await _evalJsonScoped('''
+const manga = ${_json(manga.toJson())};
+return await globalThis.$sourceId.getMangaProgress(manga) ?? null;
+''', label: 'get manga progress');
+    if (progress == null) {
+      return null;
+    }
+
+    return MangaProgress.fromJson(
+      _normalizeBridgeJsonMap(progress, 'getMangaProgress'),
+    );
+  }
+
+  @override
+  Future<ExtensionForm> getMangaProgressManagementForm(
+    WebSourceInfo source,
+    SourceManga manga,
+  ) async {
+    _requireCapability(source, SourceIntents.mangaProgress, 'progress');
+    final result = await _evalScoped('''
+const manga = ${_json(manga.toJson())};
+const form = await globalThis.$sourceId.getMangaProgressManagementForm(manga);
+form.formWillAppear?.();
+const id = await globalThis.Application.initializeForm("mangaProgress", form);
+return id;
+''');
+
+    final formId = result.value as FormID;
+    return _forms[formId] ??
+        (throw StateError('Failed to create form $formId'));
+  }
+
+  @override
+  Future<ChapterReadActionQueueProcessingResult> processChapterReadActionQueue(
+    WebSourceInfo source,
+    List<TrackedMangaChapterReadAction> actions,
+  ) async {
+    _requireCapability(source, SourceIntents.mangaProgress, 'progress');
+    final result = await _evalJsonScoped('''
+const actions = ${_json(actions.map((e) => e.toJson()).toList())};
+return await globalThis.$sourceId.processChapterReadActionQueue(actions);
+''', label: 'process chapter read action queue');
+
+    return ChapterReadActionQueueProcessingResult.fromJson(
+      _normalizeBridgeJsonMap(result, 'processChapterReadActionQueue'),
+    );
+  }
+
+  @override
+  Future<List<ManagedCollection>> getManagedLibraryCollections(
+    WebSourceInfo source,
+  ) async {
+    _requireCapability(
+      source,
+      SourceIntents.collectionManagement,
+      'managed collections',
+    );
+    final collections = await _evalJsonScoped(
+      'return await globalThis.$sourceId.getManagedLibraryCollections();',
+      label: 'get managed library collections',
+    );
+
+    return _normalizeBridgeJsonList(collections, 'getManagedLibraryCollections')
+        .map(
+          (item) => ManagedCollection.fromJson(
+            _normalizeBridgeJsonMap(item, 'getManagedLibraryCollections item'),
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Future<List<SourceManga>> getSourceMangaInManagedCollection(
+    WebSourceInfo source,
+    ManagedCollection collection,
+  ) async {
+    _requireCapability(
+      source,
+      SourceIntents.collectionManagement,
+      'managed collections',
+    );
+    final manga = await _evalJsonScoped('''
+const collection = ${_json(collection.toJson())};
+return await globalThis.$sourceId.getSourceMangaInManagedCollection(collection);
+''', label: 'get source manga in managed collection');
+
+    return _normalizeBridgeJsonList(manga, 'getSourceMangaInManagedCollection')
+        .map(
+          (item) => SourceManga.fromJson(
+            _normalizeBridgeJsonMap(
+              item,
+              'getSourceMangaInManagedCollection item',
+            ),
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Future<void> commitManagedCollectionChanges(
+    WebSourceInfo source,
+    ManagedCollectionChangeset changeset,
+  ) async {
+    _requireCapability(
+      source,
+      SourceIntents.collectionManagement,
+      'managed collections',
+    );
+    await _evalScoped('''
+const changeset = ${_json(changeset.toJson())};
+await globalThis.$sourceId.commitManagedCollectionChanges(changeset);
+''');
   }
 
   @override
@@ -1628,9 +1816,7 @@ return await globalThis.$sourceId.getSearchResults(
 
   @override
   Future<void> uninitializeForms(WebSourceInfo source) async {
-    if (!source.hasCapability(SourceIntents.settingsUI)) {
-      throw UnsupportedError("Source does not support settings");
-    }
+    _requireFormSupport(source);
 
     await _evalScoped('globalThis.Application.uninitializeForms();');
   }
@@ -1753,8 +1939,12 @@ if (typeof form !== "undefined") {
 """, label: 'form[$id] call $method');
   }
 
+  /// The form is shown again (for example after a nested form is popped).
   @override
-  Future<void> reloadForm() async {
+  Future<void> reloadForm() => formWillAppear();
+
+  @override
+  Future<void> formWillAppear() async {
     await runtime.evalForForm("""
 const form = globalThis.Application.getForm(
   ${jsonEncode(id)},
@@ -1763,10 +1953,16 @@ const form = globalThis.Application.getForm(
 if (typeof form !== "undefined") {
   form.formWillAppear?.();
 }
-""", label: 'form[$id] reload');
+""", label: 'form[$id] will appear');
 
+    // The hook may change what the sections render without reloading.
+    refreshSections();
+  }
+
+  /// Re-reads sections without the appearance lifecycle; used when the
+  /// extension itself asks for a reload.
+  void refreshSections() {
     _sections = _getSections();
-
     notifyListeners();
   }
 

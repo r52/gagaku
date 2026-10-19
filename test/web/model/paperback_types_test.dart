@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/web/model/types.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 void main() {
   group('Paperback alpha 91 types', () {
@@ -303,6 +304,150 @@ void main() {
         context.toJson()['source'],
         containsPair('userAgent', 'Paperback/1.0'),
       );
+    });
+  });
+
+  group('Paperback alpha 92 tracker types', () {
+    const trackedManga = {
+      'mangaId': 'tracker-entry-1',
+      'mangaInfo': {
+        'thumbnailUrl': '',
+        'synopsis': '',
+        'primaryTitle': 'Fictional Tracked Title',
+        'secondaryTitles': <String>[],
+        'contentRating': 'EVERYONE',
+      },
+    };
+
+    test('parses manga progress with a bridged Date', () {
+      final progress = MangaProgress.fromJson({
+        'sourceManga': trackedManga,
+        'lastReadChapter': {
+          'chapterId': '42',
+          'sourceManga': trackedManga,
+          'langCode': 'unknown',
+          'chapNum': 42,
+          'volume': 5,
+        },
+        // JSON.stringify output of an AniList-style `Date`.
+        'lastReadTime': '2023-11-14T22:13:20.000Z',
+        'userRating': 8.5,
+      });
+
+      expect(progress.lastReadChapter.chapNum, 42);
+      expect(progress.lastReadTime, DateTime.utc(2023, 11, 14, 22, 13, 20));
+      expect(progress.userRating, 8.5);
+    });
+
+    test('serializes read actions with nested tracker entries', () {
+      final action = TrackedMangaChapterReadAction(
+        id: 'action-1',
+        sourceManga: SourceManga.fromJson(trackedManga),
+        chapterId: 'chapter-7',
+        chapterSourceId: 'FictionalSource',
+        chapterMangaId: 'series-1',
+        chapterNum: 7.5,
+        chapterVolume: 2,
+        creationDate: DateTime.utc(2026, 1, 2),
+        errorCount: 0,
+      );
+
+      final json = action.toJson();
+      expect(json['sourceManga'], isA<Map>());
+      expect((json['sourceManga'] as Map)['mangaId'], 'tracker-entry-1');
+      expect(json['chapterNum'], 7.5);
+      expect(TrackedMangaChapterReadAction.fromJson(json), action);
+    });
+
+    test('defaults missing queue result lists to empty', () {
+      final result = ChapterReadActionQueueProcessingResult.fromJson({
+        'failedItems': ['action-2'],
+      });
+
+      expect(result.successfulItems, isEmpty);
+      expect(result.failedItems, ['action-2']);
+    });
+  });
+
+  group('DiscoverSectionItem type inference', () {
+    DiscoverSection section(DiscoverSectionType type) => DiscoverSection(
+      id: 'fictional-section',
+      title: 'Fictional',
+      type: type,
+    );
+
+    // Shape of AniList's search-helper items and MangaUpdates'
+    // `Omit<...CarouselItem, "type">` items.
+    const typeless = {
+      'mangaId': 'fictional-1',
+      'title': 'Fictional Title',
+      'imageUrl': 'https://example.com/cover.jpg',
+      'contentRating': 'EVERYONE',
+      'subtitle': 'Chs. 12',
+    };
+
+    test('infers the item type from the section type when missing', () {
+      expect(
+        DiscoverSectionItem.fromSectionJson({
+          ...typeless,
+          'supertitle': 'Fictional Author',
+          'summary': 'Fictional summary',
+          'infoItems': [
+            {'symbol': 'star', 'text': '80%'},
+          ],
+        }, section(DiscoverSectionType.featured)),
+        isA<FeaturedCarouselItem>()
+            .having((e) => e.supertitle, 'supertitle', 'Fictional Author')
+            .having((e) => e.infoItems?.single.text, 'infoItem', '80%'),
+      );
+      expect(
+        DiscoverSectionItem.fromSectionJson(
+          typeless,
+          section(DiscoverSectionType.simpleCarousel),
+        ),
+        isA<SimpleCarouselItem>().having(
+          (e) => e.subtitle,
+          'subtitle',
+          'Chs. 12',
+        ),
+      );
+      expect(
+        DiscoverSectionItem.fromSectionJson(
+          typeless,
+          section(DiscoverSectionType.prominentCarousel),
+        ),
+        isA<ProminentCarouselItem>(),
+      );
+    });
+
+    test('decodes an explicit type as given', () {
+      expect(
+        DiscoverSectionItem.fromSectionJson({
+          ...typeless,
+          'type': 'simpleCarouselItem',
+        }, section(DiscoverSectionType.prominentCarousel)),
+        isA<SimpleCarouselItem>(),
+      );
+      expect(
+        () => DiscoverSectionItem.fromSectionJson({
+          ...typeless,
+          'type': 'notACarouselItem',
+        }, section(DiscoverSectionType.simpleCarousel)),
+        throwsA(isA<CheckedFromJsonException>()),
+      );
+    });
+
+    test('does not infer for sections whose items need extra fields', () {
+      for (final type in [
+        DiscoverSectionType.chapterUpdates,
+        DiscoverSectionType.genres,
+      ]) {
+        expect(
+          () => DiscoverSectionItem.fromSectionJson(typeless, section(type)),
+          throwsA(isA<CheckedFromJsonException>()),
+          reason: '$type',
+        );
+      }
     });
   });
 }

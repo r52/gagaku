@@ -12,6 +12,8 @@ import 'package:gagaku/web/html_reader.dart';
 import 'package:gagaku/web/model/config.dart';
 import 'package:gagaku/web/model/extension_image.dart';
 import 'package:gagaku/web/model/model.dart';
+import 'package:gagaku/web/model/tracking.dart';
+import 'package:gagaku/web/model/tracking_types.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -47,6 +49,7 @@ class ResolvedWebChapter {
     required this.seriesTitle,
     required this.readMarkerKey,
     required this.content,
+    this.trackedRead,
   });
 
   final WebChapterRef chapter;
@@ -54,6 +57,10 @@ class ResolvedWebChapter {
   final String? seriesTitle;
   final String readMarkerKey;
   final ResolvedWebChapterContent content;
+
+  /// Reported to linked trackers once the chapter is marked read; `null` for
+  /// chapters trackers cannot receive (pass 1: non-extension chapters).
+  final TrackedChapterRead? trackedRead;
 }
 
 sealed class ResolvedWebChapterContent {
@@ -145,6 +152,7 @@ Future<ResolvedWebChapter> resolveWebChapter(
     seriesTitle: manga.title,
     readMarkerKey: readMarkerKey,
     content: content,
+    trackedRead: TrackedChapterRead.fromItem(chapter),
   );
 }
 
@@ -242,9 +250,16 @@ class WebSourceReaderWidget extends HookConsumerWidget {
       timer.value?.cancel();
       timer.value = Timer(const Duration(milliseconds: 2000), () {
         ref.run((tsx) async {
-          return tsx
+          final markers = await tsx
               .get(webReadMarkersProvider.notifier)
               .set(data.chapter.series.key, data.readMarkerKey, true);
+          if (data.trackedRead case final read?) {
+            await tsx.get(trackerReadReporterProvider).reportRead(
+              TrackedSeriesRef.web(data.chapter.series),
+              [read],
+            );
+          }
+          return markers;
         });
       });
 
