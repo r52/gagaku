@@ -48,7 +48,7 @@ This selection only controls which favorites are checked for new chapters. New c
 
 ## Keep categories across devices
 
-Categories, list membership/order, and the saved update-category selection are included in Gagaku's database backups and **Database Sync**. They do not require a MangaDex account and are not MangaDex account lists. See [App settings](./app-settings.md#database-sync) before configuring sync or restoring a backup.
+Categories, list membership/order, and the saved update-category selection are included in Gagaku's database backups and **Database Sync**. They do not require a MangaDex account and are not MangaDex account lists. See [Database Sync](./database-sync.md) and [backup and restore](./app-settings.md#backup-and-restore) before configuring sync or restoring a backup.
 
 ## Trackers
 

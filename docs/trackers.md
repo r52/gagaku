@@ -26,7 +26,7 @@ The same trust warning applies: a tracker extension runs third-party code and ha
 
 <img class="guide-screen" src="/images/trackers.webp" alt="The Trackers screen on Android, with the Pause tracker updates switch off and an AniList card showing Pending: 0 · Not synced yet, an account settings icon, and Sync now." width="540" height="480" />
 
-The sign-in form and its steps belong to the extension, not to Gagaku. They are separate from Gagaku's MangaDex login. The tracker keeps its login in extension state, which [Database Sync and backups](./app-settings.md#database-sync) include.
+The sign-in form and its steps belong to the extension, not to Gagaku. They are separate from Gagaku's MangaDex login. The tracker keeps its login in extension state, which [Database Sync and backups](./database-sync.md#what-sync-includes) include.
 
 ## 3. Link a title
 
