@@ -42,6 +42,7 @@ Open the navigation panel, choose **Settings**, and change **Startup Section** t
 
 - [App settings](./app-settings.md): appearance, app updates, database sync, backup/restore, and database storage.
 - [Web Sources settings](./web-source-settings.md): organize favorites categories and choose which lists appear in Latest Updates.
+- [Trackers](./trackers.md): send Web Sources reading progress to a tracking service such as AniList.
 
 ## What Gagaku does not do
 

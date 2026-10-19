@@ -5,7 +5,7 @@ Web Sources lets you read through third-party **Paperback-compatible manga exten
 - A **repository**: a published catalog from an extension maintainer.
 - An **installed extension**: the adapter for a particular reading website.
 
-Gagaku supports **Paperback 0.9** manga-source extensions. Older extension generations and tracker-only extensions are not supported. You do not need the Paperback app or a MangaDex account to configure this context.
+Gagaku supports **Paperback 0.9** manga-source and tracker extensions. Older extension generations are not supported. To send your reading progress to a service such as AniList, see [Trackers](./trackers.md). You do not need the Paperback app or a MangaDex account to configure this context.
 
 When no extensions are installed, the homepage looks like this. Use **Extension Manager** <GuideIcon name="collections_bookmark" /> in the top toolbar to get started.
 
@@ -64,7 +64,7 @@ This example uses the manager's search box to show a few catalog entries. Expand
 
 The yellow warning triangle beside **Install** means that source requires Cloudflare bypass; it is not the unsupported-extension indicator. See [browser verification](#if-a-source-needs-browser-verification) if the source will not load.
 
-Tracker-only or otherwise unsupported entries show an error indicator instead of an Install button. If an extension with the same identifier is already installed from another repository, the button says **Replace**; that switches which repository supplies the extension.
+Tracker extensions have a **Tracker** <GuideIcon name="bookmark_added" /> badge; see [Trackers](./trackers.md) for setup. Unsupported entries show an error indicator instead of an Install button. If an extension with the same identifier is already installed from another repository, the button says **Replace**; that switches which repository supplies the extension.
 
 ## 3. Find a title and read
 
@@ -91,3 +91,5 @@ Verification can expire, and some websites or browser-only extensions may still 
 Use the **heart / Add to Favorites** control on a title to choose a category, or create one with **Add New Category**. Your saved titles are in the Web Sources **Favorites** tab. See [Reading & favorites](./reading.md#web-sources-favorites) for the distinction between favorites and downloads.
 
 To rename or reorder categories, or choose which ones are checked in **Latest Updates**, see [Web Sources settings](./web-source-settings.md). Category-management edits need **Save** in the editor and **Save Settings** on the parent screen.
+
+To also record your progress on a tracking service, [link the title to a tracker](./trackers.md#_3-link-a-title).

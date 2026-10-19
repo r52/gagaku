@@ -14,7 +14,7 @@ Check these in order:
 
 1. **Saved list:** your repository appears in Repo List after closing and reopening it.
 2. **URL:** the Repo URL field needs the maintainer's published repository base URL, not a GitHub source-code page or a reading website. Remove a trailing `/`. For a `paperback://` installation link, [tap it in your Android browser](./web-sources.md#use-an-installation-link-on-android) instead of pasting it into this field.
-3. **Version:** Gagaku supports Paperback **0.9** manga extensions, not older generations or tracker-only extensions.
+3. **Version:** Gagaku supports Paperback **0.9** manga-source and tracker extensions, not older generations.
 4. **Connectivity:** check whether the repository's published page loads in a browser, then use **Refresh repos** <GuideIcon name="refresh" /> in Extension Manager.
 
 Repository metadata can load while an individual extension still fails to initialize. Those are separate problems: a working catalog does not prove that its website or extension works.
@@ -30,6 +30,15 @@ Repository metadata can load while an individual extension still fails to initia
 If the browser session could not be saved, wait for the page to finish loading before trying **Done** again. Verification can expire and need to be repeated.
 
 Do not share passwords, cookies, client secrets, or a live app backup when asking for help. A source name, app version, failing action, and redacted error message are better starting points.
+
+## Tracker progress is not updating
+
+- Open **Web Sources Settings → Trackers** and check that **Pause tracker updates** is off. Reads made while it was on are not sent later.
+- Check that the title is linked: its **Tracking** <GuideIcon name="bookmark_added" /> control shows a count. Only Web Sources titles can be linked.
+- A **Pending** count that keeps growing with no error can mean you are signed out. Open the tracker's card to check its account settings, then use **Sync now**.
+- For **Failed** updates, fix the reported error first, then use **Retry failed**.
+
+See [Trackers](./trackers.md#check-status-on-the-trackers-screen) for what each status means.
 
 ## MangaDex has no chapters in my language
 

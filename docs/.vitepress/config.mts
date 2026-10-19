@@ -27,6 +27,7 @@ export default defineConfig({
         text: 'Use Gagaku',
         items: [
           { text: 'Reading & favorites', link: '/reading' },
+          { text: 'Trackers', link: '/trackers' },
           { text: 'Troubleshooting', link: '/troubleshooting' },
         ],
       },

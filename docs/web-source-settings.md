@@ -50,6 +50,10 @@ This selection controls which favorites are queried for chapter updates. It does
 
 Categories, list membership/order, and the saved update-category selection are included in Gagaku's database backups and **Database Sync**. They do not require a MangaDex account and are not MangaDex account lists. See [App settings](./app-settings.md#database-sync) before configuring sync or restoring a backup.
 
+## Trackers
+
+**Trackers** <GuideIcon name="bookmark_added" /> opens tracker accounts and their pending progress updates. See [Trackers](./trackers.md).
+
 ## Do not confuse categories with extension maintenance
 
 **Clear All Extension Settings** clears extensions' persisted settings/state, including their secure state. It is not the way to remove a favorites category and may remove source-specific configuration or login state. **Migrate Extension Data** and **Prune Unused Data** are separate maintenance tools, not part of ordinary category setup. Do not run them just to rearrange your lists.
