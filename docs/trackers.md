@@ -56,12 +56,11 @@ From the tracking sheet you can also:
 
 ## 4. Read as usual
 
-You do not need to do anything else. A chapter counts as read when Gagaku marks it read: about two seconds after you open it in the reader, or when you mark it read in the chapter list. Gagaku then queues an update for every tracker linked to that title.
+Nothing else is needed. When a chapter is marked read (about two seconds after you open it in the reader, or when you mark it read in the chapter list), Gagaku sends the highest chapter number you have read to every linked tracker.
 
-- Updates wait about 15 seconds so that several chapters read in a row can be sent together. Gagaku reports the highest chapter number you read.
-- Re-reading an earlier chapter is reported too. Depending on the tracker, it may ignore an update if your progress there is already further ahead.
-- Queued updates are saved, so they still send after the app restarts. Gagaku sends them while it is open. It does not sync trackers in the background while it is closed.
-- Unmarking a chapter as read does not lower your progress on the tracker. Use **Edit progress** to correct it.
+- Updates are sent after a short delay, so several chapters read in a row go out together. Updates that have not been sent yet survive an app restart, but are only sent while Gagaku is open.
+- Re-reading an earlier chapter is reported too; a tracker may ignore it if your progress there is already ahead.
+- Unmarking a chapter does not lower your progress on the tracker. Use **Edit progress** to correct it.
 
 ## Check status on the Trackers screen
 
@@ -70,12 +69,12 @@ You do not need to do anything else. A chapter counts as read when Gagaku marks 
 | Status | Meaning |
 | --- | --- |
 | **Pending** | Updates waiting to send. |
-| **Failed** | Updates that kept failing and will not be retried automatically. |
+| **Failed** | Updates that failed ten times in a row and will not be retried automatically. |
 | **Last sync** / **Not synced yet** | When a batch last succeeded. This resets when the app restarts, so a fresh start shows **Not synced yet** until the next batch is sent. |
-| **Retrying …** | Gagaku is waiting before it tries again after an error. |
+| **Retrying …** | Gagaku is waiting before it tries again after an error. The wait grows with each failure, up to six hours. |
 | **Last error** | The most recent error message from the tracker. |
 
-Its actions:
+Actions on each card:
 
 - **Sync now** sends pending updates immediately.
 - **Retry failed** puts failed updates back in the queue and sends them.
@@ -85,8 +84,6 @@ Its actions:
 ::: warning If Pending keeps growing
 Some trackers do not report an error when you are signed out. Their updates stay pending and Gagaku retries them every 15 minutes. If the count keeps growing without a **Last error**, open the tracker's account settings and check that you are still signed in.
 :::
-
-When an update fails, Gagaku waits before each retry, starting at one minute and backing off up to six hours. After ten failed attempts, the update is marked **Failed**.
 
 ## Removing, migrating, and syncing
 

@@ -1,6 +1,6 @@
 # Local Library
 
-Local Library reads files you already have. It does not download manga, copy a collection into a managed library, or require an extension repository.
+Local Library reads manga files you already have, where they are. It needs no extension, account, or network connection.
 
 You can read image directories and **CBZ/ZIP** or **CBT/TAR** archives. On **Android**, PDF and EPUB files are supported too.
 
@@ -26,7 +26,7 @@ Use a parent folder containing your titles or chapter archives. A folder that di
 After adding files, return to the library and pull down to refresh it. If the list remains empty, check the selected path and storage permission; see [Troubleshooting](./troubleshooting.md#local-library-is-empty-or-cannot-read-files).
 
 ::: tip Permission scope
-Android's directory scanning uses **All files access**, not just a document-tree grant for one folder. The direct file picker is a separate way to open an archive or document without configuring a scanned library directory.
+Scanning a library folder on Android needs **All files access**. If you would rather not grant it, you can still open single files with **Read Archive** or **Read Document**, which use the system file picker.
 :::
 
 ## PDF and EPUB on Android

@@ -23,7 +23,7 @@ Open **Reader Settings** <GuideIcon name="settings" /> in the reader toolbar.
 
 Edge taps follow the selected reading direction; do not assume the right side always advances. If a title is explicitly marked as long-strip content, its format control can be disabled. Direction and horizontal page-turn options are not used in Long Strip mode.
 
-Reader preferences are saved as you change them. Start with the default page preload rather than setting it to the maximum: preloading is for smoother reading, not an offline download.
+Reader preferences are saved as you change them. The default page preload is a good starting point; raising it uses more data without making chapters available offline.
 
 ## Web Sources favorites
 
@@ -33,9 +33,13 @@ Open the Web Sources **Favorites** tab to find it again. Categories are managed 
 
 **History** can help you find previously browsed titles. The **Save History?** switch is on the Web Sources **History** screen. If you turn it off, new browsing entries will not be saved.
 
+## Tracking progress on AniList and similar services
+
+To send your Web Sources reading progress to a tracking service, install a tracker extension and link the title. See [Trackers](./trackers.md).
+
 ## MangaDex library
 
-MangaDex's **Add to Library**, reading statuses, follow notifications, and account lists belong to your MangaDex account. They do not put a title in Web Sources Favorites or download its chapters.
+MangaDex's **Add to Library**, reading statuses, follow notifications, and account lists belong to your MangaDex account. They are separate from Web Sources Favorites.
 
 If you want those account features, follow the [MangaDex login setup](./mangadex.md#sign-in-only-if-you-need-account-features).
 
