@@ -219,7 +219,7 @@ final class WebSourceDioProvider extends $FunctionalProvider<Dio, Dio, Dio>
   }
 }
 
-String _$webSourceDioHash() => r'bd2b8559eee79fcb3d19de25997ef97e6d5c23f2';
+String _$webSourceDioHash() => r'f8fa59c5d4b137f90834b4e7daa5e3df9017ec58';
 
 @ProviderFor(webLinkResolver)
 final webLinkResolverProvider = WebLinkResolverProvider._();

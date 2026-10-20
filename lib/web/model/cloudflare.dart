@@ -57,15 +57,14 @@ JSON.stringify((() => {
       ...captured,
     };
     // Windows has no native default-UA getter. Seed global HTTP defaults from
-    // the first complete captured or synthesized identity, without replacing an
-    // established identity or freezing unrelated fallback hints beside a new UA.
+    // the first complete captured or synthesized identity, without freezing
+    // unrelated fallback hints beside a new UA.
     if (userAgent != null &&
-        gdat.dynamicUserAgent == null &&
         (derived != null ||
             (captured.containsKey('sec-ch-ua') &&
                 captured.containsKey('sec-ch-ua-mobile') &&
                 captured.containsKey('sec-ch-ua-platform')))) {
-      gdat.dynamicUserAgentHeaders = Map.unmodifiable(headers);
+      gdat.seedBrowserUserAgentHeaders(headers);
     }
     return headers;
   } catch (error) {

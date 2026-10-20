@@ -13,6 +13,9 @@ const _minRequestInterval = Duration(milliseconds: 200);
 final _nextRequestTimes = <String, int>{};
 final _pools = <String, Pool>{};
 
+/// The engine-level user agent is fixed when a client is created, possibly
+/// before the device identity resolves; browser-identity clients also set it
+/// per request so they pick up the resolved identity.
 String getUserAgent([bool useCustomUA = false]) {
   if (useCustomUA) return GagakuData().gagakuUserAgent;
   return GagakuData().browserUserAgentHeaders['user-agent']!;
@@ -54,10 +57,11 @@ Future<void> _staggerRequest(String host) async {
 
 class RateLimitedClient extends http.BaseClient {
   final http.Client _baseClient;
+  final bool _useCustomUA;
 
-  RateLimitedClient({bool useCustomUA = false})
+  RateLimitedClient({this._useCustomUA = false})
     : _baseClient = RetryClient(
-        _createHttpClient(useCustomUA),
+        _createHttpClient(_useCustomUA),
         retries: 2,
         when: (response) => false,
         whenError: (error, stacktrace) =>
@@ -66,6 +70,9 @@ class RateLimitedClient extends http.BaseClient {
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    if (!_useCustomUA) {
+      request.headers.putIfAbsent('user-agent', getUserAgent);
+    }
     final host = request.url.host;
     await _staggerRequest(host);
 

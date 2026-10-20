@@ -653,18 +653,18 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_readium
-      sha256: c8ba1144a4683c0f5d8fe0114c25b1e5238d63c41bce65f82ac0d2ce718a185e
+      sha256: "49341a10910ca674769a8e565696676464f8afb91ae4b4e83653a773d0c1daef"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.2"
+    version: "0.7.0"
   flutter_readium_platform_interface:
     dependency: transitive
     description:
       name: flutter_readium_platform_interface
-      sha256: "73f0979d8144908988124ac62fb945129c1ef11ef9687ee9c8ca57f187055a9a"
+      sha256: "1fe4fdc84f5ac447a3613b2686df2709709c55d52d6dd1df7137b31cd25caef0"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.2"
+    version: "0.7.0"
   flutter_riverpod:
     dependency: transitive
     description:
@@ -756,10 +756,10 @@ packages:
     dependency: "direct dev"
     description:
       name: go_router_builder
-      sha256: fbadb18697941b5efaa90c6295e81335e59b97bde83d675b4251e91eac1d4882
+      sha256: "13200a45ad9bba22e3f3630f0f0f7e7ff8002ca7375f3b514c98f591259f457f"
       url: "https://pub.dev"
     source: hosted
-    version: "4.5.0"
+    version: "4.5.2"
   graphs:
     dependency: transitive
     description:
@@ -929,10 +929,10 @@ packages:
     dependency: "direct dev"
     description:
       name: json_serializable
-      sha256: e45aefa0324f08c683caafbb94b72837aa6193c61822799c916e45f4a263113d
+      sha256: "3b177bc10ac583af8770ef514abc3287a972776194d0ef21310e3a4312fd0f33"
       url: "https://pub.dev"
     source: hosted
-    version: "6.14.1"
+    version: "6.15.1"
   leak_tracker:
     dependency: transitive
     description:
@@ -1463,10 +1463,10 @@ packages:
     dependency: transitive
     description:
       name: source_helper
-      sha256: "5e6f216fdf6376c9f3852381ae037499797a3385377d388b011dac98d303c67c"
+      sha256: "279126bce72de3f2b7d4756408a4157988cf6bb4815be551bf55851aa00e9984"
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.13"
+    version: "1.4.0"
   source_span:
     dependency: transitive
     description:

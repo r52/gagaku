@@ -1072,7 +1072,9 @@ globalThis.source.phase2source = {
     for (final MapEntry(:key, :value) in expectedIdentity.entries) {
       expect(requestWithReferer[key], value, reason: key);
     }
-    expect(requestWithReferer['origin'], 'https://reader.example');
+    // Paperback does not derive Origin from Referer; sources that need it set
+    // it explicitly, and some deliberately strip it.
+    expect(requestWithReferer['origin'], isNull);
     expect(
       requestWithReferer['referer'],
       'https://reader.example/chapter/1?token=abc',
