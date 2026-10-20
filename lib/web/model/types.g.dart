@@ -945,7 +945,7 @@ LabelRowElement _$LabelRowElementFromJson(Map<String, dynamic> json) =>
       subtitle: json['subtitle'] as String?,
       value: const LabelRowValueConverter().fromJson(json['value']),
       style: $enumDecodeNullable(_$RowStyleEnumMap, json['style']),
-      onSelect: json['onSelect'] as String?,
+      onSelect: json['onSelect'] as SelectorID?,
       $type: json['type'] as String?,
     );
 
@@ -968,7 +968,7 @@ InputRowElement _$InputRowElementFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String,
       value: json['value'] as String,
       isSecureEntry: json['isSecureEntry'] as bool?,
-      onValueChange: json['onValueChange'] as String,
+      onValueChange: json['onValueChange'] as SelectorID,
       $type: json['type'] as String?,
     );
 
@@ -989,7 +989,7 @@ ToggleRowElement _$ToggleRowElementFromJson(Map<String, dynamic> json) =>
       isHidden: json['isHidden'] as bool,
       title: json['title'] as String,
       value: json['value'] as bool,
-      onValueChange: json['onValueChange'] as String,
+      onValueChange: json['onValueChange'] as SelectorID,
       $type: json['type'] as String?,
     );
 
@@ -1008,7 +1008,7 @@ ButtonRowElement _$ButtonRowElementFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       isHidden: json['isHidden'] as bool,
       title: json['title'] as String,
-      onSelect: json['onSelect'] as String,
+      onSelect: json['onSelect'] as SelectorID,
       $type: json['type'] as String?,
     );
 
@@ -1029,7 +1029,7 @@ NavigationRowElement _$NavigationRowElementFromJson(
   title: json['title'] as String,
   subtitle: json['subtitle'] as String?,
   value: json['value'] as String?,
-  form: json['form'] as String,
+  form: json['form'] as FormID,
   $type: json['type'] as String?,
 );
 
@@ -1056,7 +1056,7 @@ StepperRowElement _$StepperRowElementFromJson(Map<String, dynamic> json) =>
       maxValue: json['maxValue'] as num,
       stepValue: json['stepValue'] as num,
       loopOver: json['loopOver'] as bool,
-      onValueChange: json['onValueChange'] as String,
+      onValueChange: json['onValueChange'] as SelectorID,
       $type: json['type'] as String?,
     );
 
@@ -1082,7 +1082,7 @@ OAuthButtonRowElement _$OAuthButtonRowElementFromJson(
   isHidden: json['isHidden'] as bool,
   title: json['title'] as String,
   subtitle: json['subtitle'] as String?,
-  onSuccess: json['onSuccess'] as String,
+  onSuccess: json['onSuccess'] as SelectorID,
   authorizeEndpoint: json['authorizeEndpoint'] as String,
   responseType: OAuthResponseType.fromJson(
     json['responseType'] as Map<String, dynamic>,
@@ -1156,9 +1156,9 @@ ListSectionElement _$ListSectionElementFromJson(Map<String, dynamic> json) =>
       allowDeletion: json['allowDeletion'] as bool,
       allowAddition: json['allowAddition'] as bool,
       allowReorder: json['allowReorder'] as bool,
-      onReorder: json['onReorder'] as String?,
-      onDeletion: json['onDeletion'] as String?,
-      onAddition: json['onAddition'] as String?,
+      onReorder: json['onReorder'] as SelectorID?,
+      onDeletion: json['onDeletion'] as SelectorID?,
+      onAddition: json['onAddition'] as SelectorID?,
       $type: json['type'] as String?,
     );
 
