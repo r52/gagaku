@@ -872,11 +872,11 @@ globalThis.gagaku = Object.assign(globalThis.gagaku ?? {}, {
       // Preparation (including supplied-state selection) precedes native setup.
       // It uses the same infrastructure policy, not an unclassified init error.
       return _completeStartupBrowserState(
-        const StartupBrowserState(
+        StartupBrowserState(
           outcome: StartupBrowserOutcome.infrastructureFailed,
-          cookies: [],
-          localStorage: {},
-          userAgentHeaders: {},
+          cookies: const [],
+          localStorage: const {},
+          userAgentHeaders: GagakuData().browserUserAgentHeaders,
         ),
         requiresCloudflare: source.hasCapability(
           SourceIntents.cloudflareBypassRequired,

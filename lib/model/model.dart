@@ -104,11 +104,15 @@ const _knownHosts =
     'https://raw.githubusercontent.com/r52/gagaku/refs/heads/data/known_hosts.json';
 
 const defaultBrowserUserAgent =
-    'Mozilla/5.0 (Linux; Android 17; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/149.0.7827.5 Mobile Safari/537.36';
-const defaultSecChUa =
-    '"Android WebView";v="149", "Chromium";v="149", "Not)A;Brand";v="24"';
-const defaultSecChUaMobile = '?1';
-const defaultSecChUaPlatform = '"Android"';
+    'Mozilla/5.0 (Linux; Android 17; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/156.0.8078.39 Mobile Safari/537.36';
+
+/// Used until the device's own WebView identity is known.
+final _fallbackBrowserUserAgentHeaders = Map<String, String>.unmodifiable(
+  deriveBrowserUserAgentHeaders(
+    defaultBrowserUserAgent,
+    TargetPlatform.android,
+  )!,
+);
 
 /// Synthesizes low-entropy hints for Android WebView and Windows WebView2.
 /// This follows Chromium's current GREASE algorithm, not authoritative metadata.
@@ -161,9 +165,9 @@ String _buildSecChUa(
   String browserBrand,
   String browserVersion,
 ) {
-  // Chromium 149: GetGreasedUserAgentBrandVersion and ShuffleBrandList.
+  // Chromium 156: GetGreasedUserAgentBrandVersion and ShuffleBrandList.
   // Update if Chromium changes its algorithm; the major alone handles releases.
-  // https://github.com/chromium/chromium/blob/149.0.7827.5/components/embedder_support/user_agent_utils.cc
+  // https://github.com/chromium/chromium/blob/156.0.8078.39/components/embedder_support/user_agent_utils.cc
   const greaseChars = [' ', '(', ':', '-', '.', '/', ')', ';', '=', '?', '_'];
   const greaseVersions = ['8', '99', '24'];
   const orders = [
@@ -203,7 +207,10 @@ class GagakuData {
   // Default user agent
   final String gagakuUserAgent = '$kPackageName/$kPackageVersion';
 
-  Map<String, String> dynamicUserAgentHeaders = {};
+  /// The device's WebView identity, seeded once by whichever reports first:
+  /// the native default-UA query at startup, or the first complete identity
+  /// captured from a live WebView (Windows has no native getter).
+  Map<String, String> _dynamicUserAgentHeaders = const {};
   Future<void>? _dynamicUserAgentFuture;
 
   List<String> blockers = [];
@@ -213,16 +220,19 @@ class GagakuData {
     return _instance;
   }
 
-  String? get dynamicUserAgent => dynamicUserAgentHeaders['user-agent'];
+  String? get dynamicUserAgent => _dynamicUserAgentHeaders['user-agent'];
+
+  @visibleForTesting
+  Map<String, String> get dynamicUserAgentHeaders => _dynamicUserAgentHeaders;
+
+  /// Replaces the identity outright; production code seeds it instead.
+  @visibleForTesting
+  set dynamicUserAgentHeaders(Map<String, String> headers) {
+    _dynamicUserAgentHeaders = Map.unmodifiable(headers);
+  }
 
   Map<String, String> get browserUserAgentHeaders {
-    return {
-      'user-agent': defaultBrowserUserAgent,
-      'sec-ch-ua': defaultSecChUa,
-      'sec-ch-ua-mobile': defaultSecChUaMobile,
-      'sec-ch-ua-platform': defaultSecChUaPlatform,
-      ...dynamicUserAgentHeaders,
-    };
+    return {..._fallbackBrowserUserAgentHeaders, ..._dynamicUserAgentHeaders};
   }
 
   Future<Map<String, String>> resolveBrowserUserAgentHeaders() async {
@@ -231,13 +241,21 @@ class GagakuData {
       try {
         await future.timeout(const Duration(seconds: 2));
       } catch (_) {}
+      // Wait at most once; later callers use whichever identity is known.
+      _dynamicUserAgentFuture = null;
     }
 
     return browserUserAgentHeaders;
   }
 
-  void _setDynamicUserAgentHeaders(Map<String, String> headers) {
-    dynamicUserAgentHeaders = headers;
+  /// Sets the device identity unless one is already established. Returns
+  /// whether [headers] were adopted.
+  bool seedBrowserUserAgentHeaders(Map<String, String> headers) {
+    if (dynamicUserAgent != null) {
+      return false;
+    }
+    _dynamicUserAgentHeaders = Map.unmodifiable(headers);
+    return true;
   }
 
   Future<void> _fetchDynamicUserAgent() async {
@@ -251,8 +269,9 @@ class GagakuData {
       return;
     }
 
-    _setDynamicUserAgentHeaders(headers);
-    logger.d("Fetched dynamic browser headers: $dynamicUserAgentHeaders");
+    if (seedBrowserUserAgentHeaders(headers)) {
+      logger.d("Fetched dynamic browser headers: $headers");
+    }
   }
 
   Future<void> initData() async {

@@ -72,17 +72,34 @@ void main() {
         isNull,
       );
     });
+  });
 
-    test('keeps static fallback headers internally consistent', () {
-      final headers = deriveBrowserUserAgentHeaders(
-        defaultBrowserUserAgent,
-        TargetPlatform.android,
+  group('GagakuData browser identity', () {
+    test('falls back to a complete identity derived from the default UA', () {
+      expect(GagakuData().browserUserAgentHeaders, {
+        'user-agent': defaultBrowserUserAgent,
+        // Chromium 156 GREASE: Not:A-Brand v8, order [0, 1, 2].
+        'sec-ch-ua':
+            '"Not:A-Brand";v="8", "Chromium";v="156", '
+            '"Android WebView";v="156"',
+        'sec-ch-ua-mobile': '?1',
+        'sec-ch-ua-platform': '"Android"',
+      });
+    });
+
+    test('adopts only the first seeded identity', () {
+      final gdat = GagakuData();
+      final first = {'user-agent': 'first', 'sec-ch-ua': 'first-hints'};
+
+      expect(gdat.seedBrowserUserAgentHeaders(first), isTrue);
+      expect(
+        gdat.seedBrowserUserAgentHeaders({'user-agent': 'second'}),
+        isFalse,
       );
-
-      expect(headers, isNotNull);
-      expect(headers!['sec-ch-ua'], defaultSecChUa);
-      expect(headers['sec-ch-ua-mobile'], defaultSecChUaMobile);
-      expect(headers['sec-ch-ua-platform'], defaultSecChUaPlatform);
+      expect(gdat.dynamicUserAgent, 'first');
+      expect(gdat.browserUserAgentHeaders['sec-ch-ua'], 'first-hints');
+      // Fallback hints the seed did not provide remain present.
+      expect(gdat.browserUserAgentHeaders['sec-ch-ua-platform'], '"Android"');
     });
   });
 }

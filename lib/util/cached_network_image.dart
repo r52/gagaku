@@ -94,7 +94,12 @@ class ExtensionHttpClient extends http.BaseClient {
     final cookieHeader = serializeBrowserCookies(
       selectBrowserCookiesForUrl(cookies ?? const [], url).cookies,
     );
-    return {...runtime.browserUserAgentHeaders, 'cookie': ?cookieHeader};
+    // A runtime disposed after lookup reports no identity; keep a complete one.
+    return {
+      ...GagakuData().browserUserAgentHeaders,
+      ...runtime.browserUserAgentHeaders,
+      'cookie': ?cookieHeader,
+    };
   }
 
   /// Plain HTTP responses only expose the `cf-mitigated` header as a definite

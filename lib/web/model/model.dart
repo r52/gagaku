@@ -132,7 +132,16 @@ Dio webSourceDio(Ref ref) {
   dio.httpClientAdapter = NativeAdapter(
     createCronetEngine: () => createCronetEngine(getUserAgent(false)),
   );
-  dio.interceptors.add(RateLimitingInterceptor());
+  dio.interceptors
+    ..add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          options.headers.putIfAbsent('user-agent', getUserAgent);
+          handler.next(options);
+        },
+      ),
+    )
+    ..add(RateLimitingInterceptor());
   ref.onDispose(dio.close);
   return dio;
 }
