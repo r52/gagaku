@@ -119,26 +119,46 @@ class ComicPageController extends ChangeNotifier {
   /// The first boundaries start the page at its initial scale. Later updates
   /// keep a named scale state, or the scale relative to the contained scale,
   /// and keep the offset proportional before clamping.
+  ///
+  /// Returns whether the boundaries changed. With [notify] false, listeners
+  /// are not called; the caller must call [notifyBoundariesChanged] later.
+  /// Layout uses this to avoid notifying listeners mid-frame.
   @internal
-  void updateBoundaries(ComicBoundaries boundaries) {
+  bool updateBoundaries(ComicBoundaries boundaries, {bool notify = true}) {
     final previous = _boundaries;
-    if (previous == boundaries) return;
+    if (previous == boundaries) return false;
     _boundaries = boundaries;
 
+    final double scale;
+    final Offset offset;
     if (previous == null) {
-      final scale = boundaries.initialScale;
-      _set(scale, boundaries.clampOffset(Offset.zero, scale), force: true);
-      return;
+      scale = boundaries.initialScale;
+      offset = Offset.zero;
+    } else {
+      scale =
+          boundaries.scaleFor(previous.scaleStateFor(_scale)) ??
+          boundaries.clampScale(
+            _scale / previous.containedScale * boundaries.containedScale,
+          );
+      offset = _offset * (scale / _scale);
     }
 
-    final state = previous.scaleStateFor(_scale);
-    final scale =
-        boundaries.scaleFor(state) ??
-        boundaries.clampScale(
-          _scale / previous.containedScale * boundaries.containedScale,
-        );
-    final offset = _offset * (scale / _scale);
-    _set(scale, boundaries.clampOffset(offset, scale), force: true);
+    _scale = scale;
+    _offset = boundaries.clampOffset(offset, scale);
+    if (notify) notifyListeners();
+    return true;
+  }
+
+  /// Notifies listeners after a silent [updateBoundaries].
+  @internal
+  void notifyBoundariesChanged() => notifyListeners();
+
+  /// Forgets the boundaries so the next [updateBoundaries] starts the page
+  /// over at its initial scale. Used when the displayed image changes.
+  @internal
+  void clearBoundaries() {
+    _animator?.stopAnimation();
+    _boundaries = null;
   }
 
   /// Sets the transform from gesture or animation input.
@@ -170,8 +190,8 @@ class ComicPageController extends ChangeNotifier {
     if (identical(_animator, animator)) _animator = null;
   }
 
-  void _set(double scale, Offset offset, {bool force = false}) {
-    if (!force && scale == _scale && offset == _offset) return;
+  void _set(double scale, Offset offset) {
+    if (scale == _scale && offset == _offset) return;
     _scale = scale;
     _offset = offset;
     notifyListeners();

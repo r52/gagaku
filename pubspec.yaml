@@ -93,6 +93,9 @@ dependencies:
   material_ui: ^1.5.0
   cupertino_ui: ^1.0.0
 
+  comic_page_view:
+    path: packages/comic_page_view
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

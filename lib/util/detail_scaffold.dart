@@ -1,13 +1,13 @@
 import 'dart:math';
 
 import 'package:cached_network_image_ce/cached_network_image.dart';
+import 'package:comic_page_view/comic_page_view.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:photo_view/photo_view.dart';
 
 /// A tab shown by [DetailScaffold].
 class DetailTab {
@@ -595,14 +595,12 @@ class CoverArtPagedOverlay extends HookConsumerWidget {
                 httpHeaders: headers,
                 imageUrl: url,
                 imageBuilder: (context, imageProvider) {
-                  return PhotoView(
+                  return ComicZoomableImage(
                     backgroundDecoration: const BoxDecoration(
                       color: Colors.transparent,
                     ),
-                    imageProvider: imageProvider,
-                    minScale: PhotoViewComputedScale.contained * 0.8,
-                    maxScale: PhotoViewComputedScale.covered * 5.0,
-                    initialScale: PhotoViewComputedScale.contained,
+                    image: imageProvider,
+                    minScale: const ComicScale.contained(0.8),
                   );
                 },
                 fit: BoxFit.contain,

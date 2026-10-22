@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
+import 'package:comic_page_view/comic_page_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:material_ui/material_ui.dart';
@@ -10,7 +11,6 @@ import 'package:gagaku/reader/model/types.dart';
 import 'package:gagaku/reader/model/viewport_controller.dart';
 import 'package:gagaku/reader/widgets/long_strip_page_image.dart';
 import 'package:gagaku/reader/widgets/reader_viewports.dart';
-import 'package:photo_view/photo_view.dart';
 
 void main() {
   test('long-strip precache indices stay within the nearby-page window', () {
@@ -127,7 +127,7 @@ void main() {
 
     expect(centerTaps, 0);
     expect(find.byType(LongStripPageOverlay), findsOneWidget);
-    expect(find.byType(PhotoView), findsOneWidget);
+    expect(find.byType(ComicZoomableImage), findsOneWidget);
     expect(
       find.byWidgetPredicate(
         (widget) => widget is Hero && widget.tag == subject.page.id,
@@ -354,7 +354,7 @@ void main() {
 }
 
 Future<void> _tapOverlayToDismiss(WidgetTester tester) async {
-  await tester.tap(find.byType(PhotoView));
+  await tester.tap(find.byType(ComicZoomableImage));
   await tester.pump(kDoubleTapTimeout);
   await tester.pumpAndSettle();
 }

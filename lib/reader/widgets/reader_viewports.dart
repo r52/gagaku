@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:comic_page_view/comic_page_view.dart';
 import 'package:flutter/rendering.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/reader/model/config.dart';
@@ -225,13 +226,9 @@ class LongStripPageOverlay extends StatelessWidget {
       extendBodyBehindAppBar: true,
       body: Hero(
         tag: page.id,
-        child: PhotoView(
-          imageProvider: readerImageProvider(page),
+        child: ComicZoomableImage(
+          image: readerImageProvider(page),
           backgroundDecoration: const BoxDecoration(color: Colors.transparent),
-          minScale: PhotoViewComputedScale.contained,
-          maxScale: PhotoViewComputedScale.covered * 5,
-          initialScale: PhotoViewComputedScale.contained,
-          basePosition: Alignment.center,
           onTapUp: (context, _, _) => Navigator.of(context).pop(),
         ),
       ),
