@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import 'boundaries.dart';
 import 'defaults.dart';
 import 'page_controller.dart';
+import 'recognizer.dart';
 import 'scale.dart';
 
 typedef ComicLoadingBuilder = Widget Function(
@@ -332,6 +333,17 @@ class _ComicZoomableImageState extends State<ComicZoomableImage>
     }
   }
 
+  bool _canPan(Axis axis, double delta) {
+    final controller = _controller;
+    return controller.boundaries?.canPan(
+          controller.offset,
+          controller.scale,
+          axis,
+          delta,
+        ) ??
+        false;
+  }
+
   void _handleDoubleTapDown(TapDownDetails details) {
     _doubleTapPosition = details.localPosition;
   }
@@ -387,6 +399,7 @@ class _ComicZoomableImageState extends State<ComicZoomableImage>
     final controller = _controller;
     final info = _imageInfo;
     final onTapUp = widget.onTapUp;
+    final pagerAxis = ComicGalleryScope.maybeOf(context)?.axis;
 
     final Widget content;
     if (_error case (final error, final stackTrace)) {
@@ -456,17 +469,20 @@ class _ComicZoomableImageState extends State<ComicZoomableImage>
                           instance.onTapUp = (details) =>
                               onTapUp(context, details, _controller),
                     ),
-              ScaleGestureRecognizer:
-                  GestureRecognizerFactoryWithHandlers<ScaleGestureRecognizer>(
-                    () => ScaleGestureRecognizer(debugOwner: this),
-                    (instance) {
-                      instance
-                        ..dragStartBehavior = DragStartBehavior.start
-                        ..onStart = _handleScaleStart
-                        ..onUpdate = _handleScaleUpdate
-                        ..onEnd = _handleScaleEnd;
-                    },
-                  ),
+              ComicZoomGestureRecognizer:
+                  GestureRecognizerFactoryWithHandlers<
+                    ComicZoomGestureRecognizer
+                  >(() => ComicZoomGestureRecognizer(debugOwner: this), (
+                    instance,
+                  ) {
+                    instance
+                      ..pagerAxis = pagerAxis
+                      ..canPan = _canPan
+                      ..dragStartBehavior = DragStartBehavior.start
+                      ..onStart = _handleScaleStart
+                      ..onUpdate = _handleScaleUpdate
+                      ..onEnd = _handleScaleEnd;
+                  }),
             },
             child: content,
           ),
