@@ -9,8 +9,6 @@ import 'package:gagaku/reader/model/viewport_controller.dart';
 import 'package:gagaku/reader/widgets/long_strip_page_image.dart';
 import 'package:gagaku/reader/widgets/passive_tap_listener.dart';
 import 'package:gagaku/util/ui.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 class HorizontalReaderView extends StatelessWidget {
@@ -37,14 +35,14 @@ class HorizontalReaderView extends StatelessWidget {
       builder: (context, constraints) => PassiveTapListener(
         onTap: (position) =>
             onTapZone(ReaderTapZone.of(position.dx, constraints.maxWidth)),
-        child: PhotoViewGallery.builder(
+        child: ComicPageGallery.builder(
+          controller: controller.gallery,
           allowImplicitScrolling: true,
           reverse: settings.direction == ReaderDirection.rightToLeft,
           scrollPhysics: !settings.swipeGestures
               ? const NeverScrollableScrollPhysics()
               : null,
           backgroundDecoration: const BoxDecoration(color: Colors.black),
-          pageController: controller.pageController,
           onPageChanged: (index) {
             onPageChanged(index);
             onInteraction();
@@ -60,18 +58,8 @@ class HorizontalReaderView extends StatelessWidget {
             ),
           ),
           itemCount: pages.length,
-          builder: (context, index) {
-            final page = pages[index];
-            return PhotoViewGalleryPageOptions(
-              imageProvider: readerImageProvider(page),
-              controller: controller.viewController(index),
-              scaleStateController: controller.scaleController(index),
-              minScale: PhotoViewComputedScale.contained,
-              maxScale: PhotoViewComputedScale.covered * 5,
-              initialScale: PhotoViewComputedScale.contained,
-              basePosition: Alignment.center,
-            );
-          },
+          builder: (context, index) =>
+              ComicPageOptions(image: readerImageProvider(pages[index])),
         ),
       ),
     );

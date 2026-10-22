@@ -81,6 +81,7 @@ Future<_Gallery> _pumpGallery(
   bool allowImplicitScrolling = false,
   bool resetOffscreenPages = false,
   ValueChanged<int>? onPageChanged,
+  DeviceGestureSettings gestureSettings = const DeviceGestureSettings(),
 }) async {
   final image = (await tester.runAsync(
     () => createTestImage(width: 800, height: 1600, cache: false),
@@ -91,21 +92,24 @@ Future<_Gallery> _pumpGallery(
   final providers = [for (var i = 0; i < itemCount; i++) _ReadyProvider(image)];
 
   await tester.pumpWidget(
-    Directionality(
-      textDirection: TextDirection.ltr,
-      child: Center(
-        child: SizedBox.fromSize(
-          size: _viewport,
-          child: ComicPageGallery.builder(
-            controller: controller,
-            itemCount: itemCount,
-            reverse: reverse,
-            scrollPhysics: physics,
-            allowImplicitScrolling: allowImplicitScrolling,
-            resetOffscreenPages: resetOffscreenPages,
-            onPageChanged: onPageChanged,
-            builder: (context, index) =>
-                ComicPageOptions(image: providers[index]),
+    MediaQuery(
+      data: MediaQueryData(gestureSettings: gestureSettings),
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Center(
+          child: SizedBox.fromSize(
+            size: _viewport,
+            child: ComicPageGallery.builder(
+              controller: controller,
+              itemCount: itemCount,
+              reverse: reverse,
+              scrollPhysics: physics,
+              allowImplicitScrolling: allowImplicitScrolling,
+              resetOffscreenPages: resetOffscreenPages,
+              onPageChanged: onPageChanged,
+              builder: (context, index) =>
+                  ComicPageOptions(image: providers[index]),
+            ),
           ),
         ),
       ),
@@ -215,6 +219,29 @@ void main() {
       // which advances when reversed.
       await gallery.drag(const Offset(300, 0));
       expect(gallery.page, 1);
+    });
+
+    testWidgets('a gradual drag pans with the platform touch slop', (
+      tester,
+    ) async {
+      // Android reports a touch slop well below Flutter's 18px default, and
+      // the pager's Scrollable applies it.
+      final gallery = await _pumpGallery(
+        tester,
+        gestureSettings: const DeviceGestureSettings(touchSlop: 8),
+      );
+      await gallery.zoom(0);
+
+      final gesture = await tester.startGesture(_center);
+      for (var i = 0; i < 20; i++) {
+        await gesture.moveBy(const Offset(-5, 0));
+        await tester.pump();
+      }
+      await gesture.up();
+      await tester.pumpAndSettle();
+
+      expect(gallery.page, 0);
+      expect(gallery.pageAt(0).offset.dx, lessThan(-50));
     });
 
     testWidgets('a vertical drag pans vertically', (tester) async {

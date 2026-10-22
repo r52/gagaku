@@ -1,27 +1,14 @@
+import 'package:comic_page_view/comic_page_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/reader/model/session.dart';
 import 'package:gagaku/reader/model/types.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 class HorizontalReaderViewportController implements ReaderViewportController {
-  PageController _pageController = PageController();
-  final Map<int, PhotoViewScaleStateController> _scaleControllers = {};
-  final Map<int, PhotoViewController> _viewControllers = {};
+  ComicGalleryController _gallery = ComicGalleryController();
 
-  PageController get pageController => _pageController;
-
-  PhotoViewController viewController(int index) {
-    return _viewControllers.putIfAbsent(index, PhotoViewController.new);
-  }
-
-  PhotoViewScaleStateController scaleController(int index) {
-    return _scaleControllers.putIfAbsent(
-      index,
-      PhotoViewScaleStateController.new,
-    );
-  }
+  ComicGalleryController get gallery => _gallery;
 
   @override
   bool get turnsPages => true;
@@ -29,44 +16,30 @@ class HorizontalReaderViewportController implements ReaderViewportController {
   @override
   void prepareInitialPage(int page) {
     // A mounted gallery keeps its position; only a fresh one needs the page.
-    if (_pageController.hasClients || _pageController.initialPage == page) {
+    final pageController = _gallery.pageController;
+    if (pageController.hasClients || pageController.initialPage == page) {
       return;
     }
 
-    _pageController.dispose();
-    _pageController = PageController(initialPage: page);
+    _gallery.dispose();
+    _gallery = ComicGalleryController(initialPage: page);
   }
 
   @override
-  void jumpToPage(int page) {
-    if (_pageController.hasClients) {
-      _pageController.jumpToPage(page);
-    }
-  }
+  void jumpToPage(int page) => _gallery.jumpToPage(page);
 
   @override
   ReaderPageTurnResult scrollBy(double delta, {required int currentPage}) {
-    final controller = viewController(currentPage);
-    controller.position = controller.position + Offset(0, -delta);
+    _gallery.pageAt(currentPage)?.panBy(Offset(0, -delta));
     return ReaderPageTurnResult.handled;
   }
 
   @override
   void togglePageSize(int currentPage) {
-    final controller = scaleController(currentPage);
-    controller.scaleState = defaultScaleStateCycle(controller.scaleState);
+    _gallery.pageAt(currentPage)?.cycleScale();
   }
 
-  void dispose() {
-    _pageController.dispose();
-
-    for (final controller in _scaleControllers.values) {
-      controller.dispose();
-    }
-    for (final controller in _viewControllers.values) {
-      controller.dispose();
-    }
-  }
+  void dispose() => _gallery.dispose();
 }
 
 typedef _LongStripAnchor = ({int index, double fraction});

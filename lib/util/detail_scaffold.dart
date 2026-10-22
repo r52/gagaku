@@ -573,55 +573,63 @@ class CoverArtPagedOverlay extends HookConsumerWidget {
       backgroundColor: Colors.transparent,
       extendBody: true,
       extendBodyBehindAppBar: true,
-      body: PageView.builder(
-        scrollBehavior: const MouseTouchScrollBehavior(),
-        findChildIndexCallback: (key) {
-          final valueKey = key as ValueKey<Object>;
-          final val = items.indexWhere((i) => i.heroTag == valueKey.value);
-          return val >= 0 ? val : null;
-        },
-        itemBuilder: (BuildContext context, int id) {
-          final (:url, :heroTag) = items[id];
+      // Zoomed covers pan horizontally until an edge, then yield to the pager.
+      body: ComicGalleryScope(
+        axis: Axis.horizontal,
+        child: PageView.builder(
+          scrollBehavior: const MouseTouchScrollBehavior(),
+          findChildIndexCallback: (key) {
+            final valueKey = key as ValueKey<Object>;
+            final val = items.indexWhere((i) => i.heroTag == valueKey.value);
+            return val >= 0 ? val : null;
+          },
+          itemBuilder: (BuildContext context, int id) {
+            final (:url, :heroTag) = items[id];
 
-          final child = Container(
-            padding: const EdgeInsets.all(10.0),
-            color: Colors.transparent,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: CachedNetworkImage(
-                cacheManager: imageCache,
-                httpHeaders: headers,
-                imageUrl: url,
-                imageBuilder: (context, imageProvider) {
-                  return ComicZoomableImage(
-                    backgroundDecoration: const BoxDecoration(
-                      color: Colors.transparent,
-                    ),
-                    image: imageProvider,
-                    minScale: const ComicScale.contained(0.8),
-                  );
+            final child = Container(
+              padding: const EdgeInsets.all(10.0),
+              color: Colors.transparent,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
                 },
-                fit: BoxFit.contain,
-                progressIndicatorBuilder: (context, url, downloadProgress) =>
-                    const Center(child: CircularProgressIndicator()),
-                errorBuilder: (context, error, stacktrace) => Tooltip(
-                  message: error.toString(),
-                  child: const Icon(Icons.error),
+                child: CachedNetworkImage(
+                  cacheManager: imageCache,
+                  httpHeaders: headers,
+                  imageUrl: url,
+                  imageBuilder: (context, imageProvider) {
+                    return ComicZoomableImage(
+                      backgroundDecoration: const BoxDecoration(
+                        color: Colors.transparent,
+                      ),
+                      image: imageProvider,
+                      minScale: const ComicScale.contained(0.8),
+                    );
+                  },
+                  fit: BoxFit.contain,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      const Center(child: CircularProgressIndicator()),
+                  errorBuilder: (context, error, stacktrace) => Tooltip(
+                    message: error.toString(),
+                    child: const Icon(Icons.error),
+                  ),
                 ),
               ),
-            ),
-          );
+            );
 
-          return activePage.value == id
-              ? Hero(key: ValueKey<Object>(heroTag), tag: heroTag, child: child)
-              : KeyedSubtree(key: ValueKey<Object>(heroTag), child: child);
-        },
-        itemCount: items.length,
-        controller: controller,
-        onPageChanged: (id) => activePage.value = id,
-        scrollDirection: Axis.horizontal,
+            return activePage.value == id
+                ? Hero(
+                    key: ValueKey<Object>(heroTag),
+                    tag: heroTag,
+                    child: child,
+                  )
+                : KeyedSubtree(key: ValueKey<Object>(heroTag), child: child);
+          },
+          itemCount: items.length,
+          controller: controller,
+          onPageChanged: (id) => activePage.value = id,
+          scrollDirection: Axis.horizontal,
+        ),
       ),
     );
   }

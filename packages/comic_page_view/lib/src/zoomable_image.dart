@@ -400,6 +400,9 @@ class _ComicZoomableImageState extends State<ComicZoomableImage>
     final info = _imageInfo;
     final onTapUp = widget.onTapUp;
     final pagerAxis = ComicGalleryScope.maybeOf(context)?.axis;
+    // Match the slops of an enclosing Scrollable, which uses the platform's
+    // settings; Android's touch slop is well below the framework default.
+    final gestureSettings = MediaQuery.maybeGestureSettingsOf(context);
 
     final Widget content;
     if (_error case (final error, final stackTrace)) {
@@ -458,6 +461,7 @@ class _ComicZoomableImageState extends State<ComicZoomableImage>
                     instance,
                   ) {
                     instance
+                      ..gestureSettings = gestureSettings
                       ..onDoubleTapDown = _handleDoubleTapDown
                       ..onDoubleTap = _handleDoubleTap;
                   }),
@@ -465,9 +469,10 @@ class _ComicZoomableImageState extends State<ComicZoomableImage>
                 TapGestureRecognizer:
                     GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
                       () => TapGestureRecognizer(debugOwner: this),
-                      (instance) =>
-                          instance.onTapUp = (details) =>
-                              onTapUp(context, details, _controller),
+                      (instance) => instance
+                        ..gestureSettings = gestureSettings
+                        ..onTapUp = (details) =>
+                            onTapUp(context, details, _controller),
                     ),
               ComicZoomGestureRecognizer:
                   GestureRecognizerFactoryWithHandlers<
@@ -476,6 +481,7 @@ class _ComicZoomableImageState extends State<ComicZoomableImage>
                     instance,
                   ) {
                     instance
+                      ..gestureSettings = gestureSettings
                       ..pagerAxis = pagerAxis
                       ..canPan = _canPan
                       ..dragStartBehavior = DragStartBehavior.start
