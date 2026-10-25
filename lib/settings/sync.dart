@@ -246,7 +246,6 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
     final result = await FilePicker.saveFile(
       dialogTitle: context.t.sync.exportBranch,
       fileName: 'gagaku_conflict-${head.revisionId}.json',
-      allowedExtensions: const ['json'],
       bytes: utf8.encode(jsonEncode(data)),
     );
     if (result != null && mounted) {

@@ -59,7 +59,6 @@ class AppSettingsPage extends HookConsumerWidget {
       dialogTitle: context.t.backup.data,
       fileName:
           'gagaku_backup-${DateFormat('yyyy-MM-dd-kk_mm').format(DateTime.now())}.json',
-      allowedExtensions: ['json'],
       bytes: utf8.encode(outputdata),
     );
 
