@@ -50,7 +50,6 @@ dependencies:
   meta:
   path: ^1.9.0
   path_provider: ^2.0.15
-  photo_view: ^0.15.0
   riverpod: ^3.2.0
   riverpod_annotation: ^4.0.0
   timeago: ^3.7.1
@@ -92,6 +91,9 @@ dependencies:
 
   material_ui: ^1.5.0
   cupertino_ui: ^1.0.0
+
+  comic_page_view:
+    path: packages/comic_page_view
 
 dev_dependencies:
   flutter_test:

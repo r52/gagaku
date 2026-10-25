@@ -1,13 +1,13 @@
 import 'dart:math';
 
 import 'package:cached_network_image_ce/cached_network_image.dart';
+import 'package:comic_page_view/comic_page_view.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util/cached_network_image.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:photo_view/photo_view.dart';
 
 /// A tab shown by [DetailScaffold].
 class DetailTab {
@@ -573,57 +573,63 @@ class CoverArtPagedOverlay extends HookConsumerWidget {
       backgroundColor: Colors.transparent,
       extendBody: true,
       extendBodyBehindAppBar: true,
-      body: PageView.builder(
-        scrollBehavior: const MouseTouchScrollBehavior(),
-        findChildIndexCallback: (key) {
-          final valueKey = key as ValueKey<Object>;
-          final val = items.indexWhere((i) => i.heroTag == valueKey.value);
-          return val >= 0 ? val : null;
-        },
-        itemBuilder: (BuildContext context, int id) {
-          final (:url, :heroTag) = items[id];
+      // Zoomed covers pan horizontally until an edge, then yield to the pager.
+      body: ComicGalleryScope(
+        axis: Axis.horizontal,
+        child: PageView.builder(
+          scrollBehavior: const MouseTouchScrollBehavior(),
+          findChildIndexCallback: (key) {
+            final valueKey = key as ValueKey<Object>;
+            final val = items.indexWhere((i) => i.heroTag == valueKey.value);
+            return val >= 0 ? val : null;
+          },
+          itemBuilder: (BuildContext context, int id) {
+            final (:url, :heroTag) = items[id];
 
-          final child = Container(
-            padding: const EdgeInsets.all(10.0),
-            color: Colors.transparent,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: CachedNetworkImage(
-                cacheManager: imageCache,
-                httpHeaders: headers,
-                imageUrl: url,
-                imageBuilder: (context, imageProvider) {
-                  return PhotoView(
-                    backgroundDecoration: const BoxDecoration(
-                      color: Colors.transparent,
-                    ),
-                    imageProvider: imageProvider,
-                    minScale: PhotoViewComputedScale.contained * 0.8,
-                    maxScale: PhotoViewComputedScale.covered * 5.0,
-                    initialScale: PhotoViewComputedScale.contained,
-                  );
+            final child = Container(
+              padding: const EdgeInsets.all(10.0),
+              color: Colors.transparent,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
                 },
-                fit: BoxFit.contain,
-                progressIndicatorBuilder: (context, url, downloadProgress) =>
-                    const Center(child: CircularProgressIndicator()),
-                errorBuilder: (context, error, stacktrace) => Tooltip(
-                  message: error.toString(),
-                  child: const Icon(Icons.error),
+                child: CachedNetworkImage(
+                  cacheManager: imageCache,
+                  httpHeaders: headers,
+                  imageUrl: url,
+                  imageBuilder: (context, imageProvider) {
+                    return ComicZoomableImage(
+                      backgroundDecoration: const BoxDecoration(
+                        color: Colors.transparent,
+                      ),
+                      image: imageProvider,
+                      minScale: const ComicScale.contained(0.8),
+                    );
+                  },
+                  fit: BoxFit.contain,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      const Center(child: CircularProgressIndicator()),
+                  errorBuilder: (context, error, stacktrace) => Tooltip(
+                    message: error.toString(),
+                    child: const Icon(Icons.error),
+                  ),
                 ),
               ),
-            ),
-          );
+            );
 
-          return activePage.value == id
-              ? Hero(key: ValueKey<Object>(heroTag), tag: heroTag, child: child)
-              : KeyedSubtree(key: ValueKey<Object>(heroTag), child: child);
-        },
-        itemCount: items.length,
-        controller: controller,
-        onPageChanged: (id) => activePage.value = id,
-        scrollDirection: Axis.horizontal,
+            return activePage.value == id
+                ? Hero(
+                    key: ValueKey<Object>(heroTag),
+                    tag: heroTag,
+                    child: child,
+                  )
+                : KeyedSubtree(key: ValueKey<Object>(heroTag), child: child);
+          },
+          itemCount: items.length,
+          controller: controller,
+          onPageChanged: (id) => activePage.value = id,
+          scrollDirection: Axis.horizontal,
+        ),
       ),
     );
   }
