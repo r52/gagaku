@@ -10,6 +10,9 @@ import 'package:super_sliver_list/super_sliver_list.dart';
 /// Retry uses the same callback as the paged view so already loaded pages remain
 /// intact. Grids should set `showNewPageErrorIndicatorAsGridChild: false` to give
 /// long errors the full width of the view rather than a fixed-size grid tile.
+///
+/// Every status indicator is supplied here so that none of the package's
+/// defaults, which are built on SDK `material.dart`, are reached.
 class ErrorReportingPagedChildBuilderDelegate<ItemType>
     extends PagedChildBuilderDelegate<ItemType> {
   ErrorReportingPagedChildBuilderDelegate({
@@ -22,7 +25,45 @@ class ErrorReportingPagedChildBuilderDelegate<ItemType>
              _PagingErrorIndicator(error: error!, onRetry: fetchNextPage),
          newPageErrorIndicatorBuilder: (_) =>
              _PagingErrorIndicator(error: error!, onRetry: fetchNextPage),
+         firstPageProgressIndicatorBuilder: (_) =>
+             const _PagingProgressIndicator(padding: EdgeInsets.all(32)),
+         newPageProgressIndicatorBuilder: (_) => const _PagingProgressIndicator(
+           padding: EdgeInsets.symmetric(vertical: 16),
+         ),
+         noItemsFoundIndicatorBuilder: (_) => const _PagingEmptyIndicator(),
        );
+}
+
+class _PagingProgressIndicator extends StatelessWidget {
+  const _PagingProgressIndicator({required this.padding});
+
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: padding,
+      child: const Center(child: CircularProgressIndicator()),
+    );
+  }
+}
+
+class _PagingEmptyIndicator extends StatelessWidget {
+  const _PagingEmptyIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+        child: Text(
+          context.t.errors.noitems,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+      ),
+    );
+  }
 }
 
 class _PagingErrorIndicator extends StatelessWidget {
