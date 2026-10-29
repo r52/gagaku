@@ -106,7 +106,6 @@ class _MangaDexListViewState extends ConsumerState<_MangaDexListView> {
           scrollToTop: true,
           body: ChapterFeedWidget(
             controller: _feed.controller,
-            mangaCache: _feed.mangaCache,
             restorationId: 'list_feed_offset',
           ),
         ),

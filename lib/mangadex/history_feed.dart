@@ -21,9 +21,7 @@ class MangaDexHistoryFeedPage extends StatefulHookConsumerWidget {
 }
 
 class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
-  final Map<String, Manga> _mangaCache = {};
-
-  late final _pagingController = PagingController<int, Chapter>(
+  late final _pagingController = PagingController<int, FeedChapter>(
     getNextPageKey: (state) => state.keys?.last != null ? null : 0,
     fetchPage: (pageKey) async {
       final me = await ref.watch(loggedUserProvider.future);
@@ -36,10 +34,6 @@ class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
         ids: mangaIds,
         limit: MangaDexEndpoints.breakLimit,
       );
-
-      for (final m in mangas) {
-        _mangaCache[m.id] = m;
-      }
 
       try {
         await (
@@ -59,7 +53,7 @@ class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
         logger.e(e, error: e);
       }
 
-      return chapters.toList();
+      return pairFeedChapters(chapters, mangas);
     },
   );
 
@@ -79,9 +73,7 @@ class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
 
     return ChapterFeedWidget(
       controller: _pagingController,
-      mangaCache: _mangaCache,
       onRefresh: () async {
-        _mangaCache.clear();
         ref.invalidate(mangaDexHistoryProvider);
         _pagingController.refresh();
       },

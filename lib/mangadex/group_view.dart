@@ -107,7 +107,6 @@ class _MangaDexGroupViewWidgetState
           scrollToTop: true,
           body: ChapterFeedWidget(
             controller: _feed.controller,
-            mangaCache: _feed.mangaCache,
             restorationId: 'group_feed_offset',
           ),
         ),

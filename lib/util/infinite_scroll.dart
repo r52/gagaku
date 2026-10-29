@@ -325,16 +325,21 @@ class OffsetPagingManager<ItemType> {
 
   OffsetPagingManager({required this.limit});
 
+  /// Ends paging once the next offset reaches [totalItems].
+  ///
+  /// Compares offsets rather than the loaded item count, because a page may
+  /// hold fewer items than it consumed from the API (e.g. dropped or
+  /// deduplicated entries).
   int? getNextPageKey(PagingState<int, ItemType> state) {
     if (state.keys == null || state.keys!.isEmpty) return 0;
 
-    final currentCount = state.items?.length ?? 0;
+    final nextOffset = state.keys!.last + limit;
 
-    if (totalItems != null && currentCount >= totalItems!) {
+    if (totalItems != null && nextOffset >= totalItems!) {
       return null;
     }
 
-    return state.keys!.last + limit;
+    return nextOffset;
   }
 
   void reset() {

@@ -1033,30 +1033,43 @@ class ChapterFeedItemData {
     return Object.hash(runtimeType, mangaId);
   }
 
-  static List<ChapterFeedItemData> toData(
-    List<Chapter> chapters,
-    Map<String, Manga> mangas,
-  ) {
-    // Craft feed items
-    final dlist = chapters.fold(<ChapterFeedItemData>[], (list, chapter) {
-      final mid = chapter.manga.id;
-      if (mangas.containsKey(mid)) {
-        ChapterFeedItemData? item;
-        if (list.isNotEmpty && list.last.mangaId == mid) {
-          item = list.last;
-        } else {
-          item = ChapterFeedItemData(manga: mangas[mid]!);
-          list.add(item);
-        }
+  /// Groups consecutive chapters of the same manga into feed items.
+  ///
+  /// Runs over the whole feed, since a group can span a page boundary.
+  static List<ChapterFeedItemData> toData(List<FeedChapter> chapters) {
+    final list = <ChapterFeedItemData>[];
 
-        item.chapters.add(chapter);
+    for (final (:chapter, :manga) in chapters) {
+      if (list.isEmpty || list.last.mangaId != manga.id) {
+        list.add(ChapterFeedItemData(manga: manga));
       }
 
-      return list;
-    });
+      list.last.chapters.add(chapter);
+    }
 
-    return dlist;
+    return list;
   }
+}
+
+/// A feed chapter paired with its fully fetched manga.
+///
+/// Chapter feeds only carry a manga stub ([ChapterOps.manga] has no title or
+/// cover), so feed cards need the [Manga] fetched separately.
+typedef FeedChapter = ({Chapter chapter, Manga manga});
+
+/// Pairs each chapter with its manga from [mangas], dropping chapters whose
+/// manga did not resolve.
+List<FeedChapter> pairFeedChapters(
+  Iterable<Chapter> chapters,
+  Iterable<Manga> mangas,
+) {
+  final byId = {for (final m in mangas) m.id: m};
+
+  return [
+    for (final chapter in chapters)
+      if (byId[chapter.manga.id] case final manga?)
+        (chapter: chapter, manga: manga),
+  ];
 }
 
 class ReadChapterSet with ExpiringData {

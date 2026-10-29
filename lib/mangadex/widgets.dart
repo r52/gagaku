@@ -515,7 +515,6 @@ class ChapterFeedWidget extends StatelessWidget {
   const ChapterFeedWidget({
     super.key,
     required this.controller,
-    required this.mangaCache,
     this.onRefresh,
     this.title,
     this.scrollController,
@@ -532,9 +531,8 @@ class ChapterFeedWidget extends StatelessWidget {
   final ScrollController? scrollController;
   final String? restorationId;
   final List<Widget> leading;
-  final Map<String, Manga> mangaCache;
 
-  final PagingController<int, Chapter> controller;
+  final PagingController<int, FeedChapter> controller;
 
   @override
   Widget build(BuildContext context) {
@@ -569,7 +567,7 @@ class ChapterFeedWidget extends StatelessWidget {
               // It will instantly return the new state without ever unmounting the list.
               final newState = useMemoized(() {
                 final items = chapters != null
-                    ? ChapterFeedItemData.toData(chapters, mangaCache)
+                    ? ChapterFeedItemData.toData(chapters)
                     : <ChapterFeedItemData>[];
 
                 return PagingState<int, ChapterFeedItemData>(
@@ -698,7 +696,6 @@ class _InfiniteScrollFeedState
   Widget build(BuildContext context) {
     return ChapterFeedWidget(
       controller: _pager.controller,
-      mangaCache: _pager.mangaCache,
       onRefresh: _pager.refresh,
       title: widget.title,
       scrollController: widget.scrollController,
@@ -727,16 +724,14 @@ class ChapterFeedPager {
   final MangaDexEntity? entity;
   final ChapterFilterOrder order;
 
-  final Map<String, Manga> mangaCache = {};
+  late final _manager = OffsetPagingManager<FeedChapter>(limit: limit);
 
-  late final _manager = OffsetPagingManager<Chapter>(limit: limit);
-
-  late final controller = PagingController<int, Chapter>(
+  late final controller = PagingController<int, FeedChapter>(
     getNextPageKey: _manager.getNextPageKey,
     fetchPage: _fetchPage,
   );
 
-  Future<List<Chapter>> _fetchPage(int pageKey) async {
+  Future<List<FeedChapter>> _fetchPage(int pageKey) async {
     final me = await ref.readAsync(loggedUserProvider.future);
     final api = ref.read(mangadexProvider);
 
@@ -759,10 +754,6 @@ class ChapterFeedPager {
       limit: MangaDexEndpoints.breakLimit,
     );
 
-    for (final m in mangas) {
-      mangaCache[m.id] = m;
-    }
-
     try {
       await (
         ref.run((tsx) async {
@@ -781,12 +772,11 @@ class ChapterFeedPager {
       logger.e(e, error: e);
     }
 
-    return chapters;
+    return pairFeedChapters(chapters, mangas);
   }
 
   Future<void> refresh() async {
     _manager.reset();
-    mangaCache.clear();
     await ref
         .read(mangadexProvider)
         .invalidateAll(entity == null ? feedKey : '$feedKey(${entity!.id}');
