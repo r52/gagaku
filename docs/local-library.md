@@ -33,6 +33,6 @@ Scanning a library folder on Android needs **All files access**. If you would ra
 
 In Local Library, open the **three-dot menu → Read Document** and select a PDF or EPUB. You can also open documents discovered in your configured library folder.
 
-The document reader has its own controls; the manga reader's Single/Long Strip settings do not control PDF or EPUB layout. EPUB text-size and paginated/continuous-scrolling preferences can be adjusted in the document reader.
+The document reader has its own controls; the manga reader's Single/Long Strip settings do not control PDF or EPUB layout. EPUB text size and the paginated/continuous-scrolling layout of both PDF and EPUB can be adjusted in the document reader.
 
 PDF and EPUB entries and the **Read Document** action are not available on Windows or Linux.

@@ -11,6 +11,7 @@ _LocalLibConfig _$LocalLibConfigFromJson(Map<String, dynamic> json) =>
       libraryDirectory: json['libraryDirectory'] as String? ?? '',
       epubFontSize: (json['epubFontSize'] as num?)?.toDouble() ?? 1.0,
       epubScroll: json['epubScroll'] as bool? ?? false,
+      pdfScroll: json['pdfScroll'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$LocalLibConfigToJson(_LocalLibConfig instance) =>
@@ -18,6 +19,7 @@ Map<String, dynamic> _$LocalLibConfigToJson(_LocalLibConfig instance) =>
       'libraryDirectory': instance.libraryDirectory,
       'epubFontSize': instance.epubFontSize,
       'epubScroll': instance.epubScroll,
+      'pdfScroll': instance.pdfScroll,
     };
 
 // **************************************************************************
@@ -59,7 +61,7 @@ final class LocalConfigProvider
   }
 }
 
-String _$localConfigHash() => r'9edc3229a7b6e99001651e0253dec438769a9651';
+String _$localConfigHash() => r'd985ae7c7be09ef72b1ef4f482bf9214e99047d2';
 
 abstract class _$LocalConfig extends $Notifier<LocalLibConfig> {
   LocalLibConfig build();

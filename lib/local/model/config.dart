@@ -14,6 +14,7 @@ abstract class LocalLibConfig with _$LocalLibConfig {
     @Default('') String libraryDirectory,
     @Default(1.0) double epubFontSize,
     @Default(false) bool epubScroll,
+    @Default(false) bool pdfScroll,
   }) = _LocalLibConfig;
 
   factory LocalLibConfig.fromJson(Map<String, dynamic> json) =>
@@ -52,4 +53,7 @@ class LocalConfig extends _$LocalConfig {
     required double fontSize,
     required bool scroll,
   }) => save(state.copyWith(epubFontSize: fontSize, epubScroll: scroll));
+
+  Future<LocalLibConfig> savePdfPreferences({required bool scroll}) =>
+      save(state.copyWith(pdfScroll: scroll));
 }

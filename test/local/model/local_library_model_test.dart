@@ -4,20 +4,22 @@ import 'package:gagaku/local/model/document_session.dart';
 import 'package:gagaku/local/model/model.dart';
 
 void main() {
-  group('LocalLibConfig EPUB preferences', () {
+  group('LocalLibConfig document preferences', () {
     test('uses backward-compatible defaults for legacy JSON', () {
       final config = LocalLibConfig.fromJson({'libraryDirectory': '/library'});
 
       expect(config.libraryDirectory, '/library');
       expect(config.epubFontSize, 1.0);
       expect(config.epubScroll, isFalse);
+      expect(config.pdfScroll, isFalse);
     });
 
-    test('round-trips persisted EPUB preferences', () {
+    test('round-trips persisted document preferences', () {
       final config = LocalLibConfig(
         libraryDirectory: '/library',
         epubFontSize: 1.4,
         epubScroll: true,
+        pdfScroll: true,
       );
 
       expect(LocalLibConfig.fromJson(config.toJson()), config);

@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LocalLibConfig {
 
- String get libraryDirectory; double get epubFontSize; bool get epubScroll;
+ String get libraryDirectory; double get epubFontSize; bool get epubScroll; bool get pdfScroll;
 /// Create a copy of LocalLibConfig
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +30,20 @@ $LocalLibConfigCopyWith<LocalLibConfig> get copyWith => _$LocalLibConfigCopyWith
 @override
 bool operator ==(Object other) {
   final _this = this as LocalLibConfig;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LocalLibConfig&&(identical(other.libraryDirectory, _this.libraryDirectory) || other.libraryDirectory == _this.libraryDirectory)&&(identical(other.epubFontSize, _this.epubFontSize) || other.epubFontSize == _this.epubFontSize)&&(identical(other.epubScroll, _this.epubScroll) || other.epubScroll == _this.epubScroll));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LocalLibConfig&&(identical(other.libraryDirectory, _this.libraryDirectory) || other.libraryDirectory == _this.libraryDirectory)&&(identical(other.epubFontSize, _this.epubFontSize) || other.epubFontSize == _this.epubFontSize)&&(identical(other.epubScroll, _this.epubScroll) || other.epubScroll == _this.epubScroll)&&(identical(other.pdfScroll, _this.pdfScroll) || other.pdfScroll == _this.pdfScroll));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as LocalLibConfig;
-  return Object.hash(runtimeType,_this.libraryDirectory,_this.epubFontSize,_this.epubScroll);
+  return Object.hash(runtimeType,_this.libraryDirectory,_this.epubFontSize,_this.epubScroll,_this.pdfScroll);
 }
 
 @override
 String toString() {
   final _this = this as LocalLibConfig;
-  return 'LocalLibConfig(libraryDirectory: ${_this.libraryDirectory}, epubFontSize: ${_this.epubFontSize}, epubScroll: ${_this.epubScroll})';
+  return 'LocalLibConfig(libraryDirectory: ${_this.libraryDirectory}, epubFontSize: ${_this.epubFontSize}, epubScroll: ${_this.epubScroll}, pdfScroll: ${_this.pdfScroll})';
 }
 
 
@@ -54,7 +54,7 @@ abstract mixin class $LocalLibConfigCopyWith<$Res>  {
   factory $LocalLibConfigCopyWith(LocalLibConfig value, $Res Function(LocalLibConfig) _then) = _$LocalLibConfigCopyWithImpl;
 @useResult
 $Res call({
- String libraryDirectory, double epubFontSize, bool epubScroll
+ String libraryDirectory, double epubFontSize, bool epubScroll, bool pdfScroll
 });
 
 
@@ -71,11 +71,12 @@ class _$LocalLibConfigCopyWithImpl<$Res>
 
 /// Create a copy of LocalLibConfig
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? libraryDirectory = null,Object? epubFontSize = null,Object? epubScroll = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? libraryDirectory = null,Object? epubFontSize = null,Object? epubScroll = null,Object? pdfScroll = null,}) {
   return _then(LocalLibConfig(
 libraryDirectory: null == libraryDirectory ? _self.libraryDirectory : libraryDirectory // ignore: cast_nullable_to_non_nullable
 as String,epubFontSize: null == epubFontSize ? _self.epubFontSize : epubFontSize // ignore: cast_nullable_to_non_nullable
 as double,epubScroll: null == epubScroll ? _self.epubScroll : epubScroll // ignore: cast_nullable_to_non_nullable
+as bool,pdfScroll: null == pdfScroll ? _self.pdfScroll : pdfScroll // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -88,12 +89,13 @@ as bool,
 @JsonSerializable()
 
 class _LocalLibConfig implements LocalLibConfig {
-   _LocalLibConfig({this.libraryDirectory = '', this.epubFontSize = 1.0, this.epubScroll = false});
+   _LocalLibConfig({this.libraryDirectory = '', this.epubFontSize = 1.0, this.epubScroll = false, this.pdfScroll = false});
   factory _LocalLibConfig.fromJson(Map<String, dynamic> json) => _$LocalLibConfigFromJson(json);
 
 @override@JsonKey() final  String libraryDirectory;
 @override@JsonKey() final  double epubFontSize;
 @override@JsonKey() final  bool epubScroll;
+@override@JsonKey() final  bool pdfScroll;
 
 /// Create a copy of LocalLibConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -108,18 +110,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _LocalLibConfig&&(identical(other.libraryDirectory, libraryDirectory) || other.libraryDirectory == libraryDirectory)&&(identical(other.epubFontSize, epubFontSize) || other.epubFontSize == epubFontSize)&&(identical(other.epubScroll, epubScroll) || other.epubScroll == epubScroll));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _LocalLibConfig&&(identical(other.libraryDirectory, libraryDirectory) || other.libraryDirectory == libraryDirectory)&&(identical(other.epubFontSize, epubFontSize) || other.epubFontSize == epubFontSize)&&(identical(other.epubScroll, epubScroll) || other.epubScroll == epubScroll)&&(identical(other.pdfScroll, pdfScroll) || other.pdfScroll == pdfScroll));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,libraryDirectory,epubFontSize,epubScroll);
+    return Object.hash(runtimeType,libraryDirectory,epubFontSize,epubScroll,pdfScroll);
 }
 
 @override
 String toString() {
-    return 'LocalLibConfig(libraryDirectory: $libraryDirectory, epubFontSize: $epubFontSize, epubScroll: $epubScroll)';
+    return 'LocalLibConfig(libraryDirectory: $libraryDirectory, epubFontSize: $epubFontSize, epubScroll: $epubScroll, pdfScroll: $pdfScroll)';
 }
 
 
@@ -130,7 +132,7 @@ abstract mixin class _$LocalLibConfigCopyWith<$Res> implements $LocalLibConfigCo
   factory _$LocalLibConfigCopyWith(_LocalLibConfig value, $Res Function(_LocalLibConfig) _then) = __$LocalLibConfigCopyWithImpl;
 @override @useResult
 $Res call({
- String libraryDirectory, double epubFontSize, bool epubScroll
+ String libraryDirectory, double epubFontSize, bool epubScroll, bool pdfScroll
 });
 
 
@@ -147,11 +149,12 @@ class __$LocalLibConfigCopyWithImpl<$Res>
 
 /// Create a copy of LocalLibConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? libraryDirectory = null,Object? epubFontSize = null,Object? epubScroll = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? libraryDirectory = null,Object? epubFontSize = null,Object? epubScroll = null,Object? pdfScroll = null,}) {
   return _then(_LocalLibConfig(
 libraryDirectory: null == libraryDirectory ? _self.libraryDirectory : libraryDirectory // ignore: cast_nullable_to_non_nullable
 as String,epubFontSize: null == epubFontSize ? _self.epubFontSize : epubFontSize // ignore: cast_nullable_to_non_nullable
 as double,epubScroll: null == epubScroll ? _self.epubScroll : epubScroll // ignore: cast_nullable_to_non_nullable
+as bool,pdfScroll: null == pdfScroll ? _self.pdfScroll : pdfScroll // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
