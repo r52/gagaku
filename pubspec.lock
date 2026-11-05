@@ -1060,14 +1060,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.19.5"
-  number_paginator:
-    dependency: "direct main"
-    description:
-      name: number_paginator
-      sha256: "7290cad873f9215bb8c7f71343c322d7c2194f3beaa724560c227c0c19f60b60"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.2"
   objectbox:
     dependency: "direct main"
     description:

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -8,10 +6,10 @@ import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/routes.dart';
+import 'package:gagaku/util/page_number_bar.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:number_paginator/number_paginator.dart';
 import 'package:riverpod/experimental/mutation.dart';
 
 class QueriedMangaDexEditListScreen extends ConsumerWidget {
@@ -77,6 +75,10 @@ class MangaDexEditListScreen extends HookConsumerWidget {
     );
 
     final currentPage = useValueNotifier(0);
+    final pageCount = pageCountOf(
+      selected.state.length,
+      MangaDexEndpoints.searchLimit,
+    );
 
     if (editList is MutationError) {
       Styles.showSnackBar(
@@ -268,7 +270,8 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                 Expanded(
                   child: HookConsumer(
                     builder: (context, ref, child) {
-                      final page = useValueListenable(currentPage);
+                      final page = useValueListenable(currentPage)
+                          .clamp(0, pageCount - 1);
                       final future = useMangaListFetcher(
                         ref,
                         selected.state,
@@ -308,14 +311,11 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                 ),
                 HookBuilder(
                   builder: (context) {
-                    final _ = useValueListenable(currentPage);
-                    return NumberPaginator(
-                      numberPages: max(
-                        (selected.state.length / MangaDexEndpoints.searchLimit)
-                            .ceil(),
-                        1,
-                      ),
-                      onPageChange: (int index) {
+                    final page = useValueListenable(currentPage);
+                    return PageNumberBar(
+                      pageCount: pageCount,
+                      currentPage: page,
+                      onPageChanged: (index) {
                         scrollController.jumpTo(0.0);
                         currentPage.value = index;
                       },

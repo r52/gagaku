@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -9,9 +7,9 @@ import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/material_hooks.dart';
+import 'package:gagaku/util/page_number_bar.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:number_paginator/number_paginator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library.g.dart';
@@ -127,12 +125,18 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                       ),
                     ),
                     builder: (context, list) {
+                      final pageCount = pageCountOf(
+                        list.length,
+                        MangaDexEndpoints.searchLimit,
+                      );
+
                       return Column(
                         children: [
                           Expanded(
                             child: HookConsumer(
                               builder: (context, ref, child) {
-                                final page = useValueListenable(currentPage);
+                                final page = useValueListenable(currentPage)
+                                    .clamp(0, pageCount - 1);
                                 final future = useMangaListFetcher(
                                   ref,
                                   list,
@@ -176,14 +180,11 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
                           ),
                           HookBuilder(
                             builder: (context) {
-                              final _ = useValueListenable(currentPage);
-                              return NumberPaginator(
-                                numberPages: max(
-                                  (list.length / MangaDexEndpoints.searchLimit)
-                                      .ceil(),
-                                  1,
-                                ),
-                                onPageChange: (int index) {
+                              final page = useValueListenable(currentPage);
+                              return PageNumberBar(
+                                pageCount: pageCount,
+                                currentPage: page,
+                                onPageChanged: (index) {
                                   scrollController.jumpTo(0.0);
                                   currentPage.value = index;
                                 },

@@ -176,6 +176,9 @@ class Translations$ui$en {
 	/// en: 'Add New'
 	String get addNew => 'Add New';
 
+	/// en: 'Page ${current} of ${total}'
+	String pageOfTotal({required Object current, required Object total}) => 'Page ${current} of ${total}';
+
 	/// en: 'Go'
 	String get go => 'Go';
 
@@ -2395,6 +2398,7 @@ extension on Translations {
 			'about.sourceCode' => 'Source code on GitHub',
 			'ui.add' => 'Add',
 			'ui.addNew' => 'Add New',
+			'ui.pageOfTotal' => ({required Object current, required Object total}) => 'Page ${current} of ${total}',
 			'ui.go' => 'Go',
 			'ui.ok' => 'Ok',
 			'ui.cancel' => 'Cancel',
@@ -2892,9 +2896,9 @@ extension on Translations {
 			'backup.data' => 'Backup Data',
 			'backup.dataSub' => 'Backup all gagaku data and settings (excludes MangaDex login and local library files)',
 			'backup.restore' => 'Restore Backup',
-			'backup.restoreWarning' => 'Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?',
 			_ => null,
 		} ?? switch (path) {
+			'backup.restoreWarning' => 'Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?',
 			'backup.fromFile' => 'Restore Data from File',
 			'backup.success' => 'Backup saved',
 			'backup.restoreSuccess' => 'Backup restored',

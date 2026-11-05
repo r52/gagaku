@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/util/riverpod.dart';
@@ -10,9 +8,9 @@ import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/detail_scaffold.dart';
 import 'package:gagaku/util/material_hooks.dart';
+import 'package:gagaku/util/page_number_bar.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:number_paginator/number_paginator.dart';
 
 enum _ViewType { titles, feed }
 
@@ -136,8 +134,15 @@ class _ListTitlesTab extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.t;
+    final pageCount = pageCountOf(
+      list.set.length,
+      MangaDexEndpoints.searchLimit,
+    );
     final page = useState(0);
-    final future = useMangaListFetcher(ref, list.set, page.value, [refreshKey]);
+    final currentPage = page.value.clamp(0, pageCount - 1);
+    final future = useMangaListFetcher(ref, list.set, currentPage, [
+      refreshKey,
+    ]);
 
     return Column(
       children: [
@@ -155,12 +160,10 @@ class _ListTitlesTab extends HookConsumerWidget {
             ],
           ),
         ),
-        NumberPaginator(
-          numberPages: max(
-            (list.set.length / MangaDexEndpoints.searchLimit).ceil(),
-            1,
-          ),
-          onPageChange: (int index) {
+        PageNumberBar(
+          pageCount: pageCount,
+          currentPage: currentPage,
+          onPageChanged: (index) {
             final controller = PrimaryScrollController.maybeOf(context);
             if (controller != null && controller.hasClients) {
               controller.jumpTo(0.0);

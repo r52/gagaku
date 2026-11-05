@@ -18,6 +18,7 @@
   "ui": {
     "add": "Add",
     "addNew": "Add New",
+    "pageOfTotal": "Page ${current} of ${total}",
     "go": "Go",
     "ok": "Ok",
     "cancel": "Cancel",

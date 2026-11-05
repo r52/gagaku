@@ -7,14 +7,13 @@ import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:gagaku/util/material_hooks.dart';
-import 'package:gagaku/util/number_paginator_controller_hook.dart';
+import 'package:gagaku/util/page_number_bar.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:number_paginator/number_paginator.dart';
 
 class WebSourceFavoritesPage extends HookConsumerWidget {
   const WebSourceFavoritesPage({super.key, this.controller});
@@ -107,13 +106,13 @@ class WebSourceFavoriteTab extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-    final pageController = useNumberPaginatorController();
-    final currentPage = useValueListenable(pageController);
     final filterText = useValueListenable(filterController);
     final debouncedFilterText = useDebounced(
       filterText.text,
       const Duration(milliseconds: 300),
     );
+    // A new filter or category starts again from the first page.
+    final page = useValueNotifier(0, [debouncedFilterText, category.id]);
 
     final query = useMemoized(() {
       final builder = GagakuData().store.box<HistoryLink>().query(
@@ -151,13 +150,11 @@ class WebSourceFavoriteTab extends HookConsumerWidget {
       return null;
     }, [items]);
 
-    final pagedItems = useMemoized(() {
-      int start = pageController.currentPage * _displayLimit;
-      if (start > items.length) {
-        start = 0;
-        pageController.currentPage = 0;
-      }
+    final pageCount = pageCountOf(items.length, _displayLimit);
+    final currentPage = useValueListenable(page).clamp(0, pageCount - 1);
 
+    final pagedItems = useMemoized(() {
+      final start = currentPage * _displayLimit;
       final end = min(start + _displayLimit, items.length);
       return items.getRange(start, end).toList();
     }, [items, currentPage]);
@@ -204,11 +201,12 @@ class WebSourceFavoriteTab extends HookConsumerWidget {
             ],
           ),
         ),
-        NumberPaginator(
-          controller: pageController,
-          numberPages: max((items.length / _displayLimit).ceil(), 1),
-          onPageChange: (int index) {
+        PageNumberBar(
+          pageCount: pageCount,
+          currentPage: currentPage,
+          onPageChanged: (index) {
             scrollController?.jumpTo(0.0);
+            page.value = index;
           },
         ),
       ],
