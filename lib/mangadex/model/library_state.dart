@@ -75,7 +75,7 @@ class ReadingStatus extends _$ReadingStatus with AutoDisposeExpiryMix {
         : status;
     bool success = await api.setMangaReadingStatus(manga, resolved);
     if (success) {
-      if (ref.exists(userLibraryProvider(me.id))) {
+      if (ref.read(userLibraryProvider(me.id).exists)) {
         ref.run((tsx) async {
           return await tsx
               .get(userLibraryProvider(me.id).notifier)

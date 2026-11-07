@@ -150,7 +150,7 @@ extension WidgetRefWorkaround on WidgetRef {
     ProviderBase<Object?> provider, {
     bool asReload = false,
   }) {
-    if (exists(provider)) {
+    if (read(provider.exists)) {
       invalidate(provider, asReload: asReload);
     }
   }
@@ -172,7 +172,7 @@ extension RefWorkaround on Ref {
     ProviderBase<Object?> provider, {
     bool asReload = false,
   }) {
-    if (exists(provider)) {
+    if (read(provider.exists)) {
       invalidate(provider, asReload: asReload);
     }
   }
