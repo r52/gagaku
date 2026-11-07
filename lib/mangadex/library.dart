@@ -1,12 +1,12 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_hooks/flutter_hooks.dart' hide useTabController;
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/login_password.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
-import 'package:gagaku/util/material_hooks.dart';
+import 'package:material_hooks/material_hooks.dart';
 import 'package:gagaku/util/page_number_bar.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -56,7 +56,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
       () => MangaReadingStatus.values.skip(1).toList(),
     );
     final initialtype = ref.read(libraryViewTypeProvider);
-    final tabController = useMaterialTabController(
+    final tabController = useTabController(
       initialLength: statuses.length,
       initialIndex: statuses.indexOf(initialtype),
     );

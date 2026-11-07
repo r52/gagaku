@@ -1,14 +1,14 @@
 import 'package:gagaku/util/riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_hooks/flutter_hooks.dart' hide useTabController;
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/exception.dart';
 import 'package:gagaku/util/detail_scaffold.dart';
-import 'package:gagaku/util/material_hooks.dart';
+import 'package:material_hooks/material_hooks.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/config.dart';
@@ -154,7 +154,7 @@ class WebMangaViewWidget extends HookConsumerWidget {
     final chapterScrollController = useScrollController();
     final artworkUrls = manga.artworkUrls;
     final hasArtwork = artworkUrls.isNotEmpty;
-    final tabController = useMaterialTabController(
+    final tabController = useTabController(
       initialLength: hasArtwork ? _WebMangaTab.values.length : 1,
       keys: [hasArtwork],
     );

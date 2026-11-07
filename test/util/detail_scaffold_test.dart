@@ -1,8 +1,8 @@
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_hooks/flutter_hooks.dart' hide useTabController;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/util/detail_scaffold.dart';
-import 'package:gagaku/util/material_hooks.dart';
+import 'package:material_hooks/material_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -241,7 +241,7 @@ class _Host extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tabController = useMaterialTabController(initialLength: 2);
+    final tabController = useTabController(initialLength: 2);
     final scrollController = useScrollController();
 
     return DetailScaffold(

@@ -1,12 +1,12 @@
 import 'dart:math';
 
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_hooks/flutter_hooks.dart' hide useTabController;
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/objectbox.g.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
-import 'package:gagaku/util/material_hooks.dart';
+import 'package:material_hooks/material_hooks.dart';
 import 'package:gagaku/util/page_number_bar.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
@@ -31,7 +31,7 @@ class WebSourceFavoritesPage extends HookConsumerWidget {
     final manager = useListenable(WebFavoritesManager());
     final categories = manager.state;
 
-    final tabController = useMaterialTabController(
+    final tabController = useTabController(
       initialLength: categories.length,
       keys: [categories.length],
     );

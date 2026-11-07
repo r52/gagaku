@@ -35,7 +35,7 @@ dependencies:
   android_file_picker: ^2.0.0
   flutter:
     sdk: flutter
-  flutter_hooks: ^0.21.2
+  flutter_hooks: ^0.21.4
   freezed_annotation: ^3.0.0
   hive_ce: ^2.20.0
   hive_ce_flutter: ^2.4.0
@@ -87,7 +87,8 @@ dependencies:
       url: https://github.com/r52/fjs.git
       ref: gagaku
 
-  material_ui: ^1.5.0
+  material_ui: ^1.10.0
+  material_hooks: ^0.1.0
   cupertino_ui: ^1.0.0
 
   comic_page_view:

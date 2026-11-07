@@ -1,6 +1,7 @@
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_hooks/flutter_hooks.dart'
+    hide useSearchController, useTabController;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gagaku/util/material_hooks.dart';
+import 'package:material_hooks/material_hooks.dart';
 import 'package:material_ui/material_ui.dart';
 
 void main() {
@@ -19,7 +20,7 @@ void main() {
             builder: (context) {
               useListenable(rebuild);
               final count = useValueListenable(length);
-              controller = useMaterialTabController(
+              controller = useTabController(
                 initialLength: count,
                 initialIndex: count == 3 ? 1 : 0,
                 keys: [count],
@@ -94,7 +95,7 @@ void main() {
           builder: (context) {
             useListenable(rebuild);
             final key = useValueListenable(generation);
-            controller = useMaterialSearchController(keys: [key]);
+            controller = useSearchController(keys: [key]);
             return Scaffold(
               body: SearchAnchor(
                 searchController: controller,

@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_hooks/flutter_hooks.dart' hide useTabController;
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/model.dart';
@@ -7,7 +7,7 @@ import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/detail_scaffold.dart';
-import 'package:gagaku/util/material_hooks.dart';
+import 'package:material_hooks/material_hooks.dart';
 import 'package:gagaku/util/page_number_bar.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -82,7 +82,7 @@ class _MangaDexListViewState extends ConsumerState<_MangaDexListView> {
   Widget build(BuildContext context) {
     final t = context.t;
     final list = widget.list;
-    final tabController = useMaterialTabController(
+    final tabController = useTabController(
       initialLength: _ViewType.values.length,
     );
     final scrollController = useScrollController();
