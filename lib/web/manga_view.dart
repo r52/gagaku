@@ -1,8 +1,8 @@
+import 'package:gagaku/util/markdown/markdown_view.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart' hide useTabController;
-import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/model.dart';
 import 'package:gagaku/routes.dart';
@@ -432,11 +432,10 @@ class _WebMetadataList extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(8),
                 color: theme.colorScheme.surfaceContainerHighest,
-                child: MarkdownBody(
+                child: MarkdownView(
                   data: manga.description,
-                  onTapLink: (text, url, title) async {
-                    if (url != null) await Styles.tryLaunchUrl(context, url);
-                  },
+                  onTapLink: (text, url, title) =>
+                      Styles.tryLaunchUrl(context, url),
                 ),
               ),
             ],

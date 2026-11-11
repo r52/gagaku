@@ -2,7 +2,7 @@
 /// and Paperback synopses.
 ///
 /// Parses with `package:markdown` (GitHub-flavored, minus single-tilde
-/// strikethrough), converts the AST to an immutable block model once per
+/// strikethrough, plus MangaDex `+++` collapsible blocks), converts the AST to an immutable block model once per
 /// input, and builds widgets from that model. Styling comes from the
 /// `material_ui` [Theme]. This library must never import SDK
 /// `material.dart` or `cupertino.dart`.
@@ -30,28 +30,20 @@ typedef MarkdownTapLinkCallback = void Function(
 
 /// Renders [data] as Markdown.
 class MarkdownView extends HookWidget {
-  const MarkdownView({
-    super.key,
-    required this.data,
-    this.onTapLink,
-    this.mangaDexExtensions = false,
-  });
+  const MarkdownView({super.key, required this.data, this.onTapLink});
 
   /// The Markdown source. CRLF and CR line endings are accepted.
+  ///
+  /// MangaDex `+++` collapsible blocks are always recognized, so text from a
+  /// Paperback MangaDex extension renders like the native client.
   final String data;
 
   /// Called when a link (text or image) is tapped.
   final MarkdownTapLinkCallback? onTapLink;
 
-  /// Enables MangaDex-only syntax (`+++` collapsible blocks).
-  final bool mangaDexExtensions;
-
   @override
   Widget build(BuildContext context) {
-    final blocks = useMemoized(
-      () => _parseMarkdown(data, mangaDexExtensions: mangaDexExtensions),
-      [data, mangaDexExtensions],
-    );
+    final blocks = useMemoized(() => _parseMarkdown(data), [data]);
 
     return _MarkdownScope(
       onTapLink: onTapLink,
@@ -73,12 +65,10 @@ int _debugLiveLinkRecognizers = 0;
 @visibleForTesting
 int get debugLiveMarkdownLinkRecognizers => _debugLiveLinkRecognizers;
 
-List<_Block> _parseMarkdown(String data, {required bool mangaDexExtensions}) {
+List<_Block> _parseMarkdown(String data) {
   final normalized = data.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
   final document = md.Document(
-    blockSyntaxes: mangaDexExtensions
-        ? const [_MangaDexDetailsSyntax()]
-        : const <md.BlockSyntax>[],
+    blockSyntaxes: const [_MangaDexDetailsSyntax()],
     extensionSet: _markdownExtensionSet,
     encodeHtml: false,
   );

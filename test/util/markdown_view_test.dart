@@ -31,13 +31,12 @@ class _Harness {
   final cache = _OfflineCacheManager();
   final taps = <_Tap>[];
 
-  Widget build(String data, {bool mangaDex = false}) {
+  Widget build(String data) {
     return MaterialApp(
       home: Scaffold(
         body: SingleChildScrollView(
           child: MarkdownView(
             data: data,
-            mangaDexExtensions: mangaDex,
             onTapLink: (text, href, title) =>
                 taps.add((text: text, href: href, title: title)),
           ),
@@ -46,15 +45,11 @@ class _Harness {
     );
   }
 
-  Future<void> pump(
-    WidgetTester tester,
-    String data, {
-    bool mangaDex = false,
-  }) async {
+  Future<void> pump(WidgetTester tester, String data) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [extensionImageCacheProvider.overrideWithValue(cache)],
-        child: build(data, mangaDex: mangaDex),
+        child: build(data),
       ),
     );
     await tester.pump();
@@ -356,7 +351,7 @@ Intro line.
       tester,
     ) async {
       final harness = _Harness();
-      await harness.pump(tester, volumes, mangaDex: true);
+      await harness.pump(tester, volumes);
 
       expect(find.text('Volume 1'), findsOneWidget);
       expect(find.text('Chapter 1'), findsNothing);
@@ -376,7 +371,7 @@ Intro line.
       tester,
     ) async {
       final harness = _Harness();
-      await harness.pump(tester, volumes, mangaDex: true);
+      await harness.pump(tester, volumes);
 
       expect(_privateType('_MarkdownDetails'), findsNWidgets(2));
       expect(_effectiveStyle(tester, 'Volume 1').fontWeight, FontWeight.bold);
@@ -399,11 +394,7 @@ Intro line.
 
     testWidgets('CRLF close lines', (tester) async {
       final harness = _Harness();
-      await harness.pump(
-        tester,
-        volumes.replaceAll('\n', '\r\n'),
-        mangaDex: true,
-      );
+      await harness.pump(tester, volumes.replaceAll('\n', '\r\n'));
 
       expect(_privateType('_MarkdownDetails'), findsNWidgets(2));
       expect(_allText(tester), isNot(contains('+++')));
@@ -414,11 +405,7 @@ Intro line.
 
     testWidgets('an unclosed block closes at end of input', (tester) async {
       final harness = _Harness();
-      await harness.pump(
-        tester,
-        'Before\n\n+++Extras\n- one\n- two',
-        mangaDex: true,
-      );
+      await harness.pump(tester, 'Before\n\n+++Extras\n- one\n- two');
 
       expect(find.text('one'), findsNothing);
       await _tapText(tester, 'Extras');
@@ -428,7 +415,7 @@ Intro line.
 
     testWidgets('a lone +++ with no open block stays literal', (tester) async {
       final harness = _Harness();
-      await harness.pump(tester, 'Before\n\n+++\n\nAfter', mangaDex: true);
+      await harness.pump(tester, 'Before\n\n+++\n\nAfter');
 
       expect(_privateType('_MarkdownDetails'), findsNothing);
       expect(_texts(tester), ['Before', '+++', 'After']);
@@ -444,7 +431,7 @@ inner body
 outer body
 +++
 after
-''', mangaDex: true);
+''');
 
       expect(find.text('after'), findsOneWidget);
       expect(find.text('Inner'), findsNothing);
@@ -458,21 +445,23 @@ after
       expect(find.text('inner body'), findsOneWidget);
     });
 
-    testWidgets('+++ stays literal without mangaDexExtensions', (tester) async {
+    testWidgets('+++ followed by a space or mid-line stays literal', (
+      tester,
+    ) async {
       final harness = _Harness();
-      await harness.pump(tester, '+++**Volume 1**\nbody\n+++');
+      await harness.pump(tester, '+++ spaced\n\nmid+++line\n\nC+++ and C++');
 
       expect(_privateType('_MarkdownDetails'), findsNothing);
-      expect(_texts(tester), ['+++Volume 1\nbody\n+++']);
+      expect(_texts(tester), ['+++ spaced', 'mid+++line', 'C+++ and C++']);
     });
 
     testWidgets('expansion resets when data changes', (tester) async {
       final harness = _Harness();
-      await harness.pump(tester, volumes, mangaDex: true);
+      await harness.pump(tester, volumes);
       await _tapText(tester, 'Volume 1');
       expect(find.text('Chapter 1'), findsOneWidget);
 
-      await harness.pump(tester, '$volumes\nMore.', mangaDex: true);
+      await harness.pump(tester, '$volumes\nMore.');
       expect(find.text('Chapter 1'), findsNothing);
     });
   });
@@ -598,7 +587,6 @@ Raw <b>html</b> stays.
     await harness.pump(
       tester,
       '+++[e](https://example.com/e)\n[f](https://example.com/f)\n+++',
-      mangaDex: true,
     );
     expect(debugLiveMarkdownLinkRecognizers, baseline + 1);
     await tester.tap(find.byIcon(Icons.arrow_right));
