@@ -1278,70 +1278,66 @@ class MangaListWidget extends HookConsumerWidget {
               !future!.hasData)
         : false;
 
-    return Stack(
-      children: [
-        CustomScrollView(
-          scrollCacheExtent: const ScrollCacheExtent.viewport(1.0),
-          controller: scrollController,
-          scrollBehavior: scrollBehavior,
-          physics: physics,
-          slivers: [
-            ...leading,
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                  vertical: 10.0,
-                ),
-                child: Row(
-                  children: [
-                    ?title,
-                    const Spacer(),
-                    const GridExtentSlider(),
-                    if (showToggle)
-                      SegmentedButton<MangaListView>(
-                        showSelectedIcon: false,
-                        style: SegmentedButton.styleFrom(
-                          shape: const RoundedRectangleBorder(),
-                        ),
-                        segments: <ButtonSegment<MangaListView>>[
-                          ButtonSegment<MangaListView>(
-                            value: MangaListView.grid,
-                            icon: Icon(Icons.grid_view, size: 24),
-                            tooltip: tr.ui.gridView,
-                          ),
-                          ButtonSegment<MangaListView>(
-                            value: MangaListView.list,
-                            icon: Icon(Icons.table_rows, size: 24),
-                            tooltip: tr.ui.listView,
-                          ),
-                          ButtonSegment<MangaListView>(
-                            value: MangaListView.detailed,
-                            icon: Icon(Icons.view_list, size: 24),
-                            tooltip: tr.ui.detailedView,
-                          ),
-                        ],
-                        selected: <MangaListView>{view},
-                        onSelectionChanged: (Set<MangaListView> newSelection) {
-                          ref.read(_mangaListViewProvider.notifier).state =
-                              newSelection.first;
-                        },
-                      ),
-                  ],
-                ),
-              ),
+    return CustomScrollView(
+      scrollCacheExtent: const ScrollCacheExtent.viewport(1.0),
+      controller: scrollController,
+      scrollBehavior: scrollBehavior,
+      physics: physics,
+      slivers: [
+        ...leading,
+        SliverLoadingIndicator(loading: isLoading),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0,
+              vertical: 10.0,
             ),
-            if (future != null && future!.hasError)
-              SliverList.list(
-                children: [
-                  Text('${future!.error}'),
-                  Text(future!.stackTrace.toString()),
-                ],
-              ),
-            ...children,
-          ],
+            child: Row(
+              children: [
+                ?title,
+                const Spacer(),
+                const GridExtentSlider(),
+                if (showToggle)
+                  SegmentedButton<MangaListView>(
+                    showSelectedIcon: false,
+                    style: SegmentedButton.styleFrom(
+                      shape: const RoundedRectangleBorder(),
+                    ),
+                    segments: <ButtonSegment<MangaListView>>[
+                      ButtonSegment<MangaListView>(
+                        value: MangaListView.grid,
+                        icon: Icon(Icons.grid_view, size: 24),
+                        tooltip: tr.ui.gridView,
+                      ),
+                      ButtonSegment<MangaListView>(
+                        value: MangaListView.list,
+                        icon: Icon(Icons.table_rows, size: 24),
+                        tooltip: tr.ui.listView,
+                      ),
+                      ButtonSegment<MangaListView>(
+                        value: MangaListView.detailed,
+                        icon: Icon(Icons.view_list, size: 24),
+                        tooltip: tr.ui.detailedView,
+                      ),
+                    ],
+                    selected: <MangaListView>{view},
+                    onSelectionChanged: (Set<MangaListView> newSelection) {
+                      ref.read(_mangaListViewProvider.notifier).state =
+                          newSelection.first;
+                    },
+                  ),
+              ],
+            ),
+          ),
         ),
-        if (isLoading) ...Styles.loadingOverlay,
+        if (future != null && future!.hasError)
+          SliverList.list(
+            children: [
+              Text('${future!.error}'),
+              Text(future!.stackTrace.toString()),
+            ],
+          ),
+        ...children,
       ],
     );
   }

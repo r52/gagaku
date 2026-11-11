@@ -187,66 +187,61 @@ class WebMangaListWidget extends HookConsumerWidget {
         ? ref.watch(_mangaListViewProvider)
         : WebMangaListView.grid;
 
-    return Stack(
-      children: [
-        CustomScrollView(
-          scrollCacheExtent: const ScrollCacheExtent.viewport(1.5),
-          controller: scrollController,
-          scrollBehavior: scrollBehavior,
-          physics: physics,
-          slivers: [
-            ...leading,
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                  vertical: 10.0,
-                ),
-                child: Row(
-                  children: [
-                    ?title,
-                    const Spacer(),
-                    const GridExtentSlider(),
-                    if (showToggle)
-                      SegmentedButton<WebMangaListView>(
-                        showSelectedIcon: false,
-                        style: SegmentedButton.styleFrom(
-                          shape: const RoundedRectangleBorder(),
-                        ),
-                        segments: <ButtonSegment<WebMangaListView>>[
-                          ButtonSegment<WebMangaListView>(
-                            value: WebMangaListView.grid,
-                            icon: Icon(Icons.grid_view, size: 24),
-                            tooltip: tr.ui.gridView,
-                          ),
-                          ButtonSegment<WebMangaListView>(
-                            value: WebMangaListView.list,
-                            icon: Icon(Icons.table_rows, size: 24),
-                            tooltip: tr.ui.listView,
-                          ),
-                        ],
-                        selected: <WebMangaListView>{view},
-                        onSelectionChanged:
-                            (Set<WebMangaListView> newSelection) {
-                              ref.read(_mangaListViewProvider.notifier).state =
-                                  newSelection.first;
-                            },
-                      ),
-                  ],
-                ),
-              ),
+    return CustomScrollView(
+      scrollCacheExtent: const ScrollCacheExtent.viewport(1.5),
+      controller: scrollController,
+      scrollBehavior: scrollBehavior,
+      physics: physics,
+      slivers: [
+        ...leading,
+        SliverLoadingIndicator(loading: isLoading),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0,
+              vertical: 10.0,
             ),
-            if (extraRow != null)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 8.0, bottom: 10.0),
-                  child: Row(children: extraRow!),
-                ),
-              ),
-            ...children,
-          ],
+            child: Row(
+              children: [
+                ?title,
+                const Spacer(),
+                const GridExtentSlider(),
+                if (showToggle)
+                  SegmentedButton<WebMangaListView>(
+                    showSelectedIcon: false,
+                    style: SegmentedButton.styleFrom(
+                      shape: const RoundedRectangleBorder(),
+                    ),
+                    segments: <ButtonSegment<WebMangaListView>>[
+                      ButtonSegment<WebMangaListView>(
+                        value: WebMangaListView.grid,
+                        icon: Icon(Icons.grid_view, size: 24),
+                        tooltip: tr.ui.gridView,
+                      ),
+                      ButtonSegment<WebMangaListView>(
+                        value: WebMangaListView.list,
+                        icon: Icon(Icons.table_rows, size: 24),
+                        tooltip: tr.ui.listView,
+                      ),
+                    ],
+                    selected: <WebMangaListView>{view},
+                    onSelectionChanged: (Set<WebMangaListView> newSelection) {
+                      ref.read(_mangaListViewProvider.notifier).state =
+                          newSelection.first;
+                    },
+                  ),
+              ],
+            ),
+          ),
         ),
-        if (isLoading) ...Styles.loadingOverlay,
+        if (extraRow != null)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0, bottom: 10.0),
+              child: Row(children: extraRow!),
+            ),
+          ),
+        ...children,
       ],
     );
   }

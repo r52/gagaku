@@ -128,10 +128,12 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                   return ElevatedButton(
                     style: Styles.buttonStyle(),
                     onPressed:
-                        listNameChanged ||
-                            (list != null &&
-                                !setEquals(selected.state, list!.set)) ||
-                            (list != null && vis != list!.attributes.visibility)
+                        !isLoading &&
+                            (listNameChanged ||
+                                (list != null &&
+                                    !setEquals(selected.state, list!.set)) ||
+                                (list != null &&
+                                    vis != list!.attributes.visibility))
                         ? () async {
                             final messenger = ScaffoldMessenger.of(context);
 
@@ -186,7 +188,10 @@ class MangaDexEditListScreen extends HookConsumerWidget {
                             }
                           }
                         : null,
-                    child: Text(list != null ? tr.ui.save : tr.ui.create),
+                    child: ButtonProgressLabel(
+                      loading: isLoading,
+                      child: Text(list != null ? tr.ui.save : tr.ui.create),
+                    ),
                   );
                 },
               ),
@@ -195,138 +200,136 @@ class MangaDexEditListScreen extends HookConsumerWidget {
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          SafeArea(
-            child: Column(
-              spacing: 12.0,
-              children: [
-                const SizedBox.shrink(),
-                Row(
-                  spacing: 12.0,
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: listNameController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          labelText: tr.mangadex.listName,
-                        ),
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: (String? value) {
-                          return (value == null || value.isEmpty)
-                              ? tr.mangadex.listNameEmptyWarning
-                              : null;
-                        },
+      body: AbsorbPointer(
+        absorbing: isLoading,
+        child: SafeArea(
+          child: Column(
+            spacing: 12.0,
+            children: [
+              const SizedBox.shrink(),
+              Row(
+                spacing: 12.0,
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: listNameController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        labelText: tr.mangadex.listName,
                       ),
-                    ),
-                    DropdownMenu<CustomListVisibility>(
-                      label: Text(tr.mangadex.visibility),
-                      initialSelection: visibility.value,
-                      enableFilter: false,
-                      enableSearch: false,
-                      requestFocusOnTap: false,
-                      onSelected: (v) {
-                        if (v != null) {
-                          visibility.value = v;
-                        }
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (String? value) {
+                        return (value == null || value.isEmpty)
+                            ? tr.mangadex.listNameEmptyWarning
+                            : null;
                       },
-                      dropdownMenuEntries: [
-                        DropdownMenuEntry<CustomListVisibility>(
-                          value: CustomListVisibility.private,
-                          label: tr[CustomListVisibility.private.label],
-                        ),
-                        DropdownMenuEntry<CustomListVisibility>(
-                          value: CustomListVisibility.public,
-                          label: tr[CustomListVisibility.public.label],
-                        ),
-                      ],
                     ),
-                  ],
-                ),
-                ElevatedButton(
-                  style: Styles.buttonStyle(
-                    backgroundColor: Theme.of(context)
-                        .colorScheme
-                        .primaryContainer,
                   ),
-                  onPressed: () {
-                    MangaDexSearchRoute(
-                      selectMode: true,
-                      selectedTitles: selected.state,
-                    ).push<Set<String>>(context).then((result) {
-                      if (result != null) {
-                        selected.dispatch(
-                          MangaSetAction(
-                            action: MangaSetActions.replace,
-                            replacement: result,
-                          ),
-                        );
+                  DropdownMenu<CustomListVisibility>(
+                    label: Text(tr.mangadex.visibility),
+                    initialSelection: visibility.value,
+                    enableFilter: false,
+                    enableSearch: false,
+                    requestFocusOnTap: false,
+                    onSelected: (v) {
+                      if (v != null) {
+                        visibility.value = v;
                       }
-                    });
-                  },
-                  child: Text(tr.mangadex.addTitles),
-                ),
-                Expanded(
-                  child: HookConsumer(
-                    builder: (context, ref, child) {
-                      final page = useValueListenable(currentPage)
-                          .clamp(0, pageCount - 1);
-                      final future = useMangaListFetcher(
-                        ref,
-                        selected.state,
-                        page,
-                      );
-
-                      return MangaListWidget(
-                        title: Text(
-                          '${tr.titles} ${list != null ? '(${list!.set.length} > ${selected.state.length})' : '(${selected.state.length})'}',
-                          style: CommonTextStyles.twentyfour,
-                        ),
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        controller: scrollController,
-                        showToggle: false,
-                        future: future,
-                        children: [
-                          if (future.hasData)
-                            MangaListViewSliver(
-                              items: future.data,
-                              selectMode: true,
-                              selectButton: (manga) {
-                                return const Icon(Icons.remove);
-                              },
-                              onSelected: (manga) {
-                                selected.dispatch(
-                                  MangaSetAction(
-                                    action: MangaSetActions.remove,
-                                    element: manga.id,
-                                  ),
-                                );
-                              },
-                            ),
-                        ],
-                      );
                     },
+                    dropdownMenuEntries: [
+                      DropdownMenuEntry<CustomListVisibility>(
+                        value: CustomListVisibility.private,
+                        label: tr[CustomListVisibility.private.label],
+                      ),
+                      DropdownMenuEntry<CustomListVisibility>(
+                        value: CustomListVisibility.public,
+                        label: tr[CustomListVisibility.public.label],
+                      ),
+                    ],
                   ),
+                ],
+              ),
+              ElevatedButton(
+                style: Styles.buttonStyle(
+                  backgroundColor: Theme.of(context)
+                      .colorScheme
+                      .primaryContainer,
                 ),
-                HookBuilder(
-                  builder: (context) {
-                    final page = useValueListenable(currentPage);
-                    return PageNumberBar(
-                      pageCount: pageCount,
-                      currentPage: page,
-                      onPageChanged: (index) {
-                        scrollController.jumpTo(0.0);
-                        currentPage.value = index;
-                      },
+                onPressed: () {
+                  MangaDexSearchRoute(
+                    selectMode: true,
+                    selectedTitles: selected.state,
+                  ).push<Set<String>>(context).then((result) {
+                    if (result != null) {
+                      selected.dispatch(
+                        MangaSetAction(
+                          action: MangaSetActions.replace,
+                          replacement: result,
+                        ),
+                      );
+                    }
+                  });
+                },
+                child: Text(tr.mangadex.addTitles),
+              ),
+              Expanded(
+                child: HookConsumer(
+                  builder: (context, ref, child) {
+                    final page = useValueListenable(currentPage)
+                        .clamp(0, pageCount - 1);
+                    final future = useMangaListFetcher(
+                      ref,
+                      selected.state,
+                      page,
+                    );
+
+                    return MangaListWidget(
+                      title: Text(
+                        '${tr.titles} ${list != null ? '(${list!.set.length} > ${selected.state.length})' : '(${selected.state.length})'}',
+                        style: CommonTextStyles.twentyfour,
+                      ),
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      controller: scrollController,
+                      showToggle: false,
+                      future: future,
+                      children: [
+                        if (future.hasData)
+                          MangaListViewSliver(
+                            items: future.data,
+                            selectMode: true,
+                            selectButton: (manga) {
+                              return const Icon(Icons.remove);
+                            },
+                            onSelected: (manga) {
+                              selected.dispatch(
+                                MangaSetAction(
+                                  action: MangaSetActions.remove,
+                                  element: manga.id,
+                                ),
+                              );
+                            },
+                          ),
+                      ],
                     );
                   },
                 ),
-              ],
-            ),
+              ),
+              HookBuilder(
+                builder: (context) {
+                  final page = useValueListenable(currentPage);
+                  return PageNumberBar(
+                    pageCount: pageCount,
+                    currentPage: page,
+                    onPageChanged: (index) {
+                      scrollController.jumpTo(0.0);
+                      currentPage.value = index;
+                    },
+                  );
+                },
+              ),
+            ],
           ),
-          if (isLoading) ...Styles.loadingOverlay,
-        ],
+        ),
       ),
     );
   }
