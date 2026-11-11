@@ -1,7 +1,6 @@
 import 'dart:collection';
 
 import 'package:flutter/rendering.dart';
-import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/riverpod.dart';
 
 import 'package:cached_network_image_ce/cached_network_image.dart';
@@ -12,6 +11,7 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
+import 'package:gagaku/util/paging.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -22,7 +22,7 @@ import 'package:gagaku/web/settings.dart';
 import 'package:gagaku/web/source_manager.dart';
 import 'package:gagaku/web/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:paged_slivers/paged_slivers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -252,6 +252,19 @@ class WebMangaListWidget extends HookConsumerWidget {
   }
 }
 
+/// Paperback paging cursor: `null` requests the first page, otherwise the
+/// record carries the `metadata` the previous page returned.
+typedef WebPageCursor = ({dynamic metadata})?;
+
+/// Converts a Paperback page into a [PageResult]. A page without `metadata`
+/// is the last one.
+PageResult<WebPageCursor, T> webPageResult<T>(
+  List<T> items,
+  dynamic metadata,
+) => metadata == null
+    ? PageResult.last(items)
+    : PageResult.more(items, nextKey: (metadata: metadata));
+
 class WebMangaListViewSliver extends ConsumerWidget {
   const WebMangaListViewSliver({
     super.key,
@@ -269,7 +282,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
   final bool showRemoveButton;
   final bool showSearchButton;
 
-  final PagingController<dynamic, HistoryLink>? controller;
+  final PagedView<HistoryLink>? controller;
 
   int? _findItemIndexCb(Key? key) {
     final valueKey = key as ValueKey<String>;
@@ -428,101 +441,81 @@ class WebMangaListViewSliver extends ConsumerWidget {
       }
     }
 
-    return PagingListener(
-      controller: controller!,
-      builder: (context, state, fetchNextPage) {
-        switch (view) {
-          case WebMangaListView.list:
-            return PagedSliverList.separated(
-              state: state,
-              fetchNextPage: fetchNextPage,
-              separatorBuilder: (_, _) => const SizedBox(height: 4.0),
-              builderDelegate:
-                  ErrorReportingPagedChildBuilderDelegate<HistoryLink>(
-                    error: state.error,
-                    fetchNextPage: fetchNextPage,
-                    animateTransitions: true,
-                    itemBuilder: (context, item, index) {
-                      final tr = context.t;
-                      return ListTile(
-                        key: ValueKey(item.url),
-                        tileColor: index.isOdd
-                            ? theme.colorScheme.surfaceContainer
-                            : theme.colorScheme.surfaceContainerHighest,
-                        leading: FavoritesButton(link: item),
-                        trailing: showRemoveButton
-                            ? IconButton(
-                                tooltip: tr.mangaActions.removeHistory,
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () async {
-                                  WebHistoryManager().remove(item);
-                                },
-                              )
-                            : null,
-                        title: Text(item.title),
-                        textColor: theme.colorScheme.onSurface,
-                        onTap: () async {
-                          final tr = context.t;
-                          final resolver = ref.read(webLinkResolverProvider);
-                          final messenger = ScaffoldMessenger.of(context);
-                          final result = await resolver.resolveHistoryLink(
-                            item,
-                          );
+    final paged = controller!;
+    final statusBuilders = pagedStatusBuilders(context);
 
-                          if (!context.mounted) return;
-                          if (result.series == null) {
-                            messenger
-                              ..removeCurrentSnackBar()
-                              ..showSnackBar(
-                                SnackBar(
-                                  content: Text(tr.errors.unsupportedUrl),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                          } else {
-                            openWebSource(
-                              context,
-                              ResolvedWebLink(series: result.series!),
-                            );
-                          }
-                        },
-                      );
-                    },
-                  ),
+    switch (view) {
+      case WebMangaListView.list:
+        return PagedSliverList<HistoryLink>.separated(
+          view: paged,
+          statusBuilders: statusBuilders,
+          separatorBuilder: (_, _) => const SizedBox(height: 4.0),
+          itemBuilder: (context, item, index) {
+            final tr = context.t;
+            return ListTile(
+              key: ValueKey(item.url),
+              tileColor: index.isOdd
+                  ? theme.colorScheme.surfaceContainer
+                  : theme.colorScheme.surfaceContainerHighest,
+              leading: FavoritesButton(link: item),
+              trailing: showRemoveButton
+                  ? IconButton(
+                      tooltip: tr.mangaActions.removeHistory,
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        WebHistoryManager().remove(item);
+                      },
+                    )
+                  : null,
+              title: Text(item.title),
+              textColor: theme.colorScheme.onSurface,
+              onTap: () async {
+                final tr = context.t;
+                final resolver = ref.read(webLinkResolverProvider);
+                final messenger = ScaffoldMessenger.of(context);
+                final result = await resolver.resolveHistoryLink(item);
+
+                if (!context.mounted) return;
+                if (result.series == null) {
+                  messenger
+                    ..removeCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(tr.errors.unsupportedUrl),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                } else {
+                  openWebSource(
+                    context,
+                    ResolvedWebLink(series: result.series!),
+                  );
+                }
+              },
             );
-          case WebMangaListView.grid:
-            return PagedSliverGrid(
-              state: state,
-              fetchNextPage: fetchNextPage,
-              showNewPageErrorIndicatorAsGridChild: false,
-              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: gridExtent.grid,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-                childAspectRatio: 0.7,
-              ),
-              builderDelegate:
-                  ErrorReportingPagedChildBuilderDelegate<HistoryLink>(
-                    error: state.error,
-                    fetchNextPage: fetchNextPage,
-                    animateTransitions: true,
-                    itemBuilder: (context, item, index) {
-                      return GridMangaItem(
-                        key: ValueKey(item.url),
-                        link: item,
-                        showFavoriteButton: showFavoriteButton,
-                        showRemoveButton: showRemoveButton,
-                        showSearchButton: showSearchButton,
-                      );
-                    },
-                  ),
+          },
+        );
+      case WebMangaListView.grid:
+        return PagedSliverGrid<HistoryLink>(
+          view: paged,
+          statusBuilders: statusBuilders,
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: gridExtent.grid,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 0.7,
+          ),
+          itemBuilder: (context, item, index) {
+            return GridMangaItem(
+              key: ValueKey(item.url),
+              link: item,
+              showFavoriteButton: showFavoriteButton,
+              showRemoveButton: showRemoveButton,
+              showSearchButton: showSearchButton,
             );
-        }
-      },
-    );
+          },
+        );
+    }
   }
 }
 

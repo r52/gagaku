@@ -1072,6 +1072,18 @@ List<FeedChapter> pairFeedChapters(
   ];
 }
 
+/// Drops repeated chapters, keeping each chapter's first occurrence.
+///
+/// Offset pages overlap when chapters are published between page fetches, so
+/// the last chapters of one page can reappear at the start of the next.
+List<FeedChapter> uniqueFeedChapters(Iterable<FeedChapter> chapters) {
+  final seen = <String>{};
+  return [
+    for (final item in chapters)
+      if (seen.add(item.chapter.id)) item,
+  ];
+}
+
 class ReadChapterSet with ExpiringData {
   ReadChapterSet(this.mangaId, this._chapters);
 

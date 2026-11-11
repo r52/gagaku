@@ -1,5 +1,3 @@
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-
 import 'dart:async';
 
 import 'package:gagaku/util/riverpod.dart';
@@ -11,13 +9,13 @@ import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:material_hooks/material_hooks.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/model/search_history.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:paged_slivers/paged_slivers.dart';
 
 class MangaDexSearchPage extends StatefulHookConsumerWidget {
   const MangaDexSearchPage({
@@ -42,15 +40,12 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
       widget.parameters ??
       const MangaSearchParameters(query: '', filter: MangaFilters());
 
-  late final _pagingManager = OffsetPagingManager<Manga>(limit: info.limit);
-
   void _refresh() {
-    _pagingManager.reset();
     _pagingController.refresh();
   }
 
-  late final _pagingController = PagingController<int, Manga>(
-    getNextPageKey: _pagingManager.getNextPageKey,
+  late final _pagingController = PagedController<int, Manga>(
+    firstKey: 0,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
       final filter = _searchParameters;
@@ -61,8 +56,6 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
         filter: filter.filter,
         offset: pageKey,
       );
-
-      _pagingManager.totalItems = results.total;
 
       final manga = results.data.cast<Manga>();
 
@@ -76,7 +69,12 @@ class _MangaDexSearchPageState extends ConsumerState<MangaDexSearchPage> {
         }
       }
 
-      return manga;
+      return PageResult.offset(
+        manga,
+        offset: pageKey,
+        limit: info.limit,
+        total: results.total,
+      );
     },
   );
 

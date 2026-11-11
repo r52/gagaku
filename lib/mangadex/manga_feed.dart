@@ -1,12 +1,11 @@
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/log.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
-import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:paged_slivers/paged_slivers.dart';
 
 class MangaDexMangaFeed extends ConsumerStatefulWidget {
   const MangaDexMangaFeed({
@@ -26,10 +25,8 @@ class MangaDexMangaFeed extends ConsumerStatefulWidget {
 class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
   static const info = MangaDexFeeds.latestChapters;
 
-  late final _pagingManager = OffsetPagingManager<Manga>(limit: info.limit);
-
-  late final _pagingController = PagingController<int, Manga>(
-    getNextPageKey: _pagingManager.getNextPageKey,
+  late final _pagingController = PagedController<int, Manga>(
+    firstKey: 0,
     fetchPage: (pageKey) async {
       final api = ref.watch(mangadexProvider);
 
@@ -39,8 +36,6 @@ class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
         limit: info.limit,
         offset: pageKey,
       );
-
-      _pagingManager.totalItems = chapterlist.total;
 
       final chapters = chapterlist.data.cast<Chapter>();
 
@@ -58,7 +53,12 @@ class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
         logger.e(e, error: e);
       }
 
-      return mangas;
+      return PageResult.offset(
+        mangas,
+        offset: pageKey,
+        limit: info.limit,
+        total: chapterlist.total,
+      );
     },
   );
 
@@ -73,7 +73,6 @@ class _MangaDexMangaFeedState extends ConsumerState<MangaDexMangaFeed> {
     return Center(
       child: RefreshIndicator(
         onRefresh: () async {
-          _pagingManager.reset();
           final api = ref.watch(mangadexProvider);
           await api.invalidateAll(info.key);
           return _pagingController.refresh();

@@ -13,15 +13,15 @@ import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/routes.dart';
-import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/detail_scaffold.dart';
+import 'package:gagaku/util/paging.dart';
 import 'package:material_hooks/material_hooks.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/types.dart' show SearchQuery;
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:paged_slivers/paged_slivers.dart';
 import 'package:riverpod/experimental/mutation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -99,12 +99,8 @@ class _MangaDexMangaViewWidgetState
   static const chapterInfo = MangaDexFeeds.mangaChapters;
   static const coverInfo = MangaDexFeeds.mangaCovers;
 
-  late final _chapterManager = OffsetPagingManager<Chapter>(
-    limit: chapterInfo.limit,
-  );
-
-  late final _chapterController = PagingController<int, Chapter>(
-    getNextPageKey: _chapterManager.getNextPageKey,
+  late final _chapterController = PagedController<int, Chapter>(
+    firstKey: 0,
     fetchPage: (pageKey) async {
       final api = ref.read(mangadexProvider);
       final sort = ref.read(mangaChaptersListSortProvider);
@@ -120,8 +116,6 @@ class _MangaDexMangaViewWidgetState
         ignoreOriginalLanguage: true,
       );
 
-      _chapterManager.totalItems = chapterlist.total;
-
       final chapters = chapterlist.data.cast<Chapter>();
 
       try {
@@ -132,48 +126,38 @@ class _MangaDexMangaViewWidgetState
         logger.e(e, error: e);
       }
 
-      return chapters;
+      return PageResult.offset(
+        chapters,
+        offset: pageKey,
+        limit: chapterInfo.limit,
+        total: chapterlist.total,
+      );
     },
   );
 
-  late final _coverManager = OffsetPagingManager<CoverArt>(
-    limit: coverInfo.limit,
-  );
-
-  late final _coverController = PagingController<int, CoverArt>(
-    getNextPageKey: _coverManager.getNextPageKey,
+  late final _coverController = PagedController<int, CoverArt>(
+    firstKey: 0,
     fetchPage: (pageKey) async {
       final api = ref.read(mangadexProvider);
       final covers = await api.getCoverList(widget.manga, offset: pageKey);
 
-      _coverManager.totalItems = covers.total;
-
-      return covers.data.cast<CoverArt>();
+      return PageResult.offset(
+        covers.data.cast<CoverArt>(),
+        offset: pageKey,
+        limit: coverInfo.limit,
+        total: covers.total,
+      );
     },
   );
 
-  late final _relatedController = PagingController<int, Manga>(
-    getNextPageKey: (state) {
-      if (widget.manga.relatedMangas.isEmpty) {
-        return null;
-      }
-
-      if (state.keys?.last == null) {
-        return 0;
-      }
-
-      if (state.keys!.last + MangaDexEndpoints.searchLimit >=
-          widget.manga.relatedMangas.length) {
-        return null;
-      }
-
-      return state.keys!.last + MangaDexEndpoints.searchLimit;
-    },
+  // Pages over the in-memory list of related titles.
+  late final _relatedController = PagedController<int, Manga>(
+    firstKey: 0,
     fetchPage: (pageKey) async {
       final related = widget.manga.relatedMangas;
 
       if (related.isEmpty) {
-        return [];
+        return const PageResult.last([]);
       }
 
       final me = await ref.readAsync(loggedUserProvider.future);
@@ -203,7 +187,12 @@ class _MangaDexMangaViewWidgetState
         logger.e(e, error: e);
       }
 
-      return mangas;
+      return PageResult.offset(
+        mangas,
+        offset: pageKey,
+        limit: MangaDexEndpoints.searchLimit,
+        total: related.length,
+      );
     },
   );
 
@@ -264,13 +253,11 @@ class _MangaDexMangaViewWidgetState
 
       switch (_ViewType.values[tabController.index]) {
         case _ViewType.chapters:
-          _chapterManager.reset();
           await ref
               .read(mangadexProvider)
               .invalidateAll('${chapterInfo.key}(${widget.manga.id}');
           return _chapterController.refresh();
         case _ViewType.art:
-          _coverManager.reset();
           await ref
               .read(mangadexProvider)
               .invalidateAll('${coverInfo.key}(${widget.manga.id}');
@@ -619,7 +606,7 @@ class _ChapterControlsBar extends ConsumerWidget {
   });
 
   final Manga manga;
-  final PagingController<int, Chapter> chapterController;
+  final PagedController<int, Chapter> chapterController;
   final VoidCallback onSortChanged;
 
   @override
@@ -654,12 +641,12 @@ class _ChapterControlsBar extends ConsumerWidget {
           ),
           const Spacer(),
           if (me != null)
-            PagingListener(
-              controller: chapterController,
-              builder: (context, state, fetchNextPage) {
-                final chapters = state.items;
+            ListenableBuilder(
+              listenable: chapterController,
+              builder: (context, _) {
+                final chapters = chapterController.state.items;
 
-                final allRead = chapters != null
+                final allRead = chapters.isNotEmpty
                     ? ref.watch(
                         mangaReadChaptersProvider(manga).select(
                           (value) => switch (value) {
@@ -706,7 +693,7 @@ class _ChapterControlsBar extends ConsumerWidget {
                       },
                     );
 
-                    if (chapters != null && result == true) {
+                    if (chapters.isNotEmpty && result == true) {
                       ref.run((tsx) async {
                         return await tsx
                             .get(readChaptersProvider(me.id).notifier)
@@ -728,14 +715,19 @@ class _ChapterControlsBar extends ConsumerWidget {
   }
 }
 
-class _MangaChaptersView extends StatelessWidget {
+class _MangaChaptersView extends HookWidget {
   const _MangaChaptersView({required this.manga, required this.controller});
 
   final Manga manga;
-  final PagingController<int, Chapter> controller;
+  final PagedController<int, Chapter> controller;
 
   @override
   Widget build(BuildContext context) {
+    final rows = useMemoized(
+      () => controller.project(_ChapterRow.fromChapters),
+      [controller],
+    );
+
     return CustomScrollView(
       scrollCacheExtent: const ScrollCacheExtent.viewport(1.0),
       physics: const AlwaysScrollableScrollPhysics(),
@@ -750,16 +742,7 @@ class _MangaChaptersView extends StatelessWidget {
             ),
           ),
         ),
-        PagingListener(
-          controller: controller,
-          builder: (context, state, fetchNextPage) {
-            return _ChapterListSliver(
-              state: state,
-              fetchNextPage: fetchNextPage,
-              manga: manga,
-            );
-          },
-        ),
+        _ChapterListSliver(view: rows, manga: manga),
       ],
     );
   }
@@ -769,7 +752,7 @@ class _MangaCoversView extends HookWidget {
   const _MangaCoversView({required this.manga, required this.controller});
 
   final Manga manga;
-  final PagingController<int, CoverArt> controller;
+  final PagedController<int, CoverArt> controller;
 
   @override
   Widget build(BuildContext context) {
@@ -778,16 +761,13 @@ class _MangaCoversView extends HookWidget {
 
     final selectedLocales = useState<Set<String?>?>(null);
 
-    final discoveredLocales = useMemoized(() {
-      final items = state.items;
-      if (items == null) return <String?>{};
-      return items.map((e) => e.attributes?.locale).toSet();
-    }, [state.items]);
+    final discoveredLocales = useMemoized(
+      () => state.items.map((e) => e.attributes?.locale).toSet(),
+      [state.items],
+    );
 
     useEffect(() {
-      if (selectedLocales.value == null &&
-          state.items != null &&
-          state.items!.isNotEmpty) {
+      if (selectedLocales.value == null && state.items.isNotEmpty) {
         final originalLang = manga.attributes?.originalLanguage.code;
         if (discoveredLocales.contains(originalLang)) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -804,25 +784,22 @@ class _MangaCoversView extends HookWidget {
 
     final currentSelected = selectedLocales.value ?? {};
 
-    final filteredState = useMemoized(() {
-      if (currentSelected.isEmpty) return state;
-
-      return state.filterItems(
-        (item) => currentSelected.contains(item.attributes?.locale),
-      );
-    }, [state, currentSelected]);
-
-    useEffect(() {
-      if (filteredState.items != null &&
-          filteredState.items!.length < 10 &&
-          filteredState.hasNextPage &&
-          !filteredState.isLoading) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          controller.fetchNextPage();
-        });
-      }
-      return null;
-    }, [filteredState]);
+    // Keeps loading while fewer than 10 covers match the selected locales.
+    final filtered = useMemoized(
+      () => controller.project(
+        (items) {
+          final selected = selectedLocales.value ?? const {};
+          if (selected.isEmpty) return items;
+          return [
+            for (final item in items)
+              if (selected.contains(item.attributes?.locale)) item,
+          ];
+        },
+        dependencies: selectedLocales,
+        minItems: 10,
+      ),
+      [controller, selectedLocales],
+    );
 
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -886,41 +863,35 @@ class _MangaCoversView extends HookWidget {
             ),
           ),
         ),
-        PagedSliverGrid(
+        PagedSliverGrid<CoverArt>(
+          view: filtered,
           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 256,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             childAspectRatio: 0.7,
           ),
-          state: filteredState,
-          fetchNextPage: controller.fetchNextPage,
-          showNewPageErrorIndicatorAsGridChild: false,
-          builderDelegate: ErrorReportingPagedChildBuilderDelegate<CoverArt>(
-            error: filteredState.error,
-            fetchNextPage: controller.fetchNextPage,
-            animateTransitions: true,
-            itemBuilder: (context, item, index) => CoverArtGridItem(
-              key: ValueKey(item.id),
-              url: manga
-                  .getUrlFromCover(item)
-                  .quality(quality: CoverArtQuality.medium),
-              heroTag: item.id,
-              footer: item.attributes?.volume != null
-                  ? GridAlbumTextBar(
-                      text: tr.mangaView.volume(n: item.attributes!.volume!),
-                    )
-                  : null,
-              onTap: () => Navigator.push(
-                context,
-                TransparentOverlay(
-                  builder: (context) => CoverArtPagedOverlay(
-                    index: index,
-                    items: [
-                      for (final cover in filteredState.items!)
-                        (url: manga.getUrlFromCover(cover), heroTag: cover.id),
-                    ],
-                  ),
+          statusBuilders: pagedStatusBuilders(context),
+          itemBuilder: (context, item, index) => CoverArtGridItem(
+            key: ValueKey(item.id),
+            url: manga
+                .getUrlFromCover(item)
+                .quality(quality: CoverArtQuality.medium),
+            heroTag: item.id,
+            footer: item.attributes?.volume != null
+                ? GridAlbumTextBar(
+                    text: tr.mangaView.volume(n: item.attributes!.volume!),
+                  )
+                : null,
+            onTap: () => Navigator.push(
+              context,
+              TransparentOverlay(
+                builder: (context) => CoverArtPagedOverlay(
+                  index: index,
+                  items: [
+                    for (final cover in filtered.snapshot.items)
+                      (url: manga.getUrlFromCover(cover), heroTag: cover.id),
+                  ],
                 ),
               ),
             ),
@@ -931,110 +902,134 @@ class _MangaCoversView extends HookWidget {
   }
 }
 
-class _ChapterListSliver extends HookWidget {
-  const _ChapterListSliver({
-    required this.state,
-    required this.fetchNextPage,
-    required this.manga,
+/// A chapter in volume order, with its grouping relative to its neighbours.
+@immutable
+class _ChapterRow {
+  const _ChapterRow({
+    required this.chapter,
+    required this.startsVolume,
+    required this.startsDuplicateChapterGroup,
+    required this.isIndented,
   });
 
-  final PagingState<int, Chapter> state;
-  final NextPageCallback fetchNextPage;
+  final Chapter chapter;
+
+  /// Whether the volume header precedes this chapter.
+  final bool startsVolume;
+
+  /// Whether a chapter-number header precedes this chapter, which starts a run
+  /// of several releases of the same chapter.
+  final bool startsDuplicateChapterGroup;
+
+  /// Whether this chapter belongs to a run of releases of the same chapter.
+  final bool isIndented;
+
+  /// Groups [chapters] by volume, keeping first-appearance order, and derives
+  /// each row's headers and indentation from its neighbours.
+  ///
+  /// Runs over every loaded chapter, because a later page can add chapters to
+  /// an earlier volume and changes the neighbours at page boundaries.
+  static List<_ChapterRow> fromChapters(List<Chapter> chapters) {
+    final ordered = chapters
+        .groupListsBy((chapter) => chapter.attributes.volume)
+        .values
+        .expand((volumeChapters) => volumeChapters)
+        .toList(growable: false);
+
+    return [
+      for (final (index, chapter) in ordered.indexed)
+        _ChapterRow.at(
+          chapter,
+          previous: index > 0 ? ordered[index - 1] : null,
+          next: index < ordered.length - 1 ? ordered[index + 1] : null,
+        ),
+    ];
+  }
+
+  factory _ChapterRow.at(
+    Chapter chapter, {
+    required Chapter? previous,
+    required Chapter? next,
+  }) {
+    final volume = chapter.attributes.volume;
+    final chapterNumber = chapter.attributes.chapter;
+    final startsVolume =
+        previous == null || previous.attributes.volume != volume;
+    final previousIsDifferentChapter =
+        startsVolume || previous.attributes.chapter != chapterNumber;
+    final nextIsSameChapter =
+        next != null &&
+        next.attributes.volume == volume &&
+        next.attributes.chapter == chapterNumber;
+
+    return _ChapterRow(
+      chapter: chapter,
+      startsVolume: startsVolume,
+      startsDuplicateChapterGroup:
+          nextIsSameChapter && previousIsDifferentChapter,
+      isIndented: nextIsSameChapter || !previousIsDifferentChapter,
+    );
+  }
+}
+
+class _ChapterListSliver extends StatelessWidget {
+  const _ChapterListSliver({required this.view, required this.manga});
+
+  final PagedView<_ChapterRow> view;
   final Manga manga;
 
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
 
-    // final sort = ref.watch(mangaChaptersListSortProvider);
-    // final sortfunc = sort == ListSort.ascending
-    //     ? compareNatural
-    //     : (a, b) {
-    //         return compareNatural(b, a);
-    //       };
-
-    final chapters = state.items;
-
-    final orderedChapters = useMemoized(() {
-      if (chapters == null) {
-        return null;
-      }
-
-      return chapters
-          .groupListsBy((chapter) => chapter.attributes.volume)
-          .values
-          .expand((volumeChapters) => volumeChapters)
-          .toList(growable: false);
-    }, [state]);
-
-    return PagedSliverList.separated(
-      state: state,
-      fetchNextPage: fetchNextPage,
+    return PagedSliverList<_ChapterRow>.separated(
+      view: view,
+      statusBuilders: pagedStatusBuilders(context),
+      animateTransitions: false,
       separatorBuilder: (_, index) => const SizedBox(height: 4.0),
-      builderDelegate: ErrorReportingPagedChildBuilderDelegate<Chapter>(
-        error: state.error,
-        fetchNextPage: fetchNextPage,
-        itemBuilder: (context, _, index) {
-          final chapter = orderedChapters![index];
-          final previousChapter = index > 0 ? orderedChapters[index - 1] : null;
-          final nextChapter = index < orderedChapters.length - 1
-              ? orderedChapters[index + 1]
-              : null;
-          final volume = chapter.attributes.volume;
-          final chapterNumber = chapter.attributes.chapter;
-          final startsVolume =
-              previousChapter == null ||
-              previousChapter.attributes.volume != volume;
-          final previousIsDifferentChapter =
-              startsVolume ||
-              previousChapter.attributes.chapter != chapterNumber;
-          final nextIsSameChapter =
-              nextChapter != null &&
-              nextChapter.attributes.volume == volume &&
-              nextChapter.attributes.chapter == chapterNumber;
-          final startsDuplicateChapterGroup =
-              nextIsSameChapter && previousIsDifferentChapter;
-          final isIndented = nextIsSameChapter || !previousIsDifferentChapter;
+      itemBuilder: (context, row, index) {
+        final chapter = row.chapter;
+        final volume = chapter.attributes.volume;
+        final chapterNumber = chapter.attributes.chapter;
 
-          final chapbtn = ChapterButtonWidget(chapter: chapter, manga: manga);
+        final chapbtn = ChapterButtonWidget(chapter: chapter, manga: manga);
 
-          final chapterWidget = isIndented
-              ? Row(
-                  children: [
-                    const Icon(Icons.subdirectory_arrow_right, size: 15.0),
-                    Flexible(child: chapbtn),
-                  ],
-                )
-              : chapbtn;
+        final chapterWidget = row.isIndented
+            ? Row(
+                children: [
+                  const Icon(Icons.subdirectory_arrow_right, size: 15.0),
+                  Flexible(child: chapbtn),
+                ],
+              )
+            : chapbtn;
 
-          return Column(
-            key: ValueKey(chapter.id),
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (startsVolume) ...[
-                _ChapterListHeader(
-                  text: volume == null
-                      ? tr.mangaView.noVolume
-                      : tr.mangaView.volume(n: volume),
-                  bold: true,
-                ),
-                const SizedBox(height: 4.0),
-              ],
-              if (startsDuplicateChapterGroup) ...[
-                _ChapterListHeader(
-                  text: chapterNumber != null
-                      ? tr.mangaView.chapter(n: chapterNumber)
-                      : chapter.title,
-                  bold: false,
-                ),
-                const SizedBox(height: 4.0),
-              ],
-              chapterWidget,
+        return Column(
+          key: ValueKey(chapter.id),
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (row.startsVolume) ...[
+              _ChapterListHeader(
+                text: volume == null
+                    ? tr.mangaView.noVolume
+                    : tr.mangaView.volume(n: volume),
+                bold: true,
+              ),
+              const SizedBox(height: 4.0),
             ],
-          );
-        },
-      ),
+            if (row.startsDuplicateChapterGroup) ...[
+              _ChapterListHeader(
+                text: chapterNumber != null
+                    ? tr.mangaView.chapter(n: chapterNumber)
+                    : chapter.title,
+                bold: false,
+              ),
+              const SizedBox(height: 4.0),
+            ],
+            chapterWidget,
+          ],
+        );
+      },
     );
   }
 }
@@ -1612,7 +1607,7 @@ class _MangaRelatedView extends StatelessWidget {
   const _MangaRelatedView({required this.manga, required this.controller});
 
   final Manga manga;
-  final PagingController<int, Manga> controller;
+  final PagedController<int, Manga> controller;
 
   @override
   Widget build(BuildContext context) {

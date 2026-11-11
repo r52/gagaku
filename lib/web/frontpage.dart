@@ -1,4 +1,3 @@
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -12,8 +11,8 @@ import 'package:gagaku/web/model/model.dart';
 import 'package:gagaku/web/model/types.dart';
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:paged_slivers/paged_slivers.dart';
 
-const _firstSearch = 0xDEADBEEF;
 var _nextExtensionHomepageInstanceId = 1;
 
 String _extensionHomepageTimestamp() =>
@@ -694,30 +693,19 @@ class _DiscoverSectionPage extends StatefulHookConsumerWidget {
 }
 
 class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
-  dynamic metadata = _firstSearch;
-
-  late final _pagingController = PagingController<dynamic, HistoryLink>(
-    getNextPageKey: (state) {
-      if (state.keys != null && state.keys!.isNotEmpty && metadata == null) {
-        return null; // end of list
-      }
-      return state.keys?.last == null ? _firstSearch : metadata;
-    },
-    fetchPage: (pageKey) async {
+  late final _pagingController = PagedController<WebPageCursor, HistoryLink>(
+    firstKey: null,
+    fetchPage: (cursor) async {
       final results = await ref
           .read(extensionSourceProvider(widget.source.id).notifier)
-          .getDiscoverSectionItems(
-            widget.section,
-            (pageKey == _firstSearch) ? null : pageKey,
-          );
+          .getDiscoverSectionItems(widget.section, cursor?.metadata);
 
-      final m = results.items.map(
-        (e) => HistoryLink.fromDiscoverySectionItem(widget.source, e),
+      return webPageResult(
+        results.items
+            .map((e) => HistoryLink.fromDiscoverySectionItem(widget.source, e))
+            .toList(),
+        results.metadata,
       );
-
-      metadata = results.metadata;
-
-      return m.toList();
     },
   );
 
@@ -733,10 +721,7 @@ class __DiscoverSectionPageState extends ConsumerState<_DiscoverSectionPage> {
 
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () async {
-          metadata = _firstSearch;
-          _pagingController.refresh();
-        },
+        onRefresh: _pagingController.refresh,
         child: WebMangaListWidget(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: controller,

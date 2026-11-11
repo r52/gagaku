@@ -16,14 +16,14 @@ import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/mangadex/settings.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
-import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/intl.dart';
+import 'package:gagaku/util/paging.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
+import 'package:paged_slivers/paged_slivers.dart';
 import 'package:riverpod/misc.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -511,7 +511,7 @@ class MarkReadButton extends ConsumerWidget {
   }
 }
 
-class ChapterFeedWidget extends StatelessWidget {
+class ChapterFeedWidget extends HookWidget {
   const ChapterFeedWidget({
     super.key,
     required this.controller,
@@ -532,10 +532,20 @@ class ChapterFeedWidget extends StatelessWidget {
   final String? restorationId;
   final List<Widget> leading;
 
-  final PagingController<int, FeedChapter> controller;
+  final PagedController<int, FeedChapter> controller;
 
   @override
   Widget build(BuildContext context) {
+    // Grouping runs over every loaded chapter, so a manga's run that spans a
+    // page boundary stays one card. Chapters repeated by overlapping offset
+    // pages are dropped first.
+    final view = useMemoized(
+      () => controller.project(
+        (items) => ChapterFeedItemData.toData(uniqueFeedChapters(items)),
+      ),
+      [controller],
+    );
+
     final feed = CustomScrollView(
       scrollCacheExtent: const ScrollCacheExtent.viewport(1.5),
       scrollBehavior: const MouseTouchScrollBehavior(),
@@ -557,56 +567,19 @@ class ChapterFeedWidget extends StatelessWidget {
               ),
             ),
           ),
-        PagingListener(
-          controller: controller,
-          builder: (context, state, fetchNextPage) => HookBuilder(
-            builder: (context) {
-              final chapters = state.items;
-
-              // Because this is now 100% synchronous, using [state] is perfectly safe.
-              // It will instantly return the new state without ever unmounting the list.
-              final newState = useMemoized(() {
-                final items = chapters != null
-                    ? ChapterFeedItemData.toData(chapters)
-                    : <ChapterFeedItemData>[];
-
-                return PagingState<int, ChapterFeedItemData>(
-                  error: state.error,
-                  pages: state.keys == null
-                      ? null
-                      : List.generate(
-                          state.keys!.length,
-                          (i) => i == 0 ? items : [],
-                        ),
-                  keys: state.keys,
-                  hasNextPage: state.hasNextPage,
-                  isLoading: state.isLoading,
-                );
-              }, [state]);
-
-              return PagedSuperSliverList(
-                state: newState,
-                fetchNextPage: fetchNextPage,
-                findChildIndexCallback: (key) {
-                  final valueKey = key as ValueKey<int>;
-                  final val = newState.items!.indexWhere(
-                    (i) => i.id == valueKey.value,
-                  );
-                  return val >= 0 ? val : null;
-                },
-                builderDelegate:
-                    ErrorReportingPagedChildBuilderDelegate<
-                      ChapterFeedItemData
-                    >(
-                      error: newState.error,
-                      fetchNextPage: fetchNextPage,
-                      animateTransitions: true,
-                      itemBuilder: (context, item, index) =>
-                          ChapterFeedItem(key: ValueKey(item.id), state: item),
-                    ),
-              );
-            },
-          ),
+        PagedSliverList<ChapterFeedItemData>(
+          view: view,
+          statusBuilders: pagedStatusBuilders(context),
+          useSuperSliverList: true,
+          findChildIndexCallback: (key) {
+            final valueKey = key as ValueKey<int>;
+            final val = view.snapshot.items.indexWhere(
+              (i) => i.id == valueKey.value,
+            );
+            return val >= 0 ? val : null;
+          },
+          itemBuilder: (context, item, index) =>
+              ChapterFeedItem(key: ValueKey(item.id), state: item),
         ),
       ],
     );
@@ -668,16 +641,22 @@ class _InfiniteScrollFeedState
     super.dispose();
   }
 
+  /// The last failure a snackbar was shown for.
+  int _shownErrorRevision = 0;
+
   @override
   void initState() {
     super.initState();
     _pager.controller.addListener(_showError);
   }
 
-  Future<void> _showError() async {
+  /// Shows one snackbar per failed fetch, not one per notification while the
+  /// error persists.
+  void _showError() {
     final controller = _pager.controller;
-    if (controller.value.status == PagingStatus.subsequentPageError ||
-        controller.value.status == PagingStatus.firstPageError) {
+    final state = controller.state;
+    if (state.error != null && state.errorRevision != _shownErrorRevision) {
+      _shownErrorRevision = state.errorRevision;
       final tr = context.t;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -685,7 +664,7 @@ class _InfiniteScrollFeedState
           duration: const Duration(seconds: 5),
           action: SnackBarAction(
             label: tr.ui.retry,
-            onPressed: () => controller.fetchNextPage(),
+            onPressed: controller.retry,
           ),
         ),
       );
@@ -724,14 +703,12 @@ class ChapterFeedPager {
   final MangaDexEntity? entity;
   final ChapterFilterOrder order;
 
-  late final _manager = OffsetPagingManager<FeedChapter>(limit: limit);
-
-  late final controller = PagingController<int, FeedChapter>(
-    getNextPageKey: _manager.getNextPageKey,
+  late final controller = PagedController<int, FeedChapter>(
+    firstKey: 0,
     fetchPage: _fetchPage,
   );
 
-  Future<List<FeedChapter>> _fetchPage(int pageKey) async {
+  Future<PageResult<int, FeedChapter>> _fetchPage(int pageKey) async {
     final me = await ref.readAsync(loggedUserProvider.future);
     final api = ref.read(mangadexProvider);
 
@@ -743,8 +720,6 @@ class ChapterFeedPager {
       entity: entity,
       order: order,
     );
-
-    _manager.totalItems = chapterlist.total;
 
     final chapters = chapterlist.data.cast<Chapter>();
 
@@ -772,15 +747,19 @@ class ChapterFeedPager {
       logger.e(e, error: e);
     }
 
-    return pairFeedChapters(chapters, mangas);
+    return PageResult.offset(
+      pairFeedChapters(chapters, mangas),
+      offset: pageKey,
+      limit: limit,
+      total: chapterlist.total,
+    );
   }
 
   Future<void> refresh() async {
-    _manager.reset();
     await ref
         .read(mangadexProvider)
         .invalidateAll(entity == null ? feedKey : '$feedKey(${entity!.id}');
-    controller.refresh();
+    await controller.refresh();
   }
 
   void dispose() => controller.dispose();
@@ -798,14 +777,12 @@ class EntityTitlesPager {
   final FeedInfo info;
   final MangaDexUUID entity;
 
-  late final _manager = OffsetPagingManager<Manga>(limit: info.limit);
-
-  late final controller = PagingController<int, Manga>(
-    getNextPageKey: _manager.getNextPageKey,
+  late final controller = PagedController<int, Manga>(
+    firstKey: 0,
     fetchPage: _fetchPage,
   );
 
-  Future<List<Manga>> _fetchPage(int pageKey) async {
+  Future<PageResult<int, Manga>> _fetchPage(int pageKey) async {
     final list = await ref
         .read(mangadexProvider)
         .fetchMangaList(
@@ -814,8 +791,6 @@ class EntityTitlesPager {
           offset: pageKey,
           entity: entity,
         );
-
-    _manager.totalItems = list.total;
 
     final newItems = list.data.cast<Manga>();
 
@@ -827,13 +802,17 @@ class EntityTitlesPager {
       logger.e(e, error: e);
     }
 
-    return newItems;
+    return PageResult.offset(
+      newItems,
+      offset: pageKey,
+      limit: info.limit,
+      total: list.total,
+    );
   }
 
   Future<void> refresh() async {
-    _manager.reset();
     await ref.read(mangadexProvider).invalidateAll('${info.key}(${entity.id}');
-    controller.refresh();
+    await controller.refresh();
   }
 
   void dispose() => controller.dispose();
@@ -1385,7 +1364,7 @@ class MangaListViewSliver extends ConsumerWidget {
   final MangaSelectCallback? onSelected;
   final Map<String, String>? headers;
 
-  final PagingController<int, Manga>? controller;
+  final PagedView<Manga>? controller;
 
   int? _findChildIndexCb(Key? key) {
     final valueKey = key as ValueKey<String>;
@@ -1469,81 +1448,60 @@ class MangaListViewSliver extends ConsumerWidget {
       }
     }
 
-    return PagingListener(
-      controller: controller!,
-      builder: (context, state, fetchNextPage) {
-        switch (view) {
-          case MangaListView.list:
-            return PagedSliverList(
-              state: state,
-              fetchNextPage: fetchNextPage,
-              builderDelegate: ErrorReportingPagedChildBuilderDelegate<Manga>(
-                error: state.error,
-                fetchNextPage: fetchNextPage,
-                animateTransitions: true,
-                itemBuilder: (context, item, index) => _ListMangaItem(
-                  key: ValueKey(item.id),
-                  manga: item,
-                  header: headers?[item.id],
-                ),
-              ),
-            );
-          case MangaListView.detailed:
-            final delegate = SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: gridExtent.detailed,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: DeviceContext.screenWidthSmall(context)
-                  ? 1.0
-                  : 2.0,
-            );
+    final paged = controller!;
+    final statusBuilders = pagedStatusBuilders(context);
 
-            return PagedSliverGrid(
-              gridDelegate: delegate,
-              state: state,
-              fetchNextPage: fetchNextPage,
-              showNewPageErrorIndicatorAsGridChild: false,
-              builderDelegate: ErrorReportingPagedChildBuilderDelegate<Manga>(
-                error: state.error,
-                fetchNextPage: fetchNextPage,
-                animateTransitions: true,
-                itemBuilder: (context, item, index) => GridMangaDetailedItem(
-                  key: ValueKey(item.id),
-                  manga: item,
-                  header: headers?[item.id],
-                ),
-              ),
-            );
-          case MangaListView.grid:
-            final delegate = SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: gridExtent.grid,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: 0.7,
-            );
+    switch (view) {
+      case MangaListView.list:
+        return PagedSliverList<Manga>(
+          view: paged,
+          statusBuilders: statusBuilders,
+          itemBuilder: (context, item, index) => _ListMangaItem(
+            key: ValueKey(item.id),
+            manga: item,
+            header: headers?[item.id],
+          ),
+        );
+      case MangaListView.detailed:
+        final delegate = SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: gridExtent.detailed,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: DeviceContext.screenWidthSmall(context) ? 1.0 : 2.0,
+        );
 
-            return PagedSliverGrid(
-              gridDelegate: delegate,
-              state: state,
-              fetchNextPage: fetchNextPage,
-              showNewPageErrorIndicatorAsGridChild: false,
-              builderDelegate: ErrorReportingPagedChildBuilderDelegate<Manga>(
-                error: state.error,
-                fetchNextPage: fetchNextPage,
-                animateTransitions: true,
-                itemBuilder: (context, item, index) => GridMangaItem(
-                  key: ValueKey(item.id),
-                  manga: item,
-                  selectMode: selectMode,
-                  selectButton: selectButton,
-                  onSelected: onSelected,
-                  header: headers?[item.id],
-                ),
-              ),
-            );
-        }
-      },
-    );
+        return PagedSliverGrid<Manga>(
+          view: paged,
+          gridDelegate: delegate,
+          statusBuilders: statusBuilders,
+          itemBuilder: (context, item, index) => GridMangaDetailedItem(
+            key: ValueKey(item.id),
+            manga: item,
+            header: headers?[item.id],
+          ),
+        );
+      case MangaListView.grid:
+        final delegate = SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: gridExtent.grid,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: 0.7,
+        );
+
+        return PagedSliverGrid<Manga>(
+          view: paged,
+          gridDelegate: delegate,
+          statusBuilders: statusBuilders,
+          itemBuilder: (context, item, index) => GridMangaItem(
+            key: ValueKey(item.id),
+            manga: item,
+            selectMode: selectMode,
+            selectButton: selectButton,
+            onSelected: onSelected,
+            header: headers?[item.id],
+          ),
+        );
+    }
   }
 }
 

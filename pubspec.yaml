@@ -65,7 +65,6 @@ dependencies:
   flutter_inappwebview: ^6.2.0-beta.3
   flutter_readium: ^0.9.0
   mime: ^2.0.0
-  infinite_scroll_pagination: ^5.0.0
   flutter_markdown_plus: ^1.0.3
   slang: ^4.6.0
   slang_flutter: ^4.6.0
@@ -93,6 +92,8 @@ dependencies:
 
   comic_page_view:
     path: packages/comic_page_view
+  paged_slivers:
+    path: packages/paged_slivers
 
 dev_dependencies:
   flutter_test:

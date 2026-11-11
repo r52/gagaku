@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gagaku/mangadex/model/types.dart';
-import 'package:gagaku/util/infinite_scroll.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:paged_slivers/paged_slivers.dart';
 
 Chapter _chapter(String id, String mangaId) {
   final time = DateTime.utc(2026);
@@ -39,6 +38,28 @@ void main() {
     });
   });
 
+  group('uniqueFeedChapters', () {
+    test('keeps the first occurrence of chapters repeated across pages', () {
+      final manga = Manga(id: 'manga-1');
+      // Page two shifted by one: c2 ends page one and starts page two.
+      final page1 = pairFeedChapters(
+        [_chapter('c1', 'manga-1'), _chapter('c2', 'manga-1')],
+        [manga],
+      );
+      final page2 = pairFeedChapters(
+        [_chapter('c2', 'manga-1'), _chapter('c3', 'manga-1')],
+        [manga],
+      );
+
+      final unique = uniqueFeedChapters([...page1, ...page2]);
+      expect(unique.map((e) => e.chapter.id), ['c1', 'c2', 'c3']);
+      expect(unique[1], same(page1[1]));
+
+      final items = ChapterFeedItemData.toData(unique);
+      expect(items.single.chapters.map((e) => e.id), ['c1', 'c2', 'c3']);
+    });
+  });
+
   group('ChapterFeedItemData.toData', () {
     test('groups consecutive chapters across page boundaries', () {
       final first = Manga(id: 'manga-1');
@@ -67,41 +88,49 @@ void main() {
     });
   });
 
-  group('OffsetPagingManager', () {
-    test('ends by offset even when pages hold fewer items than consumed', () {
-      final manager = OffsetPagingManager<int>(limit: 10)..totalItems = 25;
+  group('chapter feed projection', () {
+    test('groups across pages and ends by offset with short pages', () async {
+      final first = Manga(id: 'manga-1');
+      final second = Manga(id: 'manga-2');
 
-      expect(manager.getNextPageKey(PagingState<int, int>()), 0);
-
-      // Pages hold fewer items than the 10 API entries each consumed.
-      final afterTwo = PagingState<int, int>(
-        pages: const [
-          [1, 2],
-          [3],
-        ],
-        keys: const [0, 10],
+      // Each page consumed 10 API entries but kept fewer after pairing.
+      final pages = {
+        0: pairFeedChapters(
+          [_chapter('c1', 'manga-1'), _chapter('c2', 'missing')],
+          [first],
+        ),
+        10: pairFeedChapters(
+          [_chapter('c3', 'manga-1'), _chapter('c4', 'manga-2')],
+          [first, second],
+        ),
+      };
+      final controller = PagedController<int, FeedChapter>(
+        firstKey: 0,
+        fetchPage: (offset) async => PageResult.offset(
+          pages[offset]!,
+          offset: offset,
+          limit: 10,
+          total: 20,
+        ),
+        scheduler: (callback) => callback(),
       );
-      expect(manager.getNextPageKey(afterTwo), 20);
+      addTearDown(controller.dispose);
+      final feed = controller.project(ChapterFeedItemData.toData);
+      feed.addListener(() {});
 
-      final afterThree = PagingState<int, int>(
-        pages: const [
-          [1, 2],
-          [3],
-          [4],
-        ],
-        keys: const [0, 10, 20],
-      );
-      expect(manager.getNextPageKey(afterThree), isNull);
-    });
+      controller.fetchNext();
+      await Future<void>.delayed(Duration.zero);
+      expect(feed.snapshot.items.single.chapters.map((e) => e.id), ['c1']);
 
-    test('continues while the total is unknown', () {
-      final manager = OffsetPagingManager<int>(limit: 10);
+      controller.fetchNext();
+      await Future<void>.delayed(Duration.zero);
 
-      final state = PagingState<int, int>(
-        pages: const [<int>[]],
-        keys: const [0],
-      );
-      expect(manager.getNextPageKey(state), 10);
+      final items = feed.snapshot.items;
+      expect(items.map((e) => e.mangaId), ['manga-1', 'manga-2']);
+      expect(items[0].chapters.map((e) => e.id), ['c1', 'c3']);
+      expect(controller.state.keys, [0, 10]);
+      expect(controller.state.hasMore, isFalse);
+      expect(feed.snapshot.status, PagedStatus.complete);
     });
   });
 }

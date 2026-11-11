@@ -1,4 +1,3 @@
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:collection/collection.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart' hide useSearchController;
@@ -14,8 +13,7 @@ import "package:gagaku/web/model/extension_runtime.dart";
 import "package:gagaku/web/extension_settings.dart";
 import 'package:gagaku/web/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-const _firstSearch = 0xDEADBEEF;
+import 'package:paged_slivers/paged_slivers.dart';
 
 class ExtensionSearchPage extends StatelessWidget {
   const ExtensionSearchPage({super.key, this.initialSource, this.query});
@@ -84,31 +82,24 @@ class ExtensionSearchWidget extends StatefulHookConsumerWidget {
 
 class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
   late WebSourceInfo source;
-  dynamic metadata = _firstSearch;
   SearchQuery? query;
   SortingOption? currentSort;
 
   void _refresh() {
-    metadata = _firstSearch;
     _pagingController.refresh();
   }
 
-  late final _pagingController = PagingController<dynamic, HistoryLink>(
-    getNextPageKey: (state) {
-      if (state.keys != null && state.keys!.isNotEmpty && metadata == null) {
-        return null; // end of list
-      }
-      return state.keys?.last == null ? _firstSearch : metadata;
-    },
-    fetchPage: (pageKey) async {
+  late final _pagingController = PagedController<WebPageCursor, HistoryLink>(
+    firstKey: null,
+    fetchPage: (cursor) async {
       if (query == null || query!.isEmpty) {
-        return [];
+        return const PageResult.last([]);
       }
 
       await ref.readAsync(extensionSourceProvider(source.id).future);
       final notifier = ref.read(extensionSourceProvider(source.id).notifier);
 
-      if (pageKey == _firstSearch) {
+      if (cursor == null) {
         final options = await notifier.getSortingOptions(query!);
         if (options != null && options.isNotEmpty) {
           final isValid =
@@ -130,17 +121,16 @@ class _ExtensionSearchWidgetState extends ConsumerState<ExtensionSearchWidget> {
 
       final results = await notifier.searchManga(
         query!,
-        (pageKey == _firstSearch) ? null : pageKey,
+        cursor?.metadata,
         sortOp: currentSort,
       );
 
-      final m = results.items.map(
-        (e) => HistoryLink.fromSearchReultItem(source, e),
+      return webPageResult(
+        results.items
+            .map((e) => HistoryLink.fromSearchReultItem(source, e))
+            .toList(),
+        results.metadata,
       );
-
-      metadata = results.metadata;
-
-      return m.toList();
     },
   );
 
