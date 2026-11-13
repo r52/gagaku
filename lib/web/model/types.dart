@@ -543,6 +543,11 @@ sealed class WebManga with _$WebManga {
     WebMangaExtension(:final data) => data.mangaInfo.thumbnailUrl,
   };
 
+  bool get isWebtoon => switch (this) {
+    WebMangaCubari() => false,
+    WebMangaExtension(:final data) => data.mangaInfo.isWebtoon ?? false,
+  };
+
   List<String> get artworkUrls => switch (this) {
     WebMangaCubari() => const [],
     WebMangaExtension(:final data) => data.mangaInfo.artworkUrls ?? const [],
@@ -1163,6 +1168,9 @@ abstract class MangaInfo with _$MangaInfo {
     required List<String> secondaryTitles,
     @ContentRatingParser() required ContentRating contentRating,
     MangaContentType? contentType,
+
+    /// The reader opens the title as a vertical long strip.
+    bool? isWebtoon,
     String? status,
     String? artist,
     String? author,
@@ -1273,23 +1281,66 @@ abstract class ChapterReadActionQueueProcessingResult
 
 @freezed
 abstract class ManagedCollection with _$ManagedCollection {
-  const factory ManagedCollection({required String id, required String title}) =
-      _ManagedCollection;
+  const factory ManagedCollection({
+    required String id,
+    required String title,
+
+    /// Collections sharing a group are mutually exclusive: a title is in at
+    /// most one of them, and an add/move into one removes it from the others.
+    String? exclusiveGroup,
+  }) = _ManagedCollection;
 
   factory ManagedCollection.fromJson(Map<String, dynamic> json) =>
       _$ManagedCollectionFromJson(json);
 }
 
 @freezed
-abstract class ManagedCollectionChangeset with _$ManagedCollectionChangeset {
-  const factory ManagedCollectionChangeset({
-    required ManagedCollection collection,
-    required List<SourceManga> additions,
-    required List<SourceManga> deletions,
-  }) = _ManagedCollectionChangeset;
+abstract class ManagedCollectionItems with _$ManagedCollectionItems {
+  const factory ManagedCollectionItems({
+    required String collectionId,
+    @Default([]) List<SourceManga> items,
+  }) = _ManagedCollectionItems;
 
-  factory ManagedCollectionChangeset.fromJson(Map<String, dynamic> json) =>
-      _$ManagedCollectionChangesetFromJson(json);
+  factory ManagedCollectionItems.fromJson(Map<String, dynamic> json) =>
+      _$ManagedCollectionItemsFromJson(json);
+}
+
+@Freezed(unionKey: 'type')
+sealed class ManagedCollectionChange with _$ManagedCollectionChange {
+  const factory ManagedCollectionChange.add({
+    required String id,
+    required ManagedCollection to,
+    required SourceManga sourceManga,
+  }) = ManagedCollectionAdd;
+
+  const factory ManagedCollectionChange.remove({
+    required String id,
+    required ManagedCollection from,
+    required SourceManga sourceManga,
+  }) = ManagedCollectionRemove;
+
+  const factory ManagedCollectionChange.move({
+    required String id,
+    required ManagedCollection from,
+    required ManagedCollection to,
+    required SourceManga sourceManga,
+  }) = ManagedCollectionMove;
+
+  factory ManagedCollectionChange.fromJson(Map<String, dynamic> json) =>
+      _$ManagedCollectionChangeFromJson(json);
+}
+
+@freezed
+abstract class ManagedCollectionChangeFailure
+    with _$ManagedCollectionChangeFailure {
+  const factory ManagedCollectionChangeFailure({
+    /// The [ManagedCollectionChange.id] of the change that failed.
+    required String changeId,
+    @Default('') String reason,
+  }) = _ManagedCollectionChangeFailure;
+
+  factory ManagedCollectionChangeFailure.fromJson(Map<String, dynamic> json) =>
+      _$ManagedCollectionChangeFailureFromJson(json);
 }
 
 @freezed

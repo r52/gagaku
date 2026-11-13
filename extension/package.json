@@ -13,7 +13,7 @@
     "deploy": "bun run build && bun -e \"await Bun.write('../assets/extensionhost/bundle.js', Bun.file('./dist/bundle.js'))\""
   },
   "dependencies": {
-    "@paperback/types": "1.0.0-alpha.92",
+    "@paperback/types": "1.0.0-alpha.94",
     "entities": "^8.0.0",
     "md5": "^2.3.0"
   },

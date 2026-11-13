@@ -5,7 +5,7 @@
     "": {
       "name": "gagaku-extension",
       "dependencies": {
-        "@paperback/types": "1.0.0-alpha.92",
+        "@paperback/types": "1.0.0-alpha.94",
         "entities": "^8.0.0",
         "md5": "^2.3.0",
       },
@@ -16,7 +16,7 @@
     },
   },
   "packages": {
-    "@paperback/types": ["@paperback/types@1.0.0-alpha.92", "", { "dependencies": { "chai": "^6.2.1" } }, "sha512-A1v/D1YrFE3SjeJRCB1Cg+HoB/7VZ2D2ZW/0Ub+6mNfxPFehHqQgfIKoj7W1RIcU6IrFBUfieq56MJzo3XdDSg=="],
+    "@paperback/types": ["@paperback/types@1.0.0-alpha.94", "", { "dependencies": { "chai": "^6.2.1" } }, "sha512-z63joO6aReQO+KZKeKaWBWARwl/fRKZ1fV1k5hNurfaU/QndowSaEh7ZjdC2SJxeCMwhSVTUCK3IAkPqsYaSCw=="],
 
     "@types/md5": ["@types/md5@2.3.6", "", {}, "sha512-WD69gNXtRBnpknfZcb4TRQ0XJQbUPZcai/Qdhmka3sxUR3Et8NrXoeAoknG/LghYHTf4ve795rInVYHBTQdNVA=="],
 

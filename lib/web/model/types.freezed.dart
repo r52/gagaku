@@ -3892,7 +3892,8 @@ $MangaInfoCopyWith<$Res> get mangaInfo {
 /// @nodoc
 mixin _$MangaInfo {
 
- String get thumbnailUrl; String get synopsis; String get primaryTitle; List<String> get secondaryTitles;@ContentRatingParser() ContentRating get contentRating; MangaContentType? get contentType; String? get status; String? get artist; String? get author; String? get bannerUrl; num? get rating; List<TagSection>? get tagGroups; List<String>? get artworkUrls; Map<String, String>? get additionalInfo; String? get shareUrl;
+ String get thumbnailUrl; String get synopsis; String get primaryTitle; List<String> get secondaryTitles;@ContentRatingParser() ContentRating get contentRating; MangaContentType? get contentType;/// The reader opens the title as a vertical long strip.
+ bool? get isWebtoon; String? get status; String? get artist; String? get author; String? get bannerUrl; num? get rating; List<TagSection>? get tagGroups; List<String>? get artworkUrls; Map<String, String>? get additionalInfo; String? get shareUrl;
 /// Create a copy of MangaInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3906,20 +3907,20 @@ $MangaInfoCopyWith<MangaInfo> get copyWith => _$MangaInfoCopyWithImpl<MangaInfo>
 @override
 bool operator ==(Object other) {
   final _this = this as MangaInfo;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfo&&(identical(other.thumbnailUrl, _this.thumbnailUrl) || other.thumbnailUrl == _this.thumbnailUrl)&&(identical(other.synopsis, _this.synopsis) || other.synopsis == _this.synopsis)&&(identical(other.primaryTitle, _this.primaryTitle) || other.primaryTitle == _this.primaryTitle)&&const DeepCollectionEquality().equals(other.secondaryTitles, _this.secondaryTitles)&&(identical(other.contentRating, _this.contentRating) || other.contentRating == _this.contentRating)&&(identical(other.contentType, _this.contentType) || other.contentType == _this.contentType)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.artist, _this.artist) || other.artist == _this.artist)&&(identical(other.author, _this.author) || other.author == _this.author)&&(identical(other.bannerUrl, _this.bannerUrl) || other.bannerUrl == _this.bannerUrl)&&(identical(other.rating, _this.rating) || other.rating == _this.rating)&&const DeepCollectionEquality().equals(other.tagGroups, _this.tagGroups)&&const DeepCollectionEquality().equals(other.artworkUrls, _this.artworkUrls)&&const DeepCollectionEquality().equals(other.additionalInfo, _this.additionalInfo)&&(identical(other.shareUrl, _this.shareUrl) || other.shareUrl == _this.shareUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfo&&(identical(other.thumbnailUrl, _this.thumbnailUrl) || other.thumbnailUrl == _this.thumbnailUrl)&&(identical(other.synopsis, _this.synopsis) || other.synopsis == _this.synopsis)&&(identical(other.primaryTitle, _this.primaryTitle) || other.primaryTitle == _this.primaryTitle)&&const DeepCollectionEquality().equals(other.secondaryTitles, _this.secondaryTitles)&&(identical(other.contentRating, _this.contentRating) || other.contentRating == _this.contentRating)&&(identical(other.contentType, _this.contentType) || other.contentType == _this.contentType)&&(identical(other.isWebtoon, _this.isWebtoon) || other.isWebtoon == _this.isWebtoon)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.artist, _this.artist) || other.artist == _this.artist)&&(identical(other.author, _this.author) || other.author == _this.author)&&(identical(other.bannerUrl, _this.bannerUrl) || other.bannerUrl == _this.bannerUrl)&&(identical(other.rating, _this.rating) || other.rating == _this.rating)&&const DeepCollectionEquality().equals(other.tagGroups, _this.tagGroups)&&const DeepCollectionEquality().equals(other.artworkUrls, _this.artworkUrls)&&const DeepCollectionEquality().equals(other.additionalInfo, _this.additionalInfo)&&(identical(other.shareUrl, _this.shareUrl) || other.shareUrl == _this.shareUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as MangaInfo;
-  return Object.hash(runtimeType,_this.thumbnailUrl,_this.synopsis,_this.primaryTitle,const DeepCollectionEquality().hash(_this.secondaryTitles),_this.contentRating,_this.contentType,_this.status,_this.artist,_this.author,_this.bannerUrl,_this.rating,const DeepCollectionEquality().hash(_this.tagGroups),const DeepCollectionEquality().hash(_this.artworkUrls),const DeepCollectionEquality().hash(_this.additionalInfo),_this.shareUrl);
+  return Object.hash(runtimeType,_this.thumbnailUrl,_this.synopsis,_this.primaryTitle,const DeepCollectionEquality().hash(_this.secondaryTitles),_this.contentRating,_this.contentType,_this.isWebtoon,_this.status,_this.artist,_this.author,_this.bannerUrl,_this.rating,const DeepCollectionEquality().hash(_this.tagGroups),const DeepCollectionEquality().hash(_this.artworkUrls),const DeepCollectionEquality().hash(_this.additionalInfo),_this.shareUrl);
 }
 
 @override
 String toString() {
   final _this = this as MangaInfo;
-  return 'MangaInfo(thumbnailUrl: ${_this.thumbnailUrl}, synopsis: ${_this.synopsis}, primaryTitle: ${_this.primaryTitle}, secondaryTitles: ${_this.secondaryTitles}, contentRating: ${_this.contentRating}, contentType: ${_this.contentType}, status: ${_this.status}, artist: ${_this.artist}, author: ${_this.author}, bannerUrl: ${_this.bannerUrl}, rating: ${_this.rating}, tagGroups: ${_this.tagGroups}, artworkUrls: ${_this.artworkUrls}, additionalInfo: ${_this.additionalInfo}, shareUrl: ${_this.shareUrl})';
+  return 'MangaInfo(thumbnailUrl: ${_this.thumbnailUrl}, synopsis: ${_this.synopsis}, primaryTitle: ${_this.primaryTitle}, secondaryTitles: ${_this.secondaryTitles}, contentRating: ${_this.contentRating}, contentType: ${_this.contentType}, isWebtoon: ${_this.isWebtoon}, status: ${_this.status}, artist: ${_this.artist}, author: ${_this.author}, bannerUrl: ${_this.bannerUrl}, rating: ${_this.rating}, tagGroups: ${_this.tagGroups}, artworkUrls: ${_this.artworkUrls}, additionalInfo: ${_this.additionalInfo}, shareUrl: ${_this.shareUrl})';
 }
 
 
@@ -3930,7 +3931,7 @@ abstract mixin class $MangaInfoCopyWith<$Res>  {
   factory $MangaInfoCopyWith(MangaInfo value, $Res Function(MangaInfo) _then) = _$MangaInfoCopyWithImpl;
 @useResult
 $Res call({
- String thumbnailUrl, String synopsis, String primaryTitle, List<String> secondaryTitles,@ContentRatingParser() ContentRating contentRating, MangaContentType? contentType, String? status, String? artist, String? author, String? bannerUrl, num? rating, List<TagSection>? tagGroups, List<String>? artworkUrls, Map<String, String>? additionalInfo, String? shareUrl
+ String thumbnailUrl, String synopsis, String primaryTitle, List<String> secondaryTitles,@ContentRatingParser() ContentRating contentRating, MangaContentType? contentType, bool? isWebtoon, String? status, String? artist, String? author, String? bannerUrl, num? rating, List<TagSection>? tagGroups, List<String>? artworkUrls, Map<String, String>? additionalInfo, String? shareUrl
 });
 
 
@@ -3947,7 +3948,7 @@ class _$MangaInfoCopyWithImpl<$Res>
 
 /// Create a copy of MangaInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? thumbnailUrl = null,Object? synopsis = null,Object? primaryTitle = null,Object? secondaryTitles = null,Object? contentRating = null,Object? contentType = freezed,Object? status = freezed,Object? artist = freezed,Object? author = freezed,Object? bannerUrl = freezed,Object? rating = freezed,Object? tagGroups = freezed,Object? artworkUrls = freezed,Object? additionalInfo = freezed,Object? shareUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? thumbnailUrl = null,Object? synopsis = null,Object? primaryTitle = null,Object? secondaryTitles = null,Object? contentRating = null,Object? contentType = freezed,Object? isWebtoon = freezed,Object? status = freezed,Object? artist = freezed,Object? author = freezed,Object? bannerUrl = freezed,Object? rating = freezed,Object? tagGroups = freezed,Object? artworkUrls = freezed,Object? additionalInfo = freezed,Object? shareUrl = freezed,}) {
   return _then(MangaInfo(
 thumbnailUrl: null == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String,synopsis: null == synopsis ? _self.synopsis : synopsis // ignore: cast_nullable_to_non_nullable
@@ -3955,7 +3956,8 @@ as String,primaryTitle: null == primaryTitle ? _self.primaryTitle : primaryTitle
 as String,secondaryTitles: null == secondaryTitles ? _self.secondaryTitles : secondaryTitles // ignore: cast_nullable_to_non_nullable
 as List<String>,contentRating: null == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
 as ContentRating,contentType: freezed == contentType ? _self.contentType : contentType // ignore: cast_nullable_to_non_nullable
-as MangaContentType?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as MangaContentType?,isWebtoon: freezed == isWebtoon ? _self.isWebtoon : isWebtoon // ignore: cast_nullable_to_non_nullable
+as bool?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String?,artist: freezed == artist ? _self.artist : artist // ignore: cast_nullable_to_non_nullable
 as String?,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as String?,bannerUrl: freezed == bannerUrl ? _self.bannerUrl : bannerUrl // ignore: cast_nullable_to_non_nullable
@@ -3976,7 +3978,7 @@ as String?,
 @JsonSerializable()
 
 class _MangaInfo implements MangaInfo {
-  const _MangaInfo({required this.thumbnailUrl, required this.synopsis, required this.primaryTitle, required  List<String> secondaryTitles, @ContentRatingParser() required this.contentRating, this.contentType, this.status, this.artist, this.author, this.bannerUrl, this.rating,  List<TagSection>? tagGroups,  List<String>? artworkUrls,  Map<String, String>? additionalInfo, this.shareUrl}): _secondaryTitles = secondaryTitles,_tagGroups = tagGroups,_artworkUrls = artworkUrls,_additionalInfo = additionalInfo;
+  const _MangaInfo({required this.thumbnailUrl, required this.synopsis, required this.primaryTitle, required  List<String> secondaryTitles, @ContentRatingParser() required this.contentRating, this.contentType, this.isWebtoon, this.status, this.artist, this.author, this.bannerUrl, this.rating,  List<TagSection>? tagGroups,  List<String>? artworkUrls,  Map<String, String>? additionalInfo, this.shareUrl}): _secondaryTitles = secondaryTitles,_tagGroups = tagGroups,_artworkUrls = artworkUrls,_additionalInfo = additionalInfo;
   factory _MangaInfo.fromJson(Map<String, dynamic> json) => _$MangaInfoFromJson(json);
 
 @override final  String thumbnailUrl;
@@ -3991,6 +3993,8 @@ class _MangaInfo implements MangaInfo {
 
 @override@ContentRatingParser() final  ContentRating contentRating;
 @override final  MangaContentType? contentType;
+/// The reader opens the title as a vertical long strip.
+@override final  bool? isWebtoon;
 @override final  String? status;
 @override final  String? artist;
 @override final  String? author;
@@ -4038,18 +4042,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaInfo&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.synopsis, synopsis) || other.synopsis == synopsis)&&(identical(other.primaryTitle, primaryTitle) || other.primaryTitle == primaryTitle)&&const DeepCollectionEquality().equals(other.secondaryTitles, _secondaryTitles)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.contentType, contentType) || other.contentType == contentType)&&(identical(other.status, status) || other.status == status)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.rating, rating) || other.rating == rating)&&const DeepCollectionEquality().equals(other.tagGroups, _tagGroups)&&const DeepCollectionEquality().equals(other.artworkUrls, _artworkUrls)&&const DeepCollectionEquality().equals(other.additionalInfo, _additionalInfo)&&(identical(other.shareUrl, shareUrl) || other.shareUrl == shareUrl));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaInfo&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.synopsis, synopsis) || other.synopsis == synopsis)&&(identical(other.primaryTitle, primaryTitle) || other.primaryTitle == primaryTitle)&&const DeepCollectionEquality().equals(other.secondaryTitles, _secondaryTitles)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.contentType, contentType) || other.contentType == contentType)&&(identical(other.isWebtoon, isWebtoon) || other.isWebtoon == isWebtoon)&&(identical(other.status, status) || other.status == status)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.rating, rating) || other.rating == rating)&&const DeepCollectionEquality().equals(other.tagGroups, _tagGroups)&&const DeepCollectionEquality().equals(other.artworkUrls, _artworkUrls)&&const DeepCollectionEquality().equals(other.additionalInfo, _additionalInfo)&&(identical(other.shareUrl, shareUrl) || other.shareUrl == shareUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,thumbnailUrl,synopsis,primaryTitle,const DeepCollectionEquality().hash(_secondaryTitles),contentRating,contentType,status,artist,author,bannerUrl,rating,const DeepCollectionEquality().hash(_tagGroups),const DeepCollectionEquality().hash(_artworkUrls),const DeepCollectionEquality().hash(_additionalInfo),shareUrl);
+    return Object.hash(runtimeType,thumbnailUrl,synopsis,primaryTitle,const DeepCollectionEquality().hash(_secondaryTitles),contentRating,contentType,isWebtoon,status,artist,author,bannerUrl,rating,const DeepCollectionEquality().hash(_tagGroups),const DeepCollectionEquality().hash(_artworkUrls),const DeepCollectionEquality().hash(_additionalInfo),shareUrl);
 }
 
 @override
 String toString() {
-    return 'MangaInfo(thumbnailUrl: $thumbnailUrl, synopsis: $synopsis, primaryTitle: $primaryTitle, secondaryTitles: $secondaryTitles, contentRating: $contentRating, contentType: $contentType, status: $status, artist: $artist, author: $author, bannerUrl: $bannerUrl, rating: $rating, tagGroups: $tagGroups, artworkUrls: $artworkUrls, additionalInfo: $additionalInfo, shareUrl: $shareUrl)';
+    return 'MangaInfo(thumbnailUrl: $thumbnailUrl, synopsis: $synopsis, primaryTitle: $primaryTitle, secondaryTitles: $secondaryTitles, contentRating: $contentRating, contentType: $contentType, isWebtoon: $isWebtoon, status: $status, artist: $artist, author: $author, bannerUrl: $bannerUrl, rating: $rating, tagGroups: $tagGroups, artworkUrls: $artworkUrls, additionalInfo: $additionalInfo, shareUrl: $shareUrl)';
 }
 
 
@@ -4060,7 +4064,7 @@ abstract mixin class _$MangaInfoCopyWith<$Res> implements $MangaInfoCopyWith<$Re
   factory _$MangaInfoCopyWith(_MangaInfo value, $Res Function(_MangaInfo) _then) = __$MangaInfoCopyWithImpl;
 @override @useResult
 $Res call({
- String thumbnailUrl, String synopsis, String primaryTitle, List<String> secondaryTitles,@ContentRatingParser() ContentRating contentRating, MangaContentType? contentType, String? status, String? artist, String? author, String? bannerUrl, num? rating, List<TagSection>? tagGroups, List<String>? artworkUrls, Map<String, String>? additionalInfo, String? shareUrl
+ String thumbnailUrl, String synopsis, String primaryTitle, List<String> secondaryTitles,@ContentRatingParser() ContentRating contentRating, MangaContentType? contentType, bool? isWebtoon, String? status, String? artist, String? author, String? bannerUrl, num? rating, List<TagSection>? tagGroups, List<String>? artworkUrls, Map<String, String>? additionalInfo, String? shareUrl
 });
 
 
@@ -4077,7 +4081,7 @@ class __$MangaInfoCopyWithImpl<$Res>
 
 /// Create a copy of MangaInfo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? thumbnailUrl = null,Object? synopsis = null,Object? primaryTitle = null,Object? secondaryTitles = null,Object? contentRating = null,Object? contentType = freezed,Object? status = freezed,Object? artist = freezed,Object? author = freezed,Object? bannerUrl = freezed,Object? rating = freezed,Object? tagGroups = freezed,Object? artworkUrls = freezed,Object? additionalInfo = freezed,Object? shareUrl = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? thumbnailUrl = null,Object? synopsis = null,Object? primaryTitle = null,Object? secondaryTitles = null,Object? contentRating = null,Object? contentType = freezed,Object? isWebtoon = freezed,Object? status = freezed,Object? artist = freezed,Object? author = freezed,Object? bannerUrl = freezed,Object? rating = freezed,Object? tagGroups = freezed,Object? artworkUrls = freezed,Object? additionalInfo = freezed,Object? shareUrl = freezed,}) {
   return _then(_MangaInfo(
 thumbnailUrl: null == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String,synopsis: null == synopsis ? _self.synopsis : synopsis // ignore: cast_nullable_to_non_nullable
@@ -4085,7 +4089,8 @@ as String,primaryTitle: null == primaryTitle ? _self.primaryTitle : primaryTitle
 as String,secondaryTitles: null == secondaryTitles ? _self._secondaryTitles : secondaryTitles // ignore: cast_nullable_to_non_nullable
 as List<String>,contentRating: null == contentRating ? _self.contentRating : contentRating // ignore: cast_nullable_to_non_nullable
 as ContentRating,contentType: freezed == contentType ? _self.contentType : contentType // ignore: cast_nullable_to_non_nullable
-as MangaContentType?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as MangaContentType?,isWebtoon: freezed == isWebtoon ? _self.isWebtoon : isWebtoon // ignore: cast_nullable_to_non_nullable
+as bool?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String?,artist: freezed == artist ? _self.artist : artist // ignore: cast_nullable_to_non_nullable
 as String?,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as String?,bannerUrl: freezed == bannerUrl ? _self.bannerUrl : bannerUrl // ignore: cast_nullable_to_non_nullable
@@ -5154,7 +5159,9 @@ as List<String>,
 /// @nodoc
 mixin _$ManagedCollection {
 
- String get id; String get title;
+ String get id; String get title;/// Collections sharing a group are mutually exclusive: a title is in at
+/// most one of them, and an add/move into one removes it from the others.
+ String? get exclusiveGroup;
 /// Create a copy of ManagedCollection
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -5168,20 +5175,20 @@ $ManagedCollectionCopyWith<ManagedCollection> get copyWith => _$ManagedCollectio
 @override
 bool operator ==(Object other) {
   final _this = this as ManagedCollection;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ManagedCollection&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ManagedCollection&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.exclusiveGroup, _this.exclusiveGroup) || other.exclusiveGroup == _this.exclusiveGroup));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as ManagedCollection;
-  return Object.hash(runtimeType,_this.id,_this.title);
+  return Object.hash(runtimeType,_this.id,_this.title,_this.exclusiveGroup);
 }
 
 @override
 String toString() {
   final _this = this as ManagedCollection;
-  return 'ManagedCollection(id: ${_this.id}, title: ${_this.title})';
+  return 'ManagedCollection(id: ${_this.id}, title: ${_this.title}, exclusiveGroup: ${_this.exclusiveGroup})';
 }
 
 
@@ -5192,7 +5199,7 @@ abstract mixin class $ManagedCollectionCopyWith<$Res>  {
   factory $ManagedCollectionCopyWith(ManagedCollection value, $Res Function(ManagedCollection) _then) = _$ManagedCollectionCopyWithImpl;
 @useResult
 $Res call({
- String id, String title
+ String id, String title, String? exclusiveGroup
 });
 
 
@@ -5209,11 +5216,12 @@ class _$ManagedCollectionCopyWithImpl<$Res>
 
 /// Create a copy of ManagedCollection
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? exclusiveGroup = freezed,}) {
   return _then(ManagedCollection(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,
+as String,exclusiveGroup: freezed == exclusiveGroup ? _self.exclusiveGroup : exclusiveGroup // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -5225,11 +5233,14 @@ as String,
 @JsonSerializable()
 
 class _ManagedCollection implements ManagedCollection {
-  const _ManagedCollection({required this.id, required this.title});
+  const _ManagedCollection({required this.id, required this.title, this.exclusiveGroup});
   factory _ManagedCollection.fromJson(Map<String, dynamic> json) => _$ManagedCollectionFromJson(json);
 
 @override final  String id;
 @override final  String title;
+/// Collections sharing a group are mutually exclusive: a title is in at
+/// most one of them, and an add/move into one removes it from the others.
+@override final  String? exclusiveGroup;
 
 /// Create a copy of ManagedCollection
 /// with the given fields replaced by the non-null parameter values.
@@ -5244,18 +5255,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ManagedCollection&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ManagedCollection&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.exclusiveGroup, exclusiveGroup) || other.exclusiveGroup == exclusiveGroup));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,title);
+    return Object.hash(runtimeType,id,title,exclusiveGroup);
 }
 
 @override
 String toString() {
-    return 'ManagedCollection(id: $id, title: $title)';
+    return 'ManagedCollection(id: $id, title: $title, exclusiveGroup: $exclusiveGroup)';
 }
 
 
@@ -5266,7 +5277,7 @@ abstract mixin class _$ManagedCollectionCopyWith<$Res> implements $ManagedCollec
   factory _$ManagedCollectionCopyWith(_ManagedCollection value, $Res Function(_ManagedCollection) _then) = __$ManagedCollectionCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String title
+ String id, String title, String? exclusiveGroup
 });
 
 
@@ -5283,11 +5294,12 @@ class __$ManagedCollectionCopyWithImpl<$Res>
 
 /// Create a copy of ManagedCollection
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? exclusiveGroup = freezed,}) {
   return _then(_ManagedCollection(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,
+as String,exclusiveGroup: freezed == exclusiveGroup ? _self.exclusiveGroup : exclusiveGroup // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -5296,79 +5308,255 @@ as String,
 
 
 /// @nodoc
-mixin _$ManagedCollectionChangeset {
+mixin _$ManagedCollectionItems {
 
- ManagedCollection get collection; List<SourceManga> get additions; List<SourceManga> get deletions;
-/// Create a copy of ManagedCollectionChangeset
+ String get collectionId; List<SourceManga> get items;
+/// Create a copy of ManagedCollectionItems
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$ManagedCollectionChangesetCopyWith<ManagedCollectionChangeset> get copyWith => _$ManagedCollectionChangesetCopyWithImpl<ManagedCollectionChangeset>(this as ManagedCollectionChangeset, _$identity);
+$ManagedCollectionItemsCopyWith<ManagedCollectionItems> get copyWith => _$ManagedCollectionItemsCopyWithImpl<ManagedCollectionItems>(this as ManagedCollectionItems, _$identity);
 
-  /// Serializes this ManagedCollectionChangeset to a JSON map.
+  /// Serializes this ManagedCollectionItems to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  final _this = this as ManagedCollectionChangeset;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ManagedCollectionChangeset&&(identical(other.collection, _this.collection) || other.collection == _this.collection)&&const DeepCollectionEquality().equals(other.additions, _this.additions)&&const DeepCollectionEquality().equals(other.deletions, _this.deletions));
+  final _this = this as ManagedCollectionItems;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ManagedCollectionItems&&(identical(other.collectionId, _this.collectionId) || other.collectionId == _this.collectionId)&&const DeepCollectionEquality().equals(other.items, _this.items));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-  final _this = this as ManagedCollectionChangeset;
-  return Object.hash(runtimeType,_this.collection,const DeepCollectionEquality().hash(_this.additions),const DeepCollectionEquality().hash(_this.deletions));
+  final _this = this as ManagedCollectionItems;
+  return Object.hash(runtimeType,_this.collectionId,const DeepCollectionEquality().hash(_this.items));
 }
 
 @override
 String toString() {
-  final _this = this as ManagedCollectionChangeset;
-  return 'ManagedCollectionChangeset(collection: ${_this.collection}, additions: ${_this.additions}, deletions: ${_this.deletions})';
+  final _this = this as ManagedCollectionItems;
+  return 'ManagedCollectionItems(collectionId: ${_this.collectionId}, items: ${_this.items})';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $ManagedCollectionChangesetCopyWith<$Res>  {
-  factory $ManagedCollectionChangesetCopyWith(ManagedCollectionChangeset value, $Res Function(ManagedCollectionChangeset) _then) = _$ManagedCollectionChangesetCopyWithImpl;
+abstract mixin class $ManagedCollectionItemsCopyWith<$Res>  {
+  factory $ManagedCollectionItemsCopyWith(ManagedCollectionItems value, $Res Function(ManagedCollectionItems) _then) = _$ManagedCollectionItemsCopyWithImpl;
 @useResult
 $Res call({
- ManagedCollection collection, List<SourceManga> additions, List<SourceManga> deletions
+ String collectionId, List<SourceManga> items
 });
 
 
-$ManagedCollectionCopyWith<$Res> get collection;
+
 
 }
 /// @nodoc
-class _$ManagedCollectionChangesetCopyWithImpl<$Res>
-    implements $ManagedCollectionChangesetCopyWith<$Res> {
-  _$ManagedCollectionChangesetCopyWithImpl(this._self, this._then);
+class _$ManagedCollectionItemsCopyWithImpl<$Res>
+    implements $ManagedCollectionItemsCopyWith<$Res> {
+  _$ManagedCollectionItemsCopyWithImpl(this._self, this._then);
 
-  final ManagedCollectionChangeset _self;
-  final $Res Function(ManagedCollectionChangeset) _then;
+  final ManagedCollectionItems _self;
+  final $Res Function(ManagedCollectionItems) _then;
 
-/// Create a copy of ManagedCollectionChangeset
+/// Create a copy of ManagedCollectionItems
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? collection = null,Object? additions = null,Object? deletions = null,}) {
-  return _then(ManagedCollectionChangeset(
-collection: null == collection ? _self.collection : collection // ignore: cast_nullable_to_non_nullable
-as ManagedCollection,additions: null == additions ? _self.additions : additions // ignore: cast_nullable_to_non_nullable
-as List<SourceManga>,deletions: null == deletions ? _self.deletions : deletions // ignore: cast_nullable_to_non_nullable
+@pragma('vm:prefer-inline') @override $Res call({Object? collectionId = null,Object? items = null,}) {
+  return _then(ManagedCollectionItems(
+collectionId: null == collectionId ? _self.collectionId : collectionId // ignore: cast_nullable_to_non_nullable
+as String,items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
 as List<SourceManga>,
   ));
 }
-/// Create a copy of ManagedCollectionChangeset
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _ManagedCollectionItems implements ManagedCollectionItems {
+  const _ManagedCollectionItems({required this.collectionId,  List<SourceManga> items = const []}): _items = items;
+  factory _ManagedCollectionItems.fromJson(Map<String, dynamic> json) => _$ManagedCollectionItemsFromJson(json);
+
+@override final  String collectionId;
+ final  List<SourceManga> _items;
+@override@JsonKey() List<SourceManga> get items {
+  if (_items is EqualUnmodifiableListView) return _items;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_items);
+}
+
+
+/// Create a copy of ManagedCollectionItems
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ManagedCollectionItemsCopyWith<_ManagedCollectionItems> get copyWith => __$ManagedCollectionItemsCopyWithImpl<_ManagedCollectionItems>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ManagedCollectionItemsToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ManagedCollectionItems&&(identical(other.collectionId, collectionId) || other.collectionId == collectionId)&&const DeepCollectionEquality().equals(other.items, _items));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,collectionId,const DeepCollectionEquality().hash(_items));
+}
+
+@override
+String toString() {
+    return 'ManagedCollectionItems(collectionId: $collectionId, items: $items)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ManagedCollectionItemsCopyWith<$Res> implements $ManagedCollectionItemsCopyWith<$Res> {
+  factory _$ManagedCollectionItemsCopyWith(_ManagedCollectionItems value, $Res Function(_ManagedCollectionItems) _then) = __$ManagedCollectionItemsCopyWithImpl;
+@override @useResult
+$Res call({
+ String collectionId, List<SourceManga> items
+});
+
+
+
+
+}
+/// @nodoc
+class __$ManagedCollectionItemsCopyWithImpl<$Res>
+    implements _$ManagedCollectionItemsCopyWith<$Res> {
+  __$ManagedCollectionItemsCopyWithImpl(this._self, this._then);
+
+  final _ManagedCollectionItems _self;
+  final $Res Function(_ManagedCollectionItems) _then;
+
+/// Create a copy of ManagedCollectionItems
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? collectionId = null,Object? items = null,}) {
+  return _then(_ManagedCollectionItems(
+collectionId: null == collectionId ? _self.collectionId : collectionId // ignore: cast_nullable_to_non_nullable
+as String,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
+as List<SourceManga>,
+  ));
+}
+
+
+}
+
+ManagedCollectionChange _$ManagedCollectionChangeFromJson(
+  Map<String, dynamic> json
+) {
+        switch (json['type']) {
+                  case 'add':
+          return ManagedCollectionAdd.fromJson(
+            json
+          );
+                case 'remove':
+          return ManagedCollectionRemove.fromJson(
+            json
+          );
+                case 'move':
+          return ManagedCollectionMove.fromJson(
+            json
+          );
+        
+          default:
+            throw CheckedFromJsonException(
+  json,
+  'type',
+  'ManagedCollectionChange',
+  'Invalid union type "${json['type']}"!'
+);
+        }
+      
+}
+
+/// @nodoc
+mixin _$ManagedCollectionChange {
+
+ String get id; SourceManga get sourceManga;
+/// Create a copy of ManagedCollectionChange
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ManagedCollectionChangeCopyWith<ManagedCollectionChange> get copyWith => _$ManagedCollectionChangeCopyWithImpl<ManagedCollectionChange>(this as ManagedCollectionChange, _$identity);
+
+  /// Serializes this ManagedCollectionChange to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as ManagedCollectionChange;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ManagedCollectionChange&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.sourceManga, _this.sourceManga) || other.sourceManga == _this.sourceManga));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as ManagedCollectionChange;
+  return Object.hash(runtimeType,_this.id,_this.sourceManga);
+}
+
+@override
+String toString() {
+  final _this = this as ManagedCollectionChange;
+  return 'ManagedCollectionChange(id: ${_this.id}, sourceManga: ${_this.sourceManga})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ManagedCollectionChangeCopyWith<$Res>  {
+  factory $ManagedCollectionChangeCopyWith(ManagedCollectionChange value, $Res Function(ManagedCollectionChange) _then) = _$ManagedCollectionChangeCopyWithImpl;
+@useResult
+$Res call({
+ String id, SourceManga sourceManga
+});
+
+
+$SourceMangaCopyWith<$Res> get sourceManga;
+
+}
+/// @nodoc
+class _$ManagedCollectionChangeCopyWithImpl<$Res>
+    implements $ManagedCollectionChangeCopyWith<$Res> {
+  _$ManagedCollectionChangeCopyWithImpl(this._self, this._then);
+
+  final ManagedCollectionChange _self;
+  final $Res Function(ManagedCollectionChange) _then;
+
+/// Create a copy of ManagedCollectionChange
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? sourceManga = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,sourceManga: null == sourceManga ? _self.sourceManga : sourceManga // ignore: cast_nullable_to_non_nullable
+as SourceManga,
+  ));
+}
+/// Create a copy of ManagedCollectionChange
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$ManagedCollectionCopyWith<$Res> get collection {
+$SourceMangaCopyWith<$Res> get sourceManga {
   
-  return $ManagedCollectionCopyWith<$Res>(_self.collection, (value) {
-    return _then(_self.copyWith(collection: value));
+  return $SourceMangaCopyWith<$Res>(_self.sourceManga, (value) {
+    return _then(_self.copyWith(sourceManga: value));
   });
 }
 }
@@ -5378,97 +5566,449 @@ $ManagedCollectionCopyWith<$Res> get collection {
 /// @nodoc
 @JsonSerializable()
 
-class _ManagedCollectionChangeset implements ManagedCollectionChangeset {
-  const _ManagedCollectionChangeset({required this.collection, required  List<SourceManga> additions, required  List<SourceManga> deletions}): _additions = additions,_deletions = deletions;
-  factory _ManagedCollectionChangeset.fromJson(Map<String, dynamic> json) => _$ManagedCollectionChangesetFromJson(json);
+class ManagedCollectionAdd implements ManagedCollectionChange {
+  const ManagedCollectionAdd({required this.id, required this.to, required this.sourceManga,  String? $type}): $type = $type ?? 'add';
+  factory ManagedCollectionAdd.fromJson(Map<String, dynamic> json) => _$ManagedCollectionAddFromJson(json);
 
-@override final  ManagedCollection collection;
- final  List<SourceManga> _additions;
-@override List<SourceManga> get additions {
-  if (_additions is EqualUnmodifiableListView) return _additions;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_additions);
-}
+@override final  String id;
+ final  ManagedCollection to;
+@override final  SourceManga sourceManga;
 
- final  List<SourceManga> _deletions;
-@override List<SourceManga> get deletions {
-  if (_deletions is EqualUnmodifiableListView) return _deletions;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_deletions);
-}
+@JsonKey(name: 'type')
+final String $type;
 
 
-/// Create a copy of ManagedCollectionChangeset
+/// Create a copy of ManagedCollectionChange
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$ManagedCollectionChangesetCopyWith<_ManagedCollectionChangeset> get copyWith => __$ManagedCollectionChangesetCopyWithImpl<_ManagedCollectionChangeset>(this, _$identity);
+$ManagedCollectionAddCopyWith<ManagedCollectionAdd> get copyWith => _$ManagedCollectionAddCopyWithImpl<ManagedCollectionAdd>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$ManagedCollectionChangesetToJson(this, );
+  return _$ManagedCollectionAddToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ManagedCollectionChangeset&&(identical(other.collection, collection) || other.collection == collection)&&const DeepCollectionEquality().equals(other.additions, _additions)&&const DeepCollectionEquality().equals(other.deletions, _deletions));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ManagedCollectionAdd&&(identical(other.id, id) || other.id == id)&&(identical(other.to, to) || other.to == to)&&(identical(other.sourceManga, sourceManga) || other.sourceManga == sourceManga));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,collection,const DeepCollectionEquality().hash(_additions),const DeepCollectionEquality().hash(_deletions));
+    return Object.hash(runtimeType,id,to,sourceManga);
 }
 
 @override
 String toString() {
-    return 'ManagedCollectionChangeset(collection: $collection, additions: $additions, deletions: $deletions)';
+    return 'ManagedCollectionChange.add(id: $id, to: $to, sourceManga: $sourceManga)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$ManagedCollectionChangesetCopyWith<$Res> implements $ManagedCollectionChangesetCopyWith<$Res> {
-  factory _$ManagedCollectionChangesetCopyWith(_ManagedCollectionChangeset value, $Res Function(_ManagedCollectionChangeset) _then) = __$ManagedCollectionChangesetCopyWithImpl;
+abstract mixin class $ManagedCollectionAddCopyWith<$Res> implements $ManagedCollectionChangeCopyWith<$Res> {
+  factory $ManagedCollectionAddCopyWith(ManagedCollectionAdd value, $Res Function(ManagedCollectionAdd) _then) = _$ManagedCollectionAddCopyWithImpl;
 @override @useResult
 $Res call({
- ManagedCollection collection, List<SourceManga> additions, List<SourceManga> deletions
+ String id, ManagedCollection to, SourceManga sourceManga
 });
 
 
-@override $ManagedCollectionCopyWith<$Res> get collection;
+$ManagedCollectionCopyWith<$Res> get to;@override $SourceMangaCopyWith<$Res> get sourceManga;
 
 }
 /// @nodoc
-class __$ManagedCollectionChangesetCopyWithImpl<$Res>
-    implements _$ManagedCollectionChangesetCopyWith<$Res> {
-  __$ManagedCollectionChangesetCopyWithImpl(this._self, this._then);
+class _$ManagedCollectionAddCopyWithImpl<$Res>
+    implements $ManagedCollectionAddCopyWith<$Res> {
+  _$ManagedCollectionAddCopyWithImpl(this._self, this._then);
 
-  final _ManagedCollectionChangeset _self;
-  final $Res Function(_ManagedCollectionChangeset) _then;
+  final ManagedCollectionAdd _self;
+  final $Res Function(ManagedCollectionAdd) _then;
 
-/// Create a copy of ManagedCollectionChangeset
+/// Create a copy of ManagedCollectionChange
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? collection = null,Object? additions = null,Object? deletions = null,}) {
-  return _then(_ManagedCollectionChangeset(
-collection: null == collection ? _self.collection : collection // ignore: cast_nullable_to_non_nullable
-as ManagedCollection,additions: null == additions ? _self._additions : additions // ignore: cast_nullable_to_non_nullable
-as List<SourceManga>,deletions: null == deletions ? _self._deletions : deletions // ignore: cast_nullable_to_non_nullable
-as List<SourceManga>,
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? to = null,Object? sourceManga = null,}) {
+  return _then(ManagedCollectionAdd(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,to: null == to ? _self.to : to // ignore: cast_nullable_to_non_nullable
+as ManagedCollection,sourceManga: null == sourceManga ? _self.sourceManga : sourceManga // ignore: cast_nullable_to_non_nullable
+as SourceManga,
   ));
 }
 
-/// Create a copy of ManagedCollectionChangeset
+/// Create a copy of ManagedCollectionChange
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$ManagedCollectionCopyWith<$Res> get collection {
+$ManagedCollectionCopyWith<$Res> get to {
   
-  return $ManagedCollectionCopyWith<$Res>(_self.collection, (value) {
-    return _then(_self.copyWith(collection: value));
+  return $ManagedCollectionCopyWith<$Res>(_self.to, (value) {
+    return _then(_self.copyWith(to: value));
+  });
+}/// Create a copy of ManagedCollectionChange
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SourceMangaCopyWith<$Res> get sourceManga {
+  
+  return $SourceMangaCopyWith<$Res>(_self.sourceManga, (value) {
+    return _then(_self.copyWith(sourceManga: value));
   });
 }
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class ManagedCollectionRemove implements ManagedCollectionChange {
+  const ManagedCollectionRemove({required this.id, required this.from, required this.sourceManga,  String? $type}): $type = $type ?? 'remove';
+  factory ManagedCollectionRemove.fromJson(Map<String, dynamic> json) => _$ManagedCollectionRemoveFromJson(json);
+
+@override final  String id;
+ final  ManagedCollection from;
+@override final  SourceManga sourceManga;
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of ManagedCollectionChange
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ManagedCollectionRemoveCopyWith<ManagedCollectionRemove> get copyWith => _$ManagedCollectionRemoveCopyWithImpl<ManagedCollectionRemove>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ManagedCollectionRemoveToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ManagedCollectionRemove&&(identical(other.id, id) || other.id == id)&&(identical(other.from, from) || other.from == from)&&(identical(other.sourceManga, sourceManga) || other.sourceManga == sourceManga));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,from,sourceManga);
+}
+
+@override
+String toString() {
+    return 'ManagedCollectionChange.remove(id: $id, from: $from, sourceManga: $sourceManga)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ManagedCollectionRemoveCopyWith<$Res> implements $ManagedCollectionChangeCopyWith<$Res> {
+  factory $ManagedCollectionRemoveCopyWith(ManagedCollectionRemove value, $Res Function(ManagedCollectionRemove) _then) = _$ManagedCollectionRemoveCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, ManagedCollection from, SourceManga sourceManga
+});
+
+
+$ManagedCollectionCopyWith<$Res> get from;@override $SourceMangaCopyWith<$Res> get sourceManga;
+
+}
+/// @nodoc
+class _$ManagedCollectionRemoveCopyWithImpl<$Res>
+    implements $ManagedCollectionRemoveCopyWith<$Res> {
+  _$ManagedCollectionRemoveCopyWithImpl(this._self, this._then);
+
+  final ManagedCollectionRemove _self;
+  final $Res Function(ManagedCollectionRemove) _then;
+
+/// Create a copy of ManagedCollectionChange
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? from = null,Object? sourceManga = null,}) {
+  return _then(ManagedCollectionRemove(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,from: null == from ? _self.from : from // ignore: cast_nullable_to_non_nullable
+as ManagedCollection,sourceManga: null == sourceManga ? _self.sourceManga : sourceManga // ignore: cast_nullable_to_non_nullable
+as SourceManga,
+  ));
+}
+
+/// Create a copy of ManagedCollectionChange
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ManagedCollectionCopyWith<$Res> get from {
+  
+  return $ManagedCollectionCopyWith<$Res>(_self.from, (value) {
+    return _then(_self.copyWith(from: value));
+  });
+}/// Create a copy of ManagedCollectionChange
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SourceMangaCopyWith<$Res> get sourceManga {
+  
+  return $SourceMangaCopyWith<$Res>(_self.sourceManga, (value) {
+    return _then(_self.copyWith(sourceManga: value));
+  });
+}
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class ManagedCollectionMove implements ManagedCollectionChange {
+  const ManagedCollectionMove({required this.id, required this.from, required this.to, required this.sourceManga,  String? $type}): $type = $type ?? 'move';
+  factory ManagedCollectionMove.fromJson(Map<String, dynamic> json) => _$ManagedCollectionMoveFromJson(json);
+
+@override final  String id;
+ final  ManagedCollection from;
+ final  ManagedCollection to;
+@override final  SourceManga sourceManga;
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of ManagedCollectionChange
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ManagedCollectionMoveCopyWith<ManagedCollectionMove> get copyWith => _$ManagedCollectionMoveCopyWithImpl<ManagedCollectionMove>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ManagedCollectionMoveToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ManagedCollectionMove&&(identical(other.id, id) || other.id == id)&&(identical(other.from, from) || other.from == from)&&(identical(other.to, to) || other.to == to)&&(identical(other.sourceManga, sourceManga) || other.sourceManga == sourceManga));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,from,to,sourceManga);
+}
+
+@override
+String toString() {
+    return 'ManagedCollectionChange.move(id: $id, from: $from, to: $to, sourceManga: $sourceManga)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ManagedCollectionMoveCopyWith<$Res> implements $ManagedCollectionChangeCopyWith<$Res> {
+  factory $ManagedCollectionMoveCopyWith(ManagedCollectionMove value, $Res Function(ManagedCollectionMove) _then) = _$ManagedCollectionMoveCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, ManagedCollection from, ManagedCollection to, SourceManga sourceManga
+});
+
+
+$ManagedCollectionCopyWith<$Res> get from;$ManagedCollectionCopyWith<$Res> get to;@override $SourceMangaCopyWith<$Res> get sourceManga;
+
+}
+/// @nodoc
+class _$ManagedCollectionMoveCopyWithImpl<$Res>
+    implements $ManagedCollectionMoveCopyWith<$Res> {
+  _$ManagedCollectionMoveCopyWithImpl(this._self, this._then);
+
+  final ManagedCollectionMove _self;
+  final $Res Function(ManagedCollectionMove) _then;
+
+/// Create a copy of ManagedCollectionChange
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? from = null,Object? to = null,Object? sourceManga = null,}) {
+  return _then(ManagedCollectionMove(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,from: null == from ? _self.from : from // ignore: cast_nullable_to_non_nullable
+as ManagedCollection,to: null == to ? _self.to : to // ignore: cast_nullable_to_non_nullable
+as ManagedCollection,sourceManga: null == sourceManga ? _self.sourceManga : sourceManga // ignore: cast_nullable_to_non_nullable
+as SourceManga,
+  ));
+}
+
+/// Create a copy of ManagedCollectionChange
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ManagedCollectionCopyWith<$Res> get from {
+  
+  return $ManagedCollectionCopyWith<$Res>(_self.from, (value) {
+    return _then(_self.copyWith(from: value));
+  });
+}/// Create a copy of ManagedCollectionChange
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ManagedCollectionCopyWith<$Res> get to {
+  
+  return $ManagedCollectionCopyWith<$Res>(_self.to, (value) {
+    return _then(_self.copyWith(to: value));
+  });
+}/// Create a copy of ManagedCollectionChange
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SourceMangaCopyWith<$Res> get sourceManga {
+  
+  return $SourceMangaCopyWith<$Res>(_self.sourceManga, (value) {
+    return _then(_self.copyWith(sourceManga: value));
+  });
+}
+}
+
+
+/// @nodoc
+mixin _$ManagedCollectionChangeFailure {
+
+/// The [ManagedCollectionChange.id] of the change that failed.
+ String get changeId; String get reason;
+/// Create a copy of ManagedCollectionChangeFailure
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ManagedCollectionChangeFailureCopyWith<ManagedCollectionChangeFailure> get copyWith => _$ManagedCollectionChangeFailureCopyWithImpl<ManagedCollectionChangeFailure>(this as ManagedCollectionChangeFailure, _$identity);
+
+  /// Serializes this ManagedCollectionChangeFailure to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as ManagedCollectionChangeFailure;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ManagedCollectionChangeFailure&&(identical(other.changeId, _this.changeId) || other.changeId == _this.changeId)&&(identical(other.reason, _this.reason) || other.reason == _this.reason));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as ManagedCollectionChangeFailure;
+  return Object.hash(runtimeType,_this.changeId,_this.reason);
+}
+
+@override
+String toString() {
+  final _this = this as ManagedCollectionChangeFailure;
+  return 'ManagedCollectionChangeFailure(changeId: ${_this.changeId}, reason: ${_this.reason})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ManagedCollectionChangeFailureCopyWith<$Res>  {
+  factory $ManagedCollectionChangeFailureCopyWith(ManagedCollectionChangeFailure value, $Res Function(ManagedCollectionChangeFailure) _then) = _$ManagedCollectionChangeFailureCopyWithImpl;
+@useResult
+$Res call({
+ String changeId, String reason
+});
+
+
+
+
+}
+/// @nodoc
+class _$ManagedCollectionChangeFailureCopyWithImpl<$Res>
+    implements $ManagedCollectionChangeFailureCopyWith<$Res> {
+  _$ManagedCollectionChangeFailureCopyWithImpl(this._self, this._then);
+
+  final ManagedCollectionChangeFailure _self;
+  final $Res Function(ManagedCollectionChangeFailure) _then;
+
+/// Create a copy of ManagedCollectionChangeFailure
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? changeId = null,Object? reason = null,}) {
+  return _then(ManagedCollectionChangeFailure(
+changeId: null == changeId ? _self.changeId : changeId // ignore: cast_nullable_to_non_nullable
+as String,reason: null == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _ManagedCollectionChangeFailure implements ManagedCollectionChangeFailure {
+  const _ManagedCollectionChangeFailure({required this.changeId, this.reason = ''});
+  factory _ManagedCollectionChangeFailure.fromJson(Map<String, dynamic> json) => _$ManagedCollectionChangeFailureFromJson(json);
+
+/// The [ManagedCollectionChange.id] of the change that failed.
+@override final  String changeId;
+@override@JsonKey() final  String reason;
+
+/// Create a copy of ManagedCollectionChangeFailure
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ManagedCollectionChangeFailureCopyWith<_ManagedCollectionChangeFailure> get copyWith => __$ManagedCollectionChangeFailureCopyWithImpl<_ManagedCollectionChangeFailure>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ManagedCollectionChangeFailureToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ManagedCollectionChangeFailure&&(identical(other.changeId, changeId) || other.changeId == changeId)&&(identical(other.reason, reason) || other.reason == reason));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,changeId,reason);
+}
+
+@override
+String toString() {
+    return 'ManagedCollectionChangeFailure(changeId: $changeId, reason: $reason)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ManagedCollectionChangeFailureCopyWith<$Res> implements $ManagedCollectionChangeFailureCopyWith<$Res> {
+  factory _$ManagedCollectionChangeFailureCopyWith(_ManagedCollectionChangeFailure value, $Res Function(_ManagedCollectionChangeFailure) _then) = __$ManagedCollectionChangeFailureCopyWithImpl;
+@override @useResult
+$Res call({
+ String changeId, String reason
+});
+
+
+
+
+}
+/// @nodoc
+class __$ManagedCollectionChangeFailureCopyWithImpl<$Res>
+    implements _$ManagedCollectionChangeFailureCopyWith<$Res> {
+  __$ManagedCollectionChangeFailureCopyWithImpl(this._self, this._then);
+
+  final _ManagedCollectionChangeFailure _self;
+  final $Res Function(_ManagedCollectionChangeFailure) _then;
+
+/// Create a copy of ManagedCollectionChangeFailure
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? changeId = null,Object? reason = null,}) {
+  return _then(_ManagedCollectionChangeFailure(
+changeId: null == changeId ? _self.changeId : changeId // ignore: cast_nullable_to_non_nullable
+as String,reason: null == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
 }
 
 

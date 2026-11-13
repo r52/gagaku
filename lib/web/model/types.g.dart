@@ -441,6 +441,7 @@ _MangaInfo _$MangaInfoFromJson(Map<String, dynamic> json) => _MangaInfo(
     _$MangaContentTypeEnumMap,
     json['contentType'],
   ),
+  isWebtoon: json['isWebtoon'] as bool?,
   status: json['status'] as String?,
   artist: json['artist'] as String?,
   author: json['author'] as String?,
@@ -467,6 +468,7 @@ Map<String, dynamic> _$MangaInfoToJson(
   'secondaryTitles': instance.secondaryTitles,
   'contentRating': const ContentRatingParser().toJson(instance.contentRating),
   'contentType': _$MangaContentTypeEnumMap[instance.contentType],
+  'isWebtoon': instance.isWebtoon,
   'status': instance.status,
   'artist': instance.artist,
   'author': instance.author,
@@ -636,31 +638,108 @@ _ManagedCollection _$ManagedCollectionFromJson(Map<String, dynamic> json) =>
     _ManagedCollection(
       id: json['id'] as String,
       title: json['title'] as String,
+      exclusiveGroup: json['exclusiveGroup'] as String?,
     );
 
 Map<String, dynamic> _$ManagedCollectionToJson(_ManagedCollection instance) =>
-    <String, dynamic>{'id': instance.id, 'title': instance.title};
+    <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'exclusiveGroup': instance.exclusiveGroup,
+    };
 
-_ManagedCollectionChangeset _$ManagedCollectionChangesetFromJson(
+_ManagedCollectionItems _$ManagedCollectionItemsFromJson(
   Map<String, dynamic> json,
-) => _ManagedCollectionChangeset(
-  collection: ManagedCollection.fromJson(
-    json['collection'] as Map<String, dynamic>,
-  ),
-  additions: (json['additions'] as List<dynamic>)
-      .map((e) => SourceManga.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  deletions: (json['deletions'] as List<dynamic>)
-      .map((e) => SourceManga.fromJson(e as Map<String, dynamic>))
-      .toList(),
+) => _ManagedCollectionItems(
+  collectionId: json['collectionId'] as String,
+  items:
+      (json['items'] as List<dynamic>?)
+          ?.map((e) => SourceManga.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
 );
 
-Map<String, dynamic> _$ManagedCollectionChangesetToJson(
-  _ManagedCollectionChangeset instance,
+Map<String, dynamic> _$ManagedCollectionItemsToJson(
+  _ManagedCollectionItems instance,
 ) => <String, dynamic>{
-  'collection': instance.collection.toJson(),
-  'additions': instance.additions.map((e) => e.toJson()).toList(),
-  'deletions': instance.deletions.map((e) => e.toJson()).toList(),
+  'collectionId': instance.collectionId,
+  'items': instance.items.map((e) => e.toJson()).toList(),
+};
+
+ManagedCollectionAdd _$ManagedCollectionAddFromJson(
+  Map<String, dynamic> json,
+) => ManagedCollectionAdd(
+  id: json['id'] as String,
+  to: ManagedCollection.fromJson(json['to'] as Map<String, dynamic>),
+  sourceManga: SourceManga.fromJson(
+    json['sourceManga'] as Map<String, dynamic>,
+  ),
+  $type: json['type'] as String?,
+);
+
+Map<String, dynamic> _$ManagedCollectionAddToJson(
+  ManagedCollectionAdd instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'to': instance.to.toJson(),
+  'sourceManga': instance.sourceManga.toJson(),
+  'type': instance.$type,
+};
+
+ManagedCollectionRemove _$ManagedCollectionRemoveFromJson(
+  Map<String, dynamic> json,
+) => ManagedCollectionRemove(
+  id: json['id'] as String,
+  from: ManagedCollection.fromJson(json['from'] as Map<String, dynamic>),
+  sourceManga: SourceManga.fromJson(
+    json['sourceManga'] as Map<String, dynamic>,
+  ),
+  $type: json['type'] as String?,
+);
+
+Map<String, dynamic> _$ManagedCollectionRemoveToJson(
+  ManagedCollectionRemove instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'from': instance.from.toJson(),
+  'sourceManga': instance.sourceManga.toJson(),
+  'type': instance.$type,
+};
+
+ManagedCollectionMove _$ManagedCollectionMoveFromJson(
+  Map<String, dynamic> json,
+) => ManagedCollectionMove(
+  id: json['id'] as String,
+  from: ManagedCollection.fromJson(json['from'] as Map<String, dynamic>),
+  to: ManagedCollection.fromJson(json['to'] as Map<String, dynamic>),
+  sourceManga: SourceManga.fromJson(
+    json['sourceManga'] as Map<String, dynamic>,
+  ),
+  $type: json['type'] as String?,
+);
+
+Map<String, dynamic> _$ManagedCollectionMoveToJson(
+  ManagedCollectionMove instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'from': instance.from.toJson(),
+  'to': instance.to.toJson(),
+  'sourceManga': instance.sourceManga.toJson(),
+  'type': instance.$type,
+};
+
+_ManagedCollectionChangeFailure _$ManagedCollectionChangeFailureFromJson(
+  Map<String, dynamic> json,
+) => _ManagedCollectionChangeFailure(
+  changeId: json['changeId'] as String,
+  reason: json['reason'] as String? ?? '',
+);
+
+Map<String, dynamic> _$ManagedCollectionChangeFailureToJson(
+  _ManagedCollectionChangeFailure instance,
+) => <String, dynamic>{
+  'changeId': instance.changeId,
+  'reason': instance.reason,
 };
 
 _PaperbackRequest _$PaperbackRequestFromJson(Map<String, dynamic> json) =>
