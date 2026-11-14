@@ -39,8 +39,15 @@ class DetailScaffold extends StatelessWidget {
   static const minTwoPaneWidth = 600.0;
   static const minTwoPaneHeight = 480.0;
 
-  static bool useTwoPane(Size size) =>
-      size.width >= minTwoPaneWidth && size.height >= minTwoPaneHeight;
+  /// Width of the side pane in the two-pane layout.
+  static double sidePaneWidth(double width) => (width * 0.35).clamp(240, 360);
+
+  /// Whether [size] fits the two-pane layout, with at least [minBodyWidth]
+  /// left for the tabs beside the side pane and its divider.
+  static bool useTwoPane(Size size, {double minBodyWidth = 0.0}) =>
+      size.width >= minTwoPaneWidth &&
+      size.height >= minTwoPaneHeight &&
+      size.width - sidePaneWidth(size.width) - 1.0 >= minBodyWidth;
 
   const DetailScaffold({
     super.key,
@@ -56,6 +63,7 @@ class DetailScaffold extends StatelessWidget {
     required this.scrollController,
     this.onBack,
     this.collapsedBannerHeight,
+    this.minBodyWidth = 0.0,
   }) : assert(tabs.length > 0);
 
   final String title;
@@ -82,12 +90,17 @@ class DetailScaffold extends StatelessWidget {
   /// Collapsed height of the cover banner; ignored without a cover.
   final double? collapsedBannerHeight;
 
+  /// Narrowest tab body the two-pane layout may leave. Pages whose tabs need
+  /// more room than their side pane content justifies set this so they stay
+  /// single-pane until the body fits.
+  final double minBodyWidth;
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final size = constraints.biggest;
-        if (useTwoPane(size)) {
+        if (useTwoPane(size, minBodyWidth: minBodyWidth)) {
           return _DetailTwoPane(config: this, width: size.width);
         }
         return _DetailSinglePane(
@@ -137,7 +150,7 @@ class _DetailTwoPane extends HookWidget {
       () => config.tabController.index,
     );
     final active = _activeTab(config, index);
-    final paneWidth = (width * 0.35).clamp(240.0, 360.0);
+    final paneWidth = DetailScaffold.sidePaneWidth(width);
     const coverPadding = 12.0;
     final coverUrl = config.coverUrl;
 

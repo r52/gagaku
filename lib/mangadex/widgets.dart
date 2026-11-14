@@ -818,13 +818,13 @@ class EntityTitlesPager {
 }
 
 class _CoverButton extends ConsumerWidget {
-  const _CoverButton({required this.manga});
+  const _CoverButton({required this.manga, required this.compact});
 
   final Manga manga;
+  final bool compact;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final imageCache = ref.watch(extensionImageCacheProvider);
 
     return MouseRegion(
@@ -850,8 +850,8 @@ class _CoverButton extends ConsumerWidget {
                 borderRadius: const BorderRadius.all(Radius.circular(4.0)),
               ),
             ),
-            width: screenSizeSmall ? 64.0 : 128.0,
-            height: screenSizeSmall ? 91.0 : 182.0,
+            width: compact ? 64.0 : 128.0,
+            height: compact ? 91.0 : 182.0,
             progressIndicatorBuilder: (context, url, downloadProgress) =>
                 const Center(child: CircularProgressIndicator()),
             errorBuilder: (context, error, stacktrace) {
@@ -931,11 +931,9 @@ class ChapterFeedItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final visibleCount = useState(3);
 
     final titleBtn = MangaTitleButton(manga: state.manga);
-    final coverBtn = _CoverButton(manga: state.manga);
 
     final chaptersCount = state.chapters.length;
     final visibleChapters = state.chapters.take(visibleCount.value);
@@ -961,13 +959,35 @@ class ChapterFeedItem extends HookWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: screenSizeSmall
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  titleBtn,
-                  const Divider(height: 4.0),
-                  Row(
+        // Sized by the space the feed gives the card, which may be a pane
+        // much narrower than the screen.
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = DeviceContext.widthSmall(constraints.maxWidth);
+            final coverBtn = _CoverButton(manga: state.manga, compact: compact);
+
+            return compact
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      titleBtn,
+                      const Divider(height: 4.0),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          coverBtn,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: 4.0,
+                              children: chapterButtons,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       coverBtn,
@@ -975,30 +995,17 @@ class ChapterFeedItem extends HookWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           spacing: 4.0,
-                          children: chapterButtons,
+                          children: [
+                            titleBtn,
+                            const Divider(height: 10.0),
+                            ...chapterButtons,
+                          ],
                         ),
                       ),
                     ],
-                  ),
-                ],
-              )
-            : Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  coverBtn,
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 4.0,
-                      children: [
-                        titleBtn,
-                        const Divider(height: 10.0),
-                        ...chapterButtons,
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                  );
+          },
+        ),
       ),
     );
   }
@@ -1007,17 +1014,18 @@ class ChapterFeedItem extends HookWidget {
 class _ChapterButtonCard extends HookConsumerWidget {
   final Chapter chapter;
   final Manga manga;
+  final bool compact;
   final Widget child;
 
   const _ChapterButtonCard({
     required this.chapter,
     required this.manga,
+    required this.compact,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
     final tileColor = theme.colorScheme.primaryContainer;
     final hoverColor = theme.hoverColor;
@@ -1054,7 +1062,7 @@ class _ChapterButtonCard extends HookConsumerWidget {
         decoration: decoration,
         child: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: (screenSizeSmall ? 6.0 : 10.0),
+            horizontal: (compact ? 6.0 : 10.0),
             vertical: 4.0,
           ),
           child: child,
@@ -1065,6 +1073,10 @@ class _ChapterButtonCard extends HookConsumerWidget {
 }
 
 class ChapterButtonWidget extends ConsumerWidget {
+  /// Narrowest button width that keeps a readable chapter title beside the
+  /// fixed-width time, uploader and comment columns of the wide layout.
+  static const minWideWidth = 480.0;
+
   const ChapterButtonWidget({
     super.key,
     required this.chapter,
@@ -1079,8 +1091,6 @@ class ChapterButtonWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-
-    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     final comments = ref.watch(
       chapterStatsProvider.select(
@@ -1109,103 +1119,6 @@ class ChapterButtonWidget extends ConsumerWidget {
     final pubtime = _PubTime(time: chapter.attributes.publishAt);
     final markReadButton = MarkReadButton(manga: manga, chapter: chapter);
 
-    final title = Row(
-      spacing: 6.0,
-      children: [
-        // This gap is to deliberate leave space between
-        // the markReadButton and the flag
-        const SizedBox.shrink(),
-        Expanded(
-          child: ChapterTitle(chapter: chapter, manga: manga),
-        ),
-        if (isEndChapter) IconTextChip(color: Colors.blue, text: 'END'),
-        if (screenSizeSmall) statsChip,
-      ],
-    );
-
-    final groups = _GroupRow(chapter: chapter);
-
-    final tile = screenSizeSmall
-        ? Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  SizedBox(width: 24, child: markReadButton),
-                  Expanded(child: title),
-                ],
-              ),
-              Row(
-                children: [
-                  const SizedBox(width: 24, child: _groupIconB),
-                  Expanded(child: groups),
-                ],
-              ),
-              Row(
-                children: [
-                  const SizedBox(width: 24, child: _personIconB),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: userChip,
-                          ),
-                        ),
-                        const SizedBox(width: 4.0),
-                        _scheduleIconB,
-                        const SizedBox(width: 4.0),
-                        pubtime,
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          )
-        : Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  SizedBox(width: 24, child: markReadButton),
-                  Expanded(child: title),
-                  const SizedBox(width: 24, child: _scheduleIconB),
-                  SizedBox(
-                    width: 145,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 2.0),
-                      child: pubtime,
-                    ),
-                  ),
-                  const SizedBox(width: 60),
-                ],
-              ),
-              Row(
-                children: [
-                  const SizedBox(width: 24, child: _groupIconB),
-                  Expanded(child: groups),
-                  const SizedBox(width: 24, child: _personIconB),
-                  SizedBox(
-                    width: 145,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: userChip,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 60,
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: statsChip,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
-
     return GestureDetector(
       onTap: () {
         MangaDexReaderRoute(
@@ -1219,7 +1132,115 @@ class ChapterButtonWidget extends ConsumerWidget {
           ),
         ).push(context);
       },
-      child: _ChapterButtonCard(manga: manga, chapter: chapter, child: tile),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < minWideWidth;
+
+          final title = Row(
+            spacing: 6.0,
+            children: [
+              // This gap is to deliberate leave space between
+              // the markReadButton and the flag
+              const SizedBox.shrink(),
+              Expanded(
+                child: ChapterTitle(chapter: chapter, manga: manga),
+              ),
+              if (isEndChapter) IconTextChip(color: Colors.blue, text: 'END'),
+              if (compact) statsChip,
+            ],
+          );
+
+          final groups = _GroupRow(chapter: chapter);
+
+          final tile = compact
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(width: 24, child: markReadButton),
+                        Expanded(child: title),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 24, child: _groupIconB),
+                        Expanded(child: groups),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 24, child: _personIconB),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: userChip,
+                                ),
+                              ),
+                              const SizedBox(width: 4.0),
+                              _scheduleIconB,
+                              const SizedBox(width: 4.0),
+                              pubtime,
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(width: 24, child: markReadButton),
+                        Expanded(child: title),
+                        const SizedBox(width: 24, child: _scheduleIconB),
+                        SizedBox(
+                          width: 145,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 2.0),
+                            child: pubtime,
+                          ),
+                        ),
+                        const SizedBox(width: 60),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 24, child: _groupIconB),
+                        Expanded(child: groups),
+                        const SizedBox(width: 24, child: _personIconB),
+                        SizedBox(
+                          width: 145,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: userChip,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 60,
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: statsChip,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+
+          return _ChapterButtonCard(
+            manga: manga,
+            chapter: chapter,
+            compact: compact,
+            child: tile,
+          );
+        },
+      ),
     );
   }
 }

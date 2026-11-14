@@ -996,28 +996,54 @@ class ChapterFeedItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSizeSmall = DeviceContext.screenWidthSmall(context);
-
     final titleBtn = _MangaTitle(
       key: ValueKey('_MangaTitle(${state.link.requireSeries.key})'),
-      link: state.link,
-    );
-
-    final coverBtn = _CoverButton(
-      key: ValueKey('_CoverButton(${state.link.requireSeries.key})'),
       link: state.link,
     );
 
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: screenSizeSmall
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  titleBtn,
-                  const Divider(height: 4.0),
-                  Row(
+        // Sized by the space the feed gives the card, which may be a pane
+        // much narrower than the screen.
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = DeviceContext.widthSmall(constraints.maxWidth);
+            final coverBtn = _CoverButton(
+              key: ValueKey('_CoverButton(${state.link.requireSeries.key})'),
+              link: state.link,
+              compact: compact,
+            );
+
+            return compact
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      titleBtn,
+                      const Divider(height: 4.0),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          coverBtn,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: 4.0,
+                              children: [
+                                for (final item in state.manga.chapters.take(3))
+                                  ChapterButtonWidget(
+                                    data: item,
+                                    manga: state.manga,
+                                    series: state.link.requireSeries,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       coverBtn,
@@ -1026,6 +1052,8 @@ class ChapterFeedItem extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           spacing: 4.0,
                           children: [
+                            titleBtn,
+                            const Divider(height: 10.0),
                             for (final item in state.manga.chapters.take(3))
                               ChapterButtonWidget(
                                 data: item,
@@ -1036,46 +1064,24 @@ class ChapterFeedItem extends StatelessWidget {
                         ),
                       ),
                     ],
-                  ),
-                ],
-              )
-            : Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  coverBtn,
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 4.0,
-                      children: [
-                        titleBtn,
-                        const Divider(height: 10.0),
-                        for (final item in state.manga.chapters.take(3))
-                          ChapterButtonWidget(
-                            data: item,
-                            manga: state.manga,
-                            series: state.link.requireSeries,
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                  );
+          },
+        ),
       ),
     );
   }
 }
 
 class _CoverButton extends ConsumerWidget {
-  const _CoverButton({super.key, required this.link});
+  const _CoverButton({super.key, required this.link, required this.compact});
 
   final HistoryLink link;
+  final bool compact;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final sourceId = link.series?.sourceId ?? '';
-    final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final headers = ref.watch(sourceHeadersProvider(sourceId));
     final imageCache = ref.watch(extensionImageCacheProvider);
 
@@ -1120,8 +1126,8 @@ class _CoverButton extends ConsumerWidget {
                 borderRadius: const BorderRadius.all(Radius.circular(4.0)),
               ),
             ),
-            width: screenSizeSmall ? 64.0 : 128.0,
-            height: screenSizeSmall ? 91.0 : 182.0,
+            width: compact ? 64.0 : 128.0,
+            height: compact ? 91.0 : 182.0,
             progressIndicatorBuilder: (context, url, downloadProgress) =>
                 const Center(child: CircularProgressIndicator()),
             errorBuilder: (context, error, stacktrace) {

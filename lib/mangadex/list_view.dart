@@ -64,6 +64,11 @@ class _MangaDexListView extends StatefulHookConsumerWidget {
 class _MangaDexListViewState extends ConsumerState<_MangaDexListView> {
   static const _feedInfo = MangaDexFeeds.customListFeed;
 
+  /// The side pane would only hold the name and a few chips, while both tabs
+  /// need the room: keep a single pane until the feed's cards can use their
+  /// wide layout beside it.
+  static const _minBodyWidth = 640.0;
+
   late final _feed = ChapterFeedPager(
     ref: ref,
     feedKey: _feedInfo.key,
@@ -92,6 +97,7 @@ class _MangaDexListViewState extends ConsumerState<_MangaDexListView> {
       title: list.attributes.name,
       actions: _ListActions(list: list),
       metadata: _ListInfo(list: list),
+      minBodyWidth: _minBodyWidth,
       tabController: tabController,
       tabs: [
         DetailTab(

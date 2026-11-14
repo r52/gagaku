@@ -73,9 +73,13 @@ class DeviceContext {
       (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
 
   static bool screenWidthSmall(BuildContext context) {
-    // Somewhat arbitrary measurement but w/e
-    return MediaQuery.sizeOf(context).width <= 600;
+    return widthSmall(MediaQuery.sizeOf(context).width);
   }
+
+  /// Width-based form of [screenWidthSmall] for parent constraints, so
+  /// widgets laid out in a narrow pane on a wide screen stay compact.
+  // Somewhat arbitrary measurement but w/e
+  static bool widthSmall(double width) => width <= 600;
 
   /// Returns true when the screen is wide enough (> 600dp) to use a side
   /// [NavigationRail] instead of a bottom [NavigationBar].
