@@ -192,24 +192,68 @@ class _ListInfo extends StatelessWidget {
     final t = context.t;
     final visibility = list.attributes.visibility;
     final username = list.user?.attributes?.username;
+    final inset = DetailScaffold.titleInsetOf(context);
 
+    // One line under the title, aligned with it, so the single-pane header
+    // stays short above the tabs.
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsetsDirectional.fromSTEB(inset, 0.0, inset, 12.0),
       child: Wrap(
-        spacing: 8.0,
+        spacing: 16.0,
         runSpacing: 4.0,
         children: [
           if (username != null)
-            Chip(avatar: const Icon(Icons.person), label: Text(username)),
-          Chip(
-            avatar: Icon(
+            _ListInfoItem(
+              icon: const Icon(Icons.person, size: 18.0),
+              label: username,
+            ),
+          _ListInfoItem(
+            icon: Icon(
               Icons.circle,
-              size: 16.0,
+              size: 12.0,
               color: visibility == CustomListVisibility.private
                   ? Colors.red
                   : Colors.green,
             ),
-            label: Text(t[visibility.label]),
+            label: t[visibility.label],
+          ),
+          _ListInfoItem(
+            icon: const Icon(Icons.collections_bookmark_outlined, size: 18.0),
+            label: t.num_items(n: list.set.length),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ListInfoItem extends StatelessWidget {
+  const _ListInfoItem({required this.icon, required this.label});
+
+  final Widget icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.onSurfaceVariant;
+
+    return IconTheme.merge(
+      data: IconThemeData(color: color),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 6.0,
+        children: [
+          SizedBox(
+            width: 18.0,
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: icon,
+            ),
+          ),
+          Text(
+            label,
+            style: theme.textTheme.bodyMedium?.copyWith(color: color),
           ),
         ],
       ),

@@ -39,6 +39,12 @@ class DetailScaffold extends StatelessWidget {
   static const minTwoPaneWidth = 600.0;
   static const minTwoPaneHeight = 480.0;
 
+  /// Start inset of the title in the current layout, so [metadata] can align
+  /// with it. Outside a [DetailScaffold] this is the toolbar title spacing.
+  static double titleInsetOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_DetailTitleInset>()?.inset ??
+      NavigationToolbar.kMiddleSpacing;
+
   /// Width of the side pane in the two-pane layout.
   static double sidePaneWidth(double width) => (width * 0.35).clamp(240, 360);
 
@@ -115,6 +121,17 @@ class DetailScaffold extends StatelessWidget {
 
 /// Collapsed height of the medium app bar used without a cover.
 const _plainToolbarHeight = 64.0;
+
+/// Provides [DetailScaffold.titleInsetOf] to the metadata.
+class _DetailTitleInset extends InheritedWidget {
+  const _DetailTitleInset({required this.inset, required super.child});
+
+  final double inset;
+
+  @override
+  bool updateShouldNotify(_DetailTitleInset oldWidget) =>
+      inset != oldWidget.inset;
+}
 
 DetailTab _activeTab(DetailScaffold config, int index) =>
     config.tabs[index.clamp(0, config.tabs.length - 1)];
@@ -205,7 +222,10 @@ class _DetailTwoPane extends HookWidget {
                       ),
                       child: config.badge,
                     ),
-                  config.metadata,
+                  _DetailTitleInset(
+                    inset: coverPadding,
+                    child: config.metadata,
+                  ),
                 ],
               ),
             ),
@@ -383,7 +403,12 @@ class _DetailSinglePane extends HookWidget {
                       ),
                       sliver: SliverToBoxAdapter(child: config.badge),
                     ),
-                  SliverToBoxAdapter(child: config.metadata),
+                  SliverToBoxAdapter(
+                    child: _DetailTitleInset(
+                      inset: NavigationToolbar.kMiddleSpacing,
+                      child: config.metadata,
+                    ),
+                  ),
                   if (config.tabs.length > 1)
                     SliverToBoxAdapter(child: _DetailTabBar(config: config)),
                 ],
