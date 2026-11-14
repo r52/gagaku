@@ -1,6 +1,7 @@
 name: paged_slivers
 description: Paged sliver lists and grids with typed page results and projections.
 publish_to: "none"
+resolution: workspace
 version: 0.1.0
 
 environment:

@@ -233,13 +233,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.1"
-  comic_page_view:
-    dependency: "direct main"
-    description:
-      path: "packages/comic_page_view"
-      relative: true
-    source: path
-    version: "0.1.0"
   convert:
     dependency: transitive
     description:
@@ -1109,13 +1102,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.0"
-  paged_slivers:
-    dependency: "direct main"
-    description:
-      path: "packages/paged_slivers"
-      relative: true
-    source: path
-    version: "0.1.0"
   path:
     dependency: "direct main"
     description:
