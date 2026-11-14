@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/rendering.dart';
 import 'package:gagaku/util/markdown/markdown_view.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:collection/collection.dart';
