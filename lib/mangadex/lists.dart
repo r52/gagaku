@@ -105,6 +105,7 @@ class MangaDexListsWidget extends HookConsumerWidget {
 
     final leading = SliverAppBar(
       automaticallyImplyLeading: false,
+      primary: false,
       pinned: true,
       actions: [
         SegmentedButton<_ListViewType>(

@@ -43,6 +43,7 @@ class MangaDexChapterFeedWidget extends HookWidget {
       ),
       SliverAppBar(
         automaticallyImplyLeading: false,
+        primary: false,
         pinned: true,
         title: Text(tr.chapterFeed.updates, style: CommonTextStyles.twentyfour),
         actions: [

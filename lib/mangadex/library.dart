@@ -86,6 +86,7 @@ class MangaDexLibraryWidget extends HookConsumerWidget {
               automaticallyImplyLeading: false,
               primary: false,
               pinned: true,
+              toolbarHeight: 0,
               bottom: TabBar(
                 tabAlignment: TabAlignment.center,
                 isScrollable: true,

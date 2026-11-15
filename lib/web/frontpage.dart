@@ -273,6 +273,7 @@ class WebSourceFrontPage extends HookConsumerWidget {
           WebSourceSliverAppBar(controller: scrollController),
           SliverAppBar(
             automaticallyImplyLeading: false,
+            primary: false,
             pinned: true,
             title: Text(
               tr.webSources.homepages,
