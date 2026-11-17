@@ -1,4 +1,4 @@
-import 'package:file_picker/file_picker.dart';
+import 'package:gagaku/util/directory_picker.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -72,8 +72,18 @@ class LocalLibrarySettingsWidget extends HookConsumerWidget {
                 final perms = await Permission.manageExternalStorage.request();
 
                 if (perms.isGranted) {
-                  String? selectedDirectory =
-                      await FilePicker.getDirectoryPath();
+                  final String? selectedDirectory;
+                  try {
+                    selectedDirectory = await pickDirectoryPath();
+                  } catch (error) {
+                    if (context.mounted) {
+                      Styles.showSnackBar(
+                        ScaffoldMessenger.of(context),
+                        content: '$error',
+                      );
+                    }
+                    return;
+                  }
 
                   if (selectedDirectory != null) {
                     config.value = config.value.copyWith(

@@ -45,10 +45,10 @@ packages:
     dependency: "direct main"
     description:
       name: android_file_picker
-      sha256: e7e02f9bab7e014e5b47e4cef135a8f5c66f5c14fd90986e415e758f6a1762e1
+      sha256: ec3cf2a2c7a9b2bd56747e85f80efdd994e563049dfb0981a23903acfdd58cb5
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.6"
+    version: "2.2.0"
   animations:
     dependency: "direct main"
     description:
@@ -201,6 +201,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.4"
+  cli_config:
+    dependency: transitive
+    description:
+      name: cli_config
+      sha256: ac20a183a07002b700f0c25e61b7ee46b23c309d76ab7b7640a028f18e4d99ec
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   cli_util:
     dependency: transitive
     description:
@@ -293,10 +301,10 @@ packages:
     dependency: "direct main"
     description:
       name: cupertino_ui
-      sha256: "369e39a1c5c030a6212589c3da1809920b1c2cfade7b02aade7695bfa4b88c3a"
+      sha256: c3eaf7f5bdfee36deb0b14a4cbf7602f1b6b8d8b8576b81f38fc08c25881c94c
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.6"
+    version: "1.1.7"
   dart_style:
     dependency: transitive
     description:
@@ -405,10 +413,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: "079dc46b753abbddb7f77cd87e6ed9ecc62902580707514568321bdf8e050a86"
+      sha256: c3780977700b8962c3b9b6a9aa4e2c988956893d70d4a4fa2d7adf4ec9b9eaee
       url: "https://pub.dev"
     source: hosted
-    version: "13.3.3"
+    version: "13.4.0"
   file_picker_darwin:
     dependency: transitive
     description:
@@ -429,10 +437,10 @@ packages:
     dependency: transitive
     description:
       name: file_picker_platform_interface
-      sha256: "336e7168306834a2b68e6168ed768e00d3fabeac23154d5793e277ca9f97cf20"
+      sha256: a2ef71c4628f92a4471d424576e3bf7042b40a2683c9f9a0e3033a7fc7f7763c
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.0"
+    version: "4.3.0"
   file_picker_web:
     dependency: transitive
     description:
@@ -846,7 +854,7 @@ packages:
     source: hosted
     version: "0.6.2"
   jni:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: jni
       sha256: "2e91e6087291affd10b31b6c872f3e3ac7dc5d93b51b5ba485d930c8f08bde6c"
@@ -854,7 +862,7 @@ packages:
     source: hosted
     version: "1.1.2"
   jni_flutter:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: jni_flutter
       sha256: "0dd33d67797560f66e961a6053882d4df54bd345bf063b8fe7ea133f7ad8b191"
@@ -869,6 +877,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  jnigen:
+    dependency: "direct dev"
+    description:
+      name: jnigen
+      sha256: "2055cf3b8a9e800af37f1ede3e9f86c02695f7bbb4f3bed3eab0457c14b75580"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   jose:
     dependency: transitive
     description:
@@ -985,10 +1001,10 @@ packages:
     dependency: "direct main"
     description:
       name: material_ui
-      sha256: "474c135fd46b56ff1d35ca982155e8863d28fbc6464d1192acf4ee53a738680e"
+      sha256: a6b19012df437a356cbc01f8ea22a105e07194c47c9a6009da0032a0ce35c4ab
       url: "https://pub.dev"
     source: hosted
-    version: "1.11.0"
+    version: "1.11.1"
   meta:
     dependency: "direct main"
     description:

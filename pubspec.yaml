@@ -36,8 +36,8 @@ workspace:
 dependencies:
   animations: ^3.0.0
   archive: ^4.0.1
-  file_picker: ^13.1.0
-  android_file_picker: ^2.0.0
+  file_picker: ^13.4.0
+  android_file_picker: ^2.2.0
   flutter:
     sdk: flutter
   flutter_hooks: ^0.21.4
@@ -99,6 +99,8 @@ dependencies:
     path: packages/comic_page_view
   paged_slivers:
     path: packages/paged_slivers
+  jni: ^1.1.2
+  jni_flutter: ^1.0.4
 
 dev_dependencies:
   flutter_test:
@@ -122,6 +124,7 @@ dev_dependencies:
   go_router_builder: ^4.1.1
   integration_test:
     sdk: flutter
+  jnigen: ^1.0.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
