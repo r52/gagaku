@@ -134,175 +134,172 @@ class MangaDexLoginScreen extends HookConsumerWidget {
         leading: const BackButton(),
         title: Text(tr.mangadex.login),
       ),
-      body: Stack(
-        children: [
-          SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              children: <Widget>[
-                const SizedBox(height: 200.0),
-                AutofillGroup(
-                  child: Column(
-                    spacing: 12.0,
-                    children: [
-                      TextFormField(
-                        controller: usernameController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          labelText: tr.auth.username,
-                        ),
-                        autofillHints: const [AutofillHints.username],
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: (String? value) {
-                          return (value == null || value.isEmpty)
-                              ? tr.auth.usernameEmptyWarning
-                              : null;
-                        },
+      body: AbsorbPointer(
+        absorbing: login is MutationPending,
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            children: <Widget>[
+              const SizedBox(height: 200.0),
+              AutofillGroup(
+                child: Column(
+                  spacing: 12.0,
+                  children: [
+                    TextFormField(
+                      controller: usernameController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        labelText: tr.auth.username,
                       ),
-                      TextFormField(
-                        controller: passwordController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          labelText: tr.auth.password,
-                        ),
-                        obscureText: true,
-                        autofillHints: const [AutofillHints.password],
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: (String? value) {
-                          return (value == null || value.isEmpty)
-                              ? tr.auth.passwordEmptyWarning
-                              : null;
-                        },
+                      autofillHints: const [AutofillHints.username],
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (String? value) {
+                        return (value == null || value.isEmpty)
+                            ? tr.auth.usernameEmptyWarning
+                            : null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: passwordController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        labelText: tr.auth.password,
                       ),
-                      TextFormField(
-                        controller: clientIdController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          labelText: tr.auth.clientId,
-                        ),
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: (String? value) {
-                          return (value == null || value.isEmpty)
-                              ? tr.auth.clientIdEmptyWarning
-                              : null;
-                        },
+                      obscureText: true,
+                      autofillHints: const [AutofillHints.password],
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (String? value) {
+                        return (value == null || value.isEmpty)
+                            ? tr.auth.passwordEmptyWarning
+                            : null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: clientIdController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        labelText: tr.auth.clientId,
                       ),
-                      TextFormField(
-                        controller: clientSecretController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          labelText: tr.auth.clientSecret,
-                        ),
-                        obscureText: true,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: (String? value) {
-                          return (value == null || value.isEmpty)
-                              ? tr.auth.clientSecretEmptyWarning
-                              : null;
-                        },
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (String? value) {
+                        return (value == null || value.isEmpty)
+                            ? tr.auth.clientIdEmptyWarning
+                            : null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: clientSecretController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        labelText: tr.auth.clientSecret,
                       ),
-                    ],
-                  ),
+                      obscureText: true,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (String? value) {
+                        return (value == null || value.isEmpty)
+                            ? tr.auth.clientSecretEmptyWarning
+                            : null;
+                      },
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: OverflowBar(
-                    alignment: MainAxisAlignment.end,
-                    spacing: 8.0,
-                    children: <Widget>[
-                      TextButton(
-                        child: Text(tr.ui.cancel),
-                        onPressed: () {
-                          passwordController.clear();
-                          context.pop();
-                        },
-                      ),
-                      HookBuilder(
-                        builder: (context) {
-                          final usernameIsEmpty = useListenableSelector(
-                            usernameController,
-                            () => usernameController.text.isEmpty,
-                          );
-                          final passwordIsEmpty = useListenableSelector(
-                            passwordController,
-                            () => passwordController.text.isEmpty,
-                          );
-                          final clientIdIsEmpty = useListenableSelector(
-                            clientIdController,
-                            () => clientIdController.text.isEmpty,
-                          );
-                          final clientSecretIsEmpty = useListenableSelector(
-                            clientSecretController,
-                            () => clientSecretController.text.isEmpty,
-                          );
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: OverflowBar(
+                  alignment: MainAxisAlignment.end,
+                  spacing: 8.0,
+                  children: <Widget>[
+                    TextButton(
+                      child: Text(tr.ui.cancel),
+                      onPressed: () {
+                        passwordController.clear();
+                        context.pop();
+                      },
+                    ),
+                    HookBuilder(
+                      builder: (context) {
+                        final usernameIsEmpty = useListenableSelector(
+                          usernameController,
+                          () => usernameController.text.isEmpty,
+                        );
+                        final passwordIsEmpty = useListenableSelector(
+                          passwordController,
+                          () => passwordController.text.isEmpty,
+                        );
+                        final clientIdIsEmpty = useListenableSelector(
+                          clientIdController,
+                          () => clientIdController.text.isEmpty,
+                        );
+                        final clientSecretIsEmpty = useListenableSelector(
+                          clientSecretController,
+                          () => clientSecretController.text.isEmpty,
+                        );
 
-                          return ElevatedButton(
-                            onPressed:
-                                (usernameIsEmpty ||
-                                    passwordIsEmpty ||
-                                    clientIdIsEmpty ||
-                                    clientSecretIsEmpty ||
-                                    login is MutationPending)
-                                ? null
-                                : () async {
-                                    final messenger = ScaffoldMessenger.of(
-                                      context,
-                                    );
+                        return ElevatedButton(
+                          onPressed:
+                              (usernameIsEmpty ||
+                                  passwordIsEmpty ||
+                                  clientIdIsEmpty ||
+                                  clientSecretIsEmpty ||
+                                  login is MutationPending)
+                              ? null
+                              : () async {
+                                  final messenger = ScaffoldMessenger.of(
+                                    context,
+                                  );
 
-                                    if (usernameController.text.isNotEmpty &&
-                                        passwordController.text.isNotEmpty &&
-                                        clientIdController.text.isNotEmpty &&
-                                        clientSecretController
-                                            .text
-                                            .isNotEmpty) {
-                                      final loginSuccess =
-                                          authControlLoginMutation.run(ref, (
-                                            ref,
-                                          ) async {
-                                            return await ref
-                                                .get(
-                                                  authControlProvider.notifier,
-                                                )
-                                                .login(
-                                                  usernameController.text,
-                                                  passwordController.text,
-                                                  clientIdController.text,
-                                                  clientSecretController.text,
-                                                );
-                                          });
+                                  if (usernameController.text.isNotEmpty &&
+                                      passwordController.text.isNotEmpty &&
+                                      clientIdController.text.isNotEmpty &&
+                                      clientSecretController.text.isNotEmpty) {
+                                    final loginSuccess =
+                                        authControlLoginMutation.run(ref, (
+                                          ref,
+                                        ) async {
+                                          return await ref
+                                              .get(authControlProvider.notifier)
+                                              .login(
+                                                usernameController.text,
+                                                passwordController.text,
+                                                clientIdController.text,
+                                                clientSecretController.text,
+                                              );
+                                        });
 
-                                      loginSuccess.then((success) {
-                                        if (!context.mounted) return;
-                                        if (success) {
-                                          context.pop();
-                                          passwordController.clear();
-                                        }
-                                      });
-                                    } else {
-                                      messenger
-                                        ..removeCurrentSnackBar()
-                                        ..showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              tr.auth.fieldsEmptyWarning,
-                                            ),
-                                            backgroundColor: Colors.red,
+                                    loginSuccess.then((success) {
+                                      if (!context.mounted) return;
+                                      if (success) {
+                                        context.pop();
+                                        passwordController.clear();
+                                      }
+                                    });
+                                  } else {
+                                    messenger
+                                      ..removeCurrentSnackBar()
+                                      ..showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            tr.auth.fieldsEmptyWarning,
                                           ),
-                                        );
-                                    }
-                                  },
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                  }
+                                },
+                          child: ButtonProgressLabel(
+                            loading: login is MutationPending,
                             child: Text(tr.auth.login),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          if (login is MutationPending) ...Styles.loadingOverlay,
-        ],
+        ),
       ),
     );
   }

@@ -17,6 +17,7 @@ import 'package:gagaku/settings/convert.dart';
 import 'package:gagaku/settings/refresh.dart';
 import 'package:gagaku/settings/sync.dart';
 import 'package:gagaku/sync/metadata.dart';
+import 'package:gagaku/util/directory_picker.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_ce/hive.dart';
@@ -59,7 +60,6 @@ class AppSettingsPage extends HookConsumerWidget {
       dialogTitle: context.t.backup.data,
       fileName:
           'gagaku_backup-${DateFormat('yyyy-MM-dd-kk_mm').format(DateTime.now())}.json',
-      allowedExtensions: ['json'],
       bytes: utf8.encode(outputdata),
     );
 
@@ -570,8 +570,18 @@ class AppSettingsPage extends HookConsumerWidget {
                       .request();
 
                   if (perms.isGranted) {
-                    String? selectedDirectory =
-                        await FilePicker.getDirectoryPath();
+                    final String? selectedDirectory;
+                    try {
+                      selectedDirectory = await pickDirectoryPath();
+                    } catch (error) {
+                      if (context.mounted) {
+                        Styles.showSnackBar(
+                          ScaffoldMessenger.of(context),
+                          content: '$error',
+                        );
+                      }
+                      return;
+                    }
 
                     if (selectedDirectory != null) {
                       await gbox.put('data_location', selectedDirectory);

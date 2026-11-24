@@ -936,30 +936,30 @@ class ExtensionSource extends _$ExtensionSource {
     return await _runtime!.processChapterReadActionQueue(source, actions);
   }
 
-  Future<List<ManagedCollection>> getManagedLibraryCollections() async {
+  Future<List<ManagedCollection>> getManagedCollections() async {
     final source = await future;
     return await _retryRead(
-      'getManagedLibraryCollections',
-      (runtime) => runtime.getManagedLibraryCollections(source),
+      'getManagedCollections',
+      (runtime) => runtime.getManagedCollections(source),
     );
   }
 
-  Future<List<SourceManga>> getSourceMangaInManagedCollection(
-    ManagedCollection collection,
+  Future<List<ManagedCollectionItems>> getManagedCollectionItems(
+    List<ManagedCollection> collections,
   ) async {
     final source = await future;
     return await _retryRead(
-      'getSourceMangaInManagedCollection',
-      (runtime) =>
-          runtime.getSourceMangaInManagedCollection(source, collection),
+      'getManagedCollectionItems',
+      (runtime) => runtime.getManagedCollectionItems(source, collections),
     );
   }
 
-  Future<void> commitManagedCollectionChanges(
-    ManagedCollectionChangeset changeset,
+  /// Not retried: some changes may have applied before a failure.
+  Future<List<ManagedCollectionChangeFailure>> applyManagedCollectionChanges(
+    List<ManagedCollectionChange> changes,
   ) async {
     final source = await future;
-    await _runtime!.commitManagedCollectionChanges(source, changeset);
+    return await _runtime!.applyManagedCollectionChanges(source, changes);
   }
 
   Future<ChapterDetails> getChapterDetails(Chapter chapter) async {

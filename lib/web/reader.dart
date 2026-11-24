@@ -49,6 +49,7 @@ class ResolvedWebChapter {
     required this.seriesTitle,
     required this.readMarkerKey,
     required this.content,
+    this.isWebtoon = false,
     this.trackedRead,
   });
 
@@ -57,6 +58,9 @@ class ResolvedWebChapter {
   final String? seriesTitle;
   final String readMarkerKey;
   final ResolvedWebChapterContent content;
+
+  /// Opens image chapters as a long strip (from `MangaInfo.isWebtoon`).
+  final bool isWebtoon;
 
   /// Reported to linked trackers once the chapter is marked read; `null` for
   /// chapters trackers cannot receive (pass 1: non-extension chapters).
@@ -152,6 +156,7 @@ Future<ResolvedWebChapter> resolveWebChapter(
     seriesTitle: manga.title,
     readMarkerKey: readMarkerKey,
     content: content,
+    isWebtoon: manga.isWebtoon,
     trackedRead: TrackedChapterRead.fromItem(chapter),
   );
 }
@@ -270,7 +275,7 @@ class WebSourceReaderWidget extends HookConsumerWidget {
       ResolvedImageWebChapterContent(:final pages) => ReaderWidget(
         pages: pages,
         title: data.title,
-        longstrip: false,
+        longstrip: data.isWebtoon,
         drawerHeader: data.seriesTitle,
       ),
       ResolvedHtmlWebChapterContent(:final html, :final sourceBaseUrl) =>

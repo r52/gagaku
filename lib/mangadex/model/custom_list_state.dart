@@ -114,12 +114,12 @@ class CustomListCommands {
       return;
     }
 
-    if (ref.exists(userListsProvider(userId))) {
+    if (ref.read(userListsProvider(userId).exists)) {
       await transaction
           .get(userListsProvider(userId).notifier)
           ._upsert(list, addIfMissing: addToUserLists);
     }
-    if (ref.exists(followedListsProvider(userId))) {
+    if (ref.read(followedListsProvider(userId).exists)) {
       await transaction
           .get(followedListsProvider(userId).notifier)
           ._upsert(list);
@@ -134,10 +134,10 @@ class CustomListCommands {
       return;
     }
 
-    if (ref.exists(userListsProvider(userId))) {
+    if (ref.read(userListsProvider(userId).exists)) {
       await transaction.get(userListsProvider(userId).notifier)._remove(listId);
     }
-    if (ref.exists(followedListsProvider(userId))) {
+    if (ref.read(followedListsProvider(userId).exists)) {
       await transaction
           .get(followedListsProvider(userId).notifier)
           ._remove(listId);
@@ -150,7 +150,7 @@ class CustomListCommands {
     bool follow,
   ) async {
     final userId = this.userId;
-    if (userId == null || !ref.exists(followedListsProvider(userId))) {
+    if (userId == null || !ref.read(followedListsProvider(userId).exists)) {
       return;
     }
 

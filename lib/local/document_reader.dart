@@ -75,11 +75,15 @@ class _LocalDocumentReaderScreenState extends State<LocalDocumentReaderScreen> {
         descriptor: widget.descriptor,
         initialEpubFontSize: config.epubFontSize,
         initialEpubScroll: config.epubScroll,
+        initialPdfScroll: config.pdfScroll,
         epubBackgroundColor: colors.surface,
         epubTextColor: colors.onSurface,
         onEpubPreferencesChanged: (fontSize, scroll) => container
             .read(localConfigProvider.notifier)
             .saveEpubPreferences(fontSize: fontSize, scroll: scroll),
+        onPdfPreferencesChanged: (scroll) => container
+            .read(localConfigProvider.notifier)
+            .savePdfPreferences(scroll: scroll),
       );
     }
     _controller
@@ -254,6 +258,8 @@ class _DocumentChrome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = controller.state.readerReady;
+    final isEpub = descriptor.format == LocalDocumentFormat.epub;
+    final scroll = isEpub ? controller.epubScroll : controller.pdfScroll;
     return AnimatedOpacity(
       key: const ValueKey('local-document-chrome'),
       opacity: visible ? 1 : 0,
@@ -298,23 +304,23 @@ class _DocumentChrome extends StatelessWidget {
               ),
             ),
           ),
-          if (descriptor.format == LocalDocumentFormat.epub)
-            Positioned(
-              top: 0,
-              right: 8,
-              bottom: 0,
-              child: Center(
-                child: IgnorePointer(
-                  ignoring: !visible,
-                  child: Material(
-                    key: const ValueKey('document-side-controls'),
-                    color: Theme.of(context).colorScheme.surfaceContainer
-                        .withValues(alpha: 0.78),
-                    borderRadius: BorderRadius.circular(28),
-                    clipBehavior: Clip.antiAlias,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
+          Positioned(
+            top: 0,
+            right: 8,
+            bottom: 0,
+            child: Center(
+              child: IgnorePointer(
+                ignoring: !visible,
+                child: Material(
+                  key: const ValueKey('document-side-controls'),
+                  color: Theme.of(context).colorScheme.surfaceContainer
+                      .withValues(alpha: 0.78),
+                  borderRadius: BorderRadius.circular(28),
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isEpub) ...[
                         _ProgressionButton(
                           controller: controller,
                           enabled: enabled,
@@ -341,25 +347,26 @@ class _DocumentChrome extends StatelessWidget {
                           tooltip: context.t.localLibrary.documentIncreaseText,
                           icon: const Icon(Icons.text_increase),
                         ),
-                        IconButton(
-                          onPressed: enabled
-                              ? controller.toggleEpubScroll
-                              : null,
-                          tooltip: controller.epubScroll
-                              ? context.t.localLibrary.documentPaginatedMode
-                              : context.t.localLibrary.documentScrollMode,
-                          icon: Icon(
-                            controller.epubScroll
-                                ? Icons.view_carousel
-                                : Icons.view_day,
-                          ),
-                        ),
                       ],
-                    ),
+                      IconButton(
+                        onPressed: enabled
+                            ? isEpub
+                                  ? controller.toggleEpubScroll
+                                  : controller.togglePdfScroll
+                            : null,
+                        tooltip: scroll
+                            ? context.t.localLibrary.documentPaginatedMode
+                            : context.t.localLibrary.documentScrollMode,
+                        icon: Icon(
+                          scroll ? Icons.view_carousel : Icons.view_day,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
+          ),
           Positioned(
             left: 8,
             right: 8,

@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:animations/animations.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/app_navigation.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -16,14 +15,14 @@ import 'package:gagaku/mangadex/reader.dart';
 import 'package:gagaku/mangadex/settings.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
-import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/intl.dart';
+import 'package:gagaku/util/paging.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
+import 'package:paged_slivers/paged_slivers.dart';
 import 'package:riverpod/misc.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -511,11 +510,10 @@ class MarkReadButton extends ConsumerWidget {
   }
 }
 
-class ChapterFeedWidget extends StatelessWidget {
+class ChapterFeedWidget extends HookWidget {
   const ChapterFeedWidget({
     super.key,
     required this.controller,
-    required this.mangaCache,
     this.onRefresh,
     this.title,
     this.scrollController,
@@ -532,12 +530,21 @@ class ChapterFeedWidget extends StatelessWidget {
   final ScrollController? scrollController;
   final String? restorationId;
   final List<Widget> leading;
-  final Map<String, Manga> mangaCache;
 
-  final PagingController<int, Chapter> controller;
+  final PagedController<int, FeedChapter> controller;
 
   @override
   Widget build(BuildContext context) {
+    // Grouping runs over every loaded chapter, so a manga's run that spans a
+    // page boundary stays one card. Chapters repeated by overlapping offset
+    // pages are dropped first.
+    final view = useMemoized(
+      () => controller.project(
+        (items) => ChapterFeedItemData.toData(uniqueFeedChapters(items)),
+      ),
+      [controller],
+    );
+
     final feed = CustomScrollView(
       scrollCacheExtent: const ScrollCacheExtent.viewport(1.5),
       scrollBehavior: const MouseTouchScrollBehavior(),
@@ -559,56 +566,19 @@ class ChapterFeedWidget extends StatelessWidget {
               ),
             ),
           ),
-        PagingListener(
-          controller: controller,
-          builder: (context, state, fetchNextPage) => HookBuilder(
-            builder: (context) {
-              final chapters = state.items;
-
-              // Because this is now 100% synchronous, using [state] is perfectly safe.
-              // It will instantly return the new state without ever unmounting the list.
-              final newState = useMemoized(() {
-                final items = chapters != null
-                    ? ChapterFeedItemData.toData(chapters, mangaCache)
-                    : <ChapterFeedItemData>[];
-
-                return PagingState<int, ChapterFeedItemData>(
-                  error: state.error,
-                  pages: state.keys == null
-                      ? null
-                      : List.generate(
-                          state.keys!.length,
-                          (i) => i == 0 ? items : [],
-                        ),
-                  keys: state.keys,
-                  hasNextPage: state.hasNextPage,
-                  isLoading: state.isLoading,
-                );
-              }, [state]);
-
-              return PagedSuperSliverList(
-                state: newState,
-                fetchNextPage: fetchNextPage,
-                findChildIndexCallback: (key) {
-                  final valueKey = key as ValueKey<int>;
-                  final val = newState.items!.indexWhere(
-                    (i) => i.id == valueKey.value,
-                  );
-                  return val >= 0 ? val : null;
-                },
-                builderDelegate:
-                    ErrorReportingPagedChildBuilderDelegate<
-                      ChapterFeedItemData
-                    >(
-                      error: newState.error,
-                      fetchNextPage: fetchNextPage,
-                      animateTransitions: true,
-                      itemBuilder: (context, item, index) =>
-                          ChapterFeedItem(key: ValueKey(item.id), state: item),
-                    ),
-              );
-            },
-          ),
+        PagedSliverList<ChapterFeedItemData>(
+          view: view,
+          statusBuilders: pagedStatusBuilders(context),
+          useSuperSliverList: true,
+          findChildIndexCallback: (key) {
+            final valueKey = key as ValueKey<int>;
+            final val = view.snapshot.items.indexWhere(
+              (i) => i.id == valueKey.value,
+            );
+            return val >= 0 ? val : null;
+          },
+          itemBuilder: (context, item, index) =>
+              ChapterFeedItem(key: ValueKey(item.id), state: item),
         ),
       ],
     );
@@ -670,16 +640,22 @@ class _InfiniteScrollFeedState
     super.dispose();
   }
 
+  /// The last failure a snackbar was shown for.
+  int _shownErrorRevision = 0;
+
   @override
   void initState() {
     super.initState();
     _pager.controller.addListener(_showError);
   }
 
-  Future<void> _showError() async {
+  /// Shows one snackbar per failed fetch, not one per notification while the
+  /// error persists.
+  void _showError() {
     final controller = _pager.controller;
-    if (controller.value.status == PagingStatus.subsequentPageError ||
-        controller.value.status == PagingStatus.firstPageError) {
+    final state = controller.state;
+    if (state.error != null && state.errorRevision != _shownErrorRevision) {
+      _shownErrorRevision = state.errorRevision;
       final tr = context.t;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -687,7 +663,7 @@ class _InfiniteScrollFeedState
           duration: const Duration(seconds: 5),
           action: SnackBarAction(
             label: tr.ui.retry,
-            onPressed: () => controller.fetchNextPage(),
+            onPressed: controller.retry,
           ),
         ),
       );
@@ -698,7 +674,6 @@ class _InfiniteScrollFeedState
   Widget build(BuildContext context) {
     return ChapterFeedWidget(
       controller: _pager.controller,
-      mangaCache: _pager.mangaCache,
       onRefresh: _pager.refresh,
       title: widget.title,
       scrollController: widget.scrollController,
@@ -727,16 +702,12 @@ class ChapterFeedPager {
   final MangaDexEntity? entity;
   final ChapterFilterOrder order;
 
-  final Map<String, Manga> mangaCache = {};
-
-  late final _manager = OffsetPagingManager<Chapter>(limit: limit);
-
-  late final controller = PagingController<int, Chapter>(
-    getNextPageKey: _manager.getNextPageKey,
+  late final controller = PagedController<int, FeedChapter>(
+    firstKey: 0,
     fetchPage: _fetchPage,
   );
 
-  Future<List<Chapter>> _fetchPage(int pageKey) async {
+  Future<PageResult<int, FeedChapter>> _fetchPage(int pageKey) async {
     final me = await ref.readAsync(loggedUserProvider.future);
     final api = ref.read(mangadexProvider);
 
@@ -749,8 +720,6 @@ class ChapterFeedPager {
       order: order,
     );
 
-    _manager.totalItems = chapterlist.total;
-
     final chapters = chapterlist.data.cast<Chapter>();
 
     final mangaIds = chapters.map((e) => e.manga.id).toSet();
@@ -758,10 +727,6 @@ class ChapterFeedPager {
       ids: mangaIds,
       limit: MangaDexEndpoints.breakLimit,
     );
-
-    for (final m in mangas) {
-      mangaCache[m.id] = m;
-    }
 
     try {
       await (
@@ -781,16 +746,19 @@ class ChapterFeedPager {
       logger.e(e, error: e);
     }
 
-    return chapters;
+    return PageResult.offset(
+      pairFeedChapters(chapters, mangas),
+      offset: pageKey,
+      limit: limit,
+      total: chapterlist.total,
+    );
   }
 
   Future<void> refresh() async {
-    _manager.reset();
-    mangaCache.clear();
     await ref
         .read(mangadexProvider)
         .invalidateAll(entity == null ? feedKey : '$feedKey(${entity!.id}');
-    controller.refresh();
+    await controller.refresh();
   }
 
   void dispose() => controller.dispose();
@@ -808,14 +776,12 @@ class EntityTitlesPager {
   final FeedInfo info;
   final MangaDexUUID entity;
 
-  late final _manager = OffsetPagingManager<Manga>(limit: info.limit);
-
-  late final controller = PagingController<int, Manga>(
-    getNextPageKey: _manager.getNextPageKey,
+  late final controller = PagedController<int, Manga>(
+    firstKey: 0,
     fetchPage: _fetchPage,
   );
 
-  Future<List<Manga>> _fetchPage(int pageKey) async {
+  Future<PageResult<int, Manga>> _fetchPage(int pageKey) async {
     final list = await ref
         .read(mangadexProvider)
         .fetchMangaList(
@@ -824,8 +790,6 @@ class EntityTitlesPager {
           offset: pageKey,
           entity: entity,
         );
-
-    _manager.totalItems = list.total;
 
     final newItems = list.data.cast<Manga>();
 
@@ -837,26 +801,30 @@ class EntityTitlesPager {
       logger.e(e, error: e);
     }
 
-    return newItems;
+    return PageResult.offset(
+      newItems,
+      offset: pageKey,
+      limit: info.limit,
+      total: list.total,
+    );
   }
 
   Future<void> refresh() async {
-    _manager.reset();
     await ref.read(mangadexProvider).invalidateAll('${info.key}(${entity.id}');
-    controller.refresh();
+    await controller.refresh();
   }
 
   void dispose() => controller.dispose();
 }
 
 class _CoverButton extends ConsumerWidget {
-  const _CoverButton({required this.manga});
+  const _CoverButton({required this.manga, required this.compact});
 
   final Manga manga;
+  final bool compact;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final imageCache = ref.watch(extensionImageCacheProvider);
 
     return MouseRegion(
@@ -882,8 +850,8 @@ class _CoverButton extends ConsumerWidget {
                 borderRadius: const BorderRadius.all(Radius.circular(4.0)),
               ),
             ),
-            width: screenSizeSmall ? 64.0 : 128.0,
-            height: screenSizeSmall ? 91.0 : 182.0,
+            width: compact ? 64.0 : 128.0,
+            height: compact ? 91.0 : 182.0,
             progressIndicatorBuilder: (context, url, downloadProgress) =>
                 const Center(child: CircularProgressIndicator()),
             errorBuilder: (context, error, stacktrace) {
@@ -963,11 +931,9 @@ class ChapterFeedItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final visibleCount = useState(3);
 
     final titleBtn = MangaTitleButton(manga: state.manga);
-    final coverBtn = _CoverButton(manga: state.manga);
 
     final chaptersCount = state.chapters.length;
     final visibleChapters = state.chapters.take(visibleCount.value);
@@ -993,13 +959,35 @@ class ChapterFeedItem extends HookWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: screenSizeSmall
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  titleBtn,
-                  const Divider(height: 4.0),
-                  Row(
+        // Sized by the space the feed gives the card, which may be a pane
+        // much narrower than the screen.
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = DeviceContext.widthSmall(constraints.maxWidth);
+            final coverBtn = _CoverButton(manga: state.manga, compact: compact);
+
+            return compact
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      titleBtn,
+                      const Divider(height: 4.0),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          coverBtn,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: 4.0,
+                              children: chapterButtons,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       coverBtn,
@@ -1007,30 +995,17 @@ class ChapterFeedItem extends HookWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           spacing: 4.0,
-                          children: chapterButtons,
+                          children: [
+                            titleBtn,
+                            const Divider(height: 10.0),
+                            ...chapterButtons,
+                          ],
                         ),
                       ),
                     ],
-                  ),
-                ],
-              )
-            : Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  coverBtn,
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 4.0,
-                      children: [
-                        titleBtn,
-                        const Divider(height: 10.0),
-                        ...chapterButtons,
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                  );
+          },
+        ),
       ),
     );
   }
@@ -1039,17 +1014,18 @@ class ChapterFeedItem extends HookWidget {
 class _ChapterButtonCard extends HookConsumerWidget {
   final Chapter chapter;
   final Manga manga;
+  final bool compact;
   final Widget child;
 
   const _ChapterButtonCard({
     required this.chapter,
     required this.manga,
+    required this.compact,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final theme = Theme.of(context);
     final tileColor = theme.colorScheme.primaryContainer;
     final hoverColor = theme.hoverColor;
@@ -1086,7 +1062,7 @@ class _ChapterButtonCard extends HookConsumerWidget {
         decoration: decoration,
         child: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: (screenSizeSmall ? 6.0 : 10.0),
+            horizontal: (compact ? 6.0 : 10.0),
             vertical: 4.0,
           ),
           child: child,
@@ -1097,6 +1073,10 @@ class _ChapterButtonCard extends HookConsumerWidget {
 }
 
 class ChapterButtonWidget extends ConsumerWidget {
+  /// Narrowest button width that keeps a readable chapter title beside the
+  /// fixed-width time, uploader and comment columns of the wide layout.
+  static const minWideWidth = 480.0;
+
   const ChapterButtonWidget({
     super.key,
     required this.chapter,
@@ -1111,8 +1091,6 @@ class ChapterButtonWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
-
-    final bool screenSizeSmall = DeviceContext.screenWidthSmall(context);
 
     final comments = ref.watch(
       chapterStatsProvider.select(
@@ -1141,103 +1119,6 @@ class ChapterButtonWidget extends ConsumerWidget {
     final pubtime = _PubTime(time: chapter.attributes.publishAt);
     final markReadButton = MarkReadButton(manga: manga, chapter: chapter);
 
-    final title = Row(
-      spacing: 6.0,
-      children: [
-        // This gap is to deliberate leave space between
-        // the markReadButton and the flag
-        const SizedBox.shrink(),
-        Expanded(
-          child: ChapterTitle(chapter: chapter, manga: manga),
-        ),
-        if (isEndChapter) IconTextChip(color: Colors.blue, text: 'END'),
-        if (screenSizeSmall) statsChip,
-      ],
-    );
-
-    final groups = _GroupRow(chapter: chapter);
-
-    final tile = screenSizeSmall
-        ? Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  SizedBox(width: 24, child: markReadButton),
-                  Expanded(child: title),
-                ],
-              ),
-              Row(
-                children: [
-                  const SizedBox(width: 24, child: _groupIconB),
-                  Expanded(child: groups),
-                ],
-              ),
-              Row(
-                children: [
-                  const SizedBox(width: 24, child: _personIconB),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: userChip,
-                          ),
-                        ),
-                        const SizedBox(width: 4.0),
-                        _scheduleIconB,
-                        const SizedBox(width: 4.0),
-                        pubtime,
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          )
-        : Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  SizedBox(width: 24, child: markReadButton),
-                  Expanded(child: title),
-                  const SizedBox(width: 24, child: _scheduleIconB),
-                  SizedBox(
-                    width: 145,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 2.0),
-                      child: pubtime,
-                    ),
-                  ),
-                  const SizedBox(width: 60),
-                ],
-              ),
-              Row(
-                children: [
-                  const SizedBox(width: 24, child: _groupIconB),
-                  Expanded(child: groups),
-                  const SizedBox(width: 24, child: _personIconB),
-                  SizedBox(
-                    width: 145,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: userChip,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 60,
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: statsChip,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
-
     return GestureDetector(
       onTap: () {
         MangaDexReaderRoute(
@@ -1251,7 +1132,115 @@ class ChapterButtonWidget extends ConsumerWidget {
           ),
         ).push(context);
       },
-      child: _ChapterButtonCard(manga: manga, chapter: chapter, child: tile),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < minWideWidth;
+
+          final title = Row(
+            spacing: 6.0,
+            children: [
+              // This gap is to deliberate leave space between
+              // the markReadButton and the flag
+              const SizedBox.shrink(),
+              Expanded(
+                child: ChapterTitle(chapter: chapter, manga: manga),
+              ),
+              if (isEndChapter) IconTextChip(color: Colors.blue, text: 'END'),
+              if (compact) statsChip,
+            ],
+          );
+
+          final groups = _GroupRow(chapter: chapter);
+
+          final tile = compact
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(width: 24, child: markReadButton),
+                        Expanded(child: title),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 24, child: _groupIconB),
+                        Expanded(child: groups),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 24, child: _personIconB),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: userChip,
+                                ),
+                              ),
+                              const SizedBox(width: 4.0),
+                              _scheduleIconB,
+                              const SizedBox(width: 4.0),
+                              pubtime,
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(width: 24, child: markReadButton),
+                        Expanded(child: title),
+                        const SizedBox(width: 24, child: _scheduleIconB),
+                        SizedBox(
+                          width: 145,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 2.0),
+                            child: pubtime,
+                          ),
+                        ),
+                        const SizedBox(width: 60),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 24, child: _groupIconB),
+                        Expanded(child: groups),
+                        const SizedBox(width: 24, child: _personIconB),
+                        SizedBox(
+                          width: 145,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: userChip,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 60,
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: statsChip,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+
+          return _ChapterButtonCard(
+            manga: manga,
+            chapter: chapter,
+            compact: compact,
+            child: tile,
+          );
+        },
+      ),
     );
   }
 }
@@ -1309,70 +1298,66 @@ class MangaListWidget extends HookConsumerWidget {
               !future!.hasData)
         : false;
 
-    return Stack(
-      children: [
-        CustomScrollView(
-          scrollCacheExtent: const ScrollCacheExtent.viewport(1.0),
-          controller: scrollController,
-          scrollBehavior: scrollBehavior,
-          physics: physics,
-          slivers: [
-            ...leading,
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                  vertical: 10.0,
-                ),
-                child: Row(
-                  children: [
-                    ?title,
-                    const Spacer(),
-                    const GridExtentSlider(),
-                    if (showToggle)
-                      SegmentedButton<MangaListView>(
-                        showSelectedIcon: false,
-                        style: SegmentedButton.styleFrom(
-                          shape: const RoundedRectangleBorder(),
-                        ),
-                        segments: <ButtonSegment<MangaListView>>[
-                          ButtonSegment<MangaListView>(
-                            value: MangaListView.grid,
-                            icon: Icon(Icons.grid_view, size: 24),
-                            tooltip: tr.ui.gridView,
-                          ),
-                          ButtonSegment<MangaListView>(
-                            value: MangaListView.list,
-                            icon: Icon(Icons.table_rows, size: 24),
-                            tooltip: tr.ui.listView,
-                          ),
-                          ButtonSegment<MangaListView>(
-                            value: MangaListView.detailed,
-                            icon: Icon(Icons.view_list, size: 24),
-                            tooltip: tr.ui.detailedView,
-                          ),
-                        ],
-                        selected: <MangaListView>{view},
-                        onSelectionChanged: (Set<MangaListView> newSelection) {
-                          ref.read(_mangaListViewProvider.notifier).state =
-                              newSelection.first;
-                        },
-                      ),
-                  ],
-                ),
-              ),
+    return CustomScrollView(
+      scrollCacheExtent: const ScrollCacheExtent.viewport(1.0),
+      controller: scrollController,
+      scrollBehavior: scrollBehavior,
+      physics: physics,
+      slivers: [
+        ...leading,
+        SliverLoadingIndicator(loading: isLoading),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0,
+              vertical: 10.0,
             ),
-            if (future != null && future!.hasError)
-              SliverList.list(
-                children: [
-                  Text('${future!.error}'),
-                  Text(future!.stackTrace.toString()),
-                ],
-              ),
-            ...children,
-          ],
+            child: Row(
+              children: [
+                ?title,
+                const Spacer(),
+                const GridExtentSlider(),
+                if (showToggle)
+                  SegmentedButton<MangaListView>(
+                    showSelectedIcon: false,
+                    style: SegmentedButton.styleFrom(
+                      shape: const RoundedRectangleBorder(),
+                    ),
+                    segments: <ButtonSegment<MangaListView>>[
+                      ButtonSegment<MangaListView>(
+                        value: MangaListView.grid,
+                        icon: Icon(Icons.grid_view, size: 24),
+                        tooltip: tr.ui.gridView,
+                      ),
+                      ButtonSegment<MangaListView>(
+                        value: MangaListView.list,
+                        icon: Icon(Icons.table_rows, size: 24),
+                        tooltip: tr.ui.listView,
+                      ),
+                      ButtonSegment<MangaListView>(
+                        value: MangaListView.detailed,
+                        icon: Icon(Icons.view_list, size: 24),
+                        tooltip: tr.ui.detailedView,
+                      ),
+                    ],
+                    selected: <MangaListView>{view},
+                    onSelectionChanged: (Set<MangaListView> newSelection) {
+                      ref.read(_mangaListViewProvider.notifier).state =
+                          newSelection.first;
+                    },
+                  ),
+              ],
+            ),
+          ),
         ),
-        if (isLoading) ...Styles.loadingOverlay,
+        if (future != null && future!.hasError)
+          SliverList.list(
+            children: [
+              Text('${future!.error}'),
+              Text(future!.stackTrace.toString()),
+            ],
+          ),
+        ...children,
       ],
     );
   }
@@ -1395,7 +1380,7 @@ class MangaListViewSliver extends ConsumerWidget {
   final MangaSelectCallback? onSelected;
   final Map<String, String>? headers;
 
-  final PagingController<int, Manga>? controller;
+  final PagedView<Manga>? controller;
 
   int? _findChildIndexCb(Key? key) {
     final valueKey = key as ValueKey<String>;
@@ -1479,81 +1464,60 @@ class MangaListViewSliver extends ConsumerWidget {
       }
     }
 
-    return PagingListener(
-      controller: controller!,
-      builder: (context, state, fetchNextPage) {
-        switch (view) {
-          case MangaListView.list:
-            return PagedSliverList(
-              state: state,
-              fetchNextPage: fetchNextPage,
-              builderDelegate: ErrorReportingPagedChildBuilderDelegate<Manga>(
-                error: state.error,
-                fetchNextPage: fetchNextPage,
-                animateTransitions: true,
-                itemBuilder: (context, item, index) => _ListMangaItem(
-                  key: ValueKey(item.id),
-                  manga: item,
-                  header: headers?[item.id],
-                ),
-              ),
-            );
-          case MangaListView.detailed:
-            final delegate = SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: gridExtent.detailed,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: DeviceContext.screenWidthSmall(context)
-                  ? 1.0
-                  : 2.0,
-            );
+    final paged = controller!;
+    final statusBuilders = pagedStatusBuilders(context);
 
-            return PagedSliverGrid(
-              gridDelegate: delegate,
-              state: state,
-              fetchNextPage: fetchNextPage,
-              showNewPageErrorIndicatorAsGridChild: false,
-              builderDelegate: ErrorReportingPagedChildBuilderDelegate<Manga>(
-                error: state.error,
-                fetchNextPage: fetchNextPage,
-                animateTransitions: true,
-                itemBuilder: (context, item, index) => GridMangaDetailedItem(
-                  key: ValueKey(item.id),
-                  manga: item,
-                  header: headers?[item.id],
-                ),
-              ),
-            );
-          case MangaListView.grid:
-            final delegate = SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: gridExtent.grid,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: 0.7,
-            );
+    switch (view) {
+      case MangaListView.list:
+        return PagedSliverList<Manga>(
+          view: paged,
+          statusBuilders: statusBuilders,
+          itemBuilder: (context, item, index) => _ListMangaItem(
+            key: ValueKey(item.id),
+            manga: item,
+            header: headers?[item.id],
+          ),
+        );
+      case MangaListView.detailed:
+        final delegate = SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: gridExtent.detailed,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: DeviceContext.screenWidthSmall(context) ? 1.0 : 2.0,
+        );
 
-            return PagedSliverGrid(
-              gridDelegate: delegate,
-              state: state,
-              fetchNextPage: fetchNextPage,
-              showNewPageErrorIndicatorAsGridChild: false,
-              builderDelegate: ErrorReportingPagedChildBuilderDelegate<Manga>(
-                error: state.error,
-                fetchNextPage: fetchNextPage,
-                animateTransitions: true,
-                itemBuilder: (context, item, index) => GridMangaItem(
-                  key: ValueKey(item.id),
-                  manga: item,
-                  selectMode: selectMode,
-                  selectButton: selectButton,
-                  onSelected: onSelected,
-                  header: headers?[item.id],
-                ),
-              ),
-            );
-        }
-      },
-    );
+        return PagedSliverGrid<Manga>(
+          view: paged,
+          gridDelegate: delegate,
+          statusBuilders: statusBuilders,
+          itemBuilder: (context, item, index) => GridMangaDetailedItem(
+            key: ValueKey(item.id),
+            manga: item,
+            header: headers?[item.id],
+          ),
+        );
+      case MangaListView.grid:
+        final delegate = SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: gridExtent.grid,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: 0.7,
+        );
+
+        return PagedSliverGrid<Manga>(
+          view: paged,
+          gridDelegate: delegate,
+          statusBuilders: statusBuilders,
+          itemBuilder: (context, item, index) => GridMangaItem(
+            key: ValueKey(item.id),
+            manga: item,
+            selectMode: selectMode,
+            selectButton: selectButton,
+            onSelected: onSelected,
+            header: headers?[item.id],
+          ),
+        );
+    }
   }
 }
 

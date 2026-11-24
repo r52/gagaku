@@ -37,7 +37,7 @@ final class SafSyncStore implements SyncStore {
     if (!Platform.isAndroid) {
       throw UnsupportedError('Document-tree sync is only available on Android');
     }
-    final treeUri = await FilePicker.getDirectoryPath(
+    final treeUri = await FilePicker.pickDirectory(
       androidOptions: const FilePickerAndroidOptions(
         safOptions: AndroidSAFOptions(
           grant: AndroidSAFGrant.lifetime,
@@ -47,7 +47,7 @@ final class SafSyncStore implements SyncStore {
       ),
     );
     if (treeUri == null) return null;
-    final validatedTreeUri = _validateTreeUri(treeUri);
+    final validatedTreeUri = _validateTreeUri(treeUri.toString());
     await SafSyncStore(validatedTreeUri)._invoke<void>('persistAccess');
     return validatedTreeUri;
   }

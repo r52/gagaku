@@ -121,6 +121,81 @@ void main() {
     await readium.closePublication();
   });
 
+  testWidgets('production shell switches PDF layout and keeps navigating', (
+    tester,
+  ) async {
+    expect(Platform.isAndroid, isTrue);
+
+    final fixtureDirectory = await Directory.systemTemp.createTemp(
+      'gagaku-readium-pdf-shell-',
+    );
+    addTearDown(() async {
+      if (await fixtureDirectory.exists()) {
+        await fixtureDirectory.delete(recursive: true);
+      }
+    });
+    final pdf = File('${fixtureDirectory.path}/PDF production shell.pdf');
+    await pdf.writeAsBytes(_minimalPdf(pageCount: 20));
+
+    final saved = <bool>[];
+    final controller = LocalDocumentSessionController(
+      descriptor: LocalDocumentDescriptor(
+        path: pdf.path,
+        title: 'PDF production shell',
+        format: LocalDocumentFormat.pdf,
+      ),
+      onPdfPreferencesChanged: saved.add,
+    );
+
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MaterialApp(
+          home: LocalDocumentReaderScreen(
+            descriptor: controller.descriptor,
+            controller: controller,
+          ),
+        ),
+      ),
+    );
+    await _pumpUntil(
+      tester,
+      () => controller.state.readerReady,
+      const Duration(seconds: 30),
+    );
+
+    expect(find.byType(ReadiumReaderWidget), findsOneWidget);
+    expect(find.byIcon(Icons.view_day), findsOneWidget);
+    expect(find.byIcon(Icons.text_increase), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.view_day));
+    await tester.pumpAndSettle();
+    expect(controller.pdfScroll, isTrue);
+    expect(saved, [true]);
+    expect(find.byIcon(Icons.view_carousel), findsOneWidget);
+
+    expect(await controller.goToPdfPage(12), isTrue);
+    await _pumpUntil(
+      tester,
+      () => controller.state.locator?.locations?.position == 12,
+      const Duration(seconds: 10),
+    );
+
+    await tester.tap(find.byIcon(Icons.view_carousel));
+    await tester.pumpAndSettle();
+    expect(controller.pdfScroll, isFalse);
+    expect(saved, [true, false]);
+
+    expect(await controller.goToPdfPage(5), isTrue);
+    await _pumpUntil(
+      tester,
+      () => controller.state.locator?.locations?.position == 5,
+      const Duration(seconds: 10),
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await controller.close();
+  });
+
   testWidgets('production shell exposes EPUB font and scroll controls', (
     tester,
   ) async {

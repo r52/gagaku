@@ -856,7 +856,7 @@ final class ReadingStatusProvider
   }
 }
 
-String _$readingStatusHash() => r'f22028d84f6dbddd11f45002d902bb74efce5201';
+String _$readingStatusHash() => r'eee0f51b22bde619bf874179501f5075c8236389';
 
 final class ReadingStatusFamily extends $Family
     with

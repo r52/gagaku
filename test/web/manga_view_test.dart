@@ -112,6 +112,119 @@ void main() {
 
       expect(cache.invalidations, 1);
     });
+
+    testWidgets('${testCase.name} layout puts relations in a tab and staff '
+        'in info chips', (tester) async {
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = testCase.size;
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+
+      const series = WebSeriesRef.extension(
+        sourceId: 'source-1',
+        mangaId: 'manga-1',
+      );
+      const sourceManga = SourceManga(
+        mangaId: 'manga-1',
+        mangaInfo: MangaInfo(
+          thumbnailUrl: 'https://example.invalid/cover.jpg',
+          synopsis: 'Test synopsis',
+          primaryTitle: 'Extras title',
+          secondaryTitles: [],
+          contentRating: ContentRating.EVERYONE,
+          extras: [
+            MangaInfoExtra.relation(
+              id: 'empty',
+              title: 'Empty Relations',
+              items: [],
+            ),
+            MangaInfoExtra.staff(
+              id: 'staff',
+              title: 'Staff Section',
+              items: [
+                MangaInfoStaffItem(
+                  id: 'person-1',
+                  staff: MangaInfoPerson(imageUrl: '', title: 'Staff Person'),
+                ),
+              ],
+            ),
+            MangaInfoExtra.unsupported(),
+          ],
+        ),
+      );
+
+      Future<void> pumpManga(WebManga manga) async {
+        final dio = Dio();
+        addTearDown(dio.close);
+        await tester.pumpWidget(
+          ProviderScope(
+            key: UniqueKey(),
+            overrides: [
+              cacheProvider.overrideWithValue(_RecordingCacheManager()),
+              webSourceDioProvider.overrideWithValue(dio),
+              extensionSourceProvider('source-1')
+                  .overrideWith(() => _TestExtensionSource(manga)),
+            ],
+            child: TranslationProvider(
+              child: MaterialApp(
+                home: WebMangaViewWidget(
+                  manga: manga,
+                  series: series,
+                  link: HistoryLink.fromSeries(
+                    title: manga.title,
+                    series: series,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+      }
+
+      // Empty relation sections add no tab.
+      await pumpManga(
+        const WebManga.extension(data: sourceManga, chaptersList: []),
+      );
+      expect(find.byType(TabBar), findsNothing);
+
+      await tester.ensureVisible(find.text('Info'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Info'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Staff Section'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Staff Section'));
+      await tester.pumpAndSettle();
+      expect(find.text('Staff Person'), findsOneWidget);
+
+      await pumpManga(
+        WebManga.extension(
+          data: sourceManga.copyWith(
+            mangaInfo: sourceManga.mangaInfo.copyWith(
+              extras: [
+                const MangaInfoExtra.relation(
+                  id: 'relations',
+                  title: 'Relations',
+                  items: [
+                    MangaInfoRelationItem(
+                      id: 'manga-2',
+                      imageUrl: '',
+                      title: 'Sequel Title',
+                      subtitle: 'Sequel',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          chaptersList: const [],
+        ),
+      );
+      expect(find.byType(TabBar), findsOneWidget);
+      expect(find.text('Related'), findsOneWidget);
+      expect(find.text('Relations'), findsNothing);
+    });
   }
 }
 

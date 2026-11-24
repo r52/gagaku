@@ -137,6 +137,7 @@ class WebSourceHistoryPage extends HookConsumerWidget {
             appBar,
             SliverAppBar(
               automaticallyImplyLeading: false,
+              primary: false,
               pinned: true,
               actions: [
                 ElevatedButton.icon(

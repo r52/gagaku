@@ -1,4 +1,3 @@
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -9,6 +8,7 @@ import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/util/default_scroll_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:paged_slivers/paged_slivers.dart';
 
 class MangaDexHistoryFeedPage extends StatefulHookConsumerWidget {
   const MangaDexHistoryFeedPage({super.key, this.controller});
@@ -21,10 +21,9 @@ class MangaDexHistoryFeedPage extends StatefulHookConsumerWidget {
 }
 
 class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
-  final Map<String, Manga> _mangaCache = {};
-
-  late final _pagingController = PagingController<int, Chapter>(
-    getNextPageKey: (state) => state.keys?.last != null ? null : 0,
+  // The whole history is fetched as a single page.
+  late final _pagingController = PagedController<int, FeedChapter>(
+    firstKey: 0,
     fetchPage: (pageKey) async {
       final me = await ref.watch(loggedUserProvider.future);
       final api = ref.watch(mangadexProvider);
@@ -36,10 +35,6 @@ class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
         ids: mangaIds,
         limit: MangaDexEndpoints.breakLimit,
       );
-
-      for (final m in mangas) {
-        _mangaCache[m.id] = m;
-      }
 
       try {
         await (
@@ -59,7 +54,7 @@ class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
         logger.e(e, error: e);
       }
 
-      return chapters.toList();
+      return PageResult.last(pairFeedChapters(chapters, mangas));
     },
   );
 
@@ -79,11 +74,9 @@ class _MangaDexHistoryFeedState extends ConsumerState<MangaDexHistoryFeedPage> {
 
     return ChapterFeedWidget(
       controller: _pagingController,
-      mangaCache: _mangaCache,
       onRefresh: () async {
-        _mangaCache.clear();
         ref.invalidate(mangaDexHistoryProvider);
-        _pagingController.refresh();
+        await _pagingController.refresh();
       },
       title: t.mangadex.localHistory,
       scrollController: scrollController,

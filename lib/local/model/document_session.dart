@@ -39,12 +39,16 @@ abstract interface class LocalDocumentReadium {
   Future<bool> goToLocator(Locator locator);
   Future<bool> goToProgression(double progression);
   Future<void> setEPUBPreferences(EPUBPreferences preferences);
+  void setDefaultPDFPreferences(PDFPreferences preferences);
+  Future<void> setPDFPreferences(PDFPreferences preferences);
 }
 
 typedef LocalEpubPreferencesChanged = FutureOr<void> Function(
   double fontSize,
   bool scroll,
 );
+
+typedef LocalPdfPreferencesChanged = FutureOr<void> Function(bool scroll);
 
 class FlutterLocalDocumentReadium implements LocalDocumentReadium {
   FlutterLocalDocumentReadium([FlutterReadium? readium])
@@ -85,6 +89,14 @@ class FlutterLocalDocumentReadium implements LocalDocumentReadium {
   @override
   Future<void> setEPUBPreferences(EPUBPreferences preferences) =>
       _readium.setEPUBPreferences(preferences);
+
+  @override
+  void setDefaultPDFPreferences(PDFPreferences preferences) =>
+      _readium.setDefaultPDFPreferences(preferences);
+
+  @override
+  Future<void> setPDFPreferences(PDFPreferences preferences) =>
+      _readium.setPDFPreferences(preferences);
 }
 
 enum LocalDocumentSessionPhase { loading, ready, failure, closed }
@@ -151,6 +163,12 @@ class LocalDocumentSessionCoordinator {
 
     if (!controller._isCurrent(token)) return null;
 
+    if (controller.descriptor.format == LocalDocumentFormat.pdf) {
+      // The reader widget reads the default PDF preferences when it creates
+      // its native view, so the layout must be set before it mounts.
+      controller._readium.setDefaultPDFPreferences(controller._pdfPreferences);
+    }
+
     final publication = await controller._readium.openPublication(
       Uri.file(controller.descriptor.path).toString(),
     );
@@ -188,6 +206,21 @@ class LocalDocumentSessionCoordinator {
     await controller._readium.setEPUBPreferences(preferences);
     return true;
   });
+
+  Future<bool> applyPdfPreferences(
+    LocalDocumentSessionController controller,
+    int token,
+    PDFPreferences preferences,
+  ) => _serialize(() async {
+    final owner = _owner;
+    if (owner?.controller != controller ||
+        owner?.token != token ||
+        !controller._isCurrent(token)) {
+      return false;
+    }
+    await controller._readium.setPDFPreferences(preferences);
+    return true;
+  });
 }
 
 class _DocumentOwner {
@@ -204,16 +237,19 @@ class LocalDocumentSessionController extends ChangeNotifier {
     LocalDocumentSessionCoordinator? coordinator,
     double initialEpubFontSize = 1.0,
     bool initialEpubScroll = false,
+    bool initialPdfScroll = false,
     this._epubBackgroundColor,
     this._epubTextColor,
     this._onEpubPreferencesChanged,
+    this._onPdfPreferencesChanged,
   }) : _readium = readium ?? FlutterLocalDocumentReadium(),
        _coordinator = coordinator ?? defaultCoordinator,
        _epubFontSize = initialEpubFontSize.clamp(
          epubFontSizeMin,
          epubFontSizeMax,
        ),
-       _epubScroll = initialEpubScroll;
+       _epubScroll = initialEpubScroll,
+       _pdfScroll = initialPdfScroll;
 
   static final LocalDocumentSessionCoordinator defaultCoordinator =
       LocalDocumentSessionCoordinator();
@@ -228,6 +264,7 @@ class LocalDocumentSessionController extends ChangeNotifier {
   final Color? _epubBackgroundColor;
   final Color? _epubTextColor;
   final LocalEpubPreferencesChanged? _onEpubPreferencesChanged;
+  final LocalPdfPreferencesChanged? _onPdfPreferencesChanged;
   final List<StreamSubscription<Object?>> _subscriptions = [];
 
   LocalDocumentSessionState _state = const LocalDocumentSessionState.loading();
@@ -238,10 +275,12 @@ class LocalDocumentSessionController extends ChangeNotifier {
   int _readerStatusGeneration = 0;
   double _epubFontSize;
   bool _epubScroll;
+  bool _pdfScroll;
 
   LocalDocumentSessionState get state => _state;
   double get epubFontSize => _epubFontSize;
   bool get epubScroll => _epubScroll;
+  bool get pdfScroll => _pdfScroll;
 
   Future<void> open() => _openFuture ??= _open();
 
@@ -476,6 +515,32 @@ class LocalDocumentSessionController extends ChangeNotifier {
       ),
     );
   }
+
+  Future<void> togglePdfScroll() async {
+    final previous = _pdfScroll;
+    _pdfScroll = !_pdfScroll;
+    try {
+      final token = _activeToken;
+      if (token == null ||
+          !await _coordinator.applyPdfPreferences(
+            this,
+            token,
+            _pdfPreferences,
+          )) {
+        _pdfScroll = previous;
+        return;
+      }
+      await _onPdfPreferencesChanged?.call(_pdfScroll);
+      _notify();
+    } catch (_) {
+      _pdfScroll = previous;
+      rethrow;
+    }
+  }
+
+  PDFPreferences get _pdfPreferences => PDFPreferences(
+    layout: _pdfScroll ? PDFLayout.scrollVertical : PDFLayout.paginated,
+  );
 
   void _setState(LocalDocumentSessionState state) {
     _state = state;

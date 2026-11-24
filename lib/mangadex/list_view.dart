@@ -1,7 +1,5 @@
-import 'dart:math';
-
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_hooks/flutter_hooks.dart' hide useTabController;
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/model.dart';
@@ -9,10 +7,10 @@ import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/detail_scaffold.dart';
-import 'package:gagaku/util/material_hooks.dart';
+import 'package:material_hooks/material_hooks.dart';
+import 'package:gagaku/util/page_number_bar.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:number_paginator/number_paginator.dart';
 
 enum _ViewType { titles, feed }
 
@@ -66,6 +64,11 @@ class _MangaDexListView extends StatefulHookConsumerWidget {
 class _MangaDexListViewState extends ConsumerState<_MangaDexListView> {
   static const _feedInfo = MangaDexFeeds.customListFeed;
 
+  /// The side pane would only hold the name and a few chips, while both tabs
+  /// need the room: keep a single pane until the feed's cards can use their
+  /// wide layout beside it.
+  static const _minBodyWidth = 640.0;
+
   late final _feed = ChapterFeedPager(
     ref: ref,
     feedKey: _feedInfo.key,
@@ -84,7 +87,7 @@ class _MangaDexListViewState extends ConsumerState<_MangaDexListView> {
   Widget build(BuildContext context) {
     final t = context.t;
     final list = widget.list;
-    final tabController = useMaterialTabController(
+    final tabController = useTabController(
       initialLength: _ViewType.values.length,
     );
     final scrollController = useScrollController();
@@ -94,6 +97,7 @@ class _MangaDexListViewState extends ConsumerState<_MangaDexListView> {
       title: list.attributes.name,
       actions: _ListActions(list: list),
       metadata: _ListInfo(list: list),
+      minBodyWidth: _minBodyWidth,
       tabController: tabController,
       tabs: [
         DetailTab(
@@ -106,7 +110,6 @@ class _MangaDexListViewState extends ConsumerState<_MangaDexListView> {
           scrollToTop: true,
           body: ChapterFeedWidget(
             controller: _feed.controller,
-            mangaCache: _feed.mangaCache,
             restorationId: 'list_feed_offset',
           ),
         ),
@@ -137,8 +140,15 @@ class _ListTitlesTab extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.t;
+    final pageCount = pageCountOf(
+      list.set.length,
+      MangaDexEndpoints.searchLimit,
+    );
     final page = useState(0);
-    final future = useMangaListFetcher(ref, list.set, page.value, [refreshKey]);
+    final currentPage = page.value.clamp(0, pageCount - 1);
+    final future = useMangaListFetcher(ref, list.set, currentPage, [
+      refreshKey,
+    ]);
 
     return Column(
       children: [
@@ -156,12 +166,10 @@ class _ListTitlesTab extends HookConsumerWidget {
             ],
           ),
         ),
-        NumberPaginator(
-          numberPages: max(
-            (list.set.length / MangaDexEndpoints.searchLimit).ceil(),
-            1,
-          ),
-          onPageChange: (int index) {
+        PageNumberBar(
+          pageCount: pageCount,
+          currentPage: currentPage,
+          onPageChanged: (index) {
             final controller = PrimaryScrollController.maybeOf(context);
             if (controller != null && controller.hasClients) {
               controller.jumpTo(0.0);
@@ -184,24 +192,68 @@ class _ListInfo extends StatelessWidget {
     final t = context.t;
     final visibility = list.attributes.visibility;
     final username = list.user?.attributes?.username;
+    final inset = DetailScaffold.titleInsetOf(context);
 
+    // One line under the title, aligned with it, so the single-pane header
+    // stays short above the tabs.
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsetsDirectional.fromSTEB(inset, 0.0, inset, 12.0),
       child: Wrap(
-        spacing: 8.0,
+        spacing: 16.0,
         runSpacing: 4.0,
         children: [
           if (username != null)
-            Chip(avatar: const Icon(Icons.person), label: Text(username)),
-          Chip(
-            avatar: Icon(
+            _ListInfoItem(
+              icon: const Icon(Icons.person, size: 18.0),
+              label: username,
+            ),
+          _ListInfoItem(
+            icon: Icon(
               Icons.circle,
-              size: 16.0,
+              size: 12.0,
               color: visibility == CustomListVisibility.private
                   ? Colors.red
                   : Colors.green,
             ),
-            label: Text(t[visibility.label]),
+            label: t[visibility.label],
+          ),
+          _ListInfoItem(
+            icon: const Icon(Icons.collections_bookmark_outlined, size: 18.0),
+            label: t.num_items(n: list.set.length),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ListInfoItem extends StatelessWidget {
+  const _ListInfoItem({required this.icon, required this.label});
+
+  final Widget icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.onSurfaceVariant;
+
+    return IconTheme.merge(
+      data: IconThemeData(color: color),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 6.0,
+        children: [
+          SizedBox(
+            width: 18.0,
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: icon,
+            ),
+          ),
+          Text(
+            label,
+            style: theme.textTheme.bodyMedium?.copyWith(color: color),
           ),
         ],
       ),

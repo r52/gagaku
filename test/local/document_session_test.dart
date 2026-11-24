@@ -203,6 +203,63 @@ void main() {
       },
     );
 
+    test('sets the PDF layout before opening and persists toggles', () async {
+      final api = _FakeReadium();
+      final saved = <bool>[];
+      final coordinator = LocalDocumentSessionCoordinator();
+      final controller = LocalDocumentSessionController(
+        descriptor: _descriptor(LocalDocumentFormat.pdf),
+        readium: api,
+        coordinator: coordinator,
+        onPdfPreferencesChanged: saved.add,
+      );
+
+      await controller.open();
+      expect(api.defaultPdfPreferences?.layout, PDFLayout.paginated);
+      expect(api.pdfPreferences, isEmpty);
+
+      await controller.togglePdfScroll();
+      expect(controller.pdfScroll, isTrue);
+      expect(api.pdfPreferences.single.layout, PDFLayout.scrollVertical);
+      expect(saved, [true]);
+      await controller.close();
+
+      await controller.togglePdfScroll();
+      expect(controller.pdfScroll, isTrue);
+      expect(api.pdfPreferences, hasLength(1));
+      expect(saved, [true]);
+      controller.dispose();
+
+      final reopenedApi = _FakeReadium();
+      final reopened = LocalDocumentSessionController(
+        descriptor: _descriptor(LocalDocumentFormat.pdf),
+        readium: reopenedApi,
+        coordinator: coordinator,
+        initialPdfScroll: saved.single,
+      );
+      await reopened.open();
+      expect(
+        reopenedApi.defaultPdfPreferences?.layout,
+        PDFLayout.scrollVertical,
+      );
+      await reopened.close();
+      reopened.dispose();
+    });
+
+    test('does not set PDF preferences for EPUB documents', () async {
+      final api = _FakeReadium();
+      final controller = LocalDocumentSessionController(
+        descriptor: _descriptor(LocalDocumentFormat.epub),
+        readium: api,
+        coordinator: LocalDocumentSessionCoordinator(),
+      );
+
+      await controller.open();
+      expect(api.defaultPdfPreferences, isNull);
+      await controller.close();
+      controller.dispose();
+    });
+
     test('does not revive controls from an obsolete ready event', () async {
       final api = _FakeReadium()..deferEpubPreferences();
       final controller = LocalDocumentSessionController(
@@ -419,7 +476,19 @@ void main() {
     await tester.pump();
     await tester.pump();
 
-    expect(find.byKey(const ValueKey('document-side-controls')), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('document-side-controls')),
+        matching: find.byType(IconButton),
+      ),
+      findsOneWidget,
+    );
+    expect(find.byIcon(Icons.text_increase), findsNothing);
+    await tester.tap(find.byIcon(Icons.view_day));
+    await tester.pump();
+    expect(controller.pdfScroll, isTrue);
+    expect(api.pdfPreferences.single.layout, PDFLayout.scrollVertical);
+    expect(find.byIcon(Icons.view_carousel), findsOneWidget);
     expect(
       tester
           .getSize(find.byKey(const ValueKey('document-bottom-controls')))
@@ -505,6 +574,8 @@ class _FakeReadium implements LocalDocumentReadium {
   double? lastProgression;
   EPUBPreferences? lastEpubPreferences;
   final epubPreferences = <EPUBPreferences>[];
+  PDFPreferences? defaultPdfPreferences;
+  final pdfPreferences = <PDFPreferences>[];
 
   void deferOpen() => _deferredOpen = Completer<Publication>();
   void completeOpen(Publication publication) =>
@@ -565,5 +636,15 @@ class _FakeReadium implements LocalDocumentReadium {
     epubPreferences.add(preferences);
     final deferred = _deferredEpubPreferences;
     if (deferred != null) await deferred.future;
+  }
+
+  @override
+  void setDefaultPDFPreferences(PDFPreferences preferences) {
+    defaultPdfPreferences = preferences;
+  }
+
+  @override
+  Future<void> setPDFPreferences(PDFPreferences preferences) async {
+    pdfPreferences.add(preferences);
   }
 }

@@ -1,12 +1,12 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:flutter_hooks/flutter_hooks.dart' hide useTabController;
 import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
+import 'package:gagaku/util/markdown/markdown_view.dart';
 import 'package:gagaku/util/detail_scaffold.dart';
-import 'package:gagaku/util/material_hooks.dart';
+import 'package:material_hooks/material_hooks.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -83,7 +83,7 @@ class _MangaDexCreatorViewWidgetState
   @override
   Widget build(BuildContext context) {
     final tr = context.t;
-    final tabController = useMaterialTabController(initialLength: 1);
+    final tabController = useTabController(initialLength: 1);
     final scrollController = useScrollController();
 
     return DetailScaffold(
@@ -142,13 +142,10 @@ class _CreatorInfo extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(8),
                       color: theme.colorScheme.surfaceContainerHighest,
-                      child: MarkdownBody(
+                      child: MarkdownView(
                         data: desc,
-                        onTapLink: (text, url, title) async {
-                          if (url != null) {
-                            await Styles.tryLaunchUrl(context, url);
-                          }
-                        },
+                        onTapLink: (text, url, title) =>
+                            Styles.tryLaunchUrl(context, url),
                       ),
                     ),
                   ],

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -227,59 +228,45 @@ class FormItemDelegateBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget child;
-
-    switch (element) {
-      case NavigationRowElement():
-        child = NavigationRowBuilder(
-          source: source,
-          form: form,
-          element: element as NavigationRowElement,
-        );
-        break;
-      case InputRowElement():
-        child = InputRowBuilder(
-          source: source,
-          element: element as InputRowElement,
-        );
-        break;
-      case ButtonRowElement():
-        child = ButtonRowBuilder(
-          source: source,
-          element: element as ButtonRowElement,
-        );
-        break;
-      case ToggleRowElement():
-        child = ToggleRowBuilder(
-          source: source,
-          element: element as ToggleRowElement,
-        );
-        break;
-      case LabelRowElement():
-        child = LabelRowBuilder(
-          source: source,
-          element: element as LabelRowElement,
-        );
-        break;
-      case StepperRowElement():
-        child = StepperRowBuilder(
-          source: source,
-          element: element as StepperRowElement,
-        );
-        break;
-      case OAuthButtonRowElement():
-        child = OAuthButtonRowBuilder(
-          source: source,
-          element: element as OAuthButtonRowElement,
-        );
-        break;
-      case WebViewRowElement():
-        child = UnsupportedRowBuilder(
-          source: source,
-          element: element as OAuthButtonRowElement,
-        );
-        break;
-    }
+    final Widget child = switch (element) {
+      NavigationRowElement element => NavigationRowBuilder(
+        source: source,
+        form: form,
+        element: element,
+      ),
+      InputRowElement element => InputRowBuilder(
+        source: source,
+        element: element,
+      ),
+      ButtonRowElement element => ButtonRowBuilder(
+        source: source,
+        element: element,
+      ),
+      ToggleRowElement element => ToggleRowBuilder(
+        source: source,
+        element: element,
+      ),
+      LabelRowElement element => LabelRowBuilder(
+        source: source,
+        element: element,
+      ),
+      StepperRowElement element => StepperRowBuilder(
+        source: source,
+        element: element,
+      ),
+      OAuthButtonRowElement element => OAuthButtonRowBuilder(
+        source: source,
+        element: element,
+      ),
+      MenuRowElement element => MenuRowBuilder(
+        source: source,
+        element: element,
+      ),
+      WebViewRowElement() || UnsupportedRowElement() => UnsupportedRowBuilder(
+        source: source,
+        element: element,
+      ),
+    };
 
     if (onDelete != null) {
       return Dismissible(
@@ -420,6 +407,7 @@ class ButtonRowBuilder extends ConsumerWidget {
     return Card(
       child: ListTile(
         title: Text(element.title),
+        enabled: !element.isDisabled,
         onTap: () async {
           await _safeCallBinding(context, ref, source.id, element.onSelect);
         },
@@ -477,6 +465,7 @@ class InputRowBuilder extends HookConsumerWidget {
           return TextFormField(
             controller: controller,
             decoration: const InputDecoration(filled: true),
+            enabled: !element.isDisabled,
             obscureText: element.isSecureEntry == true,
           );
         },
@@ -521,6 +510,7 @@ class NavigationRowBuilder extends HookConsumerWidget {
     if (future.data != null) {
       body = Card(
         child: ListTile(
+          enabled: !element.isDisabled,
           title: Text(element.title),
           subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
           trailing: Row(
@@ -588,13 +578,15 @@ class ToggleRowBuilder extends HookConsumerWidget {
     return SwitchListTile(
       title: Text(element.title),
       value: currentVal.value,
-      onChanged: (value) {
-        ref.read(extensionSourceProvider(source.id).notifier).callBinding(
-          element.onValueChange,
-          [value],
-        );
-        currentVal.value = value;
-      },
+      onChanged: element.isDisabled
+          ? null
+          : (value) {
+              ref.read(extensionSourceProvider(source.id).notifier).callBinding(
+                element.onValueChange,
+                [value],
+              );
+              currentVal.value = value;
+            },
     );
   }
 }
@@ -668,6 +660,7 @@ class _StepperRowBuilderState extends ConsumerState<StepperRowBuilder> {
         maxValue: element.maxValue,
         stepValue: element.stepValue,
         loopOver: element.loopOver,
+        enabled: !element.isDisabled,
         onChanged: (value) {
           ref.read(extensionSourceProvider(source.id).notifier).callBinding(
             element.onValueChange,
@@ -761,6 +754,7 @@ class LabelRowBuilder extends ConsumerWidget {
 
     return Card(
       child: ListTile(
+        enabled: !element.isDisabled,
         textColor: outerColor,
         iconColor: outerColor,
         title: Text(element.title),
@@ -771,6 +765,75 @@ class LabelRowBuilder extends ConsumerWidget {
                 _safeCallBinding(context, ref, source.id, element.onSelect!);
               }
             : null,
+      ),
+    );
+  }
+}
+
+class MenuRowBuilder extends ConsumerWidget {
+  const MenuRowBuilder({
+    super.key,
+    required this.source,
+    required this.element,
+  });
+
+  final WebSourceInfo source;
+  final MenuRowElement element;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (element.isHidden) {
+      return const SizedBox.shrink();
+    }
+
+    final theme = Theme.of(context);
+    final selected = element.items.firstWhereOrNull(
+      (item) => item.id == element.value,
+    );
+
+    return MenuAnchor(
+      menuChildren: [
+        for (final item in element.items)
+          MenuItemButton(
+            leadingIcon: element.value != null
+                ? Icon(
+                    Icons.check,
+                    color: item.id == element.value ? null : Colors.transparent,
+                  )
+                : null,
+            onPressed: () => _safeCallBinding(
+              context,
+              ref,
+              source.id,
+              element.onSelect,
+              [item.id],
+            ),
+            child: Text(item.title),
+          ),
+      ],
+      builder: (context, controller, child) => Card(
+        child: ListTile(
+          enabled: !element.isDisabled,
+          title: Text(element.title),
+          subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (selected != null) ...[
+                Text(
+                  selected.title,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.outline,
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              const Icon(Icons.unfold_more, size: 16),
+            ],
+          ),
+          onTap: () =>
+              controller.isOpen ? controller.close() : controller.open(),
+        ),
       ),
     );
   }
@@ -816,6 +879,7 @@ class OAuthButtonRowBuilder extends ConsumerWidget {
 
     return Card(
       child: ListTile(
+        enabled: !element.isDisabled,
         title: Text(element.title),
         subtitle: element.subtitle != null ? Text(element.subtitle!) : null,
         onTap: () async {

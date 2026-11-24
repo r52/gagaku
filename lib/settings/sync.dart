@@ -13,6 +13,7 @@ import 'package:gagaku/sync/metadata.dart';
 import 'package:gagaku/sync/protocol.dart';
 import 'package:gagaku/sync/saf_store.dart';
 import 'package:gagaku/sync/service.dart';
+import 'package:gagaku/util/directory_picker.dart';
 import 'package:gagaku/util/ui.dart';
 
 final class SyncSettingsSection extends StatefulWidget {
@@ -107,15 +108,15 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
       final permission = await Permission.manageExternalStorage.request();
       if (!permission.isGranted) return null;
     }
-    return FilePicker.getDirectoryPath(dialogTitle: dialogTitle);
+    return pickDirectoryPath(dialogTitle: dialogTitle);
   }
 
   Future<void> _configureFilesystem(SyncProfileMode mode) async {
     final deviceName = await _askDeviceName();
     if (deviceName == null || !mounted) return;
-    final directory = await _pickDirectory();
-    if (directory == null) return;
     await _run(() async {
+      final directory = await _pickDirectory();
+      if (directory == null) return;
       await _service.configureFilesystem(
         rootPath: directory,
         mode: mode,
@@ -246,7 +247,6 @@ final class _SyncSettingsSectionState extends State<SyncSettingsSection> {
     final result = await FilePicker.saveFile(
       dialogTitle: context.t.sync.exportBranch,
       fileName: 'gagaku_conflict-${head.revisionId}.json',
-      allowedExtensions: const ['json'],
       bytes: utf8.encode(jsonEncode(data)),
     );
     if (result != null && mounted) {

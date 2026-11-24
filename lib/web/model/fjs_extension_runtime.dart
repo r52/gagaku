@@ -1578,7 +1578,7 @@ return await globalThis.$sourceId.processChapterReadActionQueue(actions);
   }
 
   @override
-  Future<List<ManagedCollection>> getManagedLibraryCollections(
+  Future<List<ManagedCollection>> getManagedCollections(
     WebSourceInfo source,
   ) async {
     _requireCapability(
@@ -1587,60 +1587,65 @@ return await globalThis.$sourceId.processChapterReadActionQueue(actions);
       'managed collections',
     );
     final collections = await _evalJsonScoped(
-      'return await globalThis.$sourceId.getManagedLibraryCollections();',
-      label: 'get managed library collections',
+      'return await globalThis.$sourceId.getManagedCollections();',
+      label: 'get managed collections',
     );
 
-    return _normalizeBridgeJsonList(collections, 'getManagedLibraryCollections')
+    return _normalizeBridgeJsonList(collections, 'getManagedCollections')
         .map(
           (item) => ManagedCollection.fromJson(
-            _normalizeBridgeJsonMap(item, 'getManagedLibraryCollections item'),
+            _normalizeBridgeJsonMap(item, 'getManagedCollections item'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<List<SourceManga>> getSourceMangaInManagedCollection(
+  Future<List<ManagedCollectionItems>> getManagedCollectionItems(
     WebSourceInfo source,
-    ManagedCollection collection,
+    List<ManagedCollection> collections,
   ) async {
     _requireCapability(
       source,
       SourceIntents.collectionManagement,
       'managed collections',
     );
-    final manga = await _evalJsonScoped('''
-const collection = ${_json(collection.toJson())};
-return await globalThis.$sourceId.getSourceMangaInManagedCollection(collection);
-''', label: 'get source manga in managed collection');
+    final items = await _evalJsonScoped('''
+const collections = ${_json(collections.map((e) => e.toJson()).toList())};
+return await globalThis.$sourceId.getManagedCollectionItems(collections);
+''', label: 'get managed collection items');
 
-    return _normalizeBridgeJsonList(manga, 'getSourceMangaInManagedCollection')
+    return _normalizeBridgeJsonList(items, 'getManagedCollectionItems')
         .map(
-          (item) => SourceManga.fromJson(
-            _normalizeBridgeJsonMap(
-              item,
-              'getSourceMangaInManagedCollection item',
-            ),
+          (item) => ManagedCollectionItems.fromJson(
+            _normalizeBridgeJsonMap(item, 'getManagedCollectionItems item'),
           ),
         )
         .toList();
   }
 
   @override
-  Future<void> commitManagedCollectionChanges(
+  Future<List<ManagedCollectionChangeFailure>> applyManagedCollectionChanges(
     WebSourceInfo source,
-    ManagedCollectionChangeset changeset,
+    List<ManagedCollectionChange> changes,
   ) async {
     _requireCapability(
       source,
       SourceIntents.collectionManagement,
       'managed collections',
     );
-    await _evalScoped('''
-const changeset = ${_json(changeset.toJson())};
-await globalThis.$sourceId.commitManagedCollectionChanges(changeset);
-''');
+    final failures = await _evalJsonScoped('''
+const changes = ${_json(changes.map((e) => e.toJson()).toList())};
+return (await globalThis.$sourceId.applyManagedCollectionChanges(changes)) ?? [];
+''', label: 'apply managed collection changes');
+
+    return _normalizeBridgeJsonList(failures, 'applyManagedCollectionChanges')
+        .map(
+          (item) => ManagedCollectionChangeFailure.fromJson(
+            _normalizeBridgeJsonMap(item, 'applyManagedCollectionChanges item'),
+          ),
+        )
+        .toList();
   }
 
   @override

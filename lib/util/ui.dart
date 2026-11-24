@@ -893,18 +893,51 @@ class ErrorList extends StatelessWidget {
   }
 }
 
-class LoadingOverlayStack extends StatelessWidget {
-  const LoadingOverlayStack({super.key, this.progress});
+/// Button label that swaps to a compact progress indicator while [loading],
+/// keeping the button's size stable.
+class ButtonProgressLabel extends StatelessWidget {
+  const ButtonProgressLabel({
+    super.key,
+    required this.loading,
+    required this.child,
+  });
 
-  final double? progress;
+  final bool loading;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
     return Stack(
+      alignment: Alignment.center,
       children: [
-        const ModalBarrier(dismissible: false, color: Colors.black87),
-        Center(child: CircularProgressIndicator(value: progress)),
+        Visibility.maintain(visible: !loading, child: child),
+        if (loading)
+          SizedBox.square(
+            dimension: 18.0,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.0,
+              color: DefaultTextStyle.of(context).style.color,
+            ),
+          ),
       ],
+    );
+  }
+}
+
+/// Pinned sliver slot that shows a linear progress indicator while [loading].
+/// The slot always reserves the indicator's height to avoid layout shifts.
+class SliverLoadingIndicator extends StatelessWidget {
+  const SliverLoadingIndicator({super.key, required this.loading});
+
+  final bool loading;
+
+  @override
+  Widget build(BuildContext context) {
+    return PinnedHeaderSliver(
+      child: SizedBox(
+        height: 4.0,
+        child: loading ? const LinearProgressIndicator() : null,
+      ),
     );
   }
 }
@@ -1091,11 +1124,6 @@ abstract final class Styles {
     begin: Alignment.center,
     end: Alignment.topCenter,
   );
-
-  static const List<Widget> loadingOverlay = [
-    ModalBarrier(dismissible: false, color: Colors.black87),
-    Center(child: CircularProgressIndicator()),
-  ];
 
   static void showSnackBar(
     ScaffoldMessengerState state, {

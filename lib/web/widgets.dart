@@ -1,7 +1,5 @@
 import 'dart:collection';
 
-import 'package:flutter/rendering.dart';
-import 'package:gagaku/util/infinite_scroll.dart';
 import 'package:gagaku/util/riverpod.dart';
 
 import 'package:cached_network_image_ce/cached_network_image.dart';
@@ -12,6 +10,7 @@ import 'package:gagaku/i18n/strings.g.dart';
 import 'package:gagaku/model/config.dart';
 import 'package:gagaku/routes.dart';
 import 'package:gagaku/util/cached_network_image.dart';
+import 'package:gagaku/util/paging.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:gagaku/web/model/model.dart';
@@ -22,7 +21,7 @@ import 'package:gagaku/web/settings.dart';
 import 'package:gagaku/web/source_manager.dart';
 import 'package:gagaku/web/ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:paged_slivers/paged_slivers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -187,70 +186,78 @@ class WebMangaListWidget extends HookConsumerWidget {
         ? ref.watch(_mangaListViewProvider)
         : WebMangaListView.grid;
 
-    return Stack(
-      children: [
-        CustomScrollView(
-          scrollCacheExtent: const ScrollCacheExtent.viewport(1.5),
-          controller: scrollController,
-          scrollBehavior: scrollBehavior,
-          physics: physics,
-          slivers: [
-            ...leading,
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                  vertical: 10.0,
-                ),
-                child: Row(
-                  children: [
-                    ?title,
-                    const Spacer(),
-                    const GridExtentSlider(),
-                    if (showToggle)
-                      SegmentedButton<WebMangaListView>(
-                        showSelectedIcon: false,
-                        style: SegmentedButton.styleFrom(
-                          shape: const RoundedRectangleBorder(),
-                        ),
-                        segments: <ButtonSegment<WebMangaListView>>[
-                          ButtonSegment<WebMangaListView>(
-                            value: WebMangaListView.grid,
-                            icon: Icon(Icons.grid_view, size: 24),
-                            tooltip: tr.ui.gridView,
-                          ),
-                          ButtonSegment<WebMangaListView>(
-                            value: WebMangaListView.list,
-                            icon: Icon(Icons.table_rows, size: 24),
-                            tooltip: tr.ui.listView,
-                          ),
-                        ],
-                        selected: <WebMangaListView>{view},
-                        onSelectionChanged:
-                            (Set<WebMangaListView> newSelection) {
-                              ref.read(_mangaListViewProvider.notifier).state =
-                                  newSelection.first;
-                            },
-                      ),
-                  ],
-                ),
-              ),
+    return CustomScrollView(
+      scrollCacheExtent: const ScrollCacheExtent.viewport(1.5),
+      controller: scrollController,
+      scrollBehavior: scrollBehavior,
+      physics: physics,
+      slivers: [
+        ...leading,
+        SliverLoadingIndicator(loading: isLoading),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0,
+              vertical: 10.0,
             ),
-            if (extraRow != null)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 8.0, bottom: 10.0),
-                  child: Row(children: extraRow!),
-                ),
-              ),
-            ...children,
-          ],
+            child: Row(
+              children: [
+                ?title,
+                const Spacer(),
+                const GridExtentSlider(),
+                if (showToggle)
+                  SegmentedButton<WebMangaListView>(
+                    showSelectedIcon: false,
+                    style: SegmentedButton.styleFrom(
+                      shape: const RoundedRectangleBorder(),
+                    ),
+                    segments: <ButtonSegment<WebMangaListView>>[
+                      ButtonSegment<WebMangaListView>(
+                        value: WebMangaListView.grid,
+                        icon: Icon(Icons.grid_view, size: 24),
+                        tooltip: tr.ui.gridView,
+                      ),
+                      ButtonSegment<WebMangaListView>(
+                        value: WebMangaListView.list,
+                        icon: Icon(Icons.table_rows, size: 24),
+                        tooltip: tr.ui.listView,
+                      ),
+                    ],
+                    selected: <WebMangaListView>{view},
+                    onSelectionChanged: (Set<WebMangaListView> newSelection) {
+                      ref.read(_mangaListViewProvider.notifier).state =
+                          newSelection.first;
+                    },
+                  ),
+              ],
+            ),
+          ),
         ),
-        if (isLoading) ...Styles.loadingOverlay,
+        if (extraRow != null)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0, bottom: 10.0),
+              child: Row(children: extraRow!),
+            ),
+          ),
+        ...children,
       ],
     );
   }
 }
+
+/// Paperback paging cursor: `null` requests the first page, otherwise the
+/// record carries the `metadata` the previous page returned.
+typedef WebPageCursor = ({dynamic metadata})?;
+
+/// Converts a Paperback page into a [PageResult]. A page without `metadata`
+/// is the last one.
+PageResult<WebPageCursor, T> webPageResult<T>(
+  List<T> items,
+  dynamic metadata,
+) => metadata == null
+    ? PageResult.last(items)
+    : PageResult.more(items, nextKey: (metadata: metadata));
 
 class WebMangaListViewSliver extends ConsumerWidget {
   const WebMangaListViewSliver({
@@ -269,7 +276,7 @@ class WebMangaListViewSliver extends ConsumerWidget {
   final bool showRemoveButton;
   final bool showSearchButton;
 
-  final PagingController<dynamic, HistoryLink>? controller;
+  final PagedView<HistoryLink>? controller;
 
   int? _findItemIndexCb(Key? key) {
     final valueKey = key as ValueKey<String>;
@@ -428,101 +435,81 @@ class WebMangaListViewSliver extends ConsumerWidget {
       }
     }
 
-    return PagingListener(
-      controller: controller!,
-      builder: (context, state, fetchNextPage) {
-        switch (view) {
-          case WebMangaListView.list:
-            return PagedSliverList.separated(
-              state: state,
-              fetchNextPage: fetchNextPage,
-              separatorBuilder: (_, _) => const SizedBox(height: 4.0),
-              builderDelegate:
-                  ErrorReportingPagedChildBuilderDelegate<HistoryLink>(
-                    error: state.error,
-                    fetchNextPage: fetchNextPage,
-                    animateTransitions: true,
-                    itemBuilder: (context, item, index) {
-                      final tr = context.t;
-                      return ListTile(
-                        key: ValueKey(item.url),
-                        tileColor: index.isOdd
-                            ? theme.colorScheme.surfaceContainer
-                            : theme.colorScheme.surfaceContainerHighest,
-                        leading: FavoritesButton(link: item),
-                        trailing: showRemoveButton
-                            ? IconButton(
-                                tooltip: tr.mangaActions.removeHistory,
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () async {
-                                  WebHistoryManager().remove(item);
-                                },
-                              )
-                            : null,
-                        title: Text(item.title),
-                        textColor: theme.colorScheme.onSurface,
-                        onTap: () async {
-                          final tr = context.t;
-                          final resolver = ref.read(webLinkResolverProvider);
-                          final messenger = ScaffoldMessenger.of(context);
-                          final result = await resolver.resolveHistoryLink(
-                            item,
-                          );
+    final paged = controller!;
+    final statusBuilders = pagedStatusBuilders(context);
 
-                          if (!context.mounted) return;
-                          if (result.series == null) {
-                            messenger
-                              ..removeCurrentSnackBar()
-                              ..showSnackBar(
-                                SnackBar(
-                                  content: Text(tr.errors.unsupportedUrl),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                          } else {
-                            openWebSource(
-                              context,
-                              ResolvedWebLink(series: result.series!),
-                            );
-                          }
-                        },
-                      );
-                    },
-                  ),
+    switch (view) {
+      case WebMangaListView.list:
+        return PagedSliverList<HistoryLink>.separated(
+          view: paged,
+          statusBuilders: statusBuilders,
+          separatorBuilder: (_, _) => const SizedBox(height: 4.0),
+          itemBuilder: (context, item, index) {
+            final tr = context.t;
+            return ListTile(
+              key: ValueKey(item.url),
+              tileColor: index.isOdd
+                  ? theme.colorScheme.surfaceContainer
+                  : theme.colorScheme.surfaceContainerHighest,
+              leading: FavoritesButton(link: item),
+              trailing: showRemoveButton
+                  ? IconButton(
+                      tooltip: tr.mangaActions.removeHistory,
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        WebHistoryManager().remove(item);
+                      },
+                    )
+                  : null,
+              title: Text(item.title),
+              textColor: theme.colorScheme.onSurface,
+              onTap: () async {
+                final tr = context.t;
+                final resolver = ref.read(webLinkResolverProvider);
+                final messenger = ScaffoldMessenger.of(context);
+                final result = await resolver.resolveHistoryLink(item);
+
+                if (!context.mounted) return;
+                if (result.series == null) {
+                  messenger
+                    ..removeCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(tr.errors.unsupportedUrl),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                } else {
+                  openWebSource(
+                    context,
+                    ResolvedWebLink(series: result.series!),
+                  );
+                }
+              },
             );
-          case WebMangaListView.grid:
-            return PagedSliverGrid(
-              state: state,
-              fetchNextPage: fetchNextPage,
-              showNewPageErrorIndicatorAsGridChild: false,
-              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: gridExtent.grid,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-                childAspectRatio: 0.7,
-              ),
-              builderDelegate:
-                  ErrorReportingPagedChildBuilderDelegate<HistoryLink>(
-                    error: state.error,
-                    fetchNextPage: fetchNextPage,
-                    animateTransitions: true,
-                    itemBuilder: (context, item, index) {
-                      return GridMangaItem(
-                        key: ValueKey(item.url),
-                        link: item,
-                        showFavoriteButton: showFavoriteButton,
-                        showRemoveButton: showRemoveButton,
-                        showSearchButton: showSearchButton,
-                      );
-                    },
-                  ),
+          },
+        );
+      case WebMangaListView.grid:
+        return PagedSliverGrid<HistoryLink>(
+          view: paged,
+          statusBuilders: statusBuilders,
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: gridExtent.grid,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 0.7,
+          ),
+          itemBuilder: (context, item, index) {
+            return GridMangaItem(
+              key: ValueKey(item.url),
+              link: item,
+              showFavoriteButton: showFavoriteButton,
+              showRemoveButton: showRemoveButton,
+              showSearchButton: showSearchButton,
             );
-        }
-      },
-    );
+          },
+        );
+    }
   }
 }
 
@@ -1009,28 +996,54 @@ class ChapterFeedItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSizeSmall = DeviceContext.screenWidthSmall(context);
-
     final titleBtn = _MangaTitle(
       key: ValueKey('_MangaTitle(${state.link.requireSeries.key})'),
-      link: state.link,
-    );
-
-    final coverBtn = _CoverButton(
-      key: ValueKey('_CoverButton(${state.link.requireSeries.key})'),
       link: state.link,
     );
 
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: screenSizeSmall
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  titleBtn,
-                  const Divider(height: 4.0),
-                  Row(
+        // Sized by the space the feed gives the card, which may be a pane
+        // much narrower than the screen.
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = DeviceContext.widthSmall(constraints.maxWidth);
+            final coverBtn = _CoverButton(
+              key: ValueKey('_CoverButton(${state.link.requireSeries.key})'),
+              link: state.link,
+              compact: compact,
+            );
+
+            return compact
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      titleBtn,
+                      const Divider(height: 4.0),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          coverBtn,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: 4.0,
+                              children: [
+                                for (final item in state.manga.chapters.take(3))
+                                  ChapterButtonWidget(
+                                    data: item,
+                                    manga: state.manga,
+                                    series: state.link.requireSeries,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       coverBtn,
@@ -1039,6 +1052,8 @@ class ChapterFeedItem extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           spacing: 4.0,
                           children: [
+                            titleBtn,
+                            const Divider(height: 10.0),
                             for (final item in state.manga.chapters.take(3))
                               ChapterButtonWidget(
                                 data: item,
@@ -1049,46 +1064,24 @@ class ChapterFeedItem extends StatelessWidget {
                         ),
                       ),
                     ],
-                  ),
-                ],
-              )
-            : Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  coverBtn,
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 4.0,
-                      children: [
-                        titleBtn,
-                        const Divider(height: 10.0),
-                        for (final item in state.manga.chapters.take(3))
-                          ChapterButtonWidget(
-                            data: item,
-                            manga: state.manga,
-                            series: state.link.requireSeries,
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                  );
+          },
+        ),
       ),
     );
   }
 }
 
 class _CoverButton extends ConsumerWidget {
-  const _CoverButton({super.key, required this.link});
+  const _CoverButton({super.key, required this.link, required this.compact});
 
   final HistoryLink link;
+  final bool compact;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final sourceId = link.series?.sourceId ?? '';
-    final screenSizeSmall = DeviceContext.screenWidthSmall(context);
     final headers = ref.watch(sourceHeadersProvider(sourceId));
     final imageCache = ref.watch(extensionImageCacheProvider);
 
@@ -1133,8 +1126,8 @@ class _CoverButton extends ConsumerWidget {
                 borderRadius: const BorderRadius.all(Radius.circular(4.0)),
               ),
             ),
-            width: screenSizeSmall ? 64.0 : 128.0,
-            height: screenSizeSmall ? 91.0 : 182.0,
+            width: compact ? 64.0 : 128.0,
+            height: compact ? 91.0 : 182.0,
             progressIndicatorBuilder: (context, url, downloadProgress) =>
                 const Center(child: CircularProgressIndicator()),
             errorBuilder: (context, error, stacktrace) {

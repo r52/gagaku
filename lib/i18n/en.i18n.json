@@ -18,6 +18,7 @@
   "ui": {
     "add": "Add",
     "addNew": "Add New",
+    "pageOfTotal": "Page ${current} of ${total}",
     "go": "Go",
     "ok": "Ok",
     "cancel": "Cancel",
@@ -67,7 +68,8 @@
     "fetchFail": "Something went wrong while fetching a new page",
     "pageNotFound": "Page Not Found",
     "pageNotFoundArg": "Can't find a page for: $url",
-    "failedLaunchUrl": "Failed to launch $url"
+    "failedLaunchUrl": "Failed to launch $url",
+    "directoryPathUnavailable": "This folder is not on device storage. Choose a folder on internal storage or an SD card."
   },
   "auth": {
     "login": "Login",

@@ -1,6 +1,7 @@
 name: comic_page_view
 description: Bounded zoomable image pages and a paged gallery for comic readers.
 publish_to: "none"
+resolution: workspace
 version: 0.1.0
 
 environment:

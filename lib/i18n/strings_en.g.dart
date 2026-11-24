@@ -176,6 +176,9 @@ class Translations$ui$en {
 	/// en: 'Add New'
 	String get addNew => 'Add New';
 
+	/// en: 'Page ${current} of ${total}'
+	String pageOfTotal({required Object current, required Object total}) => 'Page ${current} of ${total}';
+
 	/// en: 'Go'
 	String get go => 'Go';
 
@@ -328,6 +331,9 @@ class Translations$errors$en {
 
 	/// en: 'Failed to launch $url'
 	String failedLaunchUrl({required Object url}) => 'Failed to launch ${url}';
+
+	/// en: 'This folder is not on device storage. Choose a folder on internal storage or an SD card.'
+	String get directoryPathUnavailable => 'This folder is not on device storage. Choose a folder on internal storage or an SD card.';
 }
 
 // Path: auth
@@ -2395,6 +2401,7 @@ extension on Translations {
 			'about.sourceCode' => 'Source code on GitHub',
 			'ui.add' => 'Add',
 			'ui.addNew' => 'Add New',
+			'ui.pageOfTotal' => ({required Object current, required Object total}) => 'Page ${current} of ${total}',
 			'ui.go' => 'Go',
 			'ui.ok' => 'Ok',
 			'ui.cancel' => 'Cancel',
@@ -2443,6 +2450,7 @@ extension on Translations {
 			'errors.pageNotFound' => 'Page Not Found',
 			'errors.pageNotFoundArg' => ({required Object url}) => 'Can\'t find a page for: ${url}',
 			'errors.failedLaunchUrl' => ({required Object url}) => 'Failed to launch ${url}',
+			'errors.directoryPathUnavailable' => 'This folder is not on device storage. Choose a folder on internal storage or an SD card.',
 			'auth.login' => 'Login',
 			'auth.logout' => 'Logout',
 			'auth.username' => 'Username',
@@ -2891,10 +2899,10 @@ extension on Translations {
 			'cache.clearSuccess' => 'Cache cleared',
 			'backup.data' => 'Backup Data',
 			'backup.dataSub' => 'Backup all gagaku data and settings (excludes MangaDex login and local library files)',
-			'backup.restore' => 'Restore Backup',
-			'backup.restoreWarning' => 'Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?',
 			_ => null,
 		} ?? switch (path) {
+			'backup.restore' => 'Restore Backup',
+			'backup.restoreWarning' => 'Restoring data from a backup file will overwrite all existing data. Are you sure you want to continue?',
 			'backup.fromFile' => 'Restore Data from File',
 			'backup.success' => 'Backup saved',
 			'backup.restoreSuccess' => 'Backup restored',

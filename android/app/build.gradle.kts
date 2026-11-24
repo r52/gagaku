@@ -29,7 +29,7 @@ android {
         applicationId = "r52.gagaku"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 30
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -59,10 +59,6 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
-    // Play Services 18.1.1 pulls Cronet 141 with duplicate namespaces.
-    // Remove this override once Play Services adopts the namespace fix.
-    // https://issues.chromium.org/issues/406926302
-    implementation("org.chromium.net:cronet-api:143.7445.0")
 }
 
 kotlin {

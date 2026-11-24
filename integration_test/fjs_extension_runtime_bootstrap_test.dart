@@ -2721,12 +2721,25 @@ globalThis.source.fictionalTracker = {
         .map((action) => action.id)
     };
   },
-  getManagedLibraryCollections: async () => [{ id: "reading", title: "Reading" }],
-  getSourceMangaInManagedCollection: async (collection) => [
-    trackerEntry(`\${collection.id}-1`)
+  getManagedCollections: async () => [
+    { id: "reading", title: "Reading", exclusiveGroup: "status" },
+    { id: "planned", title: "Planned", exclusiveGroup: "status" }
   ],
-  commitManagedCollectionChanges: async () => {
-    throw new Error("fictional collections are read-only");
+  getManagedCollectionItems: async (collections) =>
+    collections.map((collection) => ({
+      collectionId: collection.id,
+      items: [trackerEntry(`\${collection.id}-1`)]
+    })),
+  applyManagedCollectionChanges: async (changes) => {
+    if (changes.every((change) => change.type === "remove")) {
+      throw new Error("fictional collections reject every removal");
+    }
+    return changes
+      .filter((change) => change.type !== "move" || change.from.id === change.to.id)
+      .map((change) => ({
+        changeId: change.id,
+        reason: `fictional \${change.type} rejected for \${change.sourceManga.mangaId}`
+      }));
   }
 };
 ''');
@@ -2788,22 +2801,45 @@ globalThis.source.fictionalTracker = {
       throwsA(anything),
     );
 
-    final collections = await runtime.getManagedLibraryCollections(source);
-    expect(collections.single.title, 'Reading');
-    final collectionManga = await runtime.getSourceMangaInManagedCollection(
+    final collections = await runtime.getManagedCollections(source);
+    expect(collections.map((c) => c.title), ['Reading', 'Planned']);
+    expect(collections.map((c) => c.exclusiveGroup), ['status', 'status']);
+    final [reading, planned] = collections;
+    final collectionItems = await runtime.getManagedCollectionItems(
       source,
-      collections.single,
+      collections,
     );
-    expect(collectionManga.single.mangaId, 'reading-1');
-    await expectLater(
-      runtime.commitManagedCollectionChanges(
-        source,
-        ManagedCollectionChangeset(
-          collection: collections.single,
-          additions: const [],
-          deletions: const [],
-        ),
+    expect(collectionItems.map((c) => c.collectionId), ['reading', 'planned']);
+    expect(collectionItems.map((c) => c.items.single.mangaId), [
+      'reading-1',
+      'planned-1',
+    ]);
+    final failures = await runtime.applyManagedCollectionChanges(source, [
+      ManagedCollectionChange.add(id: 'add', to: reading, sourceManga: entry),
+      ManagedCollectionChange.move(
+        id: 'move',
+        from: reading,
+        to: planned,
+        sourceManga: entry,
       ),
+      ManagedCollectionChange.move(
+        id: 'noop-move',
+        from: planned,
+        to: planned,
+        sourceManga: entry,
+      ),
+    ]);
+    // Every change crossed the bridge with its discriminator and id intact.
+    expect(failures.map((f) => f.changeId), ['add', 'noop-move']);
+    expect(failures.first.reason, 'fictional add rejected for entry-1');
+    await expectLater(
+      runtime.applyManagedCollectionChanges(source, [
+        ManagedCollectionChange.remove(
+          id: 'remove',
+          from: reading,
+          sourceManga: entry,
+        ),
+      ]),
       throwsA(anything),
     );
 

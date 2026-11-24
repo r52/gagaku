@@ -61,18 +61,18 @@ abstract interface class ExtensionRuntime {
     List<TrackedMangaChapterReadAction> actions,
   );
 
-  Future<List<ManagedCollection>> getManagedLibraryCollections(
+  Future<List<ManagedCollection>> getManagedCollections(WebSourceInfo source);
+
+  /// Fetches the contents of every requested collection in one call.
+  Future<List<ManagedCollectionItems>> getManagedCollectionItems(
     WebSourceInfo source,
+    List<ManagedCollection> collections,
   );
 
-  Future<List<SourceManga>> getSourceMangaInManagedCollection(
+  /// Returns the changes that failed. Throws only when none were applied.
+  Future<List<ManagedCollectionChangeFailure>> applyManagedCollectionChanges(
     WebSourceInfo source,
-    ManagedCollection collection,
-  );
-
-  Future<void> commitManagedCollectionChanges(
-    WebSourceInfo source,
-    ManagedCollectionChangeset changeset,
+    List<ManagedCollectionChange> changes,
   );
 
   Future<ChapterDetails> getChapterDetails(Chapter chapter);

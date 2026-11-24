@@ -78,6 +78,7 @@ void main() {
     expect(resolved.title, 'album-1');
     expect(resolved.seriesTitle, isNull);
     expect(resolved.readMarkerKey, '1');
+    expect(resolved.isWebtoon, isFalse);
     final content = resolved.content;
     expect(content, isA<ResolvedImageWebChapterContent>());
     final pages = (content as ResolvedImageWebChapterContent).pages;
@@ -157,6 +158,69 @@ void main() {
     final htmlContent = content as ResolvedHtmlWebChapterContent;
     expect(htmlContent.html, html);
     expect(htmlContent.sourceBaseUrl, sourceBaseUrl);
+    expect(resolved.isWebtoon, isFalse);
+
+    container.dispose();
+  });
+
+  test('extension webtoon chapter resolves as long strip', () async {
+    final sourceManga = SourceManga.fromJson({
+      'mangaId': 'webtoon-1',
+      'mangaInfo': {
+        'thumbnailUrl': 'https://example.com/cover.jpg',
+        'synopsis': 'Scrolls.',
+        'primaryTitle': 'Webtoon Series',
+        'secondaryTitles': <String>[],
+        'contentRating': 'SAFE',
+        'isWebtoon': true,
+      },
+    });
+    expect(sourceManga.mangaInfo.isWebtoon, isTrue);
+    final chapter = Chapter(
+      chapterId: 'chapter-1',
+      sourceManga: sourceManga,
+      langCode: 'en',
+      chapNum: 1,
+      title: 'Episode One',
+    );
+    final dio = Dio();
+    addTearDown(dio.close);
+    final container = ProviderContainer(
+      overrides: [
+        cacheProvider.overrideWithValue(_MemoryCacheManager()),
+        webSourceDioProvider.overrideWithValue(dio),
+        extensionSourceProvider('source-1').overrideWith(
+          () => _HtmlExtensionSource(
+            manga: WebManga.extension(
+              data: sourceManga,
+              chaptersList: [chapter],
+            ),
+            details: const ChapterDetails.images(
+              id: 'chapter-1',
+              mangaId: 'webtoon-1',
+              pages: ['https://example.com/1.jpg'],
+            ),
+            baseUrl: 'https://example.com/',
+          ),
+        ),
+      ],
+    );
+    const chapterRef = WebChapterRef(
+      series: WebSeriesRef.extension(
+        sourceId: 'source-1',
+        mangaId: 'webtoon-1',
+      ),
+      chapterId: 'chapter-1',
+    );
+
+    final subscription = container.listen(
+      resolveWebChapterProvider(chapterRef).future,
+      (_, _) {},
+    );
+    final resolved = await subscription.read();
+
+    expect(resolved.isWebtoon, isTrue);
+    expect(resolved.content, isA<ResolvedImageWebChapterContent>());
 
     container.dispose();
   });

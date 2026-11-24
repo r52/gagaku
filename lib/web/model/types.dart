@@ -543,6 +543,11 @@ sealed class WebManga with _$WebManga {
     WebMangaExtension(:final data) => data.mangaInfo.thumbnailUrl,
   };
 
+  bool get isWebtoon => switch (this) {
+    WebMangaCubari() => false,
+    WebMangaExtension(:final data) => data.mangaInfo.isWebtoon ?? false,
+  };
+
   List<String> get artworkUrls => switch (this) {
     WebMangaCubari() => const [],
     WebMangaExtension(:final data) => data.mangaInfo.artworkUrls ?? const [],
@@ -1163,6 +1168,9 @@ abstract class MangaInfo with _$MangaInfo {
     required List<String> secondaryTitles,
     @ContentRatingParser() required ContentRating contentRating,
     MangaContentType? contentType,
+
+    /// The reader opens the title as a vertical long strip.
+    bool? isWebtoon,
     String? status,
     String? artist,
     String? author,
@@ -1171,6 +1179,9 @@ abstract class MangaInfo with _$MangaInfo {
     List<TagSection>? tagGroups,
     List<String>? artworkUrls,
     Map<String, String>? additionalInfo,
+
+    /// Extra title-page sections, in order.
+    List<MangaInfoExtra>? extras,
     String? shareUrl,
   }) = _MangaInfo;
 
@@ -1179,6 +1190,69 @@ abstract class MangaInfo with _$MangaInfo {
 }
 
 enum MangaContentType { comic, novel }
+
+@Freezed(unionKey: 'type', fallbackUnion: 'unsupported')
+sealed class MangaInfoExtra with _$MangaInfoExtra {
+  /// Other titles from the same extension, such as sequels.
+  const factory MangaInfoExtra.relation({
+    required String id,
+    required String title,
+    required List<MangaInfoRelationItem> items,
+  }) = MangaInfoRelationSection;
+
+  /// People such as staff or characters. Tapping an item searches with the
+  /// advanced search form's input row [id] set to the item's id.
+  const factory MangaInfoExtra.staff({
+    required String id,
+    required String title,
+    required List<MangaInfoStaffItem> items,
+  }) = MangaInfoStaffSection;
+
+  /// A section type this host does not know yet.
+  const factory MangaInfoExtra.unsupported() = MangaInfoUnsupportedExtra;
+
+  factory MangaInfoExtra.fromJson(Map<String, dynamic> json) =>
+      _$MangaInfoExtraFromJson(json);
+}
+
+@freezed
+abstract class MangaInfoRelationItem with _$MangaInfoRelationItem {
+  const factory MangaInfoRelationItem({
+    /// The related title's mangaId.
+    required String id,
+    required String imageUrl,
+    required String title,
+    String? subtitle,
+  }) = _MangaInfoRelationItem;
+
+  factory MangaInfoRelationItem.fromJson(Map<String, dynamic> json) =>
+      _$MangaInfoRelationItemFromJson(json);
+}
+
+@freezed
+abstract class MangaInfoStaffItem with _$MangaInfoStaffItem {
+  const factory MangaInfoStaffItem({
+    /// The value the section's search filter is set to when tapped.
+    required String id,
+    required MangaInfoPerson staff,
+    MangaInfoPerson? character,
+  }) = _MangaInfoStaffItem;
+
+  factory MangaInfoStaffItem.fromJson(Map<String, dynamic> json) =>
+      _$MangaInfoStaffItemFromJson(json);
+}
+
+@freezed
+abstract class MangaInfoPerson with _$MangaInfoPerson {
+  const factory MangaInfoPerson({
+    required String imageUrl,
+    required String title,
+    String? subtitle,
+  }) = _MangaInfoPerson;
+
+  factory MangaInfoPerson.fromJson(Map<String, dynamic> json) =>
+      _$MangaInfoPersonFromJson(json);
+}
 
 @freezed
 abstract class TagSection with _$TagSection {
@@ -1273,23 +1347,66 @@ abstract class ChapterReadActionQueueProcessingResult
 
 @freezed
 abstract class ManagedCollection with _$ManagedCollection {
-  const factory ManagedCollection({required String id, required String title}) =
-      _ManagedCollection;
+  const factory ManagedCollection({
+    required String id,
+    required String title,
+
+    /// Collections sharing a group are mutually exclusive: a title is in at
+    /// most one of them, and an add/move into one removes it from the others.
+    String? exclusiveGroup,
+  }) = _ManagedCollection;
 
   factory ManagedCollection.fromJson(Map<String, dynamic> json) =>
       _$ManagedCollectionFromJson(json);
 }
 
 @freezed
-abstract class ManagedCollectionChangeset with _$ManagedCollectionChangeset {
-  const factory ManagedCollectionChangeset({
-    required ManagedCollection collection,
-    required List<SourceManga> additions,
-    required List<SourceManga> deletions,
-  }) = _ManagedCollectionChangeset;
+abstract class ManagedCollectionItems with _$ManagedCollectionItems {
+  const factory ManagedCollectionItems({
+    required String collectionId,
+    @Default([]) List<SourceManga> items,
+  }) = _ManagedCollectionItems;
 
-  factory ManagedCollectionChangeset.fromJson(Map<String, dynamic> json) =>
-      _$ManagedCollectionChangesetFromJson(json);
+  factory ManagedCollectionItems.fromJson(Map<String, dynamic> json) =>
+      _$ManagedCollectionItemsFromJson(json);
+}
+
+@Freezed(unionKey: 'type')
+sealed class ManagedCollectionChange with _$ManagedCollectionChange {
+  const factory ManagedCollectionChange.add({
+    required String id,
+    required ManagedCollection to,
+    required SourceManga sourceManga,
+  }) = ManagedCollectionAdd;
+
+  const factory ManagedCollectionChange.remove({
+    required String id,
+    required ManagedCollection from,
+    required SourceManga sourceManga,
+  }) = ManagedCollectionRemove;
+
+  const factory ManagedCollectionChange.move({
+    required String id,
+    required ManagedCollection from,
+    required ManagedCollection to,
+    required SourceManga sourceManga,
+  }) = ManagedCollectionMove;
+
+  factory ManagedCollectionChange.fromJson(Map<String, dynamic> json) =>
+      _$ManagedCollectionChangeFromJson(json);
+}
+
+@freezed
+abstract class ManagedCollectionChangeFailure
+    with _$ManagedCollectionChangeFailure {
+  const factory ManagedCollectionChangeFailure({
+    /// The [ManagedCollectionChange.id] of the change that failed.
+    required String changeId,
+    @Default('') String reason,
+  }) = _ManagedCollectionChangeFailure;
+
+  factory ManagedCollectionChangeFailure.fromJson(Map<String, dynamic> json) =>
+      _$ManagedCollectionChangeFailureFromJson(json);
 }
 
 @freezed
@@ -1486,11 +1603,15 @@ class LabelRowValueConverter implements JsonConverter<dynamic, dynamic> {
   }
 }
 
-@Freezed(unionKey: 'type')
+@Freezed(unionKey: 'type', fallbackUnion: 'unsupported')
 sealed class FormItemElement with _$FormItemElement {
   const factory FormItemElement.labelRow({
     required String id,
     required bool isHidden,
+
+    /// Keeps the row visible, but dimmed and unresponsive. Sent by
+    /// extensions built against 1.0.0-alpha.95 or later.
+    @Default(false) bool isDisabled,
     required String title,
     String? subtitle,
     @LabelRowValueConverter() dynamic value, // String | LabelRowValue
@@ -1501,6 +1622,7 @@ sealed class FormItemElement with _$FormItemElement {
   const factory FormItemElement.inputRow({
     required String id,
     required bool isHidden,
+    @Default(false) bool isDisabled,
     required String title,
     required String value,
     bool? isSecureEntry,
@@ -1510,6 +1632,7 @@ sealed class FormItemElement with _$FormItemElement {
   const factory FormItemElement.toggleRow({
     required String id,
     required bool isHidden,
+    @Default(false) bool isDisabled,
     required String title,
     required bool value,
     required SelectorID onValueChange, // (value: boolean) => Promise<void>
@@ -1518,6 +1641,7 @@ sealed class FormItemElement with _$FormItemElement {
   const factory FormItemElement.buttonRow({
     required String id,
     required bool isHidden,
+    @Default(false) bool isDisabled,
     required String title,
     required SelectorID onSelect, // () => Promise<void>
   }) = ButtonRowElement;
@@ -1525,6 +1649,7 @@ sealed class FormItemElement with _$FormItemElement {
   const factory FormItemElement.navigationRow({
     required String id,
     required bool isHidden,
+    @Default(false) bool isDisabled,
     required String title,
     String? subtitle,
     String? value,
@@ -1534,6 +1659,7 @@ sealed class FormItemElement with _$FormItemElement {
   const factory FormItemElement.stepperRow({
     required String id,
     required bool isHidden,
+    @Default(false) bool isDisabled,
     required String title,
     String? subtitle,
     required num value,
@@ -1547,6 +1673,7 @@ sealed class FormItemElement with _$FormItemElement {
   const factory FormItemElement.oauthButtonRow({
     required String id,
     required bool isHidden,
+    @Default(false) bool isDisabled,
     required String title,
     String? subtitle,
     required SelectorID
@@ -1561,11 +1688,41 @@ sealed class FormItemElement with _$FormItemElement {
   const factory FormItemElement.webViewRow({
     required String id,
     required bool isHidden,
+    @Default(false) bool isDisabled,
     required String title,
   }) = WebViewRowElement;
 
+  /// A pull-down menu. With [value] set, the chosen item's title is shown on
+  /// the row and checked in the menu; without it the items are plain actions.
+  const factory FormItemElement.menuRow({
+    required String id,
+    required bool isHidden,
+    @Default(false) bool isDisabled,
+    required String title,
+    String? subtitle,
+    required List<MenuRowItem> items,
+    String? value,
+    required SelectorID onSelect, // (itemId: string) => Promise<void>
+  }) = MenuRowElement;
+
+  /// A row type this host does not know yet.
+  const factory FormItemElement.unsupported({
+    required String id,
+    @Default(false) bool isHidden,
+    @Default(false) bool isDisabled,
+  }) = UnsupportedRowElement;
+
   factory FormItemElement.fromJson(Map<String, dynamic> json) =>
       _$FormItemElementFromJson(json);
+}
+
+@freezed
+abstract class MenuRowItem with _$MenuRowItem {
+  const factory MenuRowItem({required String id, required String title}) =
+      _MenuRowItem;
+
+  factory MenuRowItem.fromJson(Map<String, dynamic> json) =>
+      _$MenuRowItemFromJson(json);
 }
 
 @Freezed(unionKey: 'type', fallbackUnion: 'flowSection')

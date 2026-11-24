@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gagaku/i18n/strings.g.dart';
@@ -8,12 +6,12 @@ import 'package:gagaku/mangadex/model/model.dart';
 import 'package:gagaku/mangadex/model/types.dart';
 import 'package:gagaku/mangadex/widgets.dart';
 import 'package:gagaku/routes.dart';
+import 'package:gagaku/util/page_number_bar.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:gagaku/util/ui.dart';
 import 'package:gagaku/util/util.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:number_paginator/number_paginator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'tag_view.g.dart';
@@ -211,12 +209,10 @@ class MangaDexTagViewWidget extends HookConsumerWidget {
                   ),
                 if (popularFuture.hasData && popularFuture.data != null)
                   SliverToBoxAdapter(
-                    child: NumberPaginator(
-                      numberPages: max(
-                        (popularFuture.data!.total / 6).ceil(),
-                        1,
-                      ),
-                      onPageChange: (int index) {
+                    child: PageNumberBar(
+                      pageCount: pageCountOf(popularFuture.data!.total, 6),
+                      currentPage: popularPage.value,
+                      onPageChanged: (index) {
                         popularPage.value = index;
                       },
                     ),

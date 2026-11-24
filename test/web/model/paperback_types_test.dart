@@ -450,4 +450,142 @@ void main() {
       }
     });
   });
+
+  group('Paperback alpha 95 types', () {
+    Map<String, dynamic> mangaInfoJson(List<Object> extras) => {
+      'thumbnailUrl': 'https://example.com/cover.jpg',
+      'synopsis': 'Synopsis',
+      'primaryTitle': 'Title',
+      'secondaryTitles': <String>[],
+      'contentRating': 'EVERYONE',
+      'extras': extras,
+    };
+
+    test('parses relation and staff extras in order', () {
+      final info = MangaInfo.fromJson(
+        mangaInfoJson([
+          {
+            'type': 'relation',
+            'id': 'relations',
+            'title': 'Relations',
+            'items': [
+              {
+                'id': 'manga-2',
+                'imageUrl': 'https://example.com/2.jpg',
+                'title': 'Sequel Title',
+                'subtitle': 'Sequel',
+              },
+            ],
+          },
+          {
+            'type': 'staff',
+            'id': 'staff',
+            'title': 'Characters',
+            'items': [
+              {
+                'id': 'person-1',
+                'staff': {
+                  'imageUrl': 'https://example.com/p.jpg',
+                  'title': 'Voice Actor',
+                  'subtitle': 'Japanese',
+                },
+                'character': {
+                  'imageUrl': 'https://example.com/c.jpg',
+                  'title': 'Hero',
+                },
+              },
+            ],
+          },
+        ]),
+      );
+
+      final [relation, staff] = info.extras!;
+      expect(
+        switch (relation) {
+          MangaInfoRelationSection(:final items) => (
+            items.single.id,
+            items.single.subtitle,
+          ),
+          _ => fail('Expected relation section'),
+        },
+        ('manga-2', 'Sequel'),
+      );
+      expect(
+        switch (staff) {
+          MangaInfoStaffSection(:final id, :final items) => (
+            id,
+            items.single.id,
+            items.single.staff.subtitle,
+            items.single.character?.title,
+          ),
+          _ => fail('Expected staff section'),
+        },
+        ('staff', 'person-1', 'Japanese', 'Hero'),
+      );
+      expect(MangaInfo.fromJson(info.toJson()), info);
+    });
+
+    test('keeps the title page parseable for unknown extra types', () {
+      final info = MangaInfo.fromJson(
+        mangaInfoJson([
+          {'type': 'futureSection', 'id': 'x', 'title': 'X'},
+        ]),
+      );
+
+      expect(info.extras!.single, isA<MangaInfoUnsupportedExtra>());
+    });
+
+    test('defaults isDisabled for rows from older extensions', () {
+      final row = FormItemElement.fromJson({
+        'type': 'toggleRow',
+        'id': 'toggle',
+        'isHidden': false,
+        'title': 'Toggle',
+        'value': true,
+        'onValueChange': 'selector-1',
+      });
+
+      expect(row.isDisabled, isFalse);
+    });
+
+    test('parses menu rows and disabled rows', () {
+      final row = FormItemElement.fromJson({
+        'type': 'menuRow',
+        'id': 'menu',
+        'isHidden': false,
+        'isDisabled': true,
+        'title': 'Sort',
+        'items': [
+          {'id': 'a', 'title': 'A'},
+          {'id': 'b', 'title': 'B'},
+        ],
+        'value': 'b',
+        'onSelect': 'selector-2',
+      });
+
+      expect(
+        switch (row) {
+          MenuRowElement(:final items, :final value, :final onSelect) => (
+            items.map((item) => item.title).join(','),
+            value,
+            onSelect,
+          ),
+          _ => fail('Expected menu row'),
+        },
+        ('A,B', 'b', 'selector-2'),
+      );
+      expect(row.isDisabled, isTrue);
+    });
+
+    test('parses unknown row types as unsupported rows', () {
+      final row = FormItemElement.fromJson({
+        'type': 'futureRow',
+        'id': 'future',
+        'isHidden': false,
+      });
+
+      expect(row, isA<UnsupportedRowElement>());
+      expect(row.id, 'future');
+    });
+  });
 }
