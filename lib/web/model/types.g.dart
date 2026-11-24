@@ -456,6 +456,9 @@ _MangaInfo _$MangaInfoFromJson(Map<String, dynamic> json) => _MangaInfo(
   additionalInfo: (json['additionalInfo'] as Map<String, dynamic>?)?.map(
     (k, e) => MapEntry(k, e as String),
   ),
+  extras: (json['extras'] as List<dynamic>?)
+      ?.map((e) => MangaInfoExtra.fromJson(e as Map<String, dynamic>))
+      .toList(),
   shareUrl: json['shareUrl'] as String?,
 );
 
@@ -477,6 +480,7 @@ Map<String, dynamic> _$MangaInfoToJson(
   'tagGroups': instance.tagGroups?.map((e) => e.toJson()).toList(),
   'artworkUrls': instance.artworkUrls,
   'additionalInfo': instance.additionalInfo,
+  'extras': instance.extras?.map((e) => e.toJson()).toList(),
   'shareUrl': instance.shareUrl,
 };
 
@@ -484,6 +488,102 @@ const _$MangaContentTypeEnumMap = {
   MangaContentType.comic: 'comic',
   MangaContentType.novel: 'novel',
 };
+
+MangaInfoRelationSection _$MangaInfoRelationSectionFromJson(
+  Map<String, dynamic> json,
+) => MangaInfoRelationSection(
+  id: json['id'] as String,
+  title: json['title'] as String,
+  items: (json['items'] as List<dynamic>)
+      .map((e) => MangaInfoRelationItem.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  $type: json['type'] as String?,
+);
+
+Map<String, dynamic> _$MangaInfoRelationSectionToJson(
+  MangaInfoRelationSection instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'title': instance.title,
+  'items': instance.items.map((e) => e.toJson()).toList(),
+  'type': instance.$type,
+};
+
+MangaInfoStaffSection _$MangaInfoStaffSectionFromJson(
+  Map<String, dynamic> json,
+) => MangaInfoStaffSection(
+  id: json['id'] as String,
+  title: json['title'] as String,
+  items: (json['items'] as List<dynamic>)
+      .map((e) => MangaInfoStaffItem.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  $type: json['type'] as String?,
+);
+
+Map<String, dynamic> _$MangaInfoStaffSectionToJson(
+  MangaInfoStaffSection instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'title': instance.title,
+  'items': instance.items.map((e) => e.toJson()).toList(),
+  'type': instance.$type,
+};
+
+MangaInfoUnsupportedExtra _$MangaInfoUnsupportedExtraFromJson(
+  Map<String, dynamic> json,
+) => MangaInfoUnsupportedExtra($type: json['type'] as String?);
+
+Map<String, dynamic> _$MangaInfoUnsupportedExtraToJson(
+  MangaInfoUnsupportedExtra instance,
+) => <String, dynamic>{'type': instance.$type};
+
+_MangaInfoRelationItem _$MangaInfoRelationItemFromJson(
+  Map<String, dynamic> json,
+) => _MangaInfoRelationItem(
+  id: json['id'] as String,
+  imageUrl: json['imageUrl'] as String,
+  title: json['title'] as String,
+  subtitle: json['subtitle'] as String?,
+);
+
+Map<String, dynamic> _$MangaInfoRelationItemToJson(
+  _MangaInfoRelationItem instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'imageUrl': instance.imageUrl,
+  'title': instance.title,
+  'subtitle': instance.subtitle,
+};
+
+_MangaInfoStaffItem _$MangaInfoStaffItemFromJson(Map<String, dynamic> json) =>
+    _MangaInfoStaffItem(
+      id: json['id'] as String,
+      staff: MangaInfoPerson.fromJson(json['staff'] as Map<String, dynamic>),
+      character: json['character'] == null
+          ? null
+          : MangaInfoPerson.fromJson(json['character'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$MangaInfoStaffItemToJson(_MangaInfoStaffItem instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'staff': instance.staff.toJson(),
+      'character': instance.character?.toJson(),
+    };
+
+_MangaInfoPerson _$MangaInfoPersonFromJson(Map<String, dynamic> json) =>
+    _MangaInfoPerson(
+      imageUrl: json['imageUrl'] as String,
+      title: json['title'] as String,
+      subtitle: json['subtitle'] as String?,
+    );
+
+Map<String, dynamic> _$MangaInfoPersonToJson(_MangaInfoPerson instance) =>
+    <String, dynamic>{
+      'imageUrl': instance.imageUrl,
+      'title': instance.title,
+      'subtitle': instance.subtitle,
+    };
 
 _TagSection _$TagSectionFromJson(Map<String, dynamic> json) => _TagSection(
   id: json['id'] as String,
@@ -1020,6 +1120,7 @@ LabelRowElement _$LabelRowElementFromJson(Map<String, dynamic> json) =>
     LabelRowElement(
       id: json['id'] as String,
       isHidden: json['isHidden'] as bool,
+      isDisabled: json['isDisabled'] as bool? ?? false,
       title: json['title'] as String,
       subtitle: json['subtitle'] as String?,
       value: const LabelRowValueConverter().fromJson(json['value']),
@@ -1032,6 +1133,7 @@ Map<String, dynamic> _$LabelRowElementToJson(LabelRowElement instance) =>
     <String, dynamic>{
       'id': instance.id,
       'isHidden': instance.isHidden,
+      'isDisabled': instance.isDisabled,
       'title': instance.title,
       'subtitle': instance.subtitle,
       'value': const LabelRowValueConverter().toJson(instance.value),
@@ -1044,6 +1146,7 @@ InputRowElement _$InputRowElementFromJson(Map<String, dynamic> json) =>
     InputRowElement(
       id: json['id'] as String,
       isHidden: json['isHidden'] as bool,
+      isDisabled: json['isDisabled'] as bool? ?? false,
       title: json['title'] as String,
       value: json['value'] as String,
       isSecureEntry: json['isSecureEntry'] as bool?,
@@ -1055,6 +1158,7 @@ Map<String, dynamic> _$InputRowElementToJson(InputRowElement instance) =>
     <String, dynamic>{
       'id': instance.id,
       'isHidden': instance.isHidden,
+      'isDisabled': instance.isDisabled,
       'title': instance.title,
       'value': instance.value,
       'isSecureEntry': instance.isSecureEntry,
@@ -1066,6 +1170,7 @@ ToggleRowElement _$ToggleRowElementFromJson(Map<String, dynamic> json) =>
     ToggleRowElement(
       id: json['id'] as String,
       isHidden: json['isHidden'] as bool,
+      isDisabled: json['isDisabled'] as bool? ?? false,
       title: json['title'] as String,
       value: json['value'] as bool,
       onValueChange: json['onValueChange'] as SelectorID,
@@ -1076,6 +1181,7 @@ Map<String, dynamic> _$ToggleRowElementToJson(ToggleRowElement instance) =>
     <String, dynamic>{
       'id': instance.id,
       'isHidden': instance.isHidden,
+      'isDisabled': instance.isDisabled,
       'title': instance.title,
       'value': instance.value,
       'onValueChange': instance.onValueChange,
@@ -1086,6 +1192,7 @@ ButtonRowElement _$ButtonRowElementFromJson(Map<String, dynamic> json) =>
     ButtonRowElement(
       id: json['id'] as String,
       isHidden: json['isHidden'] as bool,
+      isDisabled: json['isDisabled'] as bool? ?? false,
       title: json['title'] as String,
       onSelect: json['onSelect'] as SelectorID,
       $type: json['type'] as String?,
@@ -1095,6 +1202,7 @@ Map<String, dynamic> _$ButtonRowElementToJson(ButtonRowElement instance) =>
     <String, dynamic>{
       'id': instance.id,
       'isHidden': instance.isHidden,
+      'isDisabled': instance.isDisabled,
       'title': instance.title,
       'onSelect': instance.onSelect,
       'type': instance.$type,
@@ -1105,6 +1213,7 @@ NavigationRowElement _$NavigationRowElementFromJson(
 ) => NavigationRowElement(
   id: json['id'] as String,
   isHidden: json['isHidden'] as bool,
+  isDisabled: json['isDisabled'] as bool? ?? false,
   title: json['title'] as String,
   subtitle: json['subtitle'] as String?,
   value: json['value'] as String?,
@@ -1117,6 +1226,7 @@ Map<String, dynamic> _$NavigationRowElementToJson(
 ) => <String, dynamic>{
   'id': instance.id,
   'isHidden': instance.isHidden,
+  'isDisabled': instance.isDisabled,
   'title': instance.title,
   'subtitle': instance.subtitle,
   'value': instance.value,
@@ -1128,6 +1238,7 @@ StepperRowElement _$StepperRowElementFromJson(Map<String, dynamic> json) =>
     StepperRowElement(
       id: json['id'] as String,
       isHidden: json['isHidden'] as bool,
+      isDisabled: json['isDisabled'] as bool? ?? false,
       title: json['title'] as String,
       subtitle: json['subtitle'] as String?,
       value: json['value'] as num,
@@ -1143,6 +1254,7 @@ Map<String, dynamic> _$StepperRowElementToJson(StepperRowElement instance) =>
     <String, dynamic>{
       'id': instance.id,
       'isHidden': instance.isHidden,
+      'isDisabled': instance.isDisabled,
       'title': instance.title,
       'subtitle': instance.subtitle,
       'value': instance.value,
@@ -1159,6 +1271,7 @@ OAuthButtonRowElement _$OAuthButtonRowElementFromJson(
 ) => OAuthButtonRowElement(
   id: json['id'] as String,
   isHidden: json['isHidden'] as bool,
+  isDisabled: json['isDisabled'] as bool? ?? false,
   title: json['title'] as String,
   subtitle: json['subtitle'] as String?,
   onSuccess: json['onSuccess'] as SelectorID,
@@ -1177,6 +1290,7 @@ Map<String, dynamic> _$OAuthButtonRowElementToJson(
 ) => <String, dynamic>{
   'id': instance.id,
   'isHidden': instance.isHidden,
+  'isDisabled': instance.isDisabled,
   'title': instance.title,
   'subtitle': instance.subtitle,
   'onSuccess': instance.onSuccess,
@@ -1192,6 +1306,7 @@ WebViewRowElement _$WebViewRowElementFromJson(Map<String, dynamic> json) =>
     WebViewRowElement(
       id: json['id'] as String,
       isHidden: json['isHidden'] as bool,
+      isDisabled: json['isDisabled'] as bool? ?? false,
       title: json['title'] as String,
       $type: json['type'] as String?,
     );
@@ -1200,9 +1315,62 @@ Map<String, dynamic> _$WebViewRowElementToJson(WebViewRowElement instance) =>
     <String, dynamic>{
       'id': instance.id,
       'isHidden': instance.isHidden,
+      'isDisabled': instance.isDisabled,
       'title': instance.title,
       'type': instance.$type,
     };
+
+MenuRowElement _$MenuRowElementFromJson(Map<String, dynamic> json) =>
+    MenuRowElement(
+      id: json['id'] as String,
+      isHidden: json['isHidden'] as bool,
+      isDisabled: json['isDisabled'] as bool? ?? false,
+      title: json['title'] as String,
+      subtitle: json['subtitle'] as String?,
+      items: (json['items'] as List<dynamic>)
+          .map((e) => MenuRowItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      value: json['value'] as String?,
+      onSelect: json['onSelect'] as SelectorID,
+      $type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$MenuRowElementToJson(MenuRowElement instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'isHidden': instance.isHidden,
+      'isDisabled': instance.isDisabled,
+      'title': instance.title,
+      'subtitle': instance.subtitle,
+      'items': instance.items.map((e) => e.toJson()).toList(),
+      'value': instance.value,
+      'onSelect': instance.onSelect,
+      'type': instance.$type,
+    };
+
+UnsupportedRowElement _$UnsupportedRowElementFromJson(
+  Map<String, dynamic> json,
+) => UnsupportedRowElement(
+  id: json['id'] as String,
+  isHidden: json['isHidden'] as bool? ?? false,
+  isDisabled: json['isDisabled'] as bool? ?? false,
+  $type: json['type'] as String?,
+);
+
+Map<String, dynamic> _$UnsupportedRowElementToJson(
+  UnsupportedRowElement instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'isHidden': instance.isHidden,
+  'isDisabled': instance.isDisabled,
+  'type': instance.$type,
+};
+
+_MenuRowItem _$MenuRowItemFromJson(Map<String, dynamic> json) =>
+    _MenuRowItem(id: json['id'] as String, title: json['title'] as String);
+
+Map<String, dynamic> _$MenuRowItemToJson(_MenuRowItem instance) =>
+    <String, dynamic>{'id': instance.id, 'title': instance.title};
 
 FlowSectionElement _$FlowSectionElementFromJson(Map<String, dynamic> json) =>
     FlowSectionElement(

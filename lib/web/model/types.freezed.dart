@@ -3893,7 +3893,8 @@ $MangaInfoCopyWith<$Res> get mangaInfo {
 mixin _$MangaInfo {
 
  String get thumbnailUrl; String get synopsis; String get primaryTitle; List<String> get secondaryTitles;@ContentRatingParser() ContentRating get contentRating; MangaContentType? get contentType;/// The reader opens the title as a vertical long strip.
- bool? get isWebtoon; String? get status; String? get artist; String? get author; String? get bannerUrl; num? get rating; List<TagSection>? get tagGroups; List<String>? get artworkUrls; Map<String, String>? get additionalInfo; String? get shareUrl;
+ bool? get isWebtoon; String? get status; String? get artist; String? get author; String? get bannerUrl; num? get rating; List<TagSection>? get tagGroups; List<String>? get artworkUrls; Map<String, String>? get additionalInfo;/// Extra title-page sections, in order.
+ List<MangaInfoExtra>? get extras; String? get shareUrl;
 /// Create a copy of MangaInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3907,20 +3908,20 @@ $MangaInfoCopyWith<MangaInfo> get copyWith => _$MangaInfoCopyWithImpl<MangaInfo>
 @override
 bool operator ==(Object other) {
   final _this = this as MangaInfo;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfo&&(identical(other.thumbnailUrl, _this.thumbnailUrl) || other.thumbnailUrl == _this.thumbnailUrl)&&(identical(other.synopsis, _this.synopsis) || other.synopsis == _this.synopsis)&&(identical(other.primaryTitle, _this.primaryTitle) || other.primaryTitle == _this.primaryTitle)&&const DeepCollectionEquality().equals(other.secondaryTitles, _this.secondaryTitles)&&(identical(other.contentRating, _this.contentRating) || other.contentRating == _this.contentRating)&&(identical(other.contentType, _this.contentType) || other.contentType == _this.contentType)&&(identical(other.isWebtoon, _this.isWebtoon) || other.isWebtoon == _this.isWebtoon)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.artist, _this.artist) || other.artist == _this.artist)&&(identical(other.author, _this.author) || other.author == _this.author)&&(identical(other.bannerUrl, _this.bannerUrl) || other.bannerUrl == _this.bannerUrl)&&(identical(other.rating, _this.rating) || other.rating == _this.rating)&&const DeepCollectionEquality().equals(other.tagGroups, _this.tagGroups)&&const DeepCollectionEquality().equals(other.artworkUrls, _this.artworkUrls)&&const DeepCollectionEquality().equals(other.additionalInfo, _this.additionalInfo)&&(identical(other.shareUrl, _this.shareUrl) || other.shareUrl == _this.shareUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfo&&(identical(other.thumbnailUrl, _this.thumbnailUrl) || other.thumbnailUrl == _this.thumbnailUrl)&&(identical(other.synopsis, _this.synopsis) || other.synopsis == _this.synopsis)&&(identical(other.primaryTitle, _this.primaryTitle) || other.primaryTitle == _this.primaryTitle)&&const DeepCollectionEquality().equals(other.secondaryTitles, _this.secondaryTitles)&&(identical(other.contentRating, _this.contentRating) || other.contentRating == _this.contentRating)&&(identical(other.contentType, _this.contentType) || other.contentType == _this.contentType)&&(identical(other.isWebtoon, _this.isWebtoon) || other.isWebtoon == _this.isWebtoon)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.artist, _this.artist) || other.artist == _this.artist)&&(identical(other.author, _this.author) || other.author == _this.author)&&(identical(other.bannerUrl, _this.bannerUrl) || other.bannerUrl == _this.bannerUrl)&&(identical(other.rating, _this.rating) || other.rating == _this.rating)&&const DeepCollectionEquality().equals(other.tagGroups, _this.tagGroups)&&const DeepCollectionEquality().equals(other.artworkUrls, _this.artworkUrls)&&const DeepCollectionEquality().equals(other.additionalInfo, _this.additionalInfo)&&const DeepCollectionEquality().equals(other.extras, _this.extras)&&(identical(other.shareUrl, _this.shareUrl) || other.shareUrl == _this.shareUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as MangaInfo;
-  return Object.hash(runtimeType,_this.thumbnailUrl,_this.synopsis,_this.primaryTitle,const DeepCollectionEquality().hash(_this.secondaryTitles),_this.contentRating,_this.contentType,_this.isWebtoon,_this.status,_this.artist,_this.author,_this.bannerUrl,_this.rating,const DeepCollectionEquality().hash(_this.tagGroups),const DeepCollectionEquality().hash(_this.artworkUrls),const DeepCollectionEquality().hash(_this.additionalInfo),_this.shareUrl);
+  return Object.hash(runtimeType,_this.thumbnailUrl,_this.synopsis,_this.primaryTitle,const DeepCollectionEquality().hash(_this.secondaryTitles),_this.contentRating,_this.contentType,_this.isWebtoon,_this.status,_this.artist,_this.author,_this.bannerUrl,_this.rating,const DeepCollectionEquality().hash(_this.tagGroups),const DeepCollectionEquality().hash(_this.artworkUrls),const DeepCollectionEquality().hash(_this.additionalInfo),const DeepCollectionEquality().hash(_this.extras),_this.shareUrl);
 }
 
 @override
 String toString() {
   final _this = this as MangaInfo;
-  return 'MangaInfo(thumbnailUrl: ${_this.thumbnailUrl}, synopsis: ${_this.synopsis}, primaryTitle: ${_this.primaryTitle}, secondaryTitles: ${_this.secondaryTitles}, contentRating: ${_this.contentRating}, contentType: ${_this.contentType}, isWebtoon: ${_this.isWebtoon}, status: ${_this.status}, artist: ${_this.artist}, author: ${_this.author}, bannerUrl: ${_this.bannerUrl}, rating: ${_this.rating}, tagGroups: ${_this.tagGroups}, artworkUrls: ${_this.artworkUrls}, additionalInfo: ${_this.additionalInfo}, shareUrl: ${_this.shareUrl})';
+  return 'MangaInfo(thumbnailUrl: ${_this.thumbnailUrl}, synopsis: ${_this.synopsis}, primaryTitle: ${_this.primaryTitle}, secondaryTitles: ${_this.secondaryTitles}, contentRating: ${_this.contentRating}, contentType: ${_this.contentType}, isWebtoon: ${_this.isWebtoon}, status: ${_this.status}, artist: ${_this.artist}, author: ${_this.author}, bannerUrl: ${_this.bannerUrl}, rating: ${_this.rating}, tagGroups: ${_this.tagGroups}, artworkUrls: ${_this.artworkUrls}, additionalInfo: ${_this.additionalInfo}, extras: ${_this.extras}, shareUrl: ${_this.shareUrl})';
 }
 
 
@@ -3931,7 +3932,7 @@ abstract mixin class $MangaInfoCopyWith<$Res>  {
   factory $MangaInfoCopyWith(MangaInfo value, $Res Function(MangaInfo) _then) = _$MangaInfoCopyWithImpl;
 @useResult
 $Res call({
- String thumbnailUrl, String synopsis, String primaryTitle, List<String> secondaryTitles,@ContentRatingParser() ContentRating contentRating, MangaContentType? contentType, bool? isWebtoon, String? status, String? artist, String? author, String? bannerUrl, num? rating, List<TagSection>? tagGroups, List<String>? artworkUrls, Map<String, String>? additionalInfo, String? shareUrl
+ String thumbnailUrl, String synopsis, String primaryTitle, List<String> secondaryTitles,@ContentRatingParser() ContentRating contentRating, MangaContentType? contentType, bool? isWebtoon, String? status, String? artist, String? author, String? bannerUrl, num? rating, List<TagSection>? tagGroups, List<String>? artworkUrls, Map<String, String>? additionalInfo, List<MangaInfoExtra>? extras, String? shareUrl
 });
 
 
@@ -3948,7 +3949,7 @@ class _$MangaInfoCopyWithImpl<$Res>
 
 /// Create a copy of MangaInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? thumbnailUrl = null,Object? synopsis = null,Object? primaryTitle = null,Object? secondaryTitles = null,Object? contentRating = null,Object? contentType = freezed,Object? isWebtoon = freezed,Object? status = freezed,Object? artist = freezed,Object? author = freezed,Object? bannerUrl = freezed,Object? rating = freezed,Object? tagGroups = freezed,Object? artworkUrls = freezed,Object? additionalInfo = freezed,Object? shareUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? thumbnailUrl = null,Object? synopsis = null,Object? primaryTitle = null,Object? secondaryTitles = null,Object? contentRating = null,Object? contentType = freezed,Object? isWebtoon = freezed,Object? status = freezed,Object? artist = freezed,Object? author = freezed,Object? bannerUrl = freezed,Object? rating = freezed,Object? tagGroups = freezed,Object? artworkUrls = freezed,Object? additionalInfo = freezed,Object? extras = freezed,Object? shareUrl = freezed,}) {
   return _then(MangaInfo(
 thumbnailUrl: null == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String,synopsis: null == synopsis ? _self.synopsis : synopsis // ignore: cast_nullable_to_non_nullable
@@ -3965,7 +3966,8 @@ as String?,rating: freezed == rating ? _self.rating : rating // ignore: cast_nul
 as num?,tagGroups: freezed == tagGroups ? _self.tagGroups : tagGroups // ignore: cast_nullable_to_non_nullable
 as List<TagSection>?,artworkUrls: freezed == artworkUrls ? _self.artworkUrls : artworkUrls // ignore: cast_nullable_to_non_nullable
 as List<String>?,additionalInfo: freezed == additionalInfo ? _self.additionalInfo : additionalInfo // ignore: cast_nullable_to_non_nullable
-as Map<String, String>?,shareUrl: freezed == shareUrl ? _self.shareUrl : shareUrl // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,extras: freezed == extras ? _self.extras : extras // ignore: cast_nullable_to_non_nullable
+as List<MangaInfoExtra>?,shareUrl: freezed == shareUrl ? _self.shareUrl : shareUrl // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -3978,7 +3980,7 @@ as String?,
 @JsonSerializable()
 
 class _MangaInfo implements MangaInfo {
-  const _MangaInfo({required this.thumbnailUrl, required this.synopsis, required this.primaryTitle, required  List<String> secondaryTitles, @ContentRatingParser() required this.contentRating, this.contentType, this.isWebtoon, this.status, this.artist, this.author, this.bannerUrl, this.rating,  List<TagSection>? tagGroups,  List<String>? artworkUrls,  Map<String, String>? additionalInfo, this.shareUrl}): _secondaryTitles = secondaryTitles,_tagGroups = tagGroups,_artworkUrls = artworkUrls,_additionalInfo = additionalInfo;
+  const _MangaInfo({required this.thumbnailUrl, required this.synopsis, required this.primaryTitle, required  List<String> secondaryTitles, @ContentRatingParser() required this.contentRating, this.contentType, this.isWebtoon, this.status, this.artist, this.author, this.bannerUrl, this.rating,  List<TagSection>? tagGroups,  List<String>? artworkUrls,  Map<String, String>? additionalInfo,  List<MangaInfoExtra>? extras, this.shareUrl}): _secondaryTitles = secondaryTitles,_tagGroups = tagGroups,_artworkUrls = artworkUrls,_additionalInfo = additionalInfo,_extras = extras;
   factory _MangaInfo.fromJson(Map<String, dynamic> json) => _$MangaInfoFromJson(json);
 
 @override final  String thumbnailUrl;
@@ -4027,6 +4029,17 @@ class _MangaInfo implements MangaInfo {
   return EqualUnmodifiableMapView(value);
 }
 
+/// Extra title-page sections, in order.
+ final  List<MangaInfoExtra>? _extras;
+/// Extra title-page sections, in order.
+@override List<MangaInfoExtra>? get extras {
+  final value = _extras;
+  if (value == null) return null;
+  if (_extras is EqualUnmodifiableListView) return _extras;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
 @override final  String? shareUrl;
 
 /// Create a copy of MangaInfo
@@ -4042,18 +4055,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaInfo&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.synopsis, synopsis) || other.synopsis == synopsis)&&(identical(other.primaryTitle, primaryTitle) || other.primaryTitle == primaryTitle)&&const DeepCollectionEquality().equals(other.secondaryTitles, _secondaryTitles)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.contentType, contentType) || other.contentType == contentType)&&(identical(other.isWebtoon, isWebtoon) || other.isWebtoon == isWebtoon)&&(identical(other.status, status) || other.status == status)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.rating, rating) || other.rating == rating)&&const DeepCollectionEquality().equals(other.tagGroups, _tagGroups)&&const DeepCollectionEquality().equals(other.artworkUrls, _artworkUrls)&&const DeepCollectionEquality().equals(other.additionalInfo, _additionalInfo)&&(identical(other.shareUrl, shareUrl) || other.shareUrl == shareUrl));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaInfo&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.synopsis, synopsis) || other.synopsis == synopsis)&&(identical(other.primaryTitle, primaryTitle) || other.primaryTitle == primaryTitle)&&const DeepCollectionEquality().equals(other.secondaryTitles, _secondaryTitles)&&(identical(other.contentRating, contentRating) || other.contentRating == contentRating)&&(identical(other.contentType, contentType) || other.contentType == contentType)&&(identical(other.isWebtoon, isWebtoon) || other.isWebtoon == isWebtoon)&&(identical(other.status, status) || other.status == status)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.author, author) || other.author == author)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.rating, rating) || other.rating == rating)&&const DeepCollectionEquality().equals(other.tagGroups, _tagGroups)&&const DeepCollectionEquality().equals(other.artworkUrls, _artworkUrls)&&const DeepCollectionEquality().equals(other.additionalInfo, _additionalInfo)&&const DeepCollectionEquality().equals(other.extras, _extras)&&(identical(other.shareUrl, shareUrl) || other.shareUrl == shareUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,thumbnailUrl,synopsis,primaryTitle,const DeepCollectionEquality().hash(_secondaryTitles),contentRating,contentType,isWebtoon,status,artist,author,bannerUrl,rating,const DeepCollectionEquality().hash(_tagGroups),const DeepCollectionEquality().hash(_artworkUrls),const DeepCollectionEquality().hash(_additionalInfo),shareUrl);
+    return Object.hash(runtimeType,thumbnailUrl,synopsis,primaryTitle,const DeepCollectionEquality().hash(_secondaryTitles),contentRating,contentType,isWebtoon,status,artist,author,bannerUrl,rating,const DeepCollectionEquality().hash(_tagGroups),const DeepCollectionEquality().hash(_artworkUrls),const DeepCollectionEquality().hash(_additionalInfo),const DeepCollectionEquality().hash(_extras),shareUrl);
 }
 
 @override
 String toString() {
-    return 'MangaInfo(thumbnailUrl: $thumbnailUrl, synopsis: $synopsis, primaryTitle: $primaryTitle, secondaryTitles: $secondaryTitles, contentRating: $contentRating, contentType: $contentType, isWebtoon: $isWebtoon, status: $status, artist: $artist, author: $author, bannerUrl: $bannerUrl, rating: $rating, tagGroups: $tagGroups, artworkUrls: $artworkUrls, additionalInfo: $additionalInfo, shareUrl: $shareUrl)';
+    return 'MangaInfo(thumbnailUrl: $thumbnailUrl, synopsis: $synopsis, primaryTitle: $primaryTitle, secondaryTitles: $secondaryTitles, contentRating: $contentRating, contentType: $contentType, isWebtoon: $isWebtoon, status: $status, artist: $artist, author: $author, bannerUrl: $bannerUrl, rating: $rating, tagGroups: $tagGroups, artworkUrls: $artworkUrls, additionalInfo: $additionalInfo, extras: $extras, shareUrl: $shareUrl)';
 }
 
 
@@ -4064,7 +4077,7 @@ abstract mixin class _$MangaInfoCopyWith<$Res> implements $MangaInfoCopyWith<$Re
   factory _$MangaInfoCopyWith(_MangaInfo value, $Res Function(_MangaInfo) _then) = __$MangaInfoCopyWithImpl;
 @override @useResult
 $Res call({
- String thumbnailUrl, String synopsis, String primaryTitle, List<String> secondaryTitles,@ContentRatingParser() ContentRating contentRating, MangaContentType? contentType, bool? isWebtoon, String? status, String? artist, String? author, String? bannerUrl, num? rating, List<TagSection>? tagGroups, List<String>? artworkUrls, Map<String, String>? additionalInfo, String? shareUrl
+ String thumbnailUrl, String synopsis, String primaryTitle, List<String> secondaryTitles,@ContentRatingParser() ContentRating contentRating, MangaContentType? contentType, bool? isWebtoon, String? status, String? artist, String? author, String? bannerUrl, num? rating, List<TagSection>? tagGroups, List<String>? artworkUrls, Map<String, String>? additionalInfo, List<MangaInfoExtra>? extras, String? shareUrl
 });
 
 
@@ -4081,7 +4094,7 @@ class __$MangaInfoCopyWithImpl<$Res>
 
 /// Create a copy of MangaInfo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? thumbnailUrl = null,Object? synopsis = null,Object? primaryTitle = null,Object? secondaryTitles = null,Object? contentRating = null,Object? contentType = freezed,Object? isWebtoon = freezed,Object? status = freezed,Object? artist = freezed,Object? author = freezed,Object? bannerUrl = freezed,Object? rating = freezed,Object? tagGroups = freezed,Object? artworkUrls = freezed,Object? additionalInfo = freezed,Object? shareUrl = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? thumbnailUrl = null,Object? synopsis = null,Object? primaryTitle = null,Object? secondaryTitles = null,Object? contentRating = null,Object? contentType = freezed,Object? isWebtoon = freezed,Object? status = freezed,Object? artist = freezed,Object? author = freezed,Object? bannerUrl = freezed,Object? rating = freezed,Object? tagGroups = freezed,Object? artworkUrls = freezed,Object? additionalInfo = freezed,Object? extras = freezed,Object? shareUrl = freezed,}) {
   return _then(_MangaInfo(
 thumbnailUrl: null == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String,synopsis: null == synopsis ? _self.synopsis : synopsis // ignore: cast_nullable_to_non_nullable
@@ -4098,7 +4111,761 @@ as String?,rating: freezed == rating ? _self.rating : rating // ignore: cast_nul
 as num?,tagGroups: freezed == tagGroups ? _self._tagGroups : tagGroups // ignore: cast_nullable_to_non_nullable
 as List<TagSection>?,artworkUrls: freezed == artworkUrls ? _self._artworkUrls : artworkUrls // ignore: cast_nullable_to_non_nullable
 as List<String>?,additionalInfo: freezed == additionalInfo ? _self._additionalInfo : additionalInfo // ignore: cast_nullable_to_non_nullable
-as Map<String, String>?,shareUrl: freezed == shareUrl ? _self.shareUrl : shareUrl // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,extras: freezed == extras ? _self._extras : extras // ignore: cast_nullable_to_non_nullable
+as List<MangaInfoExtra>?,shareUrl: freezed == shareUrl ? _self.shareUrl : shareUrl // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+MangaInfoExtra _$MangaInfoExtraFromJson(
+  Map<String, dynamic> json
+) {
+        switch (json['type']) {
+                  case 'relation':
+          return MangaInfoRelationSection.fromJson(
+            json
+          );
+                case 'staff':
+          return MangaInfoStaffSection.fromJson(
+            json
+          );
+        
+          default:
+            return MangaInfoUnsupportedExtra.fromJson(
+  json
+);
+        }
+      
+}
+
+/// @nodoc
+mixin _$MangaInfoExtra {
+
+
+
+  /// Serializes this MangaInfoExtra to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfoExtra);
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+    return 'MangaInfoExtra()';
+}
+
+
+}
+
+/// @nodoc
+class $MangaInfoExtraCopyWith<$Res>  {
+$MangaInfoExtraCopyWith(MangaInfoExtra _, $Res Function(MangaInfoExtra) __);
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class MangaInfoRelationSection implements MangaInfoExtra {
+  const MangaInfoRelationSection({required this.id, required this.title, required  List<MangaInfoRelationItem> items,  String? $type}): _items = items,$type = $type ?? 'relation';
+  factory MangaInfoRelationSection.fromJson(Map<String, dynamic> json) => _$MangaInfoRelationSectionFromJson(json);
+
+ final  String id;
+ final  String title;
+ final  List<MangaInfoRelationItem> _items;
+ List<MangaInfoRelationItem> get items {
+  if (_items is EqualUnmodifiableListView) return _items;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_items);
+}
+
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of MangaInfoExtra
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MangaInfoRelationSectionCopyWith<MangaInfoRelationSection> get copyWith => _$MangaInfoRelationSectionCopyWithImpl<MangaInfoRelationSection>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MangaInfoRelationSectionToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfoRelationSection&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.items, _items));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(_items));
+}
+
+@override
+String toString() {
+    return 'MangaInfoExtra.relation(id: $id, title: $title, items: $items)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MangaInfoRelationSectionCopyWith<$Res> implements $MangaInfoExtraCopyWith<$Res> {
+  factory $MangaInfoRelationSectionCopyWith(MangaInfoRelationSection value, $Res Function(MangaInfoRelationSection) _then) = _$MangaInfoRelationSectionCopyWithImpl;
+@useResult
+$Res call({
+ String id, String title, List<MangaInfoRelationItem> items
+});
+
+
+
+
+}
+/// @nodoc
+class _$MangaInfoRelationSectionCopyWithImpl<$Res>
+    implements $MangaInfoRelationSectionCopyWith<$Res> {
+  _$MangaInfoRelationSectionCopyWithImpl(this._self, this._then);
+
+  final MangaInfoRelationSection _self;
+  final $Res Function(MangaInfoRelationSection) _then;
+
+/// Create a copy of MangaInfoExtra
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? items = null,}) {
+  return _then(MangaInfoRelationSection(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
+as List<MangaInfoRelationItem>,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class MangaInfoStaffSection implements MangaInfoExtra {
+  const MangaInfoStaffSection({required this.id, required this.title, required  List<MangaInfoStaffItem> items,  String? $type}): _items = items,$type = $type ?? 'staff';
+  factory MangaInfoStaffSection.fromJson(Map<String, dynamic> json) => _$MangaInfoStaffSectionFromJson(json);
+
+ final  String id;
+ final  String title;
+ final  List<MangaInfoStaffItem> _items;
+ List<MangaInfoStaffItem> get items {
+  if (_items is EqualUnmodifiableListView) return _items;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_items);
+}
+
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of MangaInfoExtra
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MangaInfoStaffSectionCopyWith<MangaInfoStaffSection> get copyWith => _$MangaInfoStaffSectionCopyWithImpl<MangaInfoStaffSection>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MangaInfoStaffSectionToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfoStaffSection&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.items, _items));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(_items));
+}
+
+@override
+String toString() {
+    return 'MangaInfoExtra.staff(id: $id, title: $title, items: $items)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MangaInfoStaffSectionCopyWith<$Res> implements $MangaInfoExtraCopyWith<$Res> {
+  factory $MangaInfoStaffSectionCopyWith(MangaInfoStaffSection value, $Res Function(MangaInfoStaffSection) _then) = _$MangaInfoStaffSectionCopyWithImpl;
+@useResult
+$Res call({
+ String id, String title, List<MangaInfoStaffItem> items
+});
+
+
+
+
+}
+/// @nodoc
+class _$MangaInfoStaffSectionCopyWithImpl<$Res>
+    implements $MangaInfoStaffSectionCopyWith<$Res> {
+  _$MangaInfoStaffSectionCopyWithImpl(this._self, this._then);
+
+  final MangaInfoStaffSection _self;
+  final $Res Function(MangaInfoStaffSection) _then;
+
+/// Create a copy of MangaInfoExtra
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? items = null,}) {
+  return _then(MangaInfoStaffSection(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
+as List<MangaInfoStaffItem>,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class MangaInfoUnsupportedExtra implements MangaInfoExtra {
+  const MangaInfoUnsupportedExtra({ String? $type}): $type = $type ?? 'unsupported';
+  factory MangaInfoUnsupportedExtra.fromJson(Map<String, dynamic> json) => _$MangaInfoUnsupportedExtraFromJson(json);
+
+
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MangaInfoUnsupportedExtraToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfoUnsupportedExtra);
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+    return 'MangaInfoExtra.unsupported()';
+}
+
+
+}
+
+
+
+
+
+/// @nodoc
+mixin _$MangaInfoRelationItem {
+
+/// The related title's mangaId.
+ String get id; String get imageUrl; String get title; String? get subtitle;
+/// Create a copy of MangaInfoRelationItem
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MangaInfoRelationItemCopyWith<MangaInfoRelationItem> get copyWith => _$MangaInfoRelationItemCopyWithImpl<MangaInfoRelationItem>(this as MangaInfoRelationItem, _$identity);
+
+  /// Serializes this MangaInfoRelationItem to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as MangaInfoRelationItem;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfoRelationItem&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.imageUrl, _this.imageUrl) || other.imageUrl == _this.imageUrl)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.subtitle, _this.subtitle) || other.subtitle == _this.subtitle));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as MangaInfoRelationItem;
+  return Object.hash(runtimeType,_this.id,_this.imageUrl,_this.title,_this.subtitle);
+}
+
+@override
+String toString() {
+  final _this = this as MangaInfoRelationItem;
+  return 'MangaInfoRelationItem(id: ${_this.id}, imageUrl: ${_this.imageUrl}, title: ${_this.title}, subtitle: ${_this.subtitle})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MangaInfoRelationItemCopyWith<$Res>  {
+  factory $MangaInfoRelationItemCopyWith(MangaInfoRelationItem value, $Res Function(MangaInfoRelationItem) _then) = _$MangaInfoRelationItemCopyWithImpl;
+@useResult
+$Res call({
+ String id, String imageUrl, String title, String? subtitle
+});
+
+
+
+
+}
+/// @nodoc
+class _$MangaInfoRelationItemCopyWithImpl<$Res>
+    implements $MangaInfoRelationItemCopyWith<$Res> {
+  _$MangaInfoRelationItemCopyWithImpl(this._self, this._then);
+
+  final MangaInfoRelationItem _self;
+  final $Res Function(MangaInfoRelationItem) _then;
+
+/// Create a copy of MangaInfoRelationItem
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? imageUrl = null,Object? title = null,Object? subtitle = freezed,}) {
+  return _then(MangaInfoRelationItem(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _MangaInfoRelationItem implements MangaInfoRelationItem {
+  const _MangaInfoRelationItem({required this.id, required this.imageUrl, required this.title, this.subtitle});
+  factory _MangaInfoRelationItem.fromJson(Map<String, dynamic> json) => _$MangaInfoRelationItemFromJson(json);
+
+/// The related title's mangaId.
+@override final  String id;
+@override final  String imageUrl;
+@override final  String title;
+@override final  String? subtitle;
+
+/// Create a copy of MangaInfoRelationItem
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$MangaInfoRelationItemCopyWith<_MangaInfoRelationItem> get copyWith => __$MangaInfoRelationItemCopyWithImpl<_MangaInfoRelationItem>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MangaInfoRelationItemToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaInfoRelationItem&&(identical(other.id, id) || other.id == id)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,imageUrl,title,subtitle);
+}
+
+@override
+String toString() {
+    return 'MangaInfoRelationItem(id: $id, imageUrl: $imageUrl, title: $title, subtitle: $subtitle)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$MangaInfoRelationItemCopyWith<$Res> implements $MangaInfoRelationItemCopyWith<$Res> {
+  factory _$MangaInfoRelationItemCopyWith(_MangaInfoRelationItem value, $Res Function(_MangaInfoRelationItem) _then) = __$MangaInfoRelationItemCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String imageUrl, String title, String? subtitle
+});
+
+
+
+
+}
+/// @nodoc
+class __$MangaInfoRelationItemCopyWithImpl<$Res>
+    implements _$MangaInfoRelationItemCopyWith<$Res> {
+  __$MangaInfoRelationItemCopyWithImpl(this._self, this._then);
+
+  final _MangaInfoRelationItem _self;
+  final $Res Function(_MangaInfoRelationItem) _then;
+
+/// Create a copy of MangaInfoRelationItem
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? imageUrl = null,Object? title = null,Object? subtitle = freezed,}) {
+  return _then(_MangaInfoRelationItem(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$MangaInfoStaffItem {
+
+/// The value the section's search filter is set to when tapped.
+ String get id; MangaInfoPerson get staff; MangaInfoPerson? get character;
+/// Create a copy of MangaInfoStaffItem
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MangaInfoStaffItemCopyWith<MangaInfoStaffItem> get copyWith => _$MangaInfoStaffItemCopyWithImpl<MangaInfoStaffItem>(this as MangaInfoStaffItem, _$identity);
+
+  /// Serializes this MangaInfoStaffItem to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as MangaInfoStaffItem;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfoStaffItem&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.staff, _this.staff) || other.staff == _this.staff)&&(identical(other.character, _this.character) || other.character == _this.character));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as MangaInfoStaffItem;
+  return Object.hash(runtimeType,_this.id,_this.staff,_this.character);
+}
+
+@override
+String toString() {
+  final _this = this as MangaInfoStaffItem;
+  return 'MangaInfoStaffItem(id: ${_this.id}, staff: ${_this.staff}, character: ${_this.character})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MangaInfoStaffItemCopyWith<$Res>  {
+  factory $MangaInfoStaffItemCopyWith(MangaInfoStaffItem value, $Res Function(MangaInfoStaffItem) _then) = _$MangaInfoStaffItemCopyWithImpl;
+@useResult
+$Res call({
+ String id, MangaInfoPerson staff, MangaInfoPerson? character
+});
+
+
+$MangaInfoPersonCopyWith<$Res> get staff;$MangaInfoPersonCopyWith<$Res>? get character;
+
+}
+/// @nodoc
+class _$MangaInfoStaffItemCopyWithImpl<$Res>
+    implements $MangaInfoStaffItemCopyWith<$Res> {
+  _$MangaInfoStaffItemCopyWithImpl(this._self, this._then);
+
+  final MangaInfoStaffItem _self;
+  final $Res Function(MangaInfoStaffItem) _then;
+
+/// Create a copy of MangaInfoStaffItem
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? staff = null,Object? character = freezed,}) {
+  return _then(MangaInfoStaffItem(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,staff: null == staff ? _self.staff : staff // ignore: cast_nullable_to_non_nullable
+as MangaInfoPerson,character: freezed == character ? _self.character : character // ignore: cast_nullable_to_non_nullable
+as MangaInfoPerson?,
+  ));
+}
+/// Create a copy of MangaInfoStaffItem
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$MangaInfoPersonCopyWith<$Res> get staff {
+  
+  return $MangaInfoPersonCopyWith<$Res>(_self.staff, (value) {
+    return _then(_self.copyWith(staff: value));
+  });
+}/// Create a copy of MangaInfoStaffItem
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$MangaInfoPersonCopyWith<$Res>? get character {
+    if (_self.character == null) {
+    return null;
+  }
+
+  return $MangaInfoPersonCopyWith<$Res>(_self.character!, (value) {
+    return _then(_self.copyWith(character: value));
+  });
+}
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _MangaInfoStaffItem implements MangaInfoStaffItem {
+  const _MangaInfoStaffItem({required this.id, required this.staff, this.character});
+  factory _MangaInfoStaffItem.fromJson(Map<String, dynamic> json) => _$MangaInfoStaffItemFromJson(json);
+
+/// The value the section's search filter is set to when tapped.
+@override final  String id;
+@override final  MangaInfoPerson staff;
+@override final  MangaInfoPerson? character;
+
+/// Create a copy of MangaInfoStaffItem
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$MangaInfoStaffItemCopyWith<_MangaInfoStaffItem> get copyWith => __$MangaInfoStaffItemCopyWithImpl<_MangaInfoStaffItem>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MangaInfoStaffItemToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaInfoStaffItem&&(identical(other.id, id) || other.id == id)&&(identical(other.staff, staff) || other.staff == staff)&&(identical(other.character, character) || other.character == character));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,staff,character);
+}
+
+@override
+String toString() {
+    return 'MangaInfoStaffItem(id: $id, staff: $staff, character: $character)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$MangaInfoStaffItemCopyWith<$Res> implements $MangaInfoStaffItemCopyWith<$Res> {
+  factory _$MangaInfoStaffItemCopyWith(_MangaInfoStaffItem value, $Res Function(_MangaInfoStaffItem) _then) = __$MangaInfoStaffItemCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, MangaInfoPerson staff, MangaInfoPerson? character
+});
+
+
+@override $MangaInfoPersonCopyWith<$Res> get staff;@override $MangaInfoPersonCopyWith<$Res>? get character;
+
+}
+/// @nodoc
+class __$MangaInfoStaffItemCopyWithImpl<$Res>
+    implements _$MangaInfoStaffItemCopyWith<$Res> {
+  __$MangaInfoStaffItemCopyWithImpl(this._self, this._then);
+
+  final _MangaInfoStaffItem _self;
+  final $Res Function(_MangaInfoStaffItem) _then;
+
+/// Create a copy of MangaInfoStaffItem
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? staff = null,Object? character = freezed,}) {
+  return _then(_MangaInfoStaffItem(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,staff: null == staff ? _self.staff : staff // ignore: cast_nullable_to_non_nullable
+as MangaInfoPerson,character: freezed == character ? _self.character : character // ignore: cast_nullable_to_non_nullable
+as MangaInfoPerson?,
+  ));
+}
+
+/// Create a copy of MangaInfoStaffItem
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$MangaInfoPersonCopyWith<$Res> get staff {
+  
+  return $MangaInfoPersonCopyWith<$Res>(_self.staff, (value) {
+    return _then(_self.copyWith(staff: value));
+  });
+}/// Create a copy of MangaInfoStaffItem
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$MangaInfoPersonCopyWith<$Res>? get character {
+    if (_self.character == null) {
+    return null;
+  }
+
+  return $MangaInfoPersonCopyWith<$Res>(_self.character!, (value) {
+    return _then(_self.copyWith(character: value));
+  });
+}
+}
+
+
+/// @nodoc
+mixin _$MangaInfoPerson {
+
+ String get imageUrl; String get title; String? get subtitle;
+/// Create a copy of MangaInfoPerson
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MangaInfoPersonCopyWith<MangaInfoPerson> get copyWith => _$MangaInfoPersonCopyWithImpl<MangaInfoPerson>(this as MangaInfoPerson, _$identity);
+
+  /// Serializes this MangaInfoPerson to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as MangaInfoPerson;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MangaInfoPerson&&(identical(other.imageUrl, _this.imageUrl) || other.imageUrl == _this.imageUrl)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.subtitle, _this.subtitle) || other.subtitle == _this.subtitle));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as MangaInfoPerson;
+  return Object.hash(runtimeType,_this.imageUrl,_this.title,_this.subtitle);
+}
+
+@override
+String toString() {
+  final _this = this as MangaInfoPerson;
+  return 'MangaInfoPerson(imageUrl: ${_this.imageUrl}, title: ${_this.title}, subtitle: ${_this.subtitle})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MangaInfoPersonCopyWith<$Res>  {
+  factory $MangaInfoPersonCopyWith(MangaInfoPerson value, $Res Function(MangaInfoPerson) _then) = _$MangaInfoPersonCopyWithImpl;
+@useResult
+$Res call({
+ String imageUrl, String title, String? subtitle
+});
+
+
+
+
+}
+/// @nodoc
+class _$MangaInfoPersonCopyWithImpl<$Res>
+    implements $MangaInfoPersonCopyWith<$Res> {
+  _$MangaInfoPersonCopyWithImpl(this._self, this._then);
+
+  final MangaInfoPerson _self;
+  final $Res Function(MangaInfoPerson) _then;
+
+/// Create a copy of MangaInfoPerson
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? imageUrl = null,Object? title = null,Object? subtitle = freezed,}) {
+  return _then(MangaInfoPerson(
+imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _MangaInfoPerson implements MangaInfoPerson {
+  const _MangaInfoPerson({required this.imageUrl, required this.title, this.subtitle});
+  factory _MangaInfoPerson.fromJson(Map<String, dynamic> json) => _$MangaInfoPersonFromJson(json);
+
+@override final  String imageUrl;
+@override final  String title;
+@override final  String? subtitle;
+
+/// Create a copy of MangaInfoPerson
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$MangaInfoPersonCopyWith<_MangaInfoPerson> get copyWith => __$MangaInfoPersonCopyWithImpl<_MangaInfoPerson>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MangaInfoPersonToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MangaInfoPerson&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,imageUrl,title,subtitle);
+}
+
+@override
+String toString() {
+    return 'MangaInfoPerson(imageUrl: $imageUrl, title: $title, subtitle: $subtitle)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$MangaInfoPersonCopyWith<$Res> implements $MangaInfoPersonCopyWith<$Res> {
+  factory _$MangaInfoPersonCopyWith(_MangaInfoPerson value, $Res Function(_MangaInfoPerson) _then) = __$MangaInfoPersonCopyWithImpl;
+@override @useResult
+$Res call({
+ String imageUrl, String title, String? subtitle
+});
+
+
+
+
+}
+/// @nodoc
+class __$MangaInfoPersonCopyWithImpl<$Res>
+    implements _$MangaInfoPersonCopyWith<$Res> {
+  __$MangaInfoPersonCopyWithImpl(this._self, this._then);
+
+  final _MangaInfoPerson _self;
+  final $Res Function(_MangaInfoPerson) _then;
+
+/// Create a copy of MangaInfoPerson
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? imageUrl = null,Object? title = null,Object? subtitle = freezed,}) {
+  return _then(_MangaInfoPerson(
+imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -7554,13 +8321,14 @@ FormItemElement _$FormItemElementFromJson(
           return WebViewRowElement.fromJson(
             json
           );
+                case 'menuRow':
+          return MenuRowElement.fromJson(
+            json
+          );
         
           default:
-            throw CheckedFromJsonException(
-  json,
-  'type',
-  'FormItemElement',
-  'Invalid union type "${json['type']}"!'
+            return UnsupportedRowElement.fromJson(
+  json
 );
         }
       
@@ -7569,7 +8337,9 @@ FormItemElement _$FormItemElementFromJson(
 /// @nodoc
 mixin _$FormItemElement {
 
- String get id; bool get isHidden; String get title;
+ String get id; bool get isHidden;/// Keeps the row visible, but dimmed and unresponsive. Sent by
+/// extensions built against 1.0.0-alpha.95 or later.
+ bool get isDisabled;
 /// Create a copy of FormItemElement
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -7583,20 +8353,20 @@ $FormItemElementCopyWith<FormItemElement> get copyWith => _$FormItemElementCopyW
 @override
 bool operator ==(Object other) {
   final _this = this as FormItemElement;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FormItemElement&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.isHidden, _this.isHidden) || other.isHidden == _this.isHidden)&&(identical(other.title, _this.title) || other.title == _this.title));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FormItemElement&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.isHidden, _this.isHidden) || other.isHidden == _this.isHidden)&&(identical(other.isDisabled, _this.isDisabled) || other.isDisabled == _this.isDisabled));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as FormItemElement;
-  return Object.hash(runtimeType,_this.id,_this.isHidden,_this.title);
+  return Object.hash(runtimeType,_this.id,_this.isHidden,_this.isDisabled);
 }
 
 @override
 String toString() {
   final _this = this as FormItemElement;
-  return 'FormItemElement(id: ${_this.id}, isHidden: ${_this.isHidden}, title: ${_this.title})';
+  return 'FormItemElement(id: ${_this.id}, isHidden: ${_this.isHidden}, isDisabled: ${_this.isDisabled})';
 }
 
 
@@ -7607,7 +8377,7 @@ abstract mixin class $FormItemElementCopyWith<$Res>  {
   factory $FormItemElementCopyWith(FormItemElement value, $Res Function(FormItemElement) _then) = _$FormItemElementCopyWithImpl;
 @useResult
 $Res call({
- String id, bool isHidden, String title
+ String id, bool isHidden, bool isDisabled
 });
 
 
@@ -7624,12 +8394,12 @@ class _$FormItemElementCopyWithImpl<$Res>
 
 /// Create a copy of FormItemElement
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? isHidden = null,Object? title = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? isHidden = null,Object? isDisabled = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
-as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,
+as bool,isDisabled: null == isDisabled ? _self.isDisabled : isDisabled // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -7641,12 +8411,15 @@ as String,
 @JsonSerializable()
 
 class LabelRowElement implements FormItemElement {
-  const LabelRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, @LabelRowValueConverter() this.value, this.style, this.onSelect,  String? $type}): $type = $type ?? 'labelRow';
+  const LabelRowElement({required this.id, required this.isHidden, this.isDisabled = false, required this.title, this.subtitle, @LabelRowValueConverter() this.value, this.style, this.onSelect,  String? $type}): $type = $type ?? 'labelRow';
   factory LabelRowElement.fromJson(Map<String, dynamic> json) => _$LabelRowElementFromJson(json);
 
 @override final  String id;
 @override final  bool isHidden;
-@override final  String title;
+/// Keeps the row visible, but dimmed and unresponsive. Sent by
+/// extensions built against 1.0.0-alpha.95 or later.
+@override@JsonKey() final  bool isDisabled;
+ final  String title;
  final  String? subtitle;
 @LabelRowValueConverter() final  dynamic value;
  final  RowStyle? style;
@@ -7669,18 +8442,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is LabelRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.value, value)&&(identical(other.style, style) || other.style == style)&&(identical(other.onSelect, onSelect) || other.onSelect == onSelect));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is LabelRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.isDisabled, isDisabled) || other.isDisabled == isDisabled)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.value, value)&&(identical(other.style, style) || other.style == style)&&(identical(other.onSelect, onSelect) || other.onSelect == onSelect));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,isHidden,title,subtitle,const DeepCollectionEquality().hash(value),style,onSelect);
+    return Object.hash(runtimeType,id,isHidden,isDisabled,title,subtitle,const DeepCollectionEquality().hash(value),style,onSelect);
 }
 
 @override
 String toString() {
-    return 'FormItemElement.labelRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, style: $style, onSelect: $onSelect)';
+    return 'FormItemElement.labelRow(id: $id, isHidden: $isHidden, isDisabled: $isDisabled, title: $title, subtitle: $subtitle, value: $value, style: $style, onSelect: $onSelect)';
 }
 
 
@@ -7691,7 +8464,7 @@ abstract mixin class $LabelRowElementCopyWith<$Res> implements $FormItemElementC
   factory $LabelRowElementCopyWith(LabelRowElement value, $Res Function(LabelRowElement) _then) = _$LabelRowElementCopyWithImpl;
 @override @useResult
 $Res call({
- String id, bool isHidden, String title, String? subtitle,@LabelRowValueConverter() dynamic value, RowStyle? style, SelectorID? onSelect
+ String id, bool isHidden, bool isDisabled, String title, String? subtitle,@LabelRowValueConverter() dynamic value, RowStyle? style, SelectorID? onSelect
 });
 
 
@@ -7708,10 +8481,11 @@ class _$LabelRowElementCopyWithImpl<$Res>
 
 /// Create a copy of FormItemElement
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? subtitle = freezed,Object? value = freezed,Object? style = freezed,Object? onSelect = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? isDisabled = null,Object? title = null,Object? subtitle = freezed,Object? value = freezed,Object? style = freezed,Object? onSelect = freezed,}) {
   return _then(LabelRowElement(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
+as bool,isDisabled: null == isDisabled ? _self.isDisabled : isDisabled // ignore: cast_nullable_to_non_nullable
 as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
 as String?,value: freezed == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
@@ -7728,12 +8502,13 @@ as SelectorID?,
 @JsonSerializable()
 
 class InputRowElement implements FormItemElement {
-  const InputRowElement({required this.id, required this.isHidden, required this.title, required this.value, this.isSecureEntry, required this.onValueChange,  String? $type}): $type = $type ?? 'inputRow';
+  const InputRowElement({required this.id, required this.isHidden, this.isDisabled = false, required this.title, required this.value, this.isSecureEntry, required this.onValueChange,  String? $type}): $type = $type ?? 'inputRow';
   factory InputRowElement.fromJson(Map<String, dynamic> json) => _$InputRowElementFromJson(json);
 
 @override final  String id;
 @override final  bool isHidden;
-@override final  String title;
+@override@JsonKey() final  bool isDisabled;
+ final  String title;
  final  String value;
  final  bool? isSecureEntry;
  final  SelectorID onValueChange;
@@ -7755,18 +8530,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is InputRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.value, value) || other.value == value)&&(identical(other.isSecureEntry, isSecureEntry) || other.isSecureEntry == isSecureEntry)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InputRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.isDisabled, isDisabled) || other.isDisabled == isDisabled)&&(identical(other.title, title) || other.title == title)&&(identical(other.value, value) || other.value == value)&&(identical(other.isSecureEntry, isSecureEntry) || other.isSecureEntry == isSecureEntry)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,isHidden,title,value,isSecureEntry,onValueChange);
+    return Object.hash(runtimeType,id,isHidden,isDisabled,title,value,isSecureEntry,onValueChange);
 }
 
 @override
 String toString() {
-    return 'FormItemElement.inputRow(id: $id, isHidden: $isHidden, title: $title, value: $value, isSecureEntry: $isSecureEntry, onValueChange: $onValueChange)';
+    return 'FormItemElement.inputRow(id: $id, isHidden: $isHidden, isDisabled: $isDisabled, title: $title, value: $value, isSecureEntry: $isSecureEntry, onValueChange: $onValueChange)';
 }
 
 
@@ -7777,7 +8552,7 @@ abstract mixin class $InputRowElementCopyWith<$Res> implements $FormItemElementC
   factory $InputRowElementCopyWith(InputRowElement value, $Res Function(InputRowElement) _then) = _$InputRowElementCopyWithImpl;
 @override @useResult
 $Res call({
- String id, bool isHidden, String title, String value, bool? isSecureEntry, SelectorID onValueChange
+ String id, bool isHidden, bool isDisabled, String title, String value, bool? isSecureEntry, SelectorID onValueChange
 });
 
 
@@ -7794,10 +8569,11 @@ class _$InputRowElementCopyWithImpl<$Res>
 
 /// Create a copy of FormItemElement
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? value = null,Object? isSecureEntry = freezed,Object? onValueChange = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? isDisabled = null,Object? title = null,Object? value = null,Object? isSecureEntry = freezed,Object? onValueChange = null,}) {
   return _then(InputRowElement(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
+as bool,isDisabled: null == isDisabled ? _self.isDisabled : isDisabled // ignore: cast_nullable_to_non_nullable
 as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
 as String,isSecureEntry: freezed == isSecureEntry ? _self.isSecureEntry : isSecureEntry // ignore: cast_nullable_to_non_nullable
@@ -7813,12 +8589,13 @@ as SelectorID,
 @JsonSerializable()
 
 class ToggleRowElement implements FormItemElement {
-  const ToggleRowElement({required this.id, required this.isHidden, required this.title, required this.value, required this.onValueChange,  String? $type}): $type = $type ?? 'toggleRow';
+  const ToggleRowElement({required this.id, required this.isHidden, this.isDisabled = false, required this.title, required this.value, required this.onValueChange,  String? $type}): $type = $type ?? 'toggleRow';
   factory ToggleRowElement.fromJson(Map<String, dynamic> json) => _$ToggleRowElementFromJson(json);
 
 @override final  String id;
 @override final  bool isHidden;
-@override final  String title;
+@override@JsonKey() final  bool isDisabled;
+ final  String title;
  final  bool value;
  final  SelectorID onValueChange;
 
@@ -7839,18 +8616,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is ToggleRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.value, value) || other.value == value)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ToggleRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.isDisabled, isDisabled) || other.isDisabled == isDisabled)&&(identical(other.title, title) || other.title == title)&&(identical(other.value, value) || other.value == value)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,isHidden,title,value,onValueChange);
+    return Object.hash(runtimeType,id,isHidden,isDisabled,title,value,onValueChange);
 }
 
 @override
 String toString() {
-    return 'FormItemElement.toggleRow(id: $id, isHidden: $isHidden, title: $title, value: $value, onValueChange: $onValueChange)';
+    return 'FormItemElement.toggleRow(id: $id, isHidden: $isHidden, isDisabled: $isDisabled, title: $title, value: $value, onValueChange: $onValueChange)';
 }
 
 
@@ -7861,7 +8638,7 @@ abstract mixin class $ToggleRowElementCopyWith<$Res> implements $FormItemElement
   factory $ToggleRowElementCopyWith(ToggleRowElement value, $Res Function(ToggleRowElement) _then) = _$ToggleRowElementCopyWithImpl;
 @override @useResult
 $Res call({
- String id, bool isHidden, String title, bool value, SelectorID onValueChange
+ String id, bool isHidden, bool isDisabled, String title, bool value, SelectorID onValueChange
 });
 
 
@@ -7878,10 +8655,11 @@ class _$ToggleRowElementCopyWithImpl<$Res>
 
 /// Create a copy of FormItemElement
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? value = null,Object? onValueChange = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? isDisabled = null,Object? title = null,Object? value = null,Object? onValueChange = null,}) {
   return _then(ToggleRowElement(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
+as bool,isDisabled: null == isDisabled ? _self.isDisabled : isDisabled // ignore: cast_nullable_to_non_nullable
 as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
 as bool,onValueChange: null == onValueChange ? _self.onValueChange : onValueChange // ignore: cast_nullable_to_non_nullable
@@ -7896,12 +8674,13 @@ as SelectorID,
 @JsonSerializable()
 
 class ButtonRowElement implements FormItemElement {
-  const ButtonRowElement({required this.id, required this.isHidden, required this.title, required this.onSelect,  String? $type}): $type = $type ?? 'buttonRow';
+  const ButtonRowElement({required this.id, required this.isHidden, this.isDisabled = false, required this.title, required this.onSelect,  String? $type}): $type = $type ?? 'buttonRow';
   factory ButtonRowElement.fromJson(Map<String, dynamic> json) => _$ButtonRowElementFromJson(json);
 
 @override final  String id;
 @override final  bool isHidden;
-@override final  String title;
+@override@JsonKey() final  bool isDisabled;
+ final  String title;
  final  SelectorID onSelect;
 
 @JsonKey(name: 'type')
@@ -7921,18 +8700,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is ButtonRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.onSelect, onSelect) || other.onSelect == onSelect));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ButtonRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.isDisabled, isDisabled) || other.isDisabled == isDisabled)&&(identical(other.title, title) || other.title == title)&&(identical(other.onSelect, onSelect) || other.onSelect == onSelect));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,isHidden,title,onSelect);
+    return Object.hash(runtimeType,id,isHidden,isDisabled,title,onSelect);
 }
 
 @override
 String toString() {
-    return 'FormItemElement.buttonRow(id: $id, isHidden: $isHidden, title: $title, onSelect: $onSelect)';
+    return 'FormItemElement.buttonRow(id: $id, isHidden: $isHidden, isDisabled: $isDisabled, title: $title, onSelect: $onSelect)';
 }
 
 
@@ -7943,7 +8722,7 @@ abstract mixin class $ButtonRowElementCopyWith<$Res> implements $FormItemElement
   factory $ButtonRowElementCopyWith(ButtonRowElement value, $Res Function(ButtonRowElement) _then) = _$ButtonRowElementCopyWithImpl;
 @override @useResult
 $Res call({
- String id, bool isHidden, String title, SelectorID onSelect
+ String id, bool isHidden, bool isDisabled, String title, SelectorID onSelect
 });
 
 
@@ -7960,10 +8739,11 @@ class _$ButtonRowElementCopyWithImpl<$Res>
 
 /// Create a copy of FormItemElement
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? onSelect = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? isDisabled = null,Object? title = null,Object? onSelect = null,}) {
   return _then(ButtonRowElement(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
+as bool,isDisabled: null == isDisabled ? _self.isDisabled : isDisabled // ignore: cast_nullable_to_non_nullable
 as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,onSelect: null == onSelect ? _self.onSelect : onSelect // ignore: cast_nullable_to_non_nullable
 as SelectorID,
@@ -7977,12 +8757,13 @@ as SelectorID,
 @JsonSerializable()
 
 class NavigationRowElement implements FormItemElement {
-  const NavigationRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, this.value, required this.form,  String? $type}): $type = $type ?? 'navigationRow';
+  const NavigationRowElement({required this.id, required this.isHidden, this.isDisabled = false, required this.title, this.subtitle, this.value, required this.form,  String? $type}): $type = $type ?? 'navigationRow';
   factory NavigationRowElement.fromJson(Map<String, dynamic> json) => _$NavigationRowElementFromJson(json);
 
 @override final  String id;
 @override final  bool isHidden;
-@override final  String title;
+@override@JsonKey() final  bool isDisabled;
+ final  String title;
  final  String? subtitle;
  final  String? value;
  final  FormID form;
@@ -8004,18 +8785,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is NavigationRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.value, value) || other.value == value)&&(identical(other.form, form) || other.form == form));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is NavigationRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.isDisabled, isDisabled) || other.isDisabled == isDisabled)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.value, value) || other.value == value)&&(identical(other.form, form) || other.form == form));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,isHidden,title,subtitle,value,form);
+    return Object.hash(runtimeType,id,isHidden,isDisabled,title,subtitle,value,form);
 }
 
 @override
 String toString() {
-    return 'FormItemElement.navigationRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, form: $form)';
+    return 'FormItemElement.navigationRow(id: $id, isHidden: $isHidden, isDisabled: $isDisabled, title: $title, subtitle: $subtitle, value: $value, form: $form)';
 }
 
 
@@ -8026,7 +8807,7 @@ abstract mixin class $NavigationRowElementCopyWith<$Res> implements $FormItemEle
   factory $NavigationRowElementCopyWith(NavigationRowElement value, $Res Function(NavigationRowElement) _then) = _$NavigationRowElementCopyWithImpl;
 @override @useResult
 $Res call({
- String id, bool isHidden, String title, String? subtitle, String? value, FormID form
+ String id, bool isHidden, bool isDisabled, String title, String? subtitle, String? value, FormID form
 });
 
 
@@ -8043,10 +8824,11 @@ class _$NavigationRowElementCopyWithImpl<$Res>
 
 /// Create a copy of FormItemElement
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? subtitle = freezed,Object? value = freezed,Object? form = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? isDisabled = null,Object? title = null,Object? subtitle = freezed,Object? value = freezed,Object? form = null,}) {
   return _then(NavigationRowElement(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
+as bool,isDisabled: null == isDisabled ? _self.isDisabled : isDisabled // ignore: cast_nullable_to_non_nullable
 as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
 as String?,value: freezed == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
@@ -8062,12 +8844,13 @@ as FormID,
 @JsonSerializable()
 
 class StepperRowElement implements FormItemElement {
-  const StepperRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, required this.value, required this.minValue, required this.maxValue, required this.stepValue, required this.loopOver, required this.onValueChange,  String? $type}): $type = $type ?? 'stepperRow';
+  const StepperRowElement({required this.id, required this.isHidden, this.isDisabled = false, required this.title, this.subtitle, required this.value, required this.minValue, required this.maxValue, required this.stepValue, required this.loopOver, required this.onValueChange,  String? $type}): $type = $type ?? 'stepperRow';
   factory StepperRowElement.fromJson(Map<String, dynamic> json) => _$StepperRowElementFromJson(json);
 
 @override final  String id;
 @override final  bool isHidden;
-@override final  String title;
+@override@JsonKey() final  bool isDisabled;
+ final  String title;
  final  String? subtitle;
  final  num value;
  final  num minValue;
@@ -8093,18 +8876,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is StepperRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.value, value) || other.value == value)&&(identical(other.minValue, minValue) || other.minValue == minValue)&&(identical(other.maxValue, maxValue) || other.maxValue == maxValue)&&(identical(other.stepValue, stepValue) || other.stepValue == stepValue)&&(identical(other.loopOver, loopOver) || other.loopOver == loopOver)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is StepperRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.isDisabled, isDisabled) || other.isDisabled == isDisabled)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.value, value) || other.value == value)&&(identical(other.minValue, minValue) || other.minValue == minValue)&&(identical(other.maxValue, maxValue) || other.maxValue == maxValue)&&(identical(other.stepValue, stepValue) || other.stepValue == stepValue)&&(identical(other.loopOver, loopOver) || other.loopOver == loopOver)&&(identical(other.onValueChange, onValueChange) || other.onValueChange == onValueChange));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,isHidden,title,subtitle,value,minValue,maxValue,stepValue,loopOver,onValueChange);
+    return Object.hash(runtimeType,id,isHidden,isDisabled,title,subtitle,value,minValue,maxValue,stepValue,loopOver,onValueChange);
 }
 
 @override
 String toString() {
-    return 'FormItemElement.stepperRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, value: $value, minValue: $minValue, maxValue: $maxValue, stepValue: $stepValue, loopOver: $loopOver, onValueChange: $onValueChange)';
+    return 'FormItemElement.stepperRow(id: $id, isHidden: $isHidden, isDisabled: $isDisabled, title: $title, subtitle: $subtitle, value: $value, minValue: $minValue, maxValue: $maxValue, stepValue: $stepValue, loopOver: $loopOver, onValueChange: $onValueChange)';
 }
 
 
@@ -8115,7 +8898,7 @@ abstract mixin class $StepperRowElementCopyWith<$Res> implements $FormItemElemen
   factory $StepperRowElementCopyWith(StepperRowElement value, $Res Function(StepperRowElement) _then) = _$StepperRowElementCopyWithImpl;
 @override @useResult
 $Res call({
- String id, bool isHidden, String title, String? subtitle, num value, num minValue, num maxValue, num stepValue, bool loopOver, SelectorID onValueChange
+ String id, bool isHidden, bool isDisabled, String title, String? subtitle, num value, num minValue, num maxValue, num stepValue, bool loopOver, SelectorID onValueChange
 });
 
 
@@ -8132,10 +8915,11 @@ class _$StepperRowElementCopyWithImpl<$Res>
 
 /// Create a copy of FormItemElement
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? subtitle = freezed,Object? value = null,Object? minValue = null,Object? maxValue = null,Object? stepValue = null,Object? loopOver = null,Object? onValueChange = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? isDisabled = null,Object? title = null,Object? subtitle = freezed,Object? value = null,Object? minValue = null,Object? maxValue = null,Object? stepValue = null,Object? loopOver = null,Object? onValueChange = null,}) {
   return _then(StepperRowElement(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
+as bool,isDisabled: null == isDisabled ? _self.isDisabled : isDisabled // ignore: cast_nullable_to_non_nullable
 as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
 as String?,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
@@ -8155,12 +8939,13 @@ as SelectorID,
 @JsonSerializable()
 
 class OAuthButtonRowElement implements FormItemElement {
-  const OAuthButtonRowElement({required this.id, required this.isHidden, required this.title, this.subtitle, required this.onSuccess, required this.authorizeEndpoint, required this.responseType, this.clientId, this.redirectUri,  List<String>? scopes,  String? $type}): _scopes = scopes,$type = $type ?? 'oauthButtonRow';
+  const OAuthButtonRowElement({required this.id, required this.isHidden, this.isDisabled = false, required this.title, this.subtitle, required this.onSuccess, required this.authorizeEndpoint, required this.responseType, this.clientId, this.redirectUri,  List<String>? scopes,  String? $type}): _scopes = scopes,$type = $type ?? 'oauthButtonRow';
   factory OAuthButtonRowElement.fromJson(Map<String, dynamic> json) => _$OAuthButtonRowElementFromJson(json);
 
 @override final  String id;
 @override final  bool isHidden;
-@override final  String title;
+@override@JsonKey() final  bool isDisabled;
+ final  String title;
  final  String? subtitle;
  final  SelectorID onSuccess;
  final  String authorizeEndpoint;
@@ -8194,18 +8979,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is OAuthButtonRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.onSuccess, onSuccess) || other.onSuccess == onSuccess)&&(identical(other.authorizeEndpoint, authorizeEndpoint) || other.authorizeEndpoint == authorizeEndpoint)&&(identical(other.responseType, responseType) || other.responseType == responseType)&&(identical(other.clientId, clientId) || other.clientId == clientId)&&(identical(other.redirectUri, redirectUri) || other.redirectUri == redirectUri)&&const DeepCollectionEquality().equals(other.scopes, _scopes));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is OAuthButtonRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.isDisabled, isDisabled) || other.isDisabled == isDisabled)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.onSuccess, onSuccess) || other.onSuccess == onSuccess)&&(identical(other.authorizeEndpoint, authorizeEndpoint) || other.authorizeEndpoint == authorizeEndpoint)&&(identical(other.responseType, responseType) || other.responseType == responseType)&&(identical(other.clientId, clientId) || other.clientId == clientId)&&(identical(other.redirectUri, redirectUri) || other.redirectUri == redirectUri)&&const DeepCollectionEquality().equals(other.scopes, _scopes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,isHidden,title,subtitle,onSuccess,authorizeEndpoint,responseType,clientId,redirectUri,const DeepCollectionEquality().hash(_scopes));
+    return Object.hash(runtimeType,id,isHidden,isDisabled,title,subtitle,onSuccess,authorizeEndpoint,responseType,clientId,redirectUri,const DeepCollectionEquality().hash(_scopes));
 }
 
 @override
 String toString() {
-    return 'FormItemElement.oauthButtonRow(id: $id, isHidden: $isHidden, title: $title, subtitle: $subtitle, onSuccess: $onSuccess, authorizeEndpoint: $authorizeEndpoint, responseType: $responseType, clientId: $clientId, redirectUri: $redirectUri, scopes: $scopes)';
+    return 'FormItemElement.oauthButtonRow(id: $id, isHidden: $isHidden, isDisabled: $isDisabled, title: $title, subtitle: $subtitle, onSuccess: $onSuccess, authorizeEndpoint: $authorizeEndpoint, responseType: $responseType, clientId: $clientId, redirectUri: $redirectUri, scopes: $scopes)';
 }
 
 
@@ -8216,7 +9001,7 @@ abstract mixin class $OAuthButtonRowElementCopyWith<$Res> implements $FormItemEl
   factory $OAuthButtonRowElementCopyWith(OAuthButtonRowElement value, $Res Function(OAuthButtonRowElement) _then) = _$OAuthButtonRowElementCopyWithImpl;
 @override @useResult
 $Res call({
- String id, bool isHidden, String title, String? subtitle, SelectorID onSuccess, String authorizeEndpoint, OAuthResponseType responseType, String? clientId, String? redirectUri, List<String>? scopes
+ String id, bool isHidden, bool isDisabled, String title, String? subtitle, SelectorID onSuccess, String authorizeEndpoint, OAuthResponseType responseType, String? clientId, String? redirectUri, List<String>? scopes
 });
 
 
@@ -8233,10 +9018,11 @@ class _$OAuthButtonRowElementCopyWithImpl<$Res>
 
 /// Create a copy of FormItemElement
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,Object? subtitle = freezed,Object? onSuccess = null,Object? authorizeEndpoint = null,Object? responseType = null,Object? clientId = freezed,Object? redirectUri = freezed,Object? scopes = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? isDisabled = null,Object? title = null,Object? subtitle = freezed,Object? onSuccess = null,Object? authorizeEndpoint = null,Object? responseType = null,Object? clientId = freezed,Object? redirectUri = freezed,Object? scopes = freezed,}) {
   return _then(OAuthButtonRowElement(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
+as bool,isDisabled: null == isDisabled ? _self.isDisabled : isDisabled // ignore: cast_nullable_to_non_nullable
 as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
 as String?,onSuccess: null == onSuccess ? _self.onSuccess : onSuccess // ignore: cast_nullable_to_non_nullable
@@ -8265,12 +9051,13 @@ $OAuthResponseTypeCopyWith<$Res> get responseType {
 @JsonSerializable()
 
 class WebViewRowElement implements FormItemElement {
-  const WebViewRowElement({required this.id, required this.isHidden, required this.title,  String? $type}): $type = $type ?? 'webViewRow';
+  const WebViewRowElement({required this.id, required this.isHidden, this.isDisabled = false, required this.title,  String? $type}): $type = $type ?? 'webViewRow';
   factory WebViewRowElement.fromJson(Map<String, dynamic> json) => _$WebViewRowElementFromJson(json);
 
 @override final  String id;
 @override final  bool isHidden;
-@override final  String title;
+@override@JsonKey() final  bool isDisabled;
+ final  String title;
 
 @JsonKey(name: 'type')
 final String $type;
@@ -8289,18 +9076,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is WebViewRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.title, title) || other.title == title));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is WebViewRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.isDisabled, isDisabled) || other.isDisabled == isDisabled)&&(identical(other.title, title) || other.title == title));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,isHidden,title);
+    return Object.hash(runtimeType,id,isHidden,isDisabled,title);
 }
 
 @override
 String toString() {
-    return 'FormItemElement.webViewRow(id: $id, isHidden: $isHidden, title: $title)';
+    return 'FormItemElement.webViewRow(id: $id, isHidden: $isHidden, isDisabled: $isDisabled, title: $title)';
 }
 
 
@@ -8311,7 +9098,7 @@ abstract mixin class $WebViewRowElementCopyWith<$Res> implements $FormItemElemen
   factory $WebViewRowElementCopyWith(WebViewRowElement value, $Res Function(WebViewRowElement) _then) = _$WebViewRowElementCopyWithImpl;
 @override @useResult
 $Res call({
- String id, bool isHidden, String title
+ String id, bool isHidden, bool isDisabled, String title
 });
 
 
@@ -8328,11 +9115,330 @@ class _$WebViewRowElementCopyWithImpl<$Res>
 
 /// Create a copy of FormItemElement
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? title = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? isDisabled = null,Object? title = null,}) {
   return _then(WebViewRowElement(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
+as bool,isDisabled: null == isDisabled ? _self.isDisabled : isDisabled // ignore: cast_nullable_to_non_nullable
 as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class MenuRowElement implements FormItemElement {
+  const MenuRowElement({required this.id, required this.isHidden, this.isDisabled = false, required this.title, this.subtitle, required  List<MenuRowItem> items, this.value, required this.onSelect,  String? $type}): _items = items,$type = $type ?? 'menuRow';
+  factory MenuRowElement.fromJson(Map<String, dynamic> json) => _$MenuRowElementFromJson(json);
+
+@override final  String id;
+@override final  bool isHidden;
+@override@JsonKey() final  bool isDisabled;
+ final  String title;
+ final  String? subtitle;
+ final  List<MenuRowItem> _items;
+ List<MenuRowItem> get items {
+  if (_items is EqualUnmodifiableListView) return _items;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_items);
+}
+
+ final  String? value;
+ final  SelectorID onSelect;
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of FormItemElement
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MenuRowElementCopyWith<MenuRowElement> get copyWith => _$MenuRowElementCopyWithImpl<MenuRowElement>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MenuRowElementToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is MenuRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.isDisabled, isDisabled) || other.isDisabled == isDisabled)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&const DeepCollectionEquality().equals(other.items, _items)&&(identical(other.value, value) || other.value == value)&&(identical(other.onSelect, onSelect) || other.onSelect == onSelect));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,isHidden,isDisabled,title,subtitle,const DeepCollectionEquality().hash(_items),value,onSelect);
+}
+
+@override
+String toString() {
+    return 'FormItemElement.menuRow(id: $id, isHidden: $isHidden, isDisabled: $isDisabled, title: $title, subtitle: $subtitle, items: $items, value: $value, onSelect: $onSelect)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MenuRowElementCopyWith<$Res> implements $FormItemElementCopyWith<$Res> {
+  factory $MenuRowElementCopyWith(MenuRowElement value, $Res Function(MenuRowElement) _then) = _$MenuRowElementCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, bool isHidden, bool isDisabled, String title, String? subtitle, List<MenuRowItem> items, String? value, SelectorID onSelect
+});
+
+
+
+
+}
+/// @nodoc
+class _$MenuRowElementCopyWithImpl<$Res>
+    implements $MenuRowElementCopyWith<$Res> {
+  _$MenuRowElementCopyWithImpl(this._self, this._then);
+
+  final MenuRowElement _self;
+  final $Res Function(MenuRowElement) _then;
+
+/// Create a copy of FormItemElement
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? isDisabled = null,Object? title = null,Object? subtitle = freezed,Object? items = null,Object? value = freezed,Object? onSelect = null,}) {
+  return _then(MenuRowElement(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
+as bool,isDisabled: null == isDisabled ? _self.isDisabled : isDisabled // ignore: cast_nullable_to_non_nullable
+as bool,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,subtitle: freezed == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
+as String?,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
+as List<MenuRowItem>,value: freezed == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
+as String?,onSelect: null == onSelect ? _self.onSelect : onSelect // ignore: cast_nullable_to_non_nullable
+as SelectorID,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class UnsupportedRowElement implements FormItemElement {
+  const UnsupportedRowElement({required this.id, this.isHidden = false, this.isDisabled = false,  String? $type}): $type = $type ?? 'unsupported';
+  factory UnsupportedRowElement.fromJson(Map<String, dynamic> json) => _$UnsupportedRowElementFromJson(json);
+
+@override final  String id;
+@override@JsonKey() final  bool isHidden;
+@override@JsonKey() final  bool isDisabled;
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of FormItemElement
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$UnsupportedRowElementCopyWith<UnsupportedRowElement> get copyWith => _$UnsupportedRowElementCopyWithImpl<UnsupportedRowElement>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$UnsupportedRowElementToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is UnsupportedRowElement&&(identical(other.id, id) || other.id == id)&&(identical(other.isHidden, isHidden) || other.isHidden == isHidden)&&(identical(other.isDisabled, isDisabled) || other.isDisabled == isDisabled));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,isHidden,isDisabled);
+}
+
+@override
+String toString() {
+    return 'FormItemElement.unsupported(id: $id, isHidden: $isHidden, isDisabled: $isDisabled)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $UnsupportedRowElementCopyWith<$Res> implements $FormItemElementCopyWith<$Res> {
+  factory $UnsupportedRowElementCopyWith(UnsupportedRowElement value, $Res Function(UnsupportedRowElement) _then) = _$UnsupportedRowElementCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, bool isHidden, bool isDisabled
+});
+
+
+
+
+}
+/// @nodoc
+class _$UnsupportedRowElementCopyWithImpl<$Res>
+    implements $UnsupportedRowElementCopyWith<$Res> {
+  _$UnsupportedRowElementCopyWithImpl(this._self, this._then);
+
+  final UnsupportedRowElement _self;
+  final $Res Function(UnsupportedRowElement) _then;
+
+/// Create a copy of FormItemElement
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? isHidden = null,Object? isDisabled = null,}) {
+  return _then(UnsupportedRowElement(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,isHidden: null == isHidden ? _self.isHidden : isHidden // ignore: cast_nullable_to_non_nullable
+as bool,isDisabled: null == isDisabled ? _self.isDisabled : isDisabled // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$MenuRowItem {
+
+ String get id; String get title;
+/// Create a copy of MenuRowItem
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MenuRowItemCopyWith<MenuRowItem> get copyWith => _$MenuRowItemCopyWithImpl<MenuRowItem>(this as MenuRowItem, _$identity);
+
+  /// Serializes this MenuRowItem to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as MenuRowItem;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MenuRowItem&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as MenuRowItem;
+  return Object.hash(runtimeType,_this.id,_this.title);
+}
+
+@override
+String toString() {
+  final _this = this as MenuRowItem;
+  return 'MenuRowItem(id: ${_this.id}, title: ${_this.title})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MenuRowItemCopyWith<$Res>  {
+  factory $MenuRowItemCopyWith(MenuRowItem value, $Res Function(MenuRowItem) _then) = _$MenuRowItemCopyWithImpl;
+@useResult
+$Res call({
+ String id, String title
+});
+
+
+
+
+}
+/// @nodoc
+class _$MenuRowItemCopyWithImpl<$Res>
+    implements $MenuRowItemCopyWith<$Res> {
+  _$MenuRowItemCopyWithImpl(this._self, this._then);
+
+  final MenuRowItem _self;
+  final $Res Function(MenuRowItem) _then;
+
+/// Create a copy of MenuRowItem
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,}) {
+  return _then(MenuRowItem(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _MenuRowItem implements MenuRowItem {
+  const _MenuRowItem({required this.id, required this.title});
+  factory _MenuRowItem.fromJson(Map<String, dynamic> json) => _$MenuRowItemFromJson(json);
+
+@override final  String id;
+@override final  String title;
+
+/// Create a copy of MenuRowItem
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$MenuRowItemCopyWith<_MenuRowItem> get copyWith => __$MenuRowItemCopyWithImpl<_MenuRowItem>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MenuRowItemToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MenuRowItem&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,title);
+}
+
+@override
+String toString() {
+    return 'MenuRowItem(id: $id, title: $title)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$MenuRowItemCopyWith<$Res> implements $MenuRowItemCopyWith<$Res> {
+  factory _$MenuRowItemCopyWith(_MenuRowItem value, $Res Function(_MenuRowItem) _then) = __$MenuRowItemCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String title
+});
+
+
+
+
+}
+/// @nodoc
+class __$MenuRowItemCopyWithImpl<$Res>
+    implements _$MenuRowItemCopyWith<$Res> {
+  __$MenuRowItemCopyWithImpl(this._self, this._then);
+
+  final _MenuRowItem _self;
+  final $Res Function(_MenuRowItem) _then;
+
+/// Create a copy of MenuRowItem
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,}) {
+  return _then(_MenuRowItem(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

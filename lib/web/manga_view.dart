@@ -1,3 +1,6 @@
+import 'package:collection/collection.dart';
+import 'package:gagaku/log.dart';
+import 'package:gagaku/model/config.dart';
 import 'package:gagaku/util/markdown/markdown_view.dart';
 import 'package:gagaku/util/riverpod.dart';
 import 'package:material_ui/material_ui.dart';
@@ -24,8 +27,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'manga_view.g.dart';
 
 enum _ChapterDivider { none, divider }
-
-enum _WebMangaTab { chapters, art }
 
 @Riverpod(retry: noRetry)
 Future<(WebManga, HistoryLink)> _fetchWebMangaInfo(
@@ -154,9 +155,19 @@ class WebMangaViewWidget extends HookConsumerWidget {
     final chapterScrollController = useScrollController();
     final artworkUrls = manga.artworkUrls;
     final hasArtwork = artworkUrls.isNotEmpty;
+    final relatedSections = switch (manga) {
+      WebMangaExtension(:final data) => [
+        for (final extra in data.mangaInfo.extras ?? const <MangaInfoExtra>[])
+          if (extra case MangaInfoRelationSection(:final items)
+              when items.isNotEmpty)
+            extra,
+      ],
+      WebMangaCubari() => const <MangaInfoRelationSection>[],
+    };
+    final hasRelated = relatedSections.isNotEmpty;
     final tabController = useTabController(
-      initialLength: hasArtwork ? _WebMangaTab.values.length : 1,
-      keys: [hasArtwork],
+      initialLength: 1 + (hasArtwork ? 1 : 0) + (hasRelated ? 1 : 0),
+      keys: [hasArtwork, hasRelated],
     );
 
     return DetailScaffold(
@@ -195,6 +206,11 @@ class WebMangaViewWidget extends HookConsumerWidget {
               artworkUrls: artworkUrls,
               headers: headers,
             ),
+          ),
+        if (hasRelated)
+          DetailTab(
+            label: tr.mangaView.related,
+            body: _WebRelatedView(series: series, sections: relatedSections),
           ),
       ],
       onRefresh: () => _refreshWebManga(ref, series),
@@ -355,7 +371,7 @@ class _WebActionBar extends ConsumerWidget {
   }
 }
 
-class _WebMetadataList extends StatelessWidget {
+class _WebMetadataList extends ConsumerWidget {
   const _WebMetadataList({
     required this.manga,
     required this.series,
@@ -367,7 +383,7 @@ class _WebMetadataList extends StatelessWidget {
   final WebSourceInfo? source;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tr = context.t;
     final theme = Theme.of(context);
 
@@ -452,6 +468,33 @@ class _WebMetadataList extends StatelessWidget {
               children: [IconTextChip(text: manga.artist)],
             ),
             if (extdata != null)
+              for (final extra
+                  in extdata.mangaInfo.extras ?? const <MangaInfoExtra>[])
+                if (extra
+                    case MangaInfoStaffSection(
+                      :final id,
+                      :final title,
+                      :final items,
+                    )
+                    when items.isNotEmpty)
+                  MultiChildExpansionTile(
+                    title: title,
+                    children: [
+                      for (final item in items)
+                        ButtonChip(
+                          text: item.staff.title,
+                          onPressed: () => _searchStaffMember(
+                            context,
+                            ref,
+                            series: series,
+                            source: source,
+                            filterId: id,
+                            value: item.id,
+                          ),
+                        ),
+                    ],
+                  ),
+            if (extdata != null)
               for (final tagsec
                   in (extdata.mangaInfo.tagGroups ?? <TagSection>[]))
                 MultiChildExpansionTile(
@@ -494,6 +537,123 @@ class _WebMetadataList extends StatelessWidget {
       ],
     );
   }
+}
+
+/// The extension's relation sections, each as a titled grid. Relation
+/// subtitles are not shown, matching the MangaDex related tab.
+class _WebRelatedView extends ConsumerWidget {
+  const _WebRelatedView({required this.series, required this.sections});
+
+  final WebSeriesRef series;
+  final List<MangaInfoRelationSection> sections;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gridExtent = ref.watch(
+      gagakuSettingsProvider.select((c) => c.gridAlbumExtent),
+    );
+
+    return WebMangaListWidget(
+      physics: const AlwaysScrollableScrollPhysics(),
+      noController: true,
+      showToggle: false,
+      title: Text(sections.first.title, style: CommonTextStyles.twentyfour),
+      children: [
+        for (final (index, section) in sections.indexed) ...[
+          if (index > 0)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 10.0,
+                ),
+                child: Text(section.title, style: CommonTextStyles.twentyfour),
+              ),
+            ),
+          SliverGrid.builder(
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: gridExtent.grid,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 0.7,
+            ),
+            itemCount: section.items.length,
+            itemBuilder: (context, index) {
+              final item = section.items[index];
+              return GridMangaItem(
+                key: ValueKey(item.id),
+                link: HistoryLink.fromSeries(
+                  title: item.title,
+                  cover: item.imageUrl,
+                  series: WebSeriesRef.extension(
+                    sourceId: series.sourceId,
+                    mangaId: item.id,
+                  ),
+                ),
+                showFavoriteButton: true,
+                showRemoveButton: false,
+                showSearchButton: false,
+              );
+            },
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Opens search for a staff item. The advanced search form's input row named
+/// [filterId] is set to [value] as if typed there; without such a row,
+/// [value] is searched as a title.
+Future<void> _searchStaffMember(
+  BuildContext context,
+  WidgetRef ref, {
+  required WebSeriesRef series,
+  required WebSourceInfo? source,
+  required String filterId,
+  required String value,
+}) async {
+  var query = SearchQuery(title: value);
+
+  if (source != null) {
+    try {
+      final notifier = ref.read(extensionSourceProvider(source.id).notifier);
+      final form = await notifier.hasAdvancedSearchForm()
+          ? await notifier.getAdvancedSearchForm(const SearchQuery(title: ''))
+          : null;
+      if (form != null) {
+        try {
+          await form.call('formDidAppear');
+          final row = (await form.sections)
+              .expand((section) => section.items)
+              .whereType<InputRowElement>()
+              .firstWhereOrNull((row) => row.id == filterId);
+          if (row != null) {
+            await notifier.callBinding(row.onValueChange, [value]);
+            await form.formDidSubmit();
+            query = SearchQuery(
+              title: '',
+              metadata: await form.getSearchQueryMetadata(),
+            );
+          }
+        } finally {
+          await form.call('formDidDisappear');
+          await form.uninitialize();
+        }
+      }
+    } catch (e, stackTrace) {
+      logger.w(
+        'Staff filter $filterId failed for ${series.sourceId}; '
+        'searching by title',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      query = SearchQuery(title: value);
+    }
+  }
+
+  if (!context.mounted) return;
+  ExtensionSearchRoute(initialSource: source, query: query).push(context);
 }
 
 class _WebShareChip extends HookConsumerWidget {
