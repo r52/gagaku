@@ -73,7 +73,7 @@ dependencies:
   markdown: ^7.3.1
   slang: ^4.6.0
   slang_flutter: ^4.6.0
-  cronet_http: ^1.9.0
+  cronet_http: ^1.10.2
   dio: ^5.8.0+1
   fresh_dio: ^0.6.0
   native_dio_adapter: ^1.4.0
